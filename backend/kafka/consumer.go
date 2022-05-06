@@ -2,10 +2,10 @@ package kafka
 
 import (
 	"context"
-	"log"
 	"sync"
 
 	"github.com/Shopify/sarama"
+	log "github.com/sirupsen/logrus"
 
 	"der-ems/config"
 )
@@ -23,8 +23,13 @@ func (consumerGroupHandler) Cleanup(_ sarama.ConsumerGroupSession) error {
 
 func (h consumerGroupHandler) ConsumeClaim(sess sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
 	for msg := range claim.Messages() {
-		log.Printf("[Consumer] topic:%q partition:%d offset:%d\n", msg.Topic, msg.Partition, msg.Offset)
-		log.Printf("value: %s\n", string(msg.Value))
+		log.WithFields(log.Fields{
+			"topic":     msg.Topic,
+			"partition": msg.Partition,
+			"offset":    msg.Offset,
+			"value":     string(msg.Value),
+		}).Info("consuming")
+
 		// Mark a message as consumed
 		sess.MarkMessage(msg, "")
 	}
@@ -45,7 +50,7 @@ func ConsumerWorker(topics []string, group string) {
 		group,
 		saramaConfig)
 	if err != nil {
-		log.Fatal("NewConsumerGroup err: ", err)
+		log.Fatal("err NewConsumerGroup: ", err)
 	}
 	defer cg.Close()
 
@@ -55,10 +60,10 @@ func ConsumerWorker(topics []string, group string) {
 		defer wg.Done()
 		handler := consumerGroupHandler{}
 		for {
-			log.Println("Running: ConsumerWorker")
+			log.Info("running: ConsumerWorker")
 			err = cg.Consume(ctx, topics, handler)
 			if err != nil {
-				log.Println("Consume err: ", err)
+				log.Error("err Consume: ", err)
 			}
 
 			if ctx.Err() != nil {

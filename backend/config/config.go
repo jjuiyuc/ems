@@ -1,8 +1,7 @@
 package config
 
 import (
-	"log"
-
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
@@ -20,7 +19,7 @@ func Init(dir, env string) {
 	config.AddConfigPath(dir)
 
 	if err := config.ReadInConfig(); err != nil {
-		log.Fatal(err)
+		log.Fatal("err ReadInConfig: ", err)
 	}
 }
 

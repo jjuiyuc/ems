@@ -1,0 +1,4 @@
+---
+kafka:
+  topic:
+    receiveWeatherData: "open-data.weather.ctc.forecast.0"

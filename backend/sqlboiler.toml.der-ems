@@ -1,0 +1,15 @@
+pkgname  = "deremsmodels"
+output   = "models/der-ems"
+wipe     = true
+no-tests = true
+no-context = true
+no-hooks = true
+
+[mysql]
+dbname  = "ems_dev"
+host    = "0.0.0.0"
+port    = 3306
+user    = "ubiik"
+pass    = "testing123"
+sslmode = "false"
+whitelist = ["weather_forecast"]

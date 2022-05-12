@@ -103,7 +103,7 @@ func (h consumerGroupHandler) ConsumeClaim(sess sarama.ConsumerGroupSession, cla
 		}).Info("consuming")
 
 		if msg.Topic == config.GetString("kafka.topic.receiveWeatherData") {
-			processWeatherData(msg.Value)
+			ProcessWeatherData(msg.Value)
 		}
 
 		// Mark a message as consumed
@@ -150,7 +150,7 @@ func ConsumerWorker(topics []string, group string) {
 	wg.Wait()
 }
 
-func processWeatherData(msg []byte) {
+func ProcessWeatherData(msg []byte) {
 	log.Debug("processWeatherData")
 	var latestWeather LatestWeather
 	err := json.Unmarshal(msg, &latestWeather)

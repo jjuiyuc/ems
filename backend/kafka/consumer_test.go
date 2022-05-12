@@ -4,11 +4,15 @@ import (
 	"testing"
 
 	"der-ems/config"
+	"der-ems/models"
 	"der-ems/testutils"
+
 	"github.com/Shopify/sarama"
 	"github.com/Shopify/sarama/mocks"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
+
+	deremsmodels "der-ems/models/der-ems"
 )
 
 type ConsumerSuite struct {
@@ -21,6 +25,10 @@ func Test_Consumer(t *testing.T) {
 
 func (s *ConsumerSuite) SetupSuite() {
 	config.Init(testutils.GetConfigDir(), "ut.yaml")
+	models.Init()
+
+	// truncate data
+	models.GetDeremsDB().Exec("truncate table weather_forecast")
 }
 
 func (s *ConsumerSuite) Test_ReceiveWeatherData() {
@@ -38,7 +46,7 @@ func (s *ConsumerSuite) Test_ReceiveWeatherData() {
 		"alt":100,
 		"values":[
 			{
-				"validDate":"2022-04-19T12:00:00",
+				"validDate":"2022-04-19T12:00:00Z",
 				"acpcpsfc":0.125,
 				"capesfc":1.0,
 				"cpratavesfc":"6.960000064282212e-06",
@@ -75,9 +83,9 @@ func (s *ConsumerSuite) Test_ReceiveWeatherData() {
 		log.Fatal("err ConsumePartition: ", err)
 	}
 	testMsg := <-test.Messages()
-	s.Equal(testMsg.Topic, config.GetString("kafka.topic.receiveWeatherData"))
-	s.Equal(testMsg.Partition, seedUtPartition)
-	s.Equal(string(testMsg.Value), seedUtMsg)
+	s.Equal(config.GetString("kafka.topic.receiveWeatherData"), testMsg.Topic)
+	s.Equal(seedUtPartition, testMsg.Partition)
+	s.Equal(seedUtMsg, string(testMsg.Value))
 
 	log.WithFields(log.Fields{
 		"topic":     testMsg.Topic,
@@ -86,5 +94,7 @@ func (s *ConsumerSuite) Test_ReceiveWeatherData() {
 		"value":     string(testMsg.Value),
 	}).Info("consuming")
 
-	// TODO: Call function to parse weather data then save it to database
+	ProcessWeatherData(testMsg.Value)
+	count, _ := deremsmodels.WeatherForecasts().Count(models.GetDeremsDB())
+	s.Equal(1, int(count))
 }

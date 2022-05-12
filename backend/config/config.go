@@ -21,6 +21,10 @@ func Init(dir, env string) {
 	if err := config.ReadInConfig(); err != nil {
 		log.Fatal("err ReadInConfig: ", err)
 	}
+
+	if config.GetBool("log.debug") == true {
+		log.SetLevel(log.DebugLevel)
+	}
 }
 
 // GetConfig return config instance

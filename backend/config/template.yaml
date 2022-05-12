@@ -4,6 +4,8 @@ kafka:
   consumerGroupID: "group1"
   topic:
     receiveWeatherData: "open-data.weather.ctc.forecast.0"
+log:
+  debug: true
 server:
   debug: false
 db:

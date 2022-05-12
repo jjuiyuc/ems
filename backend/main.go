@@ -5,6 +5,7 @@ import (
 
 	"der-ems/config"
 	"der-ems/kafka"
+	"der-ems/models"
 )
 
 func main() {
@@ -13,6 +14,7 @@ func main() {
 	flag.Parse()
 
 	config.Init(*dir, *env)
+	models.Init()
 
 	kafka.ConsumerWorker(
 		[]string{config.GetConfig().GetString("kafka.topic.receiveWeatherData")},

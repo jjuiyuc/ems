@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	deremsDB *sql.DB
+	db *sql.DB
 )
 
 // Init database
@@ -20,7 +20,7 @@ func Init() {
 	config := config.GetConfig()
 	boil.DebugMode = config.GetBool("server.debug")
 
-	deremsDB, err = sql.Open(
+	db, err = sql.Open(
 		config.GetString("db.derems.driver"),
 		config.GetString("db.derems.connection"),
 	)
@@ -29,6 +29,6 @@ func Init() {
 	}
 }
 
-func GetDeremsDB() *sql.DB {
-	return deremsDB
+func GetDB() *sql.DB {
+	return db
 }

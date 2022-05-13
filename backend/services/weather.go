@@ -11,19 +11,20 @@ import (
 )
 
 func UpsertWeatherForecast(weatherForecast *deremsmodels.WeatherForecast) (err error) {
-	mods := make([]qm.QueryMod, 0)
-	mods = append(mods, qm.Where("lat = ?", weatherForecast.Lat))
-	mods = append(mods, qm.Where("lng = ?", weatherForecast.LNG))
-	mods = append(mods, qm.Where("valid_date = ?", weatherForecast.ValidDate))
+	mods := []qm.QueryMod{
+		qm.Where("lat = ?", weatherForecast.Lat),
+		qm.Where("lng = ?", weatherForecast.Lng),
+		qm.Where("valid_date = ?", weatherForecast.ValidDate),
+	}
 
 	var weatherForecastReturn *deremsmodels.WeatherForecast
-	weatherForecastReturn, err = deremsmodels.WeatherForecasts(mods...).One(models.GetDeremsDB())
+	weatherForecastReturn, err = deremsmodels.WeatherForecasts(mods...).One(models.GetDB())
 	if err != nil {
-		err = weatherForecast.Insert(models.GetDeremsDB(), boil.Infer())
+		err = weatherForecast.Insert(models.GetDB(), boil.Infer())
 	} else {
 		weatherForecast.ID = weatherForecastReturn.ID
 		weatherForecast.UpdatedAt = time.Now()
-		_, err = weatherForecast.Update(models.GetDeremsDB(), boil.Infer())
+		_, err = weatherForecast.Update(models.GetDB(), boil.Infer())
 	}
 	return
 }

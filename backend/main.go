@@ -16,7 +16,7 @@ func main() {
 	config.Init(*dir, *env)
 	models.Init()
 
-	kafka.ConsumerWorker(
-		[]string{config.GetConfig().GetString("kafka.topic.receiveWeatherData")},
+	kafka.WeatherConsumerWorker(
+		[]string{kafka.ReceiveWeatherData},
 		config.GetConfig().GetString("kafka.consumerGroupID"))
 }

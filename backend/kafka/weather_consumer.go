@@ -92,8 +92,6 @@ func (consumerGroupHandler) Cleanup(_ sarama.ConsumerGroupSession) error {
 }
 
 func (h consumerGroupHandler) ConsumeClaim(sess sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
-	config := config.GetConfig()
-
 	for msg := range claim.Messages() {
 		log.WithFields(log.Fields{
 			"topic":     msg.Topic,
@@ -102,7 +100,7 @@ func (h consumerGroupHandler) ConsumeClaim(sess sarama.ConsumerGroupSession, cla
 			"value":     string(msg.Value),
 		}).Info("consuming")
 
-		if msg.Topic == config.GetString("kafka.topic.receiveWeatherData") {
+		if msg.Topic == ReceiveWeatherData {
 			ProcessWeatherData(msg.Value)
 		}
 
@@ -112,7 +110,7 @@ func (h consumerGroupHandler) ConsumeClaim(sess sarama.ConsumerGroupSession, cla
 	return nil
 }
 
-func ConsumerWorker(topics []string, group string) {
+func WeatherConsumerWorker(topics []string, group string) {
 	config := config.GetConfig()
 	// Init sarama config
 	saramaConfig := sarama.NewConfig()
@@ -136,7 +134,7 @@ func ConsumerWorker(topics []string, group string) {
 		defer wg.Done()
 		handler := consumerGroupHandler{}
 		for {
-			log.Info("running: ConsumerWorker")
+			log.Info("running: WeatherConsumerWorker")
 			err = cg.Consume(ctx, topics, handler)
 			if err != nil {
 				log.Error("err Consume: ", err)
@@ -202,7 +200,7 @@ func ProcessWeatherData(msg []byte) {
 
 		weatherForecast := &deremsmodels.WeatherForecast{
 			Lat:       latestWeather.Lat,
-			LNG:       latestWeather.Lng,
+			Lng:       latestWeather.Lng,
 			Alt:       null.NewFloat32(latestWeather.Alt, true),
 			ValidDate: t,
 			Data:      null.NewJSON(dbWeatherDataFieldJson, true),
@@ -211,7 +209,7 @@ func ProcessWeatherData(msg []byte) {
 		log.WithFields(log.Fields{
 			"i":            i,
 			"Lat":          weatherForecast.Lat,
-			"LNG":          weatherForecast.LNG,
+			"Lng":          weatherForecast.Lng,
 			"Alt":          weatherForecast.Alt,
 			"ValidDate":    weatherForecast.ValidDate,
 			"string(Data)": string(weatherForecast.Data.JSON),

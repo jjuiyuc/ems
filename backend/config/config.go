@@ -22,8 +22,8 @@ func Init(dir, env string) {
 		log.Fatal("err ReadInConfig: ", err)
 	}
 
-	if config.GetBool("log.debug") == true {
-		log.SetLevel(log.DebugLevel)
+	if level, err := log.ParseLevel(config.GetString("log.level")); err == nil {
+		log.SetLevel(level)
 	}
 }
 

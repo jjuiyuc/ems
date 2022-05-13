@@ -5,6 +5,11 @@ no-tests = true
 no-context = true
 no-hooks = true
 
+[aliases.tables]
+  name = "weather_forecast"
+  [aliases.tables.weather_forecast.columns]
+  lng = "Lng"
+
 [mysql]
 dbname  = "ems_dev"
 host    = "0.0.0.0"

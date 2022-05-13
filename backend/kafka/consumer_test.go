@@ -28,11 +28,10 @@ func (s *ConsumerSuite) SetupSuite() {
 	models.Init()
 
 	// truncate data
-	models.GetDeremsDB().Exec("truncate table weather_forecast")
+	models.GetDB().Exec("truncate table weather_forecast")
 }
 
 func (s *ConsumerSuite) Test_ReceiveWeatherData() {
-	config := config.GetConfig()
 	consumer := mocks.NewConsumer(s.T(), mocks.NewTestConfig())
 	defer func() {
 		if err := consumer.Close(); err != nil {
@@ -76,14 +75,14 @@ func (s *ConsumerSuite) Test_ReceiveWeatherData() {
 		]
 	}`
 	var seedUtPartition int32 = 0
-	consumer.ExpectConsumePartition(config.GetString("kafka.topic.receiveWeatherData"), seedUtPartition, sarama.OffsetOldest).YieldMessage(&sarama.ConsumerMessage{Value: []byte(seedUtMsg)})
+	consumer.ExpectConsumePartition(ReceiveWeatherData, seedUtPartition, sarama.OffsetOldest).YieldMessage(&sarama.ConsumerMessage{Value: []byte(seedUtMsg)})
 
-	test, err := consumer.ConsumePartition(config.GetString("kafka.topic.receiveWeatherData"), seedUtPartition, sarama.OffsetOldest)
+	test, err := consumer.ConsumePartition(ReceiveWeatherData, seedUtPartition, sarama.OffsetOldest)
 	if err != nil {
 		log.Fatal("err ConsumePartition: ", err)
 	}
 	testMsg := <-test.Messages()
-	s.Equal(config.GetString("kafka.topic.receiveWeatherData"), testMsg.Topic)
+	s.Equal(ReceiveWeatherData, testMsg.Topic)
 	s.Equal(seedUtPartition, testMsg.Partition)
 	s.Equal(seedUtMsg, string(testMsg.Value))
 
@@ -95,6 +94,6 @@ func (s *ConsumerSuite) Test_ReceiveWeatherData() {
 	}).Info("consuming")
 
 	ProcessWeatherData(testMsg.Value)
-	count, _ := deremsmodels.WeatherForecasts().Count(models.GetDeremsDB())
+	count, _ := deremsmodels.WeatherForecasts().Count(models.GetDB())
 	s.Equal(1, int(count))
 }

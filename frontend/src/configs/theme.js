@@ -1,4 +1,5 @@
-import { createTheme } from "@mui/material/styles"
+import {createTheme} from "@mui/material/styles"
+import palette from "./palette"
 
 const theme = createTheme({
     components: {
@@ -7,7 +8,9 @@ const theme = createTheme({
                 root: {
                     color: "white",
                     fontSize: "1rem",
-                    textTransform: "none"
+                    textTransform: "none",
+                    transitionDuration: ".5s",
+                    transitionProperty: "background-color, opacity"
                 }
             },
             variants: [
@@ -33,22 +36,51 @@ const theme = createTheme({
                 }
             ]
         },
+        MuiFormHelperText: {
+            styleOverrides: {
+                root: {
+                   fontSize: ".8125rem",
+                   lineHeight: "1.5374",
+                   marginTop: ".5rem"
+                }
+            }
+        },
         MuiInputBase: {
             styleOverrides: {
                 root: {
                     borderRadius: "16px !important",
-                }
+                    color: "white",
+                    "fieldset": {transition: "border-color .5s"}
+                },
+                input: ({ownerState, theme}) => ({
+                    "&:-webkit-autofill": {
+                        boxShadow: `0 0 0 100.09px ${theme.palette.gray[600]} inset !important`
+                    }
+                })
+            }
+        },
+        MuiInputLabel: {
+            styleOverrides: {
+                root: ({ownerState, theme}) => ({
+                    color: theme.palette.gray[300]
+                })
             }
         },
         MuiTextField: {
             styleOverrides: {
                 root: {
-                    "& fieldset": {
-                        transition: "border-color .2s"
-                    }
+                    marginBottom: "2rem"
                 }
             },
             variants: [
+                {
+                    props: {font: "mono"},
+                    style: {
+                        "input": {
+                            fontFamily: `Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace`
+                        }
+                    }
+                },
                 {
                     props: {variant: "outlined"},
                     style: props => ({
@@ -61,27 +93,13 @@ const theme = createTheme({
         }
     },
     palette: {
+        ...palette,
         background: {default: "#1C1C1E"},
-        black: {main: "#020202"},
-        blue: {main: "#43B0FF"},
-        gray: {
-            200: "#E0E0E0",
-            300: "#BDBDBD",
-            400: "#606060",
-            500: "#404040",
-            600: "#303034",
-            700: "#262628",
-            800: "#232325",
-            900: "#1C1C1E"
-        },
-        green: {main: "#14EEC7"},
-        indigo: {main: "#7357FF"},
-        error: {main: "#FF4E3E"},
         mode: "dark",
-        primary: {main: "#12C9C9"},
-        purple: {main: "#EF7BE3"},
-        success: {main: "#0FD76B"},
-        yellow: {main: "#FFDA15"}
+        text: {"primary": "#E0E0E0"}
+    },
+    typography: {
+        "fontFamily": `"Roboto", "Noto Sans TC", "Helvetica", "Arial", sans-serif`
     }
 })
 

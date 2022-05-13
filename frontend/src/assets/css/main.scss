@@ -1,0 +1,25 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+TC&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+a:not([class^="MuiButton"]){
+    @apply text-primary-main transition-colors;
+
+    &:hover {
+        @apply text-primary-700;
+    }
+}
+h1 {
+    @apply font-bold text-gray-200 text-3xl sm:text-3.5xl;
+}
+h3 {
+    @apply font-bold text-xl sm:text-2xl;
+}
+h6 {
+    @apply text-gray-300 text-sm;
+}
+.box {
+    @apply border border-gray-500 px-6 py-4 rounded-3xl;
+}

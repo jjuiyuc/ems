@@ -1,0 +1,36 @@
+{
+    "common": {
+        "copyright": "© 2022 Ubiik Inc. All rights reserved",
+        "login": "Log In",
+        "passwordRule": "Password must be at least six characters long, and include 3 out of 4 of the following: uppercase letter, lowercase letter, numeric character and special character."
+    },
+    "error": {
+        "emailFormat": "Email is incorrect, please try again.",
+        "emailNotExist": "Account does not exist, please try again.",
+        "passwordFormat": "Password must meet complexity requirements, please try again.",
+        "passwordIncorrect": "Password is incorrect, please try again.",
+        "passwordNotMatch": "Password does not match, please try again."
+    },
+    "forgotPassword": {
+        "backToLogin": "Back to Login",
+        "forgotPassword": "Forgot Password",
+        "resetPassword": "Reset Password",
+        "sentResetLink": "We've just sent password reset link to {email}. Please check your inbox and spam folders."
+    },
+    "form": {
+        "confirmPassword": "Confirm Password",
+        "email": "Email",
+        "language": "Language",
+        "newPassword": "New Password",
+        "password": "Password"
+    },
+    "login": {
+        "forgotPassword": "Forgot Password?"
+    },
+    "resetPassword": {
+        "hasReset": "Your password has been reset.",
+        "loginWithNewPassword": "Please log in with your new password.",
+        "reset": "Reset",
+        "resetPassword": "Reset Password"
+    }
+}

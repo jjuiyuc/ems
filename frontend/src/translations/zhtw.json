@@ -1,0 +1,36 @@
+{
+    "common": {
+        "copyright": "© 2022 Ubiik Inc. All rights reserved",
+        "login": "登入",
+        "passwordRule": "密碼長度至少為 8 個字元，且必須包含下列 4 種字元中的 3 種：英文大寫字元、英文小寫字元、數字、特殊符號。"
+    },
+    "error": {
+        "emailFormat": "Email 帳號格式錯誤，請重新輸入。",
+        "emailNotExist": "帳號不存在，請重新輸入。",
+        "passwordFormat": "您輸入的密碼不符合密碼原則的要求，請重新輸入。",
+        "passwordIncorrect": "密碼錯誤，請重新輸入。",
+        "passwordNotMatch": "密碼不一致，請重新輸入。"
+    },
+    "forgotPassword": {
+        "backToLogin": "回登入頁",
+        "forgotPassword": "忘記密碼",
+        "resetPassword": "重設密碼",
+        "sentResetLink": "重設密碼連結已寄送至信箱「{email}」。請檢查信箱收件匣或是垃圾郵件匣。"
+    },
+    "form": {
+        "confirmPassword": "確認密碼",
+        "email": "Email",
+        "language": "語言",
+        "newPassword": "新密碼",
+        "password": "密碼"
+    },
+    "login": {
+        "forgotPassword": "忘記密碼？"
+    },
+    "resetPassword": {
+        "hasReset": "密碼已重置",
+        "loginWithNewPassword": "請以新密碼登入。",
+        "reset": "重設",
+        "resetPassword": "重設密碼"
+    }
+}

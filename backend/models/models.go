@@ -4,6 +4,7 @@ import (
 	"database/sql"
 
 	_ "github.com/go-sql-driver/mysql"
+	log "github.com/sirupsen/logrus"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 
 	"der-ems/config"
@@ -25,7 +26,10 @@ func Init() {
 		config.GetString("db.derems.connection"),
 	)
 	if err != nil {
-		panic(err)
+		log.WithFields(log.Fields{
+			"caused-by": "sql.Open",
+			"err":       err,
+		}).Panic()
 	}
 }
 

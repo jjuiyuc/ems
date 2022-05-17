@@ -35,7 +35,10 @@ func (s *ConsumerSuite) Test_ReceiveWeatherData() {
 	consumer := mocks.NewConsumer(s.T(), mocks.NewTestConfig())
 	defer func() {
 		if err := consumer.Close(); err != nil {
-			log.Error("err Close: ", err)
+			log.WithFields(log.Fields{
+				"caused-by": "consumer.Close",
+				"err":       err,
+			}).Error()
 		}
 	}()
 
@@ -79,7 +82,10 @@ func (s *ConsumerSuite) Test_ReceiveWeatherData() {
 
 	test, err := consumer.ConsumePartition(ReceiveWeatherData, seedUtPartition, sarama.OffsetOldest)
 	if err != nil {
-		log.Fatal("err ConsumePartition: ", err)
+		log.WithFields(log.Fields{
+			"caused-by": "consumer.ConsumePartition",
+			"err":       err,
+		}).Fatal()
 	}
 	testMsg := <-test.Messages()
 	s.Equal(ReceiveWeatherData, testMsg.Topic)

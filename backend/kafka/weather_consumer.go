@@ -67,7 +67,10 @@ func WeatherConsumerWorker(topics []string, group string) {
 		group,
 		saramaConfig)
 	if err != nil {
-		log.Fatal("err NewConsumerGroup: ", err)
+		log.WithFields(log.Fields{
+			"caused-by": "sarama.NewConsumerGroup",
+			"err":       err,
+		}).Fatal()
 	}
 	defer cg.Close()
 
@@ -80,7 +83,10 @@ func WeatherConsumerWorker(topics []string, group string) {
 			log.Info("running: WeatherConsumerWorker")
 			err = cg.Consume(ctx, topics, handler)
 			if err != nil {
-				log.Error("err Consume: ", err)
+				log.WithFields(log.Fields{
+					"caused-by": "cg.Consume",
+					"err":       err,
+				}).Error()
 			}
 
 			if ctx.Err() != nil {
@@ -96,7 +102,10 @@ func ProcessWeatherData(msg []byte) {
 	var latestWeather LatestWeather
 	err := json.Unmarshal(msg, &latestWeather)
 	if err != nil {
-		log.Error("err json.Unmarshal: ", err)
+		log.WithFields(log.Fields{
+			"caused-by": "json.Unmarshal",
+			"err":       err,
+		}).Error()
 		return
 	}
 
@@ -131,7 +140,10 @@ func ProcessWeatherData(msg []byte) {
 		}).Debug("upsert weatherForecast data")
 		err = services.UpsertWeatherForecast(weatherForecast)
 		if err != nil {
-			log.Error("err UpsertWeatherForecast: ", err)
+			log.WithFields(log.Fields{
+				"caused-by": "services.UpsertWeatherForecast",
+				"err":       err,
+			}).Error()
 		}
 	}
 }

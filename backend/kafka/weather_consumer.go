@@ -111,14 +111,22 @@ func ProcessWeatherData(msg []byte) {
 
 	for i, data := range latestWeather.Values {
 		const validDate = "validDate"
-		var t time.Time
 
-		for key, value := range data {
-			if key == validDate {
-				t, _ = time.Parse(time.RFC3339, fmt.Sprintf("%v", value))
-				break
-			}
+		dt, _ := data[validDate]
+		if dt == nil {
+			log.WithFields(log.Fields{
+				"caused-by": "data[validDate]",
+			}).Error()
+			return
 		}
+		if dt, err = time.Parse(time.RFC3339, fmt.Sprintf("%v", dt)); err != nil {
+			log.WithFields(log.Fields{
+				"caused-by": "time.Parse",
+				"err":       err,
+			}).Error()
+			return
+		}
+
 		delete(data, validDate)
 		dataJson, _ := json.Marshal(data)
 
@@ -126,7 +134,7 @@ func ProcessWeatherData(msg []byte) {
 			Lat:       latestWeather.Lat,
 			Lng:       latestWeather.Lng,
 			Alt:       null.NewFloat32(latestWeather.Alt, true),
-			ValidDate: t,
+			ValidDate: dt.(time.Time),
 			Data:      null.NewJSON(dataJson, true),
 		}
 

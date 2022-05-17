@@ -3,7 +3,7 @@ kafka:
   topic:
     receiveWeatherData: "open-data.weather.ctc.forecast.0"
 log:
-  debug: true
+  level: "debug"
 server:
   debug: true
 db:

@@ -1,6 +1,6 @@
 ---
 kafka:
-  broker: "10.5.10.24:9092"
+  broker: "localhost:9092"
   consumerGroupID: "group1"
 log:
   level: "debug"

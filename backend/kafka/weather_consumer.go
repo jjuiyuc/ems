@@ -13,7 +13,7 @@ import (
 
 	"der-ems/config"
 	deremsmodels "der-ems/models/der-ems"
-	"der-ems/services"
+	"der-ems/repository"
 )
 
 type LatestWeather struct {
@@ -146,10 +146,10 @@ func ProcessWeatherData(msg []byte) {
 			"ValidDate":    weatherForecast.ValidDate,
 			"string(Data)": string(weatherForecast.Data.JSON),
 		}).Debug("upsert weatherForecast data")
-		err = services.UpsertWeatherForecast(weatherForecast)
+		err = repository.UpsertWeatherForecast(weatherForecast)
 		if err != nil {
 			log.WithFields(log.Fields{
-				"caused-by": "services.UpsertWeatherForecast",
+				"caused-by": "repository.UpsertWeatherForecast",
 				"err":       err,
 			}).Error()
 		}

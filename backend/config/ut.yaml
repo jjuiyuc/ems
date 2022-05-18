@@ -2,3 +2,11 @@
 kafka:
   topic:
     receiveWeatherData: "open-data.weather.ctc.forecast.0"
+log:
+  level: "debug"
+server:
+  debug: true
+db:
+  derems:
+    driver: mysql
+    connection: "ubiik:testing123@tcp(0.0.0.0:3306)/ems_dev?parseTime=true"

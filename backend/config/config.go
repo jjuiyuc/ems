@@ -19,7 +19,14 @@ func Init(dir, env string) {
 	config.AddConfigPath(dir)
 
 	if err := config.ReadInConfig(); err != nil {
-		log.Fatal("err ReadInConfig: ", err)
+		log.WithFields(log.Fields{
+			"caused-by": "config.ReadInConfig",
+			"err":       err,
+		}).Fatal()
+	}
+
+	if level, err := log.ParseLevel(config.GetString("log.level")); err == nil {
+		log.SetLevel(level)
 	}
 }
 

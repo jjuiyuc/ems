@@ -4,11 +4,15 @@ import (
 	"testing"
 
 	"der-ems/config"
+	"der-ems/models"
 	"der-ems/testutils"
+
 	"github.com/Shopify/sarama"
 	"github.com/Shopify/sarama/mocks"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
+
+	deremsmodels "der-ems/models/der-ems"
 )
 
 type ConsumerSuite struct {
@@ -21,14 +25,20 @@ func Test_Consumer(t *testing.T) {
 
 func (s *ConsumerSuite) SetupSuite() {
 	config.Init(testutils.GetConfigDir(), "ut.yaml")
+	models.Init()
+
+	// truncate data
+	models.GetDB().Exec("truncate table weather_forecast")
 }
 
 func (s *ConsumerSuite) Test_ReceiveWeatherData() {
-	config := config.GetConfig()
 	consumer := mocks.NewConsumer(s.T(), mocks.NewTestConfig())
 	defer func() {
 		if err := consumer.Close(); err != nil {
-			log.Error("err Close: ", err)
+			log.WithFields(log.Fields{
+				"caused-by": "consumer.Close",
+				"err":       err,
+			}).Error()
 		}
 	}()
 
@@ -38,7 +48,7 @@ func (s *ConsumerSuite) Test_ReceiveWeatherData() {
 		"alt":100,
 		"values":[
 			{
-				"validDate":"2022-04-19T12:00:00",
+				"validDate":"2022-04-19T12:00:00Z",
 				"acpcpsfc":0.125,
 				"capesfc":1.0,
 				"cpratavesfc":"6.960000064282212e-06",
@@ -68,16 +78,19 @@ func (s *ConsumerSuite) Test_ReceiveWeatherData() {
 		]
 	}`
 	var seedUtPartition int32 = 0
-	consumer.ExpectConsumePartition(config.GetString("kafka.topic.receiveWeatherData"), seedUtPartition, sarama.OffsetOldest).YieldMessage(&sarama.ConsumerMessage{Value: []byte(seedUtMsg)})
+	consumer.ExpectConsumePartition(ReceiveWeatherData, seedUtPartition, sarama.OffsetOldest).YieldMessage(&sarama.ConsumerMessage{Value: []byte(seedUtMsg)})
 
-	test, err := consumer.ConsumePartition(config.GetString("kafka.topic.receiveWeatherData"), seedUtPartition, sarama.OffsetOldest)
+	test, err := consumer.ConsumePartition(ReceiveWeatherData, seedUtPartition, sarama.OffsetOldest)
 	if err != nil {
-		log.Fatal("err ConsumePartition: ", err)
+		log.WithFields(log.Fields{
+			"caused-by": "consumer.ConsumePartition",
+			"err":       err,
+		}).Fatal()
 	}
 	testMsg := <-test.Messages()
-	s.Equal(testMsg.Topic, config.GetString("kafka.topic.receiveWeatherData"))
-	s.Equal(testMsg.Partition, seedUtPartition)
-	s.Equal(string(testMsg.Value), seedUtMsg)
+	s.Equal(ReceiveWeatherData, testMsg.Topic)
+	s.Equal(seedUtPartition, testMsg.Partition)
+	s.Equal(seedUtMsg, string(testMsg.Value))
 
 	log.WithFields(log.Fields{
 		"topic":     testMsg.Topic,
@@ -86,5 +99,7 @@ func (s *ConsumerSuite) Test_ReceiveWeatherData() {
 		"value":     string(testMsg.Value),
 	}).Info("consuming")
 
-	// TODO: Call function to parse weather data then save it to database
+	ProcessWeatherData(testMsg.Value)
+	count, _ := deremsmodels.WeatherForecasts().Count(models.GetDB())
+	s.Equal(1, int(count))
 }

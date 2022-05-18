@@ -9,6 +9,10 @@ no-hooks = true
   name = "weather_forecast"
   [aliases.tables.weather_forecast.columns]
   lng = "Lng"
+  name = "customer_info"
+  [aliases.tables.customer_info.columns]
+  lng = "Lng"
+  weather_lng = "WeatherLng"
 
 [mysql]
 dbname  = "ems_dev"
@@ -17,4 +21,4 @@ port    = 3306
 user    = "ubiik"
 pass    = "testing123"
 sslmode = "false"
-whitelist = ["weather_forecast"]
+whitelist = ["weather_forecast", "customer_info", "gateway", "device_model", "device"]

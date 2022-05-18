@@ -3,7 +3,9 @@ package apps
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/Shopify/sarama"
@@ -85,8 +87,15 @@ func (w *WeatherWorker) MainLoop() {
 
 func ProcessWeatherData(msg []byte) {
 	log.Debug("processWeatherData")
+	lat, lng, err := upsertWeatherData(msg)
+	if err == nil {
+		produceWeatherDataToLocalGW(lat, lng)
+	}
+}
+
+func upsertWeatherData(msg []byte) (lat, lng float32, err error) {
 	var latestWeather LatestWeather
-	err := json.Unmarshal(msg, &latestWeather)
+	err = json.Unmarshal(msg, &latestWeather)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "json.Unmarshal",
@@ -100,8 +109,10 @@ func ProcessWeatherData(msg []byte) {
 
 		dt, _ := data[validDate]
 		if dt == nil {
+			err = errors.New("data[validDate] is not in the map")
 			log.WithFields(log.Fields{
 				"caused-by": "data[validDate]",
+				"err":       err,
 			}).Error()
 			return
 		}
@@ -138,6 +149,83 @@ func ProcessWeatherData(msg []byte) {
 				"caused-by": "repository.UpsertWeatherForecast",
 				"err":       err,
 			}).Error()
+			return
 		}
 	}
+
+	lat = latestWeather.Lat
+	lng = latestWeather.Lng
+	return
+}
+
+func produceWeatherDataToLocalGW(lat, lng float32) (err error) {
+	// 1. Prepare the message content included the weather forecast for the rest of 30 hours
+	weatherForecastList, err := repository.GetWeatherForecastByLocation(lat, lng)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "repository.GetWeatherForecastByLocation",
+			"err":       err,
+		}).Error()
+		return
+	}
+	var latestWeather LatestWeather
+	for i, weatherForecast := range weatherForecastList {
+		const validDate = "validDate"
+		var value map[string]interface{}
+		if i == 0 {
+			latestWeather.Lat = weatherForecast.Lat
+			latestWeather.Lng = weatherForecast.Lng
+			latestWeather.Alt = weatherForecast.Alt.Float32
+		}
+
+		err = json.Unmarshal(weatherForecast.Data.JSON, &value)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"caused-by": "json.Unmarshal",
+				"err":       err,
+			}).Error()
+			return
+		}
+		value[validDate] = weatherForecast.ValidDate.Format(time.RFC3339)
+		latestWeather.Values = append(latestWeather.Values, value)
+	}
+	latestWeatherJson, _ := json.Marshal(latestWeather)
+
+	// 2. Search the matched gateway UUID list
+	var customerInfos []*deremsmodels.CustomerInfo
+	var gatewayUUIDList []string
+	customerInfos, err = repository.GetCustomerInfoListByLocation(lat, lng)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "repository.GetCustomerInfoListByLocation",
+			"err":       err,
+		}).Error()
+		return
+	}
+	for _, customerInfo := range customerInfos {
+		var gateways []*deremsmodels.Gateway
+		gateways, err := repository.GetGatewayListByCustomerID(customerInfo.ID)
+		if err != nil {
+			break
+		}
+		for _, gateway := range gateways {
+			gatewayUUIDList = append(gatewayUUIDList, gateway.UUID)
+		}
+	}
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "repository.GetGatewayUUIDListByLocation",
+			"err":       err,
+		}).Error()
+		return
+	}
+	log.Debug("gatewayUUIDList: ", gatewayUUIDList)
+
+	// 3. Send the weather forecast to matched gateways
+	for _, uuid := range gatewayUUIDList {
+		sendWeatherDatatoLocalGW := strings.Replace(kafka.SendWeatherDatatoLocalGWSample, "{gw-id}", uuid, 1)
+		log.Debug("sendWeatherDatatoLocalGW: ", sendWeatherDatatoLocalGW)
+		kafka.Produce(sendWeatherDatatoLocalGW, string(latestWeatherJson))
+	}
+	return
 }

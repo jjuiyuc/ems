@@ -28,3 +28,45 @@ func UpsertWeatherForecast(weatherForecast *deremsmodels.WeatherForecast) (err e
 	}
 	return
 }
+
+func GetWeatherForecastByLocation(lat, lng float32) (weatherForecastList []*deremsmodels.WeatherForecast, err error) {
+	mods := []qm.QueryMod{
+		qm.Where("lat = ?", lat),
+		qm.Where("lng = ?", lng),
+		qm.Where("(valid_date > ? and valid_date <= ?)", time.Now().UTC(), time.Now().UTC().Add(30*time.Hour)),
+	}
+
+	weatherForecastList, err = deremsmodels.WeatherForecasts(mods...).All(models.GetDB())
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+func GetCustomerInfoListByLocation(lat, lng float32) (customerInfos []*deremsmodels.CustomerInfo, err error) {
+	mods := []qm.QueryMod{
+		qm.Where("weather_lat = ?", lat),
+		qm.Where("weather_lng = ?", lng),
+	}
+
+	customerInfos, err = deremsmodels.CustomerInfos(mods...).All(models.GetDB())
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+func GetGatewayListByCustomerID(id int) (gateways []*deremsmodels.Gateway, err error) {
+	mods := []qm.QueryMod{
+		qm.Where("customer_id = ?", id),
+	}
+
+	gateways, err = deremsmodels.Gateways(mods...).All(models.GetDB())
+	if err != nil {
+		return
+	}
+
+	return
+}

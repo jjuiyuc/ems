@@ -3,9 +3,11 @@ package repository
 import (
 	"time"
 
+	"github.com/volatiletech/sqlboiler/queries"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 
+	"der-ems/infra"
 	"der-ems/models"
 	deremsmodels "der-ems/models/der-ems"
 )
@@ -29,44 +31,25 @@ func UpsertWeatherForecast(weatherForecast *deremsmodels.WeatherForecast) (err e
 	return
 }
 
-func GetWeatherForecastByLocation(lat, lng float32) (weatherForecastList []*deremsmodels.WeatherForecast, err error) {
-	mods := []qm.QueryMod{
+func GetWeatherForecastByLocation(lat, lng float32, startValidDate, endValidDate time.Time) (weatherForecast []*deremsmodels.WeatherForecast, err error) {
+	weatherForecast, err = deremsmodels.WeatherForecasts(
 		qm.Where("lat = ?", lat),
 		qm.Where("lng = ?", lng),
-		qm.Where("(valid_date > ? and valid_date <= ?)", time.Now().UTC(), time.Now().UTC().Add(30*time.Hour)),
-	}
-
-	weatherForecastList, err = deremsmodels.WeatherForecasts(mods...).All(models.GetDB())
-	if err != nil {
-		return
-	}
-
+		qm.Where("(valid_date > ? and valid_date <= ?)", startValidDate, endValidDate)).All(models.GetDB())
 	return
 }
 
-func GetCustomerInfoListByLocation(lat, lng float32) (customerInfos []*deremsmodels.CustomerInfo, err error) {
-	mods := []qm.QueryMod{
-		qm.Where("weather_lat = ?", lat),
-		qm.Where("weather_lng = ?", lng),
+func GetGatewaysByLocation(lat, lng float32) (gatewayUUIDs []string, err error) {
+	sql := `
+		SELECT gw.uuid
+		FROM gateway gw
+		JOIN customer_info c ON c.weather_lat = ? AND c.weather_lng = ?
+		WHERE gw.customer_id = c.id
+	`
+	var gateways []*deremsmodels.Gateway
+	err = queries.Raw(sql, lat, lng).Bind(infra.GetGracefulShutdownCtx(), models.GetDB(), &gateways)
+	for _, gateway := range gateways {
+		gatewayUUIDs = append(gatewayUUIDs, gateway.UUID)
 	}
-
-	customerInfos, err = deremsmodels.CustomerInfos(mods...).All(models.GetDB())
-	if err != nil {
-		return
-	}
-
-	return
-}
-
-func GetGatewayListByCustomerID(id int) (gateways []*deremsmodels.Gateway, err error) {
-	mods := []qm.QueryMod{
-		qm.Where("customer_id = ?", id),
-	}
-
-	gateways, err = deremsmodels.Gateways(mods...).All(models.GetDB())
-	if err != nil {
-		return
-	}
-
 	return
 }

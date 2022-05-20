@@ -87,13 +87,13 @@ func (w *WeatherWorker) MainLoop() {
 
 func ProcessWeatherData(msg []byte) {
 	log.Debug("processWeatherData")
-	lat, lng, err := upsertWeatherData(msg)
+	lat, lng, err := UpsertWeatherData(msg)
 	if err == nil {
 		publishWeatherDataToLocalGW(lat, lng)
 	}
 }
 
-func upsertWeatherData(msg []byte) (lat, lng float32, err error) {
+func UpsertWeatherData(msg []byte) (lat, lng float32, err error) {
 	var latestWeather LatestWeather
 	err = json.Unmarshal(msg, &latestWeather)
 	if err != nil {
@@ -159,18 +159,18 @@ func upsertWeatherData(msg []byte) (lat, lng float32, err error) {
 }
 
 func publishWeatherDataToLocalGW(lat, lng float32) {
-	latestWeatherJson, err := getWeatherDataByLocation(lat, lng)
+	latestWeatherJson, err := GetWeatherDataByLocation(lat, lng)
 	if err != nil {
 		return
 	}
-	gatewayUUIDs, err := getGateWayUUIDsByLocation(lat, lng)
+	gatewayUUIDs, err := GetGateWayUUIDsByLocation(lat, lng)
 	if err != nil {
 		return
 	}
 	publish(latestWeatherJson, gatewayUUIDs)
 }
 
-func getWeatherDataByLocation(lat, lng float32) (latestWeatherJson []byte, err error) {
+func GetWeatherDataByLocation(lat, lng float32) (latestWeatherJson []byte, err error) {
 	startValidDate := time.Now().UTC()
 	endValidDate := time.Now().UTC().Add(30 * time.Hour)
 	weatherForecastList, err := repository.GetWeatherForecastByLocation(lat, lng, startValidDate, endValidDate)
@@ -212,7 +212,7 @@ func getWeatherDataByLocation(lat, lng float32) (latestWeatherJson []byte, err e
 	return
 }
 
-func getGateWayUUIDsByLocation(lat, lng float32) (gatewayUUIDs []string, err error) {
+func GetGateWayUUIDsByLocation(lat, lng float32) (gatewayUUIDs []string, err error) {
 	gatewayUUIDs, err = repository.GetGatewaysByLocation(lat, lng)
 	if err != nil {
 		log.WithFields(log.Fields{

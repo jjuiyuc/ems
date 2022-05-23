@@ -3,11 +3,9 @@ package repository
 import (
 	"time"
 
-	"github.com/volatiletech/sqlboiler/queries"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 
-	"der-ems/infra"
 	"der-ems/models"
 	deremsmodels "der-ems/models/der-ems"
 )
@@ -39,17 +37,9 @@ func GetWeatherForecastByLocation(lat, lng float32, startValidDate, endValidDate
 	return
 }
 
-func GetGatewaysByLocation(lat, lng float32) (gatewayUUIDs []string, err error) {
-	sql := `
-		SELECT gw.uuid
-		FROM gateway gw
-		JOIN customer_info c ON c.weather_lat = ? AND c.weather_lng = ?
-		WHERE gw.customer_id = c.id
-	`
-	var gateways []*deremsmodels.Gateway
-	err = queries.Raw(sql, lat, lng).Bind(infra.GetGracefulShutdownCtx(), models.GetDB(), &gateways)
-	for _, gateway := range gateways {
-		gatewayUUIDs = append(gatewayUUIDs, gateway.UUID)
-	}
+func GetGatewaysByLocation(lat, lng float32) (gateways []*deremsmodels.Gateway, err error) {
+	gateways, err = deremsmodels.Gateways(
+		qm.InnerJoin("customer_info AS c ON gateway.customer_id = c.id"),
+		qm.Where("(c.weather_lat = ? AND c.weather_lng = ?)", lat, lng)).All(models.GetDB())
 	return
 }

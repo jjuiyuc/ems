@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	"der-ems/config"
+	"der-ems/e"
 	"der-ems/kafka"
 	"der-ems/models"
 	deremsmodels "der-ems/models/der-ems"
@@ -159,7 +160,7 @@ func (s *WeatherWorkerSuite) Test_05_GetNoValidDateWeatherData() {
 	testMsg := s.getMockConsumerMessage(seedUtWeatherJson)
 
 	_, _, err := UpsertWeatherData(testMsg.Value)
-	s.Equal("data[validDate] is not in the map", err.Error())
+	s.Equal(e.ErrUlNoValidDate.Error(), err.Error())
 }
 
 func (s *WeatherWorkerSuite) getMockConsumerMessage(seedUtWeatherJson []byte) (testMsg *sarama.ConsumerMessage) {

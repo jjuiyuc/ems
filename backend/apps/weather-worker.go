@@ -3,7 +3,6 @@ package apps
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -13,6 +12,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/volatiletech/null/v8"
 
+	"der-ems/e"
 	"der-ems/kafka"
 	deremsmodels "der-ems/models/der-ems"
 	"der-ems/repository"
@@ -109,7 +109,7 @@ func UpsertWeatherData(msg []byte) (lat, lng float32, err error) {
 
 		dt, _ := data[validDate]
 		if dt == nil {
-			err = errors.New("data[validDate] is not in the map")
+			err = e.ErrUlNoValidDate
 			log.WithFields(log.Fields{
 				"caused-by": "data[validDate]",
 				"err":       err,
@@ -213,7 +213,7 @@ func GetWeatherDataByLocation(lat, lng float32) (latestWeatherJson []byte, err e
 }
 
 func GetGateWayUUIDsByLocation(lat, lng float32) (gatewayUUIDs []string, err error) {
-	gatewayUUIDs, err = repository.GetGatewaysByLocation(lat, lng)
+	gateways, err := repository.GetGatewaysByLocation(lat, lng)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "repository.GetGatewaysByLocation",
@@ -221,13 +221,16 @@ func GetGateWayUUIDsByLocation(lat, lng float32) (gatewayUUIDs []string, err err
 		}).Error()
 		return
 	}
+	for _, gateway := range gateways {
+		gatewayUUIDs = append(gatewayUUIDs, gateway.UUID)
+	}
 	log.Debug("gatewayUUIDs: ", gatewayUUIDs)
 	return
 }
 
 func publish(latestWeatherJson []byte, gatewayUUIDs []string) {
 	for _, uuid := range gatewayUUIDs {
-		sendWeatherDatatoLocalGW := strings.Replace(kafka.SendWeatherDatatoLocalGWSample, "{gw-id}", uuid, 1)
+		sendWeatherDatatoLocalGW := strings.Replace(kafka.SendWeatherDatatoLocalGW, "{gw-id}", uuid, 1)
 		log.Debug("sendWeatherDatatoLocalGW: ", sendWeatherDatatoLocalGW)
 		kafka.Produce(sendWeatherDatatoLocalGW, string(latestWeatherJson))
 	}

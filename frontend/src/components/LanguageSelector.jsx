@@ -1,8 +1,6 @@
 import {connect} from "react-redux"
-import {InputLabel, MenuItem, Select} from "@mui/material"
-import LanguageIcon from "@mui/icons-material/Language"
+import {MenuItem, Select} from "@mui/material"
 import React from "react"
-import {useTranslation} from "react-multi-lang"
 
 import variables from "../configs/Variables"
 
@@ -10,27 +8,20 @@ function LanguageSelector (props) {
     const changeLang = e => props.updateLang(e.target.value)
 
     const
-        t = useTranslation(),
-        formT = string => t("form." + string)
-
-    const
         {languages} = variables,
-        langLabel = <><LanguageIcon /> {formT("language")}</>,
         langOpts = Object.keys(languages).map((key, i) =>
             <MenuItem key={"l-l-" + i} value={key}>{languages[key]}</MenuItem>)
 
-    return <>
-        <InputLabel id="lang-label">{langLabel}</InputLabel>
-        <Select
-            className="mb-8 text-left"
-            id="lang"
-            label={langLabel}
-            labelId="lang-label"
-            onChange={changeLang}
-            value={props.lang}>
-            {langOpts}
-        </Select>
-    </>
+    return <Select
+        className={props.className}
+        id={props.id}
+        label={props.label}
+        labelId={props.labelId}
+        onChange={changeLang}
+        size={props.size}
+        value={props.lang}>
+        {langOpts}
+    </Select>
 }
 
 const

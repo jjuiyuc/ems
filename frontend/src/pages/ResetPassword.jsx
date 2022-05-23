@@ -7,7 +7,7 @@ import {useTranslation} from "react-multi-lang"
 import {ValidatePassword} from "../utils/utils"
 
 import AlertBox from "../components/AlertBox"
-import LanguageSelector from "../components/LanguageSelector"
+import LanguageField from "../components/NonLoggedInLanguageField"
 
 function ResetPassword () {
     const
@@ -51,7 +51,7 @@ function ResetPassword () {
                         && !newPasswordError,
         resetMsg = <>
             <p>{pageT("hasReset")}</p>
-            <p>{pageT("loginWithNewPassword")}</p>
+            <p>{pageT("logInWithNewPassword")}</p>
         </>
 
     return <div>
@@ -70,14 +70,14 @@ function ResetPassword () {
                 href="/"
                 size="x-large"
                 variant="contained">
-                {commonT("login")}
+                {commonT("logIn")}
             </Button>
         </FormControl>
         </>
         : <>
         <h6 className="mb-8 md:mb-16">{commonT("passwordRule")}</h6>
         <FormControl fullWidth>
-            <LanguageSelector />
+            <LanguageField />
             <TextField
                 error={newPasswordError}
                 font="mono"
@@ -108,7 +108,7 @@ function ResetPassword () {
             </Button>
         </FormControl>
         <div className="mt-8">
-            <Link to="/">{commonT("login")}</Link>
+            <Link to="/">{commonT("logIn")}</Link>
         </div>
         </>}
     </div>

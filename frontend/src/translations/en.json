@@ -1,7 +1,8 @@
 {
     "common": {
         "copyright": "© 2022 Ubiik Inc. All rights reserved",
-        "login": "Log In",
+        "logIn": "Log In",
+        "logOut": "Log Out",
         "passwordRule": "Password must be at least six characters long, and include 3 out of 4 of the following: uppercase letter, lowercase letter, numeric character and special character."
     },
     "error": {
@@ -24,12 +25,21 @@
         "newPassword": "New Password",
         "password": "Password"
     },
-    "login": {
+    "logIn": {
         "forgotPassword": "Forgot Password?"
+    },
+    "navigator": {
+        "analysis": "Analysis",
+        "dashboard": "Dashboard",
+        "demandCharge": "Demand Charge",
+        "economics": "Economics",
+        "energyResources": "Energy Resources",
+        "settings": "Settings",
+        "timeOfUseEnergy": "Time of Use Energy"
     },
     "resetPassword": {
         "hasReset": "Your password has been reset.",
-        "loginWithNewPassword": "Please log in with your new password.",
+        "logInWithNewPassword": "Please log in with your new password.",
         "reset": "Reset",
         "resetPassword": "Reset Password"
     }

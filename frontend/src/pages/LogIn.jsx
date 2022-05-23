@@ -6,7 +6,7 @@ import {useTranslation} from "react-multi-lang"
 
 import {ValidateEmail} from "../utils/utils"
 
-import LanguageSelector from "../components/LanguageSelector"
+import LanguageField from "../components/NonLoggedInLanguageField"
 
 function LogIn (props) {
     const
@@ -14,7 +14,7 @@ function LogIn (props) {
         commonT = string => t("common." + string),
         errorT = string => t("error." + string),
         formT = string => t("form." + string),
-        pageT = string => t("login." + string)
+        pageT = string => t("logIn." + string)
 
     const
         [email, setEmail] = useState(""),
@@ -40,13 +40,17 @@ function LogIn (props) {
                 return
             }
 
-            props.updateUser({username: email})
+            props.updateUser({
+                address: "1915 11th Ave. San Francisco, CA",
+                name: "Suncat",
+                username: email
+            })
         }
 
     return <div>
-        <h1 className="mb-8 md:mb-16">{commonT("login")}</h1>
+        <h1 className="mb-8 md:mb-16">{commonT("logIn")}</h1>
         <FormControl fullWidth>
-            <LanguageSelector />
+            <LanguageField />
             <TextField
                 error={emailError !== null}
                 helperText={emailError ? errorT(emailError.type) : ""}
@@ -69,7 +73,7 @@ function LogIn (props) {
                 onClick={submit}
                 size="x-large"
                 variant="contained">
-                {commonT("login")}
+                {commonT("logIn")}
             </Button>
         </FormControl>
         <div className="mt-8">

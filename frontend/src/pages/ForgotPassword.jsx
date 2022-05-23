@@ -8,7 +8,7 @@ import {useTranslation} from "react-multi-lang"
 import {ValidateEmail} from "../utils/utils"
 
 import AlertBox from "../components/AlertBox"
-import LanguageSelector from "../components/LanguageSelector"
+import LanguageField from "../components/NonLoggedInLanguageField"
 
 function ForgotPassword () {
     const
@@ -60,7 +60,7 @@ function ForgotPassword () {
         </>
         : <>
         <FormControl fullWidth>
-            <LanguageSelector />
+            <LanguageField />
             <TextField
                 error={emailError !== null}
                 helperText={emailError ? errorT(emailError.type) : ""}
@@ -80,7 +80,7 @@ function ForgotPassword () {
             </Button>
         </FormControl>
         <div className="mt-8">
-            <Link to="/">{commonT("login")}</Link>
+            <Link to="/">{commonT("logIn")}</Link>
         </div>
     </>}
     </div>

@@ -9,7 +9,7 @@ const theme = createTheme({
                     color: "white",
                     fontSize: "1rem",
                     textTransform: "none",
-                    transitionDuration: ".5s",
+                    transitionDuration: ".3s",
                     transitionProperty: "background-color, opacity"
                 }
             },
@@ -50,7 +50,7 @@ const theme = createTheme({
                 root: {
                     borderRadius: "16px !important",
                     color: "white",
-                    "fieldset": {transition: "border-color .5s"}
+                    "fieldset": {transition: "border-color .3s"}
                 },
                 input: ({ownerState, theme}) => ({
                     "&:-webkit-autofill": {
@@ -64,6 +64,14 @@ const theme = createTheme({
                 root: ({ownerState, theme}) => ({
                     color: theme.palette.gray[300]
                 })
+            }
+        },
+        MuiMenuItem: {
+            styleOverrides: {
+                root: {
+                    transitionDuration: ".3s",
+                    transitionProperty: "background-color"
+                }
             }
         },
         MuiTextField: {

@@ -1,4 +1,4 @@
-import {BrowserRouter, Route, Routes} from "react-router-dom"
+import {Route, Routes} from "react-router-dom"
 import React from "react"
 import {useTranslation} from "react-multi-lang"
 
@@ -49,17 +49,15 @@ function NonLoggedIn () {
                             text-center w-full
                             pt-6 sm-sm:pt-24 sm-md:pt-32 sm-lg:pt-40
                             px-6 md:px-12">
-                <BrowserRouter>
-                    <Routes>
-                        <Route
-                            element={<ForgotPassword />}
-                            path="/forgotPassword" />
-                        <Route
-                            element={<ResetPassword />}
-                            path="/resetPassword" />
-                        <Route element={<LogIn />} path="/" />
-                    </Routes>
-                </BrowserRouter>
+                <Routes>
+                    <Route
+                        element={<ForgotPassword />}
+                        path="/forgotPassword" />
+                    <Route
+                        element={<ResetPassword />}
+                        path="/resetPassword" />
+                    <Route element={<LogIn />} path="/" />
+                </Routes>
                 <div className="text-gray-300 text-13px">
                     {t("common.copyright")}
                 </div>

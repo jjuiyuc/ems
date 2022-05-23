@@ -1,7 +1,8 @@
 {
     "common": {
         "copyright": "© 2022 Ubiik Inc. All rights reserved",
-        "login": "登入",
+        "logIn": "登入",
+        "logOut": "登出",
         "passwordRule": "密碼長度至少為 8 個字元，且必須包含下列 4 種字元中的 3 種：英文大寫字元、英文小寫字元、數字、特殊符號。"
     },
     "error": {
@@ -24,12 +25,21 @@
         "newPassword": "新密碼",
         "password": "密碼"
     },
-    "login": {
+    "logIn": {
         "forgotPassword": "忘記密碼？"
+    },
+    "navigator": {
+        "analysis": "Analysis",
+        "dashboard": "Dashboard",
+        "demandCharge": "Demand Charge",
+        "economics": "Economics",
+        "energyResources": "Energy Resources",
+        "settings": "Settings",
+        "timeOfUseEnergy": "Time of Use Energy"
     },
     "resetPassword": {
         "hasReset": "密碼已重置",
-        "loginWithNewPassword": "請以新密碼登入。",
+        "logInWithNewPassword": "請以新密碼登入。",
         "reset": "重設",
         "resetPassword": "重設密碼"
     }

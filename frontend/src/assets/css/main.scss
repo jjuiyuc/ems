@@ -4,12 +4,19 @@
 @tailwind components;
 @tailwind utilities;
 
-a:not([class^="MuiButton"]){
-    @apply text-primary-main transition-colors;
+a:not([class*="MuiButton"]){
+    @apply duration-300 text-primary-main;
 
     &:hover {
         @apply text-primary-700;
     }
+}
+a:not([class*="transition"]){
+    @apply duration-300 transition-colors;
+}
+aside .logo {
+    height: 26px;
+    width: 116px;
 }
 h1 {
     @apply font-bold text-gray-200 text-3xl sm:text-3.5xl;
@@ -17,9 +24,43 @@ h1 {
 h3 {
     @apply font-bold text-xl sm:text-2xl;
 }
+h5 {
+    @apply text-gray-300 text-base;
+}
 h6 {
     @apply text-gray-300 text-sm;
 }
+.bg-image-grid {
+    background-image:
+        linear-gradient(rgb(60, 60, 60) 1.5px, transparent 1px),
+        linear-gradient(to right, rgb(60, 60, 60) 1px, transparent 1px);
+    background-position: -1px -1px;
+    background-size: 24px 24px;
+}
 .box {
     @apply border border-gray-500 px-6 py-4 rounded-3xl;
+}
+.sidebar-menu {
+    li {
+        a {
+            @apply flex items-center pl-7 py-4 text-gray-300;
+
+            &:hover {
+                @apply bg-gray-800 text-gray-300;
+            }
+            &.active {
+                @apply bg-gray-600 cursor-default font-bold text-white;
+            }
+
+            svg {
+                @apply mr-3;
+            }
+        }
+    }
+}
+.userMenu {
+    li {
+        @apply gap-3 grid cursor-pointer duration-300 items-center px-4 py-2
+                grid-cols-auto-1fr transition-colors hover:bg-gray-600;
+    }
 }

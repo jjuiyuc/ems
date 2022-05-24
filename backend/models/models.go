@@ -33,6 +33,10 @@ func Init() {
 	}
 }
 
+func Close() {
+	db.Close()
+}
+
 func GetDB() *sql.DB {
 	return db
 }

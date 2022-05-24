@@ -1,4 +1,4 @@
-package services
+package repository
 
 import (
 	"time"
@@ -26,5 +26,20 @@ func UpsertWeatherForecast(weatherForecast *deremsmodels.WeatherForecast) (err e
 		weatherForecast.UpdatedAt = time.Now()
 		_, err = weatherForecast.Update(models.GetDB(), boil.Infer())
 	}
+	return
+}
+
+func GetWeatherForecastByLocation(lat, lng float32, startValidDate, endValidDate time.Time) (weatherForecast []*deremsmodels.WeatherForecast, err error) {
+	weatherForecast, err = deremsmodels.WeatherForecasts(
+		qm.Where("lat = ?", lat),
+		qm.Where("lng = ?", lng),
+		qm.Where("(valid_date > ? and valid_date <= ?)", startValidDate, endValidDate)).All(models.GetDB())
+	return
+}
+
+func GetGatewaysByLocation(lat, lng float32) (gateways []*deremsmodels.Gateway, err error) {
+	gateways, err = deremsmodels.Gateways(
+		qm.InnerJoin("customer_info AS c ON gateway.customer_id = c.id"),
+		qm.Where("(c.weather_lat = ? AND c.weather_lng = ?)", lat, lng)).All(models.GetDB())
 	return
 }

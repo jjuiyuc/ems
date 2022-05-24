@@ -1,0 +1,17 @@
+[Unit]
+Description=weather worker service
+
+[Service]
+Type=simple
+User=derems
+Group=derems
+Restart=always
+RestartSec=10
+WorkingDirectory=/opt/derems
+ExecStart=/bin/bash -c '/opt/derems/weather-worker -d /opt/derems/config -e derems'
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=weather-worker
+
+[Install]
+WantedBy=multi-user.target

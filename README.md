@@ -30,7 +30,7 @@ $ go run weather-worker.go -d <config_path> -e <yaml_filename>
 
   # Modify credential, whitelist in sqlboiler.der-ems.toml if necessary.
 
-  $ sqlboiler -c sqlboiler.der-ems.toml mysql
+  $ sqlboiler -c sqlboiler.der-ems.toml --struct-tag-casing camel mysql
   # The model files should be generated in `models/der-ems`
   ```
 - Option 2: Prepare `sqlboiler.der-ems.toml` ready, then run `make gen-models`

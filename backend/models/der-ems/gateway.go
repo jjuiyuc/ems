@@ -25,9 +25,9 @@ import (
 type Gateway struct {
 	ID             int       `boil:"id" json:"id" toml:"id" yaml:"id"`
 	UUID           string    `boil:"uuid" json:"uuid" toml:"uuid" yaml:"uuid"`
-	CustomerInfoID int       `boil:"customer_info_id" json:"customer_info_id" toml:"customer_info_id" yaml:"customer_info_id"`
-	CreatedAt      time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
-	UpdatedAt      null.Time `boil:"updated_at" json:"updated_at,omitempty" toml:"updated_at" yaml:"updated_at,omitempty"`
+	CustomerInfoID int       `boil:"customer_info_id" json:"customerInfoID" toml:"customerInfoID" yaml:"customerInfoID"`
+	CreatedAt      time.Time `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
+	UpdatedAt      null.Time `boil:"updated_at" json:"updatedAt,omitempty" toml:"updatedAt" yaml:"updatedAt,omitempty"`
 
 	R *gatewayR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L gatewayL  `boil:"-" json:"-" toml:"-" yaml:"-"`

@@ -24,11 +24,11 @@ import (
 // DeviceModel is an object representing the database table.
 type DeviceModel struct {
 	ID         int         `boil:"id" json:"id" toml:"id" yaml:"id"`
-	DeviceType null.String `boil:"device_type" json:"device_type,omitempty" toml:"device_type" yaml:"device_type,omitempty"`
-	ModelName  null.String `boil:"model_name" json:"model_name,omitempty" toml:"model_name" yaml:"model_name,omitempty"`
+	DeviceType null.String `boil:"device_type" json:"deviceType,omitempty" toml:"deviceType" yaml:"deviceType,omitempty"`
+	ModelName  null.String `boil:"model_name" json:"modelName,omitempty" toml:"modelName" yaml:"modelName,omitempty"`
 	Capacity   null.String `boil:"capacity" json:"capacity,omitempty" toml:"capacity" yaml:"capacity,omitempty"`
-	CreatedAt  time.Time   `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
-	UpdatedAt  null.Time   `boil:"updated_at" json:"updated_at,omitempty" toml:"updated_at" yaml:"updated_at,omitempty"`
+	CreatedAt  time.Time   `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
+	UpdatedAt  null.Time   `boil:"updated_at" json:"updatedAt,omitempty" toml:"updatedAt" yaml:"updatedAt,omitempty"`
 
 	R *deviceModelR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L deviceModelL  `boil:"-" json:"-" toml:"-" yaml:"-"`

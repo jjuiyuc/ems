@@ -25,12 +25,12 @@ import (
 type Device struct {
 	ID        int         `boil:"id" json:"id" toml:"id" yaml:"id"`
 	UUID      string      `boil:"uuid" json:"uuid" toml:"uuid" yaml:"uuid"`
-	ModelID   int         `boil:"model_id" json:"model_id" toml:"model_id" yaml:"model_id"`
-	GWUUID    string      `boil:"gw_uuid" json:"gw_uuid" toml:"gw_uuid" yaml:"gw_uuid"`
+	ModelID   int         `boil:"model_id" json:"modelID" toml:"modelID" yaml:"modelID"`
+	GWUUID    string      `boil:"gw_uuid" json:"gwUUID" toml:"gwUUID" yaml:"gwUUID"`
 	Remark    null.String `boil:"remark" json:"remark,omitempty" toml:"remark" yaml:"remark,omitempty"`
 	Enable    null.Bool   `boil:"enable" json:"enable,omitempty" toml:"enable" yaml:"enable,omitempty"`
-	CreatedAt time.Time   `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
-	UpdatedAt null.Time   `boil:"updated_at" json:"updated_at,omitempty" toml:"updated_at" yaml:"updated_at,omitempty"`
+	CreatedAt time.Time   `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
+	UpdatedAt null.Time   `boil:"updated_at" json:"updatedAt,omitempty" toml:"updatedAt" yaml:"updatedAt,omitempty"`
 
 	R *deviceR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L deviceL  `boil:"-" json:"-" toml:"-" yaml:"-"`

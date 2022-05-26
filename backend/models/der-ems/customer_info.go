@@ -24,19 +24,19 @@ import (
 // CustomerInfo is an object representing the database table.
 type CustomerInfo struct {
 	ID           int          `boil:"id" json:"id" toml:"id" yaml:"id"`
-	CustomerID   string       `boil:"customer_id" json:"customer_id" toml:"customer_id" yaml:"customer_id"`
-	FieldID      string       `boil:"field_id" json:"field_id" toml:"field_id" yaml:"field_id"`
+	CustomerID   string       `boil:"customer_id" json:"customerID" toml:"customerID" yaml:"customerID"`
+	FieldID      string       `boil:"field_id" json:"fieldID" toml:"fieldID" yaml:"fieldID"`
 	Address      null.String  `boil:"address" json:"address,omitempty" toml:"address" yaml:"address,omitempty"`
 	Lat          null.Float32 `boil:"lat" json:"lat,omitempty" toml:"lat" yaml:"lat,omitempty"`
 	Lng          null.Float32 `boil:"lng" json:"lng,omitempty" toml:"lng" yaml:"lng,omitempty"`
-	WeatherLat   null.Float32 `boil:"weather_lat" json:"weather_lat,omitempty" toml:"weather_lat" yaml:"weather_lat,omitempty"`
-	WeatherLng   null.Float32 `boil:"weather_lng" json:"weather_lng,omitempty" toml:"weather_lng" yaml:"weather_lng,omitempty"`
+	WeatherLat   null.Float32 `boil:"weather_lat" json:"weatherLat,omitempty" toml:"weatherLat" yaml:"weatherLat,omitempty"`
+	WeatherLng   null.Float32 `boil:"weather_lng" json:"weatherLNG,omitempty" toml:"weatherLNG" yaml:"weatherLNG,omitempty"`
 	Timezone     null.String  `boil:"timezone" json:"timezone,omitempty" toml:"timezone" yaml:"timezone,omitempty"`
-	PowerCompany null.String  `boil:"power_company" json:"power_company,omitempty" toml:"power_company" yaml:"power_company,omitempty"`
-	VoltageType  null.String  `boil:"voltage_type" json:"voltage_type,omitempty" toml:"voltage_type" yaml:"voltage_type,omitempty"`
-	TouType      null.String  `boil:"tou_type" json:"tou_type,omitempty" toml:"tou_type" yaml:"tou_type,omitempty"`
-	CreatedAt    time.Time    `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
-	UpdatedAt    null.Time    `boil:"updated_at" json:"updated_at,omitempty" toml:"updated_at" yaml:"updated_at,omitempty"`
+	PowerCompany null.String  `boil:"power_company" json:"powerCompany,omitempty" toml:"powerCompany" yaml:"powerCompany,omitempty"`
+	VoltageType  null.String  `boil:"voltage_type" json:"voltageType,omitempty" toml:"voltageType" yaml:"voltageType,omitempty"`
+	TouType      null.String  `boil:"tou_type" json:"touType,omitempty" toml:"touType" yaml:"touType,omitempty"`
+	CreatedAt    time.Time    `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
+	UpdatedAt    null.Time    `boil:"updated_at" json:"updatedAt,omitempty" toml:"updatedAt" yaml:"updatedAt,omitempty"`
 
 	R *customerInfoR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L customerInfoL  `boil:"-" json:"-" toml:"-" yaml:"-"`

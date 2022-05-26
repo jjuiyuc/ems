@@ -6,7 +6,7 @@ clean:
 	@rm -rf dist
 
 gen-models:
-	sqlboiler -c sqlboiler.der-ems.toml mysql
+	sqlboiler -c sqlboiler.der-ems.toml --struct-tag-casing camel mysql
 
 go-lint:
 	@$(shell if [ ! -f $(GOPATH)/bin/golint ] ; then go get -u golang.org/x/lint/golint; fi)

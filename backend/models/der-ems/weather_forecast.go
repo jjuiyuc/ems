@@ -27,10 +27,10 @@ type WeatherForecast struct {
 	Lat       float32      `boil:"lat" json:"lat" toml:"lat" yaml:"lat"`
 	Lng       float32      `boil:"lng" json:"lng" toml:"lng" yaml:"lng"`
 	Alt       null.Float32 `boil:"alt" json:"alt,omitempty" toml:"alt" yaml:"alt,omitempty"`
-	ValidDate time.Time    `boil:"valid_date" json:"valid_date" toml:"valid_date" yaml:"valid_date"`
+	ValidDate time.Time    `boil:"valid_date" json:"validDate" toml:"validDate" yaml:"validDate"`
 	Data      null.JSON    `boil:"data" json:"data,omitempty" toml:"data" yaml:"data,omitempty"`
-	CreatedAt time.Time    `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
-	UpdatedAt null.Time    `boil:"updated_at" json:"updated_at,omitempty" toml:"updated_at" yaml:"updated_at,omitempty"`
+	CreatedAt time.Time    `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
+	UpdatedAt null.Time    `boil:"updated_at" json:"updatedAt,omitempty" toml:"updatedAt" yaml:"updatedAt,omitempty"`
 
 	R *weatherForecastR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L weatherForecastL  `boil:"-" json:"-" toml:"-" yaml:"-"`

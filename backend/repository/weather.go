@@ -3,6 +3,7 @@ package repository
 import (
 	"time"
 
+	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 
@@ -23,7 +24,7 @@ func UpsertWeatherForecast(weatherForecast *deremsmodels.WeatherForecast) (err e
 		err = weatherForecast.Insert(models.GetDB(), boil.Infer())
 	} else {
 		weatherForecast.ID = weatherForecastReturn.ID
-		weatherForecast.UpdatedAt = time.Now()
+		weatherForecast.UpdatedAt = null.NewTime(time.Now(), true)
 		_, err = weatherForecast.Update(models.GetDB(), boil.Infer())
 	}
 	return
@@ -39,7 +40,7 @@ func GetWeatherForecastByLocation(lat, lng float32, startValidDate, endValidDate
 
 func GetGatewaysByLocation(lat, lng float32) (gateways []*deremsmodels.Gateway, err error) {
 	gateways, err = deremsmodels.Gateways(
-		qm.InnerJoin("customer_info AS c ON gateway.customer_id = c.id"),
+		qm.InnerJoin("customer_info AS c ON gateway.customer_info_id = c.id"),
 		qm.Where("(c.weather_lat = ? AND c.weather_lng = ?)", lat, lng)).All(models.GetDB())
 	return
 }

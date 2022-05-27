@@ -89,7 +89,7 @@ func (s *WeatherWorkerSuite) SetupSuite() {
 	`)
 	// Mock gateway table
 	models.GetDB().Exec(`
-		INSERT INTO gateway (id,uuid,customer_id) VALUES
+		INSERT INTO gateway (id,uuid,customer_info_id) VALUES
 		(1,'U00001',1),
 		(2,'U00002',1),
 		(3,'U00003',2),

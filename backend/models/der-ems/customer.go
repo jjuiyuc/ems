@@ -21,89 +21,89 @@ import (
 	"github.com/volatiletech/strmangle"
 )
 
-// CustomerInfo is an object representing the database table.
-type CustomerInfo struct {
-	ID           int          `boil:"id" json:"id" toml:"id" yaml:"id"`
-	CustomerID   string       `boil:"customer_id" json:"customerID" toml:"customerID" yaml:"customerID"`
-	FieldID      string       `boil:"field_id" json:"fieldID" toml:"fieldID" yaml:"fieldID"`
-	Address      null.String  `boil:"address" json:"address,omitempty" toml:"address" yaml:"address,omitempty"`
-	Lat          null.Float32 `boil:"lat" json:"lat,omitempty" toml:"lat" yaml:"lat,omitempty"`
-	Lng          null.Float32 `boil:"lng" json:"lng,omitempty" toml:"lng" yaml:"lng,omitempty"`
-	WeatherLat   null.Float32 `boil:"weather_lat" json:"weatherLat,omitempty" toml:"weatherLat" yaml:"weatherLat,omitempty"`
-	WeatherLng   null.Float32 `boil:"weather_lng" json:"weatherLNG,omitempty" toml:"weatherLNG" yaml:"weatherLNG,omitempty"`
-	Timezone     null.String  `boil:"timezone" json:"timezone,omitempty" toml:"timezone" yaml:"timezone,omitempty"`
-	PowerCompany null.String  `boil:"power_company" json:"powerCompany,omitempty" toml:"powerCompany" yaml:"powerCompany,omitempty"`
-	VoltageType  null.String  `boil:"voltage_type" json:"voltageType,omitempty" toml:"voltageType" yaml:"voltageType,omitempty"`
-	TouType      null.String  `boil:"tou_type" json:"touType,omitempty" toml:"touType" yaml:"touType,omitempty"`
-	CreatedAt    time.Time    `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
-	UpdatedAt    null.Time    `boil:"updated_at" json:"updatedAt,omitempty" toml:"updatedAt" yaml:"updatedAt,omitempty"`
+// Customer is an object representing the database table.
+type Customer struct {
+	ID             int          `boil:"id" json:"id" toml:"id" yaml:"id"`
+	CustomerNumber string       `boil:"customer_number" json:"customerNumber" toml:"customerNumber" yaml:"customerNumber"`
+	FieldNumber    string       `boil:"field_number" json:"fieldNumber" toml:"fieldNumber" yaml:"fieldNumber"`
+	Address        null.String  `boil:"address" json:"address,omitempty" toml:"address" yaml:"address,omitempty"`
+	Lat            null.Float32 `boil:"lat" json:"lat,omitempty" toml:"lat" yaml:"lat,omitempty"`
+	LNG            null.Float32 `boil:"lng" json:"lng,omitempty" toml:"lng" yaml:"lng,omitempty"`
+	WeatherLat     null.Float32 `boil:"weather_lat" json:"weatherLat,omitempty" toml:"weatherLat" yaml:"weatherLat,omitempty"`
+	WeatherLNG     null.Float32 `boil:"weather_lng" json:"weatherLNG,omitempty" toml:"weatherLNG" yaml:"weatherLNG,omitempty"`
+	Timezone       null.String  `boil:"timezone" json:"timezone,omitempty" toml:"timezone" yaml:"timezone,omitempty"`
+	PowerCompany   null.String  `boil:"power_company" json:"powerCompany,omitempty" toml:"powerCompany" yaml:"powerCompany,omitempty"`
+	VoltageType    null.String  `boil:"voltage_type" json:"voltageType,omitempty" toml:"voltageType" yaml:"voltageType,omitempty"`
+	TouType        null.String  `boil:"tou_type" json:"touType,omitempty" toml:"touType" yaml:"touType,omitempty"`
+	CreatedAt      time.Time    `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
+	UpdatedAt      null.Time    `boil:"updated_at" json:"updatedAt,omitempty" toml:"updatedAt" yaml:"updatedAt,omitempty"`
 
-	R *customerInfoR `boil:"-" json:"-" toml:"-" yaml:"-"`
-	L customerInfoL  `boil:"-" json:"-" toml:"-" yaml:"-"`
+	R *customerR `boil:"-" json:"-" toml:"-" yaml:"-"`
+	L customerL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
-var CustomerInfoColumns = struct {
-	ID           string
-	CustomerID   string
-	FieldID      string
-	Address      string
-	Lat          string
-	Lng          string
-	WeatherLat   string
-	WeatherLng   string
-	Timezone     string
-	PowerCompany string
-	VoltageType  string
-	TouType      string
-	CreatedAt    string
-	UpdatedAt    string
+var CustomerColumns = struct {
+	ID             string
+	CustomerNumber string
+	FieldNumber    string
+	Address        string
+	Lat            string
+	LNG            string
+	WeatherLat     string
+	WeatherLNG     string
+	Timezone       string
+	PowerCompany   string
+	VoltageType    string
+	TouType        string
+	CreatedAt      string
+	UpdatedAt      string
 }{
-	ID:           "id",
-	CustomerID:   "customer_id",
-	FieldID:      "field_id",
-	Address:      "address",
-	Lat:          "lat",
-	Lng:          "lng",
-	WeatherLat:   "weather_lat",
-	WeatherLng:   "weather_lng",
-	Timezone:     "timezone",
-	PowerCompany: "power_company",
-	VoltageType:  "voltage_type",
-	TouType:      "tou_type",
-	CreatedAt:    "created_at",
-	UpdatedAt:    "updated_at",
+	ID:             "id",
+	CustomerNumber: "customer_number",
+	FieldNumber:    "field_number",
+	Address:        "address",
+	Lat:            "lat",
+	LNG:            "lng",
+	WeatherLat:     "weather_lat",
+	WeatherLNG:     "weather_lng",
+	Timezone:       "timezone",
+	PowerCompany:   "power_company",
+	VoltageType:    "voltage_type",
+	TouType:        "tou_type",
+	CreatedAt:      "created_at",
+	UpdatedAt:      "updated_at",
 }
 
-var CustomerInfoTableColumns = struct {
-	ID           string
-	CustomerID   string
-	FieldID      string
-	Address      string
-	Lat          string
-	Lng          string
-	WeatherLat   string
-	WeatherLng   string
-	Timezone     string
-	PowerCompany string
-	VoltageType  string
-	TouType      string
-	CreatedAt    string
-	UpdatedAt    string
+var CustomerTableColumns = struct {
+	ID             string
+	CustomerNumber string
+	FieldNumber    string
+	Address        string
+	Lat            string
+	LNG            string
+	WeatherLat     string
+	WeatherLNG     string
+	Timezone       string
+	PowerCompany   string
+	VoltageType    string
+	TouType        string
+	CreatedAt      string
+	UpdatedAt      string
 }{
-	ID:           "customer_info.id",
-	CustomerID:   "customer_info.customer_id",
-	FieldID:      "customer_info.field_id",
-	Address:      "customer_info.address",
-	Lat:          "customer_info.lat",
-	Lng:          "customer_info.lng",
-	WeatherLat:   "customer_info.weather_lat",
-	WeatherLng:   "customer_info.weather_lng",
-	Timezone:     "customer_info.timezone",
-	PowerCompany: "customer_info.power_company",
-	VoltageType:  "customer_info.voltage_type",
-	TouType:      "customer_info.tou_type",
-	CreatedAt:    "customer_info.created_at",
-	UpdatedAt:    "customer_info.updated_at",
+	ID:             "customer.id",
+	CustomerNumber: "customer.customer_number",
+	FieldNumber:    "customer.field_number",
+	Address:        "customer.address",
+	Lat:            "customer.lat",
+	LNG:            "customer.lng",
+	WeatherLat:     "customer.weather_lat",
+	WeatherLNG:     "customer.weather_lng",
+	Timezone:       "customer.timezone",
+	PowerCompany:   "customer.power_company",
+	VoltageType:    "customer.voltage_type",
+	TouType:        "customer.tou_type",
+	CreatedAt:      "customer.created_at",
+	UpdatedAt:      "customer.updated_at",
 }
 
 // Generated where
@@ -247,94 +247,94 @@ func (w whereHelpernull_Time) GTE(x null.Time) qm.QueryMod {
 func (w whereHelpernull_Time) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
 func (w whereHelpernull_Time) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
 
-var CustomerInfoWhere = struct {
-	ID           whereHelperint
-	CustomerID   whereHelperstring
-	FieldID      whereHelperstring
-	Address      whereHelpernull_String
-	Lat          whereHelpernull_Float32
-	Lng          whereHelpernull_Float32
-	WeatherLat   whereHelpernull_Float32
-	WeatherLng   whereHelpernull_Float32
-	Timezone     whereHelpernull_String
-	PowerCompany whereHelpernull_String
-	VoltageType  whereHelpernull_String
-	TouType      whereHelpernull_String
-	CreatedAt    whereHelpertime_Time
-	UpdatedAt    whereHelpernull_Time
+var CustomerWhere = struct {
+	ID             whereHelperint
+	CustomerNumber whereHelperstring
+	FieldNumber    whereHelperstring
+	Address        whereHelpernull_String
+	Lat            whereHelpernull_Float32
+	LNG            whereHelpernull_Float32
+	WeatherLat     whereHelpernull_Float32
+	WeatherLNG     whereHelpernull_Float32
+	Timezone       whereHelpernull_String
+	PowerCompany   whereHelpernull_String
+	VoltageType    whereHelpernull_String
+	TouType        whereHelpernull_String
+	CreatedAt      whereHelpertime_Time
+	UpdatedAt      whereHelpernull_Time
 }{
-	ID:           whereHelperint{field: "`customer_info`.`id`"},
-	CustomerID:   whereHelperstring{field: "`customer_info`.`customer_id`"},
-	FieldID:      whereHelperstring{field: "`customer_info`.`field_id`"},
-	Address:      whereHelpernull_String{field: "`customer_info`.`address`"},
-	Lat:          whereHelpernull_Float32{field: "`customer_info`.`lat`"},
-	Lng:          whereHelpernull_Float32{field: "`customer_info`.`lng`"},
-	WeatherLat:   whereHelpernull_Float32{field: "`customer_info`.`weather_lat`"},
-	WeatherLng:   whereHelpernull_Float32{field: "`customer_info`.`weather_lng`"},
-	Timezone:     whereHelpernull_String{field: "`customer_info`.`timezone`"},
-	PowerCompany: whereHelpernull_String{field: "`customer_info`.`power_company`"},
-	VoltageType:  whereHelpernull_String{field: "`customer_info`.`voltage_type`"},
-	TouType:      whereHelpernull_String{field: "`customer_info`.`tou_type`"},
-	CreatedAt:    whereHelpertime_Time{field: "`customer_info`.`created_at`"},
-	UpdatedAt:    whereHelpernull_Time{field: "`customer_info`.`updated_at`"},
+	ID:             whereHelperint{field: "`customer`.`id`"},
+	CustomerNumber: whereHelperstring{field: "`customer`.`customer_number`"},
+	FieldNumber:    whereHelperstring{field: "`customer`.`field_number`"},
+	Address:        whereHelpernull_String{field: "`customer`.`address`"},
+	Lat:            whereHelpernull_Float32{field: "`customer`.`lat`"},
+	LNG:            whereHelpernull_Float32{field: "`customer`.`lng`"},
+	WeatherLat:     whereHelpernull_Float32{field: "`customer`.`weather_lat`"},
+	WeatherLNG:     whereHelpernull_Float32{field: "`customer`.`weather_lng`"},
+	Timezone:       whereHelpernull_String{field: "`customer`.`timezone`"},
+	PowerCompany:   whereHelpernull_String{field: "`customer`.`power_company`"},
+	VoltageType:    whereHelpernull_String{field: "`customer`.`voltage_type`"},
+	TouType:        whereHelpernull_String{field: "`customer`.`tou_type`"},
+	CreatedAt:      whereHelpertime_Time{field: "`customer`.`created_at`"},
+	UpdatedAt:      whereHelpernull_Time{field: "`customer`.`updated_at`"},
 }
 
-// CustomerInfoRels is where relationship names are stored.
-var CustomerInfoRels = struct {
+// CustomerRels is where relationship names are stored.
+var CustomerRels = struct {
 	Gateways string
 }{
 	Gateways: "Gateways",
 }
 
-// customerInfoR is where relationships are stored.
-type customerInfoR struct {
+// customerR is where relationships are stored.
+type customerR struct {
 	Gateways GatewaySlice `boil:"Gateways" json:"Gateways" toml:"Gateways" yaml:"Gateways"`
 }
 
 // NewStruct creates a new relationship struct
-func (*customerInfoR) NewStruct() *customerInfoR {
-	return &customerInfoR{}
+func (*customerR) NewStruct() *customerR {
+	return &customerR{}
 }
 
-func (r *customerInfoR) GetGateways() GatewaySlice {
+func (r *customerR) GetGateways() GatewaySlice {
 	if r == nil {
 		return nil
 	}
 	return r.Gateways
 }
 
-// customerInfoL is where Load methods for each relationship are stored.
-type customerInfoL struct{}
+// customerL is where Load methods for each relationship are stored.
+type customerL struct{}
 
 var (
-	customerInfoAllColumns            = []string{"id", "customer_id", "field_id", "address", "lat", "lng", "weather_lat", "weather_lng", "timezone", "power_company", "voltage_type", "tou_type", "created_at", "updated_at"}
-	customerInfoColumnsWithoutDefault = []string{"customer_id", "field_id", "address", "lat", "lng", "weather_lat", "weather_lng", "timezone", "power_company", "voltage_type", "tou_type", "updated_at"}
-	customerInfoColumnsWithDefault    = []string{"id", "created_at"}
-	customerInfoPrimaryKeyColumns     = []string{"id"}
-	customerInfoGeneratedColumns      = []string{}
+	customerAllColumns            = []string{"id", "customer_number", "field_number", "address", "lat", "lng", "weather_lat", "weather_lng", "timezone", "power_company", "voltage_type", "tou_type", "created_at", "updated_at"}
+	customerColumnsWithoutDefault = []string{"customer_number", "field_number", "address", "lat", "lng", "weather_lat", "weather_lng", "timezone", "power_company", "voltage_type", "tou_type", "updated_at"}
+	customerColumnsWithDefault    = []string{"id", "created_at"}
+	customerPrimaryKeyColumns     = []string{"id"}
+	customerGeneratedColumns      = []string{}
 )
 
 type (
-	// CustomerInfoSlice is an alias for a slice of pointers to CustomerInfo.
-	// This should almost always be used instead of []CustomerInfo.
-	CustomerInfoSlice []*CustomerInfo
+	// CustomerSlice is an alias for a slice of pointers to Customer.
+	// This should almost always be used instead of []Customer.
+	CustomerSlice []*Customer
 
-	customerInfoQuery struct {
+	customerQuery struct {
 		*queries.Query
 	}
 )
 
 // Cache for insert, update and upsert
 var (
-	customerInfoType                 = reflect.TypeOf(&CustomerInfo{})
-	customerInfoMapping              = queries.MakeStructMapping(customerInfoType)
-	customerInfoPrimaryKeyMapping, _ = queries.BindMapping(customerInfoType, customerInfoMapping, customerInfoPrimaryKeyColumns)
-	customerInfoInsertCacheMut       sync.RWMutex
-	customerInfoInsertCache          = make(map[string]insertCache)
-	customerInfoUpdateCacheMut       sync.RWMutex
-	customerInfoUpdateCache          = make(map[string]updateCache)
-	customerInfoUpsertCacheMut       sync.RWMutex
-	customerInfoUpsertCache          = make(map[string]insertCache)
+	customerType                 = reflect.TypeOf(&Customer{})
+	customerMapping              = queries.MakeStructMapping(customerType)
+	customerPrimaryKeyMapping, _ = queries.BindMapping(customerType, customerMapping, customerPrimaryKeyColumns)
+	customerInsertCacheMut       sync.RWMutex
+	customerInsertCache          = make(map[string]insertCache)
+	customerUpdateCacheMut       sync.RWMutex
+	customerUpdateCache          = make(map[string]updateCache)
+	customerUpsertCacheMut       sync.RWMutex
+	customerUpsertCache          = make(map[string]insertCache)
 )
 
 var (
@@ -345,9 +345,9 @@ var (
 	_ = qmhelper.Where
 )
 
-// One returns a single customerInfo record from the query.
-func (q customerInfoQuery) One(exec boil.Executor) (*CustomerInfo, error) {
-	o := &CustomerInfo{}
+// One returns a single customer record from the query.
+func (q customerQuery) One(exec boil.Executor) (*Customer, error) {
+	o := &Customer{}
 
 	queries.SetLimit(q.Query, 1)
 
@@ -356,26 +356,26 @@ func (q customerInfoQuery) One(exec boil.Executor) (*CustomerInfo, error) {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, sql.ErrNoRows
 		}
-		return nil, errors.Wrap(err, "deremsmodels: failed to execute a one query for customer_info")
+		return nil, errors.Wrap(err, "deremsmodels: failed to execute a one query for customer")
 	}
 
 	return o, nil
 }
 
-// All returns all CustomerInfo records from the query.
-func (q customerInfoQuery) All(exec boil.Executor) (CustomerInfoSlice, error) {
-	var o []*CustomerInfo
+// All returns all Customer records from the query.
+func (q customerQuery) All(exec boil.Executor) (CustomerSlice, error) {
+	var o []*Customer
 
 	err := q.Bind(nil, exec, &o)
 	if err != nil {
-		return nil, errors.Wrap(err, "deremsmodels: failed to assign all query results to CustomerInfo slice")
+		return nil, errors.Wrap(err, "deremsmodels: failed to assign all query results to Customer slice")
 	}
 
 	return o, nil
 }
 
-// Count returns the count of all CustomerInfo records in the query.
-func (q customerInfoQuery) Count(exec boil.Executor) (int64, error) {
+// Count returns the count of all Customer records in the query.
+func (q customerQuery) Count(exec boil.Executor) (int64, error) {
 	var count int64
 
 	queries.SetSelect(q.Query, nil)
@@ -383,14 +383,14 @@ func (q customerInfoQuery) Count(exec boil.Executor) (int64, error) {
 
 	err := q.Query.QueryRow(exec).Scan(&count)
 	if err != nil {
-		return 0, errors.Wrap(err, "deremsmodels: failed to count customer_info rows")
+		return 0, errors.Wrap(err, "deremsmodels: failed to count customer rows")
 	}
 
 	return count, nil
 }
 
 // Exists checks if the row exists in the table.
-func (q customerInfoQuery) Exists(exec boil.Executor) (bool, error) {
+func (q customerQuery) Exists(exec boil.Executor) (bool, error) {
 	var count int64
 
 	queries.SetSelect(q.Query, nil)
@@ -399,21 +399,21 @@ func (q customerInfoQuery) Exists(exec boil.Executor) (bool, error) {
 
 	err := q.Query.QueryRow(exec).Scan(&count)
 	if err != nil {
-		return false, errors.Wrap(err, "deremsmodels: failed to check if customer_info exists")
+		return false, errors.Wrap(err, "deremsmodels: failed to check if customer exists")
 	}
 
 	return count > 0, nil
 }
 
 // Gateways retrieves all the gateway's Gateways with an executor.
-func (o *CustomerInfo) Gateways(mods ...qm.QueryMod) gatewayQuery {
+func (o *Customer) Gateways(mods ...qm.QueryMod) gatewayQuery {
 	var queryMods []qm.QueryMod
 	if len(mods) != 0 {
 		queryMods = append(queryMods, mods...)
 	}
 
 	queryMods = append(queryMods,
-		qm.Where("`gateway`.`customer_info_id`=?", o.ID),
+		qm.Where("`gateway`.`customer_id`=?", o.ID),
 	)
 
 	return Gateways(queryMods...)
@@ -421,27 +421,27 @@ func (o *CustomerInfo) Gateways(mods ...qm.QueryMod) gatewayQuery {
 
 // LoadGateways allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for a 1-M or N-M relationship.
-func (customerInfoL) LoadGateways(e boil.Executor, singular bool, maybeCustomerInfo interface{}, mods queries.Applicator) error {
-	var slice []*CustomerInfo
-	var object *CustomerInfo
+func (customerL) LoadGateways(e boil.Executor, singular bool, maybeCustomer interface{}, mods queries.Applicator) error {
+	var slice []*Customer
+	var object *Customer
 
 	if singular {
-		object = maybeCustomerInfo.(*CustomerInfo)
+		object = maybeCustomer.(*Customer)
 	} else {
-		slice = *maybeCustomerInfo.(*[]*CustomerInfo)
+		slice = *maybeCustomer.(*[]*Customer)
 	}
 
 	args := make([]interface{}, 0, 1)
 	if singular {
 		if object.R == nil {
-			object.R = &customerInfoR{}
+			object.R = &customerR{}
 		}
 		args = append(args, object.ID)
 	} else {
 	Outer:
 		for _, obj := range slice {
 			if obj.R == nil {
-				obj.R = &customerInfoR{}
+				obj.R = &customerR{}
 			}
 
 			for _, a := range args {
@@ -460,7 +460,7 @@ func (customerInfoL) LoadGateways(e boil.Executor, singular bool, maybeCustomerI
 
 	query := NewQuery(
 		qm.From(`gateway`),
-		qm.WhereIn(`gateway.customer_info_id in ?`, args...),
+		qm.WhereIn(`gateway.customer_id in ?`, args...),
 	)
 	if mods != nil {
 		mods.Apply(query)
@@ -489,19 +489,19 @@ func (customerInfoL) LoadGateways(e boil.Executor, singular bool, maybeCustomerI
 			if foreign.R == nil {
 				foreign.R = &gatewayR{}
 			}
-			foreign.R.CustomerInfo = object
+			foreign.R.Customer = object
 		}
 		return nil
 	}
 
 	for _, foreign := range resultSlice {
 		for _, local := range slice {
-			if local.ID == foreign.CustomerInfoID {
+			if local.ID == foreign.CustomerID {
 				local.R.Gateways = append(local.R.Gateways, foreign)
 				if foreign.R == nil {
 					foreign.R = &gatewayR{}
 				}
-				foreign.R.CustomerInfo = local
+				foreign.R.Customer = local
 				break
 			}
 		}
@@ -511,21 +511,21 @@ func (customerInfoL) LoadGateways(e boil.Executor, singular bool, maybeCustomerI
 }
 
 // AddGateways adds the given related objects to the existing relationships
-// of the customer_info, optionally inserting them as new records.
+// of the customer, optionally inserting them as new records.
 // Appends related to o.R.Gateways.
-// Sets related.R.CustomerInfo appropriately.
-func (o *CustomerInfo) AddGateways(exec boil.Executor, insert bool, related ...*Gateway) error {
+// Sets related.R.Customer appropriately.
+func (o *Customer) AddGateways(exec boil.Executor, insert bool, related ...*Gateway) error {
 	var err error
 	for _, rel := range related {
 		if insert {
-			rel.CustomerInfoID = o.ID
+			rel.CustomerID = o.ID
 			if err = rel.Insert(exec, boil.Infer()); err != nil {
 				return errors.Wrap(err, "failed to insert into foreign table")
 			}
 		} else {
 			updateQuery := fmt.Sprintf(
 				"UPDATE `gateway` SET %s WHERE %s",
-				strmangle.SetParamNames("`", "`", 0, []string{"customer_info_id"}),
+				strmangle.SetParamNames("`", "`", 0, []string{"customer_id"}),
 				strmangle.WhereClause("`", "`", 0, gatewayPrimaryKeyColumns),
 			)
 			values := []interface{}{o.ID, rel.ID}
@@ -538,12 +538,12 @@ func (o *CustomerInfo) AddGateways(exec boil.Executor, insert bool, related ...*
 				return errors.Wrap(err, "failed to update foreign table")
 			}
 
-			rel.CustomerInfoID = o.ID
+			rel.CustomerID = o.ID
 		}
 	}
 
 	if o.R == nil {
-		o.R = &customerInfoR{
+		o.R = &customerR{
 			Gateways: related,
 		}
 	} else {
@@ -553,57 +553,57 @@ func (o *CustomerInfo) AddGateways(exec boil.Executor, insert bool, related ...*
 	for _, rel := range related {
 		if rel.R == nil {
 			rel.R = &gatewayR{
-				CustomerInfo: o,
+				Customer: o,
 			}
 		} else {
-			rel.R.CustomerInfo = o
+			rel.R.Customer = o
 		}
 	}
 	return nil
 }
 
-// CustomerInfos retrieves all the records using an executor.
-func CustomerInfos(mods ...qm.QueryMod) customerInfoQuery {
-	mods = append(mods, qm.From("`customer_info`"))
+// Customers retrieves all the records using an executor.
+func Customers(mods ...qm.QueryMod) customerQuery {
+	mods = append(mods, qm.From("`customer`"))
 	q := NewQuery(mods...)
 	if len(queries.GetSelect(q)) == 0 {
-		queries.SetSelect(q, []string{"`customer_info`.*"})
+		queries.SetSelect(q, []string{"`customer`.*"})
 	}
 
-	return customerInfoQuery{q}
+	return customerQuery{q}
 }
 
-// FindCustomerInfo retrieves a single record by ID with an executor.
+// FindCustomer retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindCustomerInfo(exec boil.Executor, iD int, selectCols ...string) (*CustomerInfo, error) {
-	customerInfoObj := &CustomerInfo{}
+func FindCustomer(exec boil.Executor, iD int, selectCols ...string) (*Customer, error) {
+	customerObj := &Customer{}
 
 	sel := "*"
 	if len(selectCols) > 0 {
 		sel = strings.Join(strmangle.IdentQuoteSlice(dialect.LQ, dialect.RQ, selectCols), ",")
 	}
 	query := fmt.Sprintf(
-		"select %s from `customer_info` where `id`=?", sel,
+		"select %s from `customer` where `id`=?", sel,
 	)
 
 	q := queries.Raw(query, iD)
 
-	err := q.Bind(nil, exec, customerInfoObj)
+	err := q.Bind(nil, exec, customerObj)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, sql.ErrNoRows
 		}
-		return nil, errors.Wrap(err, "deremsmodels: unable to select from customer_info")
+		return nil, errors.Wrap(err, "deremsmodels: unable to select from customer")
 	}
 
-	return customerInfoObj, nil
+	return customerObj, nil
 }
 
 // Insert a single record using an executor.
 // See boil.Columns.InsertColumnSet documentation to understand column list inference for inserts.
-func (o *CustomerInfo) Insert(exec boil.Executor, columns boil.Columns) error {
+func (o *Customer) Insert(exec boil.Executor, columns boil.Columns) error {
 	if o == nil {
-		return errors.New("deremsmodels: no customer_info provided for insertion")
+		return errors.New("deremsmodels: no customer provided for insertion")
 	}
 
 	var err error
@@ -616,39 +616,39 @@ func (o *CustomerInfo) Insert(exec boil.Executor, columns boil.Columns) error {
 		queries.SetScanner(&o.UpdatedAt, currTime)
 	}
 
-	nzDefaults := queries.NonZeroDefaultSet(customerInfoColumnsWithDefault, o)
+	nzDefaults := queries.NonZeroDefaultSet(customerColumnsWithDefault, o)
 
 	key := makeCacheKey(columns, nzDefaults)
-	customerInfoInsertCacheMut.RLock()
-	cache, cached := customerInfoInsertCache[key]
-	customerInfoInsertCacheMut.RUnlock()
+	customerInsertCacheMut.RLock()
+	cache, cached := customerInsertCache[key]
+	customerInsertCacheMut.RUnlock()
 
 	if !cached {
 		wl, returnColumns := columns.InsertColumnSet(
-			customerInfoAllColumns,
-			customerInfoColumnsWithDefault,
-			customerInfoColumnsWithoutDefault,
+			customerAllColumns,
+			customerColumnsWithDefault,
+			customerColumnsWithoutDefault,
 			nzDefaults,
 		)
 
-		cache.valueMapping, err = queries.BindMapping(customerInfoType, customerInfoMapping, wl)
+		cache.valueMapping, err = queries.BindMapping(customerType, customerMapping, wl)
 		if err != nil {
 			return err
 		}
-		cache.retMapping, err = queries.BindMapping(customerInfoType, customerInfoMapping, returnColumns)
+		cache.retMapping, err = queries.BindMapping(customerType, customerMapping, returnColumns)
 		if err != nil {
 			return err
 		}
 		if len(wl) != 0 {
-			cache.query = fmt.Sprintf("INSERT INTO `customer_info` (`%s`) %%sVALUES (%s)%%s", strings.Join(wl, "`,`"), strmangle.Placeholders(dialect.UseIndexPlaceholders, len(wl), 1, 1))
+			cache.query = fmt.Sprintf("INSERT INTO `customer` (`%s`) %%sVALUES (%s)%%s", strings.Join(wl, "`,`"), strmangle.Placeholders(dialect.UseIndexPlaceholders, len(wl), 1, 1))
 		} else {
-			cache.query = "INSERT INTO `customer_info` () VALUES ()%s%s"
+			cache.query = "INSERT INTO `customer` () VALUES ()%s%s"
 		}
 
 		var queryOutput, queryReturning string
 
 		if len(cache.retMapping) != 0 {
-			cache.retQuery = fmt.Sprintf("SELECT `%s` FROM `customer_info` WHERE %s", strings.Join(returnColumns, "`,`"), strmangle.WhereClause("`", "`", 0, customerInfoPrimaryKeyColumns))
+			cache.retQuery = fmt.Sprintf("SELECT `%s` FROM `customer` WHERE %s", strings.Join(returnColumns, "`,`"), strmangle.WhereClause("`", "`", 0, customerPrimaryKeyColumns))
 		}
 
 		cache.query = fmt.Sprintf(cache.query, queryOutput, queryReturning)
@@ -664,7 +664,7 @@ func (o *CustomerInfo) Insert(exec boil.Executor, columns boil.Columns) error {
 	result, err := exec.Exec(cache.query, vals...)
 
 	if err != nil {
-		return errors.Wrap(err, "deremsmodels: unable to insert into customer_info")
+		return errors.Wrap(err, "deremsmodels: unable to insert into customer")
 	}
 
 	var lastID int64
@@ -680,7 +680,7 @@ func (o *CustomerInfo) Insert(exec boil.Executor, columns boil.Columns) error {
 	}
 
 	o.ID = int(lastID)
-	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == customerInfoMapping["id"] {
+	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == customerMapping["id"] {
 		goto CacheNoHooks
 	}
 
@@ -694,51 +694,51 @@ func (o *CustomerInfo) Insert(exec boil.Executor, columns boil.Columns) error {
 	}
 	err = exec.QueryRow(cache.retQuery, identifierCols...).Scan(queries.PtrsFromMapping(value, cache.retMapping)...)
 	if err != nil {
-		return errors.Wrap(err, "deremsmodels: unable to populate default values for customer_info")
+		return errors.Wrap(err, "deremsmodels: unable to populate default values for customer")
 	}
 
 CacheNoHooks:
 	if !cached {
-		customerInfoInsertCacheMut.Lock()
-		customerInfoInsertCache[key] = cache
-		customerInfoInsertCacheMut.Unlock()
+		customerInsertCacheMut.Lock()
+		customerInsertCache[key] = cache
+		customerInsertCacheMut.Unlock()
 	}
 
 	return nil
 }
 
-// Update uses an executor to update the CustomerInfo.
+// Update uses an executor to update the Customer.
 // See boil.Columns.UpdateColumnSet documentation to understand column list inference for updates.
 // Update does not automatically update the record in case of default values. Use .Reload() to refresh the records.
-func (o *CustomerInfo) Update(exec boil.Executor, columns boil.Columns) (int64, error) {
+func (o *Customer) Update(exec boil.Executor, columns boil.Columns) (int64, error) {
 	currTime := time.Now().In(boil.GetLocation())
 
 	queries.SetScanner(&o.UpdatedAt, currTime)
 
 	var err error
 	key := makeCacheKey(columns, nil)
-	customerInfoUpdateCacheMut.RLock()
-	cache, cached := customerInfoUpdateCache[key]
-	customerInfoUpdateCacheMut.RUnlock()
+	customerUpdateCacheMut.RLock()
+	cache, cached := customerUpdateCache[key]
+	customerUpdateCacheMut.RUnlock()
 
 	if !cached {
 		wl := columns.UpdateColumnSet(
-			customerInfoAllColumns,
-			customerInfoPrimaryKeyColumns,
+			customerAllColumns,
+			customerPrimaryKeyColumns,
 		)
 
 		if !columns.IsWhitelist() {
 			wl = strmangle.SetComplement(wl, []string{"created_at"})
 		}
 		if len(wl) == 0 {
-			return 0, errors.New("deremsmodels: unable to update customer_info, could not build whitelist")
+			return 0, errors.New("deremsmodels: unable to update customer, could not build whitelist")
 		}
 
-		cache.query = fmt.Sprintf("UPDATE `customer_info` SET %s WHERE %s",
+		cache.query = fmt.Sprintf("UPDATE `customer` SET %s WHERE %s",
 			strmangle.SetParamNames("`", "`", 0, wl),
-			strmangle.WhereClause("`", "`", 0, customerInfoPrimaryKeyColumns),
+			strmangle.WhereClause("`", "`", 0, customerPrimaryKeyColumns),
 		)
-		cache.valueMapping, err = queries.BindMapping(customerInfoType, customerInfoMapping, append(wl, customerInfoPrimaryKeyColumns...))
+		cache.valueMapping, err = queries.BindMapping(customerType, customerMapping, append(wl, customerPrimaryKeyColumns...))
 		if err != nil {
 			return 0, err
 		}
@@ -753,42 +753,42 @@ func (o *CustomerInfo) Update(exec boil.Executor, columns boil.Columns) (int64, 
 	var result sql.Result
 	result, err = exec.Exec(cache.query, values...)
 	if err != nil {
-		return 0, errors.Wrap(err, "deremsmodels: unable to update customer_info row")
+		return 0, errors.Wrap(err, "deremsmodels: unable to update customer row")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "deremsmodels: failed to get rows affected by update for customer_info")
+		return 0, errors.Wrap(err, "deremsmodels: failed to get rows affected by update for customer")
 	}
 
 	if !cached {
-		customerInfoUpdateCacheMut.Lock()
-		customerInfoUpdateCache[key] = cache
-		customerInfoUpdateCacheMut.Unlock()
+		customerUpdateCacheMut.Lock()
+		customerUpdateCache[key] = cache
+		customerUpdateCacheMut.Unlock()
 	}
 
 	return rowsAff, nil
 }
 
 // UpdateAll updates all rows with the specified column values.
-func (q customerInfoQuery) UpdateAll(exec boil.Executor, cols M) (int64, error) {
+func (q customerQuery) UpdateAll(exec boil.Executor, cols M) (int64, error) {
 	queries.SetUpdate(q.Query, cols)
 
 	result, err := q.Query.Exec(exec)
 	if err != nil {
-		return 0, errors.Wrap(err, "deremsmodels: unable to update all for customer_info")
+		return 0, errors.Wrap(err, "deremsmodels: unable to update all for customer")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "deremsmodels: unable to retrieve rows affected for customer_info")
+		return 0, errors.Wrap(err, "deremsmodels: unable to retrieve rows affected for customer")
 	}
 
 	return rowsAff, nil
 }
 
 // UpdateAll updates all rows with the specified column values, using an executor.
-func (o CustomerInfoSlice) UpdateAll(exec boil.Executor, cols M) (int64, error) {
+func (o CustomerSlice) UpdateAll(exec boil.Executor, cols M) (int64, error) {
 	ln := int64(len(o))
 	if ln == 0 {
 		return 0, nil
@@ -810,13 +810,13 @@ func (o CustomerInfoSlice) UpdateAll(exec boil.Executor, cols M) (int64, error) 
 
 	// Append all of the primary key values for each column
 	for _, obj := range o {
-		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), customerInfoPrimaryKeyMapping)
+		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), customerPrimaryKeyMapping)
 		args = append(args, pkeyArgs...)
 	}
 
-	sql := fmt.Sprintf("UPDATE `customer_info` SET %s WHERE %s",
+	sql := fmt.Sprintf("UPDATE `customer` SET %s WHERE %s",
 		strmangle.SetParamNames("`", "`", 0, colNames),
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, customerInfoPrimaryKeyColumns, len(o)))
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, customerPrimaryKeyColumns, len(o)))
 
 	if boil.DebugMode {
 		fmt.Fprintln(boil.DebugWriter, sql)
@@ -824,25 +824,25 @@ func (o CustomerInfoSlice) UpdateAll(exec boil.Executor, cols M) (int64, error) 
 	}
 	result, err := exec.Exec(sql, args...)
 	if err != nil {
-		return 0, errors.Wrap(err, "deremsmodels: unable to update all in customerInfo slice")
+		return 0, errors.Wrap(err, "deremsmodels: unable to update all in customer slice")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "deremsmodels: unable to retrieve rows affected all in update all customerInfo")
+		return 0, errors.Wrap(err, "deremsmodels: unable to retrieve rows affected all in update all customer")
 	}
 	return rowsAff, nil
 }
 
-var mySQLCustomerInfoUniqueColumns = []string{
+var mySQLCustomerUniqueColumns = []string{
 	"id",
 }
 
 // Upsert attempts an insert using an executor, and does an update or ignore on conflict.
 // See boil.Columns documentation for how to properly use updateColumns and insertColumns.
-func (o *CustomerInfo) Upsert(exec boil.Executor, updateColumns, insertColumns boil.Columns) error {
+func (o *Customer) Upsert(exec boil.Executor, updateColumns, insertColumns boil.Columns) error {
 	if o == nil {
-		return errors.New("deremsmodels: no customer_info provided for upsert")
+		return errors.New("deremsmodels: no customer provided for upsert")
 	}
 	currTime := time.Now().In(boil.GetLocation())
 
@@ -851,8 +851,8 @@ func (o *CustomerInfo) Upsert(exec boil.Executor, updateColumns, insertColumns b
 	}
 	queries.SetScanner(&o.UpdatedAt, currTime)
 
-	nzDefaults := queries.NonZeroDefaultSet(customerInfoColumnsWithDefault, o)
-	nzUniques := queries.NonZeroDefaultSet(mySQLCustomerInfoUniqueColumns, o)
+	nzDefaults := queries.NonZeroDefaultSet(customerColumnsWithDefault, o)
+	nzUniques := queries.NonZeroDefaultSet(mySQLCustomerUniqueColumns, o)
 
 	if len(nzUniques) == 0 {
 		return errors.New("cannot upsert with a table that cannot conflict on a unique column")
@@ -880,43 +880,43 @@ func (o *CustomerInfo) Upsert(exec boil.Executor, updateColumns, insertColumns b
 	key := buf.String()
 	strmangle.PutBuffer(buf)
 
-	customerInfoUpsertCacheMut.RLock()
-	cache, cached := customerInfoUpsertCache[key]
-	customerInfoUpsertCacheMut.RUnlock()
+	customerUpsertCacheMut.RLock()
+	cache, cached := customerUpsertCache[key]
+	customerUpsertCacheMut.RUnlock()
 
 	var err error
 
 	if !cached {
 		insert, ret := insertColumns.InsertColumnSet(
-			customerInfoAllColumns,
-			customerInfoColumnsWithDefault,
-			customerInfoColumnsWithoutDefault,
+			customerAllColumns,
+			customerColumnsWithDefault,
+			customerColumnsWithoutDefault,
 			nzDefaults,
 		)
 
 		update := updateColumns.UpdateColumnSet(
-			customerInfoAllColumns,
-			customerInfoPrimaryKeyColumns,
+			customerAllColumns,
+			customerPrimaryKeyColumns,
 		)
 
 		if !updateColumns.IsNone() && len(update) == 0 {
-			return errors.New("deremsmodels: unable to upsert customer_info, could not build update column list")
+			return errors.New("deremsmodels: unable to upsert customer, could not build update column list")
 		}
 
 		ret = strmangle.SetComplement(ret, nzUniques)
-		cache.query = buildUpsertQueryMySQL(dialect, "`customer_info`", update, insert)
+		cache.query = buildUpsertQueryMySQL(dialect, "`customer`", update, insert)
 		cache.retQuery = fmt.Sprintf(
-			"SELECT %s FROM `customer_info` WHERE %s",
+			"SELECT %s FROM `customer` WHERE %s",
 			strings.Join(strmangle.IdentQuoteSlice(dialect.LQ, dialect.RQ, ret), ","),
 			strmangle.WhereClause("`", "`", 0, nzUniques),
 		)
 
-		cache.valueMapping, err = queries.BindMapping(customerInfoType, customerInfoMapping, insert)
+		cache.valueMapping, err = queries.BindMapping(customerType, customerMapping, insert)
 		if err != nil {
 			return err
 		}
 		if len(ret) != 0 {
-			cache.retMapping, err = queries.BindMapping(customerInfoType, customerInfoMapping, ret)
+			cache.retMapping, err = queries.BindMapping(customerType, customerMapping, ret)
 			if err != nil {
 				return err
 			}
@@ -937,7 +937,7 @@ func (o *CustomerInfo) Upsert(exec boil.Executor, updateColumns, insertColumns b
 	result, err := exec.Exec(cache.query, vals...)
 
 	if err != nil {
-		return errors.Wrap(err, "deremsmodels: unable to upsert for customer_info")
+		return errors.Wrap(err, "deremsmodels: unable to upsert for customer")
 	}
 
 	var lastID int64
@@ -954,13 +954,13 @@ func (o *CustomerInfo) Upsert(exec boil.Executor, updateColumns, insertColumns b
 	}
 
 	o.ID = int(lastID)
-	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == customerInfoMapping["id"] {
+	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == customerMapping["id"] {
 		goto CacheNoHooks
 	}
 
-	uniqueMap, err = queries.BindMapping(customerInfoType, customerInfoMapping, nzUniques)
+	uniqueMap, err = queries.BindMapping(customerType, customerMapping, nzUniques)
 	if err != nil {
-		return errors.Wrap(err, "deremsmodels: unable to retrieve unique values for customer_info")
+		return errors.Wrap(err, "deremsmodels: unable to retrieve unique values for customer")
 	}
 	nzUniqueCols = queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), uniqueMap)
 
@@ -970,28 +970,28 @@ func (o *CustomerInfo) Upsert(exec boil.Executor, updateColumns, insertColumns b
 	}
 	err = exec.QueryRow(cache.retQuery, nzUniqueCols...).Scan(returns...)
 	if err != nil {
-		return errors.Wrap(err, "deremsmodels: unable to populate default values for customer_info")
+		return errors.Wrap(err, "deremsmodels: unable to populate default values for customer")
 	}
 
 CacheNoHooks:
 	if !cached {
-		customerInfoUpsertCacheMut.Lock()
-		customerInfoUpsertCache[key] = cache
-		customerInfoUpsertCacheMut.Unlock()
+		customerUpsertCacheMut.Lock()
+		customerUpsertCache[key] = cache
+		customerUpsertCacheMut.Unlock()
 	}
 
 	return nil
 }
 
-// Delete deletes a single CustomerInfo record with an executor.
+// Delete deletes a single Customer record with an executor.
 // Delete will match against the primary key column to find the record to delete.
-func (o *CustomerInfo) Delete(exec boil.Executor) (int64, error) {
+func (o *Customer) Delete(exec boil.Executor) (int64, error) {
 	if o == nil {
-		return 0, errors.New("deremsmodels: no CustomerInfo provided for delete")
+		return 0, errors.New("deremsmodels: no Customer provided for delete")
 	}
 
-	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), customerInfoPrimaryKeyMapping)
-	sql := "DELETE FROM `customer_info` WHERE `id`=?"
+	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), customerPrimaryKeyMapping)
+	sql := "DELETE FROM `customer` WHERE `id`=?"
 
 	if boil.DebugMode {
 		fmt.Fprintln(boil.DebugWriter, sql)
@@ -999,52 +999,52 @@ func (o *CustomerInfo) Delete(exec boil.Executor) (int64, error) {
 	}
 	result, err := exec.Exec(sql, args...)
 	if err != nil {
-		return 0, errors.Wrap(err, "deremsmodels: unable to delete from customer_info")
+		return 0, errors.Wrap(err, "deremsmodels: unable to delete from customer")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "deremsmodels: failed to get rows affected by delete for customer_info")
+		return 0, errors.Wrap(err, "deremsmodels: failed to get rows affected by delete for customer")
 	}
 
 	return rowsAff, nil
 }
 
 // DeleteAll deletes all matching rows.
-func (q customerInfoQuery) DeleteAll(exec boil.Executor) (int64, error) {
+func (q customerQuery) DeleteAll(exec boil.Executor) (int64, error) {
 	if q.Query == nil {
-		return 0, errors.New("deremsmodels: no customerInfoQuery provided for delete all")
+		return 0, errors.New("deremsmodels: no customerQuery provided for delete all")
 	}
 
 	queries.SetDelete(q.Query)
 
 	result, err := q.Query.Exec(exec)
 	if err != nil {
-		return 0, errors.Wrap(err, "deremsmodels: unable to delete all from customer_info")
+		return 0, errors.Wrap(err, "deremsmodels: unable to delete all from customer")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "deremsmodels: failed to get rows affected by deleteall for customer_info")
+		return 0, errors.Wrap(err, "deremsmodels: failed to get rows affected by deleteall for customer")
 	}
 
 	return rowsAff, nil
 }
 
 // DeleteAll deletes all rows in the slice, using an executor.
-func (o CustomerInfoSlice) DeleteAll(exec boil.Executor) (int64, error) {
+func (o CustomerSlice) DeleteAll(exec boil.Executor) (int64, error) {
 	if len(o) == 0 {
 		return 0, nil
 	}
 
 	var args []interface{}
 	for _, obj := range o {
-		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), customerInfoPrimaryKeyMapping)
+		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), customerPrimaryKeyMapping)
 		args = append(args, pkeyArgs...)
 	}
 
-	sql := "DELETE FROM `customer_info` WHERE " +
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, customerInfoPrimaryKeyColumns, len(o))
+	sql := "DELETE FROM `customer` WHERE " +
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, customerPrimaryKeyColumns, len(o))
 
 	if boil.DebugMode {
 		fmt.Fprintln(boil.DebugWriter, sql)
@@ -1052,12 +1052,12 @@ func (o CustomerInfoSlice) DeleteAll(exec boil.Executor) (int64, error) {
 	}
 	result, err := exec.Exec(sql, args...)
 	if err != nil {
-		return 0, errors.Wrap(err, "deremsmodels: unable to delete all from customerInfo slice")
+		return 0, errors.Wrap(err, "deremsmodels: unable to delete all from customer slice")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "deremsmodels: failed to get rows affected by deleteall for customer_info")
+		return 0, errors.Wrap(err, "deremsmodels: failed to get rows affected by deleteall for customer")
 	}
 
 	return rowsAff, nil
@@ -1065,8 +1065,8 @@ func (o CustomerInfoSlice) DeleteAll(exec boil.Executor) (int64, error) {
 
 // Reload refetches the object from the database
 // using the primary keys with an executor.
-func (o *CustomerInfo) Reload(exec boil.Executor) error {
-	ret, err := FindCustomerInfo(exec, o.ID)
+func (o *Customer) Reload(exec boil.Executor) error {
+	ret, err := FindCustomer(exec, o.ID)
 	if err != nil {
 		return err
 	}
@@ -1077,26 +1077,26 @@ func (o *CustomerInfo) Reload(exec boil.Executor) error {
 
 // ReloadAll refetches every row with matching primary key column values
 // and overwrites the original object slice with the newly updated slice.
-func (o *CustomerInfoSlice) ReloadAll(exec boil.Executor) error {
+func (o *CustomerSlice) ReloadAll(exec boil.Executor) error {
 	if o == nil || len(*o) == 0 {
 		return nil
 	}
 
-	slice := CustomerInfoSlice{}
+	slice := CustomerSlice{}
 	var args []interface{}
 	for _, obj := range *o {
-		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), customerInfoPrimaryKeyMapping)
+		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), customerPrimaryKeyMapping)
 		args = append(args, pkeyArgs...)
 	}
 
-	sql := "SELECT `customer_info`.* FROM `customer_info` WHERE " +
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, customerInfoPrimaryKeyColumns, len(*o))
+	sql := "SELECT `customer`.* FROM `customer` WHERE " +
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, customerPrimaryKeyColumns, len(*o))
 
 	q := queries.Raw(sql, args...)
 
 	err := q.Bind(nil, exec, &slice)
 	if err != nil {
-		return errors.Wrap(err, "deremsmodels: unable to reload all in CustomerInfoSlice")
+		return errors.Wrap(err, "deremsmodels: unable to reload all in CustomerSlice")
 	}
 
 	*o = slice
@@ -1104,10 +1104,10 @@ func (o *CustomerInfoSlice) ReloadAll(exec boil.Executor) error {
 	return nil
 }
 
-// CustomerInfoExists checks if the CustomerInfo row exists.
-func CustomerInfoExists(exec boil.Executor, iD int) (bool, error) {
+// CustomerExists checks if the Customer row exists.
+func CustomerExists(exec boil.Executor, iD int) (bool, error) {
 	var exists bool
-	sql := "select exists(select 1 from `customer_info` where `id`=? limit 1)"
+	sql := "select exists(select 1 from `customer` where `id`=? limit 1)"
 
 	if boil.DebugMode {
 		fmt.Fprintln(boil.DebugWriter, sql)
@@ -1117,7 +1117,7 @@ func CustomerInfoExists(exec boil.Executor, iD int) (bool, error) {
 
 	err := row.Scan(&exists)
 	if err != nil {
-		return false, errors.Wrap(err, "deremsmodels: unable to check if customer_info exists")
+		return false, errors.Wrap(err, "deremsmodels: unable to check if customer exists")
 	}
 
 	return exists, nil

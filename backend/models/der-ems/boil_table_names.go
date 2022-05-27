@@ -4,13 +4,13 @@
 package deremsmodels
 
 var TableNames = struct {
-	CustomerInfo    string
+	Customer        string
 	Device          string
 	DeviceModel     string
 	Gateway         string
 	WeatherForecast string
 }{
-	CustomerInfo:    "customer_info",
+	Customer:        "customer",
 	Device:          "device",
 	DeviceModel:     "device_model",
 	Gateway:         "gateway",

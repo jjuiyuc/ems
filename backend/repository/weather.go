@@ -40,7 +40,7 @@ func GetWeatherForecastByLocation(lat, lng float32, startValidDate, endValidDate
 
 func GetGatewaysByLocation(lat, lng float32) (gateways []*deremsmodels.Gateway, err error) {
 	gateways, err = deremsmodels.Gateways(
-		qm.InnerJoin("customer_info AS c ON gateway.customer_info_id = c.id"),
+		qm.InnerJoin("customer AS c ON gateway.customer_id = c.id"),
 		qm.Where("(c.weather_lat = ? AND c.weather_lng = ?)", lat, lng)).All(models.GetDB())
 	return
 }

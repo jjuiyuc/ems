@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	"der-ems/config"
-	"der-ems/e"
+	"der-ems/internal/e"
 	"der-ems/kafka"
 	"der-ems/models"
 	deremsmodels "der-ems/models/der-ems"

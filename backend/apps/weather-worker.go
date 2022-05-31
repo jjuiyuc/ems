@@ -12,7 +12,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/volatiletech/null/v8"
 
-	"der-ems/e"
+	"der-ems/internal/e"
 	"der-ems/kafka"
 	deremsmodels "der-ems/models/der-ems"
 	"der-ems/repository"

@@ -8,6 +8,7 @@ import (
 	"github.com/swaggo/gin-swagger/swaggerFiles"
 
 	"der-ems/docs"
+	"der-ems/routers/api"
 )
 
 func NewAPIWorker(cfg *viper.Viper) {
@@ -15,7 +16,7 @@ func NewAPIWorker(cfg *viper.Viper) {
 	r.Run(cfg.GetString("server.port"))
 }
 
-// initialize routing information
+// @Title DER_EMS
 // @BasePath /api
 func initRouter(isCORS bool, ginMode string) *gin.Engine {
 	r := gin.New()
@@ -39,6 +40,11 @@ func initRouter(isCORS bool, ginMode string) *gin.Engine {
 		docs.SwaggerInfo.BasePath = "/api"
 		r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	}
+
+	apiGroup := r.Group("/api")
+
+	// Auth
+	apiGroup.POST("/auth", api.GetAuth)
 
 	return r
 }

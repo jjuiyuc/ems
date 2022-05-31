@@ -13,7 +13,8 @@ RUN tar -xzvf kafka.tgz --strip 1 -C /opt/kafka
 RUN wget https://repo.mysql.com/mysql-apt-config_0.8.13-1_all.deb
 RUN dpkg -i mysql-apt-config_0.8.13-1_all.deb
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 467B942D3A79BD29
-RUN apt-get update && apt-get install -y mysql-server
+
+RUN apt-get update && apt-get install -y mysql-server openjdk-8-jre-headless
 
 # go 1.18
 RUN wget https://dl.google.com/go/go1.18.2.linux-amd64.tar.gz

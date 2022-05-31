@@ -10,7 +10,7 @@ while [ ! -S /var/run/mysqld/mysqld.sock ]; do
 done
 echo "mysql online"
 
-mysqladmin create derems
+mysqladmin create der_ems
 
 mysql -u root -e "CREATE USER 'ubiik'@'%' IDENTIFIED BY 'testing123';"
 mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'ubiik'@'%' WITH GRANT OPTION;"

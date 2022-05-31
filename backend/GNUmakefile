@@ -2,6 +2,9 @@ GOPATH := $(shell go env GOPATH)
 
 GO_PKGS := $(shell go list ./... | grep -v models\/ )
 
+# saparated by comma
+COVER_PKG := $(shell go list ./... | grep -v models\/ | paste -sd "," - )
+
 clean:
 	@rm -rf dist
 
@@ -17,3 +20,10 @@ go-build: clean
 
 systemd:
 	@./scripts/dist.sh
+
+go-test:
+	@go test -v -count=1 -coverpkg=$(COVER_PKG) -coverprofile cover.out $(GO_PKGS)
+
+go-cover: go-test
+	@go tool cover -html=cover.out -o cover.html
+	@go tool cover -func=cover.out

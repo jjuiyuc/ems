@@ -15,7 +15,7 @@ no-hooks = true
   weather_lng = "WeatherLng"
 
 [mysql]
-dbname  = "ems_dev"
+dbname  = "der_ems"
 host    = "0.0.0.0"
 port    = 3306
 user    = "ubiik"

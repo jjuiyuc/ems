@@ -80,9 +80,9 @@ func (s *WeatherWorkerSuite) SetupSuite() {
 	}
 	seedUtValue2["validDate"] = s.seedUtTime.Add(+15 * time.Minute).Format(time.RFC3339)
 	s.seedUtWeather.Values = append(s.seedUtWeather.Values, seedUtValue2)
-	// Mock customer_info table
+	// Mock customer table
 	models.GetDB().Exec(`
-		INSERT INTO customer_info (id,customer_id,field_id,weather_lat,weather_lng) VALUES
+		INSERT INTO customer (id,customer_number,field_number,weather_lat,weather_lng) VALUES
 		(1,'A00001','00001',24.75,121),
 		(2,'A00001','00002',24.75,121),
 		(3,'B00001','00001',24.75,121);
@@ -98,6 +98,9 @@ func (s *WeatherWorkerSuite) SetupSuite() {
 }
 
 func (s *WeatherWorkerSuite) TearDownSuite() {
+	deremsmodels.WeatherForecasts().DeleteAll(models.GetDB())
+	deremsmodels.Gateways().DeleteAll(models.GetDB())
+	deremsmodels.Customers().DeleteAll(models.GetDB())
 	models.Close()
 }
 

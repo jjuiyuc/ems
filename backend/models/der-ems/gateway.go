@@ -23,73 +23,73 @@ import (
 
 // Gateway is an object representing the database table.
 type Gateway struct {
-	ID             int       `boil:"id" json:"id" toml:"id" yaml:"id"`
-	UUID           string    `boil:"uuid" json:"uuid" toml:"uuid" yaml:"uuid"`
-	CustomerInfoID int       `boil:"customer_info_id" json:"customerInfoID" toml:"customerInfoID" yaml:"customerInfoID"`
-	CreatedAt      time.Time `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
-	UpdatedAt      null.Time `boil:"updated_at" json:"updatedAt,omitempty" toml:"updatedAt" yaml:"updatedAt,omitempty"`
+	ID         int       `boil:"id" json:"id" toml:"id" yaml:"id"`
+	UUID       string    `boil:"uuid" json:"uuid" toml:"uuid" yaml:"uuid"`
+	CustomerID int       `boil:"customer_id" json:"customerID" toml:"customerID" yaml:"customerID"`
+	CreatedAt  time.Time `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
+	UpdatedAt  null.Time `boil:"updated_at" json:"updatedAt,omitempty" toml:"updatedAt" yaml:"updatedAt,omitempty"`
 
 	R *gatewayR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L gatewayL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var GatewayColumns = struct {
-	ID             string
-	UUID           string
-	CustomerInfoID string
-	CreatedAt      string
-	UpdatedAt      string
+	ID         string
+	UUID       string
+	CustomerID string
+	CreatedAt  string
+	UpdatedAt  string
 }{
-	ID:             "id",
-	UUID:           "uuid",
-	CustomerInfoID: "customer_info_id",
-	CreatedAt:      "created_at",
-	UpdatedAt:      "updated_at",
+	ID:         "id",
+	UUID:       "uuid",
+	CustomerID: "customer_id",
+	CreatedAt:  "created_at",
+	UpdatedAt:  "updated_at",
 }
 
 var GatewayTableColumns = struct {
-	ID             string
-	UUID           string
-	CustomerInfoID string
-	CreatedAt      string
-	UpdatedAt      string
+	ID         string
+	UUID       string
+	CustomerID string
+	CreatedAt  string
+	UpdatedAt  string
 }{
-	ID:             "gateway.id",
-	UUID:           "gateway.uuid",
-	CustomerInfoID: "gateway.customer_info_id",
-	CreatedAt:      "gateway.created_at",
-	UpdatedAt:      "gateway.updated_at",
+	ID:         "gateway.id",
+	UUID:       "gateway.uuid",
+	CustomerID: "gateway.customer_id",
+	CreatedAt:  "gateway.created_at",
+	UpdatedAt:  "gateway.updated_at",
 }
 
 // Generated where
 
 var GatewayWhere = struct {
-	ID             whereHelperint
-	UUID           whereHelperstring
-	CustomerInfoID whereHelperint
-	CreatedAt      whereHelpertime_Time
-	UpdatedAt      whereHelpernull_Time
+	ID         whereHelperint
+	UUID       whereHelperstring
+	CustomerID whereHelperint
+	CreatedAt  whereHelpertime_Time
+	UpdatedAt  whereHelpernull_Time
 }{
-	ID:             whereHelperint{field: "`gateway`.`id`"},
-	UUID:           whereHelperstring{field: "`gateway`.`uuid`"},
-	CustomerInfoID: whereHelperint{field: "`gateway`.`customer_info_id`"},
-	CreatedAt:      whereHelpertime_Time{field: "`gateway`.`created_at`"},
-	UpdatedAt:      whereHelpernull_Time{field: "`gateway`.`updated_at`"},
+	ID:         whereHelperint{field: "`gateway`.`id`"},
+	UUID:       whereHelperstring{field: "`gateway`.`uuid`"},
+	CustomerID: whereHelperint{field: "`gateway`.`customer_id`"},
+	CreatedAt:  whereHelpertime_Time{field: "`gateway`.`created_at`"},
+	UpdatedAt:  whereHelpernull_Time{field: "`gateway`.`updated_at`"},
 }
 
 // GatewayRels is where relationship names are stored.
 var GatewayRels = struct {
-	CustomerInfo string
-	GWDevices    string
+	Customer  string
+	GWDevices string
 }{
-	CustomerInfo: "CustomerInfo",
-	GWDevices:    "GWDevices",
+	Customer:  "Customer",
+	GWDevices: "GWDevices",
 }
 
 // gatewayR is where relationships are stored.
 type gatewayR struct {
-	CustomerInfo *CustomerInfo `boil:"CustomerInfo" json:"CustomerInfo" toml:"CustomerInfo" yaml:"CustomerInfo"`
-	GWDevices    DeviceSlice   `boil:"GWDevices" json:"GWDevices" toml:"GWDevices" yaml:"GWDevices"`
+	Customer  *Customer   `boil:"Customer" json:"Customer" toml:"Customer" yaml:"Customer"`
+	GWDevices DeviceSlice `boil:"GWDevices" json:"GWDevices" toml:"GWDevices" yaml:"GWDevices"`
 }
 
 // NewStruct creates a new relationship struct
@@ -97,11 +97,11 @@ func (*gatewayR) NewStruct() *gatewayR {
 	return &gatewayR{}
 }
 
-func (r *gatewayR) GetCustomerInfo() *CustomerInfo {
+func (r *gatewayR) GetCustomer() *Customer {
 	if r == nil {
 		return nil
 	}
-	return r.CustomerInfo
+	return r.Customer
 }
 
 func (r *gatewayR) GetGWDevices() DeviceSlice {
@@ -115,8 +115,8 @@ func (r *gatewayR) GetGWDevices() DeviceSlice {
 type gatewayL struct{}
 
 var (
-	gatewayAllColumns            = []string{"id", "uuid", "customer_info_id", "created_at", "updated_at"}
-	gatewayColumnsWithoutDefault = []string{"uuid", "customer_info_id", "updated_at"}
+	gatewayAllColumns            = []string{"id", "uuid", "customer_id", "created_at", "updated_at"}
+	gatewayColumnsWithoutDefault = []string{"uuid", "customer_id", "updated_at"}
 	gatewayColumnsWithDefault    = []string{"id", "created_at"}
 	gatewayPrimaryKeyColumns     = []string{"id"}
 	gatewayGeneratedColumns      = []string{}
@@ -213,15 +213,15 @@ func (q gatewayQuery) Exists(exec boil.Executor) (bool, error) {
 	return count > 0, nil
 }
 
-// CustomerInfo pointed to by the foreign key.
-func (o *Gateway) CustomerInfo(mods ...qm.QueryMod) customerInfoQuery {
+// Customer pointed to by the foreign key.
+func (o *Gateway) Customer(mods ...qm.QueryMod) customerQuery {
 	queryMods := []qm.QueryMod{
-		qm.Where("`id` = ?", o.CustomerInfoID),
+		qm.Where("`id` = ?", o.CustomerID),
 	}
 
 	queryMods = append(queryMods, mods...)
 
-	return CustomerInfos(queryMods...)
+	return Customers(queryMods...)
 }
 
 // GWDevices retrieves all the device's Devices with an executor via gw_uuid column.
@@ -238,9 +238,9 @@ func (o *Gateway) GWDevices(mods ...qm.QueryMod) deviceQuery {
 	return Devices(queryMods...)
 }
 
-// LoadCustomerInfo allows an eager lookup of values, cached into the
+// LoadCustomer allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for an N-1 relationship.
-func (gatewayL) LoadCustomerInfo(e boil.Executor, singular bool, maybeGateway interface{}, mods queries.Applicator) error {
+func (gatewayL) LoadCustomer(e boil.Executor, singular bool, maybeGateway interface{}, mods queries.Applicator) error {
 	var slice []*Gateway
 	var object *Gateway
 
@@ -255,7 +255,7 @@ func (gatewayL) LoadCustomerInfo(e boil.Executor, singular bool, maybeGateway in
 		if object.R == nil {
 			object.R = &gatewayR{}
 		}
-		args = append(args, object.CustomerInfoID)
+		args = append(args, object.CustomerID)
 
 	} else {
 	Outer:
@@ -265,12 +265,12 @@ func (gatewayL) LoadCustomerInfo(e boil.Executor, singular bool, maybeGateway in
 			}
 
 			for _, a := range args {
-				if a == obj.CustomerInfoID {
+				if a == obj.CustomerID {
 					continue Outer
 				}
 			}
 
-			args = append(args, obj.CustomerInfoID)
+			args = append(args, obj.CustomerID)
 
 		}
 	}
@@ -280,8 +280,8 @@ func (gatewayL) LoadCustomerInfo(e boil.Executor, singular bool, maybeGateway in
 	}
 
 	query := NewQuery(
-		qm.From(`customer_info`),
-		qm.WhereIn(`customer_info.id in ?`, args...),
+		qm.From(`customer`),
+		qm.WhereIn(`customer.id in ?`, args...),
 	)
 	if mods != nil {
 		mods.Apply(query)
@@ -289,19 +289,19 @@ func (gatewayL) LoadCustomerInfo(e boil.Executor, singular bool, maybeGateway in
 
 	results, err := query.Query(e)
 	if err != nil {
-		return errors.Wrap(err, "failed to eager load CustomerInfo")
+		return errors.Wrap(err, "failed to eager load Customer")
 	}
 
-	var resultSlice []*CustomerInfo
+	var resultSlice []*Customer
 	if err = queries.Bind(results, &resultSlice); err != nil {
-		return errors.Wrap(err, "failed to bind eager loaded slice CustomerInfo")
+		return errors.Wrap(err, "failed to bind eager loaded slice Customer")
 	}
 
 	if err = results.Close(); err != nil {
-		return errors.Wrap(err, "failed to close results of eager load for customer_info")
+		return errors.Wrap(err, "failed to close results of eager load for customer")
 	}
 	if err = results.Err(); err != nil {
-		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for customer_info")
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for customer")
 	}
 
 	if len(resultSlice) == 0 {
@@ -310,9 +310,9 @@ func (gatewayL) LoadCustomerInfo(e boil.Executor, singular bool, maybeGateway in
 
 	if singular {
 		foreign := resultSlice[0]
-		object.R.CustomerInfo = foreign
+		object.R.Customer = foreign
 		if foreign.R == nil {
-			foreign.R = &customerInfoR{}
+			foreign.R = &customerR{}
 		}
 		foreign.R.Gateways = append(foreign.R.Gateways, object)
 		return nil
@@ -320,10 +320,10 @@ func (gatewayL) LoadCustomerInfo(e boil.Executor, singular bool, maybeGateway in
 
 	for _, local := range slice {
 		for _, foreign := range resultSlice {
-			if local.CustomerInfoID == foreign.ID {
-				local.R.CustomerInfo = foreign
+			if local.CustomerID == foreign.ID {
+				local.R.Customer = foreign
 				if foreign.R == nil {
-					foreign.R = &customerInfoR{}
+					foreign.R = &customerR{}
 				}
 				foreign.R.Gateways = append(foreign.R.Gateways, local)
 				break
@@ -425,10 +425,10 @@ func (gatewayL) LoadGWDevices(e boil.Executor, singular bool, maybeGateway inter
 	return nil
 }
 
-// SetCustomerInfo of the gateway to the related item.
-// Sets o.R.CustomerInfo to related.
+// SetCustomer of the gateway to the related item.
+// Sets o.R.Customer to related.
 // Adds o to related.R.Gateways.
-func (o *Gateway) SetCustomerInfo(exec boil.Executor, insert bool, related *CustomerInfo) error {
+func (o *Gateway) SetCustomer(exec boil.Executor, insert bool, related *Customer) error {
 	var err error
 	if insert {
 		if err = related.Insert(exec, boil.Infer()); err != nil {
@@ -438,7 +438,7 @@ func (o *Gateway) SetCustomerInfo(exec boil.Executor, insert bool, related *Cust
 
 	updateQuery := fmt.Sprintf(
 		"UPDATE `gateway` SET %s WHERE %s",
-		strmangle.SetParamNames("`", "`", 0, []string{"customer_info_id"}),
+		strmangle.SetParamNames("`", "`", 0, []string{"customer_id"}),
 		strmangle.WhereClause("`", "`", 0, gatewayPrimaryKeyColumns),
 	)
 	values := []interface{}{related.ID, o.ID}
@@ -451,17 +451,17 @@ func (o *Gateway) SetCustomerInfo(exec boil.Executor, insert bool, related *Cust
 		return errors.Wrap(err, "failed to update local table")
 	}
 
-	o.CustomerInfoID = related.ID
+	o.CustomerID = related.ID
 	if o.R == nil {
 		o.R = &gatewayR{
-			CustomerInfo: related,
+			Customer: related,
 		}
 	} else {
-		o.R.CustomerInfo = related
+		o.R.Customer = related
 	}
 
 	if related.R == nil {
-		related.R = &customerInfoR{
+		related.R = &customerR{
 			Gateways: GatewaySlice{o},
 		}
 	} else {

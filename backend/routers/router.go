@@ -12,13 +12,13 @@ import (
 )
 
 func NewAPIWorker(cfg *viper.Viper) {
-	r := initRouter(cfg.GetBool("server.cors"), cfg.GetString("server.ginMode"))
+	r := InitRouter(cfg.GetBool("server.cors"), cfg.GetString("server.ginMode"))
 	r.Run(cfg.GetString("server.port"))
 }
 
 // @Title DER_EMS
 // @BasePath /api
-func initRouter(isCORS bool, ginMode string) *gin.Engine {
+func InitRouter(isCORS bool, ginMode string) *gin.Engine {
 	r := gin.New()
 	if isCORS {
 		r.Use(cors.New(cors.Config{

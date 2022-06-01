@@ -1,13 +1,13 @@
 package services
 
 import (
-	"fmt"
 	"time"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/volatiletech/null/v8"
 	"golang.org/x/crypto/bcrypt"
 
+	"der-ems/internal/e"
 	deremsmodels "der-ems/models/der-ems"
 	"der-ems/repository"
 )
@@ -27,7 +27,7 @@ func Login(username, password string) (user *deremsmodels.User, err error) {
 	// Check expiration date
 	now := time.Now()
 	if user.ExpirationDate.Valid != false && user.ExpirationDate.Time.Before(now) {
-		err = fmt.Errorf("User is expired on %s, please contact admin to extend", user.ExpirationDate.Time)
+		err = e.NewUserExpirationError(user.ExpirationDate.Time)
 		log.WithFields(log.Fields{
 			"caused-by": "user.ExpirationDate",
 			"err":       err,
@@ -37,7 +37,7 @@ func Login(username, password string) (user *deremsmodels.User, err error) {
 
 	// Check password retry count
 	if user.PasswordRetryCount.Int >= passwordLockCount {
-		err = fmt.Errorf("PasswordRetryCount: over %d tries, please contact admin to unlock", passwordLockCount)
+		err = e.NewUserLockedError(passwordLockCount)
 		log.WithFields(log.Fields{
 			"caused-by": "user.PasswordRetryCount",
 			"err":       err,
@@ -73,7 +73,6 @@ func Login(username, password string) (user *deremsmodels.User, err error) {
 func CreateLoginLog(user *deremsmodels.User, token string) (err error) {
 	loginLog := &deremsmodels.LoginLog{
 		UserID: null.NewInt(user.ID, true),
-		Token:  null.NewString(token, true),
 	}
 
 	err = repository.InsertLoginLog(loginLog)

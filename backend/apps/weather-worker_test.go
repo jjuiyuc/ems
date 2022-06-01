@@ -162,14 +162,15 @@ func (s *WeatherWorkerSuite) Test_04_GetGateWayUUIDsByLocation() {
 
 func (s *WeatherWorkerSuite) Test_05_GetNoValidDateWeatherData() {
 	// Modify seedUtWeather data
+	const validDate = "validDate"
 	for _, value := range s.seedUtWeather.Values {
-		delete(value, "validDate")
+		delete(value, validDate)
 	}
 	seedUtWeatherJson, _ := json.Marshal(s.seedUtWeather)
 	testMsg := s.getMockConsumerMessage(seedUtWeatherJson)
 
 	_, _, err := UpsertWeatherData(testMsg.Value)
-	s.Equal(e.ErrUlNoValidDate.Error(), err.Error())
+	s.Equal(e.NewKeyNotExistError(validDate).Error(), err.Error())
 }
 
 func (s *WeatherWorkerSuite) getMockConsumerMessage(seedUtWeatherJson []byte) (testMsg *sarama.ConsumerMessage) {

@@ -23,11 +23,10 @@ import (
 
 // LoginLog is an object representing the database table.
 type LoginLog struct {
-	ID        int         `boil:"id" json:"id" toml:"id" yaml:"id"`
-	UserID    null.Int    `boil:"user_id" json:"userID,omitempty" toml:"userID" yaml:"userID,omitempty"`
-	Token     null.String `boil:"token" json:"token,omitempty" toml:"token" yaml:"token,omitempty"`
-	CreatedAt time.Time   `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
-	UpdatedAt null.Time   `boil:"updated_at" json:"updatedAt,omitempty" toml:"updatedAt" yaml:"updatedAt,omitempty"`
+	ID        int       `boil:"id" json:"id" toml:"id" yaml:"id"`
+	UserID    null.Int  `boil:"user_id" json:"userID,omitempty" toml:"userID" yaml:"userID,omitempty"`
+	CreatedAt time.Time `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
+	UpdatedAt null.Time `boil:"updated_at" json:"updatedAt,omitempty" toml:"updatedAt" yaml:"updatedAt,omitempty"`
 
 	R *loginLogR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L loginLogL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -36,13 +35,11 @@ type LoginLog struct {
 var LoginLogColumns = struct {
 	ID        string
 	UserID    string
-	Token     string
 	CreatedAt string
 	UpdatedAt string
 }{
 	ID:        "id",
 	UserID:    "user_id",
-	Token:     "token",
 	CreatedAt: "created_at",
 	UpdatedAt: "updated_at",
 }
@@ -50,13 +47,11 @@ var LoginLogColumns = struct {
 var LoginLogTableColumns = struct {
 	ID        string
 	UserID    string
-	Token     string
 	CreatedAt string
 	UpdatedAt string
 }{
 	ID:        "login_log.id",
 	UserID:    "login_log.user_id",
-	Token:     "login_log.token",
 	CreatedAt: "login_log.created_at",
 	UpdatedAt: "login_log.updated_at",
 }
@@ -90,13 +85,11 @@ func (w whereHelpernull_Int) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNo
 var LoginLogWhere = struct {
 	ID        whereHelperint
 	UserID    whereHelpernull_Int
-	Token     whereHelpernull_String
 	CreatedAt whereHelpertime_Time
 	UpdatedAt whereHelpernull_Time
 }{
 	ID:        whereHelperint{field: "`login_log`.`id`"},
 	UserID:    whereHelpernull_Int{field: "`login_log`.`user_id`"},
-	Token:     whereHelpernull_String{field: "`login_log`.`token`"},
 	CreatedAt: whereHelpertime_Time{field: "`login_log`.`created_at`"},
 	UpdatedAt: whereHelpernull_Time{field: "`login_log`.`updated_at`"},
 }
@@ -118,8 +111,8 @@ func (*loginLogR) NewStruct() *loginLogR {
 type loginLogL struct{}
 
 var (
-	loginLogAllColumns            = []string{"id", "user_id", "token", "created_at", "updated_at"}
-	loginLogColumnsWithoutDefault = []string{"user_id", "token", "updated_at"}
+	loginLogAllColumns            = []string{"id", "user_id", "created_at", "updated_at"}
+	loginLogColumnsWithoutDefault = []string{"user_id", "updated_at"}
 	loginLogColumnsWithDefault    = []string{"id", "created_at"}
 	loginLogPrimaryKeyColumns     = []string{"id"}
 	loginLogGeneratedColumns      = []string{}

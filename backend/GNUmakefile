@@ -18,6 +18,10 @@ go-lint:
 go-build: clean
 	@go build -o dist/weather-worker cmd/daemon/weather-worker/weather-worker.go
 
+swag:
+	@$(shell if [ ! -f $(GOPATH)/bin/swag ] ; then go get -u github.com/swaggo/swag/cmd/swag; fi)
+	$(AT_RUN)$(GOPATH)/bin/swag init -g routers/router.go
+
 systemd:
 	@./scripts/dist.sh
 

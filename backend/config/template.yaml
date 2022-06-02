@@ -4,6 +4,9 @@ kafka:
 log:
   level: "debug"
 server:
+  port: :8081
+  cors: true
+  ginMode: "debug"
   debug: false
 db:
   derems:

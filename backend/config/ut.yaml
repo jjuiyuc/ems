@@ -2,6 +2,9 @@
 log:
   level: "debug"
 server:
+  port: :8081
+  cors: true
+  ginMode: "debug"
   debug: true
 db:
   derems:

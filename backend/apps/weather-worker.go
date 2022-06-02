@@ -12,7 +12,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/volatiletech/null/v8"
 
-	"der-ems/e"
+	"der-ems/internal/e"
 	"der-ems/kafka"
 	deremsmodels "der-ems/models/der-ems"
 	"der-ems/repository"
@@ -109,9 +109,9 @@ func UpsertWeatherData(msg []byte) (lat, lng float32, err error) {
 
 		dt := data[validDate]
 		if dt == nil {
-			err = e.ErrUlNoValidDate
+			err = e.NewKeyNotExistError(validDate)
 			log.WithFields(log.Fields{
-				"caused-by": "data[validDate]",
+				"caused-by": validDate,
 				"err":       err,
 			}).Error()
 			return

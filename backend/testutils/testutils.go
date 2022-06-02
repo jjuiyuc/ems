@@ -1,6 +1,7 @@
 package testutils
 
 import (
+	"fmt"
 	"path/filepath"
 	"runtime"
 
@@ -33,4 +34,8 @@ func SeedUtUser() (err error) {
 	}
 	err = user.Insert(models.GetDB(), boil.Infer())
 	return
+}
+
+func GetAuthorization(token string) string {
+	return fmt.Sprintf("Bearer %s", token)
 }

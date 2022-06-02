@@ -30,3 +30,9 @@ func InsertLoginLog(loginLog *deremsmodels.LoginLog) (err error) {
 	err = loginLog.Insert(models.GetDB(), boil.Infer())
 	return
 }
+
+func GetProfileByUserID(userID int) (user *deremsmodels.User, err error) {
+	user, err = deremsmodels.Users(
+		qm.Where("id = ?", userID)).One(models.GetDB())
+	return
+}

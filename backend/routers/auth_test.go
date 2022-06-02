@@ -75,7 +75,7 @@ func (s *AuthorizationSuite) Test_GetAuth() {
 			},
 		},
 		{
-			name: "login_invalidParams",
+			name: "loginInvalidParams",
 			args: args{
 				Username: fixtures.UtUser.Username,
 			},
@@ -86,7 +86,7 @@ func (s *AuthorizationSuite) Test_GetAuth() {
 			},
 		},
 		{
-			name: "login_notExistUser",
+			name: "loginNotExistUser",
 			args: args{
 				Username: "xxx",
 				Password: fixtures.UtUser.Password,

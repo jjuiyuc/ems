@@ -32,8 +32,10 @@ func (s *AuthorizationSuite) SetupSuite() {
 	models.Init()
 
 	// Truncate & seed data
-	models.GetDB().Exec("truncate table login_log")
-	testutils.SeedUtUser()
+	_, err := models.GetDB().Exec("truncate table login_log")
+	s.Require().NoError(err)
+	err = testutils.SeedUtUser()
+	s.Require().NoError(err)
 
 	s.router = InitRouter(config.GetConfig().GetBool("server.cors"), config.GetConfig().GetString("server.ginMode"))
 }
@@ -49,9 +51,9 @@ func (s *AuthorizationSuite) Test_GetAuth() {
 	}
 
 	type response struct {
-		Code int                    `json:"code"`
-		Msg  string                 `json:"msg"`
-		Data map[string]interface{} `json:"data"`
+		Code int         `json:"code"`
+		Msg  string      `json:"msg"`
+		Data interface{} `json:"data"`
 	}
 
 	tests := []struct {
@@ -98,20 +100,25 @@ func (s *AuthorizationSuite) Test_GetAuth() {
 	}
 
 	for _, tt := range tests {
-		payloadBuf, _ := json.Marshal(tt.args)
-		req, _ := http.NewRequest("POST", "/api/auth", bytes.NewBuffer(payloadBuf))
+		payloadBuf, err := json.Marshal(tt.args)
+		s.Require().NoError(err)
+		req, err := http.NewRequest("POST", "/api/auth", bytes.NewBuffer(payloadBuf))
+		s.Require().NoError(err)
 		rv := httptest.NewRecorder()
 		s.router.ServeHTTP(rv, req)
 		s.Equal(tt.wantStatus, rv.Code)
 
 		var res response
-		json.Unmarshal([]byte(rv.Body.String()), &res)
+		err = json.Unmarshal([]byte(rv.Body.String()), &res)
+		s.Require().NoError(err)
 		s.Equal(tt.wantRv.Code, res.Code)
 		s.Equal(tt.wantRv.Msg, res.Msg)
 
 		if tt.name == "login" {
-			s.NotEmpty(res.Data["token"])
-			count, _ := deremsmodels.LoginLogs().Count(models.GetDB())
+			dataMap := res.Data.(map[string]interface{})
+			s.NotEmpty(dataMap["token"])
+			count, err := deremsmodels.LoginLogs().Count(models.GetDB())
+			s.Require().NoError(err)
 			s.Equal(1, int(count))
 		}
 	}

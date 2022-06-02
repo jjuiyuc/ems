@@ -17,13 +17,20 @@ func GetConfigDir() string {
 	return filepath.Join(filepath.Dir(filename), "..", "config")
 }
 
-func SeedUtUser() {
-	models.GetDB().Exec("truncate table user")
-	hashPassword, _ := bcrypt.GenerateFromPassword([]byte(fixtures.UtUser.Password), bcrypt.DefaultCost)
+func SeedUtUser() (err error) {
+	_, err = models.GetDB().Exec("truncate table user")
+	if err != nil {
+		return
+	}
+	hashPassword, err := bcrypt.GenerateFromPassword([]byte(fixtures.UtUser.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return
+	}
 	user := &deremsmodels.User{
 		Username:       fixtures.UtUser.Username,
 		Password:       string(hashPassword[:]),
 		ExpirationDate: fixtures.UtUser.ExpirationDate,
 	}
-	user.Insert(models.GetDB(), boil.Infer())
+	err = user.Insert(models.GetDB(), boil.Infer())
+	return
 }

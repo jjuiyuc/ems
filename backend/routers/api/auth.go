@@ -1,15 +1,16 @@
 package api
 
 import (
-	"der-ems/internal/app"
-	"der-ems/internal/e"
-	"der-ems/internal/utils"
-	"der-ems/services"
 	"net/http"
 
 	"github.com/astaxie/beego/validation"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
+
+	"der-ems/internal/app"
+	"der-ems/internal/e"
+	"der-ems/internal/utils"
+	"der-ems/services"
 )
 
 // @Summary Get Authorization

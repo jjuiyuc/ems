@@ -33,11 +33,16 @@ func (s *WeatherWorkerSuite) SetupSuite() {
 	models.Init()
 
 	// Truncate data
-	models.GetDB().Exec("truncate table weather_forecast")
-	models.GetDB().Exec("set FOREIGN_KEY_CHECKS = 0")
-	models.GetDB().Exec("truncate table gateway")
-	models.GetDB().Exec("truncate table customer_info")
-	models.GetDB().Exec("set FOREIGN_KEY_CHECKS = 1")
+	_, err := models.GetDB().Exec("TRUNCATE TABLE weather_forecast")
+	s.Require().NoError(err)
+	_, err = models.GetDB().Exec("SET FOREIGN_KEY_CHECKS = 0")
+	s.Require().NoError(err)
+	_, err = models.GetDB().Exec("TRUNCATE TABLE gateway")
+	s.Require().NoError(err)
+	_, err = models.GetDB().Exec("TRUNCATE TABLE customer")
+	s.Require().NoError(err)
+	_, err = models.GetDB().Exec("SET FOREIGN_KEY_CHECKS = 1")
+	s.Require().NoError(err)
 	// Mock seedUtWeather data
 	s.seedUtTime = time.Now().UTC()
 	s.seedUtWeather = LatestWeather{
@@ -49,29 +54,29 @@ func (s *WeatherWorkerSuite) SetupSuite() {
 		"validDate":   s.seedUtTime.Format(time.RFC3339),
 		"acpcpsfc":    0.125,
 		"capesfc":     1.0,
-		"cpratavesfc": "6.960000064282212e-06",
-		"cpratsfc":    "2.752000000327825e-05",
-		"crainavesfc": "1.0",
-		"crainsfc":    "0.0",
-		"dlwrfsfc":    "386.7000122070313",
-		"dpt2m":       "287.0",
-		"dswrfsfc":    "15.712000846862791",
-		"lftxsfc":     "10.458468437194824",
-		"lhtflsfc":    "85.36327362060547",
-		"no4lftxsfc":  "1.2618210315704346",
-		"prateavesfc": "0.0002532000071369",
-		"pratesfc":    "8.560000424040481e-05",
-		"pressfc":     "100225.5234375",
-		"pwatclm":     "45.57017135620117",
-		"rh2m":        "88.5999984741211",
-		"shtflsfc":    "26.11602783203125",
-		"lcdclcll":    "100.0",
-		"mcdcmcll":    "100.0",
-		"tmpsfc":      "288.83892822265625",
-		"ulwrfsfc":    "402.679443359375",
-		"ulwrftoa":    "208.6212615966797",
-		"uswrfsfc":    "1.856000065803528",
-		"uswrftoa":    "314.656005859375",
+		"cpratavesfc": 6.960000064282212e-06,
+		"cpratsfc":    2.752000000327825e-05,
+		"crainavesfc": 1.0,
+		"crainsfc":    0.0,
+		"dlwrfsfc":    386.7000122070313,
+		"dpt2m":       287.0,
+		"dswrfsfc":    15.712000846862791,
+		"lftxsfc":     10.458468437194824,
+		"lhtflsfc":    85.36327362060547,
+		"no4lftxsfc":  1.2618210315704346,
+		"prateavesfc": 0.0002532000071369,
+		"pratesfc":    8.560000424040481e-05,
+		"pressfc":     100225.5234375,
+		"pwatclm":     45.57017135620117,
+		"rh2m":        88.5999984741211,
+		"shtflsfc":    26.11602783203125,
+		"lcdclcll":    100.0,
+		"mcdcmcll":    100.0,
+		"tmpsfc":      288.83892822265625,
+		"ulwrfsfc":    402.679443359375,
+		"ulwrftoa":    208.6212615966797,
+		"uswrfsfc":    1.856000065803528,
+		"uswrftoa":    314.656005859375,
 	}
 	s.seedUtWeather.Values = append(s.seedUtWeather.Values, seedUtValue1)
 	seedUtValue2 := make(map[string]interface{})
@@ -80,27 +85,28 @@ func (s *WeatherWorkerSuite) SetupSuite() {
 	}
 	seedUtValue2["validDate"] = s.seedUtTime.Add(+15 * time.Minute).Format(time.RFC3339)
 	s.seedUtWeather.Values = append(s.seedUtWeather.Values, seedUtValue2)
+
 	// Mock customer table
-	models.GetDB().Exec(`
+	_, err = models.GetDB().Exec(`
 		INSERT INTO customer (id,customer_number,field_number,weather_lat,weather_lng) VALUES
 		(1,'A00001','00001',24.75,121),
 		(2,'A00001','00002',24.75,121),
 		(3,'B00001','00001',24.75,121);
 	`)
+	s.Require().NoError(err)
+
 	// Mock gateway table
-	models.GetDB().Exec(`
+	_, err = models.GetDB().Exec(`
 		INSERT INTO gateway (id,uuid,customer_id) VALUES
 		(1,'U00001',1),
 		(2,'U00002',1),
 		(3,'U00003',2),
 		(4,'U00004',3);
 	`)
+	s.Require().NoError(err)
 }
 
 func (s *WeatherWorkerSuite) TearDownSuite() {
-	deremsmodels.WeatherForecasts().DeleteAll(models.GetDB())
-	deremsmodels.Gateways().DeleteAll(models.GetDB())
-	deremsmodels.Customers().DeleteAll(models.GetDB())
 	models.Close()
 }
 

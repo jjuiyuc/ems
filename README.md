@@ -1,6 +1,6 @@
 # DER-EMS
 
-## Backend
+## Backend [![pipeline status](https://gitlab.com/ubiik/ems/der-ems/badges/main/pipeline.svg)](https://gitlab.com/ubiik/ems/der-ems/-/commits/main) [![coverage report](https://gitlab.com/ubiik/ems/der-ems/badges/main/coverage.svg)](https://gitlab.com/ubiik/ems/der-ems/-/commits/main)
 
 ### Prerequisite
 

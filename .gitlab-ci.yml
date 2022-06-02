@@ -27,7 +27,7 @@ backend-test-job:
     - cp sqlboiler.toml.der-ems sqlboiler.der-ems.toml
     - make go-cover
     - go run github.com/t-yuki/gocover-cobertura < cover.out > coverage.xml
-    - sed -i 's;filename=\"gitlab.com/ubiik/onm/;filename=\";g' coverage.xml
+    - sed -i 's;filename=\"gitlab.com/ubiik/ems/der-ems/;filename=\";g' coverage.xml
   artifacts:
     reports:
       coverage_report:

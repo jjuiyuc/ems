@@ -4,6 +4,7 @@ wipe     = true
 no-tests = true
 no-context = true
 no-hooks = true
+tag-ignore = ["password"]
 
 [aliases.tables]
   name = "weather_forecast"
@@ -15,10 +16,10 @@ no-hooks = true
   weather_lng = "WeatherLng"
 
 [mysql]
-dbname  = "ems_dev"
+dbname  = "der_ems"
 host    = "0.0.0.0"
 port    = 3306
 user    = "ubiik"
 pass    = "testing123"
 sslmode = "false"
-whitelist = ["weather_forecast", "customer", "gateway", "device_model", "device"]
+whitelist = ["weather_forecast", "customer", "gateway", "device_model", "device", "login_log", "user"]

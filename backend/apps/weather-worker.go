@@ -107,7 +107,7 @@ func UpsertWeatherData(msg []byte) (lat, lng float32, err error) {
 	for i, data := range latestWeather.Values {
 		const validDate = "validDate"
 
-		dt, _ := data[validDate]
+		dt := data[validDate]
 		if dt == nil {
 			err = e.ErrUlNoValidDate
 			log.WithFields(log.Fields{
@@ -234,5 +234,4 @@ func publish(latestWeatherJson []byte, gatewayUUIDs []string) {
 		log.Debug("sendWeatherDatatoLocalGW: ", sendWeatherDatatoLocalGW)
 		kafka.Produce(sendWeatherDatatoLocalGW, string(latestWeatherJson))
 	}
-	return
 }

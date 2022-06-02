@@ -61,7 +61,7 @@ func (s *UserSuite) Test_Authorize() {
 		wantRv     response
 	}{
 		{
-			name:       "authorize_noHeader",
+			name:       "authorizeNoHeader",
 			token:      s.token,
 			wantStatus: http.StatusUnauthorized,
 			wantRv: response{
@@ -70,7 +70,7 @@ func (s *UserSuite) Test_Authorize() {
 			},
 		},
 		{
-			name:       "authorize_invalidHeader",
+			name:       "authorizeInvalidHeader",
 			token:      "xxx xxx",
 			wantStatus: http.StatusUnauthorized,
 			wantRv: response{
@@ -79,7 +79,7 @@ func (s *UserSuite) Test_Authorize() {
 			},
 		},
 		{
-			name:       "authorize_wrongToken",
+			name:       "authorizeWrongToken",
 			token:      "xxx",
 			wantStatus: http.StatusUnauthorized,
 			wantRv: response{
@@ -92,7 +92,7 @@ func (s *UserSuite) Test_Authorize() {
 	for _, tt := range tests {
 		req, err := http.NewRequest("GET", fmt.Sprintf("/api/users/profile"), nil)
 		s.Require().NoError(err)
-		if tt.name != "authorize_noHeader" {
+		if tt.name != "authorizeNoHeader" {
 			req.Header.Set("Authorization", testutils.GetAuthorization(tt.token))
 		}
 		rv := httptest.NewRecorder()

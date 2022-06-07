@@ -45,7 +45,7 @@ function NonLoggedIn () {
                 {brand}
             </div>
             <div className="bg-gray-800 gap-10 grid grid-rows-1fr-auto h-full
-                            items-start max-h-4xl max-w-xl pb-5 rounded-4xl
+                            items-start max-h-4xl max-w-xl pb-5 rounded-2.5xl
                             text-center w-full
                             pt-6 sm-sm:pt-24 sm-md:pt-32 sm-lg:pt-40
                             px-6 md:px-12">
@@ -56,7 +56,7 @@ function NonLoggedIn () {
                     <Route
                         element={<ResetPassword />}
                         path="/resetPassword" />
-                    <Route element={<LogIn />} path="/" />
+                    <Route element={<LogIn />} path="*" />
                 </Routes>
                 <div className="text-gray-300 text-13px">
                     {t("common.copyright")}

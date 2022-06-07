@@ -1,6 +1,8 @@
 {
     "black": {"main": "#020202"},
     "blue": {"main": "#43B0FF"},
+    "brand": {"main": "#12c9c9"},
+    "darkGray": {"main": "#303034"},
     "gray": {
         "200": "#E0E0E0",
         "main": "#E0E0E0",
@@ -30,5 +32,5 @@
     },
     "purple": {"main": "#EF7BE3"},
     "success": {"main": "#0FD76B"},
-    "yellow": {"main": "#FFDA15"}
+    "yellow": {"main": "#FBE947"}
 }

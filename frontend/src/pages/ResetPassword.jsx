@@ -75,7 +75,9 @@ function ResetPassword () {
         </FormControl>
         </>
         : <>
-        <h6 className="mb-8 md:mb-16">{commonT("passwordRule")}</h6>
+        <h6 className="text-gray-300 mb-8 md:mb-16">
+            {commonT("passwordRule")}
+        </h6>
         <FormControl fullWidth>
             <LanguageField />
             <TextField

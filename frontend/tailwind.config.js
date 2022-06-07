@@ -8,7 +8,7 @@ module.exports = {
     theme: {
         extend: {
             borderRadius: {
-                "4xl": "20px"
+                "2.5xl": "1.25rem"
             },
             boxShadow: {
                 main: "4px 0px 4px rgba(0, 0, 0, 0.05) inset"
@@ -16,10 +16,12 @@ module.exports = {
             colors: {...palette},
             fontSize: {
                 "13px": ".8125rem",
+                "28px": "1.75rem",
                 "3.5xl": "2rem"
             },
             gridTemplateColumns: {
                 "auto-1fr": "auto 1fr",
+                "3-auto": "auto auto auto",
                 "5rem-1fr": "5rem 1fr",
                 "15rem-1fr": "15rem 1fr"
             },
@@ -28,10 +30,14 @@ module.exports = {
                 "auto-1fr": "auto 1fr"
             },
             height: {
-                "15": "3.75rem"
+                "15": "3.75rem",
+                "38": "9.5rem",
+                "45": "11.25rem",
+                "160": "40rem"
             },
             maxHeight: {
-                "4xl": "56rem"
+                "4xl": "56rem",
+                "80vh": "80vh"
             },
             maxWidth: {
                 "2/3": "66.6%"
@@ -50,7 +56,10 @@ module.exports = {
             width: {
                 "3/8": "37.5%",
                 "5/8": "65.5%",
+                "41": "10.25rem",
                 "42": "10.5rem",
+                "45": "11.25rem",
+                "38": "9.5rem",
                 "60": "15rem"
             }
         },

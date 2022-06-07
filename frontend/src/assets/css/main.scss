@@ -1,4 +1,6 @@
+@use "sass:math";
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+TC&display=swap");
+
 
 @tailwind base;
 @tailwind components;
@@ -21,14 +23,20 @@ aside .logo {
 h1 {
     @apply font-bold text-gray-200 text-3xl sm:text-3.5xl;
 }
+h2 {
+    @apply font-bold text-3xl text-2xl sm:text-28px;
+}
 h3 {
     @apply font-bold text-xl sm:text-2xl;
 }
+h4 {
+    @apply font-bold text-lg sm:text-xl;
+}
 h5 {
-    @apply text-gray-300 text-base;
+    @apply text-base;
 }
 h6 {
-    @apply text-gray-300 text-sm;
+    @apply text-sm;
 }
 .bg-image-grid {
     background-image:
@@ -39,6 +47,33 @@ h6 {
 }
 .box {
     @apply border border-gray-500 px-6 py-4 rounded-3xl;
+}
+.card {
+    @apply bg-gray-900 rounded-3xl;
+    @apply py-4 md:py-8;
+
+    &.chart {
+        @apply px-4 md:px-8;
+    }
+    &:not(.chart) {
+        @apply px-6 md:px-10;
+    }
+
+    .header {
+        @apply sm:flex items-center h-9 justify-between mb-6;
+    }
+
+    .subCard {
+        @apply bg-gray-700 my-4 rounded-2.5xl
+                px-4 py-3 md:px-6 md:py-4;
+    }
+}
+.page-header {
+    @apply sm:flex items-center justify-between mb-8;
+
+    h1 {
+        @apply mb-3 sm:mb-0;
+    }
 }
 .sidebar-menu {
     li {
@@ -56,6 +91,38 @@ h6 {
                 @apply mr-3;
             }
         }
+    }
+}
+.text-11px {
+    @apply text-xs;
+    transform: scale(0.917);
+}
+.three-columns {
+    $gray-400: #606060;
+    $trans: transparent;
+
+    @mixin bgImage($gap) {
+        $halfGap: math.div($gap, 2);
+        $pos1: calc((100% - $gap * 2) / 3 + $halfGap);
+        $pos1_1: calc((100% - $gap * 2) / 3 + $halfGap + 1px);
+        $pos2: calc((100% - $gap * 2) / 3 * 2 + $gap + $halfGap);
+        $pos2_1: calc((100% - $gap * 2) / 3 * 2 + $gap + $halfGap + 1px);
+
+        background-image: linear-gradient(to right,
+            $trans $pos1, $gray-400 $pos1_1, $trans $pos1_1,
+            $trans $pos2, $gray-400 $pos2, $trans $pos2_1
+        );
+    }
+
+    background-position: left bottom;
+    background-repeat: repeat-x;
+    background-size: 100% 3.25rem;
+
+    @media (max-width: 599px) {
+        @include bgImage(1.25rem);
+    }
+    @media (min-width: 600px) {
+        @include bgImage(2.5rem);
     }
 }
 .userMenu {

@@ -5,15 +5,58 @@ const theme = createTheme({
     components: {
         MuiButton: {
             styleOverrides: {
-                root: {
-                    color: "white",
-                    fontSize: "1rem",
-                    textTransform: "none",
-                    transitionDuration: ".3s",
-                    transitionProperty: "background-color, opacity"
+                root: ({ownerState, theme}) => {
+                    let styles = {
+                        color: ownerState.color === "primary"
+                                ? "white"
+                                : theme.palette[ownerState.color].main,
+                        fontSize: "1rem",
+                        fontWeight: 400,
+                        textTransform: "none",
+                        transitionDuration: ".3s",
+                        transitionProperty: "background-color, opacity"
+                    }
+
+                    if ("filter" in ownerState) {
+                        styles = {
+                            ...styles,
+                            background: theme.palette.gray[600],
+                            color: theme.palette.gray[200],
+                            boxShadow: "none",
+                            minWidth: "6.75rem",
+                            paddingLeft: "1rem",
+                            paddingRight: "1rem",
+                            "&:hover": {
+                                background: theme.palette.gray[500],
+                                boxShadow: "none"
+                            }
+                        }
+                    }
+
+                    return styles
                 }
             },
             variants: [
+                {
+                    props: {disabled: true},
+                    style: props => ({
+                        background: `${props.theme.palette[props.ownerState.color].main} !important`,
+                        color: "white !important",
+                        opacity: .3
+                    })
+                },
+                {
+                    props: {filter: "selected"},
+                    style: props => ({
+                        fontWeight: "bold",
+                        background: theme.palette.primary.main,
+                        color: props.theme.palette.gray[900],
+                        cursor: "default",
+                        "&:hover": {
+                            background: theme.palette.primary.main
+                        }
+                    }),
+                },
                 {
                     props: {radius: "pill"},
                     style: {borderRadius: "100vh"},
@@ -27,13 +70,13 @@ const theme = createTheme({
                     }
                 },
                 {
-                    props: {disabled: true},
-                    style: props => ({
-                        background: `${props.theme.palette[props.ownerState.color].main} !important`,
-                        color: "white !important",
-                        opacity: .3
-                    })
-                }
+                    props: {size: "small", variant: "text"},
+                    style: {
+                        fontWeight: "bold",
+                        lineHeight: "1.17",
+                        padding: ".5rem 1rem"
+                    },
+                },
             ]
         },
         MuiFormHelperText: {
@@ -52,7 +95,7 @@ const theme = createTheme({
                     color: "white",
                     "fieldset": {transition: "border-color .3s"}
                 },
-                input: ({ownerState, theme}) => ({
+                input: ({theme}) => ({
                     "&:-webkit-autofill": {
                         boxShadow: `0 0 0 100.09px ${theme.palette.gray[600]} inset !important`
                     }
@@ -61,7 +104,7 @@ const theme = createTheme({
         },
         MuiInputLabel: {
             styleOverrides: {
-                root: ({ownerState, theme}) => ({
+                root: ({theme}) => ({
                     color: theme.palette.gray[300]
                 })
             }

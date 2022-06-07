@@ -1,9 +1,14 @@
 {
     "common": {
+        "battery": "電池",
         "copyright": "© 2022 Ubiik Inc. All rights reserved",
+        "grid": "電網",
         "logIn": "登入",
         "logOut": "登出",
-        "passwordRule": "密碼長度至少為 8 個字元，且必須包含下列 4 種字元中的 3 種：英文大寫字元、英文小寫字元、數字、特殊符號。"
+        "kw": "kW",
+        "kwh": "kWh",
+        "passwordRule": "密碼長度至少為 8 個字元，且必須包含下列 4 種字元中的 3 種：英文大寫字元、英文小寫字元、數字、特殊符號。",
+        "solar": "太陽能"
     },
     "error": {
         "emailFormat": "Email 帳號格式錯誤，請重新輸入。",
@@ -42,5 +47,23 @@
         "logInWithNewPassword": "請以新密碼登入。",
         "reset": "重設",
         "resetPassword": "重設密碼"
+    },
+    "timeOfUse": {
+        "batteryPower": "供電量",
+        "batteryStatus": "電池狀態",
+        "chargingFrom": "充電來源",
+        "current": "目前",
+        "directSolarUsage": "Direct Solar Usage",
+        "editTimeOfUse": "Edit Time of Use",
+        "midPeak": "Mid-peak",
+        "offPeak": "Off-peak",
+        "onPeak": "On-peak",
+        "source": "{type} Energy Sources",
+        "stateOfCharge": "充電狀態",
+        "superOffPeak": "Super off-peak",
+        "timeOfUse": "Time of Use",
+        "today": "今天",
+        "totalUntilNow": "Total Until Now",
+        "yesterday": "昨日"
     }
 }

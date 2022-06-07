@@ -6,6 +6,12 @@ server:
   cors: true
   ginMode: "debug"
   debug: true
+email:
+  server: "smtp.gmail.com:587"
+  account: "gitlab@ubiik.com"
+  password: ""
+  accountName: "DER-EMS Mailer"
+  plainAuth: true
 db:
   derems:
     driver: mysql

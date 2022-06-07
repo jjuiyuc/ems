@@ -49,6 +49,34 @@ paths:
       summary: Get Authorization
       tags:
       - Authorization
+  /user/passwordLost:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Username
+        in: path
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: Send an email for reset the password
+      tags:
+      - User
   /user/profile:
     get:
       parameters:

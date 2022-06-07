@@ -12,5 +12,9 @@ const (
 	ErrAuthTokenGen      = 20003
 	ErrAuthLogin         = 20004
 
+	// ErrPasswordToken = 30000
+	// ErrPasswordReset = 30001
+	ErrPasswordLost = 30002
+
 	ErrToken = 40000
 )

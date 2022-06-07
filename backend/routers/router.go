@@ -54,6 +54,7 @@ func InitRouter(isCORS bool, ginMode string) *gin.Engine {
 	apiGroup.POST("/auth", api.GetAuth)
 
 	// User
+	apiGroup.PUT("/users/password/lost", api.PasswordLost)
 	apiGroup.GET("/users/profile", authorize(), api.GetProfile)
 
 	return r

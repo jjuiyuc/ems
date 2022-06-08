@@ -6,10 +6,11 @@ const (
 	Error         = 500
 	InvalidParams = 400
 
-	// ErrAuthNoHeader      = 20000
-	// ErrAuthInvalidHeader = 20001
-	// ErrAuthTokenParse    = 20002
-	// ErrAuthTokenTimeout  = 20003
-	ErrAuthTokenGen = 20004
-	ErrAuthLogin    = 20005
+	ErrAuthNoHeader      = 20000
+	ErrAuthInvalidHeader = 20001
+	ErrAuthTokenParse    = 20002
+	ErrAuthTokenGen      = 20003
+	ErrAuthLogin         = 20004
+
+	ErrToken = 40000
 )

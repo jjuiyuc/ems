@@ -29,3 +29,17 @@ func GenerateToken(userID int) (token string, err error) {
 	token, err = tokenClaims.SignedString(jwtSecret)
 	return
 }
+
+func ParseToken(token string) (*Claims, error) {
+	tokenClaims, err := jwt.ParseWithClaims(token, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return jwtSecret, nil
+	})
+
+	if tokenClaims != nil {
+		if claims, ok := tokenClaims.Claims.(*Claims); ok && tokenClaims.Valid {
+			return claims, nil
+		}
+	}
+
+	return nil, err
+}

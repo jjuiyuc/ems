@@ -25,7 +25,7 @@ import (
 type User struct {
 	ID                  int         `boil:"id" json:"id" toml:"id" yaml:"id"`
 	Username            string      `boil:"username" json:"username" toml:"username" yaml:"username"`
-	Password            string      `boil:"password" json:"password" toml:"password" yaml:"password"`
+	Password            string      `boil:"password" json:"-" toml:"-" yaml:"-"`
 	PasswordLastChanged null.Time   `boil:"password_last_changed" json:"passwordLastChanged,omitempty" toml:"passwordLastChanged" yaml:"passwordLastChanged,omitempty"`
 	PasswordResetExpiry null.Time   `boil:"password_reset_expiry" json:"passwordResetExpiry,omitempty" toml:"passwordResetExpiry" yaml:"passwordResetExpiry,omitempty"`
 	PasswordRetryCount  null.Int    `boil:"password_retry_count" json:"passwordRetryCount,omitempty" toml:"passwordRetryCount" yaml:"passwordRetryCount,omitempty"`

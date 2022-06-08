@@ -10,9 +10,11 @@ import (
 	"der-ems/internal/app"
 	"der-ems/internal/e"
 	"der-ems/internal/utils"
+	"der-ems/repository"
 	"der-ems/services"
 )
 
+// GetAuth issues the token if user provides the valid credential
 // @Summary Get Authorization
 // @Tags Authorization
 // @Accept application/json
@@ -42,7 +44,9 @@ func GetAuth(c *gin.Context) {
 		return
 	}
 
-	user, err := services.Login(a.Username, a.Password)
+	repo := repository.NewUserRepository()
+	s := services.NewAuthService(repo)
+	user, err := s.Login(a.Username, a.Password)
 	if err != nil {
 		appG.Response(http.StatusUnauthorized, e.ErrAuthLogin, map[string]string{
 			"msg": err.Error(),
@@ -60,7 +64,7 @@ func GetAuth(c *gin.Context) {
 		return
 	}
 
-	services.CreateLoginLog(user, token)
+	s.CreateLoginLog(user, token)
 
 	appG.Response(http.StatusOK, e.Success, map[string]string{
 		"token": token,

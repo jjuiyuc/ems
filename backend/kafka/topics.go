@@ -1,6 +1,6 @@
 package kafka
 
 const (
-	ReceiveWeatherData       = "open-data.weather.ctc.forecast.0"
-	SendWeatherDatatoLocalGW = "core.weather.ctc.forecast.{gw-id}.0"
+	ReceiveWeatherData       = "open-data.weather.cdc.forecast.0"
+	SendWeatherDatatoLocalGW = "core.weather.cdc.forecast.{gw-id}.0"
 )

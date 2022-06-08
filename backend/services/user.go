@@ -7,11 +7,22 @@ import (
 	"der-ems/repository"
 )
 
-func GetProfile(userID int) (user *deremsmodels.User, err error) {
-	user, err = repository.GetProfileByUserID(userID)
+// UserService ...
+type UserService struct {
+	repo repository.UserRepository
+}
+
+// NewUserService ...
+func NewUserService(repo repository.UserRepository) *UserService {
+	return &UserService{repo}
+}
+
+// GetProfile ...
+func (s *UserService) GetProfile(userID int) (user *deremsmodels.User, err error) {
+	user, err = s.repo.GetProfileByUserID(userID)
 	if err != nil {
 		log.WithFields(log.Fields{
-			"caused-by": "repository.GetProfileByUserID",
+			"caused-by": "s.repo.GetProfileByUserID",
 			"err":       err,
 		}).Error()
 	}

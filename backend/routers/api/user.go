@@ -8,9 +8,11 @@ import (
 
 	"der-ems/internal/app"
 	"der-ems/internal/e"
+	"der-ems/repository"
 	"der-ems/services"
 )
 
+// GetProfile provides the detailed information about an individual user
 // @Summary Provide detailed information about an individual user
 // @Tags User
 // @Security ApiKeyAuth
@@ -28,7 +30,9 @@ func GetProfile(c *gin.Context) {
 		return
 	}
 
-	user, err := services.GetProfile(userID.(int))
+	repo := repository.NewUserRepository()
+	s := services.NewUserService(repo)
+	user, err := s.GetProfile(userID.(int))
 	if err != nil {
 		log.WithFields(log.Fields{"caused-by": "error token"}).Error()
 		appG.Response(http.StatusUnauthorized, e.ErrToken, nil)

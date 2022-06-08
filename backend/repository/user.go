@@ -11,28 +11,46 @@ import (
 	deremsmodels "der-ems/models/der-ems"
 )
 
-func GetUserByUsername(username string) (user *deremsmodels.User, err error) {
+// UserRepository ...
+type UserRepository interface {
+	GetUserByUsername(username string) (user *deremsmodels.User, err error)
+	UpdateUser(user *deremsmodels.User) (err error)
+	InsertLoginLog(loginLog *deremsmodels.LoginLog) (err error)
+	GetProfileByUserID(userID int) (user *deremsmodels.User, err error)
+}
+
+type defaultUserRepository struct {}
+
+// NewUserRepository ...
+func NewUserRepository() UserRepository {
+	return &defaultUserRepository{}
+}
+
+// GetUserByUsername ...
+func (repo defaultUserRepository) GetUserByUsername(username string) (user *deremsmodels.User, err error) {
 	user, err = deremsmodels.Users(
 		qm.Where("username = ?", username),
 		qm.Where("deleted_at IS NULL")).One(models.GetDB())
 	return
 }
 
-func UpdateUser(user *deremsmodels.User) (err error) {
+// UpdateUser ...
+func (repo defaultUserRepository) UpdateUser(user *deremsmodels.User) (err error) {
 	user.UpdatedAt = null.NewTime(time.Now(), true)
 	_, err = user.Update(models.GetDB(), boil.Infer())
 	return
 }
 
-func InsertLoginLog(loginLog *deremsmodels.LoginLog) (err error) {
+// InsertLoginLog ...
+func (repo defaultUserRepository) InsertLoginLog(loginLog *deremsmodels.LoginLog) (err error) {
 	loginLog.CreatedAt = time.Now()
 	loginLog.UpdatedAt = null.NewTime(time.Now(), true)
 	err = loginLog.Insert(models.GetDB(), boil.Infer())
 	return
 }
 
-func GetProfileByUserID(userID int) (user *deremsmodels.User, err error) {
-	user, err = deremsmodels.Users(
-		qm.Where("id = ?", userID)).One(models.GetDB())
+// GetProfileByUserID ...
+func (repo defaultUserRepository) GetProfileByUserID(userID int) (user *deremsmodels.User, err error) {
+	user, err = deremsmodels.FindUser(models.GetDB(), userID)
 	return
 }

@@ -1,4 +1,4 @@
-package api
+package routers
 
 import (
 	"net/http"
@@ -9,8 +9,6 @@ import (
 
 	"der-ems/internal/app"
 	"der-ems/internal/e"
-	"der-ems/repository"
-	"der-ems/services"
 )
 
 // PasswordLost sends an email for reset the password
@@ -23,7 +21,7 @@ import (
 // @Failure 400 {object} app.Response
 // @Failure 401 {object} app.Response
 // @Router /user/passwordLost [put]
-func PasswordLost(c *gin.Context) {
+func (w *APIWorker) PasswordLost(c *gin.Context) {
 	appG := app.Gin{c}
 	valid := validation.Validation{}
 
@@ -40,9 +38,12 @@ func PasswordLost(c *gin.Context) {
 		return
 	}
 
-	repo := repository.NewUserRepository()
-	s := services.NewUserService(repo)
-	err := s.PasswordLost(c, a.Username)
+	name, token, err := w.UserService.CreateTemporaryPassword(a.Username)
+	if err != nil {
+		appG.Response(http.StatusUnauthorized, e.ErrPasswordLost, nil)
+		return
+	}
+	err = w.EmailService.SendResetEmail(c, name, a.Username, token)
 	if err != nil {
 		appG.Response(http.StatusUnauthorized, e.ErrPasswordLost, nil)
 		return
@@ -62,7 +63,7 @@ func PasswordLost(c *gin.Context) {
 // @Success 200 {object} app.Response
 // @Failure 401 {object} app.Response
 // @Router /user/profile [get]
-func GetProfile(c *gin.Context) {
+func (w *APIWorker) GetProfile(c *gin.Context) {
 	appG := app.Gin{c}
 	userID, _ := c.Get("userID")
 	if userID == nil {
@@ -71,9 +72,7 @@ func GetProfile(c *gin.Context) {
 		return
 	}
 
-	repo := repository.NewUserRepository()
-	s := services.NewUserService(repo)
-	user, err := s.GetProfile(userID.(int))
+	user, err := w.UserService.GetProfile(userID.(int))
 	if err != nil {
 		log.WithFields(log.Fields{"caused-by": "error token"}).Error()
 		appG.Response(http.StatusUnauthorized, e.ErrToken, nil)

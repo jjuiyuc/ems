@@ -5,15 +5,35 @@ import (
 	"net"
 	"net/mail"
 	"net/smtp"
+	"net/url"
 
+	"github.com/gin-gonic/gin"
 	"github.com/scorredoira/email"
 	log "github.com/sirupsen/logrus"
-
-	"der-ems/config"
+	"github.com/spf13/viper"
 )
 
+// EmailService ...
+type EmailService interface {
+	SendResetEmail(c *gin.Context, name, address, token string) error
+}
+
+type defaultEmailService struct {
+	cfg *viper.Viper
+}
+
+// NewEmailService ...
+func NewEmailService(cfg *viper.Viper) EmailService {
+	return &defaultEmailService{cfg}
+}
+
 // SendResetEmail ...
-func SendResetEmail(name, address, referrer, token string) error {
+func (s defaultEmailService) SendResetEmail(c *gin.Context, name, address, token string) error {
+	referrer, err := getReferrerBase(c)
+	if err != nil {
+		return err
+	}
+
 	body := fmt.Sprintf(`
 Please follow this link to reset your password:
 %s/handle-reset-link?token=%s
@@ -25,38 +45,53 @@ Please follow this link to reset your password:
 		Address: address,
 	})
 
-	return sendEmail(msg)
+	return sendEmail(s.cfg, msg)
 }
 
-func sendEmail(msg *email.Message) (err error) {
-	var (
-		auth smtp.Auth
-		cfg  = config.GetConfig()
-	)
+func getReferrerBase(c *gin.Context) (referrer string, err error) {
+	u, err := url.Parse(c.Request.Referer())
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "getReferrerBase url.Parse",
+			"err":       err,
+		}).Error()
+		return
+	}
+	referrer = u.Scheme + "://" + u.Host
+	return
+}
 
-	server, _, err := net.SplitHostPort(cfg.GetString("email.server"))
+func sendEmail(cfg *viper.Viper, msg *email.Message) (err error) {
+	var auth smtp.Auth
+	emailServer := cfg.GetString("email.server")
+	emailAccount := cfg.GetString("email.account")
+	emailPassword := cfg.GetString("email.password")
+	emailAccountName := cfg.GetString("email.accountName")
+	emailPlainAuth := cfg.GetBool("email.plainAuth")
+
+	server, _, err := net.SplitHostPort(emailServer)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"caused-by":    "sendEmail net.SplitHostPort",
-			"email.server": cfg.GetString("email.server"),
+			"email.server": emailServer,
 			"err":          err,
 		}).Error()
 		return
 	}
 
-	if cfg.GetBool("email.plainAuth") {
-		auth = smtp.PlainAuth("", cfg.GetString("email.account"), cfg.GetString("email.password"), server)
+	if emailPlainAuth {
+		auth = smtp.PlainAuth("", emailAccount, emailPassword, server)
 	}
 
 	log.WithField("to", msg.Tolist()).Info("sending-email")
 
-	msg.From = mail.Address{Name: cfg.GetString("email.accountName"), Address: cfg.GetString("email.account")}
-	err = smtp.SendMail(cfg.GetString("email.server"), auth, cfg.GetString("email.account"), msg.Tolist(), msg.Bytes())
+	msg.From = mail.Address{Name: emailAccountName, Address: emailAccount}
+	err = smtp.SendMail(emailServer, auth, emailAccount, msg.Tolist(), msg.Bytes())
 	if err != nil {
 		log.WithFields(log.Fields{
 			"caused-by":     "sendEmail smtp.SendMail",
-			"email.server":  cfg.GetString("email.server"),
-			"email.account": cfg.GetString("email.account"),
+			"email.server":  emailServer,
+			"email.account": emailAccount,
 			"err":           err,
 		}).Error("send-error")
 	}

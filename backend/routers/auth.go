@@ -1,4 +1,4 @@
-package api
+package routers
 
 import (
 	"net/http"
@@ -10,8 +10,6 @@ import (
 	"der-ems/internal/app"
 	"der-ems/internal/e"
 	"der-ems/internal/utils"
-	"der-ems/repository"
-	"der-ems/services"
 )
 
 // GetAuth issues the token if user provides the valid credential
@@ -26,7 +24,7 @@ import (
 // @Failure 401 {object} app.Response
 // @Failure 500 {object} app.Response
 // @Router /auth [post]
-func GetAuth(c *gin.Context) {
+func (w *APIWorker) GetAuth(c *gin.Context) {
 	appG := app.Gin{c}
 	valid := validation.Validation{}
 
@@ -44,9 +42,7 @@ func GetAuth(c *gin.Context) {
 		return
 	}
 
-	repo := repository.NewUserRepository()
-	s := services.NewAuthService(repo)
-	user, err := s.Login(a.Username, a.Password)
+	user, err := w.AuthService.Login(a.Username, a.Password)
 	if err != nil {
 		appG.Response(http.StatusUnauthorized, e.ErrAuthLogin, map[string]string{
 			"msg": err.Error(),
@@ -64,7 +60,7 @@ func GetAuth(c *gin.Context) {
 		return
 	}
 
-	s.CreateLoginLog(user, token)
+	w.AuthService.CreateLoginLog(user, token)
 
 	appG.Response(http.StatusOK, e.Success, map[string]string{
 		"token": token,

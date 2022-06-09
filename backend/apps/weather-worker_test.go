@@ -14,7 +14,7 @@ import (
 	"der-ems/internal/e"
 	"der-ems/kafka"
 	"der-ems/models"
-	deremsmodels "der-ems/models/der-ems"
+	"der-ems/repository"
 	"der-ems/testutils"
 )
 
@@ -22,6 +22,7 @@ type WeatherWorkerSuite struct {
 	suite.Suite
 	seedUtTime    time.Time
 	seedUtWeather LatestWeather
+	repo          repository.WeatherRepository
 }
 
 func Test_WeatherWorker(t *testing.T) {
@@ -30,18 +31,21 @@ func Test_WeatherWorker(t *testing.T) {
 
 func (s *WeatherWorkerSuite) SetupSuite() {
 	config.Init(testutils.GetConfigDir(), "ut.yaml")
-	models.Init()
+	models.Init(config.GetConfig())
+	db := models.GetDB()
+
+	s.repo = repository.NewWeatherRepository(db)
 
 	// Truncate data
-	_, err := models.GetDB().Exec("TRUNCATE TABLE weather_forecast")
+	_, err := db.Exec("TRUNCATE TABLE weather_forecast")
 	s.Require().NoError(err)
-	_, err = models.GetDB().Exec("SET FOREIGN_KEY_CHECKS = 0")
+	_, err = db.Exec("SET FOREIGN_KEY_CHECKS = 0")
 	s.Require().NoError(err)
-	_, err = models.GetDB().Exec("TRUNCATE TABLE gateway")
+	_, err = db.Exec("TRUNCATE TABLE gateway")
 	s.Require().NoError(err)
-	_, err = models.GetDB().Exec("TRUNCATE TABLE customer")
+	_, err = db.Exec("TRUNCATE TABLE customer")
 	s.Require().NoError(err)
-	_, err = models.GetDB().Exec("SET FOREIGN_KEY_CHECKS = 1")
+	_, err = db.Exec("SET FOREIGN_KEY_CHECKS = 1")
 	s.Require().NoError(err)
 	// Mock seedUtWeather data
 	s.seedUtTime = time.Now().UTC()
@@ -87,7 +91,7 @@ func (s *WeatherWorkerSuite) SetupSuite() {
 	s.seedUtWeather.Values = append(s.seedUtWeather.Values, seedUtValue2)
 
 	// Mock customer table
-	_, err = models.GetDB().Exec(`
+	_, err = db.Exec(`
 		INSERT INTO customer (id,customer_number,field_number,weather_lat,weather_lng) VALUES
 		(1,'A00001','00001',24.75,121),
 		(2,'A00001','00002',24.75,121),
@@ -96,7 +100,7 @@ func (s *WeatherWorkerSuite) SetupSuite() {
 	s.Require().NoError(err)
 
 	// Mock gateway table
-	_, err = models.GetDB().Exec(`
+	_, err = db.Exec(`
 		INSERT INTO gateway (id,uuid,customer_id) VALUES
 		(1,'U00001',1),
 		(2,'U00002',1),
@@ -116,8 +120,8 @@ func (s *WeatherWorkerSuite) Test_01_GetWeatherData() {
 
 	testMsg := s.getMockConsumerMessage(seedUtWeatherJson)
 
-	UpsertWeatherData(testMsg.Value)
-	count, _ := deremsmodels.WeatherForecasts().Count(models.GetDB())
+	UpsertWeatherData(s.repo, testMsg.Value)
+	count, _ := s.repo.GetWeatherForecastCount()
 	s.Equal(2, int(count))
 }
 
@@ -135,8 +139,8 @@ func (s *WeatherWorkerSuite) Test_02_UpsertWeatherData() {
 
 	testMsg := s.getMockConsumerMessage(seedUtWeatherJson)
 
-	UpsertWeatherData(testMsg.Value)
-	count, _ := deremsmodels.WeatherForecasts().Count(models.GetDB())
+	UpsertWeatherData(s.repo, testMsg.Value)
+	count, _ := s.repo.GetWeatherForecastCount()
 	s.Equal(3, int(count))
 }
 
@@ -146,7 +150,7 @@ func (s *WeatherWorkerSuite) Test_03_GetWeatherDataByLocation() {
 	testLng := s.seedUtWeather.Lng
 	testWeatherData, _ := json.Marshal(s.seedUtWeather)
 
-	weatherData, _ := GetWeatherDataByLocation(testLat, testLng)
+	weatherData, _ := GetWeatherDataByLocation(s.repo, testLat, testLng)
 	s.Equal(testWeatherData, weatherData)
 }
 
@@ -156,7 +160,7 @@ func (s *WeatherWorkerSuite) Test_04_GetGateWayUUIDsByLocation() {
 	testLng := s.seedUtWeather.Lng
 	testUUIDs := []string{"U00001", "U00002", "U00003", "U00004"}
 
-	UUIDs, _ := GetGateWayUUIDsByLocation(testLat, testLng)
+	UUIDs, _ := GetGateWayUUIDsByLocation(s.repo, testLat, testLng)
 	s.Equal(testUUIDs, UUIDs)
 }
 
@@ -169,7 +173,7 @@ func (s *WeatherWorkerSuite) Test_05_GetNoValidDateWeatherData() {
 	seedUtWeatherJson, _ := json.Marshal(s.seedUtWeather)
 	testMsg := s.getMockConsumerMessage(seedUtWeatherJson)
 
-	_, _, err := UpsertWeatherData(testMsg.Value)
+	_, _, err := UpsertWeatherData(s.repo, testMsg.Value)
 	s.Equal(e.NewKeyNotExistError(validDate).Error(), err.Error())
 }
 

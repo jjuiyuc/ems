@@ -15,17 +15,22 @@ import (
 const passwordLockCount = 5
 
 // AuthService ...
-type AuthService struct {
+type AuthService interface {
+	Login(username, password string) (user *deremsmodels.User, err error)
+	CreateLoginLog(user *deremsmodels.User, token string) (err error)
+}
+
+type defaultAuthService struct {
 	repo repository.UserRepository
 }
 
 // NewAuthService ...
-func NewAuthService(repo repository.UserRepository) *AuthService {
-	return &AuthService{repo}
+func NewAuthService(repo repository.UserRepository) AuthService {
+	return &defaultAuthService{repo}
 }
 
 // Login ...
-func (s *AuthService) Login(username, password string) (user *deremsmodels.User, err error) {
+func (s defaultAuthService) Login(username, password string) (user *deremsmodels.User, err error) {
 	user, err = s.repo.GetUserByUsername(username)
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -82,7 +87,7 @@ func (s *AuthService) Login(username, password string) (user *deremsmodels.User,
 }
 
 // CreateLoginLog ...
-func (s *AuthService) CreateLoginLog(user *deremsmodels.User, token string) (err error) {
+func (s defaultAuthService) CreateLoginLog(user *deremsmodels.User, token string) (err error) {
 	loginLog := &deremsmodels.LoginLog{
 		UserID: null.NewInt(user.ID, true),
 	}

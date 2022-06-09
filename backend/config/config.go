@@ -6,9 +6,7 @@ import (
 )
 
 var (
-	config    *viper.Viper
-	gitBranch string
-	gitCommit string
+	config *viper.Viper
 )
 
 // Init config

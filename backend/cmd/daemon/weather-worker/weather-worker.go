@@ -5,6 +5,7 @@ import (
 	"der-ems/config"
 	"der-ems/infra"
 	"der-ems/models"
+	"der-ems/repository"
 	"flag"
 )
 
@@ -14,10 +15,14 @@ func main() {
 	env := flag.String("e", "template", "")
 	flag.Parse()
 	config.Init(*dir, *env)
-	models.Init()
+	cfg := config.GetConfig()
+	models.Init(cfg)
+	db := models.GetDB()
 	defer models.Close()
 
-	mdWeatherWorker := apps.NewWeatherWorker(infra.GetGracefulShutdownCtx(), config.GetConfig(), name)
+	repo := repository.NewWeatherRepository(db)
+
+	mdWeatherWorker := apps.NewWeatherWorker(infra.GetGracefulShutdownCtx(), cfg, repo, name)
 
 	mdWeatherWorker.MainLoop()
 }

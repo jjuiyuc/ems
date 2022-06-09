@@ -15,6 +15,8 @@ import (
 	"der-ems/internal/utils"
 	"der-ems/models"
 	deremsmodels "der-ems/models/der-ems"
+	"der-ems/repository"
+	"der-ems/services"
 	"der-ems/testutils"
 	"der-ems/testutils/fixtures"
 )
@@ -31,16 +33,24 @@ func Test_User(t *testing.T) {
 
 func (s *UserSuite) SetupSuite() {
 	config.Init(testutils.GetConfigDir(), "ut.yaml")
-	models.Init()
+	cfg := config.GetConfig()
+	models.Init(cfg)
+	db := models.GetDB()
+
+	repo := repository.NewUserRepository(db)
+	userService := services.NewUserService(repo)
+	worker := &APIWorker{
+		UserService: userService,
+	}
 
 	// Truncate & seed data
-	err := testutils.SeedUtUser()
+	err := testutils.SeedUtUser(db)
 	s.Require().NoError(err)
 	token, err := utils.GenerateToken(fixtures.UtUser.ID)
 	s.Require().NoError(err)
 	s.token = token
 
-	s.router = InitRouter(config.GetConfig().GetBool("server.cors"), config.GetConfig().GetString("server.ginMode"))
+	s.router = InitRouter(cfg.GetBool("server.cors"), cfg.GetString("server.ginMode"), worker)
 }
 
 func (s *UserSuite) TearDownSuite() {

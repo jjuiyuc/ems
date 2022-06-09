@@ -19,7 +19,7 @@ type UserRepository interface {
 	GetProfileByUserID(userID int) (user *deremsmodels.User, err error)
 }
 
-type defaultUserRepository struct {}
+type defaultUserRepository struct{}
 
 // NewUserRepository ...
 func NewUserRepository() UserRepository {
@@ -27,11 +27,10 @@ func NewUserRepository() UserRepository {
 }
 
 // GetUserByUsername ...
-func (repo defaultUserRepository) GetUserByUsername(username string) (user *deremsmodels.User, err error) {
-	user, err = deremsmodels.Users(
+func (repo defaultUserRepository) GetUserByUsername(username string) (*deremsmodels.User, error) {
+	return deremsmodels.Users(
 		qm.Where("username = ?", username),
 		qm.Where("deleted_at IS NULL")).One(models.GetDB())
-	return
 }
 
 // UpdateUser ...
@@ -42,15 +41,13 @@ func (repo defaultUserRepository) UpdateUser(user *deremsmodels.User) (err error
 }
 
 // InsertLoginLog ...
-func (repo defaultUserRepository) InsertLoginLog(loginLog *deremsmodels.LoginLog) (err error) {
+func (repo defaultUserRepository) InsertLoginLog(loginLog *deremsmodels.LoginLog) error {
 	loginLog.CreatedAt = time.Now()
 	loginLog.UpdatedAt = null.NewTime(time.Now(), true)
-	err = loginLog.Insert(models.GetDB(), boil.Infer())
-	return
+	return loginLog.Insert(models.GetDB(), boil.Infer())
 }
 
 // GetProfileByUserID ...
-func (repo defaultUserRepository) GetProfileByUserID(userID int) (user *deremsmodels.User, err error) {
-	user, err = deremsmodels.FindUser(models.GetDB(), userID)
-	return
+func (repo defaultUserRepository) GetProfileByUserID(userID int) (*deremsmodels.User, error) {
+	return deremsmodels.FindUser(models.GetDB(), userID)
 }

@@ -25,6 +25,7 @@ import (
 type UserSuite struct {
 	suite.Suite
 	router *gin.Engine
+	repo   *repository.Repository
 	token  string
 }
 
@@ -54,6 +55,7 @@ func (s *UserSuite) SetupSuite() {
 	s.Require().NoError(err)
 	s.token = token
 
+	s.repo = repo
 	s.router = InitRouter(cfg.GetBool("server.cors"), cfg.GetString("server.ginMode"), w)
 }
 
@@ -61,9 +63,14 @@ func (s *UserSuite) TearDownSuite() {
 	models.Close()
 }
 
-func (s *UserSuite) Test_PasswordLost() {
-	type args struct {
+func (s *UserSuite) Test_PasswordLostAndResetByToken() {
+	type args1 struct {
 		Username string `json:"username"`
+	}
+
+	type args2 struct {
+		Token    string `json:"token"`
+		Password string `json:"password"`
 	}
 
 	type response struct {
@@ -72,15 +79,15 @@ func (s *UserSuite) Test_PasswordLost() {
 		Data interface{} `json:"data"`
 	}
 
-	tests := []struct {
+	tests1 := []struct {
 		name       string
-		args       args
+		args       args1
 		wantStatus int
 		wantRv     response
 	}{
 		{
 			name: "passwordLost",
-			args: args{
+			args: args1{
 				Username: fixtures.UtUser.Username,
 			},
 			wantStatus: http.StatusOK,
@@ -99,7 +106,7 @@ func (s *UserSuite) Test_PasswordLost() {
 		},
 		{
 			name: "passwordLostError",
-			args: args{
+			args: args1{
 				Username: "xxx",
 			},
 			wantStatus: http.StatusUnauthorized,
@@ -110,7 +117,49 @@ func (s *UserSuite) Test_PasswordLost() {
 		},
 	}
 
-	for _, tt := range tests {
+	tests2 := []struct {
+		name       string
+		args       args2
+		wantStatus int
+		wantRv     response
+	}{
+		{
+			name: "passwordResetByToken",
+			args: args2{
+				Password: fixtures.UtUser.Password,
+			},
+			wantStatus: http.StatusOK,
+			wantRv: response{
+				Code: e.Success,
+				Msg:  "ok",
+			},
+		},
+		{
+			name: "passwordResetByTokenInvalidParams",
+			args: args2{
+				Password: fixtures.UtUser.Password,
+			},
+			wantStatus: http.StatusBadRequest,
+			wantRv: response{
+				Code: e.InvalidParams,
+				Msg:  "invalid parameters",
+			},
+		},
+		{
+			name: "passwordResetByTokenError",
+			args: args2{
+				Token:    "xxx",
+				Password: fixtures.UtUser.Password,
+			},
+			wantStatus: http.StatusUnauthorized,
+			wantRv: response{
+				Code: e.ErrPasswordToken,
+				Msg:  "fail",
+			},
+		},
+	}
+
+	for _, tt := range tests1 {
 		payloadBuf, err := json.Marshal(tt.args)
 		s.Require().NoError(err)
 		req, err := http.NewRequest("PUT", "/api/users/password/lost", bytes.NewBuffer(payloadBuf))
@@ -128,6 +177,34 @@ func (s *UserSuite) Test_PasswordLost() {
 		if tt.name == "passwordLost" {
 			dataMap := res.Data.(map[string]interface{})
 			s.Equal(fixtures.UtUser.Username, dataMap["username"])
+		}
+	}
+
+	user, err := s.repo.User.GetUserByUsername(fixtures.UtUser.Username)
+	s.Require().NoError(err)
+
+	for _, tt := range tests2 {
+		if tt.name == "passwordResetByToken" {
+			tt.args.Token = user.Password
+		}
+
+		payloadBuf, err := json.Marshal(tt.args)
+		s.Require().NoError(err)
+		req, err := http.NewRequest("PUT", "/api/users/password/reset-by-token", bytes.NewBuffer(payloadBuf))
+		s.Require().NoError(err)
+		rv := httptest.NewRecorder()
+		s.router.ServeHTTP(rv, req)
+		s.Equal(tt.wantStatus, rv.Code)
+
+		var res response
+		err = json.Unmarshal([]byte(rv.Body.String()), &res)
+		s.Require().NoError(err)
+		s.Equal(tt.wantRv.Code, res.Code)
+		s.Equal(tt.wantRv.Msg, res.Msg)
+
+		if tt.name == "passwordResetByToken" {
+			dataMap := res.Data.(map[string]interface{})
+			s.Equal("success", dataMap["status"])
 		}
 	}
 }

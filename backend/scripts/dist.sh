@@ -1,14 +1,15 @@
 #!/bin/bash
 
-service="weather-worker"
+service="$1"
+echo "[$service]"
 
-echo "** building services"
+echo "** building service $service"
 go build -o dist/$service cmd/daemon/$service/$service.go
 
-echo "** stopping services"
+echo "** stopping service $service"
 sudo systemctl stop $service 2>/dev/null
 
-echo "** updating unit files"
+echo "** updating unit file"
 cp cmd/daemon/$service/$service.service dist
 sudo cp dist/$service.service /etc/systemd/system/$service.service
 sudo mkdir -p /opt/derems
@@ -21,5 +22,5 @@ sudo cp config/derems.yaml /opt/derems/config/derems.yaml
 echo "** daemon reload"
 sudo systemctl daemon-reload
 
-echo "** starting services"
+echo "** starting service $service"
 sudo systemctl start $service

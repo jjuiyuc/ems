@@ -17,13 +17,15 @@ go-lint:
 
 go-build: clean
 	@go build -o dist/weather-worker cmd/daemon/weather-worker/weather-worker.go
+	@go build -o dist/api-worker cmd/daemon/api-worker/api-worker.go
 
 swag:
 	@$(shell if [ ! -f $(GOPATH)/bin/swag ] ; then go get -u github.com/swaggo/swag/cmd/swag; fi)
 	$(AT_RUN)$(GOPATH)/bin/swag init -g routers/router.go
 
 systemd:
-	@./scripts/dist.sh
+	@./scripts/dist.sh "weather-worker"
+	@./scripts/dist.sh "api-worker"
 
 go-test:
 	@go test -v -count=1 -coverpkg=$(COVER_PKG) -coverprofile cover.out $(GO_PKGS)

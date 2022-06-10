@@ -21,17 +21,17 @@ type AuthService interface {
 }
 
 type defaultAuthService struct {
-	repo repository.UserRepository
+	repo *repository.Repository
 }
 
 // NewAuthService ...
-func NewAuthService(repo repository.UserRepository) AuthService {
+func NewAuthService(repo *repository.Repository) AuthService {
 	return &defaultAuthService{repo}
 }
 
 // Login ...
 func (s defaultAuthService) Login(username, password string) (user *deremsmodels.User, err error) {
-	user, err = s.repo.GetUserByUsername(username)
+	user, err = s.repo.User.GetUserByUsername(username)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "repository.GetUserByUsername",
@@ -75,12 +75,12 @@ func (s defaultAuthService) Login(username, password string) (user *deremsmodels
 			now := time.Now()
 			user.LockedAt = null.NewTime(now, true)
 		}
-		s.repo.UpdateUser(user)
+		s.repo.User.UpdateUser(user)
 		return
 	}
 	if nowPasswordRetryCount > 0 {
 		user.PasswordRetryCount = null.NewInt(0, true)
-		s.repo.UpdateUser(user)
+		s.repo.User.UpdateUser(user)
 	}
 
 	return
@@ -92,7 +92,7 @@ func (s defaultAuthService) CreateLoginLog(user *deremsmodels.User, token string
 		UserID: null.NewInt(user.ID, true),
 	}
 
-	err = s.repo.InsertLoginLog(loginLog)
+	err = s.repo.User.InsertLoginLog(loginLog)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "s.repo.InsertLoginLog",

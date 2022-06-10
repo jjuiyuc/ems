@@ -20,18 +20,12 @@ import (
 
 // APIWorker ...
 type APIWorker struct {
-	AuthService services.AuthService
-	EmailService services.EmailService
-	UserService services.UserService
+	Services *services.Services
 }
 
 // NewAPIWorker ...
-func NewAPIWorker(cfg *viper.Viper, authService services.AuthService, emailService services.EmailService, userService services.UserService) {
-	w := &APIWorker{
-		AuthService: authService,
-		EmailService: emailService,
-		UserService: userService,
-	}
+func NewAPIWorker(cfg *viper.Viper, services *services.Services) {
+	w := &APIWorker{Services: services}
 
 	r := InitRouter(cfg.GetBool("server.cors"), cfg.GetString("server.ginMode"), w)
 	r.Run(cfg.GetString("server.port"))

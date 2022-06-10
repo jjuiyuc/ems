@@ -18,17 +18,17 @@ type UserService interface {
 }
 
 type defaultUserService struct {
-	repo repository.UserRepository
+	repo *repository.Repository
 }
 
 // NewUserService ...
-func NewUserService(repo repository.UserRepository) UserService {
+func NewUserService(repo *repository.Repository) UserService {
 	return &defaultUserService{repo}
 }
 
 // PasswordLost ...
 func (s defaultUserService) CreateTemporaryPassword(username string) (name, token string, err error) {
-	user, err := s.repo.GetUserByUsername(username)
+	user, err := s.repo.User.GetUserByUsername(username)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "s.repo.GetUserByUsername",
@@ -41,7 +41,7 @@ func (s defaultUserService) CreateTemporaryPassword(username string) (name, toke
 	token = uuid.New().String()
 	user.Password = token
 	user.PasswordResetExpiry = null.NewTime(time.Now().Add(1*time.Hour), true)
-	err = s.repo.UpdateUser(user)
+	err = s.repo.User.UpdateUser(user)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "s.repo.UpdateUser",
@@ -56,7 +56,7 @@ func (s defaultUserService) CreateTemporaryPassword(username string) (name, toke
 
 // GetProfile ...
 func (s defaultUserService) GetProfile(userID int) (user *deremsmodels.User, err error) {
-	user, err = s.repo.GetProfileByUserID(userID)
+	user, err = s.repo.User.GetProfileByUserID(userID)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "s.repo.GetProfileByUserID",

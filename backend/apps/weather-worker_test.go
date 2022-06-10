@@ -22,7 +22,7 @@ type WeatherWorkerSuite struct {
 	suite.Suite
 	seedUtTime    time.Time
 	seedUtWeather LatestWeather
-	repo          repository.WeatherRepository
+	repo          *repository.Repository
 }
 
 func Test_WeatherWorker(t *testing.T) {
@@ -34,7 +34,7 @@ func (s *WeatherWorkerSuite) SetupSuite() {
 	models.Init(config.GetConfig())
 	db := models.GetDB()
 
-	s.repo = repository.NewWeatherRepository(db)
+	s.repo = repository.NewRepository(db)
 
 	// Truncate data
 	_, err := db.Exec("TRUNCATE TABLE weather_forecast")
@@ -121,7 +121,7 @@ func (s *WeatherWorkerSuite) Test_01_GetWeatherData() {
 	testMsg := s.getMockConsumerMessage(seedUtWeatherJson)
 
 	UpsertWeatherData(s.repo, testMsg.Value)
-	count, _ := s.repo.GetWeatherForecastCount()
+	count, _ := s.repo.Weather.GetWeatherForecastCount()
 	s.Equal(2, int(count))
 }
 
@@ -140,7 +140,7 @@ func (s *WeatherWorkerSuite) Test_02_UpsertWeatherData() {
 	testMsg := s.getMockConsumerMessage(seedUtWeatherJson)
 
 	UpsertWeatherData(s.repo, testMsg.Value)
-	count, _ := s.repo.GetWeatherForecastCount()
+	count, _ := s.repo.Weather.GetWeatherForecastCount()
 	s.Equal(3, int(count))
 }
 

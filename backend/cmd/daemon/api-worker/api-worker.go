@@ -19,10 +19,8 @@ func main() {
 	db := models.GetDB()
 	defer models.Close()
 
-	repo := repository.NewUserRepository(db)
-	authService := services.NewAuthService(repo)
-	emailService := services.NewEmailService(cfg)
-	userService := services.NewUserService(repo)
+	repo := repository.NewRepository(db)
+	services := services.NewServices(cfg, repo)
 
-	routers.NewAPIWorker(cfg, authService, emailService, userService)
+	routers.NewAPIWorker(cfg, services)
 }

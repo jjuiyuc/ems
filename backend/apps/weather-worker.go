@@ -31,7 +31,7 @@ type LatestWeather struct {
 
 type weatherConsumerHandler struct {
 	cfg  *viper.Viper
-	repo repository.WeatherRepository
+	repo *repository.Repository
 }
 
 func (weatherConsumerHandler) Setup(_ sarama.ConsumerGroupSession) error {
@@ -64,7 +64,7 @@ func (h weatherConsumerHandler) ConsumeClaim(sess sarama.ConsumerGroupSession, c
 func NewWeatherWorker(
 	ctx context.Context,
 	cfg *viper.Viper,
-	repo repository.WeatherRepository,
+	repo *repository.Repository,
 	name string,
 ) (w *WeatherWorker) {
 	topics := []string{
@@ -99,7 +99,7 @@ func (h weatherConsumerHandler) ProcessWeatherData(msg []byte) {
 	}
 }
 
-func UpsertWeatherData(repo repository.WeatherRepository, msg []byte) (lat, lng float32, err error) {
+func UpsertWeatherData(repo *repository.Repository, msg []byte) (lat, lng float32, err error) {
 	var latestWeather LatestWeather
 	err = json.Unmarshal(msg, &latestWeather)
 	if err != nil {
@@ -149,7 +149,7 @@ func UpsertWeatherData(repo repository.WeatherRepository, msg []byte) (lat, lng 
 			"ValidDate":    weatherForecast.ValidDate,
 			"string(Data)": string(weatherForecast.Data.JSON),
 		}).Debug("upsert weatherForecast data")
-		err = repo.UpsertWeatherForecast(weatherForecast)
+		err = repo.Weather.UpsertWeatherForecast(weatherForecast)
 		if err != nil {
 			log.WithFields(log.Fields{
 				"caused-by": "repository.UpsertWeatherForecast",
@@ -164,7 +164,7 @@ func UpsertWeatherData(repo repository.WeatherRepository, msg []byte) (lat, lng 
 	return
 }
 
-func publishWeatherDataToLocalGW(cfg *viper.Viper, repo repository.WeatherRepository, lat, lng float32) {
+func publishWeatherDataToLocalGW(cfg *viper.Viper, repo *repository.Repository, lat, lng float32) {
 	latestWeatherJson, err := GetWeatherDataByLocation(repo, lat, lng)
 	if err != nil {
 		return
@@ -176,10 +176,10 @@ func publishWeatherDataToLocalGW(cfg *viper.Viper, repo repository.WeatherReposi
 	publish(cfg, latestWeatherJson, gatewayUUIDs)
 }
 
-func GetWeatherDataByLocation(repo repository.WeatherRepository, lat, lng float32) (latestWeatherJson []byte, err error) {
+func GetWeatherDataByLocation(repo *repository.Repository, lat, lng float32) (latestWeatherJson []byte, err error) {
 	startValidDate := time.Now().UTC()
 	endValidDate := time.Now().UTC().Add(30 * time.Hour)
-	weatherForecastList, err := repo.GetWeatherForecastByLocation(lat, lng, startValidDate, endValidDate)
+	weatherForecastList, err := repo.Weather.GetWeatherForecastByLocation(lat, lng, startValidDate, endValidDate)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "repo.GetWeatherForecastByLocation",
@@ -218,8 +218,8 @@ func GetWeatherDataByLocation(repo repository.WeatherRepository, lat, lng float3
 	return
 }
 
-func GetGateWayUUIDsByLocation(repo repository.WeatherRepository, lat, lng float32) (gatewayUUIDs []string, err error) {
-	gateways, err := repo.GetGatewaysByLocation(lat, lng)
+func GetGateWayUUIDsByLocation(repo *repository.Repository, lat, lng float32) (gatewayUUIDs []string, err error) {
+	gateways, err := repo.Weather.GetGatewaysByLocation(lat, lng)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "repository.GetGatewaysByLocation",

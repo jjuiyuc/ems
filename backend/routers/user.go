@@ -38,12 +38,12 @@ func (w *APIWorker) PasswordLost(c *gin.Context) {
 		return
 	}
 
-	name, token, err := w.UserService.CreateTemporaryPassword(a.Username)
+	name, token, err := w.Services.User.CreateTemporaryPassword(a.Username)
 	if err != nil {
 		appG.Response(http.StatusUnauthorized, e.ErrPasswordLost, nil)
 		return
 	}
-	err = w.EmailService.SendResetEmail(c, name, a.Username, token)
+	err = w.Services.Email.SendResetEmail(c, name, a.Username, token)
 	if err != nil {
 		appG.Response(http.StatusUnauthorized, e.ErrPasswordLost, nil)
 		return
@@ -72,7 +72,7 @@ func (w *APIWorker) GetProfile(c *gin.Context) {
 		return
 	}
 
-	user, err := w.UserService.GetProfile(userID.(int))
+	user, err := w.Services.User.GetProfile(userID.(int))
 	if err != nil {
 		log.WithFields(log.Fields{"caused-by": "error token"}).Error()
 		appG.Response(http.StatusUnauthorized, e.ErrToken, nil)

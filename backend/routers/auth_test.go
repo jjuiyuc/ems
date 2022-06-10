@@ -22,7 +22,7 @@ import (
 type AuthorizationSuite struct {
 	suite.Suite
 	router *gin.Engine
-	repo   repository.UserRepository
+	repo   *repository.Repository
 }
 
 func Test_Authorization(t *testing.T) {
@@ -35,12 +35,10 @@ func (s *AuthorizationSuite) SetupSuite() {
 	models.Init(cfg)
 	db := models.GetDB()
 
-	repo := repository.NewUserRepository(db)
-	authService := services.NewAuthService(repo)
-	userService := services.NewUserService(repo)
+	repo := repository.NewRepository(db)
+	services := services.NewServices(cfg, repo)
 	worker := &APIWorker{
-		AuthService: authService,
-		UserService: userService,
+		Services: services,
 	}
 
 	// Truncate & seed data
@@ -130,7 +128,7 @@ func (s *AuthorizationSuite) Test_GetAuth() {
 		if tt.name == "login" {
 			dataMap := res.Data.(map[string]interface{})
 			s.NotEmpty(dataMap["token"])
-			count, err := s.repo.GetLoginLogCount()
+			count, err := s.repo.User.GetLoginLogCount()
 			s.Require().NoError(err)
 			s.Equal(1, int(count))
 		}

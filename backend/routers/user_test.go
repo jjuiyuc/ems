@@ -37,10 +37,12 @@ func (s *UserSuite) SetupSuite() {
 	models.Init(cfg)
 	db := models.GetDB()
 
-	repo := repository.NewUserRepository(db)
-	userService := services.NewUserService(repo)
-	worker := &APIWorker{
-		UserService: userService,
+	repo := repository.NewRepository(db)
+	services := &services.Services{
+		User: services.NewUserService(repo),
+	}
+	w := &APIWorker{
+		Services: services,
 	}
 
 	// Truncate & seed data
@@ -50,7 +52,7 @@ func (s *UserSuite) SetupSuite() {
 	s.Require().NoError(err)
 	s.token = token
 
-	s.router = InitRouter(cfg.GetBool("server.cors"), cfg.GetString("server.ginMode"), worker)
+	s.router = InitRouter(cfg.GetBool("server.cors"), cfg.GetString("server.ginMode"), w)
 }
 
 func (s *UserSuite) TearDownSuite() {

@@ -20,7 +20,7 @@ func main() {
 	db := models.GetDB()
 	defer models.Close()
 
-	repo := repository.NewWeatherRepository(db)
+	repo := repository.NewRepository(db)
 
 	mdWeatherWorker := apps.NewWeatherWorker(infra.GetGracefulShutdownCtx(), cfg, repo, name)
 

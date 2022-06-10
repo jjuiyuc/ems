@@ -1,6 +1,7 @@
 package routers
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -39,7 +40,8 @@ func (s *UserSuite) SetupSuite() {
 
 	repo := repository.NewRepository(db)
 	services := &services.Services{
-		User: services.NewUserService(repo),
+		Email: &testutils.MockEmailService{},
+		User:  services.NewUserService(repo),
 	}
 	w := &APIWorker{
 		Services: services,
@@ -57,6 +59,77 @@ func (s *UserSuite) SetupSuite() {
 
 func (s *UserSuite) TearDownSuite() {
 	models.Close()
+}
+
+func (s *UserSuite) Test_PasswordLost() {
+	type args struct {
+		Username string `json:"username"`
+	}
+
+	type response struct {
+		Code int         `json:"code"`
+		Msg  string      `json:"msg"`
+		Data interface{} `json:"data"`
+	}
+
+	tests := []struct {
+		name       string
+		args       args
+		wantStatus int
+		wantRv     response
+	}{
+		{
+			name: "passwordLost",
+			args: args{
+				Username: fixtures.UtUser.Username,
+			},
+			wantStatus: http.StatusOK,
+			wantRv: response{
+				Code: e.Success,
+				Msg:  "ok",
+			},
+		},
+		{
+			name:       "passwordLostInvalidParams",
+			wantStatus: http.StatusBadRequest,
+			wantRv: response{
+				Code: e.InvalidParams,
+				Msg:  "invalid parameters",
+			},
+		},
+		{
+			name: "passwordLostError",
+			args: args{
+				Username: "xxx",
+			},
+			wantStatus: http.StatusUnauthorized,
+			wantRv: response{
+				Code: e.ErrPasswordLost,
+				Msg:  "fail",
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		payloadBuf, err := json.Marshal(tt.args)
+		s.Require().NoError(err)
+		req, err := http.NewRequest("PUT", "/api/users/password/lost", bytes.NewBuffer(payloadBuf))
+		s.Require().NoError(err)
+		rv := httptest.NewRecorder()
+		s.router.ServeHTTP(rv, req)
+		s.Equal(tt.wantStatus, rv.Code)
+
+		var res response
+		err = json.Unmarshal([]byte(rv.Body.String()), &res)
+		s.Require().NoError(err)
+		s.Equal(tt.wantRv.Code, res.Code)
+		s.Equal(tt.wantRv.Msg, res.Msg)
+
+		if tt.name == "passwordLost" {
+			dataMap := res.Data.(map[string]interface{})
+			s.Equal(fixtures.UtUser.Username, dataMap["username"])
+		}
+	}
 }
 
 func (s *UserSuite) Test_Authorize() {

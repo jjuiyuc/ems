@@ -64,6 +64,7 @@ func InitRouter(isCORS bool, ginMode string, w *APIWorker) *gin.Engine {
 
 	// User
 	apiGroup.PUT("/users/password/lost", w.PasswordLost)
+	apiGroup.PUT("/users/password/reset-by-token", w.PasswordResetByToken)
 	apiGroup.GET("/users/profile", authorize(), w.GetProfile)
 
 	return r

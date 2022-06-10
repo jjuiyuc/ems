@@ -54,6 +54,45 @@ func (w *APIWorker) PasswordLost(c *gin.Context) {
 	})
 }
 
+// PasswordResetByToken sets new password by having the token from email
+// @Summary Set new password by having the token from email
+// @Tags User
+// @Accept application/json
+// @Produce application/json
+// @Param token path string true "Token"
+// @Param password path string true "Password"
+// @Success 200 {object} app.Response
+// @Failure 400 {object} app.Response
+// @Failure 401 {object} app.Response
+// @Router /user/PasswordResetByToken [put]
+func (w *APIWorker) PasswordResetByToken(c *gin.Context) {
+	appG := app.Gin{c}
+	valid := validation.Validation{}
+
+	var a struct {
+		Token    string `valid:"Required; MaxSize(50)"`
+		Password string `valid:"Required; MaxSize(50)"`
+	}
+	c.BindJSON(&a)
+	if ok, err := valid.Valid(&a); !ok {
+		log.WithFields(log.Fields{
+			"caused-by": "valid.Valid",
+			"err":       err,
+		}).Error()
+		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
+		return
+	}
+
+	if err := w.Services.User.PasswordResetByPasswordToken(a.Token, a.Password); err != nil {
+		appG.Response(http.StatusUnauthorized, e.ErrPasswordToken, nil)
+		return
+	}
+
+	appG.Response(http.StatusOK, e.Success, map[string]string{
+		"status": "success",
+	})
+}
+
 // GetProfile provides the detailed information about an individual user
 // @Summary Provide detailed information about an individual user
 // @Tags User

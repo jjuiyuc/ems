@@ -42,9 +42,9 @@ func (w *APIWorker) GetAuth(c *gin.Context) {
 		return
 	}
 
-	user, err := w.Services.Auth.Login(a.Username, a.Password)
+	user, errCode, err := w.Services.Auth.Login(a.Username, a.Password)
 	if err != nil {
-		appG.Response(http.StatusUnauthorized, e.ErrAuthLogin, map[string]string{
+		appG.Response(http.StatusUnauthorized, errCode, map[string]string{
 			"msg": err.Error(),
 		})
 		return

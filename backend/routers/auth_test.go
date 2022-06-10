@@ -97,14 +97,26 @@ func (s *AuthorizationSuite) Test_GetAuth() {
 			},
 		},
 		{
-			name: "loginNotExistUser",
+			name: "loginUserNotExist",
 			args: args{
 				Username: "xxx",
 				Password: fixtures.UtUser.Password,
 			},
 			wantStatus: http.StatusUnauthorized,
 			wantRv: response{
-				Code: e.ErrAuthLogin,
+				Code: e.ErrAuthUserNotExist,
+				Msg:  "fail",
+			},
+		},
+		{
+			name: "loginPasswordNotMatch",
+			args: args{
+				Username: fixtures.UtUser.Username,
+				Password: "xxx",
+			},
+			wantStatus: http.StatusUnauthorized,
+			wantRv: response{
+				Code: e.ErrAuthPasswordNotMatch,
 				Msg:  "fail",
 			},
 		},

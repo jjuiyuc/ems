@@ -185,7 +185,7 @@ func (s *UserSuite) Test_PasswordLostAndResetByToken() {
 
 	for _, tt := range tests2 {
 		if tt.name == "passwordResetByToken" {
-			tt.args.Token = user.Password
+			tt.args.Token = user.ResetPWDToken.String
 		}
 
 		payloadBuf, err := json.Marshal(tt.args)

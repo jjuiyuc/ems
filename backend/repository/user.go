@@ -64,6 +64,6 @@ func (repo defaultUserRepository) GetUserByUsername(username string) (*deremsmod
 // GetUserByPasswordToken ...
 func (repo defaultUserRepository) GetUserByPasswordToken(token string) (*deremsmodels.User, error) {
 	return deremsmodels.Users(
-		qm.Where("password = ?", token),
-		qm.Where("password_reset_expiry > ?", time.Now())).One(repo.db)
+		qm.Where("reset_pwd_token = ?", token),
+		qm.Where("pwd_token_expiry > ?", time.Now())).One(repo.db)
 }

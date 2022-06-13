@@ -76,6 +76,7 @@ func (s defaultUserService) PasswordResetByPasswordToken(token, newPassword stri
 	}
 	user.Password = string(hashPassword[:])
 	user.PasswordLastChanged = null.NewTime(time.Now(), true)
+	user.ResetPWDToken = null.NewString("", true)
 	err = s.repo.User.UpdateUser(user)
 	if err != nil {
 		log.WithFields(log.Fields{

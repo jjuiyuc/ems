@@ -13,7 +13,7 @@ import (
 
 // UserService ...
 type UserService interface {
-	CreateTemporaryPassword(username string) (name, token string, err error)
+	CreatePasswordToken(username string) (name, token string, err error)
 	GetProfile(userID int) (user *deremsmodels.User, err error)
 }
 
@@ -26,8 +26,8 @@ func NewUserService(repo *repository.Repository) UserService {
 	return &defaultUserService{repo}
 }
 
-// PasswordLost ...
-func (s defaultUserService) CreateTemporaryPassword(username string) (name, token string, err error) {
+// CreatePasswordToken ...
+func (s defaultUserService) CreatePasswordToken(username string) (name, token string, err error) {
 	user, err := s.repo.User.GetUserByUsername(username)
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -37,10 +37,9 @@ func (s defaultUserService) CreateTemporaryPassword(username string) (name, toke
 		return
 	}
 
-	// Create temporary password
 	token = uuid.New().String()
-	user.Password = token
-	user.PasswordResetExpiry = null.NewTime(time.Now().Add(1*time.Hour), true)
+	user.ResetPWDToken = null.NewString(token, true)
+	user.PWDTokenExpiry = null.NewTime(time.Now().Add(1*time.Hour), true)
 	err = s.repo.User.UpdateUser(user)
 	if err != nil {
 		log.WithFields(log.Fields{

@@ -38,7 +38,7 @@ func (w *APIWorker) PasswordLost(c *gin.Context) {
 		return
 	}
 
-	name, token, err := w.Services.User.CreateTemporaryPassword(a.Username)
+	name, token, err := w.Services.User.CreatePasswordToken(a.Username)
 	if err != nil {
 		appG.Response(http.StatusUnauthorized, e.ErrPasswordLost, nil)
 		return

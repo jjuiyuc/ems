@@ -1,9 +1,14 @@
 {
     "common": {
+        "battery": "Battery",
         "copyright": "© 2022 Ubiik Inc. All rights reserved",
+        "grid": "Grid",
         "logIn": "Log In",
         "logOut": "Log Out",
-        "passwordRule": "Password must be at least six characters long, and include 3 out of 4 of the following: uppercase letter, lowercase letter, numeric character and special character."
+        "kw": "kW",
+        "kwh": "kWh",
+        "passwordRule": "Password must be at least six characters long, and include 3 out of 4 of the following: uppercase letter, lowercase letter, numeric character and special character.",
+        "solar": "Solar"
     },
     "error": {
         "emailFormat": "Email is incorrect, please try again.",
@@ -42,5 +47,23 @@
         "logInWithNewPassword": "Please log in with your new password.",
         "reset": "Reset",
         "resetPassword": "Reset Password"
+    },
+    "timeOfUse": {
+        "batteryPower": "Battery Power",
+        "batteryStatus": "Battery Status",
+        "chargingFrom": "Charging From",
+        "current": "Current",
+        "directSolarUsage": "Direct Solar Usage",
+        "editTimeOfUse": "Edit Time of Use",
+        "midPeak": "Mid-peak",
+        "offPeak": "Off-peak",
+        "onPeak": "On-peak",
+        "source": "{type} Energy Sources",
+        "stateOfCharge": "State of Charge",
+        "superOffPeak": "Super off-peak",
+        "timeOfUse": "Time of Use",
+        "today": "Today",
+        "totalUntilNow": "Total Until Now",
+        "yesterday": "Yesterday"
     }
 }

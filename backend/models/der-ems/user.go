@@ -27,8 +27,9 @@ type User struct {
 	Username            string      `boil:"username" json:"username" toml:"username" yaml:"username"`
 	Password            string      `boil:"password" json:"-" toml:"-" yaml:"-"`
 	PasswordLastChanged null.Time   `boil:"password_last_changed" json:"passwordLastChanged,omitempty" toml:"passwordLastChanged" yaml:"passwordLastChanged,omitempty"`
-	PasswordResetExpiry null.Time   `boil:"password_reset_expiry" json:"passwordResetExpiry,omitempty" toml:"passwordResetExpiry" yaml:"passwordResetExpiry,omitempty"`
 	PasswordRetryCount  null.Int    `boil:"password_retry_count" json:"passwordRetryCount,omitempty" toml:"passwordRetryCount" yaml:"passwordRetryCount,omitempty"`
+	ResetPWDToken       null.String `boil:"reset_pwd_token" json:"resetPWDToken,omitempty" toml:"resetPWDToken" yaml:"resetPWDToken,omitempty"`
+	PWDTokenExpiry      null.Time   `boil:"pwd_token_expiry" json:"pwdTokenExpiry,omitempty" toml:"pwdTokenExpiry" yaml:"pwdTokenExpiry,omitempty"`
 	Name                null.String `boil:"name" json:"name,omitempty" toml:"name" yaml:"name,omitempty"`
 	LockedAt            null.Time   `boil:"locked_at" json:"lockedAt,omitempty" toml:"lockedAt" yaml:"lockedAt,omitempty"`
 	ExpirationDate      null.Time   `boil:"expiration_date" json:"expirationDate,omitempty" toml:"expirationDate" yaml:"expirationDate,omitempty"`
@@ -45,8 +46,9 @@ var UserColumns = struct {
 	Username            string
 	Password            string
 	PasswordLastChanged string
-	PasswordResetExpiry string
 	PasswordRetryCount  string
+	ResetPWDToken       string
+	PWDTokenExpiry      string
 	Name                string
 	LockedAt            string
 	ExpirationDate      string
@@ -58,8 +60,9 @@ var UserColumns = struct {
 	Username:            "username",
 	Password:            "password",
 	PasswordLastChanged: "password_last_changed",
-	PasswordResetExpiry: "password_reset_expiry",
 	PasswordRetryCount:  "password_retry_count",
+	ResetPWDToken:       "reset_pwd_token",
+	PWDTokenExpiry:      "pwd_token_expiry",
 	Name:                "name",
 	LockedAt:            "locked_at",
 	ExpirationDate:      "expiration_date",
@@ -73,8 +76,9 @@ var UserTableColumns = struct {
 	Username            string
 	Password            string
 	PasswordLastChanged string
-	PasswordResetExpiry string
 	PasswordRetryCount  string
+	ResetPWDToken       string
+	PWDTokenExpiry      string
 	Name                string
 	LockedAt            string
 	ExpirationDate      string
@@ -86,8 +90,9 @@ var UserTableColumns = struct {
 	Username:            "user.username",
 	Password:            "user.password",
 	PasswordLastChanged: "user.password_last_changed",
-	PasswordResetExpiry: "user.password_reset_expiry",
 	PasswordRetryCount:  "user.password_retry_count",
+	ResetPWDToken:       "user.reset_pwd_token",
+	PWDTokenExpiry:      "user.pwd_token_expiry",
 	Name:                "user.name",
 	LockedAt:            "user.locked_at",
 	ExpirationDate:      "user.expiration_date",
@@ -103,8 +108,9 @@ var UserWhere = struct {
 	Username            whereHelperstring
 	Password            whereHelperstring
 	PasswordLastChanged whereHelpernull_Time
-	PasswordResetExpiry whereHelpernull_Time
 	PasswordRetryCount  whereHelpernull_Int
+	ResetPWDToken       whereHelpernull_String
+	PWDTokenExpiry      whereHelpernull_Time
 	Name                whereHelpernull_String
 	LockedAt            whereHelpernull_Time
 	ExpirationDate      whereHelpernull_Time
@@ -116,8 +122,9 @@ var UserWhere = struct {
 	Username:            whereHelperstring{field: "`user`.`username`"},
 	Password:            whereHelperstring{field: "`user`.`password`"},
 	PasswordLastChanged: whereHelpernull_Time{field: "`user`.`password_last_changed`"},
-	PasswordResetExpiry: whereHelpernull_Time{field: "`user`.`password_reset_expiry`"},
 	PasswordRetryCount:  whereHelpernull_Int{field: "`user`.`password_retry_count`"},
+	ResetPWDToken:       whereHelpernull_String{field: "`user`.`reset_pwd_token`"},
+	PWDTokenExpiry:      whereHelpernull_Time{field: "`user`.`pwd_token_expiry`"},
 	Name:                whereHelpernull_String{field: "`user`.`name`"},
 	LockedAt:            whereHelpernull_Time{field: "`user`.`locked_at`"},
 	ExpirationDate:      whereHelpernull_Time{field: "`user`.`expiration_date`"},
@@ -143,8 +150,8 @@ func (*userR) NewStruct() *userR {
 type userL struct{}
 
 var (
-	userAllColumns            = []string{"id", "username", "password", "password_last_changed", "password_reset_expiry", "password_retry_count", "name", "locked_at", "expiration_date", "created_at", "updated_at", "deleted_at"}
-	userColumnsWithoutDefault = []string{"username", "password", "password_last_changed", "password_reset_expiry", "name", "locked_at", "expiration_date", "created_at", "updated_at", "deleted_at"}
+	userAllColumns            = []string{"id", "username", "password", "password_last_changed", "password_retry_count", "reset_pwd_token", "pwd_token_expiry", "name", "locked_at", "expiration_date", "created_at", "updated_at", "deleted_at"}
+	userColumnsWithoutDefault = []string{"username", "password", "password_last_changed", "reset_pwd_token", "pwd_token_expiry", "name", "locked_at", "expiration_date", "created_at", "updated_at", "deleted_at"}
 	userColumnsWithDefault    = []string{"id", "password_retry_count"}
 	userPrimaryKeyColumns     = []string{"id"}
 	userGeneratedColumns      = []string{}

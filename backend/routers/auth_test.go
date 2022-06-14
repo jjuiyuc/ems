@@ -13,7 +13,8 @@ import (
 	"der-ems/config"
 	"der-ems/internal/e"
 	"der-ems/models"
-	deremsmodels "der-ems/models/der-ems"
+	"der-ems/repository"
+	"der-ems/services"
 	"der-ems/testutils"
 	"der-ems/testutils/fixtures"
 )
@@ -21,6 +22,7 @@ import (
 type AuthorizationSuite struct {
 	suite.Suite
 	router *gin.Engine
+	repo   *repository.Repository
 }
 
 func Test_Authorization(t *testing.T) {
@@ -29,15 +31,24 @@ func Test_Authorization(t *testing.T) {
 
 func (s *AuthorizationSuite) SetupSuite() {
 	config.Init(testutils.GetConfigDir(), "ut.yaml")
-	models.Init()
+	cfg := config.GetConfig()
+	models.Init(cfg)
+	db := models.GetDB()
+
+	repo := repository.NewRepository(db)
+	services := services.NewServices(cfg, repo)
+	worker := &APIWorker{
+		Services: services,
+	}
 
 	// Truncate & seed data
-	_, err := models.GetDB().Exec("truncate table login_log")
+	_, err := db.Exec("truncate table login_log")
 	s.Require().NoError(err)
-	err = testutils.SeedUtUser()
+	err = testutils.SeedUtUser(db)
 	s.Require().NoError(err)
 
-	s.router = InitRouter(config.GetConfig().GetBool("server.cors"), config.GetConfig().GetString("server.ginMode"))
+	s.repo = repo
+	s.router = InitRouter(cfg.GetBool("server.cors"), cfg.GetString("server.ginMode"), worker)
 }
 
 func (s *AuthorizationSuite) TearDownSuite() {
@@ -117,7 +128,7 @@ func (s *AuthorizationSuite) Test_GetAuth() {
 		if tt.name == "login" {
 			dataMap := res.Data.(map[string]interface{})
 			s.NotEmpty(dataMap["token"])
-			count, err := deremsmodels.LoginLogs().Count(models.GetDB())
+			count, err := s.repo.User.GetLoginLogCount()
 			s.Require().NoError(err)
 			s.Equal(1, int(count))
 		}

@@ -5,9 +5,8 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"github.com/volatiletech/sqlboiler/v4/boil"
-
-	"der-ems/config"
 )
 
 var (
@@ -15,15 +14,14 @@ var (
 )
 
 // Init database
-func Init() {
+func Init(cfg *viper.Viper) {
 	var err error
 
-	config := config.GetConfig()
-	boil.DebugMode = config.GetBool("server.debug")
+	boil.DebugMode = cfg.GetBool("server.debug")
 
 	db, err = sql.Open(
-		config.GetString("db.derems.driver"),
-		config.GetString("db.derems.connection"),
+		cfg.GetString("db.derems.driver"),
+		cfg.GetString("db.derems.connection"),
 	)
 	if err != nil {
 		log.WithFields(log.Fields{

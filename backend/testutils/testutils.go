@@ -1,6 +1,7 @@
 package testutils
 
 import (
+	"database/sql"
 	"fmt"
 	"path/filepath"
 	"runtime"
@@ -8,7 +9,6 @@ import (
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"golang.org/x/crypto/bcrypt"
 
-	"der-ems/models"
 	deremsmodels "der-ems/models/der-ems"
 	"der-ems/testutils/fixtures"
 )
@@ -18,8 +18,8 @@ func GetConfigDir() string {
 	return filepath.Join(filepath.Dir(filename), "..", "config")
 }
 
-func SeedUtUser() (err error) {
-	_, err = models.GetDB().Exec("truncate table user")
+func SeedUtUser(db *sql.DB) (err error) {
+	_, err = db.Exec("truncate table user")
 	if err != nil {
 		return
 	}
@@ -32,7 +32,7 @@ func SeedUtUser() (err error) {
 		Password:       string(hashPassword[:]),
 		ExpirationDate: fixtures.UtUser.ExpirationDate,
 	}
-	err = user.Insert(models.GetDB(), boil.Infer())
+	err = user.Insert(db, boil.Infer())
 	return
 }
 

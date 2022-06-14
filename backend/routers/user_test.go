@@ -1,6 +1,7 @@
 package routers
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -15,6 +16,8 @@ import (
 	"der-ems/internal/utils"
 	"der-ems/models"
 	deremsmodels "der-ems/models/der-ems"
+	"der-ems/repository"
+	"der-ems/services"
 	"der-ems/testutils"
 	"der-ems/testutils/fixtures"
 )
@@ -31,20 +34,102 @@ func Test_User(t *testing.T) {
 
 func (s *UserSuite) SetupSuite() {
 	config.Init(testutils.GetConfigDir(), "ut.yaml")
-	models.Init()
+	cfg := config.GetConfig()
+	models.Init(cfg)
+	db := models.GetDB()
+
+	repo := repository.NewRepository(db)
+	services := &services.Services{
+		Email: &testutils.MockEmailService{},
+		User:  services.NewUserService(repo),
+	}
+	w := &APIWorker{
+		Services: services,
+	}
 
 	// Truncate & seed data
-	err := testutils.SeedUtUser()
+	err := testutils.SeedUtUser(db)
 	s.Require().NoError(err)
 	token, err := utils.GenerateToken(fixtures.UtUser.ID)
 	s.Require().NoError(err)
 	s.token = token
 
-	s.router = InitRouter(config.GetConfig().GetBool("server.cors"), config.GetConfig().GetString("server.ginMode"))
+	s.router = InitRouter(cfg.GetBool("server.cors"), cfg.GetString("server.ginMode"), w)
 }
 
 func (s *UserSuite) TearDownSuite() {
 	models.Close()
+}
+
+func (s *UserSuite) Test_PasswordLost() {
+	type args struct {
+		Username string `json:"username"`
+	}
+
+	type response struct {
+		Code int         `json:"code"`
+		Msg  string      `json:"msg"`
+		Data interface{} `json:"data"`
+	}
+
+	tests := []struct {
+		name       string
+		args       args
+		wantStatus int
+		wantRv     response
+	}{
+		{
+			name: "passwordLost",
+			args: args{
+				Username: fixtures.UtUser.Username,
+			},
+			wantStatus: http.StatusOK,
+			wantRv: response{
+				Code: e.Success,
+				Msg:  "ok",
+			},
+		},
+		{
+			name:       "passwordLostInvalidParams",
+			wantStatus: http.StatusBadRequest,
+			wantRv: response{
+				Code: e.InvalidParams,
+				Msg:  "invalid parameters",
+			},
+		},
+		{
+			name: "passwordLostError",
+			args: args{
+				Username: "xxx",
+			},
+			wantStatus: http.StatusUnauthorized,
+			wantRv: response{
+				Code: e.ErrPasswordLost,
+				Msg:  "fail",
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		payloadBuf, err := json.Marshal(tt.args)
+		s.Require().NoError(err)
+		req, err := http.NewRequest("PUT", "/api/users/password/lost", bytes.NewBuffer(payloadBuf))
+		s.Require().NoError(err)
+		rv := httptest.NewRecorder()
+		s.router.ServeHTTP(rv, req)
+		s.Equal(tt.wantStatus, rv.Code)
+
+		var res response
+		err = json.Unmarshal([]byte(rv.Body.String()), &res)
+		s.Require().NoError(err)
+		s.Equal(tt.wantRv.Code, res.Code)
+		s.Equal(tt.wantRv.Msg, res.Msg)
+
+		if tt.name == "passwordLost" {
+			dataMap := res.Data.(map[string]interface{})
+			s.Equal(fixtures.UtUser.Username, dataMap["username"])
+		}
+	}
 }
 
 func (s *UserSuite) Test_Authorize() {

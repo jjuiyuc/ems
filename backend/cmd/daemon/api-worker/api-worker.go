@@ -3,7 +3,9 @@ package main
 import (
 	"der-ems/config"
 	"der-ems/models"
+	"der-ems/repository"
 	"der-ems/routers"
+	"der-ems/services"
 	"flag"
 )
 
@@ -12,8 +14,13 @@ func main() {
 	env := flag.String("e", "template", "")
 	flag.Parse()
 	config.Init(*dir, *env)
-	models.Init()
+	cfg := config.GetConfig()
+	models.Init(cfg)
+	db := models.GetDB()
 	defer models.Close()
 
-	routers.NewAPIWorker(config.GetConfig())
+	repo := repository.NewRepository(db)
+	services := services.NewServices(cfg, repo)
+
+	routers.NewAPIWorker(cfg, services)
 }

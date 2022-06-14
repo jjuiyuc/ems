@@ -15,17 +15,26 @@ import (
 	"der-ems/internal/app"
 	"der-ems/internal/e"
 	"der-ems/internal/utils"
-	"der-ems/routers/api"
+	"der-ems/services"
 )
 
-func NewAPIWorker(cfg *viper.Viper) {
-	r := InitRouter(cfg.GetBool("server.cors"), cfg.GetString("server.ginMode"))
+// APIWorker ...
+type APIWorker struct {
+	Services *services.Services
+}
+
+// NewAPIWorker ...
+func NewAPIWorker(cfg *viper.Viper, services *services.Services) {
+	w := &APIWorker{Services: services}
+
+	r := InitRouter(cfg.GetBool("server.cors"), cfg.GetString("server.ginMode"), w)
 	r.Run(cfg.GetString("server.port"))
 }
 
+// InitRouter ...
 // @Title DER_EMS
 // @BasePath /api
-func InitRouter(isCORS bool, ginMode string) *gin.Engine {
+func InitRouter(isCORS bool, ginMode string, w *APIWorker) *gin.Engine {
 	r := gin.New()
 	if isCORS {
 		r.Use(cors.New(cors.Config{
@@ -51,10 +60,11 @@ func InitRouter(isCORS bool, ginMode string) *gin.Engine {
 	apiGroup := r.Group("/api")
 
 	// Auth
-	apiGroup.POST("/auth", api.GetAuth)
+	apiGroup.POST("/auth", w.GetAuth)
 
 	// User
-	apiGroup.GET("/users/profile", authorize(), api.GetProfile)
+	apiGroup.PUT("/users/password/lost", w.PasswordLost)
+	apiGroup.GET("/users/profile", authorize(), w.GetProfile)
 
 	return r
 }

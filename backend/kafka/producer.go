@@ -7,13 +7,12 @@ import (
 
 	"github.com/Shopify/sarama"
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 
-	"der-ems/config"
 	"der-ems/infra"
 )
 
-func Produce(topic, message string) {
-	cfg := config.GetConfig()
+func Produce(cfg *viper.Viper, topic, message string) {
 	saramaConfig := sarama.NewConfig()
 	saramaConfig.Producer.Return.Errors = true
 	producer, err := sarama.NewAsyncProducer([]string{cfg.GetString("kafka.broker")}, saramaConfig)

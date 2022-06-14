@@ -64,11 +64,11 @@ func (s *UserSuite) TearDownSuite() {
 }
 
 func (s *UserSuite) Test_PasswordLostAndResetByToken() {
-	type args1 struct {
+	type passwordLostArgs struct {
 		Username string `json:"username"`
 	}
 
-	type args2 struct {
+	type passwordResetArgs struct {
 		Token    string `json:"token"`
 		Password string `json:"password"`
 	}
@@ -79,15 +79,15 @@ func (s *UserSuite) Test_PasswordLostAndResetByToken() {
 		Data interface{} `json:"data"`
 	}
 
-	tests1 := []struct {
+	passwordLostTest := []struct {
 		name       string
-		args       args1
+		args       passwordLostArgs
 		wantStatus int
 		wantRv     response
 	}{
 		{
 			name: "passwordLost",
-			args: args1{
+			args: passwordLostArgs{
 				Username: fixtures.UtUser.Username,
 			},
 			wantStatus: http.StatusOK,
@@ -106,7 +106,7 @@ func (s *UserSuite) Test_PasswordLostAndResetByToken() {
 		},
 		{
 			name: "passwordLostError",
-			args: args1{
+			args: passwordLostArgs{
 				Username: "xxx",
 			},
 			wantStatus: http.StatusUnauthorized,
@@ -117,15 +117,15 @@ func (s *UserSuite) Test_PasswordLostAndResetByToken() {
 		},
 	}
 
-	tests2 := []struct {
+	passwordResetTest := []struct {
 		name       string
-		args       args2
+		args       passwordResetArgs
 		wantStatus int
 		wantRv     response
 	}{
 		{
 			name: "passwordResetByToken",
-			args: args2{
+			args: passwordResetArgs{
 				Password: fixtures.UtUser.Password,
 			},
 			wantStatus: http.StatusOK,
@@ -136,7 +136,7 @@ func (s *UserSuite) Test_PasswordLostAndResetByToken() {
 		},
 		{
 			name: "passwordResetByTokenInvalidParams",
-			args: args2{
+			args: passwordResetArgs{
 				Password: fixtures.UtUser.Password,
 			},
 			wantStatus: http.StatusBadRequest,
@@ -147,7 +147,7 @@ func (s *UserSuite) Test_PasswordLostAndResetByToken() {
 		},
 		{
 			name: "passwordResetByTokenError",
-			args: args2{
+			args: passwordResetArgs{
 				Token:    "xxx",
 				Password: fixtures.UtUser.Password,
 			},
@@ -159,7 +159,7 @@ func (s *UserSuite) Test_PasswordLostAndResetByToken() {
 		},
 	}
 
-	for _, tt := range tests1 {
+	for _, tt := range passwordLostTest {
 		payloadBuf, err := json.Marshal(tt.args)
 		s.Require().NoError(err)
 		req, err := http.NewRequest("PUT", "/api/users/password/lost", bytes.NewBuffer(payloadBuf))
@@ -183,7 +183,7 @@ func (s *UserSuite) Test_PasswordLostAndResetByToken() {
 	user, err := s.repo.User.GetUserByUsername(fixtures.UtUser.Username)
 	s.Require().NoError(err)
 
-	for _, tt := range tests2 {
+	for _, tt := range passwordResetTest {
 		if tt.name == "passwordResetByToken" {
 			tt.args.Token = user.ResetPWDToken.String
 		}
@@ -201,11 +201,6 @@ func (s *UserSuite) Test_PasswordLostAndResetByToken() {
 		s.Require().NoError(err)
 		s.Equal(tt.wantRv.Code, res.Code)
 		s.Equal(tt.wantRv.Msg, res.Msg)
-
-		if tt.name == "passwordResetByToken" {
-			dataMap := res.Data.(map[string]interface{})
-			s.Equal("success", dataMap["status"])
-		}
 	}
 }
 

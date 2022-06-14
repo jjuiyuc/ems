@@ -88,9 +88,7 @@ func (w *APIWorker) PasswordResetByToken(c *gin.Context) {
 		return
 	}
 
-	appG.Response(http.StatusOK, e.Success, map[string]string{
-		"status": "success",
-	})
+	appG.Response(http.StatusOK, e.Success, nil)
 }
 
 // GetProfile provides the detailed information about an individual user

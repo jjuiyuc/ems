@@ -92,14 +92,19 @@ func (w *WeatherWorker) MainLoop() {
 }
 
 func (h weatherConsumerHandler) ProcessWeatherData(msg []byte) {
-	log.Debug("processWeatherData")
-	lat, lng, err := UpsertWeatherData(h.repo, msg)
-	if err == nil {
-		publishWeatherDataToLocalGW(h.cfg, h.repo, lat, lng)
+	log.Debug("ProcessWeatherData")
+	lat, lng, err := h.SaveWeatherData(msg)
+	if err != nil {
+		return
 	}
+	latestWeatherJson, gatewayUUIDs, err := h.GenerateWeatherSendingInfo(lat, lng)
+	if err != nil {
+		return
+	}
+	h.sendWeatherDataToGateway(latestWeatherJson, gatewayUUIDs)
 }
 
-func UpsertWeatherData(repo *repository.Repository, msg []byte) (lat, lng float32, err error) {
+func (h weatherConsumerHandler) SaveWeatherData(msg []byte) (lat, lng float32, err error) {
 	var latestWeather LatestWeather
 	err = json.Unmarshal(msg, &latestWeather)
 	if err != nil {
@@ -149,10 +154,10 @@ func UpsertWeatherData(repo *repository.Repository, msg []byte) (lat, lng float3
 			"ValidDate":    weatherForecast.ValidDate,
 			"string(Data)": string(weatherForecast.Data.JSON),
 		}).Debug("upsert weatherForecast data")
-		err = repo.Weather.UpsertWeatherForecast(weatherForecast)
+		err = h.repo.Weather.UpsertWeatherForecast(weatherForecast)
 		if err != nil {
 			log.WithFields(log.Fields{
-				"caused-by": "repository.UpsertWeatherForecast",
+				"caused-by": "h.repo.Weather.UpsertWeatherForecast",
 				"err":       err,
 			}).Error()
 			return
@@ -164,25 +169,22 @@ func UpsertWeatherData(repo *repository.Repository, msg []byte) (lat, lng float3
 	return
 }
 
-func publishWeatherDataToLocalGW(cfg *viper.Viper, repo *repository.Repository, lat, lng float32) {
-	latestWeatherJson, err := GetWeatherDataByLocation(repo, lat, lng)
+func (h weatherConsumerHandler) GenerateWeatherSendingInfo(lat, lng float32) (latestWeatherJson []byte, gatewayUUIDs []string, err error) {
+	latestWeatherJson, err = h.getWeatherDataByLocation(lat, lng)
 	if err != nil {
 		return
 	}
-	gatewayUUIDs, err := GetGateWayUUIDsByLocation(repo, lat, lng)
-	if err != nil {
-		return
-	}
-	publish(cfg, latestWeatherJson, gatewayUUIDs)
+	gatewayUUIDs, err = h.getGatewayUUIDsByLocation(lat, lng)
+	return
 }
 
-func GetWeatherDataByLocation(repo *repository.Repository, lat, lng float32) (latestWeatherJson []byte, err error) {
+func (h weatherConsumerHandler) getWeatherDataByLocation(lat, lng float32) (latestWeatherJson []byte, err error) {
 	startValidDate := time.Now().UTC()
 	endValidDate := time.Now().UTC().Add(30 * time.Hour)
-	weatherForecastList, err := repo.Weather.GetWeatherForecastByLocation(lat, lng, startValidDate, endValidDate)
+	weatherForecastList, err := h.repo.Weather.GetWeatherForecastByLocation(lat, lng, startValidDate, endValidDate)
 	if err != nil {
 		log.WithFields(log.Fields{
-			"caused-by": "repo.GetWeatherForecastByLocation",
+			"caused-by": "h.repo.Weather.GetWeatherForecastByLocation",
 			"err":       err,
 		}).Error()
 		return
@@ -218,11 +220,11 @@ func GetWeatherDataByLocation(repo *repository.Repository, lat, lng float32) (la
 	return
 }
 
-func GetGateWayUUIDsByLocation(repo *repository.Repository, lat, lng float32) (gatewayUUIDs []string, err error) {
-	gateways, err := repo.Weather.GetGatewaysByLocation(lat, lng)
+func (h weatherConsumerHandler) getGatewayUUIDsByLocation(lat, lng float32) (gatewayUUIDs []string, err error) {
+	gateways, err := h.repo.Weather.GetGatewaysByLocation(lat, lng)
 	if err != nil {
 		log.WithFields(log.Fields{
-			"caused-by": "repository.GetGatewaysByLocation",
+			"caused-by": "h.repo.Weather.GetGatewaysByLocation",
 			"err":       err,
 		}).Error()
 		return
@@ -234,10 +236,10 @@ func GetGateWayUUIDsByLocation(repo *repository.Repository, lat, lng float32) (g
 	return
 }
 
-func publish(cfg *viper.Viper, latestWeatherJson []byte, gatewayUUIDs []string) {
+func (h weatherConsumerHandler) sendWeatherDataToGateway(latestWeatherJson []byte, gatewayUUIDs []string) {
 	for _, uuid := range gatewayUUIDs {
 		sendWeatherDatatoLocalGW := strings.Replace(kafka.SendWeatherDatatoLocalGW, "{gw-id}", uuid, 1)
 		log.Debug("sendWeatherDatatoLocalGW: ", sendWeatherDatatoLocalGW)
-		kafka.Produce(cfg, sendWeatherDatatoLocalGW, string(latestWeatherJson))
+		kafka.Produce(h.cfg, sendWeatherDatatoLocalGW, string(latestWeatherJson))
 	}
 }

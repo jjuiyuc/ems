@@ -1,12 +1,13 @@
 package main
 
 import (
+	"flag"
+
 	"der-ems/apps"
 	"der-ems/config"
 	"der-ems/infra"
 	"der-ems/models"
 	"der-ems/repository"
-	"flag"
 )
 
 func main() {
@@ -19,10 +20,8 @@ func main() {
 	models.Init(cfg)
 	db := models.GetDB()
 	defer models.Close()
-
 	repo := repository.NewRepository(db)
 
 	mdWeatherWorker := apps.NewWeatherWorker(infra.GetGracefulShutdownCtx(), cfg, repo, name)
-
 	mdWeatherWorker.MainLoop()
 }

@@ -32,8 +32,9 @@ func NewUserRepository(db *sql.DB) UserRepository {
 
 // InsertLoginLog ...
 func (repo defaultUserRepository) InsertLoginLog(loginLog *deremsmodels.LoginLog) error {
-	loginLog.CreatedAt = time.Now()
-	loginLog.UpdatedAt = null.NewTime(time.Now(), true)
+	now := time.Now()
+	loginLog.CreatedAt = now
+	loginLog.UpdatedAt = null.NewTime(now, true)
 	return loginLog.Insert(repo.db, boil.Infer())
 }
 

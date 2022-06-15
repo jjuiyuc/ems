@@ -1,12 +1,13 @@
 package main
 
 import (
+	"flag"
+
 	"der-ems/config"
 	"der-ems/models"
 	"der-ems/repository"
 	"der-ems/routers"
 	"der-ems/services"
-	"flag"
 )
 
 func main() {

@@ -147,12 +147,12 @@ func (h weatherConsumerHandler) SaveWeatherData(msg []byte) (lat, lng float32, e
 		}
 
 		log.WithFields(log.Fields{
-			"i":            i,
-			"Lat":          weatherForecast.Lat,
-			"Lng":          weatherForecast.Lng,
-			"Alt":          weatherForecast.Alt,
-			"ValidDate":    weatherForecast.ValidDate,
-			"string(Data)": string(weatherForecast.Data.JSON),
+			"i":                                           i,
+			deremsmodels.WeatherForecastColumns.Lat:       weatherForecast.Lat,
+			deremsmodels.WeatherForecastColumns.Lng:       weatherForecast.Lng,
+			deremsmodels.WeatherForecastColumns.Alt:       weatherForecast.Alt,
+			deremsmodels.WeatherForecastColumns.ValidDate: weatherForecast.ValidDate,
+			deremsmodels.WeatherForecastColumns.Data:      string(weatherForecast.Data.JSON),
 		}).Debug("upsert weatherForecast data")
 		err = h.repo.Weather.UpsertWeatherForecast(weatherForecast)
 		if err != nil {
@@ -179,8 +179,9 @@ func (h weatherConsumerHandler) GenerateWeatherSendingInfo(lat, lng float32) (la
 }
 
 func (h weatherConsumerHandler) getWeatherDataByLocation(lat, lng float32) (latestWeatherJson []byte, err error) {
-	startValidDate := time.Now().UTC()
-	endValidDate := time.Now().UTC().Add(30 * time.Hour)
+	now := time.Now().UTC()
+	startValidDate := now
+	endValidDate := now.Add(30 * time.Hour)
 	weatherForecastList, err := h.repo.Weather.GetWeatherForecastByLocation(lat, lng, startValidDate, endValidDate)
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -221,10 +222,10 @@ func (h weatherConsumerHandler) getWeatherDataByLocation(lat, lng float32) (late
 }
 
 func (h weatherConsumerHandler) getGatewayUUIDsByLocation(lat, lng float32) (gatewayUUIDs []string, err error) {
-	gateways, err := h.repo.Weather.GetGatewaysByLocation(lat, lng)
+	gateways, err := h.repo.Gateway.GetGatewaysByLocation(lat, lng)
 	if err != nil {
 		log.WithFields(log.Fields{
-			"caused-by": "h.repo.Weather.GetGatewaysByLocation",
+			"caused-by": "h.repo.Gateway.GetGatewaysByLocation",
 			"err":       err,
 		}).Error()
 		return

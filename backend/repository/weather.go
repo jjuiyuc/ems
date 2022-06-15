@@ -16,7 +16,6 @@ type WeatherRepository interface {
 	UpsertWeatherForecast(weatherForecast *deremsmodels.WeatherForecast) (err error)
 	GetWeatherForecastByLocation(lat, lng float32, startValidDate, endValidDate time.Time) ([]*deremsmodels.WeatherForecast, error)
 	GetWeatherForecastCount() (int64, error)
-	GetGatewaysByLocation(lat, lng float32) ([]*deremsmodels.Gateway, error)
 }
 
 type defaultWeatherRepository struct {
@@ -35,11 +34,13 @@ func (repo defaultWeatherRepository) UpsertWeatherForecast(weatherForecast *dere
 		qm.Where("lat = ?", weatherForecast.Lat),
 		qm.Where("lng = ?", weatherForecast.Lng),
 		qm.Where("valid_date = ?", weatherForecast.ValidDate)).One(repo.db)
+	now := time.Now()
+	weatherForecast.UpdatedAt = null.NewTime(now, true)
 	if err != nil {
+		weatherForecast.CreatedAt = now
 		err = weatherForecast.Insert(repo.db, boil.Infer())
 	} else {
 		weatherForecast.ID = weatherForecastReturn.ID
-		weatherForecast.UpdatedAt = null.NewTime(time.Now(), true)
 		_, err = weatherForecast.Update(repo.db, boil.Infer())
 	}
 	return
@@ -56,11 +57,4 @@ func (repo defaultWeatherRepository) GetWeatherForecastByLocation(lat, lng float
 // GetWeatherForecastCount ...
 func (repo defaultWeatherRepository) GetWeatherForecastCount() (int64, error) {
 	return deremsmodels.WeatherForecasts().Count(repo.db)
-}
-
-// GetGatewaysByLocation ...
-func (repo defaultWeatherRepository) GetGatewaysByLocation(lat, lng float32) ([]*deremsmodels.Gateway, error) {
-	return deremsmodels.Gateways(
-		qm.InnerJoin("customer AS c ON gateway.customer_id = c.id"),
-		qm.Where("(c.weather_lat = ? AND c.weather_lng = ?)", lat, lng)).All(repo.db)
 }

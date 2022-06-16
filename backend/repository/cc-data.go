@@ -14,6 +14,7 @@ import (
 // CCDataRepository ...
 type CCDataRepository interface {
 	UpsertCCData(ccData *deremsmodels.CCDatum) (err error)
+	GetCCDataCount() (int64, error)
 }
 
 type defaultCCDataRepository struct {
@@ -41,4 +42,9 @@ func (repo defaultCCDataRepository) UpsertCCData(ccData *deremsmodels.CCDatum) (
 		_, err = ccData.Update(repo.db, boil.Infer())
 	}
 	return
+}
+
+// GetCCDataCount ...
+func (repo defaultCCDataRepository) GetCCDataCount() (int64, error) {
+	return deremsmodels.CCData().Count(repo.db)
 }

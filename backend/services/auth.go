@@ -16,7 +16,7 @@ const passwordLockCount = 5
 
 // AuthService ...
 type AuthService interface {
-	Login(username, password string) (user *deremsmodels.User, err error)
+	Login(username, password string) (user *deremsmodels.User, errCode int, err error)
 	CreateLoginLog(user *deremsmodels.User, token string) (err error)
 }
 
@@ -30,9 +30,10 @@ func NewAuthService(repo *repository.Repository) AuthService {
 }
 
 // Login ...
-func (s defaultAuthService) Login(username, password string) (user *deremsmodels.User, err error) {
+func (s defaultAuthService) Login(username, password string) (user *deremsmodels.User, errCode int, err error) {
 	user, err = s.repo.User.GetUserByUsername(username)
 	if err != nil {
+		errCode = e.ErrAuthUserNotExist
 		log.WithFields(log.Fields{
 			"caused-by": "repository.GetUserByUsername",
 			"err":       err,
@@ -43,6 +44,7 @@ func (s defaultAuthService) Login(username, password string) (user *deremsmodels
 	// Check expiration date
 	now := time.Now()
 	if user.ExpirationDate.Valid != false && user.ExpirationDate.Time.Before(now) {
+		errCode = e.ErrAuthUserExpirated
 		err = e.NewUserExpirationError(user.ExpirationDate.Time)
 		log.WithFields(log.Fields{
 			"caused-by": "user.ExpirationDate",
@@ -53,6 +55,7 @@ func (s defaultAuthService) Login(username, password string) (user *deremsmodels
 
 	// Check password retry count
 	if user.PasswordRetryCount.Int >= passwordLockCount {
+		errCode = e.ErrAuthUserLocked
 		err = e.NewUserLockedError(passwordLockCount)
 		log.WithFields(log.Fields{
 			"caused-by": "user.PasswordRetryCount",
@@ -65,6 +68,7 @@ func (s defaultAuthService) Login(username, password string) (user *deremsmodels
 	nowPasswordRetryCount := user.PasswordRetryCount.Int
 	err = comparePassword(password, user.Password)
 	if err != nil {
+		errCode = e.ErrAuthPasswordNotMatch
 		log.WithFields(log.Fields{
 			"caused-by": "comparePassword",
 			"err":       err,

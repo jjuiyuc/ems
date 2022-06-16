@@ -23,6 +23,7 @@ type WeatherWorkerSuite struct {
 	seedUtTime    time.Time
 	seedUtWeather LatestWeather
 	repo          *repository.Repository
+	handler       weatherConsumerHandler
 }
 
 func Test_WeatherWorker(t *testing.T) {
@@ -31,10 +32,17 @@ func Test_WeatherWorker(t *testing.T) {
 
 func (s *WeatherWorkerSuite) SetupSuite() {
 	config.Init(testutils.GetConfigDir(), "ut.yaml")
-	models.Init(config.GetConfig())
+	cfg := config.GetConfig()
+	models.Init(cfg)
 	db := models.GetDB()
+	repo := repository.NewRepository(db)
+	handler := weatherConsumerHandler{
+		cfg:  cfg,
+		repo: repo,
+	}
 
-	s.repo = repository.NewRepository(db)
+	s.repo = repo
+	s.handler = handler
 
 	// Truncate data
 	_, err := db.Exec("TRUNCATE TABLE weather_forecast")
@@ -116,16 +124,18 @@ func (s *WeatherWorkerSuite) TearDownSuite() {
 
 func (s *WeatherWorkerSuite) Test_01_GetWeatherData() {
 	// Use default seedUtWeather data
-	seedUtWeatherJson, _ := json.Marshal(s.seedUtWeather)
+	seedUtWeatherJson, err := json.Marshal(s.seedUtWeather)
+	s.Require().NoError(err)
 
 	testMsg := s.getMockConsumerMessage(seedUtWeatherJson)
 
-	UpsertWeatherData(s.repo, testMsg.Value)
-	count, _ := s.repo.Weather.GetWeatherForecastCount()
+	s.handler.SaveWeatherData(testMsg.Value)
+	count, err := s.repo.Weather.GetWeatherForecastCount()
+	s.Require().NoError(err)
 	s.Equal(2, int(count))
 }
 
-func (s *WeatherWorkerSuite) Test_02_UpsertWeatherData() {
+func (s *WeatherWorkerSuite) Test_02_GetUpdatedWeatherData() {
 	// Modify seedUtWeather data
 	for i, value := range s.seedUtWeather.Values {
 		switch i {
@@ -135,36 +145,31 @@ func (s *WeatherWorkerSuite) Test_02_UpsertWeatherData() {
 			value["validDate"] = s.seedUtTime.Add(+30 * time.Minute).Format(time.RFC3339)
 		}
 	}
-	seedUtWeatherJson, _ := json.Marshal(s.seedUtWeather)
+	seedUtWeatherJson, err := json.Marshal(s.seedUtWeather)
+	s.Require().NoError(err)
 
 	testMsg := s.getMockConsumerMessage(seedUtWeatherJson)
 
-	UpsertWeatherData(s.repo, testMsg.Value)
-	count, _ := s.repo.Weather.GetWeatherForecastCount()
+	s.handler.SaveWeatherData(testMsg.Value)
+	count, err := s.repo.Weather.GetWeatherForecastCount()
+	s.Require().NoError(err)
 	s.Equal(3, int(count))
 }
 
-func (s *WeatherWorkerSuite) Test_03_GetWeatherDataByLocation() {
+func (s *WeatherWorkerSuite) Test_03_GenerateWeatherSendingInfo() {
 	// Mock data
 	testLat := s.seedUtWeather.Lat
 	testLng := s.seedUtWeather.Lng
 	testWeatherData, _ := json.Marshal(s.seedUtWeather)
-
-	weatherData, _ := GetWeatherDataByLocation(s.repo, testLat, testLng)
-	s.Equal(testWeatherData, weatherData)
-}
-
-func (s *WeatherWorkerSuite) Test_04_GetGateWayUUIDsByLocation() {
-	// Mock data
-	testLat := s.seedUtWeather.Lat
-	testLng := s.seedUtWeather.Lng
 	testUUIDs := []string{"U00001", "U00002", "U00003", "U00004"}
 
-	UUIDs, _ := GetGateWayUUIDsByLocation(s.repo, testLat, testLng)
+	weatherData, UUIDs, err := s.handler.GenerateWeatherSendingInfo(testLat, testLng)
+	s.Require().NoError(err)
+	s.Equal(testWeatherData, weatherData)
 	s.Equal(testUUIDs, UUIDs)
 }
 
-func (s *WeatherWorkerSuite) Test_05_GetNoValidDateWeatherData() {
+func (s *WeatherWorkerSuite) Test_04_GetNoValidDateWeatherData() {
 	// Modify seedUtWeather data
 	const validDate = "validDate"
 	for _, value := range s.seedUtWeather.Values {
@@ -173,7 +178,7 @@ func (s *WeatherWorkerSuite) Test_05_GetNoValidDateWeatherData() {
 	seedUtWeatherJson, _ := json.Marshal(s.seedUtWeather)
 	testMsg := s.getMockConsumerMessage(seedUtWeatherJson)
 
-	_, _, err := UpsertWeatherData(s.repo, testMsg.Value)
+	_, _, err := s.handler.SaveWeatherData(testMsg.Value)
 	s.Equal(e.NewKeyNotExistError(validDate).Error(), err.Error())
 }
 

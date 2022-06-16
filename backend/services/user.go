@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 	"github.com/volatiletech/null/v8"
+	"golang.org/x/crypto/bcrypt"
 
 	deremsmodels "der-ems/models/der-ems"
 	"der-ems/repository"
@@ -14,6 +15,7 @@ import (
 // UserService ...
 type UserService interface {
 	CreatePasswordToken(username string) (name, token string, err error)
+	PasswordResetByPasswordToken(token, newPassword string) (err error)
 	GetProfile(userID int) (user *deremsmodels.User, err error)
 }
 
@@ -50,6 +52,38 @@ func (s defaultUserService) CreatePasswordToken(username string) (name, token st
 	}
 
 	name = user.Name.String
+	return
+}
+
+// PasswordResetByPasswordToken ...
+func (s defaultUserService) PasswordResetByPasswordToken(token, newPassword string) (err error) {
+	user, err := s.repo.User.GetUserByPasswordToken(token)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "s.repo.User.GetUserByPasswordToken",
+			"err":       err,
+		}).Error()
+		return
+	}
+
+	hashPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "bcrypt.GenerateFromPassword",
+			"err":       err,
+		}).Error()
+		return
+	}
+	user.Password = string(hashPassword[:])
+	user.PasswordLastChanged = null.NewTime(time.Now(), true)
+	user.ResetPWDToken = null.NewString("", true)
+	err = s.repo.User.UpdateUser(user)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "s.repo.UpdateUser",
+			"err":       err,
+		}).Error()
+	}
 	return
 }
 

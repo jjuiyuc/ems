@@ -18,6 +18,7 @@ type UserRepository interface {
 	GetLoginLogCount() (int64, error)
 	GetProfileByUserID(userID int) (*deremsmodels.User, error)
 	GetUserByUsername(username string) (*deremsmodels.User, error)
+	GetUserByPasswordToken(token string) (*deremsmodels.User, error)
 }
 
 type defaultUserRepository struct {
@@ -58,4 +59,11 @@ func (repo defaultUserRepository) GetUserByUsername(username string) (*deremsmod
 	return deremsmodels.Users(
 		qm.Where("username = ?", username),
 		qm.Where("deleted_at IS NULL")).One(repo.db)
+}
+
+// GetUserByPasswordToken ...
+func (repo defaultUserRepository) GetUserByPasswordToken(token string) (*deremsmodels.User, error) {
+	return deremsmodels.Users(
+		qm.Where("reset_pwd_token = ?", token),
+		qm.Where("pwd_token_expiry > ?", time.Now())).One(repo.db)
 }

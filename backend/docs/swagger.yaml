@@ -49,6 +49,39 @@ paths:
       summary: Get Authorization
       tags:
       - Authorization
+  /user/PasswordResetByToken:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Token
+        in: path
+        name: token
+        required: true
+        type: string
+      - description: Password
+        in: path
+        name: password
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: Set new password by having the token from email
+      tags:
+      - User
   /user/passwordLost:
     put:
       consumes:

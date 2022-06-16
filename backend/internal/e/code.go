@@ -15,7 +15,7 @@ const (
 	ErrAuthUserLocked       = 20006
 	ErrAuthPasswordNotMatch = 20007
 
-	// ErrPasswordToken = 30000
+	ErrPasswordToken = 30000
 	// ErrPasswordReset = 30001
 	ErrPasswordLost = 30002
 

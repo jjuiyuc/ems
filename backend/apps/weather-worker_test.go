@@ -5,8 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Shopify/sarama"
-	"github.com/Shopify/sarama/mocks"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 
@@ -20,6 +18,7 @@ import (
 
 type WeatherWorkerSuite struct {
 	suite.Suite
+	seedUtTopic   string
 	seedUtTime    time.Time
 	seedUtWeather LatestWeather
 	repo          *repository.Repository
@@ -41,6 +40,7 @@ func (s *WeatherWorkerSuite) SetupSuite() {
 		repo: repo,
 	}
 
+	s.seedUtTopic = kafka.ReceiveWeatherData
 	s.repo = repo
 	s.handler = handler
 
@@ -122,22 +122,112 @@ func (s *WeatherWorkerSuite) TearDownSuite() {
 	models.Close()
 }
 
-func (s *WeatherWorkerSuite) Test_01_GetWeatherData() {
-	// Use default seedUtWeather data
-	seedUtWeatherJson, err := json.Marshal(s.seedUtWeather)
-	s.Require().NoError(err)
+func (s *WeatherWorkerSuite) Test_01_SaveWeatherData() {
+	const validDate = "validDate"
 
-	testMsg := s.getMockConsumerMessage(seedUtWeatherJson)
+	// Modify seedUtWeather data
+	// testDataUpdated
+	testDataUpdated := LatestWeather{
+		Lat: s.seedUtWeather.Lat,
+		Lng: s.seedUtWeather.Lng,
+		Alt: s.seedUtWeather.Alt,
+	}
+	for _, value := range s.seedUtWeather.Values {
+		testDataUpdated.Values = append(testDataUpdated.Values, testutils.CopyMap(value))
+	}
+	for i, value := range testDataUpdated.Values {
+		switch i {
+		case 0:
+			value[validDate] = s.seedUtTime.Add(+15 * time.Minute).Format(time.RFC3339)
+		case 1:
+			value[validDate] = s.seedUtTime.Add(+30 * time.Minute).Format(time.RFC3339)
+		}
+	}
+	// testDataNoValidDate
+	testDataNoValidDate := LatestWeather{
+		Lat: s.seedUtWeather.Lat,
+		Lng: s.seedUtWeather.Lng,
+		Alt: s.seedUtWeather.Alt,
+	}
+	for _, value := range s.seedUtWeather.Values {
+		testDataNoValidDate.Values = append(testDataNoValidDate.Values, testutils.CopyMap(value))
+	}
+	for _, value := range testDataNoValidDate.Values {
+		delete(value, validDate)
+	}
 
-	s.handler.SaveWeatherData(testMsg.Value)
-	count, err := s.repo.Weather.GetWeatherForecastCount()
-	s.Require().NoError(err)
-	s.Equal(2, int(count))
+	tests := []struct {
+		name string
+		args LatestWeather
+	}{
+		{
+			name: "saveWeatherData",
+			args: s.seedUtWeather,
+		},
+		{
+			name: "saveWeatherDataUpdated",
+			args: testDataUpdated,
+		},
+		{
+			name: "saveWeatherDataNoValidDate",
+			args: testDataNoValidDate,
+		},
+		{
+			name: "saveWeatherDataEmptyInput",
+		},
+	}
+
+	for _, tt := range tests {
+		log.Info("test name: ", tt.name)
+		testDataJson, err := json.Marshal(tt.args)
+		s.Require().NoError(err)
+		testMsg, err := testutils.GetMockConsumerMessage(s.T(), s.seedUtTopic, testDataJson)
+		s.Require().NoError(err)
+		s.Equal(s.seedUtTopic, testMsg.Topic)
+
+		switch tt.name {
+		case "saveWeatherDataNoValidDate":
+			_, _, err = s.handler.SaveWeatherData(testMsg.Value)
+			s.Equal(e.NewKeyNotExistError(validDate).Error(), err.Error())
+			continue
+		case "saveWeatherDataEmptyInput":
+			_, _, err := s.handler.SaveWeatherData(nil)
+			s.Require().Error(e.NewUnexpectedJSONInputError, err)
+			continue
+		}
+
+		currentCount, err := s.repo.Weather.GetWeatherForecastCount()
+		s.Require().NoError(err)
+		_, _, err = s.handler.SaveWeatherData(testMsg.Value)
+		s.Require().NoError(err)
+		updatedCount, err := s.repo.Weather.GetWeatherForecastCount()
+		s.Require().NoError(err)
+		switch tt.name {
+		case "saveWeatherData":
+			s.Equal(currentCount+2, updatedCount)
+		case "saveWeatherDataUpdated":
+			s.Equal(currentCount+1, updatedCount)
+		}
+	}
 }
 
-func (s *WeatherWorkerSuite) Test_02_GetUpdatedWeatherData() {
-	// Modify seedUtWeather data
-	for i, value := range s.seedUtWeather.Values {
+func (s *WeatherWorkerSuite) Test_02_GenerateWeatherSendingInfo() {
+	type args struct {
+		Lat         float32
+		Lng         float32
+		WeatherData []byte
+		UUIDs       []string
+	}
+
+	testData := LatestWeather{
+		Lat: s.seedUtWeather.Lat,
+		Lng: s.seedUtWeather.Lng,
+		Alt: s.seedUtWeather.Alt,
+	}
+	for _, value := range s.seedUtWeather.Values {
+		testData.Values = append(testData.Values, testutils.CopyMap(value))
+	}
+	for i, value := range testData.Values {
 		switch i {
 		case 0:
 			value["validDate"] = s.seedUtTime.Add(+15 * time.Minute).Format(time.RFC3339)
@@ -145,74 +235,27 @@ func (s *WeatherWorkerSuite) Test_02_GetUpdatedWeatherData() {
 			value["validDate"] = s.seedUtTime.Add(+30 * time.Minute).Format(time.RFC3339)
 		}
 	}
-	seedUtWeatherJson, err := json.Marshal(s.seedUtWeather)
-	s.Require().NoError(err)
-
-	testMsg := s.getMockConsumerMessage(seedUtWeatherJson)
-
-	s.handler.SaveWeatherData(testMsg.Value)
-	count, err := s.repo.Weather.GetWeatherForecastCount()
-	s.Require().NoError(err)
-	s.Equal(3, int(count))
-}
-
-func (s *WeatherWorkerSuite) Test_03_GenerateWeatherSendingInfo() {
-	// Mock data
 	testLat := s.seedUtWeather.Lat
 	testLng := s.seedUtWeather.Lng
-	testWeatherData, _ := json.Marshal(s.seedUtWeather)
+	testWeatherData, _ := json.Marshal(testData)
 	testUUIDs := []string{"U00001", "U00002", "U00003", "U00004"}
 
-	weatherData, UUIDs, err := s.handler.GenerateWeatherSendingInfo(testLat, testLng)
+	tt := struct {
+		name string
+		args args
+	}{
+		name: "generateWeatherSendingInfo",
+		args: args{
+			Lat:         testLat,
+			Lng:         testLng,
+			WeatherData: testWeatherData,
+			UUIDs:       testUUIDs,
+		},
+	}
+
+	log.Info("test name: ", tt.name)
+	weatherData, uuids, err := s.handler.GenerateWeatherSendingInfo(tt.args.Lat, tt.args.Lng)
 	s.Require().NoError(err)
 	s.Equal(testWeatherData, weatherData)
-	s.Equal(testUUIDs, UUIDs)
-}
-
-func (s *WeatherWorkerSuite) Test_04_GetNoValidDateWeatherData() {
-	// Modify seedUtWeather data
-	const validDate = "validDate"
-	for _, value := range s.seedUtWeather.Values {
-		delete(value, validDate)
-	}
-	seedUtWeatherJson, _ := json.Marshal(s.seedUtWeather)
-	testMsg := s.getMockConsumerMessage(seedUtWeatherJson)
-
-	_, _, err := s.handler.SaveWeatherData(testMsg.Value)
-	s.Equal(e.NewKeyNotExistError(validDate).Error(), err.Error())
-}
-
-func (s *WeatherWorkerSuite) getMockConsumerMessage(seedUtWeatherJson []byte) (testMsg *sarama.ConsumerMessage) {
-	consumer := mocks.NewConsumer(s.T(), mocks.NewTestConfig())
-	defer func() {
-		if err := consumer.Close(); err != nil {
-			log.WithFields(log.Fields{
-				"caused-by": "consumer.Close",
-				"err":       err,
-			}).Error()
-		}
-	}()
-
-	var seedUtPartition int32 = 0
-	consumer.ExpectConsumePartition(kafka.ReceiveWeatherData, seedUtPartition, sarama.OffsetOldest).YieldMessage(&sarama.ConsumerMessage{Value: []byte(seedUtWeatherJson)})
-
-	test, err := consumer.ConsumePartition(kafka.ReceiveWeatherData, seedUtPartition, sarama.OffsetOldest)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"caused-by": "consumer.ConsumePartition",
-			"err":       err,
-		}).Fatal()
-	}
-	testMsg = <-test.Messages()
-	s.Equal(kafka.ReceiveWeatherData, testMsg.Topic)
-	s.Equal(seedUtPartition, testMsg.Partition)
-	s.Equal(string(seedUtWeatherJson), string(testMsg.Value))
-
-	log.WithFields(log.Fields{
-		"topic":     testMsg.Topic,
-		"partition": testMsg.Partition,
-		"offset":    testMsg.Offset,
-		"value":     string(testMsg.Value),
-	}).Info("consuming")
-	return
+	s.Equal(testUUIDs, uuids)
 }

@@ -11,7 +11,7 @@ import (
 	deremsmodels "der-ems/models/der-ems"
 )
 
-// UserRepository ...
+// UserRepository godoc
 type UserRepository interface {
 	InsertLoginLog(loginLog *deremsmodels.LoginLog) error
 	UpdateUser(user *deremsmodels.User) (err error)
@@ -25,43 +25,44 @@ type defaultUserRepository struct {
 	db *sql.DB
 }
 
-// NewUserRepository ...
+// NewUserRepository godoc
 func NewUserRepository(db *sql.DB) UserRepository {
 	return &defaultUserRepository{db}
 }
 
-// InsertLoginLog ...
+// InsertLoginLog godoc
 func (repo defaultUserRepository) InsertLoginLog(loginLog *deremsmodels.LoginLog) error {
-	loginLog.CreatedAt = time.Now()
-	loginLog.UpdatedAt = null.NewTime(time.Now(), true)
+	now := time.Now()
+	loginLog.CreatedAt = now
+	loginLog.UpdatedAt = null.NewTime(now, true)
 	return loginLog.Insert(repo.db, boil.Infer())
 }
 
-// UpdateUser ...
+// UpdateUser godoc
 func (repo defaultUserRepository) UpdateUser(user *deremsmodels.User) (err error) {
 	user.UpdatedAt = null.NewTime(time.Now(), true)
 	_, err = user.Update(repo.db, boil.Infer())
 	return
 }
 
-// GetLoginLogCount ...
+// GetLoginLogCount godoc
 func (repo defaultUserRepository) GetLoginLogCount() (int64, error) {
 	return deremsmodels.LoginLogs().Count(repo.db)
 }
 
-// GetProfileByUserID ...
+// GetProfileByUserID godoc
 func (repo defaultUserRepository) GetProfileByUserID(userID int) (*deremsmodels.User, error) {
 	return deremsmodels.FindUser(repo.db, userID)
 }
 
-// GetUserByUsername ...
+// GetUserByUsername godoc
 func (repo defaultUserRepository) GetUserByUsername(username string) (*deremsmodels.User, error) {
 	return deremsmodels.Users(
 		qm.Where("username = ?", username),
 		qm.Where("deleted_at IS NULL")).One(repo.db)
 }
 
-// GetUserByPasswordToken ...
+// GetUserByPasswordToken godoc
 func (repo defaultUserRepository) GetUserByPasswordToken(token string) (*deremsmodels.User, error) {
 	return deremsmodels.Users(
 		qm.Where("reset_pwd_token = ?", token),

@@ -33,7 +33,7 @@ type User struct {
 	Name                null.String `boil:"name" json:"name,omitempty" toml:"name" yaml:"name,omitempty"`
 	LockedAt            null.Time   `boil:"locked_at" json:"lockedAt,omitempty" toml:"lockedAt" yaml:"lockedAt,omitempty"`
 	ExpirationDate      null.Time   `boil:"expiration_date" json:"expirationDate,omitempty" toml:"expirationDate" yaml:"expirationDate,omitempty"`
-	CreatedAt           null.Time   `boil:"created_at" json:"createdAt,omitempty" toml:"createdAt" yaml:"createdAt,omitempty"`
+	CreatedAt           time.Time   `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
 	UpdatedAt           null.Time   `boil:"updated_at" json:"updatedAt,omitempty" toml:"updatedAt" yaml:"updatedAt,omitempty"`
 	DeletedAt           null.Time   `boil:"deleted_at" json:"deletedAt,omitempty" toml:"deletedAt" yaml:"deletedAt,omitempty"`
 
@@ -114,7 +114,7 @@ var UserWhere = struct {
 	Name                whereHelpernull_String
 	LockedAt            whereHelpernull_Time
 	ExpirationDate      whereHelpernull_Time
-	CreatedAt           whereHelpernull_Time
+	CreatedAt           whereHelpertime_Time
 	UpdatedAt           whereHelpernull_Time
 	DeletedAt           whereHelpernull_Time
 }{
@@ -128,7 +128,7 @@ var UserWhere = struct {
 	Name:                whereHelpernull_String{field: "`user`.`name`"},
 	LockedAt:            whereHelpernull_Time{field: "`user`.`locked_at`"},
 	ExpirationDate:      whereHelpernull_Time{field: "`user`.`expiration_date`"},
-	CreatedAt:           whereHelpernull_Time{field: "`user`.`created_at`"},
+	CreatedAt:           whereHelpertime_Time{field: "`user`.`created_at`"},
 	UpdatedAt:           whereHelpernull_Time{field: "`user`.`updated_at`"},
 	DeletedAt:           whereHelpernull_Time{field: "`user`.`deleted_at`"},
 }
@@ -151,8 +151,8 @@ type userL struct{}
 
 var (
 	userAllColumns            = []string{"id", "username", "password", "password_last_changed", "password_retry_count", "reset_pwd_token", "pwd_token_expiry", "name", "locked_at", "expiration_date", "created_at", "updated_at", "deleted_at"}
-	userColumnsWithoutDefault = []string{"username", "password", "password_last_changed", "reset_pwd_token", "pwd_token_expiry", "name", "locked_at", "expiration_date", "created_at", "updated_at", "deleted_at"}
-	userColumnsWithDefault    = []string{"id", "password_retry_count"}
+	userColumnsWithoutDefault = []string{"username", "password", "password_last_changed", "reset_pwd_token", "pwd_token_expiry", "name", "locked_at", "expiration_date", "updated_at", "deleted_at"}
+	userColumnsWithDefault    = []string{"id", "password_retry_count", "created_at"}
 	userPrimaryKeyColumns     = []string{"id"}
 	userGeneratedColumns      = []string{}
 )
@@ -295,8 +295,8 @@ func (o *User) Insert(exec boil.Executor, columns boil.Columns) error {
 	var err error
 	currTime := time.Now().In(boil.GetLocation())
 
-	if queries.MustTime(o.CreatedAt).IsZero() {
-		queries.SetScanner(&o.CreatedAt, currTime)
+	if o.CreatedAt.IsZero() {
+		o.CreatedAt = currTime
 	}
 	if queries.MustTime(o.UpdatedAt).IsZero() {
 		queries.SetScanner(&o.UpdatedAt, currTime)
@@ -532,8 +532,8 @@ func (o *User) Upsert(exec boil.Executor, updateColumns, insertColumns boil.Colu
 	}
 	currTime := time.Now().In(boil.GetLocation())
 
-	if queries.MustTime(o.CreatedAt).IsZero() {
-		queries.SetScanner(&o.CreatedAt, currTime)
+	if o.CreatedAt.IsZero() {
+		o.CreatedAt = currTime
 	}
 	queries.SetScanner(&o.UpdatedAt, currTime)
 

@@ -18,12 +18,12 @@ import (
 	"der-ems/services"
 )
 
-// APIWorker ...
+// APIWorker godoc
 type APIWorker struct {
 	Services *services.Services
 }
 
-// NewAPIWorker ...
+// NewAPIWorker godoc
 func NewAPIWorker(cfg *viper.Viper, services *services.Services) {
 	w := &APIWorker{Services: services}
 
@@ -31,7 +31,7 @@ func NewAPIWorker(cfg *viper.Viper, services *services.Services) {
 	r.Run(cfg.GetString("server.port"))
 }
 
-// InitRouter ...
+// InitRouter godoc
 // @Title DER_EMS
 // @BasePath /api
 func InitRouter(isCORS bool, ginMode string, w *APIWorker) *gin.Engine {

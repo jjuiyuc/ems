@@ -3,14 +3,15 @@ package main
 import (
 	"flag"
 
+	"der-ems/apps"
 	"der-ems/config"
+	"der-ems/infra"
 	"der-ems/models"
 	"der-ems/repository"
-	"der-ems/routers"
-	"der-ems/services"
 )
 
 func main() {
+	name := "local-cc-worker"
 	dir := flag.String("d", "../../../config", "")
 	env := flag.String("e", "template", "")
 	flag.Parse()
@@ -19,9 +20,8 @@ func main() {
 	models.Init(cfg)
 	db := models.GetDB()
 	defer models.Close()
-
 	repo := repository.NewRepository(db)
-	services := services.NewServices(cfg, repo)
 
-	routers.NewAPIWorker(cfg, services)
+	mdLocalCCWorker := apps.NewLocalCCWorker(infra.GetGracefulShutdownCtx(), cfg, repo, name)
+	mdLocalCCWorker.MainLoop()
 }

@@ -4,6 +4,7 @@
 package deremsmodels
 
 var TableNames = struct {
+	CCData          string
 	Customer        string
 	Device          string
 	DeviceModel     string
@@ -12,6 +13,7 @@ var TableNames = struct {
 	User            string
 	WeatherForecast string
 }{
+	CCData:          "cc_data",
 	Customer:        "customer",
 	Device:          "device",
 	DeviceModel:     "device_model",

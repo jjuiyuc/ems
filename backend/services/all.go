@@ -6,14 +6,14 @@ import (
 	"der-ems/repository"
 )
 
-// Services ...
+// Services godoc
 type Services struct {
 	Auth  AuthService
 	Email EmailService
 	User  UserService
 }
 
-// NewServices ...
+// NewServices godoc
 func NewServices(cfg *viper.Viper, repo *repository.Repository) *Services {
 	return &Services{
 		Auth:  NewAuthService(repo),

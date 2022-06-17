@@ -13,7 +13,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-// EmailService ...
+// EmailService godoc
 type EmailService interface {
 	SendResetEmail(c *gin.Context, name, address, token string) error
 }
@@ -22,12 +22,12 @@ type defaultEmailService struct {
 	cfg *viper.Viper
 }
 
-// NewEmailService ...
+// NewEmailService godoc
 func NewEmailService(cfg *viper.Viper) EmailService {
 	return &defaultEmailService{cfg}
 }
 
-// SendResetEmail ...
+// SendResetEmail godoc
 func (s defaultEmailService) SendResetEmail(c *gin.Context, name, address, token string) error {
 	referrer, err := getReferrerBase(c)
 	if err != nil {

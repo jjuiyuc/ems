@@ -199,3 +199,54 @@ func (s *LocalCCWorkerSuite) Test_SaveLocalCCData() {
 		}
 	}
 }
+
+func (s *LocalCCWorkerSuite) Test_GenerateCloudCCSendingInfo() {
+	const timestamp = "timestamp"
+	type args struct {
+		Msg map[string]interface{}
+	}
+
+	// Mock data
+	testDataNoCloudCCParams := map[string]interface{}{
+		"test": "testValue",
+	}
+
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			name: "generateCloudCCSendingInfo",
+			args: args{
+				Msg: s.seedUtLocalCCData,
+			},
+		},
+		{
+			name: "inputNotJson",
+		},
+		{
+			name: "inputNoCloudCCParams",
+			args: args{
+				Msg: testDataNoCloudCCParams,
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		switch tt.name {
+		case "generateCloudCCSendingInfo":
+			testDataJson, err := json.Marshal(tt.args.Msg)
+			s.Require().NoError(err)
+			_, err = s.handler.GenerateCloudCCSendingInfo(testDataJson)
+			s.Require().NoError(err)
+		case "inputNotJson":
+			_, err := s.handler.GenerateCloudCCSendingInfo(nil)
+			s.Require().Error(e.NewUnexpectedJSONInputError, err)
+		case "inputNoCloudCCParams":
+			testDataJson, err := json.Marshal(tt.args.Msg)
+			s.Require().NoError(err)
+			_, err = s.handler.GenerateCloudCCSendingInfo(testDataJson)
+			s.Require().Error(e.NewKeyNotExistError("gwID"), err)
+		}
+	}
+}

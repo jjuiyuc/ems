@@ -1,8 +1,13 @@
 package e
 
 import (
+	"errors"
 	"fmt"
 	"time"
+)
+
+var (
+	NewUnexpectedJSONInputError = errors.New("unexpected end of JSON input")
 )
 
 func NewKeyNotExistError(key string) error {

@@ -2,7 +2,7 @@ package repository
 
 import "database/sql"
 
-// Repository ...
+// Repository godoc
 type Repository struct {
 	User    UserRepository
 	Weather WeatherRepository
@@ -10,7 +10,7 @@ type Repository struct {
 	CCData  CCDataRepository
 }
 
-// NewRepository ...
+// NewRepository godoc
 func NewRepository(db *sql.DB) *Repository {
 	return &Repository{
 		User:    NewUserRepository(db),

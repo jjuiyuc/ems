@@ -14,7 +14,7 @@ import (
 
 const passwordLockCount = 5
 
-// AuthService ...
+// AuthService godoc
 type AuthService interface {
 	Login(username, password string) (user *deremsmodels.User, errCode int, err error)
 	CreateLoginLog(user *deremsmodels.User, token string) (err error)
@@ -24,12 +24,12 @@ type defaultAuthService struct {
 	repo *repository.Repository
 }
 
-// NewAuthService ...
+// NewAuthService godoc
 func NewAuthService(repo *repository.Repository) AuthService {
 	return &defaultAuthService{repo}
 }
 
-// Login ...
+// Login godoc
 func (s defaultAuthService) Login(username, password string) (user *deremsmodels.User, errCode int, err error) {
 	user, err = s.repo.User.GetUserByUsername(username)
 	if err != nil {
@@ -90,7 +90,7 @@ func (s defaultAuthService) Login(username, password string) (user *deremsmodels
 	return
 }
 
-// CreateLoginLog ...
+// CreateLoginLog godoc
 func (s defaultAuthService) CreateLoginLog(user *deremsmodels.User, token string) (err error) {
 	loginLog := &deremsmodels.LoginLog{
 		UserID: null.NewInt(user.ID, true),

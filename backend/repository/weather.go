@@ -11,7 +11,7 @@ import (
 	deremsmodels "der-ems/models/der-ems"
 )
 
-// WeatherRepository ...
+// WeatherRepository godoc
 type WeatherRepository interface {
 	UpsertWeatherForecast(weatherForecast *deremsmodels.WeatherForecast) (err error)
 	GetWeatherForecastByLocation(lat, lng float32, startValidDate, endValidDate time.Time) ([]*deremsmodels.WeatherForecast, error)
@@ -22,12 +22,12 @@ type defaultWeatherRepository struct {
 	db *sql.DB
 }
 
-// NewWeatherRepository ...
+// NewWeatherRepository godoc
 func NewWeatherRepository(db *sql.DB) WeatherRepository {
 	return &defaultWeatherRepository{db}
 }
 
-// UpsertWeatherForecast ...
+// UpsertWeatherForecast godoc
 func (repo defaultWeatherRepository) UpsertWeatherForecast(weatherForecast *deremsmodels.WeatherForecast) (err error) {
 	var weatherForecastReturn *deremsmodels.WeatherForecast
 	weatherForecastReturn, err = deremsmodels.WeatherForecasts(
@@ -46,7 +46,7 @@ func (repo defaultWeatherRepository) UpsertWeatherForecast(weatherForecast *dere
 	return
 }
 
-// GetWeatherForecastByLocation ...
+// GetWeatherForecastByLocation godoc
 func (repo defaultWeatherRepository) GetWeatherForecastByLocation(lat, lng float32, startValidDate, endValidDate time.Time) ([]*deremsmodels.WeatherForecast, error) {
 	return deremsmodels.WeatherForecasts(
 		qm.Where("lat = ?", lat),
@@ -54,7 +54,7 @@ func (repo defaultWeatherRepository) GetWeatherForecastByLocation(lat, lng float
 		qm.Where("(valid_date > ? and valid_date <= ?)", startValidDate, endValidDate)).All(repo.db)
 }
 
-// GetWeatherForecastCount ...
+// GetWeatherForecastCount godoc
 func (repo defaultWeatherRepository) GetWeatherForecastCount() (int64, error) {
 	return deremsmodels.WeatherForecasts().Count(repo.db)
 }

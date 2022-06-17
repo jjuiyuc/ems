@@ -12,7 +12,7 @@ import (
 	"der-ems/repository"
 )
 
-// UserService ...
+// UserService godoc
 type UserService interface {
 	CreatePasswordToken(username string) (name, token string, err error)
 	PasswordResetByPasswordToken(token, newPassword string) (err error)
@@ -23,12 +23,12 @@ type defaultUserService struct {
 	repo *repository.Repository
 }
 
-// NewUserService ...
+// NewUserService godoc
 func NewUserService(repo *repository.Repository) UserService {
 	return &defaultUserService{repo}
 }
 
-// CreatePasswordToken ...
+// CreatePasswordToken godoc
 func (s defaultUserService) CreatePasswordToken(username string) (name, token string, err error) {
 	user, err := s.repo.User.GetUserByUsername(username)
 	if err != nil {
@@ -55,7 +55,7 @@ func (s defaultUserService) CreatePasswordToken(username string) (name, token st
 	return
 }
 
-// PasswordResetByPasswordToken ...
+// PasswordResetByPasswordToken godoc
 func (s defaultUserService) PasswordResetByPasswordToken(token, newPassword string) (err error) {
 	user, err := s.repo.User.GetUserByPasswordToken(token)
 	if err != nil {
@@ -87,7 +87,7 @@ func (s defaultUserService) PasswordResetByPasswordToken(token, newPassword stri
 	return
 }
 
-// GetProfile ...
+// GetProfile godoc
 func (s defaultUserService) GetProfile(userID int) (user *deremsmodels.User, err error) {
 	user, err = s.repo.User.GetProfileByUserID(userID)
 	if err != nil {

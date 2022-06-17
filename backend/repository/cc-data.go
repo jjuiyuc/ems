@@ -11,7 +11,7 @@ import (
 	deremsmodels "der-ems/models/der-ems"
 )
 
-// CCDataRepository ...
+// CCDataRepository godoc
 type CCDataRepository interface {
 	UpsertCCData(ccData *deremsmodels.CCDatum) (err error)
 	GetCCDataCount() (int64, error)
@@ -21,12 +21,12 @@ type defaultCCDataRepository struct {
 	db *sql.DB
 }
 
-// NewCCDataRepository ...
+// NewCCDataRepository godoc
 func NewCCDataRepository(db *sql.DB) CCDataRepository {
 	return &defaultCCDataRepository{db}
 }
 
-// UpsertCCData ...
+// UpsertCCData godoc
 func (repo defaultCCDataRepository) UpsertCCData(ccData *deremsmodels.CCDatum) (err error) {
 	var ccDataReturn *deremsmodels.CCDatum
 	ccDataReturn, err = deremsmodels.CCData(
@@ -44,7 +44,7 @@ func (repo defaultCCDataRepository) UpsertCCData(ccData *deremsmodels.CCDatum) (
 	return
 }
 
-// GetCCDataCount ...
+// GetCCDataCount godoc
 func (repo defaultCCDataRepository) GetCCDataCount() (int64, error) {
 	return deremsmodels.CCData().Count(repo.db)
 }

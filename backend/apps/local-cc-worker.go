@@ -16,7 +16,7 @@ import (
 	"der-ems/repository"
 )
 
-// LocalCCWorker ...
+// LocalCCWorker godoc
 type LocalCCWorker struct {
 	kafka.SimpleConsumer
 }
@@ -53,7 +53,7 @@ func (h localCCConsumerHandler) ConsumeClaim(sess sarama.ConsumerGroupSession, c
 	return nil
 }
 
-// NewLocalCCWorker ...
+// NewLocalCCWorker godoc
 func NewLocalCCWorker(
 	ctx context.Context,
 	cfg *viper.Viper,
@@ -80,12 +80,12 @@ func NewLocalCCWorker(
 	return
 }
 
-// MainLoop ...
+// MainLoop godoc
 func (w *LocalCCWorker) MainLoop() {
 	w.SimpleConsumer.MainLoop()
 }
 
-// ProcessLocalCCData ...
+// ProcessLocalCCData godoc
 func (h localCCConsumerHandler) ProcessLocalCCData(msg []byte) {
 	log.Debug("ProcessLocalCCData")
 	err := h.SaveLocalCCData(msg)
@@ -94,7 +94,7 @@ func (h localCCConsumerHandler) ProcessLocalCCData(msg []byte) {
 	}
 }
 
-// SaveLocalCCData ...
+// SaveLocalCCData godoc
 func (h localCCConsumerHandler) SaveLocalCCData(msg []byte) (err error) {
 	const (
 		gwID      = "gwID"

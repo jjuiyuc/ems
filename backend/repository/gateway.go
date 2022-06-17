@@ -8,7 +8,7 @@ import (
 	deremsmodels "der-ems/models/der-ems"
 )
 
-// GatewayRepository ...
+// GatewayRepository godoc
 type GatewayRepository interface {
 	GetCustomerIDByGatewayUUID(gwUUID string) (*deremsmodels.Gateway, error)
 	GetGatewaysByLocation(lat, lng float32) ([]*deremsmodels.Gateway, error)
@@ -18,18 +18,18 @@ type defaultGatewayRepository struct {
 	db *sql.DB
 }
 
-// NewGatewayRepository ...
+// NewGatewayRepository godoc
 func NewGatewayRepository(db *sql.DB) GatewayRepository {
 	return &defaultGatewayRepository{db}
 }
 
-// GetCustomerIDByGatewayUUID ...
+// GetCustomerIDByGatewayUUID godoc
 func (repo defaultGatewayRepository) GetCustomerIDByGatewayUUID(gwUUID string) (*deremsmodels.Gateway, error) {
 	return deremsmodels.Gateways(
 		qm.Where("uuid = ?", gwUUID)).One(repo.db)
 }
 
-// GetGatewaysByLocation ...
+// GetGatewaysByLocation godoc
 func (repo defaultGatewayRepository) GetGatewaysByLocation(lat, lng float32) ([]*deremsmodels.Gateway, error) {
 	return deremsmodels.Gateways(
 		qm.InnerJoin("customer AS c ON gateway.customer_id = c.id"),

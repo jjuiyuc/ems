@@ -175,8 +175,18 @@ func (s *LocalCCWorkerSuite) Test_SaveLocalCCData() {
 				Msg: testDataNoTimestamp,
 			},
 		},
+		{
+			name: "saveLocalCCDataEmptyInput",
+		},
 	}
+
 	for _, tt := range tests {
+		if tt.name == "saveLocalCCDataEmptyInput" {
+			err := s.handler.SaveLocalCCData(nil)
+			s.Require().Error(e.NewUnexpectedJSONInputError, err)
+			continue
+		}
+
 		testDataJson, err := json.Marshal(tt.args.Msg)
 		s.Require().NoError(err)
 		testMsg, err := testutils.GetMockConsumerMessage(s.T(), s.seedUtTopic, testDataJson)
@@ -187,14 +197,15 @@ func (s *LocalCCWorkerSuite) Test_SaveLocalCCData() {
 		s.Require().NoError(err)
 		err = s.handler.SaveLocalCCData(testMsg.Value)
 
-		if tt.name == "saveLocalCCData" || tt.name == "saveLocalCCDataNewGW" {
+		switch tt.name {
+		case "saveLocalCCData", "saveLocalCCDataNewGW":
 			s.Require().NoError(err)
 			updatedCount, err := s.repo.CCData.GetCCDataCount()
 			s.Require().NoError(err)
 			s.Equal(currentCount+1, updatedCount)
-		} else if tt.name == "saveLocalCCDataNoGWID" {
+		case "saveLocalCCDataNoGWID":
 			s.Equal(e.NewKeyNotExistError(gwID).Error(), err.Error())
-		} else if tt.name == "saveLocalCCDataNoTimestamp" {
+		case "saveLocalCCDataNoTimestamp":
 			s.Equal(e.NewKeyNotExistError(timestamp).Error(), err.Error())
 		}
 	}

@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 
 	"der-ems/config"
@@ -160,6 +161,7 @@ func (s *UserSuite) Test_PasswordLostAndResetByToken() {
 	}
 
 	for _, tt := range passwordLostTest {
+		log.Info("test name: ", tt.name)
 		payloadBuf, err := json.Marshal(tt.args)
 		s.Require().NoError(err)
 		req, err := http.NewRequest("PUT", "/api/users/password/lost", bytes.NewBuffer(payloadBuf))
@@ -184,6 +186,7 @@ func (s *UserSuite) Test_PasswordLostAndResetByToken() {
 	s.Require().NoError(err)
 
 	for _, tt := range passwordResetTest {
+		log.Info("test name: ", tt.name)
 		if tt.name == "passwordResetByToken" {
 			tt.args.Token = user.ResetPWDToken.String
 		}
@@ -247,6 +250,7 @@ func (s *UserSuite) Test_Authorize() {
 	}
 
 	for _, tt := range tests {
+		log.Info("test name: ", tt.name)
 		req, err := http.NewRequest("GET", fmt.Sprintf("/api/users/profile"), nil)
 		s.Require().NoError(err)
 		if tt.name != "authorizeNoHeader" {
@@ -284,6 +288,7 @@ func (s *UserSuite) Test_GetProfile() {
 		},
 	}
 
+	log.Info("test name: ", tt.name)
 	req, err := http.NewRequest("GET", fmt.Sprintf("/api/users/profile"), nil)
 	s.Require().NoError(err)
 	req.Header.Set("Authorization", testutils.GetAuthorization(s.token))

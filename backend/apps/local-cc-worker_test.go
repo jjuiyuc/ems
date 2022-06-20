@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 
 	"der-ems/config"
@@ -181,6 +182,7 @@ func (s *LocalCCWorkerSuite) Test_SaveLocalCCData() {
 	}
 
 	for _, tt := range tests {
+		log.Info("test name: ", tt.name)
 		if tt.name == "saveLocalCCDataEmptyInput" {
 			err := s.handler.SaveLocalCCData(nil)
 			s.Require().Error(e.NewUnexpectedJSONInputError, err)
@@ -244,6 +246,7 @@ func (s *LocalCCWorkerSuite) Test_GenerateCloudCCSendingInfo() {
 	}
 
 	for _, tt := range tests {
+		log.Info("test name: ", tt.name)
 		switch tt.name {
 		case "generateCloudCCSendingInfo":
 			testDataJson, err := json.Marshal(tt.args.Msg)

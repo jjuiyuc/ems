@@ -179,26 +179,26 @@ func (s *WeatherWorkerSuite) Test_01_SaveWeatherData() {
 
 	for _, tt := range tests {
 		log.Info("test name: ", tt.name)
-		testDataJson, err := json.Marshal(tt.args)
+		testDataJSON, err := json.Marshal(tt.args)
 		s.Require().NoError(err)
-		testMsg, err := testutils.GetMockConsumerMessage(s.T(), s.seedUtTopic, testDataJson)
+		testMsg, err := testutils.GetMockConsumerMessage(s.T(), s.seedUtTopic, testDataJSON)
 		s.Require().NoError(err)
 		s.Equal(s.seedUtTopic, testMsg.Topic)
 
 		switch tt.name {
 		case "saveWeatherDataNoValidDate":
-			_, _, err = s.handler.SaveWeatherData(testMsg.Value)
-			s.Equal(e.NewKeyNotExistError(validDate).Error(), err.Error())
+			_, _, err = s.handler.saveWeatherData(testMsg.Value)
+			s.Equal(e.ErrNewKeyNotExist(validDate).Error(), err.Error())
 			continue
 		case "saveWeatherDataEmptyInput":
-			_, _, err := s.handler.SaveWeatherData(nil)
-			s.Require().Error(e.NewUnexpectedJSONInputError, err)
+			_, _, err := s.handler.saveWeatherData(nil)
+			s.Require().Error(e.ErrNewUnexpectedJSONInput, err)
 			continue
 		}
 
 		currentCount, err := s.repo.Weather.GetWeatherForecastCount()
 		s.Require().NoError(err)
-		_, _, err = s.handler.SaveWeatherData(testMsg.Value)
+		_, _, err = s.handler.saveWeatherData(testMsg.Value)
 		s.Require().NoError(err)
 		updatedCount, err := s.repo.Weather.GetWeatherForecastCount()
 		s.Require().NoError(err)
@@ -254,7 +254,7 @@ func (s *WeatherWorkerSuite) Test_02_GenerateWeatherSendingInfo() {
 	}
 
 	log.Info("test name: ", tt.name)
-	weatherData, uuids, err := s.handler.GenerateWeatherSendingInfo(tt.args.Lat, tt.args.Lng)
+	weatherData, uuids, err := s.handler.generateWeatherSendingInfo(tt.args.Lat, tt.args.Lng)
 	s.Require().NoError(err)
 	s.Equal(testWeatherData, weatherData)
 	s.Equal(testUUIDs, uuids)

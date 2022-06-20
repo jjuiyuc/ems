@@ -45,7 +45,7 @@ func (s defaultAuthService) Login(username, password string) (user *deremsmodels
 	now := time.Now()
 	if user.ExpirationDate.Valid != false && user.ExpirationDate.Time.Before(now) {
 		errCode = e.ErrAuthUserExpirated
-		err = e.NewUserExpirationError(user.ExpirationDate.Time)
+		err = e.ErrNewUserExpiration(user.ExpirationDate.Time)
 		log.WithFields(log.Fields{
 			"caused-by": "user.ExpirationDate",
 			"err":       err,
@@ -56,7 +56,7 @@ func (s defaultAuthService) Login(username, password string) (user *deremsmodels
 	// Check password retry count
 	if user.PasswordRetryCount.Int >= passwordLockCount {
 		errCode = e.ErrAuthUserLocked
-		err = e.NewUserLockedError(passwordLockCount)
+		err = e.ErrNewUserLocked(passwordLockCount)
 		log.WithFields(log.Fields{
 			"caused-by": "user.PasswordRetryCount",
 			"err":       err,

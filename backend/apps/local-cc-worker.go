@@ -21,6 +21,7 @@ type LocalCCWorker struct {
 	kafka.SimpleConsumer
 }
 
+// CloudCCParams godoc
 var CloudCCParams = []string{
 	"gwID", "timestamp", "gridAveragePowerAC", "gridProducedEnergyAC", "gridConsumedEnergyAC",
 	"loadInstantaneousPowerAC", "loadAveragePowerAC", "loadBatteryAveragePowerAC", "loadPvAveragePowerAC", "loadBatteryConsumedEnergyAC",
@@ -52,7 +53,7 @@ func (h localCCConsumerHandler) ConsumeClaim(sess sarama.ConsumerGroupSession, c
 		}).Info("consuming")
 
 		if msg.Topic == kafka.ReceiveLocalCCData {
-			h.ProcessLocalCCData(msg.Value)
+			h.processLocalCCData(msg.Value)
 		}
 
 		// Mark a message as consumed
@@ -93,22 +94,20 @@ func (w *LocalCCWorker) MainLoop() {
 	w.SimpleConsumer.MainLoop()
 }
 
-// ProcessLocalCCData godoc
-func (h localCCConsumerHandler) ProcessLocalCCData(msg []byte) {
-	log.Debug("ProcessLocalCCData")
-	err := h.SaveLocalCCData(msg)
+func (h localCCConsumerHandler) processLocalCCData(msg []byte) {
+	log.Debug("processLocalCCData")
+	err := h.saveLocalCCData(msg)
 	if err != nil {
 		return
 	}
-	cloudCCParamsDataJson, err := h.GenerateCloudCCSendingInfo(msg)
+	cloudCCParamsDataJSON, err := h.generateCloudCCSendingInfo(msg)
 	if err != nil {
 		return
 	}
-	h.sendParamsToCloudCC(cloudCCParamsDataJson)
+	h.sendParamsToCloudCC(cloudCCParamsDataJSON)
 }
 
-// SaveLocalCCData godoc
-func (h localCCConsumerHandler) SaveLocalCCData(msg []byte) (err error) {
+func (h localCCConsumerHandler) saveLocalCCData(msg []byte) (err error) {
 	const (
 		gwID      = "gwID"
 		timestamp = "timestamp"
@@ -125,7 +124,7 @@ func (h localCCConsumerHandler) SaveLocalCCData(msg []byte) (err error) {
 
 	gwIDValue := data[gwID]
 	if gwIDValue == nil {
-		err = e.NewKeyNotExistError(gwID)
+		err = e.ErrNewKeyNotExist(gwID)
 		log.WithFields(log.Fields{
 			"caused-by": gwID,
 			"err":       err,
@@ -134,7 +133,7 @@ func (h localCCConsumerHandler) SaveLocalCCData(msg []byte) (err error) {
 	}
 	timestampValue := data[timestamp]
 	if timestampValue == nil {
-		err = e.NewKeyNotExistError(timestamp)
+		err = e.ErrNewKeyNotExist(timestamp)
 		log.WithFields(log.Fields{
 			"caused-by": timestamp,
 			"err":       err,
@@ -143,12 +142,12 @@ func (h localCCConsumerHandler) SaveLocalCCData(msg []byte) (err error) {
 	}
 	gwUUID := gwIDValue.(string)
 	logDate := int64(timestampValue.(float64))
-	dataJson, _ := json.Marshal(data)
+	dataJSON, _ := json.Marshal(data)
 
 	ccData := &deremsmodels.CCDatum{
 		GWUUID:      gwUUID,
 		LogDate:     time.Unix(logDate, 0),
-		LocalCCData: null.NewJSON(dataJson, true),
+		LocalCCData: null.NewJSON(dataJSON, true),
 	}
 
 	gateway, err := h.repo.Gateway.GetCustomerIDByGatewayUUID(gwUUID)
@@ -177,8 +176,7 @@ func (h localCCConsumerHandler) SaveLocalCCData(msg []byte) (err error) {
 	return
 }
 
-// GenerateCloudCCSendingInfo godoc
-func (h localCCConsumerHandler) GenerateCloudCCSendingInfo(msg []byte) (cloudCCParamsDataJson []byte, err error) {
+func (h localCCConsumerHandler) generateCloudCCSendingInfo(msg []byte) (cloudCCParamsDataJSON []byte, err error) {
 	var data map[string]interface{}
 	err = json.Unmarshal(msg, &data)
 	if err != nil {
@@ -193,7 +191,7 @@ func (h localCCConsumerHandler) GenerateCloudCCSendingInfo(msg []byte) (cloudCCP
 	for _, param := range CloudCCParams {
 		value := data[param]
 		if value == nil {
-			err = e.NewKeyNotExistError(param)
+			err = e.ErrNewKeyNotExist(param)
 			log.WithFields(log.Fields{
 				"caused-by": param,
 				"err":       err,
@@ -203,7 +201,7 @@ func (h localCCConsumerHandler) GenerateCloudCCSendingInfo(msg []byte) (cloudCCP
 		cloudCCParamsData[param] = value
 	}
 
-	cloudCCParamsDataJson, err = json.Marshal(cloudCCParamsData)
+	cloudCCParamsDataJSON, err = json.Marshal(cloudCCParamsData)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "json.Marshal",
@@ -213,9 +211,9 @@ func (h localCCConsumerHandler) GenerateCloudCCSendingInfo(msg []byte) (cloudCCP
 	return
 }
 
-func (h localCCConsumerHandler) sendParamsToCloudCC(cloudCCParamsDataJson []byte) {
+func (h localCCConsumerHandler) sendParamsToCloudCC(cloudCCParamsDataJSON []byte) {
 	log.WithFields(log.Fields{
-		"message": string(cloudCCParamsDataJson),
+		"message": string(cloudCCParamsDataJSON),
 	}).Debug("send parameters to cloud CC")
-	kafka.Produce(h.cfg, kafka.SendParamsToCloudCC, string(cloudCCParamsDataJson))
+	kafka.Produce(h.cfg, kafka.SendParamsToCloudCC, string(cloudCCParamsDataJSON))
 }

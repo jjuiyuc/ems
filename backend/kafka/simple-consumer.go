@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/viper"
 )
 
+// SimpleConsumer godoc
 type SimpleConsumer struct {
 	ctx      context.Context
 	name     string
@@ -17,6 +18,7 @@ type SimpleConsumer struct {
 	topics   []string
 }
 
+// NewSimpleConsumer godoc
 func NewSimpleConsumer(
 	ctx context.Context,
 	cfg *viper.Viper,
@@ -48,6 +50,7 @@ func NewSimpleConsumer(
 	return
 }
 
+// MainLoop godoc
 func (w *SimpleConsumer) MainLoop() {
 	defer w.consumer.Close()
 

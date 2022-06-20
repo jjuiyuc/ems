@@ -184,20 +184,20 @@ func (s *LocalCCWorkerSuite) Test_SaveLocalCCData() {
 	for _, tt := range tests {
 		log.Info("test name: ", tt.name)
 		if tt.name == "saveLocalCCDataEmptyInput" {
-			err := s.handler.SaveLocalCCData(nil)
-			s.Require().Error(e.NewUnexpectedJSONInputError, err)
+			err := s.handler.saveLocalCCData(nil)
+			s.Require().Error(e.ErrNewUnexpectedJSONInput, err)
 			continue
 		}
 
-		testDataJson, err := json.Marshal(tt.args.Msg)
+		testDataJSON, err := json.Marshal(tt.args.Msg)
 		s.Require().NoError(err)
-		testMsg, err := testutils.GetMockConsumerMessage(s.T(), s.seedUtTopic, testDataJson)
+		testMsg, err := testutils.GetMockConsumerMessage(s.T(), s.seedUtTopic, testDataJSON)
 		s.Require().NoError(err)
 		s.Equal(s.seedUtTopic, testMsg.Topic)
 
 		currentCount, err := s.repo.CCData.GetCCDataCount()
 		s.Require().NoError(err)
-		err = s.handler.SaveLocalCCData(testMsg.Value)
+		err = s.handler.saveLocalCCData(testMsg.Value)
 
 		switch tt.name {
 		case "saveLocalCCData", "saveLocalCCDataNewGW":
@@ -206,9 +206,9 @@ func (s *LocalCCWorkerSuite) Test_SaveLocalCCData() {
 			s.Require().NoError(err)
 			s.Equal(currentCount+1, updatedCount)
 		case "saveLocalCCDataNoGWID":
-			s.Equal(e.NewKeyNotExistError(gwID).Error(), err.Error())
+			s.Equal(e.ErrNewKeyNotExist(gwID).Error(), err.Error())
 		case "saveLocalCCDataNoTimestamp":
-			s.Equal(e.NewKeyNotExistError(timestamp).Error(), err.Error())
+			s.Equal(e.ErrNewKeyNotExist(timestamp).Error(), err.Error())
 		}
 	}
 }
@@ -249,18 +249,18 @@ func (s *LocalCCWorkerSuite) Test_GenerateCloudCCSendingInfo() {
 		log.Info("test name: ", tt.name)
 		switch tt.name {
 		case "generateCloudCCSendingInfo":
-			testDataJson, err := json.Marshal(tt.args.Msg)
+			testDataJSON, err := json.Marshal(tt.args.Msg)
 			s.Require().NoError(err)
-			_, err = s.handler.GenerateCloudCCSendingInfo(testDataJson)
+			_, err = s.handler.generateCloudCCSendingInfo(testDataJSON)
 			s.Require().NoError(err)
 		case "inputNotJson":
-			_, err := s.handler.GenerateCloudCCSendingInfo(nil)
-			s.Require().Error(e.NewUnexpectedJSONInputError, err)
+			_, err := s.handler.generateCloudCCSendingInfo(nil)
+			s.Require().Error(e.ErrNewUnexpectedJSONInput, err)
 		case "inputNoCloudCCParams":
-			testDataJson, err := json.Marshal(tt.args.Msg)
+			testDataJSON, err := json.Marshal(tt.args.Msg)
 			s.Require().NoError(err)
-			_, err = s.handler.GenerateCloudCCSendingInfo(testDataJson)
-			s.Require().Error(e.NewKeyNotExistError("gwID"), err)
+			_, err = s.handler.generateCloudCCSendingInfo(testDataJSON)
+			s.Require().Error(e.ErrNewKeyNotExist("gwID"), err)
 		}
 	}
 }

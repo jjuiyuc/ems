@@ -61,9 +61,9 @@ func (s *TestutilsSuite) Test_CopyMap() {
 func (s *TestutilsSuite) Test_GetMockConsumerMessage() {
 	seedUtTopic := kafka.ReceiveLocalCCData
 
-	testDataJson, err := json.Marshal(s.seedUtData)
+	testDataJSON, err := json.Marshal(s.seedUtData)
 	s.Require().NoError(err)
-	testMsg, err := GetMockConsumerMessage(s.T(), seedUtTopic, testDataJson)
+	testMsg, err := GetMockConsumerMessage(s.T(), seedUtTopic, testDataJSON)
 	s.Require().NoError(err)
 	s.Equal(seedUtTopic, testMsg.Topic)
 }

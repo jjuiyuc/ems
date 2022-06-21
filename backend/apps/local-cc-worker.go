@@ -21,15 +21,6 @@ type LocalCCWorker struct {
 	kafka.SimpleConsumer
 }
 
-// CloudCCParams godoc
-var CloudCCParams = []string{
-	"gwID", "timestamp", "gridAveragePowerAC", "gridProducedEnergyAC", "gridConsumedEnergyAC",
-	"loadInstantaneousPowerAC", "loadAveragePowerAC", "loadBatteryAveragePowerAC", "loadPvAveragePowerAC", "loadBatteryConsumedEnergyAC",
-	"loadPvConsumedEnergyAC", "loadConsumedEnergyAC", "batteryInstantaneousPowerAC", "batteryAveragePowerAC", "batteryProducedEnergyAC",
-	"batteryConsumedEnergyAC", "batteryLifetimeEnergyAC", "batteryNameplateEnergy", "batteryVoltage", "batterySoC",
-	"batterySoH", "pvInstantaneousPowerAC", "pvAveragePowerAC", "pvProducedEnergyAC", "allProducedEnergyAC", "allConsumedEnergyAC",
-}
-
 type localCCConsumerHandler struct {
 	cfg  *viper.Viper
 	repo *repository.Repository
@@ -96,15 +87,8 @@ func (w *LocalCCWorker) MainLoop() {
 
 func (h localCCConsumerHandler) processLocalCCData(msg []byte) {
 	log.Debug("processLocalCCData")
-	err := h.saveLocalCCData(msg)
-	if err != nil {
-		return
-	}
-	cloudCCParamsDataJSON, err := h.generateCloudCCSendingInfo(msg)
-	if err != nil {
-		return
-	}
-	h.sendParamsToCloudCC(cloudCCParamsDataJSON)
+	h.saveLocalCCData(msg)
+	h.sendParamsToCloudCC(msg)
 }
 
 func (h localCCConsumerHandler) saveLocalCCData(msg []byte) (err error) {
@@ -176,44 +160,6 @@ func (h localCCConsumerHandler) saveLocalCCData(msg []byte) (err error) {
 	return
 }
 
-func (h localCCConsumerHandler) generateCloudCCSendingInfo(msg []byte) (cloudCCParamsDataJSON []byte, err error) {
-	var data map[string]interface{}
-	err = json.Unmarshal(msg, &data)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"caused-by": "json.Unmarshal",
-			"err":       err,
-		}).Error()
-		return
-	}
-
-	cloudCCParamsData := make(map[string]interface{})
-	for _, param := range CloudCCParams {
-		value := data[param]
-		if value == nil {
-			err = e.ErrNewKeyNotExist(param)
-			log.WithFields(log.Fields{
-				"caused-by": param,
-				"err":       err,
-			}).Error()
-			return
-		}
-		cloudCCParamsData[param] = value
-	}
-
-	cloudCCParamsDataJSON, err = json.Marshal(cloudCCParamsData)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"caused-by": "json.Marshal",
-			"err":       err,
-		}).Error()
-	}
-	return
-}
-
-func (h localCCConsumerHandler) sendParamsToCloudCC(cloudCCParamsDataJSON []byte) {
-	log.WithFields(log.Fields{
-		"message": string(cloudCCParamsDataJSON),
-	}).Debug("send parameters to cloud CC")
-	kafka.Produce(h.cfg, kafka.SendParamsToCloudCC, string(cloudCCParamsDataJSON))
+func (h localCCConsumerHandler) sendParamsToCloudCC(msg []byte) {
+	kafka.Produce(h.cfg, kafka.SendParamsToCloudCC, string(msg))
 }

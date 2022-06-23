@@ -12,6 +12,7 @@ import (
 	"der-ems/infra"
 )
 
+// Produce godoc
 func Produce(cfg *viper.Viper, topic, message string) {
 	saramaConfig := sarama.NewConfig()
 	saramaConfig.Producer.Return.Errors = true

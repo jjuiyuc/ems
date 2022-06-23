@@ -44,7 +44,7 @@ func (h localCCConsumerHandler) ConsumeClaim(sess sarama.ConsumerGroupSession, c
 		}).Info("consuming")
 
 		if msg.Topic == kafka.ReceiveLocalCCData {
-			h.ProcessLocalCCData(msg.Value)
+			h.processLocalCCData(msg.Value)
 		}
 
 		// Mark a message as consumed
@@ -85,17 +85,13 @@ func (w *LocalCCWorker) MainLoop() {
 	w.SimpleConsumer.MainLoop()
 }
 
-// ProcessLocalCCData godoc
-func (h localCCConsumerHandler) ProcessLocalCCData(msg []byte) {
-	log.Debug("ProcessLocalCCData")
-	err := h.SaveLocalCCData(msg)
-	if err != nil {
-		return
-	}
+func (h localCCConsumerHandler) processLocalCCData(msg []byte) {
+	log.Debug("processLocalCCData")
+	h.saveLocalCCData(msg)
+	h.sendParamsToCloudCC(msg)
 }
 
-// SaveLocalCCData godoc
-func (h localCCConsumerHandler) SaveLocalCCData(msg []byte) (err error) {
+func (h localCCConsumerHandler) saveLocalCCData(msg []byte) (err error) {
 	const (
 		gwID      = "gwID"
 		timestamp = "timestamp"
@@ -112,7 +108,7 @@ func (h localCCConsumerHandler) SaveLocalCCData(msg []byte) (err error) {
 
 	gwIDValue := data[gwID]
 	if gwIDValue == nil {
-		err = e.NewKeyNotExistError(gwID)
+		err = e.ErrNewKeyNotExist(gwID)
 		log.WithFields(log.Fields{
 			"caused-by": gwID,
 			"err":       err,
@@ -121,7 +117,7 @@ func (h localCCConsumerHandler) SaveLocalCCData(msg []byte) (err error) {
 	}
 	timestampValue := data[timestamp]
 	if timestampValue == nil {
-		err = e.NewKeyNotExistError(timestamp)
+		err = e.ErrNewKeyNotExist(timestamp)
 		log.WithFields(log.Fields{
 			"caused-by": timestamp,
 			"err":       err,
@@ -130,12 +126,12 @@ func (h localCCConsumerHandler) SaveLocalCCData(msg []byte) (err error) {
 	}
 	gwUUID := gwIDValue.(string)
 	logDate := int64(timestampValue.(float64))
-	dataJson, _ := json.Marshal(data)
+	dataJSON, _ := json.Marshal(data)
 
 	ccData := &deremsmodels.CCDatum{
 		GWUUID:      gwUUID,
 		LogDate:     time.Unix(logDate, 0),
-		LocalCCData: null.NewJSON(dataJson, true),
+		LocalCCData: null.NewJSON(dataJSON, true),
 	}
 
 	gateway, err := h.repo.Gateway.GetCustomerIDByGatewayUUID(gwUUID)
@@ -162,4 +158,8 @@ func (h localCCConsumerHandler) SaveLocalCCData(msg []byte) (err error) {
 		}).Error()
 	}
 	return
+}
+
+func (h localCCConsumerHandler) sendParamsToCloudCC(msg []byte) {
+	kafka.Produce(h.cfg, kafka.SendParamsToCloudCC, string(msg))
 }

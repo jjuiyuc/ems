@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 
 	"der-ems/config"
@@ -123,6 +124,7 @@ func (s *AuthorizationSuite) Test_GetAuth() {
 	}
 
 	for _, tt := range tests {
+		log.Info("test name: ", tt.name)
 		payloadBuf, err := json.Marshal(tt.args)
 		s.Require().NoError(err)
 		req, err := http.NewRequest("POST", "/api/auth", bytes.NewBuffer(payloadBuf))

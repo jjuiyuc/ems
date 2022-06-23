@@ -6,7 +6,7 @@ var msgFlags = map[int]string{
 	InvalidParams: "invalid parameters",
 }
 
-// Get error information based on code
+// GetMsg returns the information based on code
 func GetMsg(code int) string {
 	msg, ok := msgFlags[code]
 	if ok {

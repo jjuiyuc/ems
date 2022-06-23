@@ -17,11 +17,13 @@ import (
 	"der-ems/testutils/fixtures"
 )
 
+// GetConfigDir godoc
 func GetConfigDir() string {
 	_, filename, _, _ := runtime.Caller(0)
 	return filepath.Join(filepath.Dir(filename), "..", "config")
 }
 
+// SeedUtUser godoc
 func SeedUtUser(db *sql.DB) (err error) {
 	_, err = db.Exec("truncate table user")
 	if err != nil {
@@ -40,10 +42,12 @@ func SeedUtUser(db *sql.DB) (err error) {
 	return
 }
 
+// GetAuthorization godoc
 func GetAuthorization(token string) string {
 	return fmt.Sprintf("Bearer %s", token)
 }
 
+// CopyMap godoc
 func CopyMap(originalMap map[string]interface{}) (targetMap map[string]interface{}) {
 	targetMap = make(map[string]interface{})
 	for key, value := range originalMap {
@@ -52,6 +56,7 @@ func CopyMap(originalMap map[string]interface{}) (targetMap map[string]interface
 	return
 }
 
+// GetMockConsumerMessage godoc
 func GetMockConsumerMessage(t *testing.T, seedUtTopic string, seedUtData []byte) (testMsg *sarama.ConsumerMessage, err error) {
 	consumer := mocks.NewConsumer(t, mocks.NewTestConfig())
 	defer func() {

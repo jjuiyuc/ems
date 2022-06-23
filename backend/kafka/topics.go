@@ -1,9 +1,13 @@
 package kafka
 
 const (
+	// ReceiveWeatherData godoc
 	ReceiveWeatherData = "open-data.weather.cdc.forecast.0"
-
-	ReceiveLocalCCData = "iot.cc.fct.record.0"
-
+	// SendWeatherDatatoLocalGW godoc
 	SendWeatherDatatoLocalGW = "core.weather.cdc.forecast.{gw-id}.0"
+
+	// ReceiveLocalCCData godoc
+	ReceiveLocalCCData = "iot.cc.fct.record.0"
+	// SendParamsToCloudCC godoc
+	SendParamsToCloudCC = "core.cc.cmd.cloud-cc-params.0"
 )

@@ -41,7 +41,27 @@ function ResetPassword () {
                 && confirmPassword.length > 0
                 && (confirmPassword !== newPassword)
         ),
-        submit = () => setIsReset(true)
+
+        submit = () => 
+            {
+                setIsReset(true)
+                
+                const data = { token,password}
+
+                const onSuccess = (token) => {
+                   
+                }
+                const onError = (err) => {
+                   
+                }
+                apiCall({
+                    url: " /users/password/reset-by-token",
+                    method: "put",
+                    data,
+                    onSuccess,
+                    onError
+                })
+            }
 
     const
         cpHelperText = confirmPasswordError ? errorT("passwordNotMatch") : "",

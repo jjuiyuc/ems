@@ -6,6 +6,7 @@ import {Button, FormControl, TextField} from "@mui/material"
 import {useTranslation} from "react-multi-lang"
 
 import {ValidateEmail} from "../utils/utils"
+import { apiCall } from "../utils/api"
 
 import AlertBox from "../components/AlertBox"
 import LanguageField from "../components/NonLoggedInLanguageField"
@@ -38,6 +39,23 @@ function ForgotPassword () {
             }
 
             setIsReset(true)
+
+            const onSuccess = () => {
+             
+            };
+            const onError = (err) => {
+                
+            };
+
+            const data = { username: email };
+            apiCall({
+                url: "/users/password/lost",
+                method: "put",
+                data:data,
+                onSuccess,
+                onError
+            });
+          
         }
 
     return <div>

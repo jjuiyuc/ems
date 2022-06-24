@@ -11,12 +11,9 @@ export const apiCall = ({
     onSuccess = () => {},
     onError = () => {}
 }) => {
-    try {
         url = `${API_HOST}/${url}`
         const token = store.getState().user.value
-        const _token = token ? { Authorization: `Bearer ${token}` } : {}
-        const _contentType = contentType ? { "Content-Type": contentType } : {}
-        axios({ method, url, data, token })
+        axios({ method, url, data, token})
             .then((res) => {
                 if (res.status === 200) onSuccess(res.data.data.token)
                 else console.log(res.status, res);
@@ -24,9 +21,6 @@ export const apiCall = ({
             .catch((err) => {
                 onError(err.response.data.code);
                 console.error(err)
-            });
-    } catch (err) {
-        console.error(err)
-    }
-};
+            })
+}
 

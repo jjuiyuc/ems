@@ -21,7 +21,8 @@ function LogIn(props) {
         [password, setPassword] = useState(""),
         [passwordError, setPasswordError] = useState(false)
 
-    const changeEmail = (e) => {
+    const
+        changeEmail = (e) => {
             setEmail(e.target.value)
             setEmailError(null)
         },
@@ -46,15 +47,15 @@ function LogIn(props) {
                 })
             }
             const onError = (err) => {
-              if(err==20004){
-                  setEmailError({type:"emailNotExist"})
-              }
-              if(err==20006){
-                setEmailError({type:"userLocked"})
-              }
-              if(err==20007){
-                setPasswordError(true)
-              }
+                if(err==20004){
+                    setEmailError({type:"emailNotExist"})
+                }
+                if(err==20006){
+                    setEmailError({type:"userLocked"})
+                }
+                if(err==20007){
+                    setPasswordError(true)
+                }
             }
 
             const data = { username: email, password };

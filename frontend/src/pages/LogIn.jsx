@@ -18,9 +18,8 @@ function LogIn(props) {
 
     const [email, setEmail] = useState(""),
         [emailError, setEmailError] = useState(null),
-        // savedEmail = localStorage.getItem("email") || "",
         [password, setPassword] = useState(""),
-        [passwordError, setPasswordError] = useState(false);
+        [passwordError, setPasswordError] = useState(false)
 
     const changeEmail = (e) => {
             setEmail(e.target.value)
@@ -46,13 +45,25 @@ function LogIn(props) {
                     token
                 })
             }
+            const onError = (err) => {
+              if(err==20004){
+                  setEmailError({type:"emailNotExist"})
+              }
+              if(err==20006){
+                setEmailError({type:"userLocked"})
+              }
+              if(err==20007){
+                setPasswordError(true)
+              }
+            }
 
             const data = { username: email, password };
             apiCall({
                 url: "api/auth",
                 method: "post",
                 data: data,
-                onSuccess
+                onSuccess,
+                onError
             })
         }
 

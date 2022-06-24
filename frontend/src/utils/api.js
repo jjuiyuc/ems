@@ -1,5 +1,7 @@
 import axios from "axios"
 import { API_HOST } from "../constant/env"
+import store from "../store"
+
 
 export const apiCall = ({
     url = "/",
@@ -11,7 +13,7 @@ export const apiCall = ({
 }) => {
     try {
         url = `${API_HOST}/${url}`
-        const token = getToken()
+        const token = store.getState().user.value
         const _token = token ? { Authorization: `Bearer ${token}` } : {}
         const _contentType = contentType ? { "Content-Type": contentType } : {}
         axios({ method, url, data, token })
@@ -20,7 +22,7 @@ export const apiCall = ({
                 else console.log(res.status, res);
             })
             .catch((err) => {
-                onError(err.response.data.errors);
+                onError(err.response.data.code);
                 console.error(err)
             });
     } catch (err) {

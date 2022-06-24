@@ -15,7 +15,8 @@
         "emailNotExist": "Account does not exist, please try again.",
         "passwordFormat": "Password must meet complexity requirements, please try again.",
         "passwordIncorrect": "Password is incorrect, please try again.",
-        "passwordNotMatch": "Password does not match, please try again."
+        "passwordNotMatch": "Password does not match, please try again.",
+        "userLocked":"User is locked."
     },
     "forgotPassword": {
         "backToLogin": "Back to Login",

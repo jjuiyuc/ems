@@ -18,7 +18,7 @@ function LogIn(props) {
 
     const [email, setEmail] = useState(""),
         [emailError, setEmailError] = useState(null),
-        savedEmail = localStorage.getItem("email") || "",
+        // savedEmail = localStorage.getItem("email") || "",
         [password, setPassword] = useState(""),
         [passwordError, setPasswordError] = useState(false);
 

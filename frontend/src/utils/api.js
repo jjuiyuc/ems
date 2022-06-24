@@ -28,4 +28,3 @@ export const apiCall = ({
     }
 };
 
-export const getToken = () => localStorage.getItem("at") || ""

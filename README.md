@@ -35,6 +35,57 @@ $ go run weather-worker.go -d <config_path> -e <yaml_filename>
   ```
 - Option 2: Prepare `sqlboiler.der-ems.toml` ready, then run `make gen-models`
 
+### Deployment (PM2)
+- Make sure the model codes have been generated with the correct databases.
+- Create the user `derems`  if user not existed.
+  ```shell
+  $ adduser derems --disabled-password
+  ```
+- [Install PM2 and PM2 modules](backend/docs/PM2.md)
+- Switch to `backend` directory
+  ```shell
+  $ cd backend
+  ```
+- Prepare `config/derems.yaml` and `pm2/derems.config.js`
+- Deploy by commands
+  ```shell
+  # Build code
+  $ make go-build
+
+  # Create folders as follows
+  /opt/derems
+  ├── etc
+  ├── sbin
+
+  # Copy binary files
+  $ sudo cp dist/* /opt/derems/sbin/
+  # Copy specific binary file
+  # Take `local-cc-worker` for example
+  $ sudo cp dist/local-cc-worker /opt/derems/sbin/
+
+  # Copy config files
+  $ sudo cp pm2/derems.config.js /opt/derems/etc
+  $ sudo cp config/derems.yaml /opt/derems/etc
+  ```
+- Run processes
+  ```shell
+  # Create logs softlink
+  sudo ln -s /home/derems/.pm2/logs/ /opt/derems/logs
+
+  cd /opt/derems/etc
+
+  # Start specific process
+  # Take `core-local-cc-worker` for example
+  pm2 start derems.config.js --only "core-local-cc-worker"
+
+  # Check processes
+  pm2 list
+  # Stop a process
+  pm2 stop "core-local-cc-worker"
+  # Restart a process
+  pm2 restart "core-local-cc-worker"
+  ```
+
 ### Deployment (systemd)
 - Make sure the model codes have been generated with the correct databases.
 - Create the user `derems`  if user not existed.

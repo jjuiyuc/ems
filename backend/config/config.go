@@ -1,6 +1,7 @@
 package config
 
 import (
+	"bytes"
 	"os"
 
 	log "github.com/sirupsen/logrus"
@@ -10,6 +11,8 @@ import (
 var (
 	config *viper.Viper
 )
+
+type OutputSplitter struct{}
 
 // Init config
 func Init(dir, env string) {
@@ -28,10 +31,17 @@ func Init(dir, env string) {
 	if level, err := log.ParseLevel(config.GetString("log.level")); err == nil {
 		log.SetLevel(level)
 	}
-	log.SetOutput(os.Stdout)
+	log.SetOutput(&OutputSplitter{})
 }
 
 // GetConfig return config instance
 func GetConfig() *viper.Viper {
 	return config
+}
+
+func (splitter *OutputSplitter) Write(p []byte) (n int, err error) {
+	if bytes.Contains(p, []byte("level=error")) {
+		return os.Stderr.Write(p)
+	}
+	return os.Stdout.Write(p)
 }

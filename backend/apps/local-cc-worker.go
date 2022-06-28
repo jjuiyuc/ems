@@ -88,7 +88,6 @@ func (w *LocalCCWorker) MainLoop() {
 func (h localCCConsumerHandler) processLocalCCData(msg []byte) {
 	log.Debug("processLocalCCData")
 	h.saveLocalCCData(msg)
-	h.sendParamsToCloudCC(msg)
 }
 
 func (h localCCConsumerHandler) saveLocalCCData(msg []byte) (err error) {
@@ -158,8 +157,4 @@ func (h localCCConsumerHandler) saveLocalCCData(msg []byte) (err error) {
 		}).Error()
 	}
 	return
-}
-
-func (h localCCConsumerHandler) sendParamsToCloudCC(msg []byte) {
-	kafka.Produce(h.cfg, kafka.SendParamsToCloudCC, string(msg))
 }

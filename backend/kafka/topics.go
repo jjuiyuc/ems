@@ -8,6 +8,4 @@ const (
 
 	// ReceiveLocalCCData godoc
 	ReceiveLocalCCData = "iot.cc.fct.record.0"
-	// SendParamsToCloudCC godoc
-	SendParamsToCloudCC = "core.cc.cmd.cloud-cc-params.0"
 )

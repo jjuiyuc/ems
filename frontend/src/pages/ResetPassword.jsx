@@ -1,15 +1,16 @@
+import React, { useState } from "react"
+import { Link, useSearchParams } from "react-router-dom"
+import { useTranslation } from "react-multi-lang"
 import CheckCircleIcon from "@mui/icons-material/CheckCircle"
-import {Link} from "react-router-dom"
-import React, {useState} from "react"
-import {Button, FormControl, TextField} from "@mui/material"
-import {useTranslation} from "react-multi-lang"
+import { Button, FormControl, TextField } from "@mui/material"
 
-import {ValidatePassword} from "../utils/utils"
+import { ValidatePassword } from "../utils/utils"
+import { apiCall } from "../utils/api"
 
 import AlertBox from "../components/AlertBox"
 import LanguageField from "../components/NonLoggedInLanguageField"
 
-function ResetPassword () {
+function ResetPassword() {
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
@@ -18,11 +19,16 @@ function ResetPassword () {
         pageT = string => t("resetPassword." + string)
 
     const
+        [newPassword, setNewPassword] = useState(""),
+        [newPasswordError, setNewPasswordError] = useState(false),
         [confirmPassword, setConfirmPassword] = useState(""),
         [confirmPasswordError, setConfirmPasswordError] = useState(false),
-        [isReset, setIsReset] = useState(false),
-        [newPassword, setNewPassword] = useState(""),
-        [newPasswordError, setNewPasswordError] = useState(false)
+        [isReset, setIsReset] = useState(false)
+
+
+    const
+        [searchParams, setSearchParams] = useSearchParams()
+
 
     const
         changeConfirmPassword = e => {
@@ -38,37 +44,41 @@ function ResetPassword () {
         ),
         validateMatchPassword = () => setConfirmPasswordError(
             newPassword.length > 0
-                && confirmPassword.length > 0
-                && (confirmPassword !== newPassword)
+            && confirmPassword.length > 0
+            && (confirmPassword !== newPassword)
         ),
 
-        submit = () => 
-            {
-                setIsReset(true)
-                
-                const data = { token,password}
 
-                const onSuccess = (token) => {
-                   
-                }
-                const onError = (err) => {
-                   
-                }
-                apiCall({
-                    url: " /users/password/reset-by-token",
-                    method: "put",
-                    data,
-                    onSuccess,
-                    onError
-                })
+
+        submit = () => {
+
+            const data = { token: searchParams.get('token'), password: newPassword }
+
+            const onSuccess = (res) => {
+
+                setIsReset(true)
+                console.log(res)
             }
+            const onError = (err) => {
+                //passwordTokenError
+                console.log(err)
+
+            }
+            apiCall({
+                url: "/api/users/password/reset-by-token",
+                method: "put",
+                data,
+                onSuccess,
+                onError
+            })
+        }
 
     const
         cpHelperText = confirmPasswordError ? errorT("passwordNotMatch") : "",
         isSubmittable = confirmPassword
-                        && !confirmPasswordError
-                        && newPassword
-                        && !newPasswordError,
+            && !confirmPasswordError
+            && newPassword
+            && !newPasswordError,
         resetMsg = <>
             <p>{pageT("hasReset")}</p>
             <p>{pageT("logInWithNewPassword")}</p>
@@ -78,61 +88,61 @@ function ResetPassword () {
         <h1 className={"mb-8" + (isReset ? " md:mb-16" : "")}>
             {pageT("resetPassword")}
         </h1>
-    {isReset
-        ? <>
-        <AlertBox
-            boxClass="mb-8"
-            content={resetMsg}
-            icon={CheckCircleIcon} />
-        <FormControl fullWidth>
-            <Button
-                color="primary"
-                href="/"
-                size="x-large"
-                variant="contained">
-                {commonT("logIn")}
-            </Button>
-        </FormControl>
-        </>
-        : <>
-        <h6 className="text-gray-300 mb-8 md:mb-16">
-            {commonT("passwordRule")}
-        </h6>
-        <FormControl fullWidth>
-            <LanguageField />
-            <TextField
-                error={newPasswordError}
-                font="mono"
-                helperText={newPasswordError ? errorT("passwordFormat") : ""}
-                label={formT("newPassword")}
-                onBlur={validateNewPassword}
-                onChange={changeNewPassword}
-                type="password"
-                variant="outlined"
-                value={newPassword} />
-            <TextField
-                error={confirmPasswordError}
-                font="mono"
-                helperText={cpHelperText}
-                label={formT("confirmPassword")}
-                onBlur={validateMatchPassword}
-                onChange={changeConfirmPassword}
-                type="password"
-                variant="outlined"
-                value={confirmPassword} />
-            <Button
-                color="primary"
-                disabled={!isSubmittable}
-                onClick={submit}
-                size="x-large"
-                variant="contained">
-                {pageT("reset")}
-            </Button>
-        </FormControl>
-        <div className="mt-8">
-            <Link to="/">{commonT("logIn")}</Link>
-        </div>
-        </>}
+        {isReset
+            ? <>
+                <AlertBox
+                    boxClass="mb-8"
+                    content={resetMsg}
+                    icon={CheckCircleIcon} />
+                <FormControl fullWidth>
+                    <Button
+                        color="primary"
+                        href="/"
+                        size="x-large"
+                        variant="contained">
+                        {commonT("logIn")}
+                    </Button>
+                </FormControl>
+            </>
+            : <>
+                <h6 className="text-gray-300 mb-8 md:mb-16">
+                    {commonT("passwordRule")}
+                </h6>
+                <FormControl fullWidth>
+                    <LanguageField />
+                    <TextField
+                        error={newPasswordError}
+                        font="mono"
+                        helperText={newPasswordError ? errorT("passwordFormat") : ""}
+                        label={formT("newPassword")}
+                        onBlur={validateNewPassword}
+                        onChange={changeNewPassword}
+                        type="password"
+                        variant="outlined"
+                        value={newPassword} />
+                    <TextField
+                        error={confirmPasswordError}
+                        font="mono"
+                        helperText={cpHelperText}
+                        label={formT("confirmPassword")}
+                        onBlur={validateMatchPassword}
+                        onChange={changeConfirmPassword}
+                        type="password"
+                        variant="outlined"
+                        value={confirmPassword} />
+                    <Button
+                        color="primary"
+                        disabled={!isSubmittable}
+                        onClick={submit}
+                        size="x-large"
+                        variant="contained">
+                        {pageT("reset")}
+                    </Button>
+                </FormControl>
+                <div className="mt-8">
+                    <Link to="/">{commonT("logIn")}</Link>
+                </div>
+            </>}
     </div>
 }
 

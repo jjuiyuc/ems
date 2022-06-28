@@ -38,7 +38,8 @@ function LogIn(props) {
 
                 return;
             }
-            const onSuccess = (token) => {
+            const onSuccess = (res) => {
+                const token = res.data.data.token
                 props.updateUser({
                     // address: "1915 11th Ave. San Francisco, CA",
                     // name: "Suncat",
@@ -47,20 +48,20 @@ function LogIn(props) {
                 })
             }
             const onError = (err) => {
-                if(err==20004){
-                    setEmailError({type:"emailNotExist"})
+                if (err == 20004) {
+                    setEmailError({ type: "emailNotExist" })
                 }
-                if(err==20006){
-                    setEmailError({type:"userLocked"})
+                if (err == 20006) {
+                    setEmailError({ type: "userLocked" })
                 }
-                if(err==20007){
+                if (err == 20007) {
                     setPasswordError(true)
                 }
             }
 
             const data = { username: email, password };
             apiCall({
-                url: "api/auth",
+                url: "/api/auth",
                 method: "post",
                 data: data,
                 onSuccess,
@@ -68,7 +69,7 @@ function LogIn(props) {
             })
         }
 
-   
+
 
     return (
         <div>
@@ -113,9 +114,9 @@ function LogIn(props) {
 }
 
 const mapState = (state) => ({
-        lang: state.lang.value,
-        user: state.user.value,
-    }),
+    lang: state.lang.value,
+    user: state.user.value,
+}),
     mapDispatch = (dispatch) => ({
         updateLang: (value) =>
             dispatch({

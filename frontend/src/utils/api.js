@@ -11,16 +11,16 @@ export const apiCall = ({
     onSuccess = () => {},
     onError = () => {}
 }) => {
-        url = `${API_HOST}/${url}`
-        const token = store.getState().user.value
-        axios({ method, url, data, token})
-            .then((res) => {
-                if (res.status === 200) onSuccess(res.data.data.token)
-                else console.log(res.status, res);
-            })
-            .catch((err) => {
-                onError(err.response.data.code);
-                console.error(err)
-            })
+    url = `${API_HOST}${url}`
+    const token = store.getState().user.value
+    axios({ method, url, data, token })
+        .then((res) => {
+            if (res.status === 200) onSuccess(res)
+            else console.log(res.status, res);
+        })
+        .catch((err) => {
+            onError(err.response?.data?.code);
+            console.error(err)
+        })
 }
 

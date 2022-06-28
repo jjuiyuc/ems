@@ -49,7 +49,7 @@ function ForgotPassword () {
 
             const data = { username: email };
             apiCall({
-                url: "/users/password/lost",
+                url: "/api/users/password/lost",
                 method: "put",
                 data:data,
                 onSuccess,

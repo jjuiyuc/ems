@@ -28,7 +28,6 @@ type CCDatum struct {
 	LogDate     time.Time `boil:"log_date" json:"logDate" toml:"logDate" yaml:"logDate"`
 	CustomerID  null.Int  `boil:"customer_id" json:"customerID,omitempty" toml:"customerID" yaml:"customerID,omitempty"`
 	LocalCCData null.JSON `boil:"local_cc_data" json:"localCCData,omitempty" toml:"localCCData" yaml:"localCCData,omitempty"`
-	CloudCCData null.JSON `boil:"cloud_cc_data" json:"cloudCCData,omitempty" toml:"cloudCCData" yaml:"cloudCCData,omitempty"`
 	CreatedAt   time.Time `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
 	UpdatedAt   null.Time `boil:"updated_at" json:"updatedAt,omitempty" toml:"updatedAt" yaml:"updatedAt,omitempty"`
 
@@ -42,7 +41,6 @@ var CCDatumColumns = struct {
 	LogDate     string
 	CustomerID  string
 	LocalCCData string
-	CloudCCData string
 	CreatedAt   string
 	UpdatedAt   string
 }{
@@ -51,7 +49,6 @@ var CCDatumColumns = struct {
 	LogDate:     "log_date",
 	CustomerID:  "customer_id",
 	LocalCCData: "local_cc_data",
-	CloudCCData: "cloud_cc_data",
 	CreatedAt:   "created_at",
 	UpdatedAt:   "updated_at",
 }
@@ -62,7 +59,6 @@ var CCDatumTableColumns = struct {
 	LogDate     string
 	CustomerID  string
 	LocalCCData string
-	CloudCCData string
 	CreatedAt   string
 	UpdatedAt   string
 }{
@@ -71,7 +67,6 @@ var CCDatumTableColumns = struct {
 	LogDate:     "cc_data.log_date",
 	CustomerID:  "cc_data.customer_id",
 	LocalCCData: "cc_data.local_cc_data",
-	CloudCCData: "cc_data.cloud_cc_data",
 	CreatedAt:   "cc_data.created_at",
 	UpdatedAt:   "cc_data.updated_at",
 }
@@ -223,7 +218,6 @@ var CCDatumWhere = struct {
 	LogDate     whereHelpertime_Time
 	CustomerID  whereHelpernull_Int
 	LocalCCData whereHelpernull_JSON
-	CloudCCData whereHelpernull_JSON
 	CreatedAt   whereHelpertime_Time
 	UpdatedAt   whereHelpernull_Time
 }{
@@ -232,7 +226,6 @@ var CCDatumWhere = struct {
 	LogDate:     whereHelpertime_Time{field: "`cc_data`.`log_date`"},
 	CustomerID:  whereHelpernull_Int{field: "`cc_data`.`customer_id`"},
 	LocalCCData: whereHelpernull_JSON{field: "`cc_data`.`local_cc_data`"},
-	CloudCCData: whereHelpernull_JSON{field: "`cc_data`.`cloud_cc_data`"},
 	CreatedAt:   whereHelpertime_Time{field: "`cc_data`.`created_at`"},
 	UpdatedAt:   whereHelpernull_Time{field: "`cc_data`.`updated_at`"},
 }
@@ -254,8 +247,8 @@ func (*ccDatumR) NewStruct() *ccDatumR {
 type ccDatumL struct{}
 
 var (
-	ccDatumAllColumns            = []string{"id", "gw_uuid", "log_date", "customer_id", "local_cc_data", "cloud_cc_data", "created_at", "updated_at"}
-	ccDatumColumnsWithoutDefault = []string{"gw_uuid", "log_date", "customer_id", "local_cc_data", "cloud_cc_data", "updated_at"}
+	ccDatumAllColumns            = []string{"id", "gw_uuid", "log_date", "customer_id", "local_cc_data", "created_at", "updated_at"}
+	ccDatumColumnsWithoutDefault = []string{"gw_uuid", "log_date", "customer_id", "local_cc_data", "updated_at"}
 	ccDatumColumnsWithDefault    = []string{"id", "created_at"}
 	ccDatumPrimaryKeyColumns     = []string{"id"}
 	ccDatumGeneratedColumns      = []string{}

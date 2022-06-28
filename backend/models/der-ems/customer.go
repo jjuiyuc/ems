@@ -27,8 +27,8 @@ type Customer struct {
 	CustomerNumber string       `boil:"customer_number" json:"customerNumber" toml:"customerNumber" yaml:"customerNumber"`
 	FieldNumber    string       `boil:"field_number" json:"fieldNumber" toml:"fieldNumber" yaml:"fieldNumber"`
 	Address        null.String  `boil:"address" json:"address,omitempty" toml:"address" yaml:"address,omitempty"`
-	Lat            null.Float32 `boil:"lat" json:"lat,omitempty" toml:"lat" yaml:"lat,omitempty"`
-	LNG            null.Float32 `boil:"lng" json:"lng,omitempty" toml:"lng" yaml:"lng,omitempty"`
+	Lat            null.Float64 `boil:"lat" json:"lat,omitempty" toml:"lat" yaml:"lat,omitempty"`
+	LNG            null.Float64 `boil:"lng" json:"lng,omitempty" toml:"lng" yaml:"lng,omitempty"`
 	WeatherLat     null.Float32 `boil:"weather_lat" json:"weatherLat,omitempty" toml:"weatherLat" yaml:"weatherLat,omitempty"`
 	WeatherLNG     null.Float32 `boil:"weather_lng" json:"weatherLNG,omitempty" toml:"weatherLNG" yaml:"weatherLNG,omitempty"`
 	Timezone       null.String  `boil:"timezone" json:"timezone,omitempty" toml:"timezone" yaml:"timezone,omitempty"`
@@ -132,6 +132,30 @@ func (w whereHelpernull_String) GTE(x null.String) qm.QueryMod {
 func (w whereHelpernull_String) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
 func (w whereHelpernull_String) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
 
+type whereHelpernull_Float64 struct{ field string }
+
+func (w whereHelpernull_Float64) EQ(x null.Float64) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, false, x)
+}
+func (w whereHelpernull_Float64) NEQ(x null.Float64) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, true, x)
+}
+func (w whereHelpernull_Float64) LT(x null.Float64) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LT, x)
+}
+func (w whereHelpernull_Float64) LTE(x null.Float64) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LTE, x)
+}
+func (w whereHelpernull_Float64) GT(x null.Float64) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GT, x)
+}
+func (w whereHelpernull_Float64) GTE(x null.Float64) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GTE, x)
+}
+
+func (w whereHelpernull_Float64) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
+func (w whereHelpernull_Float64) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
+
 type whereHelpernull_Float32 struct{ field string }
 
 func (w whereHelpernull_Float32) EQ(x null.Float32) qm.QueryMod {
@@ -161,8 +185,8 @@ var CustomerWhere = struct {
 	CustomerNumber whereHelperstring
 	FieldNumber    whereHelperstring
 	Address        whereHelpernull_String
-	Lat            whereHelpernull_Float32
-	LNG            whereHelpernull_Float32
+	Lat            whereHelpernull_Float64
+	LNG            whereHelpernull_Float64
 	WeatherLat     whereHelpernull_Float32
 	WeatherLNG     whereHelpernull_Float32
 	Timezone       whereHelpernull_String
@@ -176,8 +200,8 @@ var CustomerWhere = struct {
 	CustomerNumber: whereHelperstring{field: "`customer`.`customer_number`"},
 	FieldNumber:    whereHelperstring{field: "`customer`.`field_number`"},
 	Address:        whereHelpernull_String{field: "`customer`.`address`"},
-	Lat:            whereHelpernull_Float32{field: "`customer`.`lat`"},
-	LNG:            whereHelpernull_Float32{field: "`customer`.`lng`"},
+	Lat:            whereHelpernull_Float64{field: "`customer`.`lat`"},
+	LNG:            whereHelpernull_Float64{field: "`customer`.`lng`"},
 	WeatherLat:     whereHelpernull_Float32{field: "`customer`.`weather_lat`"},
 	WeatherLNG:     whereHelpernull_Float32{field: "`customer`.`weather_lng`"},
 	Timezone:       whereHelpernull_String{field: "`customer`.`timezone`"},

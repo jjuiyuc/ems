@@ -24,7 +24,8 @@ import (
 // Device is an object representing the database table.
 type Device struct {
 	ID        int         `boil:"id" json:"id" toml:"id" yaml:"id"`
-	UUID      string      `boil:"uuid" json:"uuid" toml:"uuid" yaml:"uuid"`
+	ModbusID  string      `boil:"modbusid" json:"modbusid" toml:"modbusid" yaml:"modbusid"`
+	UUEID     string      `boil:"uueid" json:"uueid" toml:"uueid" yaml:"uueid"`
 	ModelID   int         `boil:"model_id" json:"modelID" toml:"modelID" yaml:"modelID"`
 	GWUUID    string      `boil:"gw_uuid" json:"gwUUID" toml:"gwUUID" yaml:"gwUUID"`
 	Remark    null.String `boil:"remark" json:"remark,omitempty" toml:"remark" yaml:"remark,omitempty"`
@@ -38,7 +39,8 @@ type Device struct {
 
 var DeviceColumns = struct {
 	ID        string
-	UUID      string
+	ModbusID  string
+	UUEID     string
 	ModelID   string
 	GWUUID    string
 	Remark    string
@@ -47,7 +49,8 @@ var DeviceColumns = struct {
 	UpdatedAt string
 }{
 	ID:        "id",
-	UUID:      "uuid",
+	ModbusID:  "modbusid",
+	UUEID:     "uueid",
 	ModelID:   "model_id",
 	GWUUID:    "gw_uuid",
 	Remark:    "remark",
@@ -58,7 +61,8 @@ var DeviceColumns = struct {
 
 var DeviceTableColumns = struct {
 	ID        string
-	UUID      string
+	ModbusID  string
+	UUEID     string
 	ModelID   string
 	GWUUID    string
 	Remark    string
@@ -67,7 +71,8 @@ var DeviceTableColumns = struct {
 	UpdatedAt string
 }{
 	ID:        "device.id",
-	UUID:      "device.uuid",
+	ModbusID:  "device.modbusid",
+	UUEID:     "device.uueid",
 	ModelID:   "device.model_id",
 	GWUUID:    "device.gw_uuid",
 	Remark:    "device.remark",
@@ -104,7 +109,8 @@ func (w whereHelpernull_Bool) IsNotNull() qm.QueryMod { return qmhelper.WhereIsN
 
 var DeviceWhere = struct {
 	ID        whereHelperint
-	UUID      whereHelperstring
+	ModbusID  whereHelperstring
+	UUEID     whereHelperstring
 	ModelID   whereHelperint
 	GWUUID    whereHelperstring
 	Remark    whereHelpernull_String
@@ -113,7 +119,8 @@ var DeviceWhere = struct {
 	UpdatedAt whereHelpernull_Time
 }{
 	ID:        whereHelperint{field: "`device`.`id`"},
-	UUID:      whereHelperstring{field: "`device`.`uuid`"},
+	ModbusID:  whereHelperstring{field: "`device`.`modbusid`"},
+	UUEID:     whereHelperstring{field: "`device`.`uueid`"},
 	ModelID:   whereHelperint{field: "`device`.`model_id`"},
 	GWUUID:    whereHelperstring{field: "`device`.`gw_uuid`"},
 	Remark:    whereHelpernull_String{field: "`device`.`remark`"},
@@ -160,8 +167,8 @@ func (r *deviceR) GetModel() *DeviceModel {
 type deviceL struct{}
 
 var (
-	deviceAllColumns            = []string{"id", "uuid", "model_id", "gw_uuid", "remark", "enable", "created_at", "updated_at"}
-	deviceColumnsWithoutDefault = []string{"uuid", "model_id", "gw_uuid", "remark", "enable", "updated_at"}
+	deviceAllColumns            = []string{"id", "modbusid", "uueid", "model_id", "gw_uuid", "remark", "enable", "created_at", "updated_at"}
+	deviceColumnsWithoutDefault = []string{"modbusid", "uueid", "model_id", "gw_uuid", "remark", "enable", "updated_at"}
 	deviceColumnsWithDefault    = []string{"id", "created_at"}
 	devicePrimaryKeyColumns     = []string{"id"}
 	deviceGeneratedColumns      = []string{}
@@ -838,7 +845,6 @@ func (o DeviceSlice) UpdateAll(exec boil.Executor, cols M) (int64, error) {
 
 var mySQLDeviceUniqueColumns = []string{
 	"id",
-	"uuid",
 }
 
 // Upsert attempts an insert using an executor, and does an update or ignore on conflict.

@@ -28,9 +28,9 @@ type Customer struct {
 	FieldNumber    string       `boil:"field_number" json:"fieldNumber" toml:"fieldNumber" yaml:"fieldNumber"`
 	Address        null.String  `boil:"address" json:"address,omitempty" toml:"address" yaml:"address,omitempty"`
 	Lat            null.Float64 `boil:"lat" json:"lat,omitempty" toml:"lat" yaml:"lat,omitempty"`
-	LNG            null.Float64 `boil:"lng" json:"lng,omitempty" toml:"lng" yaml:"lng,omitempty"`
+	Lng            null.Float64 `boil:"lng" json:"lng,omitempty" toml:"lng" yaml:"lng,omitempty"`
 	WeatherLat     null.Float32 `boil:"weather_lat" json:"weatherLat,omitempty" toml:"weatherLat" yaml:"weatherLat,omitempty"`
-	WeatherLNG     null.Float32 `boil:"weather_lng" json:"weatherLNG,omitempty" toml:"weatherLNG" yaml:"weatherLNG,omitempty"`
+	WeatherLng     null.Float32 `boil:"weather_lng" json:"weatherLNG,omitempty" toml:"weatherLNG" yaml:"weatherLNG,omitempty"`
 	Timezone       null.String  `boil:"timezone" json:"timezone,omitempty" toml:"timezone" yaml:"timezone,omitempty"`
 	PowerCompany   null.String  `boil:"power_company" json:"powerCompany,omitempty" toml:"powerCompany" yaml:"powerCompany,omitempty"`
 	VoltageType    null.String  `boil:"voltage_type" json:"voltageType,omitempty" toml:"voltageType" yaml:"voltageType,omitempty"`
@@ -48,9 +48,9 @@ var CustomerColumns = struct {
 	FieldNumber    string
 	Address        string
 	Lat            string
-	LNG            string
+	Lng            string
 	WeatherLat     string
-	WeatherLNG     string
+	WeatherLng     string
 	Timezone       string
 	PowerCompany   string
 	VoltageType    string
@@ -63,9 +63,9 @@ var CustomerColumns = struct {
 	FieldNumber:    "field_number",
 	Address:        "address",
 	Lat:            "lat",
-	LNG:            "lng",
+	Lng:            "lng",
 	WeatherLat:     "weather_lat",
-	WeatherLNG:     "weather_lng",
+	WeatherLng:     "weather_lng",
 	Timezone:       "timezone",
 	PowerCompany:   "power_company",
 	VoltageType:    "voltage_type",
@@ -80,9 +80,9 @@ var CustomerTableColumns = struct {
 	FieldNumber    string
 	Address        string
 	Lat            string
-	LNG            string
+	Lng            string
 	WeatherLat     string
-	WeatherLNG     string
+	WeatherLng     string
 	Timezone       string
 	PowerCompany   string
 	VoltageType    string
@@ -95,9 +95,9 @@ var CustomerTableColumns = struct {
 	FieldNumber:    "customer.field_number",
 	Address:        "customer.address",
 	Lat:            "customer.lat",
-	LNG:            "customer.lng",
+	Lng:            "customer.lng",
 	WeatherLat:     "customer.weather_lat",
-	WeatherLNG:     "customer.weather_lng",
+	WeatherLng:     "customer.weather_lng",
 	Timezone:       "customer.timezone",
 	PowerCompany:   "customer.power_company",
 	VoltageType:    "customer.voltage_type",
@@ -186,9 +186,9 @@ var CustomerWhere = struct {
 	FieldNumber    whereHelperstring
 	Address        whereHelpernull_String
 	Lat            whereHelpernull_Float64
-	LNG            whereHelpernull_Float64
+	Lng            whereHelpernull_Float64
 	WeatherLat     whereHelpernull_Float32
-	WeatherLNG     whereHelpernull_Float32
+	WeatherLng     whereHelpernull_Float32
 	Timezone       whereHelpernull_String
 	PowerCompany   whereHelpernull_String
 	VoltageType    whereHelpernull_String
@@ -201,9 +201,9 @@ var CustomerWhere = struct {
 	FieldNumber:    whereHelperstring{field: "`customer`.`field_number`"},
 	Address:        whereHelpernull_String{field: "`customer`.`address`"},
 	Lat:            whereHelpernull_Float64{field: "`customer`.`lat`"},
-	LNG:            whereHelpernull_Float64{field: "`customer`.`lng`"},
+	Lng:            whereHelpernull_Float64{field: "`customer`.`lng`"},
 	WeatherLat:     whereHelpernull_Float32{field: "`customer`.`weather_lat`"},
-	WeatherLNG:     whereHelpernull_Float32{field: "`customer`.`weather_lng`"},
+	WeatherLng:     whereHelpernull_Float32{field: "`customer`.`weather_lng`"},
 	Timezone:       whereHelpernull_String{field: "`customer`.`timezone`"},
 	PowerCompany:   whereHelpernull_String{field: "`customer`.`power_company`"},
 	VoltageType:    whereHelpernull_String{field: "`customer`.`voltage_type`"},

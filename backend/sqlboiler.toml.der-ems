@@ -10,8 +10,8 @@ tag-ignore = ["password"]
   name = "weather_forecast"
   [aliases.tables.weather_forecast.columns]
   lng = "Lng"
-  name = "customer_info"
-  [aliases.tables.customer_info.columns]
+  name = "customer"
+  [aliases.tables.customer.columns]
   lng = "Lng"
   weather_lng = "WeatherLng"
   name = "device"

@@ -24,10 +24,6 @@ swag:
 	@$(shell if [ ! -f $(GOPATH)/bin/swag ] ; then go get -u github.com/swaggo/swag/cmd/swag; fi)
 	$(AT_RUN)$(GOPATH)/bin/swag init -g routers/router.go
 
-systemd:
-	@./scripts/dist.sh "weather-worker"
-	@./scripts/dist.sh "api-worker"
-
 go-test:
 	@go test -v -count=1 -coverpkg=$(COVER_PKG) -coverprofile cover.out $(GO_PKGS)
 

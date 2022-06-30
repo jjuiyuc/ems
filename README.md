@@ -85,24 +85,3 @@ $ go run weather-worker.go -d <config_path> -e <yaml_filename>
   # Restart a process
   pm2 restart "core-local-cc-worker"
   ```
-
-### Deployment (systemd)
-- Make sure the model codes have been generated with the correct databases.
-- Create the user `derems`  if user not existed.
-  ```shell
-  $ adduser derems --disabled-password
-  ```
-- Switch to `backend` directory
-  ```shell
-  $ cd backend
-  ```
-- Prepare `config/derems.yaml`
-- Deploy by running
-  ```shell
-  $ make systemd
-  ```
-- Check log by
-  ```shell
-  # Take `weather-worker` for example
-  $ sudo journalctl -f -u weather-worker
-  ```

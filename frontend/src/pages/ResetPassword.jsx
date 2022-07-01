@@ -2,6 +2,7 @@ import React, { useState } from "react"
 import { Link, useSearchParams } from "react-router-dom"
 import { useTranslation } from "react-multi-lang"
 import CheckCircleIcon from "@mui/icons-material/CheckCircle"
+import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import { Button, FormControl, TextField } from "@mui/material"
 
 import { ValidatePassword } from "../utils/utils"
@@ -23,7 +24,9 @@ function ResetPassword() {
         [newPasswordError, setNewPasswordError] = useState(false),
         [confirmPassword, setConfirmPassword] = useState(""),
         [confirmPasswordError, setConfirmPasswordError] = useState(false),
-        [isReset, setIsReset] = useState(false)
+        [isReset, setIsReset] = useState(false),
+        [isError, setIsError] = useState(false)
+
 
 
     const
@@ -59,10 +62,10 @@ function ResetPassword() {
                 setIsReset(true)
                 console.log(res)
             }
-            const onError = (err) => {
-                //passwordTokenError
-                console.log(err)
 
+            const onError = (res) => {
+
+                setIsError(true)
             }
             apiCall({
                 url: "/api/users/password/reset-by-token",
@@ -82,6 +85,9 @@ function ResetPassword() {
         resetMsg = <>
             <p>{pageT("hasReset")}</p>
             <p>{pageT("logInWithNewPassword")}</p>
+        </>,
+        errorMsg = <>
+            <p>{errorT("passwordTokenError")}</p>
         </>
 
     return <div>
@@ -108,6 +114,13 @@ function ResetPassword() {
                 <h6 className="text-gray-300 mb-8 md:mb-16">
                     {commonT("passwordRule")}
                 </h6>
+            {isError
+                ?<AlertBox
+                    boxClass="mb-8"
+                    content={errorMsg}
+                    icon={HighlightOffIcon} />
+                :""
+            }    
                 <FormControl fullWidth>
                     <LanguageField />
                     <TextField

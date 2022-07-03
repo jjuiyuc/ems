@@ -30,7 +30,7 @@ function LogIn(props) {
             setPassword(e.target.value)
             setPasswordError(false)
         },
-        submit = () => {
+        submit = async () => {
             const isEmail = ValidateEmail(email)
 
             if (!isEmail) {
@@ -38,39 +38,40 @@ function LogIn(props) {
 
                 return;
             }
-            const onSuccess = (res) => {
-                const token = res.data.data.token
-                props.updateUser({
-                    // address: "1915 11th Ave. San Francisco, CA",
-                    // name: "Suncat",
-                    username: email,
-                    token
-                })
-            }
+
             const onError = (err) => {
                 if (err == 20004) {
                     setEmailError({ type: "emailNotExist" })
                 }
-                if (err == 20006) {
+                else if (err == 20006) {
                     setEmailError({ type: "userLocked" })
                 }
-                if (err == 20007) {
+                else if (err == 20007) {
                     setPasswordError(true)
+                }
+                else if (err = 40000) {
+                    console.log('error')
                 }
             }
 
             const data = { username: email, password };
-            apiCall({
+            const loginStatus = await apiCall({
                 url: "/api/auth",
                 method: "post",
-                data: data,
-                onSuccess,
+                data,
                 onError
             })
+            const token = loginStatus.data.token
+            props.updateUser({
+                username: email,
+                token
+            })
+            const userProfile = await apiCall({
+                url: "/api/users/profile",
+                onError
+            })
+            props.updateUserProfile(userProfile.data)
         }
-
-
-
     return (
         <div>
             <h1 className="mb-8 md:mb-16">{commonT("logIn")}</h1>
@@ -127,7 +128,13 @@ const mapState = (state) => ({
             dispatch({
                 type: "user/updateUser",
                 payload: value,
+            }),
+        updateUserProfile: (value) =>
+            dispatch({
+                type: "user/updateUserProfile",
+                payload: value,
             })
+
     })
 
 export default connect(mapState, mapDispatch)(LogIn)

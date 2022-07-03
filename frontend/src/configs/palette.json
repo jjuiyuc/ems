@@ -32,5 +32,7 @@
     },
     "purple": {"main": "#EF7BE3"},
     "success": {"main": "#0FD76B"},
-    "yellow": {"main": "#FBE947"}
+    "yellow": {"main": "#FBE947"},
+    "positive": {"main": "#0FD76B"},
+    "negative": {"main": "#FF4E3E"}
 }

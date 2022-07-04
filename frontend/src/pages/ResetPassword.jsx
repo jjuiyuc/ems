@@ -30,7 +30,7 @@ function ResetPassword() {
 
 
     const
-        [searchParams, setSearchParams] = useSearchParams()
+        [searchParams] = useSearchParams()
 
 
     const
@@ -58,13 +58,10 @@ function ResetPassword() {
             const data = { token: searchParams.get('token'), password: newPassword }
 
             const onSuccess = (res) => {
-
                 setIsReset(true)
-                console.log(res)
             }
 
             const onError = (res) => {
-
                 setIsError(true)
             }
             apiCall({

@@ -26,10 +26,7 @@ export const apiCall = async ({
             onSuccess(res.data)
             return res.data
         }
-        else console.log(res.status, res)
-
     } catch (err) {
         onError(err.response?.data?.code);
-        console.error(err)
     }
 }

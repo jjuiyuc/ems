@@ -35,8 +35,7 @@ function LogIn(props) {
 
             if (!isEmail) {
                 setEmailError({ type: "emailFormat" })
-
-                return;
+                return
             }
 
             const onError = (err) => {

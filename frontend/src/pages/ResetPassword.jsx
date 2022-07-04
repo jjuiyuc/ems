@@ -114,13 +114,13 @@ function ResetPassword() {
                 <h6 className="text-gray-300 mb-8 md:mb-16">
                     {commonT("passwordRule")}
                 </h6>
-            {isError
-                ?<AlertBox
-                    boxClass="mb-8"
-                    content={errorMsg}
-                    icon={HighlightOffIcon} />
-                :""
-            }    
+                {isError
+                    ? <AlertBox
+                        boxClass="mb-8"
+                        content={errorMsg}
+                        icon={HighlightOffIcon} />
+                    : ""
+                }
                 <FormControl fullWidth>
                     <LanguageField />
                     <TextField

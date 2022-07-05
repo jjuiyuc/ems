@@ -42,12 +42,14 @@ func GetGracefulShutdownWaitGroup() *sync.WaitGroup {
 	return &wg
 }
 
+// ManualShutdown godoc
 func ManualShutdown() {
 	cancel()
 	log.Info("waiting for goroutines to finish")
 	wg.Wait()
 }
 
+// WaitForShutdown godoc
 func WaitForShutdown() {
 	wg.Wait()
 }

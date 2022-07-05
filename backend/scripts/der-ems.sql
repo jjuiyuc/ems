@@ -24,11 +24,10 @@ DROP TABLE IF EXISTS `cc_data`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `cc_data` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `gw_uuid` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `gw_uuid` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `log_date` datetime NOT NULL,
   `customer_id` int DEFAULT NULL,
   `local_cc_data` json DEFAULT NULL,
-  `cloud_cc_data` json DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -48,8 +47,8 @@ CREATE TABLE `customer` (
   `customer_number` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `field_number` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `address` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `lat` float DEFAULT NULL,
-  `lng` float DEFAULT NULL,
+  `lat` double DEFAULT NULL,
+  `lng` double DEFAULT NULL,
   `weather_lat` float DEFAULT NULL,
   `weather_lng` float DEFAULT NULL,
   `timezone` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
@@ -72,15 +71,16 @@ DROP TABLE IF EXISTS `device`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `device` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `uuid` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `modbusid` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `uueid` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `model_id` int NOT NULL,
-  `gw_uuid` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `gw_uuid` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `remark` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `enable` tinyint(1) DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uuid_UNIQUE` (`uuid`),
+  UNIQUE KEY `modbusid_uueid_UNIQUE` (`modbusid`,`uueid`),
   KEY `device_model_id_device_model_id_foreign` (`model_id`),
   KEY `device_gw_uuid_gateway_uuid_foreign` (`gw_uuid`),
   CONSTRAINT `device_gw_uuid_gateway_uuid_foreign` FOREIGN KEY (`gw_uuid`) REFERENCES `gateway` (`uuid`) ON DELETE RESTRICT ON UPDATE RESTRICT,
@@ -115,7 +115,7 @@ DROP TABLE IF EXISTS `gateway`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `gateway` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `uuid` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `uuid` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `customer_id` int NOT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime DEFAULT NULL,

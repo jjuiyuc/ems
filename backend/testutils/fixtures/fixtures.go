@@ -8,6 +8,7 @@ import (
 	deremsmodels "der-ems/models/der-ems"
 )
 
+// UtUser godoc
 var UtUser = &deremsmodels.User{
 	ID:             1,
 	Username:       "ut-user@gmail.com",

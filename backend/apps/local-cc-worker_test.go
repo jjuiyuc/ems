@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 
 	"der-ems/config"
@@ -164,38 +165,44 @@ func (s *LocalCCWorkerSuite) Test_SaveLocalCCData() {
 			},
 		},
 		{
-			name: "saveLocalCCDataNoGWID",
-			args: args{
-				Msg: testDataNoGWID,
-			},
-		},
-		{
 			name: "saveLocalCCDataNoTimestamp",
 			args: args{
 				Msg: testDataNoTimestamp,
 			},
 		},
+		{
+			name: "saveLocalCCDataEmptyInput",
+		},
 	}
+
 	for _, tt := range tests {
-		testDataJson, err := json.Marshal(tt.args.Msg)
+		log.Info("test name: ", tt.name)
+		if tt.name == "saveLocalCCDataEmptyInput" {
+			err := s.handler.saveLocalCCData(nil)
+			s.Require().Error(e.ErrNewUnexpectedJSONInput, err)
+			continue
+		}
+
+		testDataJSON, err := json.Marshal(tt.args.Msg)
 		s.Require().NoError(err)
-		testMsg, err := testutils.GetMockConsumerMessage(s.T(), s.seedUtTopic, testDataJson)
+		testMsg, err := testutils.GetMockConsumerMessage(s.T(), s.seedUtTopic, testDataJSON)
 		s.Require().NoError(err)
 		s.Equal(s.seedUtTopic, testMsg.Topic)
 
 		currentCount, err := s.repo.CCData.GetCCDataCount()
 		s.Require().NoError(err)
-		err = s.handler.SaveLocalCCData(testMsg.Value)
+		err = s.handler.saveLocalCCData(testMsg.Value)
 
-		if tt.name == "saveLocalCCData" || tt.name == "saveLocalCCDataNewGW" {
+		switch tt.name {
+		case "saveLocalCCData", "saveLocalCCDataNewGW":
 			s.Require().NoError(err)
 			updatedCount, err := s.repo.CCData.GetCCDataCount()
 			s.Require().NoError(err)
 			s.Equal(currentCount+1, updatedCount)
-		} else if tt.name == "saveLocalCCDataNoGWID" {
-			s.Equal(e.NewKeyNotExistError(gwID).Error(), err.Error())
-		} else if tt.name == "saveLocalCCDataNoTimestamp" {
-			s.Equal(e.NewKeyNotExistError(timestamp).Error(), err.Error())
+		case "saveLocalCCDataNoGWID":
+			s.Equal(e.ErrNewKeyNotExist(gwID).Error(), err.Error())
+		case "saveLocalCCDataNoTimestamp":
+			s.Equal(e.ErrNewKeyNotExist(timestamp).Error(), err.Error())
 		}
 	}
 }

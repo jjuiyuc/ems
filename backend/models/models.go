@@ -3,6 +3,7 @@ package models
 import (
 	"database/sql"
 
+	// import the driver
 	_ "github.com/go-sql-driver/mysql"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -13,7 +14,7 @@ var (
 	db *sql.DB
 )
 
-// Init database
+// Init init database
 func Init(cfg *viper.Viper) {
 	var err error
 
@@ -31,10 +32,12 @@ func Init(cfg *viper.Viper) {
 	}
 }
 
+// Close godoc
 func Close() {
 	db.Close()
 }
 
+// GetDB godoc
 func GetDB() *sql.DB {
 	return db
 }

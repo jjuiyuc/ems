@@ -1,0 +1,28 @@
+const path = require("path");
+const binPath = "/opt/derems/sbin";
+const args = "-d /opt/derems/etc -e derems.yaml";
+
+
+module.exports = {
+  apps: [
+    /***** core-derems *****/
+    {
+      name: "core-weather-worker",
+      script: path.join(binPath, "weather-worker"),
+      args: args,
+      namespace: "core-derems",
+    },
+    {
+      name: "core-api-worker",
+      script: path.join(binPath, "api-worker"),
+      args: args,
+      namespace: "core-derems",
+    },
+    {
+      name: "core-local-cc-worker",
+      script: path.join(binPath, "local-cc-worker"),
+      args: args,
+      namespace: "core-derems",
+    },
+  ]
+}

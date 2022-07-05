@@ -55,7 +55,7 @@ function NonLoggedIn () {
                         path="/forgotPassword" />
                     <Route
                         element={<ResetPassword />}
-                        path="/resetPassword" />
+                        path="/handle-reset-link" />
                     <Route element={<LogIn />} path="*" />
                 </Routes>
                 <div className="text-gray-300 text-13px">

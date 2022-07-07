@@ -23,65 +23,65 @@ import (
 
 // TouHoliday is an object representing the database table.
 type TouHoliday struct {
-	ID           int         `boil:"id" json:"id" toml:"id" yaml:"id"`
-	PowerCompany null.String `boil:"power_company" json:"powerCompany,omitempty" toml:"powerCompany" yaml:"powerCompany,omitempty"`
-	Year         null.String `boil:"year" json:"year,omitempty" toml:"year" yaml:"year,omitempty"`
-	Day          null.Time   `boil:"day" json:"day,omitempty" toml:"day" yaml:"day,omitempty"`
-	CreatedAt    time.Time   `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
-	UpdatedAt    null.Time   `boil:"updated_at" json:"updatedAt,omitempty" toml:"updatedAt" yaml:"updatedAt,omitempty"`
+	ID            int         `boil:"id" json:"id" toml:"id" yaml:"id"`
+	TOULocationID null.Int    `boil:"tou_location_id" json:"touLocationID,omitempty" toml:"touLocationID" yaml:"touLocationID,omitempty"`
+	Year          null.String `boil:"year" json:"year,omitempty" toml:"year" yaml:"year,omitempty"`
+	Day           null.Time   `boil:"day" json:"day,omitempty" toml:"day" yaml:"day,omitempty"`
+	CreatedAt     time.Time   `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
+	UpdatedAt     null.Time   `boil:"updated_at" json:"updatedAt,omitempty" toml:"updatedAt" yaml:"updatedAt,omitempty"`
 
 	R *touHolidayR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L touHolidayL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var TouHolidayColumns = struct {
-	ID           string
-	PowerCompany string
-	Year         string
-	Day          string
-	CreatedAt    string
-	UpdatedAt    string
+	ID            string
+	TOULocationID string
+	Year          string
+	Day           string
+	CreatedAt     string
+	UpdatedAt     string
 }{
-	ID:           "id",
-	PowerCompany: "power_company",
-	Year:         "year",
-	Day:          "day",
-	CreatedAt:    "created_at",
-	UpdatedAt:    "updated_at",
+	ID:            "id",
+	TOULocationID: "tou_location_id",
+	Year:          "year",
+	Day:           "day",
+	CreatedAt:     "created_at",
+	UpdatedAt:     "updated_at",
 }
 
 var TouHolidayTableColumns = struct {
-	ID           string
-	PowerCompany string
-	Year         string
-	Day          string
-	CreatedAt    string
-	UpdatedAt    string
+	ID            string
+	TOULocationID string
+	Year          string
+	Day           string
+	CreatedAt     string
+	UpdatedAt     string
 }{
-	ID:           "tou_holiday.id",
-	PowerCompany: "tou_holiday.power_company",
-	Year:         "tou_holiday.year",
-	Day:          "tou_holiday.day",
-	CreatedAt:    "tou_holiday.created_at",
-	UpdatedAt:    "tou_holiday.updated_at",
+	ID:            "tou_holiday.id",
+	TOULocationID: "tou_holiday.tou_location_id",
+	Year:          "tou_holiday.year",
+	Day:           "tou_holiday.day",
+	CreatedAt:     "tou_holiday.created_at",
+	UpdatedAt:     "tou_holiday.updated_at",
 }
 
 // Generated where
 
 var TouHolidayWhere = struct {
-	ID           whereHelperint
-	PowerCompany whereHelpernull_String
-	Year         whereHelpernull_String
-	Day          whereHelpernull_Time
-	CreatedAt    whereHelpertime_Time
-	UpdatedAt    whereHelpernull_Time
+	ID            whereHelperint
+	TOULocationID whereHelpernull_Int
+	Year          whereHelpernull_String
+	Day           whereHelpernull_Time
+	CreatedAt     whereHelpertime_Time
+	UpdatedAt     whereHelpernull_Time
 }{
-	ID:           whereHelperint{field: "`tou_holiday`.`id`"},
-	PowerCompany: whereHelpernull_String{field: "`tou_holiday`.`power_company`"},
-	Year:         whereHelpernull_String{field: "`tou_holiday`.`year`"},
-	Day:          whereHelpernull_Time{field: "`tou_holiday`.`day`"},
-	CreatedAt:    whereHelpertime_Time{field: "`tou_holiday`.`created_at`"},
-	UpdatedAt:    whereHelpernull_Time{field: "`tou_holiday`.`updated_at`"},
+	ID:            whereHelperint{field: "`tou_holiday`.`id`"},
+	TOULocationID: whereHelpernull_Int{field: "`tou_holiday`.`tou_location_id`"},
+	Year:          whereHelpernull_String{field: "`tou_holiday`.`year`"},
+	Day:           whereHelpernull_Time{field: "`tou_holiday`.`day`"},
+	CreatedAt:     whereHelpertime_Time{field: "`tou_holiday`.`created_at`"},
+	UpdatedAt:     whereHelpernull_Time{field: "`tou_holiday`.`updated_at`"},
 }
 
 // TouHolidayRels is where relationship names are stored.
@@ -101,8 +101,8 @@ func (*touHolidayR) NewStruct() *touHolidayR {
 type touHolidayL struct{}
 
 var (
-	touHolidayAllColumns            = []string{"id", "power_company", "year", "day", "created_at", "updated_at"}
-	touHolidayColumnsWithoutDefault = []string{"power_company", "year", "day", "updated_at"}
+	touHolidayAllColumns            = []string{"id", "tou_location_id", "year", "day", "created_at", "updated_at"}
+	touHolidayColumnsWithoutDefault = []string{"tou_location_id", "year", "day", "updated_at"}
 	touHolidayColumnsWithDefault    = []string{"id", "created_at"}
 	touHolidayPrimaryKeyColumns     = []string{"id"}
 	touHolidayGeneratedColumns      = []string{}

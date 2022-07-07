@@ -23,128 +23,135 @@ import (
 
 // Tou is an object representing the database table.
 type Tou struct {
-	ID           int          `boil:"id" json:"id" toml:"id" yaml:"id"`
-	PowerCompany null.String  `boil:"power_company" json:"powerCompany,omitempty" toml:"powerCompany" yaml:"powerCompany,omitempty"`
-	VoltageType  null.String  `boil:"voltage_type" json:"voltageType,omitempty" toml:"voltageType" yaml:"voltageType,omitempty"`
-	TouType      null.String  `boil:"tou_type" json:"touType,omitempty" toml:"touType" yaml:"touType,omitempty"`
-	PeakType     null.String  `boil:"peak_type" json:"peakType,omitempty" toml:"peakType" yaml:"peakType,omitempty"`
-	IsSummer     null.Bool    `boil:"is_summer" json:"isSummer,omitempty" toml:"isSummer" yaml:"isSummer,omitempty"`
-	PeriodStime  null.String  `boil:"period_stime" json:"periodStime,omitempty" toml:"periodStime" yaml:"periodStime,omitempty"`
-	PeriodEtime  null.String  `boil:"period_etime" json:"periodEtime,omitempty" toml:"periodEtime" yaml:"periodEtime,omitempty"`
-	BasicCharge  null.Float32 `boil:"basic_charge" json:"basicCharge,omitempty" toml:"basicCharge" yaml:"basicCharge,omitempty"`
-	BasicRate    null.Float32 `boil:"basic_rate" json:"basicRate,omitempty" toml:"basicRate" yaml:"basicRate,omitempty"`
-	FlowRate     null.Float32 `boil:"flow_rate" json:"flowRate,omitempty" toml:"flowRate" yaml:"flowRate,omitempty"`
-	EnableAt     null.Time    `boil:"enable_at" json:"enableAt,omitempty" toml:"enableAt" yaml:"enableAt,omitempty"`
-	DisableAt    null.Time    `boil:"disable_at" json:"disableAt,omitempty" toml:"disableAt" yaml:"disableAt,omitempty"`
-	CreatedAt    time.Time    `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
-	UpdatedAt    null.Time    `boil:"updated_at" json:"updatedAt,omitempty" toml:"updatedAt" yaml:"updatedAt,omitempty"`
+	ID            int          `boil:"id" json:"id" toml:"id" yaml:"id"`
+	TOULocationID null.Int     `boil:"tou_location_id" json:"touLocationID,omitempty" toml:"touLocationID" yaml:"touLocationID,omitempty"`
+	VoltageType   null.String  `boil:"voltage_type" json:"voltageType,omitempty" toml:"voltageType" yaml:"voltageType,omitempty"`
+	TOUType       null.String  `boil:"tou_type" json:"touType,omitempty" toml:"touType" yaml:"touType,omitempty"`
+	PeriodType    null.String  `boil:"period_type" json:"periodType,omitempty" toml:"periodType" yaml:"periodType,omitempty"`
+	PeakType      null.String  `boil:"peak_type" json:"peakType,omitempty" toml:"peakType" yaml:"peakType,omitempty"`
+	IsSummer      null.Bool    `boil:"is_summer" json:"isSummer,omitempty" toml:"isSummer" yaml:"isSummer,omitempty"`
+	PeriodStime   null.String  `boil:"period_stime" json:"periodStime,omitempty" toml:"periodStime" yaml:"periodStime,omitempty"`
+	PeriodEtime   null.String  `boil:"period_etime" json:"periodEtime,omitempty" toml:"periodEtime" yaml:"periodEtime,omitempty"`
+	BasicCharge   null.Float32 `boil:"basic_charge" json:"basicCharge,omitempty" toml:"basicCharge" yaml:"basicCharge,omitempty"`
+	BasicRate     null.Float32 `boil:"basic_rate" json:"basicRate,omitempty" toml:"basicRate" yaml:"basicRate,omitempty"`
+	FlowRate      null.Float32 `boil:"flow_rate" json:"flowRate,omitempty" toml:"flowRate" yaml:"flowRate,omitempty"`
+	EnableAt      null.Time    `boil:"enable_at" json:"enableAt,omitempty" toml:"enableAt" yaml:"enableAt,omitempty"`
+	DisableAt     null.Time    `boil:"disable_at" json:"disableAt,omitempty" toml:"disableAt" yaml:"disableAt,omitempty"`
+	CreatedAt     time.Time    `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
+	UpdatedAt     null.Time    `boil:"updated_at" json:"updatedAt,omitempty" toml:"updatedAt" yaml:"updatedAt,omitempty"`
 
 	R *touR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L touL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var TouColumns = struct {
-	ID           string
-	PowerCompany string
-	VoltageType  string
-	TouType      string
-	PeakType     string
-	IsSummer     string
-	PeriodStime  string
-	PeriodEtime  string
-	BasicCharge  string
-	BasicRate    string
-	FlowRate     string
-	EnableAt     string
-	DisableAt    string
-	CreatedAt    string
-	UpdatedAt    string
+	ID            string
+	TOULocationID string
+	VoltageType   string
+	TOUType       string
+	PeriodType    string
+	PeakType      string
+	IsSummer      string
+	PeriodStime   string
+	PeriodEtime   string
+	BasicCharge   string
+	BasicRate     string
+	FlowRate      string
+	EnableAt      string
+	DisableAt     string
+	CreatedAt     string
+	UpdatedAt     string
 }{
-	ID:           "id",
-	PowerCompany: "power_company",
-	VoltageType:  "voltage_type",
-	TouType:      "tou_type",
-	PeakType:     "peak_type",
-	IsSummer:     "is_summer",
-	PeriodStime:  "period_stime",
-	PeriodEtime:  "period_etime",
-	BasicCharge:  "basic_charge",
-	BasicRate:    "basic_rate",
-	FlowRate:     "flow_rate",
-	EnableAt:     "enable_at",
-	DisableAt:    "disable_at",
-	CreatedAt:    "created_at",
-	UpdatedAt:    "updated_at",
+	ID:            "id",
+	TOULocationID: "tou_location_id",
+	VoltageType:   "voltage_type",
+	TOUType:       "tou_type",
+	PeriodType:    "period_type",
+	PeakType:      "peak_type",
+	IsSummer:      "is_summer",
+	PeriodStime:   "period_stime",
+	PeriodEtime:   "period_etime",
+	BasicCharge:   "basic_charge",
+	BasicRate:     "basic_rate",
+	FlowRate:      "flow_rate",
+	EnableAt:      "enable_at",
+	DisableAt:     "disable_at",
+	CreatedAt:     "created_at",
+	UpdatedAt:     "updated_at",
 }
 
 var TouTableColumns = struct {
-	ID           string
-	PowerCompany string
-	VoltageType  string
-	TouType      string
-	PeakType     string
-	IsSummer     string
-	PeriodStime  string
-	PeriodEtime  string
-	BasicCharge  string
-	BasicRate    string
-	FlowRate     string
-	EnableAt     string
-	DisableAt    string
-	CreatedAt    string
-	UpdatedAt    string
+	ID            string
+	TOULocationID string
+	VoltageType   string
+	TOUType       string
+	PeriodType    string
+	PeakType      string
+	IsSummer      string
+	PeriodStime   string
+	PeriodEtime   string
+	BasicCharge   string
+	BasicRate     string
+	FlowRate      string
+	EnableAt      string
+	DisableAt     string
+	CreatedAt     string
+	UpdatedAt     string
 }{
-	ID:           "tou.id",
-	PowerCompany: "tou.power_company",
-	VoltageType:  "tou.voltage_type",
-	TouType:      "tou.tou_type",
-	PeakType:     "tou.peak_type",
-	IsSummer:     "tou.is_summer",
-	PeriodStime:  "tou.period_stime",
-	PeriodEtime:  "tou.period_etime",
-	BasicCharge:  "tou.basic_charge",
-	BasicRate:    "tou.basic_rate",
-	FlowRate:     "tou.flow_rate",
-	EnableAt:     "tou.enable_at",
-	DisableAt:    "tou.disable_at",
-	CreatedAt:    "tou.created_at",
-	UpdatedAt:    "tou.updated_at",
+	ID:            "tou.id",
+	TOULocationID: "tou.tou_location_id",
+	VoltageType:   "tou.voltage_type",
+	TOUType:       "tou.tou_type",
+	PeriodType:    "tou.period_type",
+	PeakType:      "tou.peak_type",
+	IsSummer:      "tou.is_summer",
+	PeriodStime:   "tou.period_stime",
+	PeriodEtime:   "tou.period_etime",
+	BasicCharge:   "tou.basic_charge",
+	BasicRate:     "tou.basic_rate",
+	FlowRate:      "tou.flow_rate",
+	EnableAt:      "tou.enable_at",
+	DisableAt:     "tou.disable_at",
+	CreatedAt:     "tou.created_at",
+	UpdatedAt:     "tou.updated_at",
 }
 
 // Generated where
 
 var TouWhere = struct {
-	ID           whereHelperint
-	PowerCompany whereHelpernull_String
-	VoltageType  whereHelpernull_String
-	TouType      whereHelpernull_String
-	PeakType     whereHelpernull_String
-	IsSummer     whereHelpernull_Bool
-	PeriodStime  whereHelpernull_String
-	PeriodEtime  whereHelpernull_String
-	BasicCharge  whereHelpernull_Float32
-	BasicRate    whereHelpernull_Float32
-	FlowRate     whereHelpernull_Float32
-	EnableAt     whereHelpernull_Time
-	DisableAt    whereHelpernull_Time
-	CreatedAt    whereHelpertime_Time
-	UpdatedAt    whereHelpernull_Time
+	ID            whereHelperint
+	TOULocationID whereHelpernull_Int
+	VoltageType   whereHelpernull_String
+	TOUType       whereHelpernull_String
+	PeriodType    whereHelpernull_String
+	PeakType      whereHelpernull_String
+	IsSummer      whereHelpernull_Bool
+	PeriodStime   whereHelpernull_String
+	PeriodEtime   whereHelpernull_String
+	BasicCharge   whereHelpernull_Float32
+	BasicRate     whereHelpernull_Float32
+	FlowRate      whereHelpernull_Float32
+	EnableAt      whereHelpernull_Time
+	DisableAt     whereHelpernull_Time
+	CreatedAt     whereHelpertime_Time
+	UpdatedAt     whereHelpernull_Time
 }{
-	ID:           whereHelperint{field: "`tou`.`id`"},
-	PowerCompany: whereHelpernull_String{field: "`tou`.`power_company`"},
-	VoltageType:  whereHelpernull_String{field: "`tou`.`voltage_type`"},
-	TouType:      whereHelpernull_String{field: "`tou`.`tou_type`"},
-	PeakType:     whereHelpernull_String{field: "`tou`.`peak_type`"},
-	IsSummer:     whereHelpernull_Bool{field: "`tou`.`is_summer`"},
-	PeriodStime:  whereHelpernull_String{field: "`tou`.`period_stime`"},
-	PeriodEtime:  whereHelpernull_String{field: "`tou`.`period_etime`"},
-	BasicCharge:  whereHelpernull_Float32{field: "`tou`.`basic_charge`"},
-	BasicRate:    whereHelpernull_Float32{field: "`tou`.`basic_rate`"},
-	FlowRate:     whereHelpernull_Float32{field: "`tou`.`flow_rate`"},
-	EnableAt:     whereHelpernull_Time{field: "`tou`.`enable_at`"},
-	DisableAt:    whereHelpernull_Time{field: "`tou`.`disable_at`"},
-	CreatedAt:    whereHelpertime_Time{field: "`tou`.`created_at`"},
-	UpdatedAt:    whereHelpernull_Time{field: "`tou`.`updated_at`"},
+	ID:            whereHelperint{field: "`tou`.`id`"},
+	TOULocationID: whereHelpernull_Int{field: "`tou`.`tou_location_id`"},
+	VoltageType:   whereHelpernull_String{field: "`tou`.`voltage_type`"},
+	TOUType:       whereHelpernull_String{field: "`tou`.`tou_type`"},
+	PeriodType:    whereHelpernull_String{field: "`tou`.`period_type`"},
+	PeakType:      whereHelpernull_String{field: "`tou`.`peak_type`"},
+	IsSummer:      whereHelpernull_Bool{field: "`tou`.`is_summer`"},
+	PeriodStime:   whereHelpernull_String{field: "`tou`.`period_stime`"},
+	PeriodEtime:   whereHelpernull_String{field: "`tou`.`period_etime`"},
+	BasicCharge:   whereHelpernull_Float32{field: "`tou`.`basic_charge`"},
+	BasicRate:     whereHelpernull_Float32{field: "`tou`.`basic_rate`"},
+	FlowRate:      whereHelpernull_Float32{field: "`tou`.`flow_rate`"},
+	EnableAt:      whereHelpernull_Time{field: "`tou`.`enable_at`"},
+	DisableAt:     whereHelpernull_Time{field: "`tou`.`disable_at`"},
+	CreatedAt:     whereHelpertime_Time{field: "`tou`.`created_at`"},
+	UpdatedAt:     whereHelpernull_Time{field: "`tou`.`updated_at`"},
 }
 
 // TouRels is where relationship names are stored.
@@ -164,8 +171,8 @@ func (*touR) NewStruct() *touR {
 type touL struct{}
 
 var (
-	touAllColumns            = []string{"id", "power_company", "voltage_type", "tou_type", "peak_type", "is_summer", "period_stime", "period_etime", "basic_charge", "basic_rate", "flow_rate", "enable_at", "disable_at", "created_at", "updated_at"}
-	touColumnsWithoutDefault = []string{"power_company", "voltage_type", "tou_type", "peak_type", "is_summer", "period_stime", "period_etime", "basic_charge", "basic_rate", "flow_rate", "enable_at", "disable_at", "updated_at"}
+	touAllColumns            = []string{"id", "tou_location_id", "voltage_type", "tou_type", "period_type", "peak_type", "is_summer", "period_stime", "period_etime", "basic_charge", "basic_rate", "flow_rate", "enable_at", "disable_at", "created_at", "updated_at"}
+	touColumnsWithoutDefault = []string{"tou_location_id", "voltage_type", "tou_type", "period_type", "peak_type", "is_summer", "period_stime", "period_etime", "basic_charge", "basic_rate", "flow_rate", "enable_at", "disable_at", "updated_at"}
 	touColumnsWithDefault    = []string{"id", "created_at"}
 	touPrimaryKeyColumns     = []string{"id"}
 	touGeneratedColumns      = []string{}

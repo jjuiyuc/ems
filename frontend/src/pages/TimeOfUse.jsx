@@ -1,7 +1,7 @@
-import {Button, Stack} from "@mui/material"
-import {Fragment as Frag, useEffect, useRef, useState} from "react"
+import { Button, Stack } from "@mui/material"
+import { Fragment as Frag, useEffect, useRef, useState } from "react"
 import moment from "moment"
-import {useTranslation} from "react-multi-lang"
+import { useTranslation } from "react-multi-lang"
 import WaterChart from "water-chart"
 
 import Clock from "../components/Clock"
@@ -9,11 +9,11 @@ import EnergyCard from "../components/EnergyCard"
 import LineChart from "../components/LineChart"
 import variables from "../configs/variables"
 
-import {ReactComponent as EditIcon} from "../assets/icons/edit.svg"
+import { ReactComponent as EditIcon } from "../assets/icons/edit.svg"
 
-const {colors} = variables
+const { colors } = variables
 
-export default function TimeOfUse () {
+export default function TimeOfUse() {
     const batteryChart = useRef()
 
     const
@@ -25,7 +25,7 @@ export default function TimeOfUse () {
 
     const energyCardTitle = source => <>
         <span className="inline-block mr-1">
-            {pageT("source", {type: pageT(source)})}
+            {pageT("source", { type: pageT(source) })}
         </span>
         <span className="inline-block">
             ({pageT("totalUntilNow")})
@@ -73,51 +73,51 @@ export default function TimeOfUse () {
             }],
             labels: lineChartDateLabels,
             tooltipCallbacks: {
-                label: item => `${item.parsed.y} ${commonT("kwh")}`,
+                label: item => `${item.parsed.y} ${"%"}`,
                 labelPointStyle: context => {
                     const
                         color = context.dataset.backgroundColor
-                                .replace("#", "%23"),
+                            .replace("#", "%23"),
                         image = new Image(8, 8)
 
                     image.className = "test"
                     image.src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='8' width='8'%3E%3Ccircle cx='4' cy='4' r ='4' fill='${color}' /%3E%3C/svg%3E`
 
-                    return {pointStyle: image}
+                    return { pointStyle: image }
                 }
             }
         }),
         [midPeak, setMidPeak] = useState({
             types: [
-               {kwh: 7.5, percentage: 15, type: "grid"},
-               {kwh: 30, percentage: 60, type: "solar"},
-               {kwh: 12.5, percentage: 25, type: "battery"},
+                { kwh: 7.5, percentage: 15, type: "grid" },
+                { kwh: 30, percentage: 60, type: "solar" },
+                { kwh: 12.5, percentage: 25, type: "battery" },
             ],
             kwh: 50
         }),
         [onPeak, setOnPeak] = useState({
             types: [
-               {kwh: 5, percentage: 10, type: "grid"},
-               {kwh: 52, percentage: 50, type: "solar"},
-               {kwh: 20, percentage: 40, type: "battery"},
+                { kwh: 5, percentage: 10, type: "grid" },
+                { kwh: 52, percentage: 50, type: "solar" },
+                { kwh: 20, percentage: 40, type: "battery" },
             ],
             kwh: 50
         }),
         [offPeak, setOffPeak] = useState({
             types: [
-               {kwh: 10, percentage: 18, type: "grid"},
-               {kwh: 25, percentage: 41, type: "solar"},
-               {kwh: 25, percentage: 41, type: "battery"},
+                { kwh: 10, percentage: 18, type: "grid" },
+                { kwh: 25, percentage: 41, type: "solar" },
+                { kwh: 25, percentage: 41, type: "battery" },
             ],
             kwh: 60
         }),
         [prices, setPrices]
-            = useState({onPeak: 0, midPeak: 0, offPeak: 0, superOffPeak: 0}),
+            = useState({ onPeak: 0, midPeak: 0, offPeak: 0, superOffPeak: 0 }),
         [superOffPeak, setSuperOffPeak] = useState({
             types: [
-               {kwh: 21, percentage: 35, type: "grid"},
-               {kwh: 24, percentage: 40, type: "solar"},
-               {kwh: 15, percentage: 25, type: "battery"},
+                { kwh: 21, percentage: 35, type: "grid" },
+                { kwh: 24, percentage: 40, type: "solar" },
+                { kwh: 15, percentage: 25, type: "battery" },
             ],
             kwh: 60
         }),
@@ -164,8 +164,8 @@ export default function TimeOfUse () {
     useEffect(() => {
         const
             currentTime = moment(),
-            dataset = {data: [], backgroundColor: []},
-            prices = {onPeak: 0, midPeak: 0, offPeak: 0, superOffPeak: 0}
+            dataset = { data: [], backgroundColor: [] },
+            prices = { onPeak: 0, midPeak: 0, offPeak: 0, superOffPeak: 0 }
 
         let currentPeriod = ""
 
@@ -173,7 +173,7 @@ export default function TimeOfUse () {
 
         timeOfUse.forEach(item => {
             const
-                {end, start} = item,
+                { end, start } = item,
                 endTime = getMoment(end),
                 startTime = getMoment(start),
                 duration = moment.duration(endTime.diff(startTime)).as("hours")
@@ -260,18 +260,18 @@ export default function TimeOfUse () {
                         <Clock dataset={clockDataset} id="touClock" />
                         <div className="grid grid-cols-3-auto gap-y-2
                                         items-center mx-8 my-4 text-white">
-                    {Object.keys(prices).map((key, i) =>
-                        <Frag key={"t-p-" + i}>
-                            <div
-                                className="h-2 rounded-full mr-3 w-2"
-                                style={{background: colors[key]}} />
-                            <div className="text-11px">
-                                {pageT(key)}
-                            </div>
-                            <div className="font-bold ml-2 text-base">
-                                ${prices[key]}
-                            </div>
-                        </Frag>)}
+                            {Object.keys(prices).map((key, i) =>
+                                <Frag key={"t-p-" + i}>
+                                    <div
+                                        className="h-2 rounded-full mr-3 w-2"
+                                        style={{ background: colors[key] }} />
+                                    <div className="text-11px">
+                                        {pageT(key)}
+                                    </div>
+                                    <div className="font-bold ml-2 text-base">
+                                        ${prices[key]}
+                                    </div>
+                                </Frag>)}
                         </div>
                     </div>
                     <div className="my-6 subCard w-56">
@@ -281,7 +281,7 @@ export default function TimeOfUse () {
                         <div className="flex flex-col items-center justify-center">
                             <div
                                 className="font-bold mb-3 mt-2 px-5 py-2 rounded-full text-gray-900 text-sm"
-                                style={{background: colors[currentPeriod]}}>
+                                style={{ background: colors[currentPeriod] }}>
                                 {pageT(currentPeriod)}
                             </div>
                             <div className="font-bold text-2xl">
@@ -291,54 +291,54 @@ export default function TimeOfUse () {
                     </div>
                 </div>
             </div>
-        {tab === "today"
-            ? <div className="card">
-                <div className="header">
-                    <h4>{pageT("batteryStatus")}</h4>
-                </div>
-                <div className="flex flex-wrap items-center justify-around">
-                    <div className="h-48 relative w-48">
-                        <div className="absolute bg-gray-800 h-44 m-2
+            {tab === "today"
+                ? <div className="card">
+                    <div className="header">
+                        <h4>{pageT("batteryStatus")}</h4>
+                    </div>
+                    <div className="flex flex-wrap items-center justify-around">
+                        <div className="h-48 relative w-48">
+                            <div className="absolute bg-gray-800 h-44 m-2
                                         rounded-full w-44" />
-                        <svg
-                            className="h-48 relative w-48"
-                            id="batteryChart"
-                            ref={batteryChart} />
-                    </div>
-                    <div className="grid grid-cols-3 my-6 mw-88 three-columns
+                            <svg
+                                className="h-48 relative w-48"
+                                id="batteryChart"
+                                ref={batteryChart} />
+                        </div>
+                        <div className="grid grid-cols-3 my-6 mw-88 three-columns
                                     gap-x-5 sm:gap-x-10">
-                        <div>
-                            <h3>{battery.level}%</h3>
-                            <span className="text-13px">
-                                {pageT("stateOfCharge")}
-                            </span>
-                        </div>
-                        <div>
-                            <h3>{battery.power} {commonT("kw")}</h3>
-                            <span className="text-13px">
-                                {pageT("batteryPower")}
-                            </span>
-                        </div>
-                        <div>
-                            <h3>{commonT(battery.source)}</h3>
-                            <span className="text-13px">
-                                {pageT("chargingFrom")}
-                            </span>
+                            <div>
+                                <h3>{battery.level}%</h3>
+                                <span className="text-13px">
+                                    {pageT("stateOfCharge")}
+                                </span>
+                            </div>
+                            <div>
+                                <h3>{battery.power} {commonT("kw")}</h3>
+                                <span className="text-13px">
+                                    {pageT("batteryPower")}
+                                </span>
+                            </div>
+                            <div>
+                                <h3>{commonT(battery.source)}</h3>
+                                <span className="text-13px">
+                                    {pageT("chargingFrom")}
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+                : null}
+        </div>
+        {tab === "today"
+            ? <>
+                <div className="mt-20 page-header">
+                    <h1>{pageT("directSolarUsage")}</h1>
+                </div>
+                <div className="card chart max-h-80vh h-160 relative w-full">
+                    <LineChart data={lineChartData} id="touLineChart" />
+                </div>
+            </>
             : null}
-        </div>
-    {tab === "today"
-        ? <>
-        <div className="mt-20 page-header">
-            <h1>{pageT("directSolarUsage")}</h1>
-        </div>
-        <div className="card chart max-h-80vh h-160 relative w-full">
-            <LineChart data={lineChartData} id="touLineChart" />
-        </div>
-        </>
-        : null}
     </>
 }

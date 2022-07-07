@@ -16,7 +16,7 @@ export default function Dashboard() {
 
     return <>
         <h1>Dashboard</h1>
-        <div className="flex">
+        <div className="flex items-start">
             <div className="card w-full mt-8">
                 <div className="flex flex-wrap items-baseline mb-6">
                     <h5 className="font-bold">Peak Shave</h5>

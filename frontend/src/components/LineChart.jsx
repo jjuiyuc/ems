@@ -1,4 +1,3 @@
-
 import {
     CategoryScale,
     Chart,
@@ -97,9 +96,7 @@ export default function LineChart(props) {
                                     size: 11
                                 },
                                 padding: 10,
-                                callback: function (val, index) {
-                                    return val + '%'
-                                }
+                                callback: props.data.tickCallback
                             }
                         }
                     }

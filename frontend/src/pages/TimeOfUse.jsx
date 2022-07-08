@@ -73,7 +73,7 @@ export default function TimeOfUse() {
             }],
             labels: lineChartDateLabels,
             tooltipCallbacks: {
-                label: item => `${item.parsed.y} ${"%"}`,
+                label: item => `${item.parsed.y}%`,
                 labelPointStyle: context => {
                     const
                         color = context.dataset.backgroundColor
@@ -85,6 +85,9 @@ export default function TimeOfUse() {
 
                     return { pointStyle: image }
                 }
+            },
+            tickCallback: function (val, index) {
+                return val + '%'
             }
         }),
         [midPeak, setMidPeak] = useState({

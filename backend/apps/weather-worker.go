@@ -16,6 +16,7 @@ import (
 	"der-ems/kafka"
 	deremsmodels "der-ems/models/der-ems"
 	"der-ems/repository"
+	"der-ems/utils"
 )
 
 // WeatherWorker godoc
@@ -96,7 +97,7 @@ func (w *WeatherWorker) MainLoop() {
 }
 
 func (h weatherConsumerHandler) processWeatherData(msg []byte) {
-	log.Debug("processWeatherData")
+	utils.PrintFunctionName()
 	lat, lng, err := h.saveWeatherData(msg)
 	if err != nil {
 		return

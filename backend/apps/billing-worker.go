@@ -13,6 +13,7 @@ import (
 	"der-ems/kafka"
 	deremsmodels "der-ems/models/der-ems"
 	"der-ems/repository"
+	"der-ems/utils"
 )
 
 const (
@@ -71,8 +72,7 @@ func NewBillingWorker(
 }
 
 func sendAIBillingParams(cfg *viper.Viper, repo *repository.Repository, sendNow bool) {
-	// TODO: modify log format
-	log.Info("sendAIBillingParams")
+	utils.PrintFunctionName()
 	gateways, err := getGateways(repo)
 	if err != nil {
 		return

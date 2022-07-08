@@ -36,7 +36,7 @@ export default function Dashboard() {
             <div className="card-column mt-3">
                 <div className="card w-96 m-5">
                     <div className="flex flex-wrap items-center mb-8">
-                        <div className="h-10 w-10 bg-blue-300 rounded-full">
+                        <div className="h-10 w-10 bg-green-main-opacity-80 rounded-full">
                             <HomeIcon className="h-8 w-8 ml-1 mt-0.5 p-1 opacity-80 text-green-main" />
                         </div>
                         <h5 className="font-bold ml-3">Load</h5>
@@ -60,7 +60,7 @@ export default function Dashboard() {
                 </div>
                 <div className="card w-96 m-5">
                     <div className="flex flex-wrap items-center mb-8">
-                        <div className="h-10 w-10 bg-blue-300 rounded-full">
+                        <div className="h-10 w-10 bg-blue-main-opacity-80 rounded-full">
                             <BatteryIcon className="h-8 w-8 ml-1 mt-0.5 p-0.5 opacity-80 text-blue-main" />
                         </div>
                         <h5 className="font-bold ml-3">Battery</h5>
@@ -88,7 +88,7 @@ export default function Dashboard() {
                 </div>
                 <div className="card w-96 m-5">
                     <div className="flex flex-wrap items-center mb-8">
-                        <div className="w-10 h-10 bg-yellow-300 rounded-full">
+                        <div className="w-10 h-10 bg-yellow-main-opacity-80 rounded-full">
                             <SolarIcon className="h-8 w-8 ml-1 mt-1 p-0.5 opacity-80 text-yellow-main" />
                         </div>
                         <h5 className="font-bold ml-3">Solar</h5>

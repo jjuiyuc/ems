@@ -24,5 +24,11 @@ module.exports = {
       args: args,
       namespace: "core-derems",
     },
+    {
+      name: "core-billing-worker",
+      script: path.join(binPath, "billing-worker"),
+      args: args,
+      namespace: "core-derems",
+    },
   ]
 }

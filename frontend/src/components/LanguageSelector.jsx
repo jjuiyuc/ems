@@ -2,7 +2,7 @@ import {connect} from "react-redux"
 import {MenuItem, Select} from "@mui/material"
 import React from "react"
 
-import variables from "../configs/Variables"
+import variables from "../configs/variables"
 
 function LanguageSelector (props) {
     const changeLang = e => props.updateLang(e.target.value)

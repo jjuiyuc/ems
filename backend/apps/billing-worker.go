@@ -235,14 +235,13 @@ func getWeeklyBillingParamsByType(repo *repository.Repository, billingType Billi
 func getSundayOfBillingWeek(t time.Time, sendNow bool) (timeOnSunday time.Time) {
 	weekDay := t.Weekday()
 	var offset = 0
-	if sendNow {
-		// Get Sunday of this week
-		if weekDay != time.Sunday {
-			offset = int(time.Sunday - weekDay)
-		}
-	} else {
-		// Get Sunday of next week (Check on Saturday)
-		offset = 1
+	// Get Sunday of this week
+	if weekDay != time.Sunday {
+		offset = int(time.Sunday - weekDay)
+	}
+	// Get Sunday of next week
+	if !sendNow {
+		offset += 7
 	}
 	timeOnSunday = t.AddDate(0, 0, offset)
 	return

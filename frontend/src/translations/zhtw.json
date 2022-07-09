@@ -67,5 +67,15 @@
         "today": "今天",
         "totalUntilNow": "Total Until Now",
         "yesterday": "昨日"
+    },
+    "dashboard": {
+        "dashboard": "Dashboard",
+        "peakShave": "Peak Shave",
+        "load":"負載",
+        "batteryDischarge":"電池放電",
+        "importFromGrid":"電網導入",
+        "stateOfCharge":"充電狀態",
+        "batteryPower": "供電量",
+        "dischargingTo":"Discharging To"
     }
 }

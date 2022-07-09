@@ -67,5 +67,15 @@
         "today": "Today",
         "totalUntilNow": "Total Until Now",
         "yesterday": "Yesterday"
+    },
+    "dashboard": {
+        "dashboard": "Dashboard",
+        "peakShave": "Peak Shave",
+        "load":"Load",
+        "batteryDischarge":"Battery Discharge",
+        "importFromGrid":"Import From Grid",
+        "stateOfCharge":"State of Charge",
+        "batteryPower":"Battery Power",
+        "dischargingTo":"Discharging To"
     }
 }

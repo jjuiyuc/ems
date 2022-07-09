@@ -1,14 +1,14 @@
-import {connect} from "react-redux"
-import {MenuItem, Select} from "@mui/material"
+import { connect } from "react-redux"
+import { MenuItem, Select } from "@mui/material"
 import React from "react"
 
-import variables from "../configs/Variables"
+import variables from "../configs/variables"
 
-function LanguageSelector (props) {
+function LanguageSelector(props) {
     const changeLang = e => props.updateLang(e.target.value)
 
     const
-        {languages} = variables,
+        { languages } = variables,
         langOpts = Object.keys(languages).map((key, i) =>
             <MenuItem key={"l-l-" + i} value={key}>{languages[key]}</MenuItem>)
 
@@ -25,9 +25,9 @@ function LanguageSelector (props) {
 }
 
 const
-    mapState = state => ({lang: state.lang.value}),
+    mapState = state => ({ lang: state.lang.value }),
     mapDispatch = dispatch => ({
-        updateLang: value => dispatch({type: "lang/updateLang", payload: value})
+        updateLang: value => dispatch({ type: "lang/updateLang", payload: value })
     })
 
 export default connect(mapState, mapDispatch)(LanguageSelector)

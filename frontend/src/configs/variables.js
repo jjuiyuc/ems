@@ -12,7 +12,8 @@ const variables = {
         onPeak: palette.blue.main,
         offPeak: palette.purple.main,
         solar: palette.yellow.main,
-        superOffPeak: palette.yellow.main
+        superOffPeak: palette.yellow.main,
+        peakShave: palette.green.main
     },
     languages: {
         en: "English",

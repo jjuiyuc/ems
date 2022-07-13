@@ -10,6 +10,9 @@ module.exports = {
             borderRadius: {
                 "2.5xl": "1.25rem"
             },
+            borderWidth: {
+                "6": "6px"
+            },
             boxShadow: {
                 main: "4px 0px 4px rgba(0, 0, 0, 0.05) inset"
             },
@@ -38,6 +41,9 @@ module.exports = {
             maxHeight: {
                 "4xl": "56rem",
                 "80vh": "80vh"
+            },
+            margin: {
+                "18": "4.5rem",
             },
             maxWidth: {
                 "2/3": "66.6%"
@@ -79,5 +85,21 @@ module.exports = {
             "sm-xl": {raw: "(min-width: 600px) and (min-height: 1536px)"},
         }
     },
-    plugins: []
+    plugins: [],
+    safelist: [
+        "bg-blue-main-opacity-20",
+        "bg-green-main-opacity-20",
+        "bg-indigo-main-opacity-20",
+        "bg-negative-main",
+        "bg-positive-main",
+        "bg-yellow-main-opacity-20",
+        "h-10",
+        "w-10",
+        "text-blue-main",
+        "text-green-main",
+        "text-indigo-main",
+        "text-negative-main",
+        "text-positive-main",
+        "text-yellow-main"
+    ]
 }

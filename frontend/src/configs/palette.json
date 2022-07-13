@@ -2,7 +2,7 @@
     "black": {"main": "#020202"},
     "blue": {
         "main": "#43B0FF",
-        "main-opacity-80":"#43B0FF80"
+        "main-opacity-20":"#43B0FF20"
     },
     "brand": {"main": "#12c9c9"},
     "darkGray": {"main": "#303034"},
@@ -19,9 +19,12 @@
     },
     "green": {
         "main": "#14EEC7",
-        "main-opacity-80":"#14EEC780"
+        "main-opacity-20":"#14EEC720"
     },
-    "indigo": {"main": "#7357FF"},
+    "indigo": {
+        "main": "#7357FF",
+        "main-opacity-20":"#7357FF20"
+    },
     "error": {"main": "#FF4E3E"},
     "primary": {
         "50": "#f3fcfc",
@@ -40,7 +43,7 @@
     "success": {"main": "#0FD76B"},
     "yellow": {
         "main": "#FBE947",
-        "main-opacity-80":"#FBE94780"
+        "main-opacity-20":"#FBE94720"
     },
     "positive": {"main": "#0FD76B"},
     "negative": {"main": "#FF4E3E"}

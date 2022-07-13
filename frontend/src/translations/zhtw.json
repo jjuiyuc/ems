@@ -102,5 +102,21 @@
         "timeOfUse": "Time of Use",
         "totalUntilNow": "Total Until Now",
         "yesterday": "昨日"
+    },
+    "analysis": {
+        "analysis": "Analysis",
+        "days":"日",
+        "weeks":"週",
+        "month":"月",
+        "year":"年",
+        "custom":"Custom",
+        "totalEnergySources":"Total Energy Sources",
+        "energyDestinations":"Energy Destinations",
+        "batteryDischarge":"Battery Discharge",
+        "load":"Load",
+        "exportFromGrid":"Export From Grid",
+        "chargeToBattery":"Charge to Battery"
+
+        
     }
 }

@@ -1,5 +1,9 @@
 import { Button, Stack, TextField, Box } from "@mui/material"
 import { DateRangePickerDay } from '@mui/x-date-pickers-pro'
+import { LocalizationProvider } from '@mui/x-date-pickers-pro'
+import { AdapterDateFns } from '@mui/x-date-pickers-pro/AdapterDateFns'
+import { StaticDateRangePicker } from '@mui/x-date-pickers-pro/StaticDateRangePicker'
+
 import { Fragment as Frag, useEffect, useRef, useState } from "react"
 import moment from "moment"
 import { useTranslation } from "react-multi-lang"
@@ -103,11 +107,27 @@ export default function Analysis() {
                     variant="contained">
                     {pageT("custom")}
                 </Button>
-                {/* {tab === "custom"
+                {tab === "custom"
                     ? <>
-                        <DateRangePickerDay />
+                        {/* <DateRangePickerDay /> */}
+                        <LocalizationProvider dateAdapter={AdapterDateFns}>
+                            <StaticDateRangePicker
+                                displayStaticWrapperAs="desktop"
+                                value={value}
+                                onChange={(newValue) => {
+                                    setValue(newValue);
+                                }}
+                                renderInput={(startProps, endProps) => (
+                                    <>
+                                        <TextField {...startProps} />
+                                        <Box sx={{ mx: 2 }}> to </Box>
+                                        <TextField {...endProps} />
+                                    </>
+                                )}
+                            />
+                        </LocalizationProvider>
                     </>
-                    : null} */}
+                    : null}
             </Stack>
         </div>
         <div className="gap-8 grid md:grid-cols-2 items-start">

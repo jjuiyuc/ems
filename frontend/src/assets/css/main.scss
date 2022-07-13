@@ -1,7 +1,6 @@
 @use "sass:math";
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+TC&display=swap");
 
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -50,13 +49,14 @@ h6 {
 }
 .card {
     @apply bg-gray-900 rounded-3xl;
+    @apply px-6 md:px-10;
     @apply py-4 md:py-8;
 
     &.chart {
         @apply px-4 md:px-8;
     }
-    &:not(.chart) {
-        @apply px-6 md:px-10;
+    &.narrow {
+        @apply px-4 md:px-6;
     }
 
     .header {
@@ -71,8 +71,6 @@ h6 {
 .long-card {
     @apply bg-gray-900 rounded-3xl;
     @apply py-4 md:py-8;
-
-  
 }
 .page-header {
     @apply sm:flex items-center justify-between mb-8;

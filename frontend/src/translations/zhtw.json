@@ -110,13 +110,14 @@
         "month":"月",
         "year":"年",
         "custom":"Custom",
-        "totalEnergySources":"Total Energy Sources",
+        "totalEnergySources":"全部能源來源",
         "energyDestinations":"Energy Destinations",
-        "batteryDischarge":"Battery Discharge",
+        "directSolarSupply":"太陽能供給",
+        "importFromGrid":"自電網輸入",
+        "batteryDischarge":"電池釋放",
         "load":"Load",
-        "exportFromGrid":"Export From Grid",
-        "chargeToBattery":"Charge to Battery"
-
+        "exportFromGrid":"自電網輸出",
+        "chargeToBattery":"電池充電"
         
     }
 }

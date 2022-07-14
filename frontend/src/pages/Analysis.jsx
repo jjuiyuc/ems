@@ -110,7 +110,7 @@ export default function Analysis() {
             }
         },
         tickCallback: function (val, index) {
-            return val + "kwh"
+            return val + commonT("kwh")
         }
     })
 

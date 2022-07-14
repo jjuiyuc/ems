@@ -117,7 +117,9 @@
         "batteryDischarge":"Battery Discharge",
         "load":"Load",
         "exportFromGrid":"Export From Grid",
-        "chargeToBattery":"Charge to Battery"
-        
+        "chargeToBattery":"Charge to Battery",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "to": "to"
     }
 }

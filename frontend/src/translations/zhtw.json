@@ -117,7 +117,9 @@
         "batteryDischarge":"電池釋放",
         "load":"Load",
         "exportFromGrid":"自電網輸出",
-        "chargeToBattery":"電池充電"
-        
+        "chargeToBattery":"電池充電",
+        "startDate": "開始日期",
+        "endDate": "結束日期",
+        "to": "至"
     }
 }

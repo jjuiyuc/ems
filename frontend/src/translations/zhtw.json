@@ -10,14 +10,29 @@
         "passwordRule": "密碼長度至少為 8 個字元，且必須包含下列 4 種字元中的 3 種：英文大寫字元、英文小寫字元、數字、特殊符號。",
         "solar": "太陽能"
     },
+    "dashboard": {
+        "active": "Active",
+        "batteryDischarge": "電池放電",
+        "batteryPower": "供電量",
+        "chargeToBattery": "Charge to Battery",
+        "chargingFrom": "充電來源",
+        "dashboard": "Dashboard",
+        "directConsumption": "Direct Consumption",
+        "dischargingTo": "Discharging To",
+        "exportToGrid": "Export to Grid",
+        "importFromGrid": "電網導入",
+        "load": "負載",
+        "peakShave": "Peak Shave",
+        "stateOfCharge": "充電狀態"
+    },
     "error": {
         "emailFormat": "Email 帳號格式錯誤，請重新輸入。",
         "emailNotExist": "帳號不存在，請重新輸入。",
         "passwordFormat": "您輸入的密碼不符合密碼原則的要求，請重新輸入。",
         "passwordIncorrect": "密碼錯誤，請重新輸入。",
         "passwordNotMatch": "密碼不一致，請重新輸入。",
-        "userLocked":"使用者帳號已被鎖定。",
-        "passwordTokenError":"該重設密碼連結已失效"
+        "userLocked": "使用者帳號已被鎖定。",
+        "passwordTokenError": "該重設密碼連結已失效"
     },
     "forgotPassword": {
         "backToLogin": "回登入頁",
@@ -67,15 +82,5 @@
         "today": "今天",
         "totalUntilNow": "Total Until Now",
         "yesterday": "昨日"
-    },
-    "dashboard": {
-        "dashboard": "Dashboard",
-        "peakShave": "Peak Shave",
-        "load":"負載",
-        "batteryDischarge":"電池放電",
-        "importFromGrid":"電網導入",
-        "stateOfCharge":"充電狀態",
-        "batteryPower": "供電量",
-        "dischargingTo":"Discharging To"
     }
 }

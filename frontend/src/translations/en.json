@@ -10,14 +10,29 @@
         "passwordRule": "Password must be at least six characters long, and include 3 out of 4 of the following: uppercase letter, lowercase letter, numeric character and special character.",
         "solar": "Solar"
     },
+    "dashboard": {
+        "active": "Active",
+        "batteryDischarge": "Battery Discharge",
+        "batteryPower": "Battery Power",
+        "chargeToBattery": "Charge to Battery",
+        "chargingFrom": "Charging From",
+        "dashboard": "Dashboard",
+        "directConsumption": "Direct Consumption",
+        "dischargingTo": "Discharging To",
+        "exportToGrid": "Export to Grid",
+        "importFromGrid": "Import From Grid",
+        "load": "Load",
+        "peakShave": "Peak Shave",
+        "stateOfCharge": "State of Charge"
+    },
     "error": {
         "emailFormat": "Email is incorrect, please try again.",
         "emailNotExist": "Account does not exist, please try again.",
         "passwordFormat": "Password must meet complexity requirements, please try again.",
         "passwordIncorrect": "Password is incorrect, please try again.",
         "passwordNotMatch": "Password does not match, please try again.",
-        "userLocked":"User is locked.",
-        "passwordTokenError":"The reset password link is invalid."
+        "userLocked": "User is locked.",
+        "passwordTokenError": "The reset password link is invalid."
     },
     "forgotPassword": {
         "backToLogin": "Back to Login",
@@ -67,15 +82,5 @@
         "today": "Today",
         "totalUntilNow": "Total Until Now",
         "yesterday": "Yesterday"
-    },
-    "dashboard": {
-        "dashboard": "Dashboard",
-        "peakShave": "Peak Shave",
-        "load":"Load",
-        "batteryDischarge":"Battery Discharge",
-        "importFromGrid":"Import From Grid",
-        "stateOfCharge":"State of Charge",
-        "batteryPower":"Battery Power",
-        "dischargingTo":"Discharging To"
     }
 }

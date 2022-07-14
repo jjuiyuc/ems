@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-multi-lang"
 
 import ElectricalGridDiagram from "../components/ElectricalGridDiagram"
@@ -64,31 +64,152 @@ export default function Dashboard() {
         pageT = (string, params) => t("dashboard." + string, params)
 
     const
-        [current, setCurrent] = useState(13),
-        [threshhold, setThreshhold] = useState(15)
+        [battery, setBattery] = useState({
+            direction: "",
+            target: "",
+            import: 0,
+            power: 0,
+            state: 0
+        }),
+        [diagram, setDiagram] = useState({
+            battery: 0,
+            grid: 0,
+            load: 0,
+            solar: 0
+        }),
+        [lines, setLines] = useState({
+            battery: {grid: 0, load: 0, pv: 0},
+            grid: {battery: 0, load: 0, pv: 0},
+            load: {battery: 0, grid: 0, pv: 0},
+            pv: {battery: 0, grid: 0, load: 0},
+        }),
+        [load, setLoad] = useState({discharge: 0, import: 0, solar: 0}),
+        [peak, setPeak] = useState({active: 0, current: 0, threshhold: 0}),
+        [solar, setSolar] = useState({charge: 0, consume: 0, export: 0})
 
-    const
-        peakShaveRate = useMemo(() => {
-            const rawRate = current / threshhold
-            return rawRate <= 1 ? rawRate : 1
-        }, [current, threshhold])
+    useEffect(() => {
+        const data = {
+            "gridIsPeakShaving": 0,
+            "loadGridAveragePowerAC":10,
+            "batteryGridAveragePowerAC":0,
+            "gridContractPowerAC":15,
+            "loadPvAveragePowerAC":20,
+            "loadBatteryAveragePowerAC":0,
+            "batterySoC":80,
+            "batteryProducedAveragePowerAC":20,
+            "batteryConsumedAveragePowerAC":0,
+            "batteryChargingFrom":"Solar",
+            "batteryDischargingTo":"",
+            "batteryPvAveragePowerAC":20,
+            "pvAveragePowerAC":40,
+            "loadAveragePowerAC": 30,
+            "loadLinks": {
+                "grid":0,
+                "battery":0,
+                "pv":0
+            },
+            "gridLinks": {
+                "load":1,
+                "battery":0,
+                "pv":0
+            },
+            "pvLinks": {
+                "load":1,
+                "battery":1,
+                "grid":0
+            },
+            "batteryLinks": {
+                "load":0,
+                "pv":0,
+                "grid":0
+            },
+            "gridPvAveragePowerAC":0,
+            "gridProducedAveragePowerAC":10,
+            "gridConsumedAveragePowerAC":0
+        }
+
+        const
+            batteryPower = data.batteryProducedAveragePowerAC
+                            + data.batteryConsumedAveragePowerAC
+
+        setBattery({
+            direction:
+                data.batteryChargingFrom ? "chargingFrom" : "dischargingTo",
+            target: (data.batteryChargingFrom || data.batteryDischargingTo)
+                        .toLocaleLowerCase(),
+            import: data.batteryGridAveragePowerAC,
+            power: batteryPower,
+            state: data.batterySoC
+        })
+        setDiagram({
+            battery: batteryPower,
+            grid: data.gridProducedAveragePowerAC
+                    + data.gridConsumedAveragePowerAC,
+            load: data.loadAveragePowerAC,
+            solar: data.pvAveragePowerAC
+        })
+        setLines({
+            battery: data.batteryLinks,
+            grid: data.gridLinks,
+            load: data.loadLinks,
+            pv: data.pvLinks
+        })
+        setLoad({
+            discharge: data.loadBatteryAveragePowerAC,
+            import: data.loadGridAveragePowerAC,
+            solar: data.loadPvAveragePowerAC
+        })
+        setPeak({
+            active: data.gridIsPeakShaving,
+            current: data.gridProducedAveragePowerAC,
+            threshhold: data.gridContractPowerAC
+        })
+        setSolar({
+            charge: data.batteryPvAveragePowerAC,
+            consume: data.loadPvAveragePowerAC,
+            export: data.gridPvAveragePowerAC
+        })
+    }, [])
+
+    const peakShaveRate = useMemo(() => {
+        if (!peak.current || !peak.threshhold) return 0
+
+        const rawRate = peak.current / peak.threshhold
+
+        return rawRate <= 1 ? rawRate : 1
+    }, [peak.current, peak.threshhold])
 
     const
         batteryData = [
-            {name: pageT("stateOfCharge"), value: "80%"},
-            {name: pageT("batteryPower"), value: `20 ${commonT("kw")}`},
-            {name: pageT("importFromGrid"), value: `10 ${commonT("kw")}`},
-            {name: pageT("dischargingTo"), value: "-"},
+            {name: pageT("stateOfCharge"), value: `${battery.state}%`},
+            {
+                name: pageT("batteryPower"),
+                value: `${battery.power} ${commonT("kw")}`
+            },
+            {
+                name: pageT("importFromGrid"),
+                value: `${battery.import} ${commonT("kw")}`
+            },
+            {name: pageT(battery.direction), value: commonT(battery.target)}
         ],
         loadData = [
-            {name: commonT("solar"), value: `20 ${commonT("kw")}`},
-            {name: pageT("batteryDischarge"), value: "-"},
-            {name: pageT("importFromGrid"), value: `10 ${commonT("kw")}`}
+            {name: commonT("solar"), value: `${load.solar} ${commonT("kw")}`},
+            {name: pageT("batteryDischarge"), value: load.discharge || "-"},
+            {
+                name: pageT("importFromGrid"),
+                value: `${load.import} ${commonT("kw")}`
+            }
         ],
         solarData = [
-            {name: commonT("solar"), value: `20 ${commonT("kw")}`},
-            {name: pageT("batteryDischarge"), value: "-"},
-            {name: pageT("importFromGrid"), value: `10 ${commonT("kw")}`},
+            {
+                name: pageT("directConsumption"),
+                value: `${solar.consume} ${commonT("kw")}`
+            },
+            {
+                name: pageT("chargeToBattery"),
+                value: `${solar.charge} ${commonT("kw")}`
+            },
+            {name: pageT("exportToGrid"), value: solar.export || "-"},
         ]
 
     const
@@ -97,27 +218,38 @@ export default function Dashboard() {
                 arrow={props.arrow}
                 icon="battery"
                 title={commonT("battery")}
-                value={`20 ${commonT("kw")}`} />,
+                value={`${diagram.battery} ${commonT("kw")}`} />,
         GridCard = props =>
             <CardOnDiagram
                 arrow={props.arrow}
                 icon="grid"
                 title={commonT("grid")}
-                value={`10 ${commonT("kw")}`} />,
+                value={`${diagram.grid} ${commonT("kw")}`} />,
         LoadCard = props =>
             <CardOnDiagram
                 arrow={props.arrow}
                 icon="home"
                 title={pageT("load")}
-                value={`30 ${commonT("kw")}`} />,
+                value={`${diagram.load} ${commonT("kw")}`} />,
         SolarCard = props =>
             <CardOnDiagram
                 arrow={props.arrow}
                 icon="solar"
                 title={commonT("solar")}
-                value={`40 ${commonT("kw")}`} />
+                value={`${diagram.solar} ${commonT("kw")}`} />
 
-    const peakShaveColor = current > threshhold ? "negative" : "positive"
+    const activeIndicator = peak.active
+        ? <>
+        <div className="grid h-6 ml-6 mr-1 place-items-center relative w-6">
+            <div className="absolute animate-ping bg-negative-main h-3
+                            rounded-full w-3" />
+            <div className="bg-negative-main h-2.5 rounded-full w-2.5" />
+        </div>
+        <h5 className="text-negative-main">{pageT("active")}</h5>
+        </>
+        : null
+
+    const peakShaveColor = peak.active ? "negative" : "positive"
 
     return <>
         <h1 className="mb-9">{pageT("dashboard")}</h1>
@@ -134,10 +266,13 @@ export default function Dashboard() {
                             style={{ width: `${peakShaveRate * 100}%` }}
                         />
                     </div>
-                    <div className="mt-2 text-28px font-bold">
-                        <span className={`text-${peakShaveColor}-main`}>
-                            {current}
-                        </span> / {threshhold} {commonT("kw")}
+                    <div className="flex font-bold items-center mt-2">
+                        <div className="text-28px">
+                            <span className={`text-${peakShaveColor}-main`}>
+                                {peak.current}
+                            </span> / {peak.threshhold} {commonT("kw")}
+                        </div>
+                        {activeIndicator}
                     </div>
                 </div>
                 <div className="grid-cols-3-auto items-stretch
@@ -157,7 +292,8 @@ export default function Dashboard() {
                     </div>
                     <ElectricalGridDiagram
                         className="h-auto w-full
-                                    md:py-8 lg:py-0 xl:py-8" />
+                                    md:py-8 lg:py-0 xl:py-8"
+                        data={lines} />
                     <div className="grid-cols-2 mt-4
                                     grid md:hidden lg:grid xl:hidden">
                         <div className="flex"><BatteryCard arrow="top" /></div>

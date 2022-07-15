@@ -27,6 +27,16 @@ export const apiCall = async ({
             return res.data
         }
     } catch (err) {
-        onError(err.response?.data?.code);
+        let result = err.code
+
+        if (err.response) {
+            result = err.response.status
+
+            if (typeof (err.response.data) === "object") {
+                result = err.response.data.code
+            }
+        }
+
+        onError(result)
     }
 }

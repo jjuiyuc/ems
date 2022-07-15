@@ -16,8 +16,10 @@ function LogIn(props) {
         formT = (string) => t("form." + string),
         pageT = (string) => t("logIn." + string);
 
-    const [email, setEmail] = useState(""),
+    const
+        [email, setEmail] = useState(""),
         [emailError, setEmailError] = useState(null),
+        [otherError, setOtherError] = useState(""),
         [password, setPassword] = useState(""),
         [passwordError, setPasswordError] = useState(false)
 
@@ -39,17 +41,17 @@ function LogIn(props) {
             }
 
             const onError = (err) => {
-                if (err == 20004) {
-                    setEmailError({ type: "emailNotExist" })
-                }
-                else if (err == 20006) {
-                    setEmailError({ type: "userLocked" })
-                }
-                else if (err == 20007) {
-                    setPasswordError(true)
-                }
-                else if (err = 40000) {
-                    console.log('error')
+                switch (err) {
+                    case 20004:
+                        setEmailError({ type: "emailNotExist" })
+                        break
+                    case 20006:
+                        setEmailError({ type: "userLocked" })
+                        break
+                    case 20007:
+                        setPasswordError(true)
+                        break
+                    default: setOtherError(err)
                 }
             }
 
@@ -60,16 +62,29 @@ function LogIn(props) {
                 data,
                 onError
             })
+
+            if (!loginStatus) return
+
             const token = loginStatus.data.token
             props.updateUser({
                 username: email,
                 token
             })
-            const userProfile = await apiCall({
-                url: "/api/users/profile",
-                onError
+
+            const userProfile = await apiCall({url: "/api/users/profile"})
+
+            if (!userProfile) return
+
+            const
+                {id, name, username} = userProfile.data,
+                threeHours = 1000 * 60 * 60 * 3
+
+            props.updateUserProfile({
+                id,
+                name,
+                tokenExpiry: new Date().getTime() + threeHours,
+                username
             })
-            props.updateUserProfile(userProfile.data)
         }
     return (
         <div>
@@ -96,6 +111,11 @@ function LogIn(props) {
                     variant="outlined"
                     value={password}
                 />
+            {otherError
+                ? <div className="box mb-8 negative text-center text-red-400">
+                    {otherError}
+                </div>
+                : null}
                 <Button
                     color="primary"
                     disabled={!email || !password}

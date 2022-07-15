@@ -6,6 +6,10 @@ export const userSlice = createSlice({
     name: "user",
     initialState: { value: lsUser ? JSON.parse(lsUser) : {} },
     reducers: {
+        logout: state => {
+            localStorage.removeItem("user")
+            state.value = {}
+        },
         updateUser: (state, action) => {
             localStorage.setItem("user", JSON.stringify(action.payload))
             state.value = action.payload

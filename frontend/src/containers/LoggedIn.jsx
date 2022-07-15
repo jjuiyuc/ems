@@ -1,6 +1,6 @@
 import {Navigate, Route, Routes, useLocation} from "react-router-dom"
 import {connect} from "react-redux"
-import React from "react"
+import React, { useEffect } from "react"
 import {useTranslation} from "react-multi-lang"
 
 import Sidebar from "../components/Sidebar"
@@ -17,6 +17,10 @@ function LoggedIn (props) {
         {sidebarStatus} = props,
         sidebarW = sidebarStatus === "expand" ? "w-60" : "w-20",
         t = useTranslation()
+
+    useEffect(() => {
+        if (new Date().getTime() > props.tokenExpiry) props.logout()
+    })
 
     return <div className="grid grid-rows-1fr-auto min-h-screen">
         <div className="align-items-stretch flex">
@@ -54,6 +58,11 @@ function LoggedIn (props) {
     </div>
 }
 
-const mapState = state => ({sidebarStatus: state.sidebarStatus.value})
+const
+    mapDispatch = dispatch => ({logout: () => dispatch({type: "user/logout"})}),
+    mapState = state => ({
+        sidebarStatus: state.sidebarStatus.value,
+        tokenExpiry: state.user.value.tokenExpiry
+    })
 
-export default connect(mapState)(LoggedIn)
+export default connect(mapState, mapDispatch)(LoggedIn)

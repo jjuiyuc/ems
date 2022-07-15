@@ -20,7 +20,6 @@ function TopNav (props) {
 
     const
         closeMenu = () => setMenuAnchorEl(null),
-        logOut = () => props.updateUser({}),
         openMenu = e => setMenuAnchorEl(e.currentTarget)
 
     const
@@ -66,7 +65,7 @@ function TopNav (props) {
                 <LanguageSelector id="lang" size="small" />
             </MenuItem>
             <Divider />
-            <MenuItem onClick={logOut}>
+            <MenuItem onClick={props.logout}>
                 <ListItemIcon><LogoutIcon /></ListItemIcon>
                 {commonT("logOut")}
             </MenuItem>
@@ -76,11 +75,6 @@ function TopNav (props) {
 
 const
     mapState = state => ({lang: state.lang.value, user: state.user.value}),
-    mapDispatch = dispatch => ({
-        updateLang: value =>
-            dispatch({type: "lang/updateLang", payload: value}),
-        updateUser: value =>
-            dispatch({type: "user/updateUser", payload: value})
-    })
+    mapDispatch = dispatch => ({logout: () => dispatch({type: "user/logout"})})
 
 export default connect(mapState, mapDispatch)(TopNav)

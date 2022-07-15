@@ -67,6 +67,9 @@ func InitRouter(isCORS bool, ginMode string, w *APIWorker) *gin.Engine {
 	apiGroup.PUT("/users/password/reset-by-token", w.PasswordResetByToken)
 	apiGroup.GET("/users/profile", authorize(), w.GetProfile)
 
+	// Websocket
+	apiGroup.GET("/dashboard/:gwid", w.websocketAuthorize(), w.dashboardHandler)
+
 	return r
 }
 

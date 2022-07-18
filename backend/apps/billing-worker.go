@@ -39,7 +39,7 @@ type BillingType struct {
 // BillingParams godoc
 type BillingParams struct {
 	Timezone string     `json:"timezone"`
-	Rate     []RateInfo `json:"rate"`
+	Rates    []RateInfo `json:"rates"`
 }
 
 // RateInfo godoc
@@ -57,12 +57,12 @@ func NewBillingWorker(
 	repo *repository.Repository,
 	name string,
 ) {
-	// 1. Send in beginning
+	// 1. Send at the beginning
 	sendAIBillingParams(cfg, repo, true)
 
 	// 2. Send at 04:00 on Saturday in UTC(12:00 on Saturday in UTC+0800)
 	c := cron.New()
-	c.AddFunc("0 4 * * 6", func() { sendAIBillingParams(cfg, repo, false) })
+	c.AddFunc(cfg.GetString("cron.billing"), func() { sendAIBillingParams(cfg, repo, false) })
 	c.Start()
 	log.Info("serving: ", name)
 	<-ctx.Done()
@@ -187,35 +187,17 @@ func getWeeklyBillingParamsByType(repo *repository.Repository, billingType Billi
 				"disable at":   billing.DisableAt,
 			}).Debug()
 
-			startTime, err := time.Parse(HHMMSS24h, billing.PeriodStime.String)
+			interval, err := getBillingInterval(billing.PeriodStime.String, billing.PeriodEtime.String)
 			if err != nil {
-				log.WithFields(log.Fields{
-					"caused-by": "time.Parse",
-					"err":       err,
-				}).Error()
 				break
 			}
-			startTimeString := startTime.Format(HHMM24h)
-			endTime, err := time.Parse(HHMMSS24h, billing.PeriodEtime.String)
-			if err != nil {
-				log.WithFields(log.Fields{
-					"caused-by": "time.Parse",
-					"err":       err,
-				}).Error()
-				break
-			}
-			endTimeString := endTime.Format(HHMM24h)
-			if endTimeString == "0000" {
-				endTimeString = "2400"
-			}
-			interval := startTimeString + "-" + endTimeString
 
 			var rate RateInfo
 			rate.Date = timeOfEachDay.Format(YYYYMMDD)
 			rate.Interval = interval
 			rate.DemandChargeRate = billing.BasicRate.Float32
 			rate.TOURate = billing.FlowRate.Float32
-			billingParams.Rate = append(billingParams.Rate, rate)
+			billingParams.Rates = append(billingParams.Rates, rate)
 		}
 	}
 	if err != nil {
@@ -249,16 +231,12 @@ func getSundayOfBillingWeek(t time.Time, sendNow bool) (timeOnSunday time.Time) 
 
 func getPeriodTypeOfDay(repo *repository.Repository, touLocationID int, t time.Time) (periodType string) {
 	// The day is holiday or not
-	count, _ := repo.TOU.GetHolidayByDay(touLocationID, t.Format(YYYY), t.Format(YYYYMMDD))
-	if count > 0 {
-		periodType = "Sunday & Holiday"
-		return
-	}
+	count, _ := repo.TOU.CountHolidayByDay(touLocationID, t.Format(YYYY), t.Format(YYYYMMDD))
 
-	switch t.Weekday() {
-	case time.Sunday:
+	switch {
+	case count > 0 || t.Weekday() == time.Sunday:
 		periodType = "Sunday & Holiday"
-	case time.Saturday:
+	case t.Weekday() == time.Saturday:
 		periodType = "Saturday"
 	default:
 		periodType = "Weekdays"
@@ -268,10 +246,38 @@ func getPeriodTypeOfDay(repo *repository.Repository, touLocationID int, t time.T
 
 func isSummer(t time.Time) bool {
 	// XXX: Hardcode TPC summer is 06/30~09/30
-	if t.Month() == time.June || t.Month() == time.July || t.Month() == time.August || t.Month() == time.September {
+	switch t.Month() {
+	case time.June, time.July, time.August, time.September:
 		return true
 	}
 	return false
+
+}
+
+func getBillingInterval(periodStime, periodEtime string) (interval string, err error) {
+	startTime, err := time.Parse(HHMMSS24h, periodStime)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "time.Parse",
+			"err":       err,
+		}).Error()
+		return
+	}
+	startTimeString := startTime.Format(HHMM24h)
+	endTime, err := time.Parse(HHMMSS24h, periodEtime)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "time.Parse",
+			"err":       err,
+		}).Error()
+		return
+	}
+	endTimeString := endTime.Format(HHMM24h)
+	if endTimeString == "0000" {
+		endTimeString = "2400"
+	}
+	interval = startTimeString + "-" + endTimeString
+	return
 }
 
 func sendAIBillingParamsToGateway(cfg *viper.Viper, billingParamsJSON []byte, uuid string) {

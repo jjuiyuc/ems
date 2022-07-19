@@ -19,6 +19,7 @@ go-build: clean
 	@go build -o dist/weather-worker cmd/daemon/weather-worker/weather-worker.go
 	@go build -o dist/api-worker cmd/daemon/api-worker/api-worker.go
 	@go build -o dist/local-cc-worker cmd/daemon/local-cc-worker/local-cc-worker.go
+	@go build -o dist/billing-worker cmd/daemon/billing-worker/billing-worker.go
 
 swag:
 	@$(shell if [ ! -f $(GOPATH)/bin/swag ] ; then go get -u github.com/swaggo/swag/cmd/swag; fi)

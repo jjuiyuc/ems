@@ -16,6 +16,7 @@ import (
 	"der-ems/kafka"
 	deremsmodels "der-ems/models/der-ems"
 	"der-ems/repository"
+	"der-ems/utils"
 )
 
 // WeatherWorker godoc
@@ -96,7 +97,7 @@ func (w *WeatherWorker) MainLoop() {
 }
 
 func (h weatherConsumerHandler) processWeatherData(msg []byte) {
-	log.Debug("processWeatherData")
+	utils.PrintFunctionName()
 	lat, lng, err := h.saveWeatherData(msg)
 	if err != nil {
 		return
@@ -243,8 +244,8 @@ func (h weatherConsumerHandler) getGatewayUUIDsByLocation(lat, lng float32) (gat
 
 func (h weatherConsumerHandler) sendWeatherDataToGateway(latestWeatherJSON []byte, gatewayUUIDs []string) {
 	for _, uuid := range gatewayUUIDs {
-		sendWeatherDatatoLocalGW := strings.Replace(kafka.SendWeatherDatatoLocalGW, "{gw-id}", uuid, 1)
-		log.Debug("sendWeatherDatatoLocalGW: ", sendWeatherDatatoLocalGW)
-		kafka.Produce(h.cfg, sendWeatherDatatoLocalGW, string(latestWeatherJSON))
+		sendWeatherDataToLocalGW := strings.Replace(kafka.SendWeatherDataToLocalGW, "{gw-id}", uuid, 1)
+		log.Debug("sendWeatherDataToLocalGW: ", sendWeatherDataToLocalGW)
+		kafka.Produce(h.cfg, sendWeatherDataToLocalGW, string(latestWeatherJSON))
 	}
 }

@@ -18,3 +18,5 @@ db:
   derems:
     driver: mysql
     connection: "ubiik:testing123@tcp(0.0.0.0:3306)/ems_dev?parseTime=true"
+cron:
+  billing: "0 4 * * 6"

@@ -12,6 +12,7 @@ var (
 	config *viper.Viper
 )
 
+// OutputSplitter godoc
 type OutputSplitter struct{}
 
 // Init config

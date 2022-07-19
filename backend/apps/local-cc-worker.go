@@ -14,6 +14,7 @@ import (
 	"der-ems/kafka"
 	deremsmodels "der-ems/models/der-ems"
 	"der-ems/repository"
+	"der-ems/utils"
 )
 
 // LocalCCWorker godoc
@@ -86,7 +87,7 @@ func (w *LocalCCWorker) MainLoop() {
 }
 
 func (h localCCConsumerHandler) processLocalCCData(msg []byte) {
-	log.Debug("processLocalCCData")
+	utils.PrintFunctionName()
 	h.saveLocalCCData(msg)
 }
 

@@ -32,9 +32,9 @@ type Customer struct {
 	WeatherLat     null.Float32 `boil:"weather_lat" json:"weatherLat,omitempty" toml:"weatherLat" yaml:"weatherLat,omitempty"`
 	WeatherLng     null.Float32 `boil:"weather_lng" json:"weatherLNG,omitempty" toml:"weatherLNG" yaml:"weatherLNG,omitempty"`
 	Timezone       null.String  `boil:"timezone" json:"timezone,omitempty" toml:"timezone" yaml:"timezone,omitempty"`
-	PowerCompany   null.String  `boil:"power_company" json:"powerCompany,omitempty" toml:"powerCompany" yaml:"powerCompany,omitempty"`
+	TOULocationID  null.Int     `boil:"tou_location_id" json:"touLocationID,omitempty" toml:"touLocationID" yaml:"touLocationID,omitempty"`
 	VoltageType    null.String  `boil:"voltage_type" json:"voltageType,omitempty" toml:"voltageType" yaml:"voltageType,omitempty"`
-	TouType        null.String  `boil:"tou_type" json:"touType,omitempty" toml:"touType" yaml:"touType,omitempty"`
+	TOUType        null.String  `boil:"tou_type" json:"touType,omitempty" toml:"touType" yaml:"touType,omitempty"`
 	CreatedAt      time.Time    `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
 	UpdatedAt      null.Time    `boil:"updated_at" json:"updatedAt,omitempty" toml:"updatedAt" yaml:"updatedAt,omitempty"`
 
@@ -52,9 +52,9 @@ var CustomerColumns = struct {
 	WeatherLat     string
 	WeatherLng     string
 	Timezone       string
-	PowerCompany   string
+	TOULocationID  string
 	VoltageType    string
-	TouType        string
+	TOUType        string
 	CreatedAt      string
 	UpdatedAt      string
 }{
@@ -67,9 +67,9 @@ var CustomerColumns = struct {
 	WeatherLat:     "weather_lat",
 	WeatherLng:     "weather_lng",
 	Timezone:       "timezone",
-	PowerCompany:   "power_company",
+	TOULocationID:  "tou_location_id",
 	VoltageType:    "voltage_type",
-	TouType:        "tou_type",
+	TOUType:        "tou_type",
 	CreatedAt:      "created_at",
 	UpdatedAt:      "updated_at",
 }
@@ -84,9 +84,9 @@ var CustomerTableColumns = struct {
 	WeatherLat     string
 	WeatherLng     string
 	Timezone       string
-	PowerCompany   string
+	TOULocationID  string
 	VoltageType    string
-	TouType        string
+	TOUType        string
 	CreatedAt      string
 	UpdatedAt      string
 }{
@@ -99,9 +99,9 @@ var CustomerTableColumns = struct {
 	WeatherLat:     "customer.weather_lat",
 	WeatherLng:     "customer.weather_lng",
 	Timezone:       "customer.timezone",
-	PowerCompany:   "customer.power_company",
+	TOULocationID:  "customer.tou_location_id",
 	VoltageType:    "customer.voltage_type",
-	TouType:        "customer.tou_type",
+	TOUType:        "customer.tou_type",
 	CreatedAt:      "customer.created_at",
 	UpdatedAt:      "customer.updated_at",
 }
@@ -190,9 +190,9 @@ var CustomerWhere = struct {
 	WeatherLat     whereHelpernull_Float32
 	WeatherLng     whereHelpernull_Float32
 	Timezone       whereHelpernull_String
-	PowerCompany   whereHelpernull_String
+	TOULocationID  whereHelpernull_Int
 	VoltageType    whereHelpernull_String
-	TouType        whereHelpernull_String
+	TOUType        whereHelpernull_String
 	CreatedAt      whereHelpertime_Time
 	UpdatedAt      whereHelpernull_Time
 }{
@@ -205,9 +205,9 @@ var CustomerWhere = struct {
 	WeatherLat:     whereHelpernull_Float32{field: "`customer`.`weather_lat`"},
 	WeatherLng:     whereHelpernull_Float32{field: "`customer`.`weather_lng`"},
 	Timezone:       whereHelpernull_String{field: "`customer`.`timezone`"},
-	PowerCompany:   whereHelpernull_String{field: "`customer`.`power_company`"},
+	TOULocationID:  whereHelpernull_Int{field: "`customer`.`tou_location_id`"},
 	VoltageType:    whereHelpernull_String{field: "`customer`.`voltage_type`"},
-	TouType:        whereHelpernull_String{field: "`customer`.`tou_type`"},
+	TOUType:        whereHelpernull_String{field: "`customer`.`tou_type`"},
 	CreatedAt:      whereHelpertime_Time{field: "`customer`.`created_at`"},
 	UpdatedAt:      whereHelpernull_Time{field: "`customer`.`updated_at`"},
 }
@@ -240,8 +240,8 @@ func (r *customerR) GetGateways() GatewaySlice {
 type customerL struct{}
 
 var (
-	customerAllColumns            = []string{"id", "customer_number", "field_number", "address", "lat", "lng", "weather_lat", "weather_lng", "timezone", "power_company", "voltage_type", "tou_type", "created_at", "updated_at"}
-	customerColumnsWithoutDefault = []string{"customer_number", "field_number", "address", "lat", "lng", "weather_lat", "weather_lng", "timezone", "power_company", "voltage_type", "tou_type", "updated_at"}
+	customerAllColumns            = []string{"id", "customer_number", "field_number", "address", "lat", "lng", "weather_lat", "weather_lng", "timezone", "tou_location_id", "voltage_type", "tou_type", "created_at", "updated_at"}
+	customerColumnsWithoutDefault = []string{"customer_number", "field_number", "address", "lat", "lng", "weather_lat", "weather_lng", "timezone", "tou_location_id", "voltage_type", "tou_type", "updated_at"}
 	customerColumnsWithDefault    = []string{"id", "created_at"}
 	customerPrimaryKeyColumns     = []string{"id"}
 	customerGeneratedColumns      = []string{}

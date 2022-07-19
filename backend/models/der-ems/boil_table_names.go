@@ -10,6 +10,9 @@ var TableNames = struct {
 	DeviceModel     string
 	Gateway         string
 	LoginLog        string
+	Tou             string
+	TouHoliday      string
+	TouLocation     string
 	User            string
 	WeatherForecast string
 }{
@@ -19,6 +22,9 @@ var TableNames = struct {
 	DeviceModel:     "device_model",
 	Gateway:         "gateway",
 	LoginLog:        "login_log",
+	Tou:             "tou",
+	TouHoliday:      "tou_holiday",
+	TouLocation:     "tou_location",
 	User:            "user",
 	WeatherForecast: "weather_forecast",
 }

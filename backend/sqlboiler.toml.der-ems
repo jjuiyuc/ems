@@ -14,10 +14,17 @@ tag-ignore = ["password"]
   [aliases.tables.customer.columns]
   lng = "Lng"
   weather_lng = "WeatherLng"
+  tou_location_id = "TOULocationID"
+  tou_type = "TOUType"
   name = "device"
   [aliases.tables.device.columns]
   modbusid = "ModbusID"
   uueid = "UUEID"
+  [aliases.tables.tou.columns]
+  tou_location_id = "TOULocationID"
+  tou_type = "TOUType"
+  [aliases.tables.tou_holiday.columns]
+  tou_location_id = "TOULocationID"
 
 [mysql]
 dbname  = "der_ems"
@@ -26,4 +33,4 @@ port    = 3306
 user    = "ubiik"
 pass    = "testing123"
 sslmode = "false"
-whitelist = ["weather_forecast", "customer", "gateway", "device_model", "device", "login_log", "user", "cc_data"]
+whitelist = ["weather_forecast", "customer", "gateway", "device_model", "device", "login_log", "user", "cc_data", "tou", "tou_holiday", "tou_location"]

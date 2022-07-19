@@ -1,0 +1,34 @@
+$i: !important;
+$brand-main: #12C9C9;
+$gray-900:#1C1C1E;
+$white-main:#EEECF1;
+
+
+.date-range-picker{
+    [class*=materialui-daterange-picker-MuiPaper-root] {
+        background-color:$gray-900;
+    }
+    h6{
+        color:$white-main;
+    }
+    div{
+        color:$white-main;
+        span{
+            color:$white-main;
+        }
+    }
+    span p{
+        color:$white-main;
+    }
+    svg {
+        color: $white-main;
+    }
+    
+}
+.date-range-picker-wrapper{
+    background-color: $gray-900;
+    justify-content: end;
+    .date-range-button{
+        margin: 1rem;
+    }
+}

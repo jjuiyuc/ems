@@ -120,6 +120,8 @@
         "chargeToBattery":"Charge to Battery",
         "startDate": "Start Date",
         "endDate": "End Date",
-        "to": "to"
+        "to": "to",
+        "cancel":"Cancel",
+        "apply":"Apply"
     }
 }

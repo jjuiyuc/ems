@@ -598,7 +598,7 @@ export default function ElectricalGridDiagram (props) {
     }
 
     const {data} = props, {battery, grid} = data
-    
+
     const isPointActive = point =>
         Object.keys(data[point]).some(key => data[point][key] > 0)
         || Object.keys(data).some(key => data[key][point] > 0)

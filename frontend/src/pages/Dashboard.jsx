@@ -1,6 +1,10 @@
+import { connect } from "react-redux"
+import ReportProblemIcon from "@mui/icons-material/ReportProblem"
 import { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-multi-lang"
 
+import AlertBox from "../components/AlertBox"
+import { API_HOST } from "../constant/env"
 import ElectricalGridDiagram from "../components/ElectricalGridDiagram"
 
 import { ReactComponent as HomeIcon } from "../assets/icons/home.svg"
@@ -57,7 +61,9 @@ const CardOnDiagram = props =>
         </div>
     </div>
 
-export default function Dashboard() {
+const mapState = state => ({token: state.user.value.token})
+
+export default connect(mapState)(function Dashboard(props) {
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
@@ -77,6 +83,7 @@ export default function Dashboard() {
             load: 0,
             solar: 0
         }),
+        [error, setError] = useState(null),
         [lines, setLines] = useState({
             battery: {grid: 0, load: 0, pv: 0},
             grid: {battery: 0, load: 0, pv: 0},
@@ -85,49 +92,10 @@ export default function Dashboard() {
         }),
         [load, setLoad] = useState({discharge: 0, import: 0, solar: 0}),
         [peak, setPeak] = useState({active: 0, current: 0, threshhold: 0}),
-        [solar, setSolar] = useState({charge: 0, consume: 0, export: 0})
+        [solar, setSolar] = useState({charge: 0, consume: 0, export: 0}),
+        [websocketSupport, setWebSocketSupport] = useState(true)
 
-    useEffect(() => {
-        const data = {
-            "gridIsPeakShaving": 0,
-            "loadGridAveragePowerAC":10,
-            "batteryGridAveragePowerAC":0,
-            "gridContractPowerAC":15,
-            "loadPvAveragePowerAC":20,
-            "loadBatteryAveragePowerAC":0,
-            "batterySoC":80,
-            "batteryProducedAveragePowerAC":20,
-            "batteryConsumedAveragePowerAC":0,
-            "batteryChargingFrom":"Solar",
-            "batteryDischargingTo":"",
-            "batteryPvAveragePowerAC":20,
-            "pvAveragePowerAC":40,
-            "loadAveragePowerAC": 30,
-            "loadLinks": {
-                "grid":0,
-                "battery":0,
-                "pv":0
-            },
-            "gridLinks": {
-                "load":1,
-                "battery":0,
-                "pv":0
-            },
-            "pvLinks": {
-                "load":1,
-                "battery":1,
-                "grid":0
-            },
-            "batteryLinks": {
-                "load":0,
-                "pv":0,
-                "grid":0
-            },
-            "gridPvAveragePowerAC":0,
-            "gridProducedAveragePowerAC":10,
-            "gridConsumedAveragePowerAC":0
-        }
-
+    const updateData = data => {
         const
             batteryPower = data.batteryProducedAveragePowerAC
                             + data.batteryConsumedAveragePowerAC
@@ -169,6 +137,26 @@ export default function Dashboard() {
             consume: data.loadPvAveragePowerAC,
             export: data.gridPvAveragePowerAC
         })
+    }
+
+    useEffect(() => {
+        let wsConnection = null
+
+        if (window["WebSocket"]) {
+            const url = "ws://" + API_HOST + "/api/dashboard/0324DE7B51B262F3B11A643CBA8E12CE"
+
+            wsConnection = new WebSocket(url, props.token)
+            wsConnection.onerror = () => setError({url})
+            wsConnection.onmessage = e => updateData(JSON.parse(e.data).data)
+            wsConnection.onopen = () => setError(null)
+        }
+        else {
+            setWebSocketSupport(false)
+        }
+
+        return () => {
+            if (wsConnection) wsConnection.close()
+        }
     }, [])
 
     const peakShaveRate = useMemo(() => {
@@ -253,6 +241,23 @@ export default function Dashboard() {
 
     return <>
         <h1 className="mb-9">{pageT("dashboard")}</h1>
+    {websocketSupport
+        ? null
+        : <div className="box mb-8 negative text-center">
+            {pageT("noWebsocketSupport")}
+        </div>}
+    {error
+        ? <AlertBox
+            boxClass="mb-8 negative"
+            content={<div>
+                {pageT("unableToConnect")}
+                <p className="break-all font-mono mt-2 pt-2 border-t border-red-400">
+                    {error.url}
+                </p>
+            </div>}
+            icon={ReportProblemIcon}
+            iconColor="negative-main" />
+        : null}
         <div className="lg:flex items-start">
             <div className="flex-1">
                 <div className="card">
@@ -323,4 +328,4 @@ export default function Dashboard() {
             </div>
         </div>
     </>
-}
+})

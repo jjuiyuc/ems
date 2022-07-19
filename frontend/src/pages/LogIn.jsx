@@ -27,10 +27,12 @@ function LogIn(props) {
         changeEmail = (e) => {
             setEmail(e.target.value)
             setEmailError(null)
+            setOtherError("")
         },
         changePassword = (e) => {
             setPassword(e.target.value)
             setPasswordError(false)
+            setOtherError("")
         },
         submit = async () => {
             const isEmail = ValidateEmail(email)

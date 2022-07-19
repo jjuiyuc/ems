@@ -10,8 +10,9 @@ export const apiCall = async ({
     onSuccess = () => { },
     onError = () => { }
 }) => {
-    url = `${API_HOST}${url}`
-    const { token } = store.getState().user.value
+    const {protocol} = window.location, {token} = store.getState().user.value
+
+    url = `${protocol}//${API_HOST}${url}`
 
     try {
         const res = await axios({

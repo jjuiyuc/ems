@@ -22,8 +22,10 @@
         "exportToGrid": "Export to Grid",
         "importFromGrid": "Import From Grid",
         "load": "Load",
+        "noWebsocketSupport": "Your browser does not support WebSockets.",
         "peakShave": "Peak Shave",
-        "stateOfCharge": "State of Charge"
+        "stateOfCharge": "State of Charge",
+        "unableToConnect": "Unable to connect"
     },
     "error": {
         "emailFormat": "Email is incorrect, please try again.",

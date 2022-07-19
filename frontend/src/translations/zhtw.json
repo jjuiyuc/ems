@@ -22,8 +22,10 @@
         "exportToGrid": "Export to Grid",
         "importFromGrid": "電網導入",
         "load": "負載",
+        "noWebsocketSupport": "您的瀏覽器不支援 WebSocket",
         "peakShave": "Peak Shave",
-        "stateOfCharge": "充電狀態"
+        "stateOfCharge": "充電狀態",
+        "unableToConnect": "無法建立連線"
     },
     "error": {
         "emailFormat": "Email 帳號格式錯誤，請重新輸入。",

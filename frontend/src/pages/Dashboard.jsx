@@ -293,7 +293,7 @@ export default connect(mapState)(function Dashboard(props) {
                     <div className="flex-col justify-between
                                     hidden md:flex lg:hidden xl:flex">
                         <div><LoadCard arrow="right" /></div>
-                        <div><GridCard arrow="right" /></div>
+                        <div><BatteryCard arrow="right" /></div>
                     </div>
                     <ElectricalGridDiagram
                         className="h-auto w-full
@@ -308,7 +308,7 @@ export default connect(mapState)(function Dashboard(props) {
                     </div>
                     <div className="flex-col justify-between
                                     hidden md:flex lg:hidden xl:flex">
-                        <div><BatteryCard arrow="left" /></div>
+                        <div><GridCard arrow="left" /></div>
                         <div><SolarCard arrow="left" /></div>
                     </div>
                 </div>

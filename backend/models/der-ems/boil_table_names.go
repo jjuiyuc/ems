@@ -4,27 +4,29 @@
 package deremsmodels
 
 var TableNames = struct {
-	CCData          string
-	Customer        string
-	Device          string
-	DeviceModel     string
-	Gateway         string
-	LoginLog        string
-	Tou             string
-	TouHoliday      string
-	TouLocation     string
-	User            string
-	WeatherForecast string
+	CCData           string
+	Customer         string
+	Device           string
+	DeviceModel      string
+	Gateway          string
+	LoginLog         string
+	Tou              string
+	TouHoliday       string
+	TouLocation      string
+	User             string
+	UserGatewayRight string
+	WeatherForecast  string
 }{
-	CCData:          "cc_data",
-	Customer:        "customer",
-	Device:          "device",
-	DeviceModel:     "device_model",
-	Gateway:         "gateway",
-	LoginLog:        "login_log",
-	Tou:             "tou",
-	TouHoliday:      "tou_holiday",
-	TouLocation:     "tou_location",
-	User:            "user",
-	WeatherForecast: "weather_forecast",
+	CCData:           "cc_data",
+	Customer:         "customer",
+	Device:           "device",
+	DeviceModel:      "device_model",
+	Gateway:          "gateway",
+	LoginLog:         "login_log",
+	Tou:              "tou",
+	TouHoliday:       "tou_holiday",
+	TouLocation:      "tou_location",
+	User:             "user",
+	UserGatewayRight: "user_gateway_right",
+	WeatherForecast:  "weather_forecast",
 }

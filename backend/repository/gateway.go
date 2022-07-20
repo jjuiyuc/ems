@@ -12,6 +12,7 @@ import (
 type GatewayRepository interface {
 	GetGatewayByGatewayUUID(gwUUID string) (*deremsmodels.Gateway, error)
 	GetGatewaysByLocation(lat, lng float32) ([]*deremsmodels.Gateway, error)
+	GetGatewaysByUserID(userID int) ([]*deremsmodels.Gateway, error)
 	GetGateways() ([]*deremsmodels.Gateway, error)
 }
 
@@ -35,6 +36,13 @@ func (repo defaultGatewayRepository) GetGatewaysByLocation(lat, lng float32) ([]
 	return deremsmodels.Gateways(
 		qm.InnerJoin("customer AS c ON gateway.customer_id = c.id"),
 		qm.Where("(c.weather_lat = ? AND c.weather_lng = ?)", lat, lng)).All(repo.db)
+}
+
+// GetGatewaysByUserID godoc
+func (repo defaultGatewayRepository) GetGatewaysByUserID(userID int) ([]*deremsmodels.Gateway, error) {
+	return deremsmodels.Gateways(
+		qm.InnerJoin("user_gateway_right AS u ON gateway.id = u.gw_id"),
+		qm.Where("(u.user_id = ?)", userID)).All(repo.db)
 }
 
 // GetGateways godoc

@@ -1,12 +1,8 @@
 import { Button, Stack, TextField, Box } from "@mui/material"
-// import { DateRangePickerDay, LocalizationProvider } from '@mui/x-date-pickers-pro'
-// import { AdapterDateFns } from '@mui/x-date-pickers-pro/AdapterDateFns'
-// import { StaticDateRangePicker } from '@mui/x-date-pickers-pro/StaticDateRangePicker'
-// import { DateRangePicker } from "materialui-daterange-picker"
 import { CalendarToday, Today } from "@mui/icons-material"
 import { DateRangePicker } from "materialui-daterange-picker"
 
-import { Fragment as Frag, useEffect, useRef, useState } from "react"
+import { Fragment as Frag, useEffect, useRef, useState, useMemo } from "react"
 import moment from "moment"
 import { useTranslation } from "react-multi-lang"
 
@@ -17,9 +13,12 @@ import "../assets/css/datePicker.scss"
 const { colors } = variables
 
 const dateFormat = "YYYY-MM-DD"
+const defaultDate = {
+    startDate: moment().format(dateFormat),
+    endDate: moment().format(dateFormat)
+}
 
 export default function Analysis() {
-
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
@@ -35,14 +34,14 @@ export default function Analysis() {
             <span className="inline-block mr-1">
                 {pageT("energyDestinations")}
             </span>
-
         </>
     }
 
-    const [open, setOpen] = useState(false);
-    const [dateRange, setDateRange] = useState({});
+    const [open, setOpen] = useState(false)
+    const [dateRange, setDateRange] = useState(defaultDate)
+    const [tempDateRange, setTempDateRange] = useState({ ...dateRange })
 
-    const toggle = () => setOpen(!open);
+    const toggle = () => setOpen(!open)
 
     const
         [totalEnergySources, setTotalEnergySources] = useState({
@@ -66,8 +65,22 @@ export default function Analysis() {
         [tab, setTab] = useState("days")
 
 
+    const onApply = () => {
+        toggle()
+        setDateRange(tempDateRange)
+    }
 
-
+    const onCancel = () => {
+        toggle()
+    }
+    // dateRange === tempDateRange
+    // tempDateRange lacks  startDate endDate
+    const applyDisabled = useMemo(() => {
+        const { startDate, endDate } = dateRange
+        console.log(startDate, endDate)
+        const { startDate: tempStartDate, endDate: tempEndDate } = tempDateRange
+        if (!tempStartDate || !tempEndDate) return true
+    }, [dateRange, tempDateRange])
 
     return <>
         <div className="page-header">
@@ -108,12 +121,9 @@ export default function Analysis() {
                     variant="contained">
                     {pageT("custom")}
                 </Button>
-                {/* {tab === "custom" */}
-                {/* ?  */}
-                {/* : null} */}
             </Stack>
         </div>
-        <div className="flex justify-end mb-10 relative w-auto">
+        {tab === 'custom' ? <div className="flex justify-end mb-10 relative w-auto">
             <div className="flex items-center">
                 <TextField
                     InputProps={{
@@ -141,23 +151,29 @@ export default function Analysis() {
             </div>
             <div className="absolute mt-2 top-full">
                 <DateRangePicker
-                    onChange={(range) => setDateRange(range)}
+                    onChange={(range) => {
+                        console.log(123)
+                        setTempDateRange(range)
+                    }}
                     open={open}
                     toggle={toggle}
-                    maxDate={Today}
+                    maxDate={new Date}
+                    // minDate={}
+                    definedRanges={[]}
                     wrapperClassName="date-range-picker"
                 />
                 {open &&
                     <div className="date-range-picker-wrapper flex">
                         <Button
-                            onClick={() => setTab("cancel")}
+                            onClick={onCancel}
                             className="date-range-button"
                             radius="pill"
                             variant="contained">
                             {pageT("cancel")}
                         </Button>
                         <Button
-                            onClick={() => setTab("apply")}
+                            onClick={onApply}
+                            disabled={applyDisabled}
                             className="date-range-button"
                             radius="pill"
                             variant="contained">
@@ -165,7 +181,7 @@ export default function Analysis() {
                         </Button>
                     </div>}
             </div>
-        </div>
+        </div> : null}
         <div className="gap-8 grid md:grid-cols-2 items-start">
             <AnalysisCard data={totalEnergySources} title={analysisCardTitle("totalEnergySources")} />
             <AnalysisCard data={energyDestinations} title={analysisCardTitle("energyDestinations")} />

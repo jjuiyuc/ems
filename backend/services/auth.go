@@ -99,7 +99,7 @@ func (s defaultAuthService) CreateLoginLog(user *deremsmodels.User, token string
 	err = s.repo.User.InsertLoginLog(loginLog)
 	if err != nil {
 		log.WithFields(log.Fields{
-			"caused-by": "s.repo.InsertLoginLog",
+			"caused-by": "s.repo.User.InsertLoginLog",
 			"err":       err,
 		}).Error()
 	}

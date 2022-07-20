@@ -45,7 +45,7 @@ func (s defaultUserService) CreatePasswordToken(username string) (name, token st
 	user, err := s.repo.User.GetUserByUsername(username)
 	if err != nil {
 		log.WithFields(log.Fields{
-			"caused-by": "s.repo.GetUserByUsername",
+			"caused-by": "s.repo.User.GetUserByUsername",
 			"err":       err,
 		}).Error()
 		return
@@ -57,7 +57,7 @@ func (s defaultUserService) CreatePasswordToken(username string) (name, token st
 	err = s.repo.User.UpdateUser(user)
 	if err != nil {
 		log.WithFields(log.Fields{
-			"caused-by": "s.repo.UpdateUser",
+			"caused-by": "s.repo.User.UpdateUser",
 			"err":       err,
 		}).Error()
 		return
@@ -92,7 +92,7 @@ func (s defaultUserService) PasswordResetByPasswordToken(token, newPassword stri
 	err = s.repo.User.UpdateUser(user)
 	if err != nil {
 		log.WithFields(log.Fields{
-			"caused-by": "s.repo.UpdateUser",
+			"caused-by": "s.repo.User.UpdateUser",
 			"err":       err,
 		}).Error()
 	}

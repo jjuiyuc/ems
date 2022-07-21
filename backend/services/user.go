@@ -16,11 +16,23 @@ import (
 type UserService interface {
 	CreatePasswordToken(username string) (name, token string, err error)
 	PasswordResetByPasswordToken(token, newPassword string) (err error)
-	GetProfile(userID int) (user *deremsmodels.User, err error)
+	GetProfile(userID int) (profile *ProfileResponse, err error)
 }
 
 type defaultUserService struct {
 	repo *repository.Repository
+}
+
+// ProfileResponse godoc
+type ProfileResponse struct {
+	*deremsmodels.User
+	Gateways []GatewayInfo `json:"gateways"`
+}
+
+// GatewayInfo godoc
+type GatewayInfo struct {
+	GatewayID string `json:"gatewayID"`
+	Address   string `json:"address"`
 }
 
 // NewUserService godoc
@@ -33,7 +45,7 @@ func (s defaultUserService) CreatePasswordToken(username string) (name, token st
 	user, err := s.repo.User.GetUserByUsername(username)
 	if err != nil {
 		log.WithFields(log.Fields{
-			"caused-by": "s.repo.GetUserByUsername",
+			"caused-by": "s.repo.User.GetUserByUsername",
 			"err":       err,
 		}).Error()
 		return
@@ -45,7 +57,7 @@ func (s defaultUserService) CreatePasswordToken(username string) (name, token st
 	err = s.repo.User.UpdateUser(user)
 	if err != nil {
 		log.WithFields(log.Fields{
-			"caused-by": "s.repo.UpdateUser",
+			"caused-by": "s.repo.User.UpdateUser",
 			"err":       err,
 		}).Error()
 		return
@@ -80,7 +92,7 @@ func (s defaultUserService) PasswordResetByPasswordToken(token, newPassword stri
 	err = s.repo.User.UpdateUser(user)
 	if err != nil {
 		log.WithFields(log.Fields{
-			"caused-by": "s.repo.UpdateUser",
+			"caused-by": "s.repo.User.UpdateUser",
 			"err":       err,
 		}).Error()
 	}
@@ -88,13 +100,49 @@ func (s defaultUserService) PasswordResetByPasswordToken(token, newPassword stri
 }
 
 // GetProfile godoc
-func (s defaultUserService) GetProfile(userID int) (user *deremsmodels.User, err error) {
-	user, err = s.repo.User.GetProfileByUserID(userID)
+func (s defaultUserService) GetProfile(userID int) (profile *ProfileResponse, err error) {
+	// Get user information
+	user, err := s.repo.User.GetUserByUserID(userID)
 	if err != nil {
 		log.WithFields(log.Fields{
-			"caused-by": "s.repo.GetProfileByUserID",
+			"caused-by": "s.repo.User.GetUserByUserID",
 			"err":       err,
 		}).Error()
+		return
+	}
+
+	// Get gateway information
+	gateways, err := s.repo.Gateway.GetGatewaysByUserID(userID)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "s.repo.Gateway.GetGatewaysByUserID",
+			"err":       err,
+		}).Error()
+		return
+	}
+	gatewayInfos := []GatewayInfo{}
+	for _, gateway := range gateways {
+		log.Debug("gateway.UUID: ", gateway.UUID)
+		customer, err := s.repo.Customer.GetCustomerByCustomerID(gateway.CustomerID)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"caused-by": "s.repo.Customer.GetCustomerByCustomerID",
+				"err":       err,
+			}).Error()
+			continue
+		}
+		log.Debug("customer.Address: ", customer.Address)
+
+		gatewayInfo := GatewayInfo{
+			GatewayID: gateway.UUID,
+			Address:   customer.Address.String,
+		}
+		gatewayInfos = append(gatewayInfos, gatewayInfo)
+	}
+
+	profile = &ProfileResponse{
+		User:     user,
+		Gateways: gatewayInfos,
 	}
 	return
 }

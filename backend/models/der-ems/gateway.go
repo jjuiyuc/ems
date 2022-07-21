@@ -79,17 +79,20 @@ var GatewayWhere = struct {
 
 // GatewayRels is where relationship names are stored.
 var GatewayRels = struct {
-	Customer  string
-	GWDevices string
+	Customer            string
+	GWDevices           string
+	GWUserGatewayRights string
 }{
-	Customer:  "Customer",
-	GWDevices: "GWDevices",
+	Customer:            "Customer",
+	GWDevices:           "GWDevices",
+	GWUserGatewayRights: "GWUserGatewayRights",
 }
 
 // gatewayR is where relationships are stored.
 type gatewayR struct {
-	Customer  *Customer   `boil:"Customer" json:"Customer" toml:"Customer" yaml:"Customer"`
-	GWDevices DeviceSlice `boil:"GWDevices" json:"GWDevices" toml:"GWDevices" yaml:"GWDevices"`
+	Customer            *Customer             `boil:"Customer" json:"Customer" toml:"Customer" yaml:"Customer"`
+	GWDevices           DeviceSlice           `boil:"GWDevices" json:"GWDevices" toml:"GWDevices" yaml:"GWDevices"`
+	GWUserGatewayRights UserGatewayRightSlice `boil:"GWUserGatewayRights" json:"GWUserGatewayRights" toml:"GWUserGatewayRights" yaml:"GWUserGatewayRights"`
 }
 
 // NewStruct creates a new relationship struct
@@ -109,6 +112,13 @@ func (r *gatewayR) GetGWDevices() DeviceSlice {
 		return nil
 	}
 	return r.GWDevices
+}
+
+func (r *gatewayR) GetGWUserGatewayRights() UserGatewayRightSlice {
+	if r == nil {
+		return nil
+	}
+	return r.GWUserGatewayRights
 }
 
 // gatewayL is where Load methods for each relationship are stored.
@@ -236,6 +246,20 @@ func (o *Gateway) GWDevices(mods ...qm.QueryMod) deviceQuery {
 	)
 
 	return Devices(queryMods...)
+}
+
+// GWUserGatewayRights retrieves all the user_gateway_right's UserGatewayRights with an executor via gw_id column.
+func (o *Gateway) GWUserGatewayRights(mods ...qm.QueryMod) userGatewayRightQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("`user_gateway_right`.`gw_id`=?", o.ID),
+	)
+
+	return UserGatewayRights(queryMods...)
 }
 
 // LoadCustomer allows an eager lookup of values, cached into the
@@ -425,6 +449,97 @@ func (gatewayL) LoadGWDevices(e boil.Executor, singular bool, maybeGateway inter
 	return nil
 }
 
+// LoadGWUserGatewayRights allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (gatewayL) LoadGWUserGatewayRights(e boil.Executor, singular bool, maybeGateway interface{}, mods queries.Applicator) error {
+	var slice []*Gateway
+	var object *Gateway
+
+	if singular {
+		object = maybeGateway.(*Gateway)
+	} else {
+		slice = *maybeGateway.(*[]*Gateway)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &gatewayR{}
+		}
+		args = append(args, object.ID)
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &gatewayR{}
+			}
+
+			for _, a := range args {
+				if queries.Equal(a, obj.ID) {
+					continue Outer
+				}
+			}
+
+			args = append(args, obj.ID)
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(
+		qm.From(`user_gateway_right`),
+		qm.WhereIn(`user_gateway_right.gw_id in ?`, args...),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.Query(e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load user_gateway_right")
+	}
+
+	var resultSlice []*UserGatewayRight
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice user_gateway_right")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on user_gateway_right")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for user_gateway_right")
+	}
+
+	if singular {
+		object.R.GWUserGatewayRights = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &userGatewayRightR{}
+			}
+			foreign.R.GW = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if queries.Equal(local.ID, foreign.GWID) {
+				local.R.GWUserGatewayRights = append(local.R.GWUserGatewayRights, foreign)
+				if foreign.R == nil {
+					foreign.R = &userGatewayRightR{}
+				}
+				foreign.R.GW = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
 // SetCustomer of the gateway to the related item.
 // Sets o.R.Customer to related.
 // Adds o to related.R.Gateways.
@@ -520,6 +635,131 @@ func (o *Gateway) AddGWDevices(exec boil.Executor, insert bool, related ...*Devi
 			rel.R.GW = o
 		}
 	}
+	return nil
+}
+
+// AddGWUserGatewayRights adds the given related objects to the existing relationships
+// of the gateway, optionally inserting them as new records.
+// Appends related to o.R.GWUserGatewayRights.
+// Sets related.R.GW appropriately.
+func (o *Gateway) AddGWUserGatewayRights(exec boil.Executor, insert bool, related ...*UserGatewayRight) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			queries.Assign(&rel.GWID, o.ID)
+			if err = rel.Insert(exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE `user_gateway_right` SET %s WHERE %s",
+				strmangle.SetParamNames("`", "`", 0, []string{"gw_id"}),
+				strmangle.WhereClause("`", "`", 0, userGatewayRightPrimaryKeyColumns),
+			)
+			values := []interface{}{o.ID, rel.ID}
+
+			if boil.DebugMode {
+				fmt.Fprintln(boil.DebugWriter, updateQuery)
+				fmt.Fprintln(boil.DebugWriter, values)
+			}
+			if _, err = exec.Exec(updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			queries.Assign(&rel.GWID, o.ID)
+		}
+	}
+
+	if o.R == nil {
+		o.R = &gatewayR{
+			GWUserGatewayRights: related,
+		}
+	} else {
+		o.R.GWUserGatewayRights = append(o.R.GWUserGatewayRights, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &userGatewayRightR{
+				GW: o,
+			}
+		} else {
+			rel.R.GW = o
+		}
+	}
+	return nil
+}
+
+// SetGWUserGatewayRights removes all previously related items of the
+// gateway replacing them completely with the passed
+// in related items, optionally inserting them as new records.
+// Sets o.R.GW's GWUserGatewayRights accordingly.
+// Replaces o.R.GWUserGatewayRights with related.
+// Sets related.R.GW's GWUserGatewayRights accordingly.
+func (o *Gateway) SetGWUserGatewayRights(exec boil.Executor, insert bool, related ...*UserGatewayRight) error {
+	query := "update `user_gateway_right` set `gw_id` = null where `gw_id` = ?"
+	values := []interface{}{o.ID}
+	if boil.DebugMode {
+		fmt.Fprintln(boil.DebugWriter, query)
+		fmt.Fprintln(boil.DebugWriter, values)
+	}
+	_, err := exec.Exec(query, values...)
+	if err != nil {
+		return errors.Wrap(err, "failed to remove relationships before set")
+	}
+
+	if o.R != nil {
+		for _, rel := range o.R.GWUserGatewayRights {
+			queries.SetScanner(&rel.GWID, nil)
+			if rel.R == nil {
+				continue
+			}
+
+			rel.R.GW = nil
+		}
+		o.R.GWUserGatewayRights = nil
+	}
+
+	return o.AddGWUserGatewayRights(exec, insert, related...)
+}
+
+// RemoveGWUserGatewayRights relationships from objects passed in.
+// Removes related items from R.GWUserGatewayRights (uses pointer comparison, removal does not keep order)
+// Sets related.R.GW.
+func (o *Gateway) RemoveGWUserGatewayRights(exec boil.Executor, related ...*UserGatewayRight) error {
+	if len(related) == 0 {
+		return nil
+	}
+
+	var err error
+	for _, rel := range related {
+		queries.SetScanner(&rel.GWID, nil)
+		if rel.R != nil {
+			rel.R.GW = nil
+		}
+		if _, err = rel.Update(exec, boil.Whitelist("gw_id")); err != nil {
+			return err
+		}
+	}
+	if o.R == nil {
+		return nil
+	}
+
+	for _, rel := range related {
+		for i, ri := range o.R.GWUserGatewayRights {
+			if rel != ri {
+				continue
+			}
+
+			ln := len(o.R.GWUserGatewayRights)
+			if ln > 1 && i < ln-1 {
+				o.R.GWUserGatewayRights[i] = o.R.GWUserGatewayRights[ln-1]
+			}
+			o.R.GWUserGatewayRights = o.R.GWUserGatewayRights[:ln-1]
+			break
+		}
+	}
+
 	return nil
 }
 

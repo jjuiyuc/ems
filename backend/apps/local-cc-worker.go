@@ -134,12 +134,12 @@ func (h localCCConsumerHandler) saveLocalCCData(msg []byte) (err error) {
 		LocalCCData: null.NewJSON(dataJSON, true),
 	}
 
-	gateway, err := h.repo.Gateway.GetCustomerIDByGatewayUUID(gwUUID)
+	gateway, err := h.repo.Gateway.GetGatewayByGatewayUUID(gwUUID)
 	if err == nil {
 		ccData.CustomerID = null.NewInt(gateway.CustomerID, true)
 	} else {
 		log.WithFields(log.Fields{
-			"caused-by": "h.repo.Gateway.GetCustomerIDByGatewayUUID",
+			"caused-by": "h.repo.Gateway.GetGatewayByGatewayUUID",
 			"err":       err,
 		}).Warn()
 	}

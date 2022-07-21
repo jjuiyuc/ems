@@ -33,4 +33,4 @@ port    = 3306
 user    = "ubiik"
 pass    = "testing123"
 sslmode = "false"
-whitelist = ["weather_forecast", "customer", "gateway", "device_model", "device", "login_log", "user", "cc_data", "tou", "tou_holiday", "tou_location"]
+whitelist = ["weather_forecast", "customer", "gateway", "device_model", "device", "login_log", "user", "cc_data", "tou", "tou_holiday", "tou_location", "user_gateway_right"]

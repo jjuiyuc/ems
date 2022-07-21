@@ -16,7 +16,7 @@ type UserRepository interface {
 	InsertLoginLog(loginLog *deremsmodels.LoginLog) error
 	UpdateUser(user *deremsmodels.User) (err error)
 	GetLoginLogCount() (int64, error)
-	GetProfileByUserID(userID int) (*deremsmodels.User, error)
+	GetUserByUserID(userID int) (*deremsmodels.User, error)
 	GetUserByUsername(username string) (*deremsmodels.User, error)
 	GetUserByPasswordToken(token string) (*deremsmodels.User, error)
 }
@@ -50,8 +50,8 @@ func (repo defaultUserRepository) GetLoginLogCount() (int64, error) {
 	return deremsmodels.LoginLogs().Count(repo.db)
 }
 
-// GetProfileByUserID godoc
-func (repo defaultUserRepository) GetProfileByUserID(userID int) (*deremsmodels.User, error) {
+// GetUserByUserID godoc
+func (repo defaultUserRepository) GetUserByUserID(userID int) (*deremsmodels.User, error) {
 	return deremsmodels.FindUser(repo.db, userID)
 }
 

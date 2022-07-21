@@ -6,6 +6,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// PrintFunctionName godoc
 func PrintFunctionName() {
 	pc := make([]uintptr, 10)
 	runtime.Callers(2, pc)

@@ -56,6 +56,9 @@ $white-main:#EEECF1;
     [class*=materialui-daterange-picker-MuiSvgIcon-colorDisabled]{
         color: $gray-300;
     }
+    [class*=materialui-daterange-picker-MuiInput-underline]:after{
+        border-bottom: 2px solid $brand-main;
+    }
   
     
 }

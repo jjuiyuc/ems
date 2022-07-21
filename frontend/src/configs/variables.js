@@ -1,15 +1,16 @@
 import palette from "./palette.json"
 
-const {gray, primary} = palette
+const {blue, gray, primary} = palette
 
 const variables = {
     colors: {
-        battery: palette.blue.main,
+        battery: blue.main,
+        blue,
         gray,
         grid: palette.indigo.main,
         midPeak: palette.green.main,
         primary,
-        onPeak: palette.blue.main,
+        onPeak: blue.main,
         offPeak: palette.purple.main,
         solar: palette.yellow.main,
         superOffPeak: palette.yellow.main,

@@ -22,17 +22,30 @@ Chart.register(
 
 import variables from "../configs/variables"
 
+const
+    {colors} = variables,
+    datasetCommonOpts = {
+        borderWidth: 1,
+        hoverRadius: 3,
+        pointHoverBorderWidth: 6,
+        pointBorderWidth: 0,
+        radius: 3,
+        tension: 0
+    }
+const createDatasets = datasets => datasets.map(item => ({
+    ...datasetCommonOpts,
+    ...item
+}))
+
 export default function LineChart(props) {
     const [chart, setChart] = useState(null)
-
-    const { colors } = variables
 
     useEffect(() => {
         const
             ctx = document.getElementById(props.id),
             chart = new Chart(ctx, {
                 data: {
-                    datasets: props.data.datasets,
+                    datasets: createDatasets(props.data.datasets),
                     labels: props.data.labels
                 },
                 options: {
@@ -47,7 +60,17 @@ export default function LineChart(props) {
                             boxPadding: 4,
                             bodyFont: { size: 13 },
                             callbacks: {
-                                ...props.data.tooltipCallbacks
+                                label: props.data.tooltipLabel,
+                                labelPointStyle: context => {
+                                    const
+                                        color = context.dataset.backgroundColor
+                                                .replace("#", "%23"),
+                                        image = new Image(8, 8)
+
+                                    image.src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='8' width='8'%3E%3Ccircle cx='4' cy='4' r ='4' fill='${color}' /%3E%3C/svg%3E`
+
+                                    return { pointStyle: image }
+                                }
                             },
                             caretPadding: 12,
                             caretSize: 8,
@@ -70,7 +93,9 @@ export default function LineChart(props) {
                     scales: {
                         x: {
                             grid: {
-                                lineWidth: 0
+                                borderDash: [1, 2],
+                                color: colors.gray[400],
+                                drawTicks: false
                             },
                             ticks: {
                                 autoSkip: true,
@@ -79,8 +104,9 @@ export default function LineChart(props) {
                                 font: {
                                     size: 11
                                 },
-                                padding: 0
-                            }
+                                padding: 10
+                            },
+                            ...props.data?.x
                         },
                         y: {
                             grid: {
@@ -88,8 +114,6 @@ export default function LineChart(props) {
                                 color: colors.gray[400],
                                 drawTicks: false
                             },
-                            max: 80,
-                            min: 0,
                             ticks: {
                                 color: colors.gray[200],
                                 font: {
@@ -97,7 +121,8 @@ export default function LineChart(props) {
                                 },
                                 padding: 10,
                                 callback: props.data.tickCallback
-                            }
+                            },
+                            ...props.data?.y
                         }
                     }
                 },
@@ -128,12 +153,13 @@ export default function LineChart(props) {
         return () => chart.destroy()
     }, [])
 
-    // useEffect(() => {
-    //     if (chart) {
-    //         chart.data.datasets = [props.dataset]
-    //         chart.update()
-    //     }
-    // }, [props.dataset])
+    useEffect(() => {
+        if (chart) {
+            chart.data.datasets = createDatasets(props.data.datasets)
+            chart.data.labels = props.data.labels
+            chart.update()
+        }
+    }, [props.data])
 
     return <canvas className="h-full relative w-full" id={props.id} />
 }

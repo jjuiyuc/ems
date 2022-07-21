@@ -8,7 +8,8 @@
         "kw": "kW",
         "kwh": "kWh",
         "passwordRule": "Password must be at least six characters long, and include 3 out of 4 of the following: uppercase letter, lowercase letter, numeric character and special character.",
-        "solar": "Solar"
+        "solar": "Solar",
+        "today": "Today"
     },
     "dashboard": {
         "active": "Active",
@@ -26,6 +27,24 @@
         "peakShave": "Peak Shave",
         "stateOfCharge": "State of Charge",
         "unableToConnect": "Unable to connect"
+    },
+    "energyResources": {
+        "battery": {
+            "batteryInformation": "Battery Information",
+            "batteryOperationCycles": "Battery Operation Cycles",
+            "batteryPower": "Battery Power",
+            "capacity": "Capacity",
+            "charged": "Charged",
+            "chargingDischargingPower": "Charging / Discharging Power",
+            "discharged": "Discharged",
+            "lifetime": "Lifetime",
+            "modal": "Modal",
+            "percentage": "Percentage",
+            "powerSources": "Power Sources",
+            "stateOfCharge": "State of Charge (SOC)",
+            "stateOfChargeVoltage": "State of Charge and Voltage",
+            "voltage": "Voltage"
+        }
     },
     "error": {
         "emailFormat": "Email is incorrect, please try again.",
@@ -81,7 +100,6 @@
         "stateOfCharge": "State of Charge",
         "superOffPeak": "Super off-peak",
         "timeOfUse": "Time of Use",
-        "today": "Today",
         "totalUntilNow": "Total Until Now",
         "yesterday": "Yesterday"
     }

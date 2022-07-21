@@ -8,6 +8,7 @@ import TopNav from "../components/TopNav"
 import Sample from "../configs/Sample"
 
 import Dashboard from "../pages/Dashboard"
+import EnergyResoucesBattery from "../pages/EnergyResoucesBattery"
 import TimeOfUse from "../pages/TimeOfUse"
 
 function LoggedIn (props) {
@@ -38,11 +39,18 @@ function LoggedIn (props) {
                         <Route element={<TimeOfUse />} path="/time-of-use" />
                         <Route element={<Sample />} path="/economics" />
                         <Route element={<Sample />} path="/demand-charge" />
-                        <Route element={<Sample />} path="/energy-resources" />
+                        <Route
+                            element={<EnergyResoucesBattery />}
+                            path="/energy-resources/battery" />
                         <Route element={<Sample />} path="/settings" />
                         <Route
-                            path="*"
-                            element={<Navigate to="/dashboard" replace />}/>
+                            element={<Navigate
+                                        replace
+                                        to="/energy-resources/battery" />}
+                            path="/energy-resources" />
+                        <Route
+                            element={<Navigate to="/dashboard" replace />}
+                            path="*" />
                     </Routes>
                 </div>
             </div>

@@ -8,7 +8,8 @@
         "kw": "kW",
         "kwh": "kWh",
         "passwordRule": "密碼長度至少為 8 個字元，且必須包含下列 4 種字元中的 3 種：英文大寫字元、英文小寫字元、數字、特殊符號。",
-        "solar": "太陽能"
+        "solar": "太陽能",
+        "today": "今天"
     },
     "dashboard": {
         "active": "Active",
@@ -26,6 +27,24 @@
         "peakShave": "Peak Shave",
         "stateOfCharge": "充電狀態",
         "unableToConnect": "無法建立連線"
+    },
+    "energyResources": {
+        "battery": {
+            "batteryInformation": "Battery Information",
+            "batteryOperationCycles": "Battery Operation Cycles",
+            "batteryPower": "Battery Power",
+            "capacity": "Capacity",
+            "charged": "Charged",
+            "chargingDischargingPower": "Charging / Discharging Power",
+            "discharged": "Discharged",
+            "lifetime": "Lifetime",
+            "modal": "Modal",
+            "percentage": "百分比",
+            "powerSources": "Power Sources",
+            "stateOfCharge": "State of Charge (SOC)",
+            "stateOfChargeVoltage": "State of Charge and Voltage",
+            "voltage": "Voltage"
+        }
     },
     "error": {
         "emailFormat": "Email 帳號格式錯誤，請重新輸入。",
@@ -81,7 +100,6 @@
         "stateOfCharge": "充電狀態",
         "superOffPeak": "Super off-peak",
         "timeOfUse": "Time of Use",
-        "today": "今天",
         "totalUntilNow": "Total Until Now",
         "yesterday": "昨日"
     }

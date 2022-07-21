@@ -79,6 +79,40 @@ const theme = createTheme({
                 },
             ]
         },
+        MuiButtonGroup: {
+            styleOverrides: {
+                root: ({ownerState, theme}) => {
+                    if (!ownerState.variant.includes("ubiik")) return null
+
+                    let styles = {
+                        boxShadow: "none",
+                        "button": {
+                            background: theme.palette.gray[900],
+                            border: "none !important",
+                            borderRadius: "1.25em",
+                            color: theme.palette.gray[200],
+                            fontWeight: "700",
+                            lineHeight: "1.171875",
+                            padding: "1em 2em",
+                            "&:hover": {
+                                background: theme.palette.gray[800],
+                            },
+                            "&[aria-current=true]": {
+                                background: theme.palette.gray[600],
+                            }
+                        }
+                    }
+
+                    if ("amount" in ownerState) {
+                        styles.display = "inline-grid"
+                        styles.gridTemplateColumns
+                            = `repeat(${ownerState.amount}, 1fr)`
+                    }
+
+                    return styles
+                }
+            }
+        },
         MuiFormHelperText: {
             styleOverrides: {
                 root: {

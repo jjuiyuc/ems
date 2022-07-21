@@ -62,6 +62,9 @@ h6 {
     &.narrow {
         @apply px-4 md:px-6;
     }
+    &.short {
+        @apply py-4 md:py-6;
+    }
 
     .header {
         @apply sm:flex items-center h-9 justify-between mb-6;

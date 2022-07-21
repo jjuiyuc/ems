@@ -56,39 +56,20 @@ export default function TimeOfUse() {
         [currentTime, setCurrentTime] = useState(""),
         [lineChartData, setLineChartData] = useState({
             datasets: [{
-                backgroundColor: "#12c9c9",
-                borderColor: "#12c9c9",
-                borderWidth: 1,
+                backgroundColor: colors.primary.main,
+                borderColor: colors.primary.main,
                 data: lineChartDataArray,
                 fill: {
-                    above: "rgba(18, 201, 201, .2)",
+                    above: colors.primary["main-opacity-10"],
                     target: "origin"
                 },
-                hoverRadius: 3,
-                pointBorderColor: "rgba(18, 201, 201, .2)",
-                pointHoverBorderWidth: 6,
-                pointBorderWidth: 0,
-                radius: 3,
-                tension: 0
+                pointBorderColor: colors.primary["main-opacity-20"]
             }],
             labels: lineChartDateLabels,
-            tooltipCallbacks: {
-                label: item => `${item.parsed.y}%`,
-                labelPointStyle: context => {
-                    const
-                        color = context.dataset.backgroundColor
-                            .replace("#", "%23"),
-                        image = new Image(8, 8)
-
-                    image.className = "test"
-                    image.src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='8' width='8'%3E%3Ccircle cx='4' cy='4' r ='4' fill='${color}' /%3E%3C/svg%3E`
-
-                    return { pointStyle: image }
-                }
-            },
-            tickCallback: function (val, index) {
-                return val + '%'
-            }
+            tickCallback: (val, index) => val + "%",
+            tooltipLabel: item => `${item.parsed.y}%`,
+            x: {grid: {lineWidth: 0}},
+            y: {max: 80, min: 0}
         }),
         [midPeak, setMidPeak] = useState({
             types: [
@@ -228,7 +209,7 @@ export default function TimeOfUse() {
                     filter={tab === "today" ? "selected" : ""}
                     radius="pill"
                     variant="contained">
-                    {pageT("today")}
+                    {commonT("today")}
                 </Button>
                 <Button
                     filter={tab === "yesterday" ? "selected" : ""}

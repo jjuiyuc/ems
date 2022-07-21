@@ -24,6 +24,7 @@ module.exports = {
             },
             gridTemplateColumns: {
                 "auto-1fr": "auto 1fr",
+                "1fr-1px-1fr": "1fr 1px 1fr",
                 "3-auto": "auto auto auto",
                 "5rem-1fr": "5rem 1fr",
                 "15rem-1fr": "15rem 1fr"

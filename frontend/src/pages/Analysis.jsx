@@ -1,5 +1,5 @@
 import { Button, Stack, TextField, Box } from "@mui/material"
-import { CalendarToday, Today } from "@mui/icons-material"
+import { CalendarToday } from "@mui/icons-material"
 import { DateRangePicker } from "materialui-daterange-picker"
 
 import { Fragment as Frag, useEffect, useRef, useState, useMemo } from "react"
@@ -14,8 +14,8 @@ const { colors } = variables
 
 const dateFormat = "YYYY-MM-DD"
 const defaultDate = {
-    startDate: moment().format(dateFormat),
-    endDate: moment().format(dateFormat)
+    startDate: null,
+    endDate: null
 }
 
 export default function Analysis() {
@@ -37,9 +37,10 @@ export default function Analysis() {
         </>
     }
 
-    const [open, setOpen] = useState(false)
-    const [dateRange, setDateRange] = useState(defaultDate)
-    const [tempDateRange, setTempDateRange] = useState({ ...dateRange })
+    const
+        [open, setOpen] = useState(false),
+        [dateRange, setDateRange] = useState(defaultDate),
+        [tab, setTab] = useState("days")
 
     const toggle = () => setOpen(!open)
 
@@ -60,27 +61,12 @@ export default function Analysis() {
                 { kwh: 25, percentage: 41, type: "chargeToBattery" },
             ],
             kwh: 60
-        }),
-
-        [tab, setTab] = useState("days")
+        })
 
 
-    const onApply = () => {
-        toggle()
-        setDateRange(tempDateRange)
-    }
 
-    const onCancel = () => {
-        toggle()
-    }
-    // dateRange === tempDateRange
-    // tempDateRange lacks  startDate endDate
-    const applyDisabled = useMemo(() => {
-        const { startDate, endDate } = dateRange
-        console.log(startDate, endDate)
-        const { startDate: tempStartDate, endDate: tempEndDate } = tempDateRange
-        if (!tempStartDate || !tempEndDate) return true
-    }, [dateRange, tempDateRange])
+
+
 
     return <>
         <div className="page-header">
@@ -123,65 +109,48 @@ export default function Analysis() {
                 </Button>
             </Stack>
         </div>
-        {tab === 'custom' ? <div className="flex justify-end mb-10 relative w-auto">
-            <div className="flex items-center">
-                <TextField
-                    InputProps={{
-                        endAdornment: <CalendarToday
-                            className="text-gray-300" />
-                    }}
-                    label={pageT("startDate")}
-                    onFocus={() => setOpen(true)}
-                    style={{ marginBottom: 0 }}
-                    type="text"
-                    value={moment(dateRange.startDate).format(dateFormat)}
-                    variant="outlined" />
-                <span className="mx-4">{pageT("to")}</span>
-                <TextField
-                    InputProps={{
-                        endAdornment: <CalendarToday
-                            className="text-gray-300" />
-                    }}
-                    label={pageT("endDate")}
-                    onFocus={() => setOpen(true)}
-                    style={{ marginBottom: 0 }}
-                    type="text"
-                    value={moment(dateRange.endDate).format(dateFormat)}
-                    variant="outlined" />
-            </div>
-            <div className="absolute mt-2 top-full">
-                <DateRangePicker
-                    onChange={(range) => {
-                        console.log(123)
-                        setTempDateRange(range)
-                    }}
-                    open={open}
-                    toggle={toggle}
-                    maxDate={new Date}
-                    // minDate={}
-                    definedRanges={[]}
-                    wrapperClassName="date-range-picker"
-                />
-                {open &&
-                    <div className="date-range-picker-wrapper flex">
-                        <Button
-                            onClick={onCancel}
-                            className="date-range-button"
-                            radius="pill"
-                            variant="contained">
-                            {pageT("cancel")}
-                        </Button>
-                        <Button
-                            onClick={onApply}
-                            disabled={applyDisabled}
-                            className="date-range-button"
-                            radius="pill"
-                            variant="contained">
-                            {pageT("apply")}
-                        </Button>
-                    </div>}
-            </div>
-        </div> : null}
+        {tab === 'custom' ?
+            <div className="flex justify-end mb-10 relative w-auto">
+                <div className="flex items-center">
+                    <TextField
+                        InputProps={{
+                            endAdornment: <CalendarToday
+                                className="text-gray-300" />
+                        }}
+                        label={pageT("startDate")}
+                        onFocus={() => setOpen(true)}
+                        style={{ marginBottom: 0 }}
+                        type="text"
+                        value={dateRange.startDate ? moment(dateRange.startDate).format(dateFormat) : ""}
+                        variant="outlined" />
+                    <span className="mx-4">{pageT("to")}</span>
+                    <TextField
+                        InputProps={{
+                            endAdornment: <CalendarToday
+                                className="text-gray-300" />
+                        }}
+                        label={pageT("endDate")}
+                        onFocus={() => setOpen(true)}
+                        style={{ marginBottom: 0 }}
+                        type="text"
+                        value={dateRange.endDate ? moment(dateRange.endDate).format(dateFormat) : ""}
+                        variant="outlined" />
+                </div>
+                <div className="absolute mt-2 top-full">
+                    <DateRangePicker
+                        onChange={(range) => {
+                            setDateRange(range)
+                        }}
+                        open={open}
+                        toggle={toggle}
+                        maxDate={new Date}
+                        minDate={moment().subtract(1, "y")}
+                        definedRanges={[]}
+                        wrapperClassName="date-range-picker"
+                    />
+
+                </div>
+            </div> : null}
         <div className="gap-8 grid md:grid-cols-2 items-start">
             <AnalysisCard data={totalEnergySources} title={analysisCardTitle("totalEnergySources")} />
             <AnalysisCard data={energyDestinations} title={analysisCardTitle("energyDestinations")} />

@@ -6,18 +6,21 @@ $white-main:#EEECF1;
 
 
 .date-range-picker{
+    box-shadow:none;
     
     [class*=materialui-daterange-picker-MuiPaper-root] {
         background-color:$gray-900;
-        border-radius: 1.5rem;
+        border-radius: 1rem;
+        box-shadow: 2px 2px 16px rgba(224, 224, 224, 0.05);
     }
-    [class*=materialui-daterange-picker-MuiPaper-elevation]{
-        box-shadow:none;
-    }
+    
     [class*=materialui-daterange-picker-makeStyles-outlined]{
         border: 1px solid $white-main;
     }
     [class*=materialui-daterange-picker-makeStyles-filled]{
+        background-color: $brand-main;
+    }
+    [class*=materialui-daterange-picker-makeStyles-filled]:hover{
         background-color: $brand-main;
     }
     [class*=materialui-daterange-picker-makeStyles-highlighted]{
@@ -32,7 +35,13 @@ $white-main:#EEECF1;
     [class*=materialui-daterange-picker-MuiTypography-colorTextSecondary]{
         color: $gray-300;
     }
+    [class*=materialui-daterange-picker-MuiIconButton-disabled]{
+        opacity: 0.3;
+    }
     [class*=materialui-daterange-picker-MuiTypography-caption]{
+        color:$white-main;
+    }
+    [class*=materialui-daterange-picker-MuiListItem-root]{
         color:$white-main;
     }
     [class*=materialui-daterange-picker-MuiTypography-colorTextPrimary]{
@@ -49,11 +58,4 @@ $white-main:#EEECF1;
     }
   
     
-}
-.date-range-picker-wrapper{
-    background-color: $gray-900;
-    justify-content: end;
-    .date-range-button{
-        margin: 0.5rem;
-    }
 }

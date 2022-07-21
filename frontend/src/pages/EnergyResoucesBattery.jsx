@@ -1,5 +1,5 @@
 import moment from "moment"
-import { useEffect, useState } from "react"
+import { startTransition, useEffect, useState } from "react"
 import { useTranslation } from "react-multi-lang"
 
 import EnergyResoucesCard from "../components/EnergyResoucesCard"
@@ -17,7 +17,30 @@ import { ReactComponent as DischargeIcon }
 
 const {colors} = variables
 
-const chartChargeVoltageSet = ({data, labels, unit}) => ({
+const drawHighPeak = (startHour, endHour) => chart => {
+    if (chart.scales.x._gridLineItems && endHour && startHour) {
+        const
+            ctx = chart.ctx,
+            xLines = chart.scales.x._gridLineItems,
+            xLineFirst = xLines[0],
+            yFirstLine = chart.scales.y._gridLineItems[0],
+            xLeft = yFirstLine.x1,
+            xFullWidth = yFirstLine.x2 - xLeft,
+            xWidth = (endHour - startHour) / 24 * xFullWidth,
+            xStart = startHour / 24 * xFullWidth + xLeft,
+            yTop = xLineFirst.y1,
+            yFullHeight = xLineFirst.y2 - yTop
+
+        ctx.beginPath()
+        ctx.fillStyle = "#ffffff10"
+        ctx.strokeStyle = colors.gray[400]
+        ctx.rect(xStart, yTop, xWidth, yFullHeight)
+        ctx.fill()
+        ctx.stroke()
+    }
+}
+const chartChargeVoltageSet = ({data, highPeak, labels, unit}) => ({
+    beforeDraw: drawHighPeak(highPeak.start, highPeak.end),
     datasets: [
         {
             backgroundColor: colors.blue.main,
@@ -46,7 +69,8 @@ const chartChargeVoltageSet = ({data, labels, unit}) => ({
     tooltipLabel: item => item.parsed.y + unit[item.dataset.id],
     y: {max: 100, min: 0}
 })
-const chartPowerSet = ({data, labels, unit}) => ({
+const chartPowerSet = ({data, highPeak, labels, unit}) => ({
+    beforeDraw: drawHighPeak(highPeak.start, highPeak.end),
     datasets: [{
         backgroundColor: colors.blue.main,
         borderColor: colors.blue.main,
@@ -71,16 +95,13 @@ export default function EnergyResoucesBattery () {
         [chargedLifetime, setChargedLifetime] = useState(0),
         [chargedToday, setChargedToday] = useState(0),
         [chargingState, setChargingState] = useState(0),
-        [chargeVoltage, setChargeVoltage] = useState({
-            data: {charge: [], voltage: []},
-            labels: []
-        }),
+        [chargeVoltage, setChargeVoltage] = useState(null),
         [cyclesLifetime, setCyclesLifetime] = useState(0),
         [cyclesToday, setCyclesToday] = useState(0),
         [dischargedLifetime, setDischargedLifetime] = useState(0),
         [dischargedToday, setDischargedToday] = useState(0),
         [modal, setModal] = useState(""),
-        [power, setPower] = useState({data: [], labels: []}),
+        [power, setPower] = useState(null),
         [powerSources, setPowerSources] = useState(""),
         [voltage, setVoltage] = useState(0)
 
@@ -102,7 +123,7 @@ export default function EnergyResoucesBattery () {
         const
             currentHour = new Date().getHours(),
             hours = Array.from(new Array(currentHour + 1).keys()),
-            labels = hours.map(n => {
+            labels = Array.from(new Array(25).keys()).map(n => {
                 const time = moment().hour(n).minute(0).second(0)
 
                 return time.format("hh A")
@@ -116,9 +137,10 @@ export default function EnergyResoucesBattery () {
 
         setChargeVoltage({
             data: {charge: chargeArrays, voltage: voltageArrays},
+            highPeak: {start: 19, end: 23},
             labels
         })
-        setPower({data: powerArrays, labels})
+        setPower({data: powerArrays, highPeak: {start: 19, end: 23}, labels})
     }, [])
 
     const
@@ -165,17 +187,20 @@ export default function EnergyResoucesBattery () {
         ]
     }
 
-    const chartChargeVoltageData = chartChargeVoltageSet({
-        data: chargeVoltage.data,
-        labels: chargeVoltage.labels,
-        unit: {charge: "%", voltage: " " + commonT("kw")}
-    })
+    const chargeVoltageChart = chargeVoltage
+        ? <LineChart
+            data={chartChargeVoltageSet({
+                ...chargeVoltage,
+                unit: {charge: "%", voltage: " " + commonT("kw")}
+            })}
+            id="erbChargeVoltage" />
+        : null
 
-    const powerData = chartPowerSet({
-        data: power.data,
-        labels: power.labels,
-        unit: commonT("kw")
-    })
+    const powerChart = power
+        ? <LineChart
+            data={chartPowerSet({...power, unit: commonT("kw")})}
+            id="erbPower" />
+        : null
 
     const batteryInfoCards = batteryInfoData.map((item, i) =>
         <div className="card" key={"erb-bic-" + i}>
@@ -206,16 +231,12 @@ export default function EnergyResoucesBattery () {
         </div>
         <div className="card chart mt-8">
             <h4 className="mb-9">{pageT("chargingDischargingPower")}</h4>
-            <div className="max-h-80vh h-160 relative w-full">
-                <LineChart data={powerData} id="erbPower" />
-            </div>
+            <div className="max-h-80vh h-160 relative w-full">{powerChart}</div>
         </div>
         <div className="card chart mt-8">
             <h4 className="mb-9">{pageT("stateOfChargeVoltage")}</h4>
             <div className="max-h-80vh h-160 relative w-full">
-                <LineChart
-                    data={chartChargeVoltageData}
-                    id="erbChargeVoltage" />
+                {chargeVoltageChart}
             </div>
         </div>
         <h1 className="mb-7 mt-20">{pageT("batteryInformation")}</h1>

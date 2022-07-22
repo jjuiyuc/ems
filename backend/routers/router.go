@@ -68,7 +68,7 @@ func InitRouter(isCORS bool, ginMode string, w *APIWorker) *gin.Engine {
 	apiGroup.GET("/users/profile", authorize(), w.GetProfile)
 
 	// Websocket
-	apiGroup.GET("/dashboard/:gwid", w.websocketAuthorize(), w.dashboardHandler)
+	apiGroup.GET("/:gwid/devices/energy-info", w.websocketAuthorize(), w.dashboardHandler)
 
 	return r
 }

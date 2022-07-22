@@ -4,7 +4,7 @@ import React from "react"
 import LoggedIn from "./LoggedIn"
 import NonLoggedIn from "./NonLoggedIn"
 
-const Main = props => props.user.username ? <LoggedIn /> : <NonLoggedIn />
-const mapState = state => ({user: state.user.value})
+const Main = props => props.username ? <LoggedIn /> : <NonLoggedIn />
+const mapState = state => ({username: state.user.username})
 
 export default connect(mapState)(Main)

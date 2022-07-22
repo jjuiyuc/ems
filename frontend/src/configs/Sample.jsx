@@ -25,7 +25,7 @@ function Sample (props) {
 }
 
 const
-    mapState = state => ({user: state.user.value}),
+    mapState = state => ({user: state.user}),
     mapDispatch = dispatch => ({
         updateUser: value => dispatch({
             type: "user/updateUser", payload: value

@@ -78,10 +78,15 @@ function LogIn(props) {
             if (!userProfile) return
 
             const
-                {id, name, username} = userProfile.data,
+                {gateways, id, name, username} = userProfile.data,
                 threeHours = 1000 * 60 * 60 * 3
 
+            if (gateways && gateways.length > 0) {
+                gateways.forEach((gateway, i) => gateway.active = i === 0)
+            }
+
             props.updateUserProfile({
+                gateways: gateways || [],
                 id,
                 name,
                 tokenExpiry: new Date().getTime() + threeHours,
@@ -137,7 +142,7 @@ function LogIn(props) {
 
 const mapState = (state) => ({
     lang: state.lang.value,
-    user: state.user.value,
+    user: state.user,
 }),
     mapDispatch = (dispatch) => ({
         updateLang: (value) =>

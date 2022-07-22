@@ -103,7 +103,7 @@ function ForgotPassword() {
 const
     mapState = state => ({
         lang: state.lang.value,
-        user: state.user.value
+        user: state.user
     }),
     mapDispatch = dispatch => ({
         updateLang: value => dispatch({

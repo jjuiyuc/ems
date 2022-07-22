@@ -4,20 +4,26 @@ const lsUser = window.localStorage.user
 
 export const userSlice = createSlice({
     name: "user",
-    initialState: { value: lsUser ? JSON.parse(lsUser) : {} },
+    initialState: lsUser ? JSON.parse(lsUser) : {},
     reducers: {
+        changeGateway: (state, action) => {
+            state.gateways.forEach((g, i) => g.active = i === action.payload)
+            localStorage.setItem("user", JSON.stringify(state))
+
+            return state
+        },
         logout: state => {
             localStorage.removeItem("user")
-            state.value = {}
+            return {}
         },
         updateUser: (state, action) => {
             localStorage.setItem("user", JSON.stringify(action.payload))
-            state.value = action.payload
+            return action.payload
         },
         updateUserProfile: (state, action) => {
-            const userValue = { ...state.value, ...action.payload }
+            const userValue = { ...state, ...action.payload }
             localStorage.setItem("user", JSON.stringify(userValue))
-            state.value = userValue
+            return userValue
         }
     }
 })

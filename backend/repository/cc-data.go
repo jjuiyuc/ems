@@ -14,6 +14,7 @@ import (
 // CCDataRepository godoc
 type CCDataRepository interface {
 	UpsertCCData(ccData *deremsmodels.CCDatum) (err error)
+	UpsertCCDataLog(ccDataLog *deremsmodels.CCDataLog) (err error)
 	GetCCDataCount() (int64, error)
 }
 
@@ -40,6 +41,24 @@ func (repo defaultCCDataRepository) UpsertCCData(ccData *deremsmodels.CCDatum) (
 	} else {
 		ccData.ID = ccDataReturn.ID
 		_, err = ccData.Update(repo.db, boil.Infer())
+	}
+	return
+}
+
+// UpsertCCDataLog godoc
+func (repo defaultCCDataRepository) UpsertCCDataLog(ccDataLog *deremsmodels.CCDataLog) (err error) {
+	var ccDataLogReturn *deremsmodels.CCDataLog
+	ccDataLogReturn, err = deremsmodels.CCDataLogs(
+		qm.Where("gw_uuid = ?", ccDataLog.GWUUID),
+		qm.Where("log_date = ?", ccDataLog.LogDate)).One(repo.db)
+	now := time.Now()
+	ccDataLog.UpdatedAt = null.NewTime(now, true)
+	if err != nil {
+		ccDataLog.CreatedAt = now
+		err = ccDataLog.Insert(repo.db, boil.Infer())
+	} else {
+		ccDataLog.ID = ccDataLogReturn.ID
+		_, err = ccDataLog.Update(repo.db, boil.Infer())
 	}
 	return
 }

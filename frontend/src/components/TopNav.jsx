@@ -24,7 +24,10 @@ function TopNav (props) {
 
     const
         {className} = props,
-        {address, name} = props.user,
+        {gateways, name} = props.user,
+        gateway = gateways.length > 0
+            ? gateways.filter(g => g.active)[0]
+            : {address: ""},
         menuPaperProps = {
             sx: {
                 borderTopLeftRadius: 0,
@@ -49,7 +52,7 @@ function TopNav (props) {
             </div>
             <div className="items-center hidden md:flex">
                 <LocationIcon className="h-8 mr-1 w-8" />
-                {address}
+                {gateway.address}
             </div>
         </div>
         <Menu
@@ -74,7 +77,7 @@ function TopNav (props) {
 }
 
 const
-    mapState = state => ({lang: state.lang.value, user: state.user.value}),
+    mapState = state => ({lang: state.lang.value, user: state.user}),
     mapDispatch = dispatch => ({logout: () => dispatch({type: "user/logout"})})
 
 export default connect(mapState, mapDispatch)(TopNav)

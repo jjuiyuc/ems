@@ -70,7 +70,7 @@ const
     mapDispatch = dispatch => ({logout: () => dispatch({type: "user/logout"})}),
     mapState = state => ({
         sidebarStatus: state.sidebarStatus.value,
-        tokenExpiry: state.user.value.tokenExpiry
+        tokenExpiry: state.user.tokenExpiry
     })
 
 export default connect(mapState, mapDispatch)(LoggedIn)

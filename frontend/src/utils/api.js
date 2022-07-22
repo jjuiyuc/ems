@@ -10,7 +10,7 @@ export const apiCall = async ({
     onSuccess = () => { },
     onError = () => { }
 }) => {
-    const {protocol} = window.location, {token} = store.getState().user.value
+    const {protocol} = window.location, {token} = store.getState().user
 
     url = `${protocol}//${API_HOST}${url}`
 

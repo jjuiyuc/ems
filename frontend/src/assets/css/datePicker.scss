@@ -1,21 +1,19 @@
-$brand-main: #12C9C9;
-$brand-main-transparent: #12C9C966;
-$gray-300:#BDBDBD;
-$gray-900:#1C1C1E;
-$white-main:#EEECF1;
-
+$brand-main: theme("colors.primary.main");
+$brand-main-transparent: theme("colors.primary.main-opacity-30");
+$gray-300: theme("colors.gray.300");
+$gray-900: theme("colors.gray.900");
+$white-main:theme("colors.calendar.white");
 
 .date-range-picker{
     box-shadow:none;
-    
+
     [class*=materialui-daterange-picker-MuiPaper-root] {
         background-color:$gray-900;
         border-radius: 1rem;
         box-shadow: 2px 2px 16px rgba(224, 224, 224, 0.05);
     }
-    
     [class*=materialui-daterange-picker-makeStyles-outlined]{
-        border: 1px solid $white-main;
+        border: 1px solid $gray-300;
     }
     [class*=materialui-daterange-picker-makeStyles-filled]{
         background-color: $brand-main;
@@ -59,6 +57,4 @@ $white-main:#EEECF1;
     [class*=materialui-daterange-picker-MuiInput-underline]:after{
         border-bottom: 2px solid $brand-main;
     }
-  
-    
 }

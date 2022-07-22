@@ -6,6 +6,7 @@
         "main-opacity-20":"#43B0FF20"
     },
     "brand": {"main": "#12c9c9"},
+    "calendar": {"white": "#EEECF1"},
     "darkGray": {"main": "#303034"},
     "gray": {
         "200": "#E0E0E0",
@@ -37,6 +38,7 @@
         "main": "#12c9c9",
         "main-opacity-10": "#12c9c910",
         "main-opacity-20": "#12c9c920",
+        "main-opacity-30": "#12c9c930",
         "500": "#12c9c9",
         "600": "#10b5b5",
         "700": "#0e9797",

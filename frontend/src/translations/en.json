@@ -1,4 +1,23 @@
 {
+    "analysis": {
+        "analysis": "Analysis",
+        "days": "Days",
+        "weeks": "Weeks",
+        "month": "Month",
+        "year": "Year",
+        "custom": "Custom",
+        "totalEnergySources": "Total Energy Sources",
+        "energyDestinations": "Energy Destinations",
+        "directSolarSupply": "Direct Solar Supply",
+        "importFromGrid": "Import From Grid",
+        "batteryDischarge": "Battery Discharge",
+        "load": "Load",
+        "exportFromGrid": "Export From Grid",
+        "chargeToBattery": "Charge to Battery",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "to": "to"
+    },
     "common": {
         "battery": "Battery",
         "copyright": "© 2022 Ubiik Inc. All rights reserved",
@@ -102,26 +121,5 @@
         "timeOfUse": "Time of Use",
         "totalUntilNow": "Total Until Now",
         "yesterday": "Yesterday"
-    },
-    "analysis": {
-        "analysis": "Analysis",
-        "days":"Days",
-        "weeks":"Weeks",
-        "month":"Month",
-        "year":"Year",
-        "custom":"Custom",
-        "totalEnergySources":"Total Energy Sources",
-        "energyDestinations":"Energy Destinations",
-        "directSolarSupply":"Direct Solar Supply",
-        "importFromGrid":"Import From Grid",
-        "batteryDischarge":"Battery Discharge",
-        "load":"Load",
-        "exportFromGrid":"Export From Grid",
-        "chargeToBattery":"Charge to Battery",
-        "startDate": "Start Date",
-        "endDate": "End Date",
-        "to": "to",
-        "cancel":"Cancel",
-        "apply":"Apply"
     }
 }

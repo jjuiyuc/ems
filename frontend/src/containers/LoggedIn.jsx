@@ -12,7 +12,6 @@ import EnergyResoucesBattery from "../pages/EnergyResoucesBattery"
 import Analysis from "../pages/Analysis"
 import TimeOfUse from "../pages/TimeOfUse"
 
-
 function LoggedIn(props) {
     const
         location = useLocation(),

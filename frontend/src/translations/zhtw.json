@@ -1,4 +1,23 @@
 {
+    "analysis": {
+        "analysis": "Analysis",
+        "days": "日",
+        "weeks": "週",
+        "month": "月",
+        "year": "年",
+        "custom": "Custom",
+        "totalEnergySources": "全部能源來源",
+        "energyDestinations": "Energy Destinations",
+        "directSolarSupply": "太陽能供給",
+        "importFromGrid": "自電網輸入",
+        "batteryDischarge": "電池釋放",
+        "load": "Load",
+        "exportFromGrid": "自電網輸出",
+        "chargeToBattery": "電池充電",
+        "startDate": "開始日期",
+        "endDate": "結束日期",
+        "to": "至"
+    },
     "common": {
         "battery": "電池",
         "copyright": "© 2022 Ubiik Inc. All rights reserved",

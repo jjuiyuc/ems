@@ -9,13 +9,14 @@ import Sample from "../configs/Sample"
 
 import Dashboard from "../pages/Dashboard"
 import EnergyResoucesBattery from "../pages/EnergyResoucesBattery"
+import Analysis from "../pages/Analysis"
 import TimeOfUse from "../pages/TimeOfUse"
 
-function LoggedIn (props) {
+function LoggedIn(props) {
     const
         location = useLocation(),
         isDashboard = location.pathname === "/dashboard",
-        {sidebarStatus} = props,
+        { sidebarStatus } = props,
         sidebarW = sidebarStatus === "expand" ? "w-60" : "w-20",
         t = useTranslation()
 
@@ -31,11 +32,11 @@ function LoggedIn (props) {
             <div className="flex-auto bg-gray grid grid-rows-auto-1fr">
                 <TopNav className="z-10" />
                 <div className={"bg-gray-700 min-w-0 shadow-main z-0 "
-                                + "pl-10 pr-8 py-8 lg:pl-25 lg:pr-20 lg:py-20"
-                                + (isDashboard ? " bg-image-grid" : "")}>
+                    + "pl-10 pr-8 py-8 lg:pl-25 lg:pr-20 lg:py-20"
+                    + (isDashboard ? " bg-image-grid" : "")}>
                     <Routes>
                         <Route element={<Dashboard />} path="/dashboard" />
-                        <Route element={<Sample />} path="/analysis" />
+                        <Route element={<Analysis />} path="/analysis" />
                         <Route element={<TimeOfUse />} path="/time-of-use" />
                         <Route element={<Sample />} path="/economics" />
                         <Route element={<Sample />} path="/demand-charge" />

@@ -12,26 +12,26 @@ import (
 // DevicesEnergyInfoResponse godoc
 type DevicesEnergyInfoResponse struct {
 	GridIsPeakShaving             int                    `json:"gridIsPeakShaving"`
-	LoadGridAveragePowerAc        float32                `json:"loadGridAveragePowerAC"`
-	BatteryGridAveragePowerAc     float32                `json:"batteryGridAveragePowerAC"`
-	GridContractPowerAc           float32                `json:"gridContractPowerAC"`
-	LoadPVAveragePowerAc          float32                `json:"loadPvAveragePowerAC"`
-	LoadBatteryAveragePowerAc     float32                `json:"loadBatteryAveragePowerAC"`
-	BatterySoc                    float32                `json:"batterySoC"`
-	BatteryProducedAveragePowerAc float32                `json:"batteryProducedAveragePowerAC"`
-	BatteryConsumedAveragePowerAc float32                `json:"batteryConsumedAveragePowerAC"`
+	LoadGridAveragePowerAC        float32                `json:"loadGridAveragePowerAC"`
+	BatteryGridAveragePowerAC     float32                `json:"batteryGridAveragePowerAC"`
+	GridContractPowerAC           float32                `json:"gridContractPowerAC"`
+	LoadPvAveragePowerAC          float32                `json:"loadPvAveragePowerAC"`
+	LoadBatteryAveragePowerAC     float32                `json:"loadBatteryAveragePowerAC"`
+	BatterySoC                    float32                `json:"batterySoC"`
+	BatteryProducedAveragePowerAC float32                `json:"batteryProducedAveragePowerAC"`
+	BatteryConsumedAveragePowerAC float32                `json:"batteryConsumedAveragePowerAC"`
 	BatteryChargingFrom           string                 `json:"batteryChargingFrom"`
 	BatteryDischargingTo          string                 `json:"batteryDischargingTo"`
-	PVAveragePowerAc              float32                `json:"pvAveragePowerAC"`
-	LoadAveragePowerAc            float32                `json:"loadAveragePowerAC"`
+	PvAveragePowerAC              float32                `json:"pvAveragePowerAC"`
+	LoadAveragePowerAC            float32                `json:"loadAveragePowerAC"`
 	LoadLinks                     map[string]interface{} `json:"loadLinks"`
 	GridLinks                     map[string]interface{} `json:"gridLinks"`
 	PVLinks                       map[string]interface{} `json:"pvLinks"`
 	BatteryLinks                  map[string]interface{} `json:"batteryLinks"`
-	BatteryPVAveragePowerAc       float32                `json:"batteryPvAveragePowerAC"`
-	GridPVAveragePowerAc          float32                `json:"gridPvAveragePowerAC"`
-	GridProducedAveragePowerAc    float32                `json:"gridProducedAveragePowerAC"`
-	GridConsumedAveragePowerAc    float32                `json:"gridConsumedAveragePowerAC"`
+	BatteryPvAveragePowerAC       float32                `json:"batteryPvAveragePowerAC"`
+	GridPvAveragePowerAC          float32                `json:"gridPvAveragePowerAC"`
+	GridProducedAveragePowerAC    float32                `json:"gridProducedAveragePowerAC"`
+	GridConsumedAveragePowerAC    float32                `json:"gridConsumedAveragePowerAC"`
 }
 
 // DevicesService godoc
@@ -63,22 +63,22 @@ func (s defaultDevicesService) GetLatestDevicesEnergyInfo(gwUUID string) (logTim
 
 	devicesEnergyInfo = &DevicesEnergyInfoResponse{
 		GridIsPeakShaving:             latestLog.GridIsPeakShaving.Int,
-		LoadGridAveragePowerAc:        latestLog.LoadGridAveragePowerAc.Float32,
-		BatteryGridAveragePowerAc:     latestLog.BatteryGridAveragePowerAc.Float32,
-		GridContractPowerAc:           latestLog.GridContractPowerAc.Float32,
-		LoadPVAveragePowerAc:          latestLog.LoadPVAveragePowerAc.Float32,
-		LoadBatteryAveragePowerAc:     latestLog.LoadBatteryAveragePowerAc.Float32,
-		BatterySoc:                    latestLog.BatterySoc.Float32,
-		BatteryProducedAveragePowerAc: latestLog.BatteryProducedAveragePowerAc.Float32,
-		BatteryConsumedAveragePowerAc: latestLog.BatteryConsumedAveragePowerAc.Float32,
+		LoadGridAveragePowerAC:        latestLog.LoadGridAveragePowerAC.Float32,
+		BatteryGridAveragePowerAC:     latestLog.BatteryGridAveragePowerAC.Float32,
+		GridContractPowerAC:           latestLog.GridContractPowerAC.Float32,
+		LoadPvAveragePowerAC:          latestLog.LoadPvAveragePowerAC.Float32,
+		LoadBatteryAveragePowerAC:     latestLog.LoadBatteryAveragePowerAC.Float32,
+		BatterySoC:                    latestLog.BatterySoC.Float32,
+		BatteryProducedAveragePowerAC: latestLog.BatteryProducedAveragePowerAC.Float32,
+		BatteryConsumedAveragePowerAC: latestLog.BatteryConsumedAveragePowerAC.Float32,
 		BatteryChargingFrom:           latestLog.BatteryChargingFrom.String,
 		BatteryDischargingTo:          latestLog.BatteryDischargingTo.String,
-		PVAveragePowerAc:              latestLog.PVAveragePowerAc.Float32,
-		LoadAveragePowerAc:            latestLog.LoadAveragePowerAc.Float32,
-		BatteryPVAveragePowerAc:       latestLog.BatteryPVAveragePowerAc.Float32,
-		GridPVAveragePowerAc:          latestLog.GridPVAveragePowerAc.Float32,
-		GridProducedAveragePowerAc:    latestLog.GridProducedAveragePowerAc.Float32,
-		GridConsumedAveragePowerAc:    latestLog.GridConsumedAveragePowerAc.Float32,
+		PvAveragePowerAC:              latestLog.PvAveragePowerAC.Float32,
+		LoadAveragePowerAC:            latestLog.LoadAveragePowerAC.Float32,
+		BatteryPvAveragePowerAC:       latestLog.BatteryPvAveragePowerAC.Float32,
+		GridPvAveragePowerAC:          latestLog.GridPvAveragePowerAC.Float32,
+		GridProducedAveragePowerAC:    latestLog.GridProducedAveragePowerAC.Float32,
+		GridConsumedAveragePowerAC:    latestLog.GridConsumedAveragePowerAC.Float32,
 	}
 	var loadLinksValue map[string]interface{}
 	err = json.Unmarshal(latestLog.LoadLinks.JSON, &loadLinksValue)
@@ -101,7 +101,7 @@ func (s defaultDevicesService) GetLatestDevicesEnergyInfo(gwUUID string) (logTim
 	}
 	devicesEnergyInfo.GridLinks = gridLinksValue
 	var pvLinksValue map[string]interface{}
-	err = json.Unmarshal(latestLog.PVLinks.JSON, &pvLinksValue)
+	err = json.Unmarshal(latestLog.PvLinks.JSON, &pvLinksValue)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "json.Unmarshal",

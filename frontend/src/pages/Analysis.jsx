@@ -1,13 +1,12 @@
-import { Button, Stack, TextField, Box } from "@mui/material"
+import { Button, Stack, TextField } from "@mui/material"
 import { CalendarToday } from "@mui/icons-material"
 import { DateRangePicker } from "materialui-daterange-picker"
 
-import { Fragment as Frag, useState } from "react"
+import { Fragment as useState } from "react"
 import moment from "moment"
 import { useTranslation } from "react-multi-lang"
 
 import AnalysisCard from "../components/AnalysisCard"
-import variables from "../configs/variables"
 import "../assets/css/datePicker.scss"
 
 

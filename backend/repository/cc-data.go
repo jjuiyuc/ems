@@ -15,6 +15,7 @@ import (
 type CCDataRepository interface {
 	UpsertCCData(ccData *deremsmodels.CCDatum) (err error)
 	UpsertCCDataLog(ccDataLog *deremsmodels.CCDataLog) (err error)
+	GetLatestLogByGatewayUUID(gwUUID string) (*deremsmodels.CCDataLog, error)
 	GetCCDataCount() (int64, error)
 }
 
@@ -61,6 +62,14 @@ func (repo defaultCCDataRepository) UpsertCCDataLog(ccDataLog *deremsmodels.CCDa
 		_, err = ccDataLog.Update(repo.db, boil.Infer())
 	}
 	return
+}
+
+// GetLatestLogByGatewayUUID godoc
+func (repo defaultCCDataRepository) GetLatestLogByGatewayUUID(gwUUID string) (*deremsmodels.CCDataLog, error) {
+	return deremsmodels.CCDataLogs(
+		qm.Where("gw_uuid = ?", gwUUID),
+		qm.OrderBy("log_date DESC"),
+		qm.Limit(1)).One(repo.db)
 }
 
 // GetCCDataCount godoc

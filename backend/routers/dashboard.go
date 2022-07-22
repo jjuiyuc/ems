@@ -72,14 +72,15 @@ func (w *APIWorker) dashboardHandler(c *gin.Context) {
 		return
 	}
 	client := &Client{
-		ID:    userID.(int),
-		Token: token.(string),
-		Conn:  conn,
-		Pool:  pool,
+		ID:          userID.(int),
+		Token:       token.(string),
+		GatewayUUID: gatewayUUID,
+		Conn:        conn,
+		Pool:        pool,
 	}
 
 	pool.Register <- client
-	client.run(c)
+	client.run(w, c)
 }
 
 func (w *APIWorker) upgrade(c *gin.Context) (*websocket.Conn, error) {

@@ -34,7 +34,7 @@ func (w *APIWorker) GetBatteryEnergyInfo(c *gin.Context) {
 
 	batteryEnergyInfo, err := w.Services.Battery.GetBatteryEnergyInfo(gatewayUUID)
 	if err != nil {
-		log.WithFields(log.Fields{"caused-by": "error battery energy info"}).Error()
+		log.WithFields(log.Fields{"caused-by": "generate battery energy info"}).Error()
 		appG.Response(http.StatusInternalServerError, e.ErrBatteryEnergyInfoGen, err.Error())
 		return
 	}

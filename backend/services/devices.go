@@ -82,28 +82,28 @@ func (s defaultDevicesService) GetLatestDevicesEnergyInfo(gwUUID string) (logTim
 	}
 	if err = json.Unmarshal(latestLog.LoadLinks.JSON, &devicesEnergyInfo.LoadLinks); err != nil {
 		log.WithFields(log.Fields{
-			"caused-by": "json.Unmarshal",
+			"caused-by": "json.Unmarshal: loadLinksValue",
 			"err":       err,
 		}).Error()
 		return
 	}
 	if err = json.Unmarshal(latestLog.GridLinks.JSON, &devicesEnergyInfo.GridLinks); err != nil {
 		log.WithFields(log.Fields{
-			"caused-by": "json.Unmarshal",
+			"caused-by": "json.Unmarshal: gridLinksValue",
 			"err":       err,
 		}).Error()
 		return
 	}
 	if err = json.Unmarshal(latestLog.PvLinks.JSON, &devicesEnergyInfo.PVLinks); err != nil {
 		log.WithFields(log.Fields{
-			"caused-by": "json.Unmarshal",
+			"caused-by": "json.Unmarshal: pvLinksValue",
 			"err":       err,
 		}).Error()
 		return
 	}
 	if err = json.Unmarshal(latestLog.BatteryLinks.JSON, &devicesEnergyInfo.BatteryLinks); err != nil {
 		log.WithFields(log.Fields{
-			"caused-by": "json.Unmarshal",
+			"caused-by": "json.Unmarshal: batteryLinksValue",
 			"err":       err,
 		}).Error()
 	}

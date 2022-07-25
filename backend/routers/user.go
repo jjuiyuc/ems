@@ -99,6 +99,7 @@ func (w *APIWorker) PasswordResetByToken(c *gin.Context) {
 // @Produce application/json
 // @Success 200 {object} app.Response
 // @Failure 401 {object} app.Response
+// @Failure 500 {object} app.Response
 // @Router /user/profile [get]
 func (w *APIWorker) GetProfile(c *gin.Context) {
 	appG := app.Gin{c}
@@ -111,8 +112,8 @@ func (w *APIWorker) GetProfile(c *gin.Context) {
 
 	profile, err := w.Services.User.GetProfile(userID.(int))
 	if err != nil {
-		log.WithFields(log.Fields{"caused-by": "error token"}).Error()
-		appG.Response(http.StatusUnauthorized, e.ErrToken, nil)
+		log.WithFields(log.Fields{"caused-by": "get profile"}).Error()
+		appG.Response(http.StatusInternalServerError, e.ErrUserProfileGen, err.Error())
 		return
 	}
 	appG.Response(http.StatusOK, e.Success, profile)

@@ -22,4 +22,6 @@ const (
 	ErrToken = 40000
 
 	ErrDashboardDataParse = 50000
+
+	ErrBatteryEnergyInfoParse = 60000
 )

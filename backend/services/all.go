@@ -12,6 +12,7 @@ type Services struct {
 	Email   EmailService
 	User    UserService
 	Devices DevicesService
+	Battery BatteryService
 }
 
 // NewServices godoc
@@ -21,5 +22,6 @@ func NewServices(cfg *viper.Viper, repo *repository.Repository) *Services {
 		Email:   NewEmailService(cfg),
 		User:    NewUserService(repo),
 		Devices: NewDevicesService(repo),
+		Battery: NewBatteryService(repo),
 	}
 }

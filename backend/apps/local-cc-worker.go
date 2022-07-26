@@ -89,6 +89,7 @@ func (w *LocalCCWorker) MainLoop() {
 func (h localCCConsumerHandler) processLocalCCData(msg []byte) {
 	utils.PrintFunctionName()
 	h.saveLocalCCData(msg)
+	h.saveLocalCCDataLog(msg)
 }
 
 func (h localCCConsumerHandler) saveLocalCCData(msg []byte) (err error) {
@@ -97,8 +98,7 @@ func (h localCCConsumerHandler) saveLocalCCData(msg []byte) (err error) {
 		timestamp = "timestamp"
 	)
 	var data map[string]interface{}
-	err = json.Unmarshal(msg, &data)
-	if err != nil {
+	if err = json.Unmarshal(msg, &data); err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "json.Unmarshal",
 			"err":       err,
@@ -106,8 +106,8 @@ func (h localCCConsumerHandler) saveLocalCCData(msg []byte) (err error) {
 		return
 	}
 
-	gwIDValue := data[gwID]
-	if gwIDValue == nil {
+	gwIDValue, ok := data[gwID]
+	if !ok {
 		err = e.ErrNewKeyNotExist(gwID)
 		log.WithFields(log.Fields{
 			"caused-by": gwID,
@@ -115,8 +115,8 @@ func (h localCCConsumerHandler) saveLocalCCData(msg []byte) (err error) {
 		}).Error()
 		return
 	}
-	timestampValue := data[timestamp]
-	if timestampValue == nil {
+	timestampValue, ok := data[timestamp]
+	if !ok {
 		err = e.ErrNewKeyNotExist(timestamp)
 		log.WithFields(log.Fields{
 			"caused-by": timestamp,
@@ -154,6 +154,76 @@ func (h localCCConsumerHandler) saveLocalCCData(msg []byte) (err error) {
 	if err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "h.repo.CCData.UpsertCCData",
+			"err":       err,
+		}).Error()
+	}
+	return
+}
+
+// TODO: Reserve return error for unit test
+func (h localCCConsumerHandler) saveLocalCCDataLog(msg []byte) (err error) {
+	const (
+		gwID      = "gwID"
+		timestamp = "timestamp"
+	)
+	var data map[string]interface{}
+	if err = json.Unmarshal(msg, &data); err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "json.Unmarshal",
+			"err":       err,
+		}).Error()
+		return
+	}
+
+	gwIDValue, ok := data[gwID]
+	if !ok {
+		err = e.ErrNewKeyNotExist(gwID)
+		log.WithFields(log.Fields{
+			"caused-by": gwID,
+			"err":       err,
+		}).Error()
+		return
+	}
+	timestampValue, ok := data[timestamp]
+	if !ok {
+		err = e.ErrNewKeyNotExist(timestamp)
+		log.WithFields(log.Fields{
+			"caused-by": timestamp,
+			"err":       err,
+		}).Error()
+		return
+	}
+	delete(data, gwID)
+	delete(data, timestamp)
+
+	dataJSON, err := json.Marshal(data)
+	var ccDataLog deremsmodels.CCDataLog
+	if err = json.Unmarshal(dataJSON, &ccDataLog); err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "json.Unmarshal",
+			"err":       err,
+		}).Error()
+		return
+	}
+
+	ccDataLog.GWUUID = gwIDValue.(string)
+	ccDataLog.LogDate = time.Unix(int64(timestampValue.(float64)), 0)
+	gateway, err := h.repo.Gateway.GetGatewayByGatewayUUID(gwIDValue.(string))
+	if err == nil {
+		ccDataLog.GWID = null.NewInt(gateway.ID, true)
+		ccDataLog.CustomerID = null.NewInt(gateway.CustomerID, true)
+	} else {
+		log.WithFields(log.Fields{
+			"caused-by": "h.repo.Gateway.GetGatewayByGatewayUUID",
+			"err":       err,
+		}).Warn()
+	}
+
+	log.Debug("upsert local CC data log")
+	err = h.repo.CCData.UpsertCCDataLog(&ccDataLog)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "h.repo.CCData.UpsertCCDataLog",
 			"err":       err,
 		}).Error()
 	}

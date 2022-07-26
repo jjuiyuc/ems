@@ -81,8 +81,7 @@ func (s defaultDevicesService) GetLatestDevicesEnergyInfo(gwUUID string) (logTim
 		GridConsumedAveragePowerAC:    latestLog.GridConsumedAveragePowerAC.Float32,
 	}
 	var loadLinksValue map[string]interface{}
-	err = json.Unmarshal(latestLog.LoadLinks.JSON, &loadLinksValue)
-	if err != nil {
+	if err = json.Unmarshal(latestLog.LoadLinks.JSON, &loadLinksValue); err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "json.Unmarshal",
 			"err":       err,
@@ -91,8 +90,7 @@ func (s defaultDevicesService) GetLatestDevicesEnergyInfo(gwUUID string) (logTim
 	}
 	devicesEnergyInfo.LoadLinks = loadLinksValue
 	var gridLinksValue map[string]interface{}
-	err = json.Unmarshal(latestLog.GridLinks.JSON, &gridLinksValue)
-	if err != nil {
+	if err = json.Unmarshal(latestLog.GridLinks.JSON, &gridLinksValue); err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "json.Unmarshal",
 			"err":       err,
@@ -101,8 +99,7 @@ func (s defaultDevicesService) GetLatestDevicesEnergyInfo(gwUUID string) (logTim
 	}
 	devicesEnergyInfo.GridLinks = gridLinksValue
 	var pvLinksValue map[string]interface{}
-	err = json.Unmarshal(latestLog.PvLinks.JSON, &pvLinksValue)
-	if err != nil {
+	if err = json.Unmarshal(latestLog.PvLinks.JSON, &pvLinksValue); err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "json.Unmarshal",
 			"err":       err,
@@ -111,8 +108,7 @@ func (s defaultDevicesService) GetLatestDevicesEnergyInfo(gwUUID string) (logTim
 	}
 	devicesEnergyInfo.PVLinks = pvLinksValue
 	var batteryLinksValue map[string]interface{}
-	err = json.Unmarshal(latestLog.BatteryLinks.JSON, &batteryLinksValue)
-	if err != nil {
+	if err = json.Unmarshal(latestLog.BatteryLinks.JSON, &batteryLinksValue); err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "json.Unmarshal",
 			"err":       err,

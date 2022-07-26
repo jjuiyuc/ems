@@ -98,8 +98,7 @@ func (h localCCConsumerHandler) saveLocalCCData(msg []byte) (err error) {
 		timestamp = "timestamp"
 	)
 	var data map[string]interface{}
-	err = json.Unmarshal(msg, &data)
-	if err != nil {
+	if err = json.Unmarshal(msg, &data); err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "json.Unmarshal",
 			"err":       err,
@@ -107,8 +106,8 @@ func (h localCCConsumerHandler) saveLocalCCData(msg []byte) (err error) {
 		return
 	}
 
-	gwIDValue := data[gwID]
-	if gwIDValue == nil {
+	gwIDValue, ok := data[gwID]
+	if !ok {
 		err = e.ErrNewKeyNotExist(gwID)
 		log.WithFields(log.Fields{
 			"caused-by": gwID,
@@ -116,8 +115,8 @@ func (h localCCConsumerHandler) saveLocalCCData(msg []byte) (err error) {
 		}).Error()
 		return
 	}
-	timestampValue := data[timestamp]
-	if timestampValue == nil {
+	timestampValue, ok := data[timestamp]
+	if !ok {
 		err = e.ErrNewKeyNotExist(timestamp)
 		log.WithFields(log.Fields{
 			"caused-by": timestamp,
@@ -161,14 +160,14 @@ func (h localCCConsumerHandler) saveLocalCCData(msg []byte) (err error) {
 	return
 }
 
+// TODO: Reserve return error for unit test
 func (h localCCConsumerHandler) saveLocalCCDataLog(msg []byte) (err error) {
 	const (
 		gwID      = "gwID"
 		timestamp = "timestamp"
 	)
 	var data map[string]interface{}
-	err = json.Unmarshal(msg, &data)
-	if err != nil {
+	if err = json.Unmarshal(msg, &data); err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "json.Unmarshal",
 			"err":       err,
@@ -176,8 +175,8 @@ func (h localCCConsumerHandler) saveLocalCCDataLog(msg []byte) (err error) {
 		return
 	}
 
-	gwIDValue := data[gwID]
-	if gwIDValue == nil {
+	gwIDValue, ok := data[gwID]
+	if !ok {
 		err = e.ErrNewKeyNotExist(gwID)
 		log.WithFields(log.Fields{
 			"caused-by": gwID,
@@ -185,8 +184,8 @@ func (h localCCConsumerHandler) saveLocalCCDataLog(msg []byte) (err error) {
 		}).Error()
 		return
 	}
-	timestampValue := data[timestamp]
-	if timestampValue == nil {
+	timestampValue, ok := data[timestamp]
+	if !ok {
 		err = e.ErrNewKeyNotExist(timestamp)
 		log.WithFields(log.Fields{
 			"caused-by": timestamp,
@@ -199,8 +198,7 @@ func (h localCCConsumerHandler) saveLocalCCDataLog(msg []byte) (err error) {
 
 	dataJSON, err := json.Marshal(data)
 	var ccDataLog deremsmodels.CCDataLog
-	err = json.Unmarshal(dataJSON, &ccDataLog)
-	if err != nil {
+	if err = json.Unmarshal(dataJSON, &ccDataLog); err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "json.Unmarshal",
 			"err":       err,

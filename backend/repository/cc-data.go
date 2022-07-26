@@ -68,8 +68,7 @@ func (repo defaultCCDataRepository) UpsertCCDataLog(ccDataLog *deremsmodels.CCDa
 func (repo defaultCCDataRepository) GetLatestLogByGatewayUUID(gwUUID string) (*deremsmodels.CCDataLog, error) {
 	return deremsmodels.CCDataLogs(
 		qm.Where("gw_uuid = ?", gwUUID),
-		qm.OrderBy("log_date DESC"),
-		qm.Limit(1)).One(repo.db)
+		qm.OrderBy("log_date DESC")).One(repo.db)
 }
 
 // GetCCDataCount godoc

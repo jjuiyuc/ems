@@ -40,6 +40,17 @@ func (w *APIWorker) GetBatteryEnergyInfo(c *gin.Context) {
 	appG.Response(http.StatusOK, e.Success, batteryEnergyInfo)
 }
 
+// GetBatteryPowerState provides today's hourly power state of a battery
+// @Summary Provide today's hourly power state of a battery
+// @Tags Energy Resources
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Input user's access token" default(Bearer <Add access token here>)
+// @Produce application/json
+// @Success 200 {object} app.Response
+// @Failure 400 {object} app.Response
+// @Failure 401 {object} app.Response
+// @Failure 500 {object} app.Response
+// @Router /{gwid}/devices/battery/power-state [get]
 func (w *APIWorker) GetBatteryPowerState(c *gin.Context) {
 	appG := app.Gin{c}
 	userID, _ := c.Get("userID")

@@ -5,6 +5,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
+	"der-ems/internal/e"
 	"der-ems/repository"
 )
 
@@ -24,9 +25,17 @@ type BatteryEnergyInfoResponse struct {
 	Voltage                         float32 `json:"voltage"`
 }
 
+// BatteryPowerStateResponse godoc
+type BatteryPowerStateResponse struct {
+	Timestamps             []int             `json:"timestamps"`
+	BatteryAveragePowerACs []float32         `json:"batteryAveragePowerACs"`
+	OnPeakTime             map[string]string `json:"onPeakTime"`
+}
+
 // BatteryService godoc
 type BatteryService interface {
 	GetBatteryEnergyInfo(gwUUID string) (batteryEnergyInfo *BatteryEnergyInfoResponse)
+	GetBatteryPowerState(gwUUID string, startTime, endTime time.Time) (batteryPowerState *BatteryPowerStateResponse, err error)
 }
 
 type defaultBatteryService struct {
@@ -93,5 +102,53 @@ func (s defaultBatteryService) getBatteryInfo(gwUUID string, batteryEnergyInfo *
 		batteryEnergyInfo.Voltage = 153.6
 	}
 	batteryEnergyInfo.PowerSources = "Solar + Grid"
+	return
+}
+
+// GetBatteryPowerState godoc
+func (s defaultBatteryService) GetBatteryPowerState(gwUUID string, startTime, endTime time.Time) (batteryPowerState *BatteryPowerStateResponse, err error) {
+	periodStartTime, periodEndTime, err := s.getStatePeriod(startTime, endTime)
+	if err != nil {
+		return
+	}
+
+	batteryPowerState = &BatteryPowerStateResponse{}
+	startTimeIndex := periodStartTime.Add(-1 * time.Hour)
+	endTimeIndex := periodStartTime
+	for endTimeIndex.Before(periodEndTime) || endTimeIndex == periodEndTime {
+		latestLog, latestLogErr := s.repo.CCData.GetLatestLogByGatewayUUID(gwUUID, startTimeIndex, endTimeIndex)
+		if latestLogErr == nil {
+			log.Debug("batteryAveragePowerAC: ", latestLog.BatteryAveragePowerAC)
+			batteryPowerState.Timestamps = append(batteryPowerState.Timestamps, int(latestLog.LogDate.Unix()))
+			batteryPowerState.BatteryAveragePowerACs = append(batteryPowerState.BatteryAveragePowerACs, latestLog.BatteryAveragePowerAC.Float32)
+		} else {
+			log.WithFields(log.Fields{
+				"caused-by":      "s.repo.CCData.GetLatestLogByGatewayUUID",
+				"err":            latestLogErr,
+				"startTimeIndex": startTimeIndex,
+				"endTimeIndex":   endTimeIndex,
+			}).Warn()
+			batteryPowerState.Timestamps = append(batteryPowerState.Timestamps, int(endTimeIndex.Unix()))
+			batteryPowerState.BatteryAveragePowerACs = append(batteryPowerState.BatteryAveragePowerACs, 0)
+		}
+
+		startTimeIndex = endTimeIndex
+		endTimeIndex = startTimeIndex.Add(+1 * time.Hour)
+	}
+	return
+}
+
+func (s defaultBatteryService) getStatePeriod(startTime, endTime time.Time) (periodStartTime, periodEndTime time.Time, err error) {
+	periodStartTime = time.Date(startTime.Year(), startTime.Month(), startTime.Day(), startTime.Hour(), 0, 0, 0, startTime.Location())
+	log.Debug("periodStartTime: ", periodStartTime)
+	periodEndTime = time.Date(endTime.Year(), endTime.Month(), endTime.Day(), endTime.Hour(), 0, 0, 0, endTime.Location())
+	log.Debug("periodEndTime: ", periodEndTime)
+	if periodStartTime == periodEndTime {
+		err = e.ErrNewUnexpectedTimeRange
+		log.WithFields(log.Fields{
+			"caused-by": "s.getStatePeriod",
+			"err":       err,
+		}).Error()
+	}
 	return
 }

@@ -83,6 +83,5 @@ func (repo defaultCCDataRepository) GetLatestLogByGatewayUUID(gwUUID string) (*d
 func (repo defaultCCDataRepository) GetFirstLogByGatewayUUIDAndStartTime(gwUUID string, startTime time.Time) (*deremsmodels.CCDataLog, error) {
 	return deremsmodels.CCDataLogs(
 		qm.Where("(gw_uuid = ? and log_date >= ?)", gwUUID, startTime),
-		qm.OrderBy("log_date ASC"),
-		qm.Limit(1)).One(repo.db)
+		qm.OrderBy("log_date ASC")).One(repo.db)
 }

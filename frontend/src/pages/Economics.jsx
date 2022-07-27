@@ -18,7 +18,6 @@ export default function Economics(props) {
 
 
 
-
     return <>
         <h1 className="mb-9">{pageT("economics")}</h1>
         <div className="flex lg:max-w-7xl">

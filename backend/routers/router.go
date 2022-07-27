@@ -18,6 +18,16 @@ import (
 	"der-ems/services"
 )
 
+// APIType godoc
+type APIType int
+
+const (
+	// REST godoc
+	REST APIType = iota
+	// WebSocket godoc
+	WebSocket
+)
+
 // APIWorker godoc
 type APIWorker struct {
 	Services *services.Services
@@ -65,19 +75,25 @@ func InitRouter(isCORS bool, ginMode string, w *APIWorker) *gin.Engine {
 	// User
 	apiGroup.PUT("/users/password/lost", w.PasswordLost)
 	apiGroup.PUT("/users/password/reset-by-token", w.PasswordResetByToken)
-	apiGroup.GET("/users/profile", authorize(), w.GetProfile)
+	apiGroup.GET("/users/profile", authorize(REST), w.GetProfile)
 
-	// Websocket
-	apiGroup.GET("/:gwid/devices/energy-info", w.websocketAuthorize(), w.dashboardHandler)
+	// Dashboard
+	apiGroup.GET("/:gwid/devices/energy-info", authorize(WebSocket), w.dashboardHandler)
 
 	return r
 }
 
-func authorize() gin.HandlerFunc {
+func authorize(apiType APIType) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		appG := app.Gin{c}
 
-		authHeader := c.GetHeader("Authorization")
+		var authHeader string
+		switch apiType {
+		case REST:
+			authHeader = c.GetHeader("Authorization")
+		case WebSocket:
+			authHeader = c.GetHeader("Sec-WebSocket-Protocol")
+		}
 		if authHeader == "" {
 			log.WithFields(log.Fields{"caused-by": "no header"}).Error()
 			appG.Response(http.StatusUnauthorized, e.ErrAuthNoHeader, nil)
@@ -85,15 +101,24 @@ func authorize() gin.HandlerFunc {
 			return
 		}
 
-		bearers := strings.Split(authHeader, " ")
-		if len(bearers) != 2 || bearers[0] != "Bearer" {
+		var token string
+		switch apiType {
+		case REST:
+			bearers := strings.Split(authHeader, " ")
+			if len(bearers) == 2 && bearers[0] == "Bearer" {
+				token = bearers[1]
+			}
+		case WebSocket:
+			if len(strings.Split(authHeader, " ")) == 1 {
+				token = authHeader
+			}
+		}
+		if token == "" {
 			log.WithFields(log.Fields{"caused-by": "invalid header"}).Error()
 			appG.Response(http.StatusUnauthorized, e.ErrAuthInvalidHeader, nil)
 			c.Abort()
 			return
 		}
-
-		token := bearers[1]
 		claims, err := utils.ParseToken(token)
 		if err != nil {
 			// Token timeout included
@@ -104,6 +129,9 @@ func authorize() gin.HandlerFunc {
 		}
 
 		c.Set("userID", claims.UserID)
+		if apiType == WebSocket {
+			c.Set("token", token)
+		}
 
 		c.Next()
 	}

@@ -2,7 +2,6 @@ package routers
 
 import (
 	"net/http"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -10,44 +9,7 @@ import (
 
 	"der-ems/internal/app"
 	"der-ems/internal/e"
-	"der-ems/internal/utils"
 )
-
-func (w *APIWorker) websocketAuthorize() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		appG := app.Gin{c}
-
-		authHeader := c.GetHeader("Sec-WebSocket-Protocol")
-		if authHeader == "" {
-			log.WithFields(log.Fields{"caused-by": "no header"}).Error()
-			appG.Response(http.StatusUnauthorized, e.ErrAuthNoHeader, nil)
-			c.Abort()
-			return
-		}
-
-		if len(strings.Split(authHeader, " ")) != 1 {
-			log.WithFields(log.Fields{"caused-by": "invalid header"}).Error()
-			appG.Response(http.StatusUnauthorized, e.ErrAuthInvalidHeader, nil)
-			c.Abort()
-			return
-		}
-
-		token := authHeader
-		claims, err := utils.ParseToken(token)
-		if err != nil {
-			// Token timeout included
-			log.WithFields(log.Fields{"caused-by": "token parse"}).Error()
-			appG.Response(http.StatusUnauthorized, e.ErrAuthTokenParse, nil)
-			c.Abort()
-			return
-		}
-
-		c.Set("userID", claims.UserID)
-		c.Set("token", token)
-
-		c.Next()
-	}
-}
 
 func (w *APIWorker) dashboardHandler(c *gin.Context) {
 	appG := app.Gin{c}

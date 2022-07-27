@@ -1,7 +1,7 @@
-import {Navigate, Route, Routes, useLocation} from "react-router-dom"
-import {connect} from "react-redux"
+import { Navigate, Route, Routes, useLocation } from "react-router-dom"
+import { connect } from "react-redux"
 import React, { useEffect } from "react"
-import {useTranslation} from "react-multi-lang"
+import { useTranslation } from "react-multi-lang"
 
 import Sidebar from "../components/Sidebar"
 import TopNav from "../components/TopNav"
@@ -11,6 +11,8 @@ import Dashboard from "../pages/Dashboard"
 import EnergyResoucesBattery from "../pages/EnergyResoucesBattery"
 import Analysis from "../pages/Analysis"
 import TimeOfUse from "../pages/TimeOfUse"
+import Economics from "../pages/Economics"
+
 
 function LoggedIn(props) {
     const
@@ -38,7 +40,7 @@ function LoggedIn(props) {
                         <Route element={<Dashboard />} path="/dashboard" />
                         <Route element={<Analysis />} path="/analysis" />
                         <Route element={<TimeOfUse />} path="/time-of-use" />
-                        <Route element={<Sample />} path="/economics" />
+                        <Route element={<Economics />} path="/economics" />
                         <Route element={<Sample />} path="/demand-charge" />
                         <Route
                             element={<EnergyResoucesBattery />}
@@ -46,8 +48,8 @@ function LoggedIn(props) {
                         <Route element={<Sample />} path="/settings" />
                         <Route
                             element={<Navigate
-                                        replace
-                                        to="/energy-resources/battery" />}
+                                replace
+                                to="/energy-resources/battery" />}
                             path="/energy-resources" />
                         <Route
                             element={<Navigate to="/dashboard" replace />}
@@ -68,7 +70,7 @@ function LoggedIn(props) {
 }
 
 const
-    mapDispatch = dispatch => ({logout: () => dispatch({type: "user/logout"})}),
+    mapDispatch = dispatch => ({ logout: () => dispatch({ type: "user/logout" }) }),
     mapState = state => ({
         sidebarStatus: state.sidebarStatus.value,
         tokenExpiry: state.user.tokenExpiry

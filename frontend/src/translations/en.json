@@ -121,5 +121,17 @@
         "timeOfUse": "Time of Use",
         "totalUntilNow": "Total Until Now",
         "yesterday": "Yesterday"
+    },
+    "economics":{
+        "economics":"Economics",
+        "total":"Total",
+        "ancillaryServices":"Ancillary Services",
+        "demandCharge":"Demand Charge",
+        "timeOfUseArbitrage":"Time of Use Arbitrage",
+        "renewableEnergyCertificate":"Renewable Energy Certificate (REC)",
+        "solarLocalUsage":"Solar Local Usage",
+        "exportToGrid":"Export to Grid",
+        "monthlyStackedRevenue":"Monthly Stacked Revenue",
+        "thisMonth":"This Month"
     }
 }

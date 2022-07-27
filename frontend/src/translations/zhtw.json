@@ -39,7 +39,7 @@
         "dashboard": "Dashboard",
         "directConsumption": "Direct Consumption",
         "dischargingTo": "Discharging To",
-        "exportToGrid": "Export to Grid",
+        "exportToGrid": "輸出至電網",
         "importFromGrid": "電網導入",
         "load": "負載",
         "noWebsocketSupport": "您的瀏覽器不支援 WebSocket",
@@ -121,5 +121,17 @@
         "timeOfUse": "Time of Use",
         "totalUntilNow": "Total Until Now",
         "yesterday": "昨日"
+    },
+    "economics":{
+        "economics":"Economics",
+        "total":"Total",
+        "ancillaryServices":"輔助服務",
+        "demandCharge":"需求費用",
+        "timeOfUseArbitrage":"Time of Use Arbitrage",
+        "renewableEnergyCertificate":"可再生能源書",
+        "solarLocalUsage":"Solar Local Usage",
+        "exportToGrid":"輸出至電網",
+        "monthlyStackedRevenue":"每月累積收入",
+        "thisMonth":"當月"
     }
 }

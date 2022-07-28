@@ -1,22 +1,23 @@
 import {
-    CategoryScale,
     Chart,
     Filler,
     LinearScale,
     LineController,
     LineElement,
     PointElement,
+    TimeSeriesScale,
     Tooltip
 } from "chart.js"
+import "chartjs-adapter-moment"
 import { useEffect, useState } from "react"
 
 Chart.register(
-    CategoryScale,
     Filler,
     LinearScale,
     LineController,
     LineElement,
     PointElement,
+    TimeSeriesScale,
     Tooltip
 )
 
@@ -109,6 +110,13 @@ export default function LineChart(props) {
                             },
                             padding: 10
                         },
+                        time: {
+                            displayFormats: {
+                                hour: "h A"
+                            },
+                            tooltipFormat: "hh:mm:ss A"
+                        },
+                        type: "timeseries",
                         ...props.data?.x
                     },
                     y: {

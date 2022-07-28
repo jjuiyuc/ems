@@ -27,7 +27,8 @@ function LanguageSelector(props) {
 const
     mapState = state => ({ lang: state.lang.value }),
     mapDispatch = dispatch => ({
-        updateLang: value => dispatch({ type: "lang/updateLang", payload: value })
+        updateLang: value =>
+            dispatch({ type: "lang/updateLang", payload: value })
     })
 
 export default connect(mapState, mapDispatch)(LanguageSelector)

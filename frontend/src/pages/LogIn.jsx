@@ -68,30 +68,24 @@ function LogIn(props) {
             if (!loginStatus) return
 
             const token = loginStatus.data.token
-            props.updateUser({
-                username: email,
-                token
-            })
+
+            props.updateUser({token, username: email})
 
             const userProfile = await apiCall({url: "/api/users/profile"})
 
             if (!userProfile) return
 
             const
-                {gateways, id, name, username} = userProfile.data,
-                threeHours = 1000 * 60 * 60 * 3
+                {gateways, id, name} = userProfile.data,
+                // Tokens will expire in 3 hours
+                tokenExpiryTime = new Date().getTime() + 1000 * 60 * 60 * 3
 
             if (gateways && gateways.length > 0) {
-                gateways.forEach((gateway, i) => gateway.active = i === 0)
+                props.setGateway(gateways[0])
+                props.setGatewayList(gateways)
             }
 
-            props.updateUserProfile({
-                gateways: gateways || [],
-                id,
-                name,
-                tokenExpiry: new Date().getTime() + threeHours,
-                username
-            })
+            props.updateUserProfile({id, name, tokenExpiryTime})
         }
     return (
         <div>
@@ -140,27 +134,15 @@ function LogIn(props) {
     );
 }
 
-const mapState = (state) => ({
-    lang: state.lang.value,
-    user: state.user,
-}),
-    mapDispatch = (dispatch) => ({
-        updateLang: (value) =>
-            dispatch({
-                type: "lang/updateLang",
-                payload: value,
-            }),
-        updateUser: (value) =>
-            dispatch({
-                type: "user/updateUser",
-                payload: value,
-            }),
-        updateUserProfile: (value) =>
-            dispatch({
-                type: "user/updateUserProfile",
-                payload: value,
-            })
+const mapDispatch = dispatch => {
+    const updateStore = (payload, type) => dispatch({payload, type})
 
+    return ({
+        setGateway: v => updateStore(v, "gateways/changeGateway"),
+        setGatewayList: v => updateStore(v, "gateways/updateList"),
+        updateUser: v => updateStore(v, "user/updateUser"),
+        updateUserProfile: v => updateStore(v, "user/updateUserProfile")
     })
+}
 
-export default connect(mapState, mapDispatch)(LogIn)
+export default connect(null, mapDispatch)(LogIn)

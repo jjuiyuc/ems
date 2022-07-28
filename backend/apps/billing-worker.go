@@ -83,32 +83,11 @@ func generateBillingParams(repo *repository.Repository, gateway *deremsmodels.Ga
 	if err != nil {
 		return
 	}
-	localTime, err := getLocalTime(repo, billingType.TOULocationID)
+	localTime, err := utils.GetLocalTime(repo, billingType.TOULocationID, time.Now().UTC())
 	if err != nil {
 		return
 	}
 	billingParamsJSON, err = getWeeklyBillingParamsByType(repo, billingType, localTime, sendNow)
-	return
-}
-
-func getLocalTime(repo *repository.Repository, touLocationID int) (localTime time.Time, err error) {
-	touLocation, err := repo.TOU.GetTOULocationByTOULocationID(touLocationID)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"caused-by": "repo.TOU.GetTOULocationByTOULocationID",
-			"err":       err,
-		}).Error()
-		return
-	}
-	localLocation, err := time.LoadLocation(touLocation.Location.String)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"caused-by": "time.LoadLocation",
-			"err":       err,
-		}).Error()
-		return
-	}
-	localTime = time.Now().In(localLocation)
 	return
 }
 

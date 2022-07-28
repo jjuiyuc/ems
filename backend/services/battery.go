@@ -164,7 +164,7 @@ func (s defaultBatteryService) getStatePeriod(startTime, endTime time.Time) (per
 	return
 }
 
-func (s defaultBatteryService) getOnPeakTime(gwUUID string, timeOfToday time.Time) (onPeakTime map[string]string, err error) {
+func (s defaultBatteryService) getOnPeakTime(gwUUID string, t time.Time) (onPeakTime map[string]string, err error) {
 	gateway, err := s.repo.Gateway.GetGatewayByGatewayUUID(gwUUID)
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -181,7 +181,15 @@ func (s defaultBatteryService) getOnPeakTime(gwUUID string, timeOfToday time.Tim
 		}).Error()
 		return
 	}
-	periodType := utils.GetPeriodTypeOfDay(s.repo, billingType.TOULocationID, timeOfToday)
+	localTime, err := utils.GetLocalTime(s.repo, billingType.TOULocationID, t)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "utils.GetLocalTime",
+			"err":       err,
+		}).Error()
+		return
+	}
+	periodType := utils.GetPeriodTypeOfDay(s.repo, billingType.TOULocationID, localTime)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "apps.GetPeriodTypeOfDay",
@@ -189,8 +197,8 @@ func (s defaultBatteryService) getOnPeakTime(gwUUID string, timeOfToday time.Tim
 		}).Error()
 		return
 	}
-	isSummer := utils.IsSummer(timeOfToday)
-	billings, err := s.repo.TOU.GetBillingsByTOUInfo(billingType.TOULocationID, billingType.VoltageType, billingType.TOUType, periodType, isSummer, timeOfToday.Format(utils.YYYYMMDD))
+	isSummer := utils.IsSummer(localTime)
+	billings, err := s.repo.TOU.GetBillingsByTOUInfo(billingType.TOULocationID, billingType.VoltageType, billingType.TOUType, periodType, isSummer, localTime.Format(utils.YYYYMMDD))
 	if err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "s.repo.TOU.GetBillingsByTOUInfo",
@@ -198,14 +206,18 @@ func (s defaultBatteryService) getOnPeakTime(gwUUID string, timeOfToday time.Tim
 		}).Error()
 		return
 	}
+
 	onPeakTime = map[string]string{}
 	for _, billing := range billings {
 		if billing.PeakType.String == "On-peak" {
 			log.WithFields(log.Fields{
+				"localTime": localTime,
+				"timezone":  localTime.Format(utils.ZHHMM),
 				"billing.PeakType":    billing.PeakType,
 				"billing.PeriodStime": billing.PeriodStime,
 				"billing.PeriodEtime": billing.PeriodEtime,
 			}).Debug()
+			onPeakTime["timezone"] = localTime.Format(utils.ZHHMM)
 			onPeakTime["start"] = billing.PeriodStime.String
 			onPeakTime["end"] = billing.PeriodEtime.String
 			break

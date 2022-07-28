@@ -33,6 +33,28 @@ func GetBillingTypeByCustomerID(repo *repository.Repository, customerID int) (bi
 	return
 }
 
+// GetLocalTime godoc
+func GetLocalTime(repo *repository.Repository, touLocationID int, t time.Time) (localTime time.Time, err error) {
+	touLocation, err := repo.TOU.GetTOULocationByTOULocationID(touLocationID)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "repo.TOU.GetTOULocationByTOULocationID",
+			"err":       err,
+		}).Error()
+		return
+	}
+	localLocation, err := time.LoadLocation(touLocation.Location.String)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "time.LoadLocation",
+			"err":       err,
+		}).Error()
+		return
+	}
+	localTime = t.In(localLocation)
+	return
+}
+
 // GetPeriodTypeOfDay godoc
 func GetPeriodTypeOfDay(repo *repository.Repository, touLocationID int, t time.Time) (periodType string) {
 	// The day is holiday or not

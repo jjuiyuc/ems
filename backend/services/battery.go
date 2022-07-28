@@ -33,10 +33,19 @@ type BatteryPowerStateResponse struct {
 	OnPeakTime             map[string]string `json:"onPeakTime"`
 }
 
+// BatteryChargeVoltageStateResponse godoc
+type BatteryChargeVoltageStateResponse struct {
+	Timestamps      []int             `json:"timestamps"`
+	BatterySoCs     []float32         `json:"batterySoCs"`
+	BatteryVoltages []float32         `json:"batteryVoltages"`
+	OnPeakTime      map[string]string `json:"onPeakTime"`
+}
+
 // BatteryService godoc
 type BatteryService interface {
 	GetBatteryEnergyInfo(gwUUID string, startTime time.Time) (batteryEnergyInfo *BatteryEnergyInfoResponse)
 	GetBatteryPowerState(gwUUID string, startTime, endTime time.Time) (batteryPowerState *BatteryPowerStateResponse, err error)
+	GetBatteryChargeVoltageState(gwUUID string, startTime, endTime time.Time) (batteryChargeVoltageState *BatteryChargeVoltageStateResponse, err error)
 }
 
 type defaultBatteryService struct {
@@ -144,6 +153,51 @@ func (s defaultBatteryService) GetBatteryPowerState(gwUUID string, startTime, en
 		return
 	}
 	batteryPowerState.OnPeakTime = onPeakTime
+
+	return
+}
+
+// GetBatteryChargeVoltageState godoc
+func (s defaultBatteryService) GetBatteryChargeVoltageState(gwUUID string, startTime, endTime time.Time) (batteryChargeVoltageState *BatteryChargeVoltageStateResponse, err error) {
+	periodStartTime, periodEndTime, err := s.getStatePeriod(startTime, endTime)
+	if err != nil {
+		return
+	}
+
+	batteryChargeVoltageState = &BatteryChargeVoltageStateResponse{}
+	startTimeIndex := periodStartTime.Add(-1 * time.Hour)
+	endTimeIndex := periodStartTime
+	for endTimeIndex.Before(periodEndTime) || endTimeIndex == periodEndTime {
+		latestLog, latestLogErr := s.repo.CCData.GetLatestLogByGatewayUUID(gwUUID, startTimeIndex, endTimeIndex)
+		if latestLogErr == nil {
+			log.WithFields(log.Fields{
+				"log_date":              latestLog.LogDate,
+				"batteryAveragePowerAC": latestLog.BatteryAveragePowerAC,
+			}).Debug()
+			batteryChargeVoltageState.Timestamps = append(batteryChargeVoltageState.Timestamps, int(latestLog.LogDate.Unix()))
+			batteryChargeVoltageState.BatterySoCs = append(batteryChargeVoltageState.BatterySoCs, latestLog.BatterySoC.Float32)
+			batteryChargeVoltageState.BatteryVoltages = append(batteryChargeVoltageState.BatteryVoltages, latestLog.BatteryVoltage.Float32)
+		} else {
+			log.WithFields(log.Fields{
+				"caused-by":      "s.repo.CCData.GetLatestLogByGatewayUUID",
+				"err":            latestLogErr,
+				"startTimeIndex": startTimeIndex,
+				"endTimeIndex":   endTimeIndex,
+			}).Warn()
+			batteryChargeVoltageState.Timestamps = append(batteryChargeVoltageState.Timestamps, int(endTimeIndex.Unix()))
+			batteryChargeVoltageState.BatterySoCs = append(batteryChargeVoltageState.BatterySoCs, 0)
+			batteryChargeVoltageState.BatteryVoltages = append(batteryChargeVoltageState.BatteryVoltages, 0)
+		}
+
+		startTimeIndex = endTimeIndex
+		endTimeIndex = startTimeIndex.Add(+1 * time.Hour)
+	}
+
+	onPeakTime, err := s.getOnPeakTime(gwUUID, startTime)
+	if err != nil {
+		return
+	}
+	batteryChargeVoltageState.OnPeakTime = onPeakTime
 
 	return
 }

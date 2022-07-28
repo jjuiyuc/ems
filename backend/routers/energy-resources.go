@@ -17,6 +17,16 @@ type ZoomableQuery struct {
 	EndTime    string `form:"endTime" validate:"required" example:"UTC time in ISO-8601" format:"date-time"`
 }
 
+// BatteryState godoc
+type BatteryState int
+
+const (
+	// Power godoc
+	Power BatteryState = iota
+	// ChargeVoltage godoc
+	ChargeVoltage
+)
+
 // GetBatteryEnergyInfo godoc
 // @Summary     Show the detailed information and current state about a battery
 // @Description get battery by token, gateway UUID and startTime
@@ -68,6 +78,14 @@ func (w *APIWorker) GetBatteryEnergyInfo(c *gin.Context) {
 // @Failure     500            {object}  app.Response
 // @Router      /{gwid}/devices/battery/power-state [get]
 func (w *APIWorker) GetBatteryPowerState(c *gin.Context) {
+	w.getBatteryState(c, Power)
+}
+
+func (w *APIWorker) GetBatteryChargeVoltageState(c *gin.Context) {
+	w.getBatteryState(c, ChargeVoltage)
+}
+
+func (w *APIWorker) getBatteryState(c *gin.Context, batteryState BatteryState) {
 	appG := app.Gin{c}
 	userID, _ := c.Get("userID")
 	if userID == nil {
@@ -92,13 +110,24 @@ func (w *APIWorker) GetBatteryPowerState(c *gin.Context) {
 		return
 	}
 
-	batteryPowerState, err := w.Services.Battery.GetBatteryPowerState(gatewayUUID, startTime, endTime)
-	if err != nil {
-		log.WithFields(log.Fields{"caused-by": "generate battery power state"}).Error()
-		appG.Response(http.StatusInternalServerError, e.ErrBatteryPowerStateGen, err.Error())
-		return
+	switch batteryState {
+	case Power:
+		batteryPowerState, err := w.Services.Battery.GetBatteryPowerState(gatewayUUID, startTime, endTime)
+		if err != nil {
+			log.WithFields(log.Fields{"caused-by": "generate battery power state"}).Error()
+			appG.Response(http.StatusInternalServerError, e.ErrBatteryPowerStateGen, err.Error())
+			return
+		}
+		appG.Response(http.StatusOK, e.Success, batteryPowerState)
+	case ChargeVoltage:
+		batteryChargeVoltageState, err := w.Services.Battery.GetBatteryChargeVoltageState(gatewayUUID, startTime, endTime)
+		if err != nil {
+			log.WithFields(log.Fields{"caused-by": "generate battery charge and voltage state"}).Error()
+			appG.Response(http.StatusInternalServerError, e.ErrBatteryChargeVoltageStateGen, err.Error())
+			return
+		}
+		appG.Response(http.StatusOK, e.Success, batteryChargeVoltageState)
 	}
-	appG.Response(http.StatusOK, e.Success, batteryPowerState)
 }
 
 func (zoomableQuery *ZoomableQuery) Validate() (startTime, endTime time.Time, ok bool) {

@@ -5,7 +5,6 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"der-ems/internal/e"
 	"der-ems/internal/utils"
 	"der-ems/repository"
 )
@@ -115,12 +114,7 @@ func (s defaultBatteryService) getBatteryInfo(gwUUID string, batteryEnergyInfo *
 }
 
 // GetBatteryPowerState godoc
-func (s defaultBatteryService) GetBatteryPowerState(gwUUID string, startTime, endTime time.Time) (batteryPowerState *BatteryPowerStateResponse, err error) {
-	periodStartTime, periodEndTime, err := s.getStatePeriod(startTime, endTime)
-	if err != nil {
-		return
-	}
-
+func (s defaultBatteryService) GetBatteryPowerState(gwUUID string, periodStartTime, periodEndTime time.Time) (batteryPowerState *BatteryPowerStateResponse, err error) {
 	batteryPowerState = &BatteryPowerStateResponse{}
 	startTimeIndex := periodStartTime.Add(-1 * time.Hour)
 	endTimeIndex := periodStartTime
@@ -148,7 +142,7 @@ func (s defaultBatteryService) GetBatteryPowerState(gwUUID string, startTime, en
 		endTimeIndex = startTimeIndex.Add(+1 * time.Hour)
 	}
 
-	onPeakTime, err := s.getOnPeakTime(gwUUID, startTime)
+	onPeakTime, err := s.getOnPeakTime(gwUUID, startTimeIndex)
 	if err != nil {
 		return
 	}
@@ -158,12 +152,7 @@ func (s defaultBatteryService) GetBatteryPowerState(gwUUID string, startTime, en
 }
 
 // GetBatteryChargeVoltageState godoc
-func (s defaultBatteryService) GetBatteryChargeVoltageState(gwUUID string, startTime, endTime time.Time) (batteryChargeVoltageState *BatteryChargeVoltageStateResponse, err error) {
-	periodStartTime, periodEndTime, err := s.getStatePeriod(startTime, endTime)
-	if err != nil {
-		return
-	}
-
+func (s defaultBatteryService) GetBatteryChargeVoltageState(gwUUID string, periodStartTime, periodEndTime time.Time) (batteryChargeVoltageState *BatteryChargeVoltageStateResponse, err error) {
 	batteryChargeVoltageState = &BatteryChargeVoltageStateResponse{}
 	startTimeIndex := periodStartTime.Add(-1 * time.Hour)
 	endTimeIndex := periodStartTime
@@ -193,27 +182,12 @@ func (s defaultBatteryService) GetBatteryChargeVoltageState(gwUUID string, start
 		endTimeIndex = startTimeIndex.Add(+1 * time.Hour)
 	}
 
-	onPeakTime, err := s.getOnPeakTime(gwUUID, startTime)
+	onPeakTime, err := s.getOnPeakTime(gwUUID, startTimeIndex)
 	if err != nil {
 		return
 	}
 	batteryChargeVoltageState.OnPeakTime = onPeakTime
 
-	return
-}
-
-func (s defaultBatteryService) getStatePeriod(startTime, endTime time.Time) (periodStartTime, periodEndTime time.Time, err error) {
-	periodStartTime = time.Date(startTime.Year(), startTime.Month(), startTime.Day(), startTime.Hour(), 0, 0, 0, startTime.Location())
-	log.Debug("periodStartTime: ", periodStartTime)
-	periodEndTime = time.Date(endTime.Year(), endTime.Month(), endTime.Day(), endTime.Hour(), 0, 0, 0, endTime.Location())
-	log.Debug("periodEndTime: ", periodEndTime)
-	if periodStartTime == periodEndTime {
-		err = e.ErrNewUnexpectedTimeRange
-		log.WithFields(log.Fields{
-			"caused-by": "s.getStatePeriod",
-			"err":       err,
-		}).Error()
-	}
 	return
 }
 

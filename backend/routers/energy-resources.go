@@ -143,6 +143,26 @@ func (zoomableQuery *ZoomableQuery) Validate() (startTime, endTime time.Time, ok
 	if err != nil || startTime == endTime || endTime.Before(startTime) {
 		return
 	}
+	periodStartTime, periodEndTime, err := w.getStatePeriod(startTime, endTime)
+	if err != nil {
+		ok = false
+		return
+	}
 	ok = true
+	return
+}
+
+func (w *APIWorker) getStatePeriod(startTime, endTime time.Time) (periodStartTime, periodEndTime time.Time, err error) {
+	periodStartTime = time.Date(startTime.Year(), startTime.Month(), startTime.Day(), startTime.Hour(), 0, 0, 0, startTime.Location())
+	log.Debug("periodStartTime: ", periodStartTime)
+	periodEndTime = time.Date(endTime.Year(), endTime.Month(), endTime.Day(), endTime.Hour(), 0, 0, 0, endTime.Location())
+	log.Debug("periodEndTime: ", periodEndTime)
+	if periodStartTime == periodEndTime {
+		err = e.ErrNewUnexpectedTimeRange
+		log.WithFields(log.Fields{
+			"caused-by": "s.getStatePeriod",
+			"err":       err,
+		}).Error()
+	}
 	return
 }

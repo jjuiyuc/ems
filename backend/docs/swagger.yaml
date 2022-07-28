@@ -113,6 +113,39 @@ info:
   license: {}
   title: DER-EMS API
 paths:
+  /{gwid}/devices/battery/charge-voltage-state:
+    get:
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Input user's access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Provide today's hourly charge and voltage state of a battery
+      tags:
+      - Energy Resources
   /{gwid}/devices/battery/energy-info:
     get:
       description: get battery by token, gateway UUID and startTime

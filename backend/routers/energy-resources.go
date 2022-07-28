@@ -81,6 +81,17 @@ func (w *APIWorker) GetBatteryPowerState(c *gin.Context) {
 	w.getBatteryState(c, Power)
 }
 
+// GetBatteryPowerState provides today's hourly charge and voltage state of a battery
+// @Summary Provide today's hourly charge and voltage state of a battery
+// @Tags Energy Resources
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Input user's access token" default(Bearer <Add access token here>)
+// @Produce application/json
+// @Success 200 {object} app.Response
+// @Failure 400 {object} app.Response
+// @Failure 401 {object} app.Response
+// @Failure 500 {object} app.Response
+// @Router /{gwid}/devices/battery/charge-voltage-state [get]
 func (w *APIWorker) GetBatteryChargeVoltageState(c *gin.Context) {
 	w.getBatteryState(c, ChargeVoltage)
 }

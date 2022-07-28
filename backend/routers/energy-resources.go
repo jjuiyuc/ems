@@ -36,7 +36,14 @@ func (w *APIWorker) GetBatteryEnergyInfo(c *gin.Context) {
 	gatewayUUID := c.Param("gwid")
 	log.Debug("gatewayUUID: ", gatewayUUID)
 
-	batteryEnergyInfo := w.Services.Battery.GetBatteryEnergyInfo(gatewayUUID)
+	startTime, ok := utils.IsDateFormat(time.RFC3339, c.Query("startTime"))
+	if !ok {
+		log.WithFields(log.Fields{"caused-by": "invalid param"}).Error()
+		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
+		return
+	}
+
+	batteryEnergyInfo := w.Services.Battery.GetBatteryEnergyInfo(gatewayUUID, startTime)
 	appG.Response(http.StatusOK, e.Success, batteryEnergyInfo)
 }
 

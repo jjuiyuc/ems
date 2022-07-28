@@ -305,6 +305,12 @@ var doc = `{
                             ]
                         }
                     },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {

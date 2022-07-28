@@ -35,7 +35,7 @@ type BatteryPowerStateResponse struct {
 
 // BatteryService godoc
 type BatteryService interface {
-	GetBatteryEnergyInfo(gwUUID string) (batteryEnergyInfo *BatteryEnergyInfoResponse)
+	GetBatteryEnergyInfo(gwUUID string, startTime time.Time) (batteryEnergyInfo *BatteryEnergyInfoResponse)
 	GetBatteryPowerState(gwUUID string, startTime, endTime time.Time) (batteryPowerState *BatteryPowerStateResponse, err error)
 }
 
@@ -49,9 +49,7 @@ func NewBatteryService(repo *repository.Repository) BatteryService {
 }
 
 // GetBatteryEnergyInfo godoc
-func (s defaultBatteryService) GetBatteryEnergyInfo(gwUUID string) (batteryEnergyInfo *BatteryEnergyInfoResponse) {
-	currentTime := time.Now().UTC()
-	startTime := time.Date(currentTime.Year(), currentTime.Month(), currentTime.Day(), 0, 0, 0, 0, currentTime.Location())
+func (s defaultBatteryService) GetBatteryEnergyInfo(gwUUID string, startTime time.Time) (batteryEnergyInfo *BatteryEnergyInfoResponse) {
 	batteryEnergyInfo = &BatteryEnergyInfoResponse{}
 	firstlog, err1 := s.repo.CCData.GetFirstLogByGatewayUUIDAndStartTime(gwUUID, startTime)
 	latestLog, err2 := s.repo.CCData.GetLatestLogByGatewayUUID(gwUUID, time.Time{}, time.Time{})

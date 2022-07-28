@@ -54,7 +54,7 @@ func (s defaultBatteryService) GetBatteryEnergyInfo(gwUUID string) (batteryEnerg
 	startTime := time.Date(currentTime.Year(), currentTime.Month(), currentTime.Day(), 0, 0, 0, 0, currentTime.Location())
 	batteryEnergyInfo = &BatteryEnergyInfoResponse{}
 	firstlog, err1 := s.repo.CCData.GetFirstLogByGatewayUUIDAndStartTime(gwUUID, startTime)
-	latestLog, err2 := s.repo.CCData.GetLatestLogByGatewayUUID(gwUUID)
+	latestLog, err2 := s.repo.CCData.GetLatestLogByGatewayUUID(gwUUID, time.Time{}, time.Time{})
 	if err1 == nil && err2 == nil {
 		log.Debug("firstlog.LogDate: ", firstlog.LogDate)
 		log.Debug("latestLog.LogDate: ", latestLog.LogDate)
@@ -211,8 +211,8 @@ func (s defaultBatteryService) getOnPeakTime(gwUUID string, t time.Time) (onPeak
 	for _, billing := range billings {
 		if billing.PeakType.String == "On-peak" {
 			log.WithFields(log.Fields{
-				"localTime": localTime,
-				"timezone":  localTime.Format(utils.ZHHMM),
+				"localTime":           localTime,
+				"timezone":            localTime.Format(utils.ZHHMM),
 				"billing.PeakType":    billing.PeakType,
 				"billing.PeriodStime": billing.PeriodStime,
 				"billing.PeriodEtime": billing.PeriodEtime,

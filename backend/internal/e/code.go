@@ -23,5 +23,5 @@ const (
 
 	ErrUserProfileGen       = 50000
 	ErrDashboardDataGen     = 50001
-	ErrBatteryPowerStateGen = 50003
+	ErrBatteryPowerStateGen = 50002
 )

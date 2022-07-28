@@ -26,7 +26,7 @@ type BatteryEnergyInfoResponse struct {
 
 // BatteryService godoc
 type BatteryService interface {
-	GetBatteryEnergyInfo(gwUUID string) (batteryEnergyInfo *BatteryEnergyInfoResponse, err error)
+	GetBatteryEnergyInfo(gwUUID string) (batteryEnergyInfo *BatteryEnergyInfoResponse)
 }
 
 type defaultBatteryService struct {
@@ -39,36 +39,35 @@ func NewBatteryService(repo *repository.Repository) BatteryService {
 }
 
 // GetBatteryEnergyInfo godoc
-func (s defaultBatteryService) GetBatteryEnergyInfo(gwUUID string) (batteryEnergyInfo *BatteryEnergyInfoResponse, err error) {
+func (s defaultBatteryService) GetBatteryEnergyInfo(gwUUID string) (batteryEnergyInfo *BatteryEnergyInfoResponse) {
 	currentTime := time.Now().UTC()
 	startTime := time.Date(currentTime.Year(), currentTime.Month(), currentTime.Day(), 0, 0, 0, 0, currentTime.Location())
-	firstlog, err := s.repo.CCData.GetFirstLogByGatewayUUIDAndStartTime(gwUUID, startTime)
-	if err != nil {
+	batteryEnergyInfo = &BatteryEnergyInfoResponse{}
+	firstlog, err1 := s.repo.CCData.GetFirstLogByGatewayUUIDAndStartTime(gwUUID, startTime)
+	latestLog, err2 := s.repo.CCData.GetLatestLogByGatewayUUID(gwUUID)
+	if err1 == nil && err2 == nil {
+		log.Debug("firstlog.LogDate: ", firstlog.LogDate)
+		log.Debug("latestLog.LogDate: ", latestLog.LogDate)
+		batteryEnergyInfo.BatteryOperationCycles = latestLog.BatteryLifetimeOperationCycles.Float32 - firstlog.BatteryLifetimeOperationCycles.Float32
+		batteryEnergyInfo.BatteryLifetimeOperationCycles = latestLog.BatteryLifetimeOperationCycles.Float32
+		batteryEnergyInfo.BatterySoC = latestLog.BatterySoC.Float32
+		batteryEnergyInfo.BatteryProducedEnergyAC = latestLog.BatteryProducedLifetimeEnergyAC.Float32 - firstlog.BatteryProducedLifetimeEnergyAC.Float32
+		batteryEnergyInfo.BatteryProducedLifetimeEnergyAC = latestLog.BatteryProducedLifetimeEnergyAC.Float32
+		batteryEnergyInfo.BatteryConsumedEnergyAC = latestLog.BatteryConsumedLifetimeEnergyAC.Float32 - firstlog.BatteryConsumedLifetimeEnergyAC.Float32
+		batteryEnergyInfo.BatteryConsumedLifetimeEnergyAC = latestLog.BatteryConsumedLifetimeEnergyAC.Float32
+	} else {
 		log.WithFields(log.Fields{
-			"caused-by": "s.repo.CCData.GetFirstLogByGatewayUUIDAndStartTime",
-			"err":       err,
+			"caused-by": "s.repo.CCData.GetFirstLogByGatewayUUIDAndStartTime and GetLatestLogByGatewayUUID",
+			"err1":      err1,
+			"err2":      err2,
 		}).Error()
-		return
-	}
-	log.Debug("firstlog.LogDate: ", firstlog.LogDate)
-	latestLog, err := s.repo.CCData.GetLatestLogByGatewayUUID(gwUUID)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"caused-by": "s.repo.CCData.GetLatestLogByGatewayUUID",
-			"err":       err,
-		}).Error()
-		return
-	}
-	log.Debug("latestLog.LogDate: ", latestLog.LogDate)
-
-	batteryEnergyInfo = &BatteryEnergyInfoResponse{
-		BatteryOperationCycles:          latestLog.BatteryLifetimeOperationCycles.Float32 - firstlog.BatteryLifetimeOperationCycles.Float32,
-		BatteryLifetimeOperationCycles:  latestLog.BatteryLifetimeOperationCycles.Float32,
-		BatterySoC:                      latestLog.BatterySoC.Float32,
-		BatteryProducedEnergyAC:         latestLog.BatteryProducedLifetimeEnergyAC.Float32 - firstlog.BatteryProducedLifetimeEnergyAC.Float32,
-		BatteryProducedLifetimeEnergyAC: latestLog.BatteryProducedLifetimeEnergyAC.Float32,
-		BatteryConsumedEnergyAC:         latestLog.BatteryConsumedLifetimeEnergyAC.Float32 - firstlog.BatteryConsumedLifetimeEnergyAC.Float32,
-		BatteryConsumedLifetimeEnergyAC: latestLog.BatteryConsumedLifetimeEnergyAC.Float32,
+		batteryEnergyInfo.BatteryOperationCycles = 0
+		batteryEnergyInfo.BatteryLifetimeOperationCycles = 0
+		batteryEnergyInfo.BatterySoC = 0
+		batteryEnergyInfo.BatteryProducedEnergyAC = 0
+		batteryEnergyInfo.BatteryProducedLifetimeEnergyAC = 0
+		batteryEnergyInfo.BatteryConsumedEnergyAC = 0
+		batteryEnergyInfo.BatteryConsumedLifetimeEnergyAC = 0
 	}
 
 	s.getBatteryInfo(gwUUID, batteryEnergyInfo)

@@ -21,7 +21,6 @@ const (
 
 	ErrToken = 40000
 
-	ErrUserProfileGen       = 50000
-	ErrDashboardDataGen     = 50001
-	ErrBatteryEnergyInfoGen = 50002
+	ErrUserProfileGen   = 50000
+	ErrDashboardDataGen = 50001
 )

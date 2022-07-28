@@ -1,5 +1,8 @@
 {
-    "black": {"main": "#020202"},
+    "black": {
+        "main": "#020202",
+        "main-opacity-95": "#02020295"
+    },
     "blue": {
         "main": "#43B0FF",
         "main-opacity-10":"#43B0FF10",

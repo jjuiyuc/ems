@@ -2,31 +2,28 @@ import { createSlice } from "@reduxjs/toolkit"
 
 const lsUser = window.localStorage.user
 
+const setLocalStorage = state =>
+    localStorage.setItem("user", JSON.stringify(state))
+
 export const userSlice = createSlice({
     name: "user",
     initialState: lsUser ? JSON.parse(lsUser) : {},
     reducers: {
-        changeGateway: (state, action) => {
-            state.gateways.forEach((g, i) => g.active = i === action.payload)
-            localStorage.setItem("user", JSON.stringify(state))
-
-            return state
-        },
-        logout: state => {
+        clear: () => {
             localStorage.removeItem("user")
             return {}
         },
         updateUser: (state, action) => {
-            localStorage.setItem("user", JSON.stringify(action.payload))
+            setLocalStorage(action.payload)
             return action.payload
         },
         updateUserProfile: (state, action) => {
-            const userValue = { ...state, ...action.payload }
-            localStorage.setItem("user", JSON.stringify(userValue))
-            return userValue
+            const user = {...state, ...action.payload}
+            setLocalStorage(user)
+            return user
         }
     }
 })
 
-export const { updateUser } = userSlice.actions
+export const { clear } = userSlice.actions
 export default userSlice.reducer

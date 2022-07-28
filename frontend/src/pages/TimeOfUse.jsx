@@ -34,11 +34,8 @@ export default function TimeOfUse() {
 
     const
         hours24 = Array.from(new Array(24).keys()),
-        lineChartDateLabels = hours24.map(n => {
-            const time = moment().hour(n).minute(0).second(0)
-
-            return time.format("hh A")
-        }),
+        lineChartDateLabels = hours24.map(n =>
+            moment().hour(n).startOf("h").toISOString()),
         currentHour = moment().hour(),
         lineChartDataArray = hours24.filter(v => v <= currentHour).map(() =>
             Math.floor(Math.random() * (60 - 40 + 1) + 40))

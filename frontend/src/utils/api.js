@@ -7,12 +7,16 @@ export const apiCall = async ({
     method = "get",
     data = {},
     contentType = "",
-    onSuccess = () => { },
-    onError = () => { }
+    onComplete = () => {},
+    onStart = () => {},
+    onSuccess = () => {},
+    onError = () => {}
 }) => {
     const {protocol} = window.location, {token} = store.getState().user
 
     url = `${protocol}//${API_HOST}${url}`
+
+    onStart()
 
     try {
         const res = await axios({
@@ -39,5 +43,7 @@ export const apiCall = async ({
         }
 
         onError(result)
+    } finally {
+        onComplete()
     }
 }

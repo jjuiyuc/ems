@@ -1,10 +1,16 @@
+import { connect } from "react-redux"
 import moment from "moment"
-import { startTransition, useEffect, useState } from "react"
+import ReportProblemIcon from "@mui/icons-material/ReportProblem"
+import { useEffect, useState } from "react"
 import { useTranslation } from "react-multi-lang"
 
+import AlertBox from "../components/AlertBox"
+import { apiCall } from "../utils/api"
+import { ConvertTimeToNumber } from "../utils/utils"
 import EnergyResoucesCard from "../components/EnergyResoucesCard"
 import EnergyResoucesTabs from "../components/EnergyResoucesTabs"
 import LineChart from "../components/LineChart"
+import Spinner from "../components/Spinner"
 import variables from "../configs/variables"
 
 import { ReactComponent as ChargedIcon }
@@ -87,8 +93,23 @@ const chartPowerSet = ({data, highPeak, labels, unit}) => ({
     tooltipLabel: item => `${item.parsed.y} ${unit}`,
     y: {max: 15, min: -15}
 })
+const ErrorBox = ({error, margin="", message}) => error
+    ? <AlertBox
+        boxClass={`${margin} negative`}
+        content={<>
+            <span className="font-mono ml-2">{error}</span>
+            <span className="ml-2">{message}</span>
+        </>}
+        icon={ReportProblemIcon}
+        iconColor="negative-main" />
+    : null
+const LoadingBox = ({loading}) => loading
+    ? <div className="grid h-24 place-items-center"><Spinner /></div>
+    : null
 
-export default function EnergyResoucesBattery () {
+const mapState = state => ({gatewayID: state.gateways.active.gatewayID})
+
+export default connect(mapState)(function EnergyResoucesBattery(props) {
     const
         [batteryPower, setBatteryPower] = useState(0),
         [capacity, setCapacity] = useState(0),
@@ -96,52 +117,123 @@ export default function EnergyResoucesBattery () {
         [chargedToday, setChargedToday] = useState(0),
         [chargingState, setChargingState] = useState(0),
         [chargeVoltage, setChargeVoltage] = useState(null),
+        [chargeVoltageError, setChargeVoltageError] = useState(""),
+        [chargeVoltageLoading, setChargeVoltageLoading] = useState(false),
+        [chargeVoltageRes] = useState("hour"),
         [cyclesLifetime, setCyclesLifetime] = useState(0),
         [cyclesToday, setCyclesToday] = useState(0),
         [dischargedLifetime, setDischargedLifetime] = useState(0),
         [dischargedToday, setDischargedToday] = useState(0),
+        [infoError, setInfoError] = useState(""),
+        [infoLoading, setInfoLoading] = useState(false),
         [modal, setModal] = useState(""),
         [power, setPower] = useState(null),
+        [powerError, setPowerError] = useState(""),
+        [powerLoading, setPowerLoading] = useState(false),
+        [powerRes] = useState("hour"),
         [powerSources, setPowerSources] = useState(""),
         [voltage, setVoltage] = useState(0)
 
     useEffect(() => {
-        setBatteryPower(10)
-        setCapacity(10)
-        setChargedLifetime(500)
-        setChargedToday(50)
-        setChargingState(80)
-        setCyclesLifetime(16)
-        setCyclesToday(2)
-        setDischargedLifetime(500)
-        setDischargedToday(50)
-        setModal("Battery F1")
-        setPowerSources("Solar + Grid")
-        setVoltage(40)
+        if (!props.gatewayID) return
 
-        // Chart Data (Fake)
         const
-            currentHour = new Date().getHours(),
-            hours = Array.from(new Array(currentHour + 1).keys()),
-            labels = Array.from(new Array(25).keys()).map(n => {
-                const time = moment().hour(n).minute(0).second(0)
+            startTime = moment().startOf("day").toISOString(),
+            chartParams = resolution => new URLSearchParams({
+                startTime,
+                endTime: moment().endOf("day").toISOString(),
+                resolution
+            }).toString(),
+            urlPrefix = `/api/${props.gatewayID}/devices/battery`
 
-                return time.format("hh A")
-            }),
-            chargeArrays = hours
-                .map(() => Math.round(Math.random() * (75 - 30) + 30)),
-            powerArrays
-                = hours.map(() => Math.round(Math.random() * (5 - (-5)) + (-5))),
-            voltageArrays
-                = hours.map(() => Math.round(Math.random() * (40 - 39) + 39))
+        apiCall({
+            onComplete: () => setInfoLoading(false),
+            onError: error => setInfoError(error),
+            onStart: () => setInfoLoading(true),
+            onSuccess: rawData => {
+                if (!rawData || !rawData.data) return
 
-        setChargeVoltage({
-            data: {charge: chargeArrays, voltage: voltageArrays},
-            highPeak: {start: 19, end: 23},
-            labels
+                const {data} = rawData
+
+                setBatteryPower(data.batteryPower || 0)
+                setCapacity(data.capcity || 0)
+                setChargedLifetime(data.batteryConsumedLifetimeEnergyAC || 0)
+                setChargedToday(data.batteryConsumedEnergyAC || 0)
+                setChargingState(data.batterySoC || 0)
+                setDischargedLifetime(data.batteryProducedLifetimeEnergyAC || 0)
+                setDischargedToday(data.batteryProducedEnergyAC || 0)
+                setCyclesToday(data.batteryOperationCycles || 0)
+                setCyclesLifetime(data.batteryLifetimeOperationCycles || 0)
+                setModal(data.model || "")
+                setPowerSources(data.powerSources || "")
+                setVoltage(data.voltage || 0)
+            },
+            url: `${urlPrefix}/energy-info?startTime=${startTime}`
         })
-        setPower({data: powerArrays, highPeak: {start: 19, end: 23}, labels})
-    }, [])
+
+        const oClocks = Array.from(new Array(25).keys()).map(n =>
+            parseInt(moment().hour(n).startOf("h").format("x")))
+
+        apiCall({
+            onComplete: () => setPowerLoading(false),
+            onError: error => setPowerError(error),
+            onStart: () => setPowerLoading(true),
+            onSuccess: rawData => {
+                if (!rawData || !rawData.data) return
+
+                const
+                    {data} = rawData,
+                    {onPeakTime, timestamps} = data,
+                    {end, start, timezone} = onPeakTime,
+                    labels = [
+                        ...timestamps.map(t => t * 1000),
+                        ...oClocks.slice(timestamps.length)
+                    ],
+                    peakStart = ConvertTimeToNumber(start, timezone),
+                    peakEnd = ConvertTimeToNumber(end, timezone)
+
+                setPower({
+                    data: data.batteryAveragePowerACs,
+                    highPeak: {start: peakStart, end: peakEnd},
+                    labels
+                })
+            },
+            url: `${urlPrefix}/power-state?${chartParams(powerRes)}`
+        })
+
+        const chargeVoltageUrl = `${urlPrefix}/charge-voltage-state?`
+            + chartParams(chargeVoltageRes)
+
+        apiCall({
+            onComplete: () => setChargeVoltageLoading(false),
+            onError: error => setChargeVoltageError(error),
+            onStart: () => setChargeVoltageLoading(true),
+            onSuccess: rawData => {
+                if (!rawData || !rawData.data) return
+
+                const
+                    {data} = rawData,
+                    {onPeakTime, timestamps} = data,
+                    {end, start, timezone} = onPeakTime,
+                    labels = [
+                        ...timestamps.map(t => t * 1000),
+                        ...oClocks.slice(timestamps.length)
+                    ],
+                    peakStart = ConvertTimeToNumber(start, timezone),
+                    peakEnd = ConvertTimeToNumber(end, timezone)
+
+                setChargeVoltage({
+                    data: {
+                        charge: data.batterySoCs,
+                        voltage: data.batteryVoltages
+                    },
+                    highPeak: {start: peakStart, end: peakEnd},
+                    labels
+                })
+            },
+            url: chargeVoltageUrl
+        })
+    }, [props.gatewayID])
 
     const
         t = useTranslation(),
@@ -188,30 +280,40 @@ export default function EnergyResoucesBattery () {
     }
 
     const chargeVoltageChart = chargeVoltage
-        ? <LineChart
-            data={chartChargeVoltageSet({
-                ...chargeVoltage,
-                unit: {charge: "%", voltage: " " + commonT("kw")}
-            })}
-            id="erbChargeVoltage" />
+        ? <div className="max-h-80vh h-160 relative w-full">
+            <LineChart
+                data={chartChargeVoltageSet({
+                    ...chargeVoltage,
+                    unit: {charge: "%", voltage: " " + commonT("kw")}
+                })}
+                id="erbChargeVoltage" />
+        </div>
         : null
 
     const powerChart = power
-        ? <LineChart
-            data={chartPowerSet({...power, unit: commonT("kw")})}
-            id="erbPower" />
+        ? <div className="max-h-80vh h-160 relative w-full">
+            <LineChart
+                data={chartPowerSet({...power, unit: commonT("kw")})}
+                id="erbPower" />
+        </div>
         : null
 
     const batteryInfoCards = batteryInfoData.map((item, i) =>
         <div className="card" key={"erb-bic-" + i}>
             <h5 className="mb-4">{item.title}</h5>
-            <h2>{item.value}</h2>
+            <h2>{item.value || "-"}</h2>
         </div>)
+
+    const infoErrorBox = <ErrorBox
+                            error={infoError}
+                            margin="mb-8"
+                            message={pageT("infoError")} />
 
     return <>
         <h1 className="mb-9">{t("navigator.energyResources")}</h1>
         <EnergyResoucesTabs current="battery" />
-        <div className="font-bold gap-8 grid lg:grid-cols-2">
+        {infoErrorBox}
+        <div className="font-bold gap-8 grid lg:grid-cols-2 relative">
             <EnergyResoucesCard
                 data={cardsData.cycles}
                 icon={CycleIcon}
@@ -228,20 +330,31 @@ export default function EnergyResoucesBattery () {
                 data={cardsData.charged}
                 icon={ChargedIcon}
                 title={pageT("charged")} />
+        {infoLoading
+            ? <div className="absolute bg-black-main-opacity-95 grid inset-0
+                                place-items-center rounded-3xl">
+                <Spinner />
+            </div>
+            : null}
         </div>
         <div className="card chart mt-8">
             <h4 className="mb-9">{pageT("chargingDischargingPower")}</h4>
-            <div className="max-h-80vh h-160 relative w-full">{powerChart}</div>
+            <ErrorBox error={powerError} message={pageT("chartError")} />
+            <LoadingBox loading={powerLoading} />
+            {powerChart}
         </div>
         <div className="card chart mt-8">
             <h4 className="mb-9">{pageT("stateOfChargeVoltage")}</h4>
-            <div className="max-h-80vh h-160 relative w-full">
-                {chargeVoltageChart}
-            </div>
+            <ErrorBox
+                error={chargeVoltageError}
+                message={pageT("chartError")} />
+            {chargeVoltageChart}
+            <LoadingBox loading={chargeVoltageLoading} />
         </div>
         <h1 className="mb-7 mt-20">{pageT("batteryInformation")}</h1>
+        {infoErrorBox}
         <div className="font-bold gap-5 grid md:grid-cols-2 lg:grid-cols-3">
             {batteryInfoCards}
         </div>
     </>
-}
+})

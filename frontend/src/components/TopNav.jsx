@@ -5,11 +5,12 @@ import {Language as LanguageIcon, Logout as LogoutIcon}
 import React, {useState} from "react"
 import {useTranslation} from "react-multi-lang"
 
+import LanguageSelector from "./LanguageSelector"
+import logout from "../utils/logout"
+
 import {ReactComponent as AlertIcon} from "../assets/icons/alert_ring.svg"
 import {ReactComponent as LocationIcon} from "../assets/icons/location.svg"
 import {ReactComponent as UserIcon} from "../assets/icons/profile.svg"
-
-import LanguageSelector from "./LanguageSelector"
 
 function TopNav (props) {
     const
@@ -24,10 +25,7 @@ function TopNav (props) {
 
     const
         {className} = props,
-        {gateways, name} = props.user,
-        gateway = gateways.length > 0
-            ? gateways.filter(g => g.active)[0]
-            : {address: ""},
+        {name} = props.user,
         menuPaperProps = {
             sx: {
                 borderTopLeftRadius: 0,
@@ -52,7 +50,7 @@ function TopNav (props) {
             </div>
             <div className="items-center hidden md:flex">
                 <LocationIcon className="h-8 mr-1 w-8" />
-                {gateway.address}
+                {props.address}
             </div>
         </div>
         <Menu
@@ -68,7 +66,7 @@ function TopNav (props) {
                 <LanguageSelector id="lang" size="small" />
             </MenuItem>
             <Divider />
-            <MenuItem onClick={props.logout}>
+            <MenuItem onClick={logout}>
                 <ListItemIcon><LogoutIcon /></ListItemIcon>
                 {commonT("logOut")}
             </MenuItem>
@@ -76,8 +74,10 @@ function TopNav (props) {
     </div>
 }
 
-const
-    mapState = state => ({lang: state.lang.value, user: state.user}),
-    mapDispatch = dispatch => ({logout: () => dispatch({type: "user/logout"})})
+const mapState = state => ({
+    address: state.gateways.active.address,
+    lang: state.lang.value,
+    user: state.user
+})
 
-export default connect(mapState, mapDispatch)(TopNav)
+export default connect(mapState)(TopNav)

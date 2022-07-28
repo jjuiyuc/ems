@@ -8,16 +8,18 @@ import (
 
 // Services godoc
 type Services struct {
-	Auth  AuthService
-	Email EmailService
-	User  UserService
+	Auth    AuthService
+	Email   EmailService
+	User    UserService
+	Devices DevicesService
 }
 
 // NewServices godoc
 func NewServices(cfg *viper.Viper, repo *repository.Repository) *Services {
 	return &Services{
-		Auth:  NewAuthService(repo),
-		Email: NewEmailService(cfg),
-		User:  NewUserService(repo),
+		Auth:    NewAuthService(repo),
+		Email:   NewEmailService(cfg),
+		User:    NewUserService(repo),
+		Devices: NewDevicesService(repo),
 	}
 }

@@ -25,5 +25,4 @@ export const userSlice = createSlice({
     }
 })
 
-export const { clear } = userSlice.actions
 export default userSlice.reducer

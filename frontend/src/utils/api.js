@@ -3,14 +3,14 @@ import { API_HOST } from "../constant/env"
 import store from "../store"
 
 export const apiCall = async ({
-    url = "/",
-    method = "get",
-    data = {},
     contentType = "",
+    data = {},
+    method = "GET",
     onComplete = () => {},
+    onError = () => {},
     onStart = () => {},
     onSuccess = () => {},
-    onError = () => {}
+    url = "/"
 }) => {
     const {protocol} = window.location, {token} = store.getState().user
 
@@ -31,7 +31,8 @@ export const apiCall = async ({
             onSuccess(res.data)
             return res.data
         }
-    } catch (err) {
+    }
+    catch (err) {
         let result = err.code
 
         if (err.response) {
@@ -43,7 +44,8 @@ export const apiCall = async ({
         }
 
         onError(result)
-    } finally {
+    }
+    finally {
         onComplete()
     }
 }

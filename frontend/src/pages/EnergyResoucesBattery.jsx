@@ -4,14 +4,15 @@ import ReportProblemIcon from "@mui/icons-material/ReportProblem"
 import { useEffect, useState } from "react"
 import { useTranslation } from "react-multi-lang"
 
-import AlertBox from "../components/AlertBox"
 import { apiCall } from "../utils/api"
 import { ConvertTimeToNumber } from "../utils/utils"
+import variables from "../configs/variables"
+
+import AlertBox from "../components/AlertBox"
 import EnergyResoucesCard from "../components/EnergyResoucesCard"
 import EnergyResoucesTabs from "../components/EnergyResoucesTabs"
 import LineChart from "../components/LineChart"
 import Spinner from "../components/Spinner"
-import variables from "../configs/variables"
 
 import { ReactComponent as ChargedIcon }
     from "../assets/icons/battery_charged.svg"
@@ -164,8 +165,8 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
                 setDischargedToday(data.batteryProducedEnergyAC || 0)
                 setCyclesToday(data.batteryOperationCycles || 0)
                 setCyclesLifetime(data.batteryLifetimeOperationCycles || 0)
-                setModal(data.model || "")
-                setPowerSources(data.powerSources || "")
+                setModal(data.model || "-")
+                setPowerSources(data.powerSources || "-")
                 setVoltage(data.voltage || 0)
             },
             url: `${urlPrefix}/energy-info?startTime=${startTime}`

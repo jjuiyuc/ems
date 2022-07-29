@@ -8,5 +8,10 @@ export default defineConfig({
         "global": {},
         "process.env": process.env
     },
+    build: {
+        rollupOptions: {
+            external: "jss-plugin-{}"
+        }
+    },
     plugins: [react(), svgr()]
 })

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import { useTranslation } from "react-multi-lang"
 
 import { API_HOST } from "../constant/env"
-// import PriceCard from "../components/PriceCard"
+import PriceCard from "../components/PriceCard"
 
 
 
@@ -14,44 +14,40 @@ export default function Economics(props) {
         t = useTranslation(),
         commonT = string => t("common." + string),
         pageT = (string, params) => t("economics." + string, params)
-
-
-
+    const
+        [ancillaryServices, setAncillaryServices] = useState(15),
+        [demandCharge, setDemandCharge] = useState(150),
+        [timeOfUseArbitrage, setTimeOfUseArbitrage] = useState(130),
+        [renewableEnergyCertificate, setRenewableEnergyCertificate] = useState(150),
+        [solarLocalUsage, setSolarLocalUsage] = useState(160),
+        [exportToGrid, setExportToGrid] = useState(130)
 
     return <>
         <h1 className="mb-9">{pageT("economics")}</h1>
         <div className="flex lg:max-w-7xl">
-            <div className="card w-3/12">
+            <div className="card w-3/12 mb-8">
                 <h6>{pageT("total")}</h6>
             </div>
-            <div className="flex flex-wrap">
-                <div className="row flex">
-                    <div className="card">
-                        <h6>{pageT("ancillaryServices")}</h6>
-                        <h2>$15</h2>
-                    </div>
-                    <div className="card">
-                        <h6>{pageT("demandCharge")}</h6>
-                        <h2>$150</h2>
-                    </div>
-                    <div className="card">
-                        <h6>{pageT("timeOfUseArbitrage")}</h6>
-                        <h2>$150</h2>
-                    </div>
-                </div>
-                <div className="row flex">
-                    <div className="card ">
-                        <h6>{pageT("renewableEnergyCertificate")}</h6>
-                        <h2>$150</h2>
-                    </div>
-                    <div className="card">
-                        <h6>{pageT("solarLocalUsage")}</h6>
-                        <h2>$150</h2>
-                    </div>
-                    <div className="card">
-                        <h6>{pageT("exportToGrid")}</h6>
-                        <h2>$150</h2>
-                    </div>
+            <div className="flex flex-wrap ml-5">
+                <div className="lg:grid grid-cols-3 auto-cols-max">
+                    <PriceCard
+                        price={ancillaryServices}
+                        title={pageT("ancillaryServices")} />
+                    <PriceCard
+                        price={demandCharge}
+                        title={pageT("demandCharge")} />
+                    <PriceCard
+                        price={timeOfUseArbitrage}
+                        title={pageT("timeOfUseArbitrage")} />
+                    <PriceCard
+                        price={renewableEnergyCertificate}
+                        title={pageT("renewableEnergyCertificate")} />
+                    <PriceCard
+                        price={solarLocalUsage}
+                        title={pageT("solarLocalUsage")} />
+                    <PriceCard
+                        price={exportToGrid}
+                        title={pageT("exportToGrid")} />
                 </div>
             </div>
 

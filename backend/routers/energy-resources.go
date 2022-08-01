@@ -81,7 +81,7 @@ func (w *APIWorker) GetBatteryPowerState(c *gin.Context) {
 	w.getBatteryState(c, Power)
 }
 
-// GetBatteryPowerState provides today's hourly charge and voltage state of a battery
+// GetBatteryChargeVoltageState provides today's hourly charge and voltage state of a battery
 // @Summary Provide today's hourly charge and voltage state of a battery
 // @Tags Energy Resources
 // @Security ApiKeyAuth

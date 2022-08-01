@@ -16,7 +16,7 @@ type Claims struct {
 
 // GenerateToken returns the token used for auth
 func GenerateToken(userID int) (token string, err error) {
-	nowTime := time.Now()
+	nowTime := time.Now().UTC()
 	expireTime := nowTime.Add(3 * time.Hour)
 	claims := Claims{
 		userID,

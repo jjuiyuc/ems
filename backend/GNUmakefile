@@ -5,6 +5,9 @@ GO_PKGS := $(shell go list ./... | grep -v models\/ )
 # saparated by comma
 COVER_PKG := $(shell go list ./... | grep -v models\/ | paste -sd "," - )
 
+GIT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
+GIT_COMMIT := $(shell git rev-parse --short HEAD)
+
 clean:
 	@rm -rf dist
 
@@ -16,10 +19,10 @@ go-lint:
 	@$(AT_RUN)$(GOPATH)/bin/golint $(GO_PKGS)
 
 go-build: clean
-	@go build -o dist/weather-worker cmd/daemon/weather-worker/weather-worker.go
-	@go build -o dist/api-worker cmd/daemon/api-worker/api-worker.go
-	@go build -o dist/local-cc-worker cmd/daemon/local-cc-worker/local-cc-worker.go
-	@go build -o dist/billing-worker cmd/daemon/billing-worker/billing-worker.go
+	go build -ldflags "-X der-ems/config.gitBranch=$(GIT_BRANCH) -X der-ems/config.gitCommit=$(GIT_COMMIT)" -o dist/weather-worker cmd/daemon/weather-worker/weather-worker.go
+	go build -ldflags "-X der-ems/config.gitBranch=$(GIT_BRANCH) -X der-ems/config.gitCommit=$(GIT_COMMIT)" -o dist/api-worker cmd/daemon/api-worker/api-worker.go
+	go build -ldflags "-X der-ems/config.gitBranch=$(GIT_BRANCH) -X der-ems/config.gitCommit=$(GIT_COMMIT)" -o dist/local-cc-worker cmd/daemon/local-cc-worker/local-cc-worker.go
+	go build -ldflags "-X der-ems/config.gitBranch=$(GIT_BRANCH) -X der-ems/config.gitCommit=$(GIT_COMMIT)" -o dist/billing-worker cmd/daemon/billing-worker/billing-worker.go
 
 swag:
 	@$(shell if [ ! -f $(GOPATH)/bin/swag ] ; then go get -u github.com/swaggo/swag/cmd/swag; fi)

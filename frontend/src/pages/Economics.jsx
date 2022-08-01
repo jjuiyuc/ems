@@ -35,7 +35,7 @@ export default function Economics(props) {
                         title={pageT("ancillaryServices")} />
                     <PriceCard
                         price={demandCharge}
-                        title={pageT("demandCharge")} />
+                        title={pageT("demandCharge")} />z
                     <PriceCard
                         price={timeOfUseArbitrage}
                         title={pageT("timeOfUseArbitrage")} />

@@ -327,13 +327,14 @@ var doc = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "get battery by token, gateway UUID, resolution, startTime and endTime",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Energy Resources"
+                    "energy resources"
                 ],
-                "summary": "Provide today's hourly power state of a battery",
+                "summary": "Show today's hourly power state of a battery",
                 "parameters": [
                     {
                         "type": "string",
@@ -342,13 +343,58 @@ var doc = `{
                         "name": "Authorization",
                         "in": "header",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Gateway UUID",
+                        "name": "gwid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "hour"
+                        ],
+                        "type": "string",
+                        "description": "Resolution",
+                        "name": "resolution",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "UTC time in ISO-8601",
+                        "name": "startTime",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "UTC time in ISO-8601",
+                        "name": "endTime",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/app.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/services.BatteryPowerStateResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
@@ -426,6 +472,29 @@ var doc = `{
                 },
                 "voltage": {
                     "type": "number"
+                }
+            }
+        },
+        "services.BatteryPowerStateResponse": {
+            "type": "object",
+            "properties": {
+                "batteryAveragePowerACs": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
+                },
+                "onPeakTime": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "timestamps": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 }
             }
         },

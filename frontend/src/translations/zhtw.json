@@ -47,6 +47,15 @@
         "stateOfCharge": "充電狀態",
         "unableToConnect": "無法建立連線"
     },
+    "demandCharge": {
+        "demandCharge": "需求費用",
+        "peakShave": "Peak Shave",
+        "currentBillCycle": "目前帳單週期",
+        "realizedSavings": "已實現結餘",
+        "lastMonthBillCycleDemandCharge": "上個月帳單週期需求費用",
+        "demandDetails": "需求詳情",
+        "active": "Active"
+    },
     "energyResources": {
         "battery": {
             "batteryInformation": "Battery Information",

@@ -1,7 +1,7 @@
-import {Navigate, Route, Routes, useLocation} from "react-router-dom"
-import {connect} from "react-redux"
+import { connect } from "react-redux"
+import { Navigate, Route, Routes, useLocation } from "react-router-dom"
 import React, { useEffect } from "react"
-import {useTranslation} from "react-multi-lang"
+import { useTranslation } from "react-multi-lang"
 
 import logout from "../utils/logout"
 
@@ -10,6 +10,7 @@ import TopNav from "../components/TopNav"
 import Sample from "../configs/Sample"
 
 import Dashboard from "../pages/Dashboard"
+import DemandCharge from "../pages/DemendCharge"
 import EnergyResoucesBattery from "../pages/EnergyResoucesBattery"
 import Analysis from "../pages/Analysis"
 import TimeOfUse from "../pages/TimeOfUse"
@@ -41,7 +42,9 @@ function LoggedIn(props) {
                         <Route element={<Analysis />} path="/analysis" />
                         <Route element={<TimeOfUse />} path="/time-of-use" />
                         <Route element={<Sample />} path="/economics" />
-                        <Route element={<Sample />} path="/demand-charge" />
+                        <Route
+                            element={<DemandCharge />}
+                            path="/demand-charge" />
                         <Route
                             element={<EnergyResoucesBattery />}
                             path="/energy-resources/battery" />

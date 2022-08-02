@@ -47,6 +47,15 @@
         "stateOfCharge": "State of Charge",
         "unableToConnect": "Unable to connect"
     },
+    "demandCharge": {
+        "demandCharge": "Demand Charge",
+        "peakShave": "Peak Shave",
+        "currentBillCycle": "Current Bill Cycle",
+        "realizedSavings": "Realized Savings",
+        "lastMonthBillCycleDemandCharge": "Last Month Bill Cycle Demand Charge",
+        "demandDetails": "Demand Details",
+        "active": "Active"
+    },
     "energyResources": {
         "battery": {
             "batteryInformation": "Battery Information",

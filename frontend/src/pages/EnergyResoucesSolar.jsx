@@ -14,14 +14,18 @@ import EnergyResoucesTabs from "../components/EnergyResoucesTabs"
 import LineChart from "../components/LineChart"
 import Spinner from "../components/Spinner"
 
-import { ReactComponent as ChargedIcon }
+import { ReactComponent as SolarIcon }
     from "../assets/icons/sunny.svg"
-import { ReactComponent as ChargingIcon }
-    from "../assets/icons/battery_charging.svg"
-import { ReactComponent as CycleIcon } from "../assets/icons/battery_cycle.svg"
-import { ReactComponent as DischargeIcon }
-    from "../assets/icons/battery_discharge.svg"
-
+import { ReactComponent as DirectUseIcon }
+    from "../assets/icons/direct_use.svg"
+import { ReactComponent as ChargedIcon }
+    from "../assets/icons/battery_charged.svg"
+import { ReactComponent as GridImportIcon }
+    from "../assets/icons/grid_import.svg"
+import { ReactComponent as EconomicsIcon }
+    from "../assets/icons/economics.svg"
+import { ReactComponent as Co2Icon }
+    from "../assets/icons/co2.svg"
 const { colors } = variables
 
 const drawHighPeak = (startHour, endHour) => chart => {

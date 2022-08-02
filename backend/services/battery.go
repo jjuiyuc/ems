@@ -40,12 +40,13 @@ type BatteryService interface {
 }
 
 type defaultBatteryService struct {
-	repo *repository.Repository
+	repo    *repository.Repository
+	billing BillingService
 }
 
 // NewBatteryService godoc
-func NewBatteryService(repo *repository.Repository) BatteryService {
-	return &defaultBatteryService{repo}
+func NewBatteryService(repo *repository.Repository, billing BillingService) BatteryService {
+	return &defaultBatteryService{repo, billing}
 }
 
 // GetBatteryEnergyInfo godoc
@@ -171,31 +172,31 @@ func (s defaultBatteryService) getOnPeakTime(gwUUID string, t time.Time) (onPeak
 		}).Error()
 		return
 	}
-	billingType, err := utils.GetBillingTypeByCustomerID(s.repo, gateway.CustomerID)
+	billingType, err := s.billing.GetBillingTypeByCustomerID(gateway.CustomerID)
 	if err != nil {
 		log.WithFields(log.Fields{
-			"caused-by": "apps.GetBillingTypeByCustomerID",
+			"caused-by": "s.billing.GetBillingTypeByCustomerID",
 			"err":       err,
 		}).Error()
 		return
 	}
-	localTime, err := utils.GetLocalTime(s.repo, billingType.TOULocationID, t)
+	localTime, err := s.billing.GetLocalTime(billingType.TOULocationID, t)
 	if err != nil {
 		log.WithFields(log.Fields{
-			"caused-by": "utils.GetLocalTime",
+			"caused-by": "s.billing.GetLocalTime",
 			"err":       err,
 		}).Error()
 		return
 	}
-	periodType := utils.GetPeriodTypeOfDay(s.repo, billingType.TOULocationID, localTime)
+	periodType := s.billing.GetPeriodTypeOfDay(billingType.TOULocationID, localTime)
 	if err != nil {
 		log.WithFields(log.Fields{
-			"caused-by": "apps.GetPeriodTypeOfDay",
+			"caused-by": "s.billing.GetPeriodTypeOfDay",
 			"err":       err,
 		}).Error()
 		return
 	}
-	isSummer := utils.IsSummer(localTime)
+	isSummer := s.billing.IsSummer(localTime)
 	billings, err := s.repo.TOU.GetBillingsByTOUInfo(billingType.TOULocationID, billingType.VoltageType, billingType.TOUType, periodType, isSummer, localTime.Format(utils.YYYYMMDD))
 	if err != nil {
 		log.WithFields(log.Fields{

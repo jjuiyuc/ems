@@ -14,6 +14,7 @@ import (
 	"der-ems/kafka"
 	deremsmodels "der-ems/models/der-ems"
 	"der-ems/repository"
+	"der-ems/services"
 )
 
 // BillingParams godoc
@@ -35,14 +36,15 @@ func NewBillingWorker(
 	ctx context.Context,
 	cfg *viper.Viper,
 	repo *repository.Repository,
+	billing services.BillingService,
 	name string,
 ) {
 	// 1. Send at the beginning
-	sendAIBillingParams(cfg, repo, true)
+	sendAIBillingParams(cfg, repo, billing, true)
 
 	// 2. Send at 04:00 on Saturday in UTC(12:00 on Saturday in UTC+0800)
 	c := cron.New()
-	c.AddFunc(cfg.GetString("cron.billing"), func() { sendAIBillingParams(cfg, repo, false) })
+	c.AddFunc(cfg.GetString("cron.billing"), func() { sendAIBillingParams(cfg, repo, billing, false) })
 	c.Start()
 	log.Info("serving: ", name)
 	<-ctx.Done()
@@ -51,7 +53,7 @@ func NewBillingWorker(
 	log.Info("stopped: ", name)
 }
 
-func sendAIBillingParams(cfg *viper.Viper, repo *repository.Repository, sendNow bool) {
+func sendAIBillingParams(cfg *viper.Viper, repo *repository.Repository, billing services.BillingService, sendNow bool) {
 	utils.PrintFunctionName()
 	gateways, err := getGateways(repo)
 	if err != nil {
@@ -59,7 +61,7 @@ func sendAIBillingParams(cfg *viper.Viper, repo *repository.Repository, sendNow 
 	}
 
 	for _, gateway := range gateways {
-		billingParamsJSON, err := generateBillingParams(repo, gateway, sendNow)
+		billingParamsJSON, err := generateBillingParams(repo, billing, gateway, sendNow)
 		if err != nil {
 			continue
 		}
@@ -78,20 +80,20 @@ func getGateways(repo *repository.Repository) (gateways []*deremsmodels.Gateway,
 	return
 }
 
-func generateBillingParams(repo *repository.Repository, gateway *deremsmodels.Gateway, sendNow bool) (billingParamsJSON []byte, err error) {
-	billingType, err := utils.GetBillingTypeByCustomerID(repo, gateway.CustomerID)
+func generateBillingParams(repo *repository.Repository, billing services.BillingService, gateway *deremsmodels.Gateway, sendNow bool) (billingParamsJSON []byte, err error) {
+	billingType, err := billing.GetBillingTypeByCustomerID(gateway.CustomerID)
 	if err != nil {
 		return
 	}
-	localTime, err := utils.GetLocalTime(repo, billingType.TOULocationID, time.Now().UTC())
+	localTime, err := billing.GetLocalTime(billingType.TOULocationID, time.Now().UTC())
 	if err != nil {
 		return
 	}
-	billingParamsJSON, err = getWeeklyBillingParamsByType(repo, billingType, localTime, sendNow)
+	billingParamsJSON, err = getWeeklyBillingParamsByType(repo, billing, billingType, localTime, sendNow)
 	return
 }
 
-func getWeeklyBillingParamsByType(repo *repository.Repository, billingType utils.BillingType, localTime time.Time, sendNow bool) (billingParamsJSON []byte, err error) {
+func getWeeklyBillingParamsByType(repo *repository.Repository, billing services.BillingService, billingType services.BillingType, localTime time.Time, sendNow bool) (billingParamsJSON []byte, err error) {
 	var billingParams BillingParams
 	// 1. Get timezone
 	log.Debug("timezone: ", localTime.Format(utils.ZHHMM))
@@ -104,10 +106,10 @@ func getWeeklyBillingParamsByType(repo *repository.Repository, billingType utils
 		timeOfEachDay := timeOnSunday.AddDate(0, 0, i)
 		log.Debug("timeOfEachDay: ", timeOfEachDay)
 		// 3-1. Get period type
-		periodType := utils.GetPeriodTypeOfDay(repo, billingType.TOULocationID, timeOfEachDay)
+		periodType := billing.GetPeriodTypeOfDay(billingType.TOULocationID, timeOfEachDay)
 		log.Debug("periodType: ", periodType)
 		// 3-2. The day is summmer or not
-		isSummer := utils.IsSummer(timeOfEachDay)
+		isSummer := billing.IsSummer(timeOfEachDay)
 		log.Debug("isSummer: ", isSummer)
 		// 3-3. Get billings
 		billings, err := repo.TOU.GetBillingsByTOUInfo(billingType.TOULocationID, billingType.VoltageType, billingType.TOUType, periodType, isSummer, timeOfEachDay.Format(utils.YYYYMMDD))

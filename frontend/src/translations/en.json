@@ -132,6 +132,18 @@
         "solarLocalUsage":"Solar Local Usage",
         "exportToGrid":"Export to Grid",
         "monthlyStackedRevenue":"Monthly Stacked Revenue",
-        "thisMonth":"This Month"
+        "thisMonth":"This Month",
+        "january":"January",
+        "february":"February",
+        "march":"March",
+        "april":"April",
+        "may":"May",
+        "june":"June",
+        "july":"July",
+        "august":"August",
+        "september":"September",
+        "october":"October",
+        "november":"November",
+        "december":"December"
     }
 }

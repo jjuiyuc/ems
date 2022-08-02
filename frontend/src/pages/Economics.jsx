@@ -1,11 +1,16 @@
-import { connect } from "react-redux"
+import { Button, Stack } from "@mui/material"
 import { useEffect, useState } from "react"
 import { useTranslation } from "react-multi-lang"
+import moment from "moment"
 
 import { API_HOST } from "../constant/env"
 import PriceCard from "../components/PriceCard"
+import LineChart from "../components/LineChart"
+import variables from "../configs/variables"
 
 import { ReactComponent as EconomicsIcon } from "../assets/icons/economics.svg"
+
+const { colors } = variables
 
 export default function Economics(props) {
 
@@ -21,6 +26,37 @@ export default function Economics(props) {
         [renewableEnergyCertificate, setRenewableEnergyCertificate] = useState(150),
         [solarLocalUsage, setSolarLocalUsage] = useState(160),
         [exportToGrid, setExportToGrid] = useState(130)
+    const
+        hours24 = Array.from(new Array(24).keys()),
+        lineChartDateLabels = hours24.map(n => {
+            const time = moment().hour(n).minute(0).second(0)
+
+            return time.format("hh A")
+        }),
+        currentHour = moment().hour(),
+        lineChartDataArray = hours24.filter(v => v <= currentHour).map(() =>
+            Math.floor(Math.random() * (60 - 40 + 1) + 40))
+    const
+        [lineChartData, setLineChartData] = useState({
+            datasets: [{
+                backgroundColor: colors.primary.main,
+                borderColor: colors.primary.main,
+                data: lineChartDataArray,
+                fill: {
+                    above: colors.primary["main-opacity-10"],
+                    target: "origin"
+                },
+                pointBorderColor: colors.primary["main-opacity-20"]
+            }],
+            labels: lineChartDateLabels,
+            tickCallback: (val, index) => val + commonT("kw"),
+            tooltipLabel: item => `${item.parsed.y}` + commonT("kw"),
+            x: { grid: { lineWidth: 0 } },
+            y: { max: 80, min: 0 }
+        })
+    const
+        [tab, setTab] = useState("monthlyStackedRevenue"),
+        tabs = ["thisMonth", "perviousMonth", "thisMonthLastYear"]
 
     return <>
         <h1 className="mb-9">{pageT("economics")}</h1>
@@ -55,9 +91,29 @@ export default function Economics(props) {
                         title={pageT("exportToGrid")} />
                 </div>
             </div>
-
-
         </div>
+        <div className="card chart">
+            <div className="grid items-center grid-cols-1fr-auto-1fr">
+                <h4>{pageT("monthlyStackedRevenue")}</h4>
+                <Stack direction="row" spacing={1.5}>
+                    {tabs.map((t, i) =>
+                        <Button
+                            color="purple"
+                            onClick={() => setTab(t)}
+                            filter={tab === t ? "selected" : ""}
+                            key={"a-t-" + i}
+                            radius="pill"
+                            variant="contained">
+                            {pageT(t)}
+                        </Button>)}
+                </Stack>
+                <div />
+            </div>
+            <div className="max-h-80vh h-160 w-full">
+                <LineChart data={lineChartData} id="dcLineChart" />
+            </div>
+        </div>
+
 
     </>
 }

@@ -4,16 +4,84 @@ definitions:
     properties:
       code:
         type: integer
-      data: {}
+      data:
+        type: object
       msg:
+        type: string
+    type: object
+  services.BatteryEnergyInfoResponse:
+    properties:
+      batteryConsumedEnergyAC:
+        type: number
+      batteryConsumedLifetimeEnergyAC:
+        type: number
+      batteryLifetimeOperationCycles:
+        type: number
+      batteryOperationCycles:
+        type: number
+      batteryPower:
+        type: number
+      batteryProducedEnergyAC:
+        type: number
+      batteryProducedLifetimeEnergyAC:
+        type: number
+      batterySoC:
+        type: number
+      capcity:
+        type: number
+      model:
+        type: string
+      powerSources:
+        type: string
+      voltage:
+        type: number
+    type: object
+  services.GatewayInfo:
+    properties:
+      address:
+        type: string
+      gatewayID:
+        type: string
+    type: object
+  services.ProfileResponse:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        type: string
+      expirationDate:
+        type: string
+      gateways:
+        items:
+          $ref: '#/definitions/services.GatewayInfo'
+        type: array
+      id:
+        type: integer
+      lockedAt:
+        type: string
+      name:
+        type: string
+      passwordLastChanged:
+        type: string
+      passwordRetryCount:
+        type: string
+      pwdTokenExpiry:
+        type: string
+      resetPWDToken:
+        type: string
+      updatedAt:
+        type: string
+      username:
         type: string
     type: object
 info:
   contact: {}
-  title: DER_EMS
+  license: {}
+  title: DER-EMS API
 paths:
   /{gwid}/devices/battery/energy-info:
     get:
+      description: get battery by token, gateway UUID and startTime
       parameters:
       - default: Bearer <Add access token here>
         description: Input user's access token
@@ -21,41 +89,56 @@ paths:
         name: Authorization
         required: true
         type: string
+      - description: Gateway UUID
+        in: path
+        name: gwid
+        required: true
+        type: string
+      - description: UTC time in ISO-8601
+        format: date-time
+        in: query
+        name: startTime
+        required: true
+        type: string
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.Response'
+            allOf:
+            - $ref: '#/definitions/app.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/services.BatteryEnergyInfoResponse'
+              type: object
         "401":
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/app.Response'
-        "500":
-          description: Internal Server Error
           schema:
             $ref: '#/definitions/app.Response'
       security:
       - ApiKeyAuth: []
-      summary: Provide detailed information and current state about a battery
+      summary: Show the detailed information and current state about a battery
       tags:
-      - Energy Resources
+      - energy resources
   /auth:
     post:
       consumes:
       - application/json
+      description: get token by username and password
       parameters:
       - description: Username
-        in: path
+        in: body
         name: username
         required: true
-        type: string
+        schema:
+          type: string
       - description: Password
-        in: path
+        in: body
         name: password
         required: true
-        type: string
+        schema:
+          type: string
       produces:
       - application/json
       responses:
@@ -75,24 +158,27 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/app.Response'
-      summary: Get Authorization
+      summary: Show a token
       tags:
-      - Authorization
+      - authorization
   /user/PasswordResetByToken:
     put:
       consumes:
       - application/json
+      description: set a new password by having the token from email
       parameters:
       - description: Token
-        in: path
+        in: body
         name: token
         required: true
-        type: string
-      - description: Password
-        in: path
+        schema:
+          type: string
+      - description: New password
+        in: body
         name: password
         required: true
-        type: string
+        schema:
+          type: string
       produces:
       - application/json
       responses:
@@ -108,19 +194,21 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/app.Response'
-      summary: Set new password by having the token from email
+      summary: Reset the password
       tags:
-      - User
+      - user
   /user/passwordLost:
     put:
       consumes:
       - application/json
+      description: get email by username
       parameters:
       - description: Username
-        in: path
+        in: body
         name: username
         required: true
-        type: string
+        schema:
+          type: string
       produces:
       - application/json
       responses:
@@ -138,9 +226,10 @@ paths:
             $ref: '#/definitions/app.Response'
       summary: Send an email for reset the password
       tags:
-      - User
+      - user
   /user/profile:
     get:
+      description: get user by token
       parameters:
       - default: Bearer <Add access token here>
         description: Input user's access token
@@ -154,7 +243,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.Response'
+            allOf:
+            - $ref: '#/definitions/app.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/services.ProfileResponse'
+              type: object
         "401":
           description: Unauthorized
           schema:
@@ -165,7 +259,7 @@ paths:
             $ref: '#/definitions/app.Response'
       security:
       - ApiKeyAuth: []
-      summary: Provide detailed information about an individual user
+      summary: Show the detailed information about an individual user
       tags:
-      - User
+      - user
 swagger: "2.0"

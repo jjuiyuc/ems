@@ -10,16 +10,18 @@ import (
 	"der-ems/internal/e"
 )
 
-// GetBatteryEnergyInfo provides the detailed information and current state about a battery
-// @Summary Provide detailed information and current state about a battery
-// @Tags Energy Resources
-// @Security ApiKeyAuth
-// @Param Authorization header string true "Input user's access token" default(Bearer <Add access token here>)
-// @Produce application/json
-// @Success 200 {object} app.Response
-// @Failure 401 {object} app.Response
-// @Failure 500 {object} app.Response
-// @Router /{gwid}/devices/battery/energy-info [get]
+// GetBatteryEnergyInfo godoc
+// @Summary     Show the detailed information and current state about a battery
+// @Description get battery by token, gateway UUID and startTime
+// @Tags        energy resources
+// @Security    ApiKeyAuth
+// @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
+// @Param       gwid           path      string true "Gateway UUID"
+// @Param       startTime      query     string true "UTC time in ISO-8601" format(date-time)
+// @Produce     json
+// @Success     200            {object}  app.Response{data=services.BatteryEnergyInfoResponse}
+// @Failure     401            {object}  app.Response
+// @Router      /{gwid}/devices/battery/energy-info [get]
 func (w *APIWorker) GetBatteryEnergyInfo(c *gin.Context) {
 	appG := app.Gin{c}
 	userID, _ := c.Get("userID")

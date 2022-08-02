@@ -144,6 +144,10 @@
         "september":"九月",
         "october":"十月",
         "november":"十一月",
-        "december":"十二月"
+        "december":"十二月",
+        "monthlyStackedRevenue":"每月累積收入",
+        "thisMonth":"當月",
+        "perviousMonth":"上個月",
+        "thisMonthLastYear":"去年當月"
     }
 }

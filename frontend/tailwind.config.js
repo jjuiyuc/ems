@@ -16,7 +16,7 @@ module.exports = {
             boxShadow: {
                 main: "4px 0px 4px rgba(0, 0, 0, 0.05) inset"
             },
-            colors: {...palette},
+            colors: { ...palette },
             fontSize: {
                 "13px": ".8125rem",
                 "28px": "1.75rem",
@@ -27,7 +27,8 @@ module.exports = {
                 "1fr-1px-1fr": "1fr 1px 1fr",
                 "3-auto": "auto auto auto",
                 "5rem-1fr": "5rem 1fr",
-                "15rem-1fr": "15rem 1fr"
+                "15rem-1fr": "15rem 1fr",
+                "1fr-auto-1fr": "1fr auto 1fr",
             },
             gridTemplateRows: {
                 "1fr-auto": "1fr auto",
@@ -68,7 +69,7 @@ module.exports = {
                 "45": "11.25rem",
                 "38": "9.5rem",
                 "60": "15rem",
-                "88":"22rem"
+                "88": "22rem"
             }
         },
         screens: {
@@ -76,14 +77,14 @@ module.exports = {
             md: "900px",
             lg: "1200px",
             xl: "1536px",
-            "h-sm": {raw: "(min-height: 600px)"},
-            "h-md": {raw: "(min-height: 900px)"},
-            "h-lg": {raw: "(min-height: 1200px)"},
-            "h-xl": {raw: "(min-height: 1536px)"},
-            "sm-sm": {raw: "(min-width: 600px) and (min-height: 600px)"},
-            "sm-md": {raw: "(min-width: 600px) and (min-height: 900px)"},
-            "sm-lg": {raw: "(min-width: 600px) and (min-height: 1200px)"},
-            "sm-xl": {raw: "(min-width: 600px) and (min-height: 1536px)"},
+            "h-sm": { raw: "(min-height: 600px)" },
+            "h-md": { raw: "(min-height: 900px)" },
+            "h-lg": { raw: "(min-height: 1200px)" },
+            "h-xl": { raw: "(min-height: 1536px)" },
+            "sm-sm": { raw: "(min-width: 600px) and (min-height: 600px)" },
+            "sm-md": { raw: "(min-width: 600px) and (min-height: 900px)" },
+            "sm-lg": { raw: "(min-width: 600px) and (min-height: 1200px)" },
+            "sm-xl": { raw: "(min-width: 600px) and (min-height: 1536px)" },
         }
     },
     plugins: [],

@@ -144,6 +144,10 @@
         "september":"September",
         "october":"October",
         "november":"November",
-        "december":"December"
+        "december":"December",
+        "monthlyStackedRevenue":"Monthly Stacked Revenue",
+        "thisMonth":"This Month",
+        "perviousMonth":"Pervious Month",
+        "thisMonthLastYear":"This Month Last Year"
     }
 }

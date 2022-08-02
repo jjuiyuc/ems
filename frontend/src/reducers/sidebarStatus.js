@@ -11,5 +11,4 @@ export const sidebarStatusSlice = createSlice({
     }
 })
 
-export const {updateSidebarStatus} = sidebarStatusSlice.actions
 export default sidebarStatusSlice.reducer

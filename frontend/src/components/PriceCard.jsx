@@ -1,11 +1,5 @@
-export default function PriceCard(props) {
-
-    const { price } = props
-
-    return <div className="card mr-5 md:mb-8">
-        <div>
-            <p className="font-bold">{props.title}</p>
-            <h2 className="font-bold mb-1 pt-4">${price}</h2>
-        </div>
+export default PriceCard = props =>
+    <div className="card font-bold mb-8">
+        <p className="mb-4">{props.title}</p>
+        <h2>$ {props.price}</h2>
     </div>
-}

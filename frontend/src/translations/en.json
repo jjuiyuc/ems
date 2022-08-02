@@ -47,6 +47,15 @@
         "stateOfCharge": "State of Charge",
         "unableToConnect": "Unable to connect"
     },
+    "demandCharge": {
+        "demandCharge": "Demand Charge",
+        "peakShave": "Peak Shave",
+        "currentBillCycle": "Current Bill Cycle",
+        "realizedSavings": "Realized Savings",
+        "lastMonthBillCycleDemandCharge": "Last Month Bill Cycle Demand Charge",
+        "demandDetails": "Demand Details",
+        "active": "Active"
+    },
     "energyResources": {
         "battery": {
             "batteryInformation": "Battery Information",
@@ -55,7 +64,9 @@
             "capacity": "Capacity",
             "charged": "Charged",
             "chargingDischargingPower": "Charging / Discharging Power",
+            "chartError": "Can't get chart data",
             "discharged": "Discharged",
+            "infoError": "Can't get battery info",
             "lifetime": "Lifetime",
             "modal": "Modal",
             "percentage": "Percentage",

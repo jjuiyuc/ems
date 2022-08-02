@@ -20,4 +20,6 @@ const (
 	ErrPasswordLost = 30002
 
 	ErrToken = 40000
+
+	ErrDashboardDataParse = 50000
 )

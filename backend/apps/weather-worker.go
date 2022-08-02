@@ -111,8 +111,7 @@ func (h weatherConsumerHandler) processWeatherData(msg []byte) {
 
 func (h weatherConsumerHandler) saveWeatherData(msg []byte) (lat, lng float32, err error) {
 	var latestWeather LatestWeather
-	err = json.Unmarshal(msg, &latestWeather)
-	if err != nil {
+	if err = json.Unmarshal(msg, &latestWeather); err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "json.Unmarshal",
 			"err":       err,
@@ -123,8 +122,8 @@ func (h weatherConsumerHandler) saveWeatherData(msg []byte) (lat, lng float32, e
 	for i, data := range latestWeather.Values {
 		const validDate = "validDate"
 
-		dt := data[validDate]
-		if dt == nil {
+		dt, ok := data[validDate]
+		if !ok {
 			err = e.ErrNewKeyNotExist(validDate)
 			log.WithFields(log.Fields{
 				"caused-by": validDate,
@@ -205,8 +204,7 @@ func (h weatherConsumerHandler) getWeatherDataByLocation(lat, lng float32) (late
 			latestWeather.Alt = weatherForecast.Alt.Float32
 		}
 
-		err = json.Unmarshal(weatherForecast.Data.JSON, &value)
-		if err != nil {
+		if err = json.Unmarshal(weatherForecast.Data.JSON, &value); err != nil {
 			log.WithFields(log.Fields{
 				"caused-by": "json.Unmarshal",
 				"err":       err,

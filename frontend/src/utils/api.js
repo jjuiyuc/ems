@@ -3,16 +3,20 @@ import { API_HOST } from "../constant/env"
 import store from "../store"
 
 export const apiCall = async ({
-    url = "/",
-    method = "get",
-    data = {},
     contentType = "",
-    onSuccess = () => { },
-    onError = () => { }
+    data = {},
+    method = "GET",
+    onComplete = () => {},
+    onError = () => {},
+    onStart = () => {},
+    onSuccess = () => {},
+    url = "/"
 }) => {
     const {protocol} = window.location, {token} = store.getState().user
 
     url = `${protocol}//${API_HOST}${url}`
+
+    onStart()
 
     try {
         const res = await axios({
@@ -27,7 +31,8 @@ export const apiCall = async ({
             onSuccess(res.data)
             return res.data
         }
-    } catch (err) {
+    }
+    catch (err) {
         let result = err.code
 
         if (err.response) {
@@ -39,5 +44,8 @@ export const apiCall = async ({
         }
 
         onError(result)
+    }
+    finally {
+        onComplete()
     }
 }

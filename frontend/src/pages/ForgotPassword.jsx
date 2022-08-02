@@ -1,8 +1,7 @@
+import { Button, FormControl, TextField } from "@mui/material"
 import CheckCircleIcon from "@mui/icons-material/CheckCircle"
-import { connect } from "react-redux"
 import { Link } from "react-router-dom"
 import React, { useState } from "react"
-import { Button, FormControl, TextField } from "@mui/material"
 import { useTranslation } from "react-multi-lang"
 
 import { ValidateEmail } from "../utils/utils"
@@ -36,22 +35,13 @@ function ForgotPassword() {
                 setEmailError({ type: "emailFormat" })
                 return
             }
-            const onSuccess = () => {
-                setIsReset(true)
-            };
-            const onError = (err) => {
 
-            };
-
-            const data = { username: email };
             apiCall({
-                url: "/api/users/password/lost",
+                data: { username: email },
                 method: "put",
-                data: data,
-                onSuccess,
-                onError
-            });
-
+                onSuccess: () => setIsReset(true),
+                url: "/api/users/password/lost"
+            })
         }
 
     return <div>
@@ -100,18 +90,4 @@ function ForgotPassword() {
     </div>
 }
 
-const
-    mapState = state => ({
-        lang: state.lang.value,
-        user: state.user
-    }),
-    mapDispatch = dispatch => ({
-        updateLang: value => dispatch({
-            type: "lang/updateLang", payload: value
-        }),
-        updateUser: value => dispatch({
-            type: "user/updateUser", payload: value
-        })
-    })
-
-export default connect(mapState, mapDispatch)(ForgotPassword)
+export default ForgotPassword

@@ -1,6 +1,6 @@
 import { Button, Stack, TextField } from "@mui/material"
 import { CalendarToday } from "@mui/icons-material"
-import { DateRangePicker } from "materialui-daterange-picker"
+// import { DateRangePicker } from "materialui-daterange-picker"
 import moment from "moment"
 import { useState } from "react"
 import { useTranslation } from "react-multi-lang"
@@ -93,7 +93,7 @@ export default function Analysis() {
                     value={endDate}
                     variant="outlined" />
             </div>
-            <div className="absolute mt-2 top-full">
+            {/* <div className="absolute mt-2 top-full">
                 <DateRangePicker
                     onChange={range => setDateRange(range)}
                     open={open}
@@ -103,7 +103,7 @@ export default function Analysis() {
                     definedRanges={[]}
                     wrapperClassName="date-range-picker"
                 />
-            </div>
+            </div> */}
         </div>
         : null}
         <div className="gap-8 grid md:grid-cols-2 items-start">

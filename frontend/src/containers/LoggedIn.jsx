@@ -1,13 +1,16 @@
-import { Navigate, Route, Routes, useLocation } from "react-router-dom"
 import { connect } from "react-redux"
+import { Navigate, Route, Routes, useLocation } from "react-router-dom"
 import React, { useEffect } from "react"
 import { useTranslation } from "react-multi-lang"
+
+import logout from "../utils/logout"
 
 import Sidebar from "../components/Sidebar"
 import TopNav from "../components/TopNav"
 import Sample from "../configs/Sample"
 
 import Dashboard from "../pages/Dashboard"
+import DemandCharge from "../pages/DemendCharge"
 import EnergyResoucesBattery from "../pages/EnergyResoucesBattery"
 import Analysis from "../pages/Analysis"
 import TimeOfUse from "../pages/TimeOfUse"
@@ -23,7 +26,7 @@ function LoggedIn(props) {
         t = useTranslation()
 
     useEffect(() => {
-        if (new Date().getTime() > props.tokenExpiry) props.logout()
+        if (new Date().getTime() > props.tokenExpiryTime) logout()
     })
 
     return <div className="grid grid-rows-1fr-auto min-h-screen">
@@ -41,7 +44,9 @@ function LoggedIn(props) {
                         <Route element={<Analysis />} path="/analysis" />
                         <Route element={<TimeOfUse />} path="/time-of-use" />
                         <Route element={<Economics />} path="/economics" />
-                        <Route element={<Sample />} path="/demand-charge" />
+                        <Route
+                            element={<DemandCharge />}
+                            path="/demand-charge" />
                         <Route
                             element={<EnergyResoucesBattery />}
                             path="/energy-resources/battery" />
@@ -69,11 +74,9 @@ function LoggedIn(props) {
     </div>
 }
 
-const
-    mapDispatch = dispatch => ({ logout: () => dispatch({ type: "user/logout" }) }),
-    mapState = state => ({
-        sidebarStatus: state.sidebarStatus.value,
-        tokenExpiry: state.user.tokenExpiry
-    })
+const mapState = state => ({
+    sidebarStatus: state.sidebarStatus.value,
+    tokenExpiryTime: state.user.tokenExpiryTime
+})
 
-export default connect(mapState, mapDispatch)(LoggedIn)
+export default connect(mapState)(LoggedIn)

@@ -62,7 +62,7 @@ const CardOnDiagram = props =>
     </div>
 
 const mapState = state => ({
-    gateways: state.user.gateways,
+    gatewayID: state.gateways.active.gatewayID,
     token: state.user.token
 })
 
@@ -143,16 +143,13 @@ export default connect(mapState)(function Dashboard(props) {
     }
 
     useEffect(() => {
-        if (props.gateways.length === 0) return
-
-        const gateway = props.gateways.filter(g => g.active)[0]
-
-        if (!gateway || !gateway.gatewayID) return
+        if (!props.gatewayID) return
 
         let wsConnection = null
 
         if (window["WebSocket"]) {
-            const url = `ws://${API_HOST}/api/dashboard/${gateway.gatewayID}`
+            const url
+                = `ws://${API_HOST}/api/${props.gatewayID}/devices/energy-info`
 
             wsConnection = new WebSocket(url, props.token)
             wsConnection.onerror = () => setError({url})
@@ -166,7 +163,7 @@ export default connect(mapState)(function Dashboard(props) {
         return () => {
             if (wsConnection) wsConnection.close()
         }
-    }, [props.gateways])
+    }, [props.gatewayID])
 
     const peakShaveRate = useMemo(() => {
         if (!peak.current || !peak.threshhold) return 0

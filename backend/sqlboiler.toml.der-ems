@@ -20,11 +20,33 @@ tag-ignore = ["password"]
   [aliases.tables.device.columns]
   modbusid = "ModbusID"
   uueid = "UUEID"
+  name = "tou"
   [aliases.tables.tou.columns]
   tou_location_id = "TOULocationID"
   tou_type = "TOUType"
+  name = "tou_holiday"
   [aliases.tables.tou_holiday.columns]
   tou_location_id = "TOULocationID"
+  name = "cc_data_log"
+  [aliases.tables.cc_data_log.columns]
+  load_grid_average_power_ac = "LoadGridAveragePowerAC"
+  battery_grid_average_power_ac = "BatteryGridAveragePowerAC"
+  grid_contract_power_ac = "GridContractPowerAC"
+  load_pv_average_power_ac = "LoadPvAveragePowerAC"
+  load_battery_average_power_ac = "LoadBatteryAveragePowerAC"
+  battery_soc = "BatterySoC"
+  battery_produced_average_power_ac = "BatteryProducedAveragePowerAC"
+  battery_consumed_average_power_ac = "BatteryConsumedAveragePowerAC"
+  pv_average_power_ac = "PvAveragePowerAC"
+  load_average_power_ac = "LoadAveragePowerAC"
+  pv_links = "PvLinks"
+  battery_pv_average_power_ac = "BatteryPvAveragePowerAC"
+  grid_pv_average_power_ac = "GridPvAveragePowerAC"
+  grid_produced_average_power_ac = "GridProducedAveragePowerAC"
+  grid_consumed_average_power_ac = "GridConsumedAveragePowerAC"
+  battery_produced_lifetime_energy_ac = "BatteryProducedLifetimeEnergyAC"
+  battery_consumed_lifetime_energy_ac = "BatteryConsumedLifetimeEnergyAC"
+  battery_average_power_ac = "BatteryAveragePowerAC"
 
 [mysql]
 dbname  = "der_ems"
@@ -33,4 +55,4 @@ port    = 3306
 user    = "ubiik"
 pass    = "testing123"
 sslmode = "false"
-whitelist = ["weather_forecast", "customer", "gateway", "device_model", "device", "login_log", "user", "cc_data", "tou", "tou_holiday", "tou_location", "user_gateway_right"]
+whitelist = ["weather_forecast", "customer", "gateway", "device_model", "device", "login_log", "user", "cc_data", "tou", "tou_holiday", "tou_location", "user_gateway_right", "cc_data_log"]

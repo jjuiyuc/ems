@@ -121,26 +121,10 @@ func getWeeklyBillingParamsByType(repo *repository.Repository, billing services.
 			break
 		}
 		for _, billing := range billings {
-			log.WithFields(log.Fields{
-				"peak type":    billing.PeakType,
-				"period stime": billing.PeriodStime,
-				"period etime": billing.PeriodEtime,
-				"basic rate":   billing.BasicRate.Float32,
-				"flow rate":    billing.FlowRate.Float32,
-				"enable at":    billing.EnableAt,
-				"disable at":   billing.DisableAt,
-			}).Debug()
-
-			interval, err := getBillingInterval(billing.PeriodStime.String, billing.PeriodEtime.String)
+			rate, err := billingToRate(billing, timeOfEachDay)
 			if err != nil {
 				break
 			}
-
-			var rate RateInfo
-			rate.Date = timeOfEachDay.Format(utils.YYYYMMDD)
-			rate.Interval = interval
-			rate.DemandChargeRate = billing.BasicRate.Float32
-			rate.TOURate = billing.FlowRate.Float32
 			billingParams.Rates = append(billingParams.Rates, rate)
 		}
 	}
@@ -170,6 +154,29 @@ func getSundayOfBillingWeek(t time.Time, sendNow bool) (timeOnSunday time.Time) 
 		offset += 7
 	}
 	timeOnSunday = t.AddDate(0, 0, offset)
+	return
+}
+
+func billingToRate(billing *deremsmodels.Tou, timeOfEachDay time.Time) (rate RateInfo, err error) {
+	log.WithFields(log.Fields{
+		"peak type":    billing.PeakType,
+		"period stime": billing.PeriodStime,
+		"period etime": billing.PeriodEtime,
+		"basic rate":   billing.BasicRate.Float32,
+		"flow rate":    billing.FlowRate.Float32,
+		"enable at":    billing.EnableAt,
+		"disable at":   billing.DisableAt,
+	}).Debug()
+
+	interval, err := getBillingInterval(billing.PeriodStime.String, billing.PeriodEtime.String)
+	if err != nil {
+		return
+	}
+
+	rate.Date = timeOfEachDay.Format(utils.YYYYMMDD)
+	rate.Interval = interval
+	rate.DemandChargeRate = billing.BasicRate.Float32
+	rate.TOURate = billing.FlowRate.Float32
 	return
 }
 

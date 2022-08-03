@@ -141,7 +141,7 @@ func (w *APIWorker) getBatteryState(c *gin.Context, batteryState BatteryState) {
 	}
 }
 
-func (zoomableQuery *ZoomableQuery) Validate() (startTime, endTime time.Time, ok bool) {
+func (zoomableQuery *ZoomableQuery) Validate() (periodStartTime, periodEndTime time.Time, ok bool) {
 	// TODO: Only supports hour now
 	if zoomableQuery.Resolution != "hour" {
 		return
@@ -150,20 +150,19 @@ func (zoomableQuery *ZoomableQuery) Validate() (startTime, endTime time.Time, ok
 	if err != nil {
 		return
 	}
-	endTime, err = time.Parse(time.RFC3339, zoomableQuery.EndTime)
+	endTime, err := time.Parse(time.RFC3339, zoomableQuery.EndTime)
 	if err != nil || startTime == endTime || endTime.Before(startTime) {
 		return
 	}
-	periodStartTime, periodEndTime, err := w.getStatePeriod(startTime, endTime)
+	periodStartTime, periodEndTime, err = zoomableQuery.getStatePeriod(startTime, endTime)
 	if err != nil {
-		ok = false
 		return
 	}
 	ok = true
 	return
 }
 
-func (w *APIWorker) getStatePeriod(startTime, endTime time.Time) (periodStartTime, periodEndTime time.Time, err error) {
+func (zoomableQuery *ZoomableQuery) getStatePeriod(startTime, endTime time.Time) (periodStartTime, periodEndTime time.Time, err error) {
 	periodStartTime = time.Date(startTime.Year(), startTime.Month(), startTime.Day(), startTime.Hour(), 0, 0, 0, startTime.Location())
 	log.Debug("periodStartTime: ", periodStartTime)
 	periodEndTime = time.Date(endTime.Year(), endTime.Month(), endTime.Day(), endTime.Hour(), 0, 0, 0, endTime.Location())

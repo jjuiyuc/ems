@@ -1,7 +1,5 @@
 package utils
 
-import "time"
-
 const (
 	// ZHHMM ±hhmm
 	ZHHMM = "Z0700"
@@ -14,12 +12,3 @@ const (
 	// HHMM24h HHMM
 	HHMM24h = "1504"
 )
-
-// IsDateFormat checks the value is a valid time or not
-func IsDateFormat(layout, value string) (dateValue time.Time, ok bool) {
-	dateValue, err := time.Parse(layout, value)
-	if err == nil {
-		ok = true
-	}
-	return
-}

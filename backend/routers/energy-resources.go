@@ -9,7 +9,6 @@ import (
 
 	"der-ems/internal/app"
 	"der-ems/internal/e"
-	"der-ems/internal/utils"
 )
 
 // GetBatteryEnergyInfo godoc
@@ -37,8 +36,8 @@ func (w *APIWorker) GetBatteryEnergyInfo(c *gin.Context) {
 	gatewayUUID := c.Param("gwid")
 	log.Debug("gatewayUUID: ", gatewayUUID)
 
-	startTime, ok := utils.IsDateFormat(time.RFC3339, c.Query("startTime"))
-	if !ok {
+	startTime, err := time.Parse(time.RFC3339, c.Query("startTime"))
+	if err != nil {
 		log.WithFields(log.Fields{"caused-by": "invalid param"}).Error()
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
@@ -97,13 +96,12 @@ func (w *APIWorker) checkZoomableParams(c *gin.Context) (startTime, endTime time
 	if c.Query("resolution") != "hour" {
 		return
 	}
-	startTime, ok = utils.IsDateFormat(time.RFC3339, c.Query("startTime"))
-	if !ok {
+	startTime, err := time.Parse(time.RFC3339, c.Query("startTime"))
+	if err != nil {
 		return
 	}
-	endTime, ok = utils.IsDateFormat(time.RFC3339, c.Query("endTime"))
-	if !ok || startTime == endTime || endTime.Before(startTime) {
-		ok = false
+	endTime, err = time.Parse(time.RFC3339, c.Query("endTime"))
+	if err != nil || startTime == endTime || endTime.Before(startTime) {
 		return
 	}
 	ok = true

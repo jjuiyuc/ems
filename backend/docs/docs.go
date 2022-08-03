@@ -253,13 +253,14 @@ var doc = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "get battery by token, gateway UUID, resolution, startTime and endTime",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Energy Resources"
+                    "energy resources"
                 ],
-                "summary": "Provide today's hourly charge and voltage state of a battery",
+                "summary": "Show today's hourly charge and voltage state of a battery",
                 "parameters": [
                     {
                         "type": "string",
@@ -268,13 +269,57 @@ var doc = `{
                         "name": "Authorization",
                         "in": "header",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Gateway UUID",
+                        "name": "gwid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "UTC time in ISO-8601",
+                        "name": "endTime",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "hour"
+                        ],
+                        "type": "string",
+                        "name": "resolution",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "UTC time in ISO-8601",
+                        "name": "startTime",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/app.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/services.BatteryChargeVoltageStateResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
@@ -454,14 +499,14 @@ var doc = `{
                             "$ref": "#/definitions/app.Response"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/app.Response"
                         }
                     },
-                    "401": {
-                        "description": "Unauthorized",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/app.Response"
                         }
@@ -508,6 +553,35 @@ var doc = `{
                     "type": "string",
                     "format": "date-time",
                     "example": "UTC time in ISO-8601"
+                }
+            }
+        },
+        "services.BatteryChargeVoltageStateResponse": {
+            "type": "object",
+            "properties": {
+                "batterySoCs": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
+                },
+                "batteryVoltages": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
+                },
+                "onPeakTime": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "timestamps": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 }
             }
         },

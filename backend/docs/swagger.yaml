@@ -28,6 +28,25 @@ definitions:
     - resolution
     - startTime
     type: object
+  services.BatteryChargeVoltageStateResponse:
+    properties:
+      batterySoCs:
+        items:
+          type: number
+        type: array
+      batteryVoltages:
+        items:
+          type: number
+        type: array
+      onPeakTime:
+        additionalProperties:
+          type: string
+        type: object
+      timestamps:
+        items:
+          type: integer
+        type: array
+    type: object
   services.BatteryEnergyInfoResponse:
     properties:
       batteryConsumedEnergyAC:
@@ -115,11 +134,35 @@ info:
 paths:
   /{gwid}/devices/battery/charge-voltage-state:
     get:
+      description: get battery by token, gateway UUID, resolution, startTime and endTime
       parameters:
       - default: Bearer <Add access token here>
         description: Input user's access token
         in: header
         name: Authorization
+        required: true
+        type: string
+      - description: Gateway UUID
+        in: path
+        name: gwid
+        required: true
+        type: string
+      - example: UTC time in ISO-8601
+        format: date-time
+        in: query
+        name: endTime
+        required: true
+        type: string
+      - enum:
+        - hour
+        in: query
+        name: resolution
+        required: true
+        type: string
+      - example: UTC time in ISO-8601
+        format: date-time
+        in: query
+        name: startTime
         required: true
         type: string
       produces:
@@ -128,7 +171,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.Response'
+            allOf:
+            - $ref: '#/definitions/app.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/services.BatteryChargeVoltageStateResponse'
+              type: object
         "400":
           description: Bad Request
           schema:
@@ -143,9 +191,9 @@ paths:
             $ref: '#/definitions/app.Response'
       security:
       - ApiKeyAuth: []
-      summary: Provide today's hourly charge and voltage state of a battery
+      summary: Show today's hourly charge and voltage state of a battery
       tags:
-      - Energy Resources
+      - energy resources
   /{gwid}/devices/battery/energy-info:
     get:
       description: get battery by token, gateway UUID and startTime
@@ -179,10 +227,6 @@ paths:
                 data:
                   $ref: '#/definitions/services.BatteryEnergyInfoResponse'
               type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/app.Response'
         "400":
           description: Bad Request
           schema:

@@ -11,6 +11,12 @@ import (
 	"der-ems/internal/e"
 )
 
+type ZoomableQuery struct {
+	Resolution string `form:"resolution" validate:"required" enums:"hour"`
+	StartTime  string `form:"startTime" validate:"required" example:"UTC time in ISO-8601" format:"date-time"`
+	EndTime    string `form:"endTime" validate:"required" example:"UTC time in ISO-8601" format:"date-time"`
+}
+
 // GetBatteryEnergyInfo godoc
 // @Summary     Show the detailed information and current state about a battery
 // @Description get battery by token, gateway UUID and startTime
@@ -18,7 +24,7 @@ import (
 // @Security    ApiKeyAuth
 // @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
 // @Param       gwid           path      string true "Gateway UUID"
-// @Param       startTime      query     string true "UTC time in ISO-8601" format(date-time)
+// @Param       startTime      query     string true "Example : UTC time in ISO-8601" format(date-time)
 // @Produce     json
 // @Success     200            {object}  app.Response{data=services.BatteryEnergyInfoResponse}
 // @Failure     400            {object}  app.Response
@@ -54,9 +60,7 @@ func (w *APIWorker) GetBatteryEnergyInfo(c *gin.Context) {
 // @Security    ApiKeyAuth
 // @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
 // @Param       gwid           path      string true "Gateway UUID"
-// @Param       resolution     query     string true "Resolution" Enums(hour)
-// @Param       startTime      query     string true "UTC time in ISO-8601" format(date-time)
-// @Param       endTime        query     string true "UTC time in ISO-8601" format(date-time)
+// @Param       query          query     ZoomableQuery true "Query"
 // @Produce     json
 // @Success     200            {object}  app.Response{data=services.BatteryPowerStateResponse}
 // @Failure     400            {object}  app.Response
@@ -75,7 +79,13 @@ func (w *APIWorker) GetBatteryPowerState(c *gin.Context) {
 	gatewayUUID := c.Param("gwid")
 	log.Debug("gatewayUUID: ", gatewayUUID)
 
-	startTime, endTime, ok := w.checkZoomableParams(c)
+	var q ZoomableQuery
+	if err := c.ShouldBindQuery(&q); err != nil {
+		log.WithFields(log.Fields{"caused-by": "invalid param"}).Error()
+		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
+		return
+	}
+	startTime, endTime, ok := q.Validate()
 	if !ok {
 		log.WithFields(log.Fields{"caused-by": "invalid param"}).Error()
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
@@ -91,16 +101,16 @@ func (w *APIWorker) GetBatteryPowerState(c *gin.Context) {
 	appG.Response(http.StatusOK, e.Success, batteryPowerState)
 }
 
-func (w *APIWorker) checkZoomableParams(c *gin.Context) (startTime, endTime time.Time, ok bool) {
+func (zoomableQuery *ZoomableQuery) Validate() (startTime, endTime time.Time, ok bool) {
 	// TODO: Only supports hour now
-	if c.Query("resolution") != "hour" {
+	if zoomableQuery.Resolution != "hour" {
 		return
 	}
-	startTime, err := time.Parse(time.RFC3339, c.Query("startTime"))
+	startTime, err := time.Parse(time.RFC3339, zoomableQuery.StartTime)
 	if err != nil {
 		return
 	}
-	endTime, err = time.Parse(time.RFC3339, c.Query("endTime"))
+	endTime, err = time.Parse(time.RFC3339, zoomableQuery.EndTime)
 	if err != nil || startTime == endTime || endTime.Before(startTime) {
 		return
 	}

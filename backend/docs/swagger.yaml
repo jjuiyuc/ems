@@ -9,6 +9,25 @@ definitions:
       msg:
         type: string
     type: object
+  routers.ZoomableQuery:
+    properties:
+      endTime:
+        example: UTC time in ISO-8601
+        format: date-time
+        type: string
+      resolution:
+        enum:
+        - hour
+        type: string
+      startTime:
+        example: UTC time in ISO-8601
+        format: date-time
+        type: string
+    required:
+    - endTime
+    - resolution
+    - startTime
+    type: object
   services.BatteryEnergyInfoResponse:
     properties:
       batteryConsumedEnergyAC:
@@ -109,7 +128,7 @@ paths:
         name: gwid
         required: true
         type: string
-      - description: UTC time in ISO-8601
+      - description: 'Example : UTC time in ISO-8601'
         format: date-time
         in: query
         name: startTime
@@ -155,23 +174,22 @@ paths:
         name: gwid
         required: true
         type: string
-      - description: Resolution
-        enum:
+      - example: UTC time in ISO-8601
+        format: date-time
+        in: query
+        name: endTime
+        required: true
+        type: string
+      - enum:
         - hour
         in: query
         name: resolution
         required: true
         type: string
-      - description: UTC time in ISO-8601
+      - example: UTC time in ISO-8601
         format: date-time
         in: query
         name: startTime
-        required: true
-        type: string
-      - description: UTC time in ISO-8601
-        format: date-time
-        in: query
-        name: endTime
         required: true
         type: string
       produces:

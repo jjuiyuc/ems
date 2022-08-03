@@ -280,7 +280,7 @@ var doc = `{
                     {
                         "type": "string",
                         "format": "date-time",
-                        "description": "UTC time in ISO-8601",
+                        "description": "Example : UTC time in ISO-8601",
                         "name": "startTime",
                         "in": "query",
                         "required": true
@@ -352,11 +352,18 @@ var doc = `{
                         "required": true
                     },
                     {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "UTC time in ISO-8601",
+                        "name": "endTime",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
                         "enum": [
                             "hour"
                         ],
                         "type": "string",
-                        "description": "Resolution",
                         "name": "resolution",
                         "in": "query",
                         "required": true
@@ -364,16 +371,8 @@ var doc = `{
                     {
                         "type": "string",
                         "format": "date-time",
-                        "description": "UTC time in ISO-8601",
+                        "example": "UTC time in ISO-8601",
                         "name": "startTime",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "format": "date-time",
-                        "description": "UTC time in ISO-8601",
-                        "name": "endTime",
                         "in": "query",
                         "required": true
                     }
@@ -431,6 +430,32 @@ var doc = `{
                 },
                 "msg": {
                     "type": "string"
+                }
+            }
+        },
+        "routers.ZoomableQuery": {
+            "type": "object",
+            "required": [
+                "endTime",
+                "resolution",
+                "startTime"
+            ],
+            "properties": {
+                "endTime": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "UTC time in ISO-8601"
+                },
+                "resolution": {
+                    "type": "string",
+                    "enum": [
+                        "hour"
+                    ]
+                },
+                "startTime": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "UTC time in ISO-8601"
                 }
             }
         },

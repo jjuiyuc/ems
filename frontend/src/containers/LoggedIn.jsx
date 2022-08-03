@@ -10,7 +10,7 @@ import TopNav from "../components/TopNav"
 import Sample from "../configs/Sample"
 
 import Dashboard from "../pages/Dashboard"
-import DemandCharge from "../pages/DemendCharge"
+import DemandCharge from "../pages/DemandCharge"
 import EnergyResoucesBattery from "../pages/EnergyResoucesBattery"
 import Analysis from "../pages/Analysis"
 import TimeOfUse from "../pages/TimeOfUse"

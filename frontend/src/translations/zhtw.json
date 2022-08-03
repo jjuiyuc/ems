@@ -84,6 +84,7 @@
             "exportToGrid": "導出至電網",
             "economics":"Economics",
             "cO2Reduction":"二氧化碳減排",
+            "tons":"tons",
             "solarGeneration":"太陽能發電",
             "onPeak": "On Peak"
         }

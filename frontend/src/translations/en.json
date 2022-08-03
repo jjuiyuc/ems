@@ -84,6 +84,7 @@
             "exportToGrid": "Export to Grid",
             "economics":"Economics",
             "cO2Reduction":"CO2 Reduction",
+            "tons":"tons",
             "solarGeneration":"solarGeneration",
             "onPeak": "On Peak"
         }

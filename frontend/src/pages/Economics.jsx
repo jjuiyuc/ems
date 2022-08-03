@@ -28,11 +28,8 @@ export default function Economics(props) {
         [exportToGrid, setExportToGrid] = useState(130)
     const
         hours24 = Array.from(new Array(24).keys()),
-        lineChartDateLabels = hours24.map(n => {
-            const time = moment().hour(n).minute(0).second(0)
-
-            return time.format("hh A")
-        }),
+        lineChartDateLabels = hours24.map(n =>
+            moment().hour(n).startOf("h").toISOString()),
         currentHour = moment().hour(),
         lineChartDataArray = hours24.filter(v => v <= currentHour).map(() =>
             Math.floor(Math.random() * (60 - 40 + 1) + 40))
@@ -61,16 +58,20 @@ export default function Economics(props) {
     return <>
         <h1 className="mb-9">{pageT("economics")}</h1>
         <div className="flex max-w-7xl">
-            <div className="card w-3/12 mb-8">
-                <h5 className="font-bold">{pageT("total")}</h5>
-                <h2 className="font-bold mb-1 pt-4">{pageT("february")} 2022</h2>
-                <h2 className="font-bold mb-1 pt-4">${total}</h2>
-                <div className="bg-primary-main-opacity-20 w-20 h-20 rounded-full relative">
-                    <EconomicsIcon className="text-brand-main w-12 h-12 ml-3 absolute" />
+            <div className="card w-3/12 mb-8 grid grid-row-2">
+                <div>
+                    <h5 className="font-bold">{pageT("total")}</h5>
+                    <h2 className="font-bold mb-1 pt-4">{pageT("february")} 2022</h2>
+                    <h2 className="font-bold mb-1 pt-4">${total}</h2>
+                </div>
+                <div className="flex justify-end items-end">
+                    <div className="items-center  place-items-center grid bg-primary-main-opacity-20 w-20 h-20 rounded-full">
+                        <EconomicsIcon className="text-brand-main w-12 h-12" />
+                    </div>
                 </div>
             </div>
             <div className="flex flex-wrap ml-5">
-                <div className="lg:grid grid-cols-3 auto-cols-max">
+                <div className="grid grid-cols-3 auto-cols-max gap-x-5">
                     <PriceCard
                         price={ancillaryServices}
                         title={pageT("ancillaryServices")} />
@@ -109,7 +110,7 @@ export default function Economics(props) {
                 </Stack>
                 <div />
             </div>
-            <div className="max-h-80vh h-160 w-full">
+            <div className="max-h-80vh h-160 w-full mt-8">
                 <LineChart data={lineChartData} id="dcLineChart" />
             </div>
         </div>

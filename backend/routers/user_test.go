@@ -16,7 +16,6 @@ import (
 	"der-ems/internal/e"
 	"der-ems/internal/utils"
 	"der-ems/models"
-	deremsmodels "der-ems/models/der-ems"
 	"der-ems/repository"
 	"der-ems/services"
 	"der-ems/testutils"
@@ -52,9 +51,19 @@ func (s *UserSuite) SetupSuite() {
 	// Truncate & seed data
 	err := testutils.SeedUtUser(db)
 	s.Require().NoError(err)
+	err = testutils.SeedUtCustomerAndGateway(db)
+	s.Require().NoError(err)
 	token, err := utils.GenerateToken(fixtures.UtUser.ID)
 	s.Require().NoError(err)
 	s.token = token
+	// Mock user_gateway_right table
+	_, err = db.Exec("TRUNCATE TABLE user_gateway_right")
+	s.Require().NoError(err)
+	_, err = db.Exec(`
+		INSERT INTO user_gateway_right (id,user_id,gw_id) VALUES
+		(1,1,1);
+	`)
+	s.Require().NoError(err)
 
 	s.repo = repo
 	s.router = InitRouter(cfg.GetBool("server.cors"), cfg.GetString("server.ginMode"), w)
@@ -269,9 +278,6 @@ func (s *UserSuite) Test_Authorize() {
 }
 
 func (s *UserSuite) Test_GetProfile() {
-	// TODO: Adjust unit test
-	s.T().Skip()
-
 	type response struct {
 		Code int         `json:"code"`
 		Msg  string      `json:"msg"`
@@ -308,10 +314,12 @@ func (s *UserSuite) Test_GetProfile() {
 	dataMap := res.Data.(map[string]interface{})
 	dataJSON, err := json.Marshal(dataMap)
 	s.Require().NoError(err)
-	var data deremsmodels.User
+	var data services.ProfileResponse
 	err = json.Unmarshal(dataJSON, &data)
 	s.Require().NoError(err)
 	s.Equal(fixtures.UtUser.ID, data.ID)
 	s.Equal(fixtures.UtUser.Username, data.Username)
 	s.Equal(fixtures.UtUser.ExpirationDate, data.ExpirationDate)
+	s.Equal(fixtures.UtGateway.UUID, data.Gateways[0].GatewayID)
+	s.Equal(fixtures.UtCustomer.Address.String, data.Gateways[0].Address)
 }

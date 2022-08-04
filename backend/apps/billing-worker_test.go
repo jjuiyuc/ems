@@ -18,8 +18,9 @@ import (
 
 type BillingWorkerSuite struct {
 	suite.Suite
-	repo    *repository.Repository
-	billing services.BillingService
+	repo       *repository.Repository
+	billing    services.BillingService
+	seedUtTime time.Time
 }
 
 func Test_BillingWorker(t *testing.T) {
@@ -57,6 +58,10 @@ func (s *BillingWorkerSuite) SetupSuite() {
 		(1,'04F1FD6D9C6F64C3352285CCEAF59EE1',1);
 	`)
 	s.Require().NoError(err)
+
+	// Mock seedUtTime
+	loc, _ := time.LoadLocation("Asia/Taipei")
+	s.seedUtTime = time.Date(2022, 8, 6, 0, 0, 0, 0, time.UTC).In(loc)
 }
 
 func (s *BillingWorkerSuite) TearDownSuite() {
@@ -110,9 +115,6 @@ func (s *BillingWorkerSuite) Test_GetLocalTime() {
 	}
 
 	testTOULocationID := 1
-	loc, _ := time.LoadLocation("Asia/Taipei")
-	t := time.Now().UTC()
-	testLocalTime := t.In(loc)
 
 	tests := []struct {
 		name string
@@ -122,7 +124,7 @@ func (s *BillingWorkerSuite) Test_GetLocalTime() {
 			name: "GetLocalTime",
 			args: args{
 				TOULocationID: testTOULocationID,
-				LocalTime:     testLocalTime,
+				LocalTime:     s.seedUtTime,
 			},
 		},
 		{
@@ -135,10 +137,50 @@ func (s *BillingWorkerSuite) Test_GetLocalTime() {
 		case "GetLocalTime":
 			localTime, err := s.billing.GetLocalTime(tt.args.TOULocationID, tt.args.LocalTime)
 			s.Require().NoError(err)
-			s.Equal(testLocalTime, localTime)
+			s.Equal(s.seedUtTime, localTime)
 		case "GetLocalTimeInvalidInput":
 			_, err := s.billing.GetLocalTime(tt.args.TOULocationID, tt.args.LocalTime)
 			s.Require().Error(err)
+		}
+	}
+}
+
+func (s *BillingWorkerSuite) Test_getSundayOfBillingWeek() {
+	type args struct {
+		LocalTime    time.Time
+		TimeOnSunday time.Time
+	}
+
+	loc, _ := time.LoadLocation("Asia/Taipei")
+
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			name: "getSundayOfBillingWeek",
+			args: args{
+				LocalTime:    s.seedUtTime,
+				TimeOnSunday: time.Date(2022, 7, 31, 8, 0, 0, 0, loc),
+			},
+		},
+		{
+			name: "getSundayOfBillingWeekNextWeek",
+			args: args{
+				LocalTime:    s.seedUtTime,
+				TimeOnSunday: time.Date(2022, 8, 7, 8, 0, 0, 0, loc),
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		switch tt.name {
+		case "getSundayOfBillingWeek":
+			timeOnSunday := getSundayOfBillingWeek(s.seedUtTime, true)
+			s.Equal(tt.args.TimeOnSunday, timeOnSunday)
+		case "getSundayOfBillingWeekNextWeek":
+			timeOnSunday := getSundayOfBillingWeek(s.seedUtTime, false)
+			s.Equal(tt.args.TimeOnSunday, timeOnSunday)
 		}
 	}
 }
@@ -156,23 +198,18 @@ func (s *BillingWorkerSuite) Test_getWeeklyBillingParamsByType() {
 		TOUType:       "Two-section",
 	}
 
-	testLocalTime, _ := s.billing.GetLocalTime(testBillingType.TOULocationID, time.Now().UTC())
-
 	var testBillingParams BillingParams
 	testBillingParams.Timezone = "+0800"
-	timeOnSunday := getSundayOfBillingWeek(testLocalTime, true)
+	timeOnSunday := getSundayOfBillingWeek(s.seedUtTime, true)
 	rate := RateInfo{
 		Date:             timeOnSunday.Format(utils.YYYYMMDD),
 		Interval:         "0000-2400",
 		DemandChargeRate: 47.2,
 		TOURate:          1.46,
 	}
-	if s.billing.IsSummer(testLocalTime) {
+	if s.billing.IsSummer(s.seedUtTime) {
 		rate.DemandChargeRate = 47.2
 		rate.TOURate = 1.46
-	} else {
-		rate.DemandChargeRate = 34.6
-		rate.TOURate = 1.36
 	}
 	testBillingParams.Rates = append(testBillingParams.Rates, rate)
 
@@ -183,7 +220,7 @@ func (s *BillingWorkerSuite) Test_getWeeklyBillingParamsByType() {
 		name: "getWeeklyBillingParamsByType",
 		args: args{
 			BillingType:   testBillingType,
-			LocalTime:     testLocalTime,
+			LocalTime:     s.seedUtTime,
 			BillingParams: testBillingParams,
 		},
 	}

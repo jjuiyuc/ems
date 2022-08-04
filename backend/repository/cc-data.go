@@ -37,7 +37,7 @@ func (repo defaultCCDataRepository) UpsertCCData(ccData *deremsmodels.CCDatum) (
 	ccDataReturn, err = deremsmodels.CCData(
 		qm.Where("gw_uuid = ?", ccData.GWUUID),
 		qm.Where("log_date = ?", ccData.LogDate)).One(repo.db)
-	now := time.Now()
+	now := time.Now().UTC()
 	ccData.UpdatedAt = null.NewTime(now, true)
 	if err != nil {
 		ccData.CreatedAt = now
@@ -60,7 +60,7 @@ func (repo defaultCCDataRepository) UpsertCCDataLog(ccDataLog *deremsmodels.CCDa
 	ccDataLogReturn, err = deremsmodels.CCDataLogs(
 		qm.Where("gw_uuid = ?", ccDataLog.GWUUID),
 		qm.Where("log_date = ?", ccDataLog.LogDate)).One(repo.db)
-	now := time.Now()
+	now := time.Now().UTC()
 	ccDataLog.UpdatedAt = null.NewTime(now, true)
 	if err != nil {
 		ccDataLog.CreatedAt = now

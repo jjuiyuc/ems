@@ -34,7 +34,7 @@ func (repo defaultWeatherRepository) UpsertWeatherForecast(weatherForecast *dere
 		qm.Where("lat = ?", weatherForecast.Lat),
 		qm.Where("lng = ?", weatherForecast.Lng),
 		qm.Where("valid_date = ?", weatherForecast.ValidDate)).One(repo.db)
-	now := time.Now()
+	now := time.Now().UTC()
 	weatherForecast.UpdatedAt = null.NewTime(now, true)
 	if err != nil {
 		weatherForecast.CreatedAt = now

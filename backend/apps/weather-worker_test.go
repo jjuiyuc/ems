@@ -59,7 +59,7 @@ func (s *WeatherWorkerSuite) SetupSuite() {
 	s.seedUtTime = time.Now().UTC()
 	s.seedUtWeather = LatestWeather{
 		Lat: 24.75,
-		Lng: 121.0,
+		Lng: 121.75,
 		Alt: 100,
 	}
 	seedUtValue1 := map[string]interface{}{
@@ -101,9 +101,9 @@ func (s *WeatherWorkerSuite) SetupSuite() {
 	// Mock customer table
 	_, err = db.Exec(`
 		INSERT INTO customer (id,customer_number,field_number,weather_lat,weather_lng) VALUES
-		(1,'A00001','00001',24.75,121),
-		(2,'A00001','00002',24.75,121),
-		(3,'B00001','00001',24.75,121);
+		(1,'00001','001',24.75,121.75),
+		(2,'00001','002',24.75,121.75),
+		(3,'00002','001',24.75,121.75);
 	`)
 	s.Require().NoError(err)
 

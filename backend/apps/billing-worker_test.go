@@ -14,6 +14,7 @@ import (
 	"der-ems/repository"
 	"der-ems/services"
 	"der-ems/testutils"
+	"der-ems/testutils/fixtures"
 )
 
 type BillingWorkerSuite struct {
@@ -36,27 +37,8 @@ func (s *BillingWorkerSuite) SetupSuite() {
 	s.repo = repo
 	s.billing = services.NewBillingService(repo)
 
-	_, err := db.Exec("SET FOREIGN_KEY_CHECKS = 0")
-	s.Require().NoError(err)
-	_, err = db.Exec("TRUNCATE TABLE gateway")
-	s.Require().NoError(err)
-	_, err = db.Exec("TRUNCATE TABLE customer")
-	s.Require().NoError(err)
-	_, err = db.Exec("SET FOREIGN_KEY_CHECKS = 1")
-	s.Require().NoError(err)
-
-	// Mock customer table
-	_, err = db.Exec(`
-		INSERT INTO customer (id,customer_number,field_number,address,lat,lng,weather_lat,weather_lng,timezone,tou_location_id,voltage_type,tou_type) VALUES
-		(1,'00001','001','宜蘭縣五結鄉大吉五路157巷68號',24.70155508690467,121.7973398847259,24.75,121.75,'+0800',1,'Low voltage','Two-section');
-	`)
-	s.Require().NoError(err)
-
-	// Mock gateway table
-	_, err = db.Exec(`
-		INSERT INTO gateway (id,uuid,customer_id) VALUES
-		(1,'04F1FD6D9C6F64C3352285CCEAF59EE1',1);
-	`)
+	// Truncate & seed data
+	err := testutils.SeedUtCustomerAndGateway(db)
 	s.Require().NoError(err)
 
 	// Mock seedUtTime
@@ -75,14 +57,14 @@ func (s *BillingWorkerSuite) Test_GetBillingTypeByCustomerID() {
 	}
 
 	testGateway := &deremsmodels.Gateway{
-		ID:         1,
-		UUID:       "04F1FD6D9C6F64C3352285CCEAF59EE1",
-		CustomerID: 1,
+		ID:         fixtures.UtGateway.ID,
+		UUID:       fixtures.UtGateway.UUID,
+		CustomerID: fixtures.UtCustomer.ID,
 	}
 	testBillingType := &services.BillingType{
-		TOULocationID: 1,
-		VoltageType:   "Low voltage",
-		TOUType:       "Two-section",
+		TOULocationID: fixtures.UtCustomer.TOULocationID.Int,
+		VoltageType:   fixtures.UtCustomer.VoltageType.String,
+		TOUType:       fixtures.UtCustomer.TOUType.String,
 	}
 
 	tt := struct {
@@ -190,9 +172,9 @@ func (s *BillingWorkerSuite) Test_getWeeklyBillingParamsByType() {
 	}
 
 	testBillingType := &services.BillingType{
-		TOULocationID: 1,
-		VoltageType:   "Low voltage",
-		TOUType:       "Two-section",
+		TOULocationID: fixtures.UtCustomer.TOULocationID.Int,
+		VoltageType:   fixtures.UtCustomer.VoltageType.String,
+		TOUType:       fixtures.UtCustomer.TOUType.String,
 	}
 
 	var testBillingParams BillingParams

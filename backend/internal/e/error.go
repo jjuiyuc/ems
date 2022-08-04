@@ -9,6 +9,8 @@ import (
 var (
 	// ErrNewUnexpectedJSONInput godoc
 	ErrNewUnexpectedJSONInput = errors.New("unexpected end of JSON input")
+	// ErrNewUnexpectedTimeRange godoc
+	ErrNewUnexpectedTimeRange = errors.New("unexpected start time and end time")
 )
 
 // ErrNewKeyNotExist godoc

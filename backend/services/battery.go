@@ -5,6 +5,8 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
+	"der-ems/internal/e"
+	"der-ems/internal/utils"
 	"der-ems/repository"
 )
 
@@ -24,27 +26,34 @@ type BatteryEnergyInfoResponse struct {
 	Voltage                         float32 `json:"voltage"`
 }
 
+// BatteryPowerStateResponse godoc
+type BatteryPowerStateResponse struct {
+	Timestamps             []int             `json:"timestamps"`
+	BatteryAveragePowerACs []float32         `json:"batteryAveragePowerACs"`
+	OnPeakTime             map[string]string `json:"onPeakTime"`
+}
+
 // BatteryService godoc
 type BatteryService interface {
-	GetBatteryEnergyInfo(gwUUID string) (batteryEnergyInfo *BatteryEnergyInfoResponse)
+	GetBatteryEnergyInfo(gwUUID string, startTime time.Time) (batteryEnergyInfo *BatteryEnergyInfoResponse)
+	GetBatteryPowerState(gwUUID string, startTime, endTime time.Time) (batteryPowerState *BatteryPowerStateResponse, err error)
 }
 
 type defaultBatteryService struct {
-	repo *repository.Repository
+	repo    *repository.Repository
+	billing BillingService
 }
 
 // NewBatteryService godoc
-func NewBatteryService(repo *repository.Repository) BatteryService {
-	return &defaultBatteryService{repo}
+func NewBatteryService(repo *repository.Repository, billing BillingService) BatteryService {
+	return &defaultBatteryService{repo, billing}
 }
 
 // GetBatteryEnergyInfo godoc
-func (s defaultBatteryService) GetBatteryEnergyInfo(gwUUID string) (batteryEnergyInfo *BatteryEnergyInfoResponse) {
-	currentTime := time.Now().UTC()
-	startTime := time.Date(currentTime.Year(), currentTime.Month(), currentTime.Day(), 0, 0, 0, 0, currentTime.Location())
+func (s defaultBatteryService) GetBatteryEnergyInfo(gwUUID string, startTime time.Time) (batteryEnergyInfo *BatteryEnergyInfoResponse) {
 	batteryEnergyInfo = &BatteryEnergyInfoResponse{}
 	firstlog, err1 := s.repo.CCData.GetFirstLogByGatewayUUIDAndStartTime(gwUUID, startTime)
-	latestLog, err2 := s.repo.CCData.GetLatestLogByGatewayUUID(gwUUID)
+	latestLog, err2 := s.repo.CCData.GetLatestLogByGatewayUUID(gwUUID, time.Time{}, time.Time{})
 	if err1 == nil && err2 == nil {
 		log.Debug("firstlog.LogDate: ", firstlog.LogDate)
 		log.Debug("latestLog.LogDate: ", latestLog.LogDate)
@@ -93,5 +102,125 @@ func (s defaultBatteryService) getBatteryInfo(gwUUID string, batteryEnergyInfo *
 		batteryEnergyInfo.Voltage = 153.6
 	}
 	batteryEnergyInfo.PowerSources = "Solar + Grid"
+	return
+}
+
+// GetBatteryPowerState godoc
+func (s defaultBatteryService) GetBatteryPowerState(gwUUID string, startTime, endTime time.Time) (batteryPowerState *BatteryPowerStateResponse, err error) {
+	periodStartTime, periodEndTime, err := s.getStatePeriod(startTime, endTime)
+	if err != nil {
+		return
+	}
+
+	batteryPowerState = &BatteryPowerStateResponse{}
+	startTimeIndex := periodStartTime.Add(-1 * time.Hour)
+	endTimeIndex := periodStartTime
+	for endTimeIndex.Before(periodEndTime) || endTimeIndex == periodEndTime {
+		latestLog, latestLogErr := s.repo.CCData.GetLatestLogByGatewayUUID(gwUUID, startTimeIndex, endTimeIndex)
+		if latestLogErr == nil {
+			log.WithFields(log.Fields{
+				"log_date":              latestLog.LogDate,
+				"batteryAveragePowerAC": latestLog.BatteryAveragePowerAC,
+			}).Debug()
+			batteryPowerState.Timestamps = append(batteryPowerState.Timestamps, int(latestLog.LogDate.Unix()))
+			batteryPowerState.BatteryAveragePowerACs = append(batteryPowerState.BatteryAveragePowerACs, latestLog.BatteryAveragePowerAC.Float32)
+		} else {
+			log.WithFields(log.Fields{
+				"caused-by":      "s.repo.CCData.GetLatestLogByGatewayUUID",
+				"err":            latestLogErr,
+				"startTimeIndex": startTimeIndex,
+				"endTimeIndex":   endTimeIndex,
+			}).Warn()
+			batteryPowerState.Timestamps = append(batteryPowerState.Timestamps, int(endTimeIndex.Unix()))
+			batteryPowerState.BatteryAveragePowerACs = append(batteryPowerState.BatteryAveragePowerACs, 0)
+		}
+
+		startTimeIndex = endTimeIndex
+		endTimeIndex = startTimeIndex.Add(+1 * time.Hour)
+	}
+
+	onPeakTime, err := s.getOnPeakTime(gwUUID, startTime)
+	if err != nil {
+		return
+	}
+	batteryPowerState.OnPeakTime = onPeakTime
+
+	return
+}
+
+func (s defaultBatteryService) getStatePeriod(startTime, endTime time.Time) (periodStartTime, periodEndTime time.Time, err error) {
+	periodStartTime = time.Date(startTime.Year(), startTime.Month(), startTime.Day(), startTime.Hour(), 0, 0, 0, startTime.Location())
+	log.Debug("periodStartTime: ", periodStartTime)
+	periodEndTime = time.Date(endTime.Year(), endTime.Month(), endTime.Day(), endTime.Hour(), 0, 0, 0, endTime.Location())
+	log.Debug("periodEndTime: ", periodEndTime)
+	if periodStartTime == periodEndTime {
+		err = e.ErrNewUnexpectedTimeRange
+		log.WithFields(log.Fields{
+			"caused-by": "s.getStatePeriod",
+			"err":       err,
+		}).Error()
+	}
+	return
+}
+
+func (s defaultBatteryService) getOnPeakTime(gwUUID string, t time.Time) (onPeakTime map[string]string, err error) {
+	gateway, err := s.repo.Gateway.GetGatewayByGatewayUUID(gwUUID)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "s.repo.Gateway.GetGatewayByGatewayUUID",
+			"err":       err,
+		}).Error()
+		return
+	}
+	billingType, err := s.billing.GetBillingTypeByCustomerID(gateway.CustomerID)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "s.billing.GetBillingTypeByCustomerID",
+			"err":       err,
+		}).Error()
+		return
+	}
+	localTime, err := s.billing.GetLocalTime(billingType.TOULocationID, t)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "s.billing.GetLocalTime",
+			"err":       err,
+		}).Error()
+		return
+	}
+	periodType := s.billing.GetPeriodTypeOfDay(billingType.TOULocationID, localTime)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "s.billing.GetPeriodTypeOfDay",
+			"err":       err,
+		}).Error()
+		return
+	}
+	isSummer := s.billing.IsSummer(localTime)
+	billings, err := s.repo.TOU.GetBillingsByTOUInfo(billingType.TOULocationID, billingType.VoltageType, billingType.TOUType, periodType, isSummer, localTime.Format(utils.YYYYMMDD))
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "s.repo.TOU.GetBillingsByTOUInfo",
+			"err":       err,
+		}).Error()
+		return
+	}
+
+	onPeakTime = map[string]string{}
+	for _, billing := range billings {
+		if billing.PeakType.String == "On-peak" {
+			log.WithFields(log.Fields{
+				"localTime":           localTime,
+				"timezone":            localTime.Format(utils.ZHHMM),
+				"billing.PeakType":    billing.PeakType,
+				"billing.PeriodStime": billing.PeriodStime,
+				"billing.PeriodEtime": billing.PeriodEtime,
+			}).Debug()
+			onPeakTime["timezone"] = localTime.Format(utils.ZHHMM)
+			onPeakTime["start"] = billing.PeriodStime.String
+			onPeakTime["end"] = billing.PeriodEtime.String
+			break
+		}
+	}
 	return
 }

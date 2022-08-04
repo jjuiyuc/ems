@@ -13,10 +13,13 @@ import (
 
 // CCDataRepository godoc
 type CCDataRepository interface {
+	// CC data
 	UpsertCCData(ccData *deremsmodels.CCDatum) (err error)
+	GetCCDataCount() (int64, error)
+	// CC data log
 	UpsertCCDataLog(ccDataLog *deremsmodels.CCDataLog) (err error)
 	GetLatestLogByGatewayUUID(gwUUID string) (*deremsmodels.CCDataLog, error)
-	GetCCDataCount() (int64, error)
+	GetFirstLogByGatewayUUIDAndStartTime(gwUUID string, startTime time.Time) (*deremsmodels.CCDataLog, error)
 }
 
 type defaultCCDataRepository struct {
@@ -46,6 +49,11 @@ func (repo defaultCCDataRepository) UpsertCCData(ccData *deremsmodels.CCDatum) (
 	return
 }
 
+// GetCCDataCount godoc
+func (repo defaultCCDataRepository) GetCCDataCount() (int64, error) {
+	return deremsmodels.CCData().Count(repo.db)
+}
+
 // UpsertCCDataLog godoc
 func (repo defaultCCDataRepository) UpsertCCDataLog(ccDataLog *deremsmodels.CCDataLog) (err error) {
 	var ccDataLogReturn *deremsmodels.CCDataLog
@@ -71,7 +79,9 @@ func (repo defaultCCDataRepository) GetLatestLogByGatewayUUID(gwUUID string) (*d
 		qm.OrderBy("log_date DESC")).One(repo.db)
 }
 
-// GetCCDataCount godoc
-func (repo defaultCCDataRepository) GetCCDataCount() (int64, error) {
-	return deremsmodels.CCData().Count(repo.db)
+// GetFirstLogByGatewayUUIDAndStartTime godoc
+func (repo defaultCCDataRepository) GetFirstLogByGatewayUUIDAndStartTime(gwUUID string, startTime time.Time) (*deremsmodels.CCDataLog, error) {
+	return deremsmodels.CCDataLogs(
+		qm.Where("(gw_uuid = ? and log_date >= ?)", gwUUID, startTime),
+		qm.OrderBy("log_date ASC")).One(repo.db)
 }

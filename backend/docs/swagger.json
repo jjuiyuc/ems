@@ -1,13 +1,15 @@
 {
     "swagger": "2.0",
     "info": {
-        "title": "DER_EMS",
-        "contact": {}
+        "title": "DER-EMS API",
+        "contact": {},
+        "license": {}
     },
     "basePath": "/api",
     "paths": {
         "/auth": {
             "post": {
+                "description": "get token by username and password",
                 "consumes": [
                     "application/json"
                 ],
@@ -15,23 +17,27 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Authorization"
+                    "authorization"
                 ],
-                "summary": "Get Authorization",
+                "summary": "Show a token",
                 "parameters": [
                     {
-                        "type": "string",
                         "description": "Username",
                         "name": "username",
-                        "in": "path",
-                        "required": true
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
                     },
                     {
-                        "type": "string",
                         "description": "Password",
                         "name": "password",
-                        "in": "path",
-                        "required": true
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
@@ -64,6 +70,7 @@
         },
         "/user/PasswordResetByToken": {
             "put": {
+                "description": "set a new password by having the token from email",
                 "consumes": [
                     "application/json"
                 ],
@@ -71,23 +78,27 @@
                     "application/json"
                 ],
                 "tags": [
-                    "User"
+                    "user"
                 ],
-                "summary": "Set new password by having the token from email",
+                "summary": "Reset the password",
                 "parameters": [
                     {
-                        "type": "string",
                         "description": "Token",
                         "name": "token",
-                        "in": "path",
-                        "required": true
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
                     },
                     {
-                        "type": "string",
-                        "description": "Password",
+                        "description": "New password",
                         "name": "password",
-                        "in": "path",
-                        "required": true
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
@@ -114,6 +125,7 @@
         },
         "/user/passwordLost": {
             "put": {
+                "description": "get email by username",
                 "consumes": [
                     "application/json"
                 ],
@@ -121,16 +133,18 @@
                     "application/json"
                 ],
                 "tags": [
-                    "User"
+                    "user"
                 ],
                 "summary": "Send an email for reset the password",
                 "parameters": [
                     {
-                        "type": "string",
                         "description": "Username",
                         "name": "username",
-                        "in": "path",
-                        "required": true
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
@@ -162,13 +176,14 @@
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "get user by token",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "User"
+                    "user"
                 ],
-                "summary": "Provide detailed information about an individual user",
+                "summary": "Show the detailed information about an individual user",
                 "parameters": [
                     {
                         "type": "string",
@@ -183,7 +198,93 @@
                     "200": {
                         "description": "OK",
                         "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/app.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/services.ProfileResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
                             "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/{gwid}/devices/battery/energy-info": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get battery by token, gateway UUID and startTime",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "energy resources"
+                ],
+                "summary": "Show the detailed information and current state about a battery",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Input user's access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Gateway UUID",
+                        "name": "gwid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "UTC time in ISO-8601",
+                        "name": "startTime",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/app.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/services.BatteryEnergyInfoResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "401": {
@@ -203,8 +304,109 @@
                 "code": {
                     "type": "integer"
                 },
-                "data": {},
+                "data": {
+                    "type": "object"
+                },
                 "msg": {
+                    "type": "string"
+                }
+            }
+        },
+        "services.BatteryEnergyInfoResponse": {
+            "type": "object",
+            "properties": {
+                "batteryConsumedEnergyAC": {
+                    "type": "number"
+                },
+                "batteryConsumedLifetimeEnergyAC": {
+                    "type": "number"
+                },
+                "batteryLifetimeOperationCycles": {
+                    "type": "number"
+                },
+                "batteryOperationCycles": {
+                    "type": "number"
+                },
+                "batteryPower": {
+                    "type": "number"
+                },
+                "batteryProducedEnergyAC": {
+                    "type": "number"
+                },
+                "batteryProducedLifetimeEnergyAC": {
+                    "type": "number"
+                },
+                "batterySoC": {
+                    "type": "number"
+                },
+                "capcity": {
+                    "type": "number"
+                },
+                "model": {
+                    "type": "string"
+                },
+                "powerSources": {
+                    "type": "string"
+                },
+                "voltage": {
+                    "type": "number"
+                }
+            }
+        },
+        "services.GatewayInfo": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "gatewayID": {
+                    "type": "string"
+                }
+            }
+        },
+        "services.ProfileResponse": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "type": "string"
+                },
+                "expirationDate": {
+                    "type": "string"
+                },
+                "gateways": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/services.GatewayInfo"
+                    }
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "lockedAt": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "passwordLastChanged": {
+                    "type": "string"
+                },
+                "passwordRetryCount": {
+                    "type": "string"
+                },
+                "pwdTokenExpiry": {
+                    "type": "string"
+                },
+                "resetPWDToken": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "username": {
                     "type": "string"
                 }
             }

@@ -21,5 +21,6 @@ const (
 
 	ErrToken = 40000
 
-	ErrDashboardDataParse = 50000
+	ErrUserProfileGen   = 50000
+	ErrDashboardDataGen = 50001
 )

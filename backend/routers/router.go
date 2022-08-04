@@ -42,7 +42,7 @@ func NewAPIWorker(cfg *viper.Viper, services *services.Services) {
 }
 
 // InitRouter godoc
-// @Title DER_EMS
+// @title DER-EMS API
 // @BasePath /api
 func InitRouter(isCORS bool, ginMode string, w *APIWorker) *gin.Engine {
 	r := gin.New()
@@ -79,6 +79,9 @@ func InitRouter(isCORS bool, ginMode string, w *APIWorker) *gin.Engine {
 
 	// Dashboard
 	apiGroup.GET("/:gwid/devices/energy-info", authorize(WebSocket), w.dashboardHandler)
+
+	// Energy Resources - Battery tab
+	apiGroup.GET("/:gwid/devices/battery/energy-info", authorize(REST), w.GetBatteryEnergyInfo)
 
 	return r
 }

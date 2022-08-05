@@ -49,21 +49,21 @@ func (s *TestutilsSuite) Test_SeedUtUser() {
 func (s *TestutilsSuite) Test_GetAuthorization() {
 	seedUtToken := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZXhwIjoxNjU1MzcxNjU2LCJpc3MiOiJkZXJlbXMifQ.VLBUMzihKZBJQ5zw845bSyokIEy-gQV1kS5w0g_dDdo"
 
-	testData := GetAuthorization(seedUtToken)
-	s.Equal(fmt.Sprintf("Bearer %s", seedUtToken), testData)
+	data := GetAuthorization(seedUtToken)
+	s.Equal(fmt.Sprintf("Bearer %s", seedUtToken), data)
 }
 
 func (s *TestutilsSuite) Test_CopyMap() {
-	testData := CopyMap(s.seedUtData)
-	s.Equal(s.seedUtData, testData)
+	data := CopyMap(s.seedUtData)
+	s.Equal(s.seedUtData, data)
 }
 
 func (s *TestutilsSuite) Test_GetMockConsumerMessage() {
 	seedUtTopic := kafka.ReceiveLocalCCData
 
-	testDataJSON, err := json.Marshal(s.seedUtData)
+	dataJSON, err := json.Marshal(s.seedUtData)
 	s.Require().NoError(err)
-	testMsg, err := GetMockConsumerMessage(s.T(), seedUtTopic, testDataJSON)
+	msg, err := GetMockConsumerMessage(s.T(), seedUtTopic, dataJSON)
 	s.Require().NoError(err)
-	s.Equal(seedUtTopic, testMsg.Topic)
+	s.Equal(seedUtTopic, msg.Topic)
 }

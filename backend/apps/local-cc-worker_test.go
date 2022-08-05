@@ -162,15 +162,15 @@ func (s *LocalCCWorkerSuite) Test_SaveLocalCCData() {
 			continue
 		}
 
-		testDataJSON, err := json.Marshal(tt.args.Msg)
+		dataJSON, err := json.Marshal(tt.args.Msg)
 		s.Require().NoError(err)
-		testMsg, err := testutils.GetMockConsumerMessage(s.T(), s.seedUtTopic, testDataJSON)
+		msg, err := testutils.GetMockConsumerMessage(s.T(), s.seedUtTopic, dataJSON)
 		s.Require().NoError(err)
-		s.Equal(s.seedUtTopic, testMsg.Topic)
+		s.Equal(s.seedUtTopic, msg.Topic)
 
 		currentCount, err := s.repo.CCData.GetCCDataCount()
 		s.Require().NoError(err)
-		err = s.handler.saveLocalCCData(testMsg.Value)
+		err = s.handler.saveLocalCCData(msg.Value)
 
 		switch tt.name {
 		case "saveLocalCCData", "saveLocalCCDataNewGW":

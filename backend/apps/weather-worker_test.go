@@ -179,15 +179,15 @@ func (s *WeatherWorkerSuite) Test_01_SaveWeatherData() {
 
 	for _, tt := range tests {
 		log.Info("test name: ", tt.name)
-		testDataJSON, err := json.Marshal(tt.args)
+		dataJSON, err := json.Marshal(tt.args)
 		s.Require().NoError(err)
-		testMsg, err := testutils.GetMockConsumerMessage(s.T(), s.seedUtTopic, testDataJSON)
+		msg, err := testutils.GetMockConsumerMessage(s.T(), s.seedUtTopic, dataJSON)
 		s.Require().NoError(err)
-		s.Equal(s.seedUtTopic, testMsg.Topic)
+		s.Equal(s.seedUtTopic, msg.Topic)
 
 		switch tt.name {
 		case "saveWeatherDataNoValidDate":
-			_, _, err = s.handler.saveWeatherData(testMsg.Value)
+			_, _, err = s.handler.saveWeatherData(msg.Value)
 			s.Equal(e.ErrNewKeyNotExist(validDate).Error(), err.Error())
 			continue
 		case "saveWeatherDataEmptyInput":
@@ -198,7 +198,7 @@ func (s *WeatherWorkerSuite) Test_01_SaveWeatherData() {
 
 		currentCount, err := s.repo.Weather.GetWeatherForecastCount()
 		s.Require().NoError(err)
-		_, _, err = s.handler.saveWeatherData(testMsg.Value)
+		_, _, err = s.handler.saveWeatherData(msg.Value)
 		s.Require().NoError(err)
 		updatedCount, err := s.repo.Weather.GetWeatherForecastCount()
 		s.Require().NoError(err)
@@ -213,8 +213,11 @@ func (s *WeatherWorkerSuite) Test_01_SaveWeatherData() {
 
 func (s *WeatherWorkerSuite) Test_02_GenerateWeatherSendingInfo() {
 	type args struct {
-		Lat         float32
-		Lng         float32
+		Lat float32
+		Lng float32
+	}
+
+	type response struct {
 		WeatherData []byte
 		UUIDs       []string
 	}
@@ -235,19 +238,20 @@ func (s *WeatherWorkerSuite) Test_02_GenerateWeatherSendingInfo() {
 			value["validDate"] = s.seedUtTime.Add(+30 * time.Minute).Format(time.RFC3339)
 		}
 	}
-	testLat := s.seedUtWeather.Lat
-	testLng := s.seedUtWeather.Lng
 	testWeatherData, _ := json.Marshal(testData)
 	testUUIDs := []string{"U00001", "U00002", "U00003", "U00004"}
 
 	tt := struct {
-		name string
-		args args
+		name   string
+		args   args
+		wantRv response
 	}{
 		name: "generateWeatherSendingInfo",
 		args: args{
-			Lat:         testLat,
-			Lng:         testLng,
+			Lat: s.seedUtWeather.Lat,
+			Lng: s.seedUtWeather.Lng,
+		},
+		wantRv: response{
 			WeatherData: testWeatherData,
 			UUIDs:       testUUIDs,
 		},
@@ -256,6 +260,6 @@ func (s *WeatherWorkerSuite) Test_02_GenerateWeatherSendingInfo() {
 	log.Info("test name: ", tt.name)
 	weatherData, uuids, err := s.handler.generateWeatherSendingInfo(tt.args.Lat, tt.args.Lng)
 	s.Require().NoError(err)
-	s.Equal(testWeatherData, weatherData)
-	s.Equal(testUUIDs, uuids)
+	s.Equal(tt.wantRv.WeatherData, weatherData)
+	s.Equal(tt.wantRv.UUIDs, uuids)
 }

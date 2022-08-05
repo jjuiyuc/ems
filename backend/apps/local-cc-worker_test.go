@@ -114,12 +114,12 @@ func (s *LocalCCWorkerSuite) Test_SaveLocalCCData() {
 	}
 
 	// Modify seedUtLocalCCData data
-	testDataNewGW := testutils.CopyMap(s.seedUtLocalCCData)
-	testDataNewGW[gwID] = "U00000"
-	testDataNoGWID := testutils.CopyMap(s.seedUtLocalCCData)
-	delete(testDataNoGWID, gwID)
-	testDataNoTimestamp := testutils.CopyMap(s.seedUtLocalCCData)
-	delete(testDataNoTimestamp, timestamp)
+	seedUtDataNewGW := testutils.CopyMap(s.seedUtLocalCCData)
+	seedUtDataNewGW[gwID] = "U00000"
+	seedUtDataNoGWID := testutils.CopyMap(s.seedUtLocalCCData)
+	delete(seedUtDataNoGWID, gwID)
+	seedUtDataNoTimestamp := testutils.CopyMap(s.seedUtLocalCCData)
+	delete(seedUtDataNoTimestamp, timestamp)
 
 	tests := []struct {
 		name string
@@ -134,19 +134,19 @@ func (s *LocalCCWorkerSuite) Test_SaveLocalCCData() {
 		{
 			name: "saveLocalCCDataNewGW",
 			args: args{
-				Msg: testDataNewGW,
+				Msg: seedUtDataNewGW,
 			},
 		},
 		{
 			name: "saveLocalCCDataNoGWID",
 			args: args{
-				Msg: testDataNoGWID,
+				Msg: seedUtDataNoGWID,
 			},
 		},
 		{
 			name: "saveLocalCCDataNoTimestamp",
 			args: args{
-				Msg: testDataNoTimestamp,
+				Msg: seedUtDataNoTimestamp,
 			},
 		},
 		{

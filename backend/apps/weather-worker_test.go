@@ -126,16 +126,16 @@ func (s *WeatherWorkerSuite) Test_01_SaveWeatherData() {
 	const validDate = "validDate"
 
 	// Modify seedUtWeather data
-	// testDataUpdated
-	testDataUpdated := LatestWeather{
+	// seedUtDataUpdated
+	seedUtDataUpdated := LatestWeather{
 		Lat: s.seedUtWeather.Lat,
 		Lng: s.seedUtWeather.Lng,
 		Alt: s.seedUtWeather.Alt,
 	}
 	for _, value := range s.seedUtWeather.Values {
-		testDataUpdated.Values = append(testDataUpdated.Values, testutils.CopyMap(value))
+		seedUtDataUpdated.Values = append(seedUtDataUpdated.Values, testutils.CopyMap(value))
 	}
-	for i, value := range testDataUpdated.Values {
+	for i, value := range seedUtDataUpdated.Values {
 		switch i {
 		case 0:
 			value[validDate] = s.seedUtTime.Add(+15 * time.Minute).Format(time.RFC3339)
@@ -143,16 +143,16 @@ func (s *WeatherWorkerSuite) Test_01_SaveWeatherData() {
 			value[validDate] = s.seedUtTime.Add(+30 * time.Minute).Format(time.RFC3339)
 		}
 	}
-	// testDataNoValidDate
-	testDataNoValidDate := LatestWeather{
+	// seedUtDataNoValidDate
+	seedUtDataNoValidDate := LatestWeather{
 		Lat: s.seedUtWeather.Lat,
 		Lng: s.seedUtWeather.Lng,
 		Alt: s.seedUtWeather.Alt,
 	}
 	for _, value := range s.seedUtWeather.Values {
-		testDataNoValidDate.Values = append(testDataNoValidDate.Values, testutils.CopyMap(value))
+		seedUtDataNoValidDate.Values = append(seedUtDataNoValidDate.Values, testutils.CopyMap(value))
 	}
-	for _, value := range testDataNoValidDate.Values {
+	for _, value := range seedUtDataNoValidDate.Values {
 		delete(value, validDate)
 	}
 
@@ -166,11 +166,11 @@ func (s *WeatherWorkerSuite) Test_01_SaveWeatherData() {
 		},
 		{
 			name: "saveWeatherDataUpdated",
-			args: testDataUpdated,
+			args: seedUtDataUpdated,
 		},
 		{
 			name: "saveWeatherDataNoValidDate",
-			args: testDataNoValidDate,
+			args: seedUtDataNoValidDate,
 		},
 		{
 			name: "saveWeatherDataEmptyInput",

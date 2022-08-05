@@ -25,7 +25,15 @@ func GetConfigDir() string {
 
 // SeedUtUser godoc
 func SeedUtUser(db *sql.DB) (err error) {
+	_, err = db.Exec("SET FOREIGN_KEY_CHECKS = 0")
+	if err != nil {
+		return
+	}
 	_, err = db.Exec("truncate table user")
+	if err != nil {
+		return
+	}
+	_, err = db.Exec("SET FOREIGN_KEY_CHECKS = 1")
 	if err != nil {
 		return
 	}

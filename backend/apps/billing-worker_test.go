@@ -149,6 +149,7 @@ func (s *BillingWorkerSuite) Test_getSundayOfBillingWeek() {
 	type args struct {
 		LocalTime    time.Time
 		TimeOnSunday time.Time
+		SendNow      bool
 	}
 
 	loc, _ := time.LoadLocation("Asia/Taipei")
@@ -162,6 +163,7 @@ func (s *BillingWorkerSuite) Test_getSundayOfBillingWeek() {
 			args: args{
 				LocalTime:    s.seedUtTime,
 				TimeOnSunday: time.Date(2022, 7, 31, 8, 0, 0, 0, loc),
+				SendNow:      true,
 			},
 		},
 		{
@@ -169,19 +171,14 @@ func (s *BillingWorkerSuite) Test_getSundayOfBillingWeek() {
 			args: args{
 				LocalTime:    s.seedUtTime,
 				TimeOnSunday: time.Date(2022, 8, 7, 8, 0, 0, 0, loc),
+				SendNow:      false,
 			},
 		},
 	}
 
 	for _, tt := range tests {
-		switch tt.name {
-		case "getSundayOfBillingWeek":
-			timeOnSunday := getSundayOfBillingWeek(s.seedUtTime, true)
-			s.Equal(tt.args.TimeOnSunday, timeOnSunday)
-		case "getSundayOfBillingWeekNextWeek":
-			timeOnSunday := getSundayOfBillingWeek(s.seedUtTime, false)
-			s.Equal(tt.args.TimeOnSunday, timeOnSunday)
-		}
+		timeOnSunday := getSundayOfBillingWeek(tt.args.LocalTime, tt.args.SendNow)
+		s.Equal(tt.args.TimeOnSunday, timeOnSunday)
 	}
 }
 

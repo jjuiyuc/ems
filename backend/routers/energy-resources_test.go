@@ -76,8 +76,8 @@ func (s *EnergyResourcesSuite) Test_GetBatteryEnergyInfo() {
 	}
 
 	prefixURL := "/api/" + fixtures.UtGateway.UUID + "/devices/battery/energy-info"
-	testURL := prefixURL + "?startTime=2022-08-03T16:00:00.000Z"
-	testInvalidParamsURL := prefixURL + "?startTime=xxx"
+	seedUtURL := prefixURL + "?startTime=2022-08-03T16:00:00.000Z"
+	seedUtInvalidParamsURL := prefixURL + "?startTime=xxx"
 	testResponseData := &services.BatteryEnergyInfoResponse{
 		BatteryOperationCycles:          8,
 		BatteryLifetimeOperationCycles:  16,
@@ -101,9 +101,9 @@ func (s *EnergyResourcesSuite) Test_GetBatteryEnergyInfo() {
 		wantRv     response
 	}{
 		{
-			name:       "getBatteryEnergyInfo",
+			name:       "batteryEnergyInfo",
 			token:      s.token,
-			url:        testURL,
+			url:        seedUtURL,
 			wantStatus: http.StatusOK,
 			wantRv: response{
 				Code: e.Success,
@@ -112,9 +112,9 @@ func (s *EnergyResourcesSuite) Test_GetBatteryEnergyInfo() {
 			},
 		},
 		{
-			name:       "getBatteryEnergyInfoInvalidParams",
+			name:       "batteryEnergyInfoInvalidParams",
 			token:      s.token,
-			url:        testInvalidParamsURL,
+			url:        seedUtInvalidParamsURL,
 			wantStatus: http.StatusBadRequest,
 			wantRv: response{
 				Code: e.InvalidParams,

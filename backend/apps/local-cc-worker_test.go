@@ -1,6 +1,7 @@
 package apps
 
 import (
+	"database/sql"
 	"encoding/json"
 	"testing"
 
@@ -20,6 +21,7 @@ type LocalCCWorkerSuite struct {
 	suite.Suite
 	seedUtTopic       string
 	seedUtLocalCCData map[string]interface{}
+	db                *sql.DB
 	repo              *repository.Repository
 	handler           localCCConsumerHandler
 }
@@ -40,6 +42,7 @@ func (s *LocalCCWorkerSuite) SetupSuite() {
 	}
 
 	s.seedUtTopic = kafka.ReceiveLocalCCData
+	s.db = db
 	s.repo = repo
 	s.handler = handler
 
@@ -47,64 +50,68 @@ func (s *LocalCCWorkerSuite) SetupSuite() {
 	err := testutils.SeedUtCustomerAndGateway(db)
 	s.Require().NoError(err)
 	// Mock seedUtLocalCCData data
+	seedUtLoadLinks := map[string]int{
+		"grid":    0,
+		"battery": 0,
+		"pv":      0,
+	}
+	seedUtGridLinks := map[string]int{
+		"load":    1,
+		"battery": 0,
+		"pv":      0,
+	}
+	seedUtPvLinks := map[string]int{
+		"load":    1,
+		"battery": 1,
+		"grid":    0,
+	}
+	seedUtBatteryLinks := map[string]int{
+		"load": 0,
+		"pv":   0,
+		"grid": 0,
+	}
 	s.seedUtLocalCCData = map[string]interface{}{
 		"gwID":                            fixtures.UtGateway.UUID,
-		"timestamp":                       1653964322,
-		"timestampDelta":                  5,
-		"gridInstantaneousPowerAC":        20.15,
-		"gridAveragePowerAC":              18.20,
-		"gridProducedEnergyAC":            5.73,
-		"gridConsumedEnergyAC":            0.000,
-		"gridLifetimeEnergyAC":            76947.0098,
-		"gridDeltaLifetimeEnergyAC":       12.10,
-		"loadInstantaneousPowerAC":        -12.0928,
-		"loadAveragePowerAC":              -2.000,
-		"loadBatteryAveragePowerAC":       5.931,
-		"loadPvAveragePowerAC":            3.3,
-		"loadBatteryConsumedEnergyAC":     56,
-		"loadPvConsumedEnergyAC":          1,
-		"loadConsumedEnergyAC":            2,
-		"loadLifetimeEnergyAC":            421,
-		"batteryInstantaneousPowerDC":     10,
-		"batteryInstantaneousPowerAC":     11,
-		"batteryAveragePowerAC":           10.3,
-		"batteryProducedEnergyDC":         2,
-		"batteryProducedEnergyAC":         2.1,
-		"batteryConsumedEnergyDC":         0.0,
-		"batteryConsumedEnergyAC":         0.0,
-		"batteryLifetimeEnergyDC":         382.2,
-		"batteryDeltaLifetimeEnergyAC":    2.1,
-		"batteryDeltaLifetimeEnergyDC":    2.1,
-		"batteryLifetimeEnergyAC":         383,
-		"batteryCurrentStoredEnergy":      31.3,
-		"batteryDeltaCurrentStoredEnergy": 2.2,
-		"batteryNameplateEnergy":          100,
-		"batteryChargeEfficiency":         79.34,
-		"batteryDischargeEfficiency":      75.53,
-		"batteryInverterEfficiencyDCAC":   95.3,
-		"batteryInverterEfficiencyACDC":   97.7,
-		"batteryVoltage":                  800.8,
-		"batterySoC":                      87.1,
-		"batterySoH":                      99.2,
-		"pvInstantaneousPowerDC":          5.9,
-		"pvInstantaneousPowerAC":          4.9,
-		"pvAveragePowerAC":                4.7,
-		"pvProducedEnergyDC":              6.7,
-		"pvProducedEnergyAC":              5.6,
-		"pvLifetimeEnergyDC":              67099,
-		"pvLifetimeEnergyAC":              67001,
-		"pvDeltaLifetimeEnergyAC":         6.97,
-		"pvInverterEfficiencyDCAC":        94,
-		"allProducedEnergyAC":             83772.28,
-		"allConsumedEnergyAC":             28726.28,
+		"timestamp":                       1659340800,
+		"gridIsPeakShaving":               0,
+		"loadGridAveragePowerAC":          10,
+		"batteryGridAveragePowerAC":       0,
+		"gridContractPowerAC":             15,
+		"loadPvAveragePowerAC":            20,
+		"loadBatteryAveragePowerAC":       0,
+		"batterySoC":                      80,
+		"batteryProducedAveragePowerAC":   20,
+		"batteryConsumedAveragePowerAC":   0,
+		"batteryChargingFrom":             "Solar",
+		"batteryDischargingTo":            "",
+		"pvAveragePowerAC":                40,
+		"loadAveragePowerAC":              30,
+		"loadLinks":                       seedUtLoadLinks,
+		"gridLinks":                       seedUtGridLinks,
+		"pvLinks":                         seedUtPvLinks,
+		"batteryLinks":                    seedUtBatteryLinks,
+		"batteryPvAveragePowerAC":         20,
+		"gridPvAveragePowerAC":            0,
+		"gridProducedAveragePowerAC":      10,
+		"gridConsumedAveragePowerAC":      0,
+		"batteryLifetimeOperationCycles":  8,
+		"batteryProducedLifetimeEnergyAC": 250,
+		"batteryConsumedLifetimeEnergyAC": 250,
+		"batteryAveragePowerAC":           -3.5,
+		"batteryVoltage":                  28,
 	}
 }
 
 func (s *LocalCCWorkerSuite) TearDownSuite() {
+	// Delete test data in cc_data_log table
+	_, err := s.db.Exec(`
+		DELETE FROM cc_data_log WHERE id = 3 OR id = 4;
+	`)
+	s.Require().NoError(err)
 	models.Close()
 }
 
-func (s *LocalCCWorkerSuite) Test_SaveLocalCCData() {
+func (s *LocalCCWorkerSuite) Test_SaveLocalCCDataAndLog() {
 	const (
 		gwID      = "gwID"
 		timestamp = "timestamp"
@@ -170,18 +177,27 @@ func (s *LocalCCWorkerSuite) Test_SaveLocalCCData() {
 
 		currentCount, err := s.repo.CCData.GetCCDataCount()
 		s.Require().NoError(err)
-		err = s.handler.saveLocalCCData(msg.Value)
+		currentLogCount, err := s.repo.CCData.GetCCDataLogCount()
+		s.Require().NoError(err)
+		saveErr := s.handler.saveLocalCCData(msg.Value)
+		saveLogErr := s.handler.saveLocalCCDataLog(msg.Value)
 
 		switch tt.name {
 		case "saveLocalCCData", "saveLocalCCDataNewGW":
-			s.Require().NoError(err)
+			s.Require().NoError(saveErr)
+			s.Require().NoError(saveLogErr)
 			updatedCount, err := s.repo.CCData.GetCCDataCount()
 			s.Require().NoError(err)
 			s.Equal(currentCount+1, updatedCount)
+			updatedCount, err = s.repo.CCData.GetCCDataLogCount()
+			s.Require().NoError(err)
+			s.Equal(currentLogCount+1, updatedCount)
 		case "saveLocalCCDataNoGWID":
-			s.Equal(e.ErrNewKeyNotExist(gwID).Error(), err.Error())
+			s.Equal(e.ErrNewKeyNotExist(gwID).Error(), saveErr.Error())
+			s.Equal(e.ErrNewKeyNotExist(gwID).Error(), saveLogErr.Error())
 		case "saveLocalCCDataNoTimestamp":
-			s.Equal(e.ErrNewKeyNotExist(timestamp).Error(), err.Error())
+			s.Equal(e.ErrNewKeyNotExist(timestamp).Error(), saveErr.Error())
+			s.Equal(e.ErrNewKeyNotExist(timestamp).Error(), saveLogErr.Error())
 		}
 	}
 }

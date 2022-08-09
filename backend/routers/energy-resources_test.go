@@ -87,9 +87,9 @@ func (s *EnergyResourcesSuite) Test_GetBatteryEnergyInfo() {
 		Data *services.BatteryEnergyInfoResponse `json:"data"`
 	}
 
-	prefixURL := "/api/" + fixtures.UtGateway.UUID + "/devices/battery/energy-info"
-	seedUtURL := prefixURL + "?startTime=2022-08-03T16:00:00.000Z"
-	seedUtInvalidParamsURL := prefixURL + "?startTime=xxx"
+	prefixURL := fmt.Sprintf("/api/%s/devices/battery/energy-info", fixtures.UtGateway.UUID)
+	seedUtURL := fmt.Sprintf("%s?startTime=%s", prefixURL, UtStartTime)
+	seedUtInvalidParamsURL := fmt.Sprintf("%s?startTime=%s", prefixURL, "xxx")
 	testResponseData := &services.BatteryEnergyInfoResponse{
 		BatteryOperationCycles:          8,
 		BatteryLifetimeOperationCycles:  16,

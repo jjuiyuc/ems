@@ -21,6 +21,18 @@ import (
 	"der-ems/testutils/fixtures"
 )
 
+const (
+	UtResolution = "hour"
+	UtStartTime  = "2022-08-03T16:00:00.000Z"
+	UtEndTime    = "2022-08-03T20:15:00.000Z"
+)
+
+var testOnPeakTime = map[string]string{
+	"timezone": "+0800",
+	"start":    "07:30:00",
+	"end":      "22:30:00",
+}
+
 type EnergyResourcesSuite struct {
 	suite.Suite
 	router *gin.Engine
@@ -115,6 +127,117 @@ func (s *EnergyResourcesSuite) Test_GetBatteryEnergyInfo() {
 			name:       "batteryEnergyInfoInvalidParams",
 			token:      s.token,
 			url:        seedUtInvalidParamsURL,
+			wantStatus: http.StatusBadRequest,
+			wantRv: response{
+				Code: e.InvalidParams,
+				Msg:  "invalid parameters",
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		log.Info("test name: ", tt.name)
+		req, err := http.NewRequest("GET", fmt.Sprintf(tt.url), nil)
+		s.Require().NoError(err)
+		req.Header.Set("Authorization", testutils.GetAuthorization(tt.token))
+		rv := httptest.NewRecorder()
+		s.router.ServeHTTP(rv, req)
+		s.Equal(tt.wantStatus, rv.Code)
+
+		var res response
+		err = json.Unmarshal([]byte(rv.Body.String()), &res)
+		s.Require().NoError(err)
+		s.Equal(tt.wantRv.Code, res.Code)
+		s.Equal(tt.wantRv.Msg, res.Msg)
+		s.Equal(tt.wantRv.Data, res.Data)
+	}
+}
+
+func (s *EnergyResourcesSuite) Test_GetBatteryPowerState() {
+	type response struct {
+		Code int                                 `json:"code"`
+		Msg  string                              `json:"msg"`
+		Data *services.BatteryPowerStateResponse `json:"data"`
+	}
+
+	prefixURL := fmt.Sprintf("/api/%s/devices/battery/power-state", fixtures.UtGateway.UUID)
+	seedUtURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, UtResolution, UtStartTime, UtEndTime)
+	seedUtInvalidResolutionParamURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, "xxx", UtStartTime, UtEndTime)
+	seedUtInvalidStartTimeParamURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, UtResolution, "xxx", UtEndTime)
+	seedUtInvalidEndTimeParamURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, UtResolution, UtStartTime, UtStartTime)
+	seedUtInvalidPeriodEndTimeURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, UtResolution, UtStartTime, "2022-08-03T16:15:00.000Z")
+	seedUtNoResolutionParamURL := fmt.Sprintf("%s?startTime=%s&endTime=%s", prefixURL, UtStartTime, UtEndTime)
+
+	testTimestamps := []int{1659542400, 1659546000, 1659549600, 1659553200, 1659556800}
+	testBatteryAveragePowerACs := []float32{-3.5, 0, 0, 0, 0}
+	testResponseData := &services.BatteryPowerStateResponse{
+		Timestamps:             testTimestamps,
+		BatteryAveragePowerACs: testBatteryAveragePowerACs,
+		OnPeakTime:             testOnPeakTime,
+	}
+
+	tests := []struct {
+		name       string
+		token      string
+		url        string
+		wantStatus int
+		wantRv     response
+	}{
+		{
+			name:       "batteryPowerState",
+			token:      s.token,
+			url:        seedUtURL,
+			wantStatus: http.StatusOK,
+			wantRv: response{
+				Code: e.Success,
+				Msg:  "ok",
+				Data: testResponseData,
+			},
+		},
+		{
+			name:       "batteryPowerStateInvalidResolutionParam",
+			token:      s.token,
+			url:        seedUtInvalidResolutionParamURL,
+			wantStatus: http.StatusBadRequest,
+			wantRv: response{
+				Code: e.InvalidParams,
+				Msg:  "invalid parameters",
+			},
+		},
+		{
+			name:       "batteryPowerStateInvalidStartTimeParam",
+			token:      s.token,
+			url:        seedUtInvalidStartTimeParamURL,
+			wantStatus: http.StatusBadRequest,
+			wantRv: response{
+				Code: e.InvalidParams,
+				Msg:  "invalid parameters",
+			},
+		},
+		{
+			name:       "batteryPowerStateInvalidEndTimeParam",
+			token:      s.token,
+			url:        seedUtInvalidEndTimeParamURL,
+			wantStatus: http.StatusBadRequest,
+			wantRv: response{
+				Code: e.InvalidParams,
+				Msg:  "invalid parameters",
+			},
+		},
+		{
+			name:       "batteryPowerStateInvalidPeriodEndTime",
+			token:      s.token,
+			url:        seedUtInvalidPeriodEndTimeURL,
+			wantStatus: http.StatusBadRequest,
+			wantRv: response{
+				Code: e.InvalidParams,
+				Msg:  "invalid parameters",
+			},
+		},
+		{
+			name:       "batteryPowerStateNoResolutionParam",
+			token:      s.token,
+			url:        seedUtNoResolutionParamURL,
 			wantStatus: http.StatusBadRequest,
 			wantRv: response{
 				Code: e.InvalidParams,

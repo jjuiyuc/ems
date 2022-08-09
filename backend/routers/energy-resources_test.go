@@ -263,3 +263,72 @@ func (s *EnergyResourcesSuite) Test_GetBatteryPowerState() {
 		s.Equal(tt.wantRv.Data, res.Data)
 	}
 }
+
+func (s *EnergyResourcesSuite) Test_GetBatteryChargeVoltageState() {
+	type response struct {
+		Code int                                         `json:"code"`
+		Msg  string                                      `json:"msg"`
+		Data *services.BatteryChargeVoltageStateResponse `json:"data"`
+	}
+
+	prefixURL := fmt.Sprintf("/api/%s/devices/battery/charge-voltage-state", fixtures.UtGateway.UUID)
+	seedUtURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, UtResolution, UtStartTime, UtEndTime)
+	seedUtInvalidParamsURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, "xxx", UtStartTime, UtEndTime)
+
+	testTimestamps := []int{1659542400, 1659546000, 1659549600, 1659553200, 1659556800}
+	testBatterySoCs := []float32{80, 0, 0, 0, 0}
+	testBatteryVoltages := []float32{28, 0, 0, 0, 0}
+	testResponseData := &services.BatteryChargeVoltageStateResponse{
+		Timestamps:      testTimestamps,
+		BatterySoCs:     testBatterySoCs,
+		BatteryVoltages: testBatteryVoltages,
+		OnPeakTime:      testOnPeakTime,
+	}
+
+	tests := []struct {
+		name       string
+		token      string
+		url        string
+		wantStatus int
+		wantRv     response
+	}{
+		{
+			name:       "batteryChargeVoltageState",
+			token:      s.token,
+			url:        seedUtURL,
+			wantStatus: http.StatusOK,
+			wantRv: response{
+				Code: e.Success,
+				Msg:  "ok",
+				Data: testResponseData,
+			},
+		},
+		{
+			name:       "batteryChargeVoltageStateInvalidParams",
+			token:      s.token,
+			url:        seedUtInvalidParamsURL,
+			wantStatus: http.StatusBadRequest,
+			wantRv: response{
+				Code: e.InvalidParams,
+				Msg:  "invalid parameters",
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		log.Info("test name: ", tt.name)
+		req, err := http.NewRequest("GET", fmt.Sprintf(tt.url), nil)
+		s.Require().NoError(err)
+		req.Header.Set("Authorization", testutils.GetAuthorization(tt.token))
+		rv := httptest.NewRecorder()
+		s.router.ServeHTTP(rv, req)
+		s.Equal(tt.wantStatus, rv.Code)
+
+		var res response
+		err = json.Unmarshal([]byte(rv.Body.String()), &res)
+		s.Require().NoError(err)
+		s.Equal(tt.wantRv.Code, res.Code)
+		s.Equal(tt.wantRv.Msg, res.Msg)
+		s.Equal(tt.wantRv.Data, res.Data)
+	}
+}

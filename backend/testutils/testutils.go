@@ -144,7 +144,9 @@ func GetMockConsumerMessage(t *testing.T, seedUtTopic string, seedUtData []byte)
 func ValidateGetRequestStatusAndCode(tt TestInfo, a *require.Assertions, router *gin.Engine) (rvData interface{}) {
 	req, err := http.NewRequest("GET", fmt.Sprintf(tt.URL), nil)
 	a.NoError(err)
-	req.Header.Set("Authorization", GetAuthorization(tt.Token))
+	if tt.Token != "" {
+		req.Header.Set("Authorization", GetAuthorization(tt.Token))
+	}
 	rv := httptest.NewRecorder()
 	router.ServeHTTP(rv, req)
 	a.Equal(tt.WantStatus, rv.Code)

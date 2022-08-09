@@ -13,6 +13,7 @@ import (
 	"der-ems/models"
 	"der-ems/repository"
 	"der-ems/testutils"
+	"der-ems/testutils/fixtures"
 )
 
 type LocalCCWorkerSuite struct {
@@ -42,20 +43,12 @@ func (s *LocalCCWorkerSuite) SetupSuite() {
 	s.repo = repo
 	s.handler = handler
 
-	// Truncate data
-	_, err := db.Exec("TRUNCATE TABLE cc_data")
-	s.Require().NoError(err)
-	_, err = db.Exec("SET FOREIGN_KEY_CHECKS = 0")
-	s.Require().NoError(err)
-	_, err = db.Exec("TRUNCATE TABLE gateway")
-	s.Require().NoError(err)
-	_, err = db.Exec("TRUNCATE TABLE customer")
-	s.Require().NoError(err)
-	_, err = db.Exec("SET FOREIGN_KEY_CHECKS = 1")
+	// Truncate & seed data
+	err := testutils.SeedUtCustomerAndGateway(db)
 	s.Require().NoError(err)
 	// Mock seedUtLocalCCData data
 	s.seedUtLocalCCData = map[string]interface{}{
-		"gwID":                            "U00001",
+		"gwID":                            fixtures.UtGateway.UUID,
 		"timestamp":                       1653964322,
 		"timestampDelta":                  5,
 		"gridInstantaneousPowerAC":        20.15,
@@ -105,20 +98,6 @@ func (s *LocalCCWorkerSuite) SetupSuite() {
 		"allProducedEnergyAC":             83772.28,
 		"allConsumedEnergyAC":             28726.28,
 	}
-
-	// Mock customer table
-	_, err = db.Exec(`
-		INSERT INTO customer (id,customer_number,field_number,weather_lat,weather_lng) VALUES
-		(1,'A00001','00001',24.75,121);
-	`)
-	s.Require().NoError(err)
-
-	// Mock gateway table
-	_, err = db.Exec(`
-		INSERT INTO gateway (id,uuid,customer_id) VALUES
-		(1,'U00001',1);
-	`)
-	s.Require().NoError(err)
 }
 
 func (s *LocalCCWorkerSuite) TearDownSuite() {
@@ -135,12 +114,12 @@ func (s *LocalCCWorkerSuite) Test_SaveLocalCCData() {
 	}
 
 	// Modify seedUtLocalCCData data
-	testDataNewGW := testutils.CopyMap(s.seedUtLocalCCData)
-	testDataNewGW[gwID] = "U00000"
-	testDataNoGWID := testutils.CopyMap(s.seedUtLocalCCData)
-	delete(testDataNoGWID, gwID)
-	testDataNoTimestamp := testutils.CopyMap(s.seedUtLocalCCData)
-	delete(testDataNoTimestamp, timestamp)
+	seedUtDataNewGW := testutils.CopyMap(s.seedUtLocalCCData)
+	seedUtDataNewGW[gwID] = "U00000"
+	seedUtDataNoGWID := testutils.CopyMap(s.seedUtLocalCCData)
+	delete(seedUtDataNoGWID, gwID)
+	seedUtDataNoTimestamp := testutils.CopyMap(s.seedUtLocalCCData)
+	delete(seedUtDataNoTimestamp, timestamp)
 
 	tests := []struct {
 		name string
@@ -155,19 +134,19 @@ func (s *LocalCCWorkerSuite) Test_SaveLocalCCData() {
 		{
 			name: "saveLocalCCDataNewGW",
 			args: args{
-				Msg: testDataNewGW,
+				Msg: seedUtDataNewGW,
 			},
 		},
 		{
 			name: "saveLocalCCDataNoGWID",
 			args: args{
-				Msg: testDataNoGWID,
+				Msg: seedUtDataNoGWID,
 			},
 		},
 		{
 			name: "saveLocalCCDataNoTimestamp",
 			args: args{
-				Msg: testDataNoTimestamp,
+				Msg: seedUtDataNoTimestamp,
 			},
 		},
 		{
@@ -183,15 +162,15 @@ func (s *LocalCCWorkerSuite) Test_SaveLocalCCData() {
 			continue
 		}
 
-		testDataJSON, err := json.Marshal(tt.args.Msg)
+		dataJSON, err := json.Marshal(tt.args.Msg)
 		s.Require().NoError(err)
-		testMsg, err := testutils.GetMockConsumerMessage(s.T(), s.seedUtTopic, testDataJSON)
+		msg, err := testutils.GetMockConsumerMessage(s.T(), s.seedUtTopic, dataJSON)
 		s.Require().NoError(err)
-		s.Equal(s.seedUtTopic, testMsg.Topic)
+		s.Equal(s.seedUtTopic, msg.Topic)
 
 		currentCount, err := s.repo.CCData.GetCCDataCount()
 		s.Require().NoError(err)
-		err = s.handler.saveLocalCCData(testMsg.Value)
+		err = s.handler.saveLocalCCData(msg.Value)
 
 		switch tt.name {
 		case "saveLocalCCData", "saveLocalCCDataNewGW":

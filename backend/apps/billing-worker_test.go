@@ -14,6 +14,7 @@ import (
 	"der-ems/repository"
 	"der-ems/services"
 	"der-ems/testutils"
+	"der-ems/testutils/fixtures"
 )
 
 type BillingWorkerSuite struct {
@@ -36,27 +37,8 @@ func (s *BillingWorkerSuite) SetupSuite() {
 	s.repo = repo
 	s.billing = services.NewBillingService(repo)
 
-	_, err := db.Exec("SET FOREIGN_KEY_CHECKS = 0")
-	s.Require().NoError(err)
-	_, err = db.Exec("TRUNCATE TABLE gateway")
-	s.Require().NoError(err)
-	_, err = db.Exec("TRUNCATE TABLE customer")
-	s.Require().NoError(err)
-	_, err = db.Exec("SET FOREIGN_KEY_CHECKS = 1")
-	s.Require().NoError(err)
-
-	// Mock customer table
-	_, err = db.Exec(`
-		INSERT INTO customer (id,customer_number,field_number,address,lat,lng,weather_lat,weather_lng,timezone,tou_location_id,voltage_type,tou_type) VALUES
-		(1,'00001','001','宜蘭縣五結鄉大吉五路157巷68號',24.70155508690467,121.7973398847259,24.75,121.75,'+0800',1,'Low voltage','Two-section');
-	`)
-	s.Require().NoError(err)
-
-	// Mock gateway table
-	_, err = db.Exec(`
-		INSERT INTO gateway (id,uuid,customer_id) VALUES
-		(1,'04F1FD6D9C6F64C3352285CCEAF59EE1',1);
-	`)
+	// Truncate & seed data
+	err := testutils.SeedUtCustomerAndGateway(db)
 	s.Require().NoError(err)
 
 	// Mock seedUtTime
@@ -69,28 +51,28 @@ func (s *BillingWorkerSuite) TearDownSuite() {
 }
 
 func (s *BillingWorkerSuite) Test_GetBillingTypeByCustomerID() {
-	type args struct {
+	type response struct {
 		Gateway     *deremsmodels.Gateway
 		BillingType *services.BillingType
 	}
 
 	testGateway := &deremsmodels.Gateway{
-		ID:         1,
-		UUID:       "04F1FD6D9C6F64C3352285CCEAF59EE1",
-		CustomerID: 1,
+		ID:         fixtures.UtGateway.ID,
+		UUID:       fixtures.UtGateway.UUID,
+		CustomerID: fixtures.UtCustomer.ID,
 	}
 	testBillingType := &services.BillingType{
-		TOULocationID: 1,
-		VoltageType:   "Low voltage",
-		TOUType:       "Two-section",
+		TOULocationID: fixtures.UtCustomer.TOULocationID.Int,
+		VoltageType:   fixtures.UtCustomer.VoltageType.String,
+		TOUType:       fixtures.UtCustomer.TOUType.String,
 	}
 
 	tt := struct {
-		name string
-		args args
+		name   string
+		wantRv response
 	}{
 		name: "GetBillingTypeByCustomerID",
-		args: args{
+		wantRv: response{
 			Gateway:     testGateway,
 			BillingType: testBillingType,
 		},
@@ -98,14 +80,14 @@ func (s *BillingWorkerSuite) Test_GetBillingTypeByCustomerID() {
 
 	gateways, err := getGateways(s.repo)
 	s.Require().NoError(err)
-	s.Equal(tt.args.Gateway.ID, gateways[0].ID)
-	s.Equal(tt.args.Gateway.UUID, gateways[0].UUID)
-	s.Equal(tt.args.Gateway.CustomerID, gateways[0].CustomerID)
+	s.Equal(tt.wantRv.Gateway.ID, gateways[0].ID)
+	s.Equal(tt.wantRv.Gateway.UUID, gateways[0].UUID)
+	s.Equal(tt.wantRv.Gateway.CustomerID, gateways[0].CustomerID)
 	billingType, err := s.billing.GetBillingTypeByCustomerID(gateways[0].CustomerID)
 	s.Require().NoError(err)
-	s.Equal(tt.args.BillingType.TOULocationID, billingType.TOULocationID)
-	s.Equal(tt.args.BillingType.VoltageType, billingType.VoltageType)
-	s.Equal(tt.args.BillingType.TOUType, billingType.TOUType)
+	s.Equal(tt.wantRv.BillingType.TOULocationID, billingType.TOULocationID)
+	s.Equal(tt.wantRv.BillingType.VoltageType, billingType.VoltageType)
+	s.Equal(tt.wantRv.BillingType.TOUType, billingType.TOUType)
 }
 
 func (s *BillingWorkerSuite) Test_GetLocalTime() {
@@ -114,7 +96,7 @@ func (s *BillingWorkerSuite) Test_GetLocalTime() {
 		LocalTime     time.Time
 	}
 
-	testTOULocationID := 1
+	seedUtTOULocationID := 1
 
 	tests := []struct {
 		name string
@@ -123,7 +105,7 @@ func (s *BillingWorkerSuite) Test_GetLocalTime() {
 		{
 			name: "GetLocalTime",
 			args: args{
-				TOULocationID: testTOULocationID,
+				TOULocationID: seedUtTOULocationID,
 				LocalTime:     s.seedUtTime,
 			},
 		},
@@ -147,52 +129,64 @@ func (s *BillingWorkerSuite) Test_GetLocalTime() {
 
 func (s *BillingWorkerSuite) Test_getSundayOfBillingWeek() {
 	type args struct {
-		LocalTime    time.Time
+		LocalTime time.Time
+		SendNow   bool
+	}
+
+	type response struct {
 		TimeOnSunday time.Time
-		SendNow      bool
 	}
 
 	loc, _ := time.LoadLocation("Asia/Taipei")
 
 	tests := []struct {
-		name string
-		args args
+		name   string
+		args   args
+		wantRv response
 	}{
 		{
 			name: "getSundayOfBillingWeek",
 			args: args{
-				LocalTime:    s.seedUtTime,
+				LocalTime: s.seedUtTime,
+				SendNow:   true,
+			},
+			wantRv: response{
 				TimeOnSunday: time.Date(2022, 7, 31, 8, 0, 0, 0, loc),
-				SendNow:      true,
 			},
 		},
 		{
 			name: "getSundayOfBillingWeekNextWeek",
 			args: args{
-				LocalTime:    s.seedUtTime,
+				LocalTime: s.seedUtTime,
+				SendNow:   false,
+			},
+			wantRv: response{
 				TimeOnSunday: time.Date(2022, 8, 7, 8, 0, 0, 0, loc),
-				SendNow:      false,
 			},
 		},
 	}
 
 	for _, tt := range tests {
 		timeOnSunday := getSundayOfBillingWeek(tt.args.LocalTime, tt.args.SendNow)
-		s.Equal(tt.args.TimeOnSunday, timeOnSunday)
+		s.Equal(tt.wantRv.TimeOnSunday, timeOnSunday)
 	}
 }
 
 func (s *BillingWorkerSuite) Test_getWeeklyBillingParamsByType() {
 	type args struct {
-		BillingType   *services.BillingType
-		LocalTime     time.Time
+		BillingType *services.BillingType
+		LocalTime   time.Time
+		SendNow     bool
+	}
+
+	type response struct {
 		BillingParams BillingParams
 	}
 
-	testBillingType := &services.BillingType{
-		TOULocationID: 1,
-		VoltageType:   "Low voltage",
-		TOUType:       "Two-section",
+	seedUtBillingType := &services.BillingType{
+		TOULocationID: fixtures.UtCustomer.TOULocationID.Int,
+		VoltageType:   fixtures.UtCustomer.VoltageType.String,
+		TOUType:       fixtures.UtCustomer.TOUType.String,
 	}
 
 	var testBillingParams BillingParams
@@ -211,27 +205,31 @@ func (s *BillingWorkerSuite) Test_getWeeklyBillingParamsByType() {
 	testBillingParams.Rates = append(testBillingParams.Rates, rate)
 
 	tt := struct {
-		name string
-		args args
+		name   string
+		args   args
+		wantRv response
 	}{
 		name: "getWeeklyBillingParamsByType",
 		args: args{
-			BillingType:   testBillingType,
-			LocalTime:     s.seedUtTime,
+			BillingType: seedUtBillingType,
+			LocalTime:   s.seedUtTime,
+			SendNow:     true,
+		},
+		wantRv: response{
 			BillingParams: testBillingParams,
 		},
 	}
 
-	billingParamsJSON, err := getWeeklyBillingParamsByType(s.repo, s.billing, *tt.args.BillingType, tt.args.LocalTime, true)
+	billingParamsJSON, err := getWeeklyBillingParamsByType(s.repo, s.billing, *tt.args.BillingType, tt.args.LocalTime, tt.args.SendNow)
 	var billingParams BillingParams
 	err = json.Unmarshal(billingParamsJSON, &billingParams)
 	s.Require().NoError(err)
-	s.Equal(tt.args.BillingParams.Timezone, billingParams.Timezone)
-	s.Equal(tt.args.BillingParams.Rates[0], billingParams.Rates[0])
+	s.Equal(tt.wantRv.BillingParams.Timezone, billingParams.Timezone)
+	s.Equal(tt.wantRv.BillingParams.Rates[0], billingParams.Rates[0])
 }
 
 func (s *BillingWorkerSuite) Test_generateBillingParams() {
-	testGateways, _ := getGateways(s.repo)
-	_, err := generateBillingParams(s.repo, s.billing, testGateways[0], true)
+	gateways, _ := getGateways(s.repo)
+	_, err := generateBillingParams(s.repo, s.billing, gateways[0], true)
 	s.Require().NoError(err)
 }

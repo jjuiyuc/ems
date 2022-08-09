@@ -1,9 +1,10 @@
 import {
+    BarController,
+    BarElement,
     Chart,
     Filler,
+    Legend,
     LinearScale,
-    LineController,
-    LineElement,
     PointElement,
     TimeSeriesScale,
     Tooltip
@@ -12,16 +13,17 @@ import "chartjs-adapter-moment"
 import { useEffect, useState } from "react"
 
 Chart.register(
+    BarController,
+    BarElement,
     Filler,
+    Legend,
     LinearScale,
-    LineController,
-    LineElement,
     PointElement,
     TimeSeriesScale,
     Tooltip
 )
 
-import {tooltipLabelPoint} from "../utils/chart"
+import {checkbox, checkboxChecked, tooltipLabelPoint} from "../utils/chart"
 import variables from "../configs/variables"
 
 const
@@ -40,7 +42,7 @@ const createDatasets = datasets => datasets.map(item => ({
     ...item
 }))
 
-export default function LineChart(props) {
+export default function BarChart(props) {
     const [chart, setChart] = useState(null)
 
     useEffect(() => {
@@ -55,7 +57,39 @@ export default function LineChart(props) {
                     mode: "index"
                 },
                 plugins: {
-                    legend: { display: false },
+                    legend: {
+                        align: "end",
+                        hidden: false,
+                        labels: {
+                            boxHeight: 18,
+                            boxWidth: 18,
+                            color: "white",
+                            font: {
+                                size: 16
+                            },
+                            generateLabels: function(chart) {
+                                const labels = Chart.defaults.plugins.legend
+                                                .labels.generateLabels(chart)
+
+                                for (var key in labels) {
+                                    const
+                                        label = labels[key],
+                                        color = label.fillStyle
+                                                .replace("#", "%23")
+
+                                    label.pointStyle = label.hidden
+                                        ? checkbox
+                                        : checkboxChecked(color)
+                                    label.hidden = false
+                                }
+
+                                return labels
+                            },
+                            padding: 20,
+                            usePointStyle: true
+                        },
+                        position: "top"
+                    },
                     tooltip: {
                         backgroundColor: colors.gray[600],
                         boxPadding: 4,
@@ -92,7 +126,8 @@ export default function LineChart(props) {
                         grid: {
                             borderDash: [1, 2],
                             color: colors.gray[400],
-                            drawTicks: false
+                            drawTicks: false,
+                            lineWidth: 0
                         },
                         ticks: {
                             autoSkip: true,
@@ -105,11 +140,12 @@ export default function LineChart(props) {
                         },
                         time: {
                             displayFormats: {
-                                hour: "h A"
+                                day: "MMM D",
                             },
-                            tooltipFormat: "hh:mm:ss A"
+                            tooltipFormat: "MMM D",
+                            unit: "day"
                         },
-                        type: "timeseries",
+                        type: "time",
                         ...props.data?.x
                     },
                     y: {
@@ -130,29 +166,7 @@ export default function LineChart(props) {
                     }
                 }
             },
-            plugins: [
-                {
-                    beforeDraw: chart => {
-                        if (chart.tooltip?._active?.length) {
-                            let x = chart.tooltip._active[0].element.x
-                            let yAxis = chart.scales.y
-                            let ctx = chart.ctx
-                            ctx.save()
-                            ctx.beginPath()
-                            ctx.moveTo(x, yAxis.top)
-                            ctx.lineTo(x, yAxis.bottom)
-                            ctx.lineWidth = 2
-                            ctx.strokeStyle = colors.gray[400]
-                            ctx.stroke()
-                            ctx.restore()
-                        }
-                        if (props.data.beforeDraw) {
-                            props.data.beforeDraw(chart)
-                        }
-                    }
-                }
-            ],
-            type: "line"
+            type: "bar"
         })
 
         setChart(chart)

@@ -137,8 +137,6 @@ func (s *EnergyResourcesSuite) Test_GetBatteryEnergyInfo() {
 		s.Require().NoError(err)
 		s.Equal(tt.wantRv.Code, res.Code)
 		s.Equal(tt.wantRv.Msg, res.Msg)
-		if tt.name == "getBatteryEnergyInfo" {
-			s.Equal(testResponseData, res.Data)
-		}
+		s.Equal(tt.wantRv.Data, res.Data)
 	}
 }

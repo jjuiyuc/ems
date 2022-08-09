@@ -13,9 +13,9 @@ import (
 
 // ZoomableQuery godoc
 type ZoomableQuery struct {
-	Resolution string `form:"resolution" validate:"required" enums:"hour"`
-	StartTime  string `form:"startTime" validate:"required" example:"UTC time in ISO-8601" format:"date-time"`
-	EndTime    string `form:"endTime" validate:"required" example:"UTC time in ISO-8601" format:"date-time"`
+	Resolution string    `form:"resolution" binding:"required" enums:"hour"`
+	StartTime  time.Time `form:"startTime" binding:"required" example:"UTC time in ISO-8601" format:"date-time"`
+	EndTime    time.Time `form:"endTime" binding:"required,gtfield=StartTime" example:"UTC time in ISO-8601" format:"date-time"`
 }
 
 // BatteryState godoc
@@ -113,7 +113,7 @@ func (w *APIWorker) getBatteryState(c *gin.Context, batteryState BatteryState) {
 	log.Debug("gatewayUUID: ", gatewayUUID)
 
 	var q ZoomableQuery
-	if err := c.ShouldBindQuery(&q); err != nil {
+	if err := c.BindQuery(&q); err != nil {
 		log.WithFields(log.Fields{"caused-by": "invalid param"}).Error()
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
@@ -151,15 +151,7 @@ func (zoomableQuery *ZoomableQuery) Validate() (periodStartTime, periodEndTime t
 	if zoomableQuery.Resolution != "hour" {
 		return
 	}
-	startTime, err := time.Parse(time.RFC3339, zoomableQuery.StartTime)
-	if err != nil {
-		return
-	}
-	endTime, err := time.Parse(time.RFC3339, zoomableQuery.EndTime)
-	if err != nil || startTime == endTime || endTime.Before(startTime) {
-		return
-	}
-	periodStartTime, periodEndTime, err = zoomableQuery.getStatePeriod(startTime, endTime)
+	periodStartTime, periodEndTime, err := zoomableQuery.getStatePeriod(zoomableQuery.StartTime, zoomableQuery.EndTime)
 	if err != nil {
 		return
 	}

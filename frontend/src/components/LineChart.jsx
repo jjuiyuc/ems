@@ -24,7 +24,7 @@ Chart.register(
 import variables from "../configs/variables"
 
 const
-    {colors} = variables,
+    { colors } = variables,
     datasetCommonOpts = {
         borderWidth: 1,
         hoverRadius: 3,
@@ -68,7 +68,7 @@ export default function LineChart(props) {
                             labelPointStyle: context => {
                                 const
                                     color = context.dataset.backgroundColor
-                                            .replace("#", "%23"),
+                                        .replace("#", "%23"),
                                     image = new Image(8, 8)
 
                                 image.src = labelPointImg(color)

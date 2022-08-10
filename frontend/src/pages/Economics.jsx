@@ -6,6 +6,7 @@ import moment from "moment"
 import { API_HOST } from "../constant/env"
 import PriceCard from "../components/PriceCard"
 import LineChart from "../components/LineChart"
+import BarChart from "../components/BarChart"
 import variables from "../configs/variables"
 
 import { ReactComponent as EconomicsIcon } from "../assets/icons/economics.svg"
@@ -62,7 +63,63 @@ export default function Economics(props) {
         })
     const
         [tab, setTab] = useState("monthlyStackedRevenue"),
-        tabs = ["thisMonth", "perviousMonth", "thisMonthLastYear"]
+        tabs = ["thisMonth", "perviousMonth", "thisMonthLastYear"],
+        [tab2, setTab2] = useState("weeklyRevenueBreakdown"),
+        tab2s = ["thisWeek", "perviouWeek"]
+
+    const fakeDataArray = amount => Array.from(new Array(amount).keys())
+        .map(() => Math.floor(Math.random() * (40 - 10 + 1) + 10))
+
+    const
+        days = 7,
+        sevenDays = Array.from(new Array(days).keys()).map(n =>
+            moment().subtract(days - n, "d").startOf("day").toISOString()),
+        fakeData1 = fakeDataArray(days),
+        fakeData2 = fakeDataArray(days),
+        fakeData3 = fakeDataArray(days),
+        fakeData4 = fakeDataArray(days),
+        fakeData5 = fakeDataArray(days),
+        fakeData6 = fakeDataArray(days)
+
+    const
+        [barChartData, setBarChartData] = useState({
+            datasets: [
+                {
+                    backgroundColor: colors.green.main,
+                    data: fakeData1,
+                    label: pageT("ancillaryServices")
+                },
+                {
+                    backgroundColor: colors.yellow.main,
+                    data: fakeData2,
+                    label: pageT("demandCharge")
+                },
+                {
+                    backgroundColor: colors.blue.main,
+                    data: fakeData3,
+                    label: pageT("tOUArbitrage")
+                },
+                {
+                    backgroundColor: colors.indigo.main,
+                    data: fakeData4,
+                    label: pageT("rec")
+                },
+                {
+                    backgroundColor: colors.purple.main,
+                    data: fakeData5,
+                    label: pageT("solarLocalUsage")
+                },
+                {
+                    backgroundColor: colors.gray[300],
+                    data: fakeData6,
+                    label: pageT("exportToGrid")
+                }
+            ],
+            labels: sevenDays,
+            tooltipLabel: item =>
+                `${item.dataset.label} ${item.parsed.y} ${commonT("kwh")}`,
+            y: { max: 70, min: 0 }
+        })
 
     return <>
         <h1 className="mb-9">{pageT("economics")}</h1>
@@ -110,7 +167,7 @@ export default function Economics(props) {
                         <Button
                             onClick={() => setTab(t)}
                             filter={tab === t ? "selected" : ""}
-                            key={"a-t-" + i}
+                            key={"ec-m" + i}
                             radius="pill"
                             variant="contained">
                             {pageT(t)}
@@ -120,6 +177,25 @@ export default function Economics(props) {
             </div>
             <div className="max-h-80vh h-160 w-full mt-8">
                 <LineChart data={lineChartData} id="dcLineChart" />
+            </div>
+        </div>
+        <div className="card mt-8">
+            <div className="grid items-center grid-cols-1fr-auto-1fr mb-8">
+                <h4>{pageT("weeklyRevenueBreakdown")}</h4>
+                <Stack direction="row" spacing={1.5}>
+                    {tab2s.map((t, i) =>
+                        <Button
+                            onClick={() => setTab2(t)}
+                            filter={tab2 === t ? "selected" : ""}
+                            key={"ec-w" + i}
+                            radius="pill"
+                            variant="contained">
+                            {pageT(t)}
+                        </Button>)}
+                </Stack>
+            </div>
+            <div className="max-h-80vh h-160 mt-8 relative w-full">
+                <BarChart data={barChartData} id="economicsBarChart" />
             </div>
         </div>
     </>

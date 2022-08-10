@@ -51,6 +51,31 @@ export default function EnergyResoucesSolar(props) {
             value: `${cO2Reduction} ${pageT("tons")}`
         }]
     }
+    const
+        hours24 = Array.from(new Array(24).keys()),
+        lineChartDateLabels = hours24.map(n =>
+            moment().hour(n).startOf("h").toISOString()),
+        currentHour = moment().hour(),
+        lineChartDataArray = hours24.filter(v => v <= currentHour).map(() =>
+            Math.floor(Math.random() * (60 - 40 + 1) + 40))
+
+    const [lineChartData, setLineChartData] = useState({
+        datasets: [{
+            backgroundColor: colors.yellow.main,
+            borderColor: colors.yellow.main,
+            data: lineChartDataArray,
+            fill: {
+                above: colors.yellow["main-opacity-10"],
+                target: "origin"
+            },
+            pointBorderColor: colors.primary["main-opacity-20"]
+        }],
+        labels: lineChartDateLabels,
+        tickCallback: (val, index) => val + commonT("kw"),
+        tooltipLabel: item => `${item.parsed.y}` + commonT("kw"),
+        x: { grid: { lineWidth: 0 } },
+        y: { max: 80, min: 0 }
+    })
 
     return <>
         <h1 className="mb-9">{t("navigator.energyResources")}</h1>
@@ -67,6 +92,12 @@ export default function EnergyResoucesSolar(props) {
                 data={cardsData.cO2Reduction}
                 icon={Co2Icon}
                 title={pageT("cO2Reduction")} />
+        </div>
+        <div className="card chart mt-8">
+            <h4 className="mb-10">{pageT("realTimeSolarGeneration")}</h4>
+            <div className="max-h-80vh h-160 w-full">
+                <LineChart data={lineChartData} id="ersLineChart" />
+            </div>
         </div>
     </>
 }

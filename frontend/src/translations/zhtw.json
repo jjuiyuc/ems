@@ -159,6 +159,9 @@
         "exportToGrid":"輸出至電網",
         "monthlyStackedRevenue":"每月累積收入",
         "thisMonth":"當月",
+        "weeklyRevenueBreakdown":"每週收入明細",
+        "thisWeek":"當週",
+        "perviouWeek":"上週",
         "january":"一月",
         "february":"二月",
         "march":"三月",
@@ -174,6 +177,8 @@
         "monthlyStackedRevenue":"每月累積收入",
         "thisMonth":"當月",
         "perviousMonth":"上個月",
-        "thisMonthLastYear":"去年當月"
+        "thisMonthLastYear":"去年當月",
+        "tOUArbitrage":"TOU Arbitrage",
+        "rec":"REC"
     }
 }

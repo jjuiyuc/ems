@@ -11,6 +11,7 @@ import (
 	"der-ems/internal/e"
 )
 
+// ZoomableQuery godoc
 type ZoomableQuery struct {
 	Resolution string `form:"resolution" validate:"required" enums:"hour"`
 	StartTime  string `form:"startTime" validate:"required" example:"UTC time in ISO-8601" format:"date-time"`
@@ -144,6 +145,7 @@ func (w *APIWorker) getBatteryState(c *gin.Context, batteryState BatteryState) {
 	}
 }
 
+// Validate godoc
 func (zoomableQuery *ZoomableQuery) Validate() (periodStartTime, periodEndTime time.Time, ok bool) {
 	// TODO: Only supports hour now
 	if zoomableQuery.Resolution != "hour" {

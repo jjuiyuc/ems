@@ -1,5 +1,5 @@
 import { Button, Stack } from "@mui/material"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useTranslation } from "react-multi-lang"
 import moment from "moment"
 
@@ -48,7 +48,16 @@ export default function Economics(props) {
             labels: lineChartDateLabels,
             tickCallback: (val, index) => val + commonT("kw"),
             tooltipLabel: item => `${item.parsed.y}` + commonT("kw"),
-            x: { grid: { lineWidth: 0 } },
+            x: {
+                type: "time",
+                grid: { lineWidth: 0 },
+                time: {
+                    displayFormats: {
+                        day: "MM DD"
+                    },
+                    tooltipFormat: "MM DD"
+                }
+            },
             y: { max: 80, min: 0 }
         })
     const
@@ -71,7 +80,7 @@ export default function Economics(props) {
                 </div>
             </div>
             <div className="flex flex-wrap ml-5">
-                <div className="grid grid-cols-3 auto-cols-max gap-x-5">
+                <div className="grid-cols-3 auto-cols-max gap-x-5 md:grid">
                     <PriceCard
                         price={ancillaryServices}
                         title={pageT("ancillaryServices")} />
@@ -94,12 +103,11 @@ export default function Economics(props) {
             </div>
         </div>
         <div className="card chart">
-            <div className="grid items-center grid-cols-1fr-auto-1fr">
+            <div className="grid items-center grid-cols-1fr-auto-1fr mb-8">
                 <h4>{pageT("monthlyStackedRevenue")}</h4>
                 <Stack direction="row" spacing={1.5}>
                     {tabs.map((t, i) =>
                         <Button
-                            color="purple"
                             onClick={() => setTab(t)}
                             filter={tab === t ? "selected" : ""}
                             key={"a-t-" + i}
@@ -114,7 +122,5 @@ export default function Economics(props) {
                 <LineChart data={lineChartData} id="dcLineChart" />
             </div>
         </div>
-
-
     </>
 }

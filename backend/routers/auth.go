@@ -12,18 +12,19 @@ import (
 	"der-ems/internal/utils"
 )
 
-// GetAuth issues the token if user provides the valid credential
-// @Summary Get Authorization
-// @Tags Authorization
-// @Accept application/json
-// @Produce application/json
-// @Param username path string true "Username"
-// @Param password path string true "Password"
-// @Success 200 {object} app.Response
-// @Failure 400 {object} app.Response
-// @Failure 401 {object} app.Response
-// @Failure 500 {object} app.Response
-// @Router /auth [post]
+// GetAuth godoc
+// @Summary     Show a token
+// @Description get token by username and password
+// @Tags        authorization
+// @Accept      json
+// @Produce     json
+// @Param       username  body      string true "Username"
+// @Param       password  body      string true "Password"
+// @Success     200       {object}  app.Response
+// @Failure     400       {object}  app.Response
+// @Failure     401       {object}  app.Response
+// @Failure     500       {object}  app.Response
+// @Router      /auth [post]
 func (w *APIWorker) GetAuth(c *gin.Context) {
 	appG := app.Gin{c}
 	valid := validation.Validation{}

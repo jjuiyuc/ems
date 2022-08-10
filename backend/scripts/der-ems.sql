@@ -36,6 +36,52 @@ CREATE TABLE `cc_data` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `cc_data_log`
+--
+
+DROP TABLE IF EXISTS `cc_data_log`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `cc_data_log` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `gw_uuid` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `log_date` datetime NOT NULL,
+  `gw_id` int DEFAULT NULL,
+  `customer_id` int DEFAULT NULL,
+  `grid_is_peak_shaving` int DEFAULT NULL,
+  `load_grid_average_power_ac` float DEFAULT NULL,
+  `battery_grid_average_power_ac` float DEFAULT NULL,
+  `grid_contract_power_ac` float DEFAULT NULL,
+  `load_pv_average_power_ac` float DEFAULT NULL,
+  `load_battery_average_power_ac` float DEFAULT NULL,
+  `battery_soc` float DEFAULT NULL,
+  `battery_produced_average_power_ac` float DEFAULT NULL,
+  `battery_consumed_average_power_ac` float DEFAULT NULL,
+  `battery_charging_from` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `battery_discharging_to` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `pv_average_power_ac` float DEFAULT NULL,
+  `load_average_power_ac` float DEFAULT NULL,
+  `load_links` json DEFAULT NULL,
+  `grid_links` json DEFAULT NULL,
+  `pv_links` json DEFAULT NULL,
+  `battery_links` json DEFAULT NULL,
+  `battery_pv_average_power_ac` float DEFAULT NULL,
+  `grid_pv_average_power_ac` float DEFAULT NULL,
+  `grid_produced_average_power_ac` float DEFAULT NULL,
+  `grid_consumed_average_power_ac` float DEFAULT NULL,
+  `battery_lifetime_operation_cycles` float DEFAULT NULL,
+  `battery_produced_lifetime_energy_ac` float DEFAULT NULL,
+  `battery_consumed_lifetime_energy_ac` float DEFAULT NULL,
+  `battery_average_power_ac` float DEFAULT NULL,
+  `battery_voltage` float DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `gw_uuid_log_date_UNIQUE` (`gw_uuid`,`log_date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `customer`
 --
 
@@ -52,7 +98,7 @@ CREATE TABLE `customer` (
   `weather_lat` float DEFAULT NULL,
   `weather_lng` float DEFAULT NULL,
   `timezone` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `power_company` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `tou_location_id` int DEFAULT NULL,
   `voltage_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `tou_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -143,6 +189,69 @@ CREATE TABLE `login_log` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `tou`
+--
+
+DROP TABLE IF EXISTS `tou`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tou` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `tou_location_id` int DEFAULT NULL,
+  `voltage_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `tou_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `period_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `peak_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `is_summer` tinyint(1) DEFAULT NULL,
+  `period_stime` time DEFAULT NULL,
+  `period_etime` time DEFAULT NULL,
+  `basic_charge` float DEFAULT NULL,
+  `basic_rate` float DEFAULT NULL,
+  `flow_rate` float DEFAULT NULL,
+  `enable_at` date DEFAULT NULL,
+  `disable_at` date DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `tou_holiday`
+--
+
+DROP TABLE IF EXISTS `tou_holiday`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tou_holiday` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `tou_location_id` int DEFAULT NULL,
+  `year` year DEFAULT NULL,
+  `day` date DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `tou_location`
+--
+
+DROP TABLE IF EXISTS `tou_location`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tou_location` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `power_company` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `location` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `user`
 --
 
@@ -164,6 +273,28 @@ CREATE TABLE `user` (
   `updated_at` datetime DEFAULT NULL,
   `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `user_gateway_right`
+--
+
+DROP TABLE IF EXISTS `user_gateway_right`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `user_gateway_right` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int DEFAULT NULL,
+  `gw_id` int DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_id_gw_id_UNIQUE` (`user_id`,`gw_id`),
+  KEY `user_gateway_right_user_id_user_id_foreign` (`user_id`),
+  KEY `user_gateway_right_gw_id_gateway_id_foreign` (`gw_id`),
+  CONSTRAINT `user_gateway_right_gw_id_gateway_id_foreign` FOREIGN KEY (`gw_id`) REFERENCES `gateway` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `user_gateway_right_user_id_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

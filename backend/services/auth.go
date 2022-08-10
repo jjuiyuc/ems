@@ -42,7 +42,7 @@ func (s defaultAuthService) Login(username, password string) (user *deremsmodels
 	}
 
 	// Check expiration date
-	now := time.Now()
+	now := time.Now().UTC()
 	if user.ExpirationDate.Valid != false && user.ExpirationDate.Time.Before(now) {
 		errCode = e.ErrAuthUserExpirated
 		err = e.ErrNewUserExpiration(user.ExpirationDate.Time)
@@ -76,7 +76,7 @@ func (s defaultAuthService) Login(username, password string) (user *deremsmodels
 
 		user.PasswordRetryCount = null.NewInt(nowPasswordRetryCount+1, true)
 		if user.PasswordRetryCount.Int == passwordLockCount {
-			now := time.Now()
+			now := time.Now().UTC()
 			user.LockedAt = null.NewTime(now, true)
 		}
 		s.repo.User.UpdateUser(user)

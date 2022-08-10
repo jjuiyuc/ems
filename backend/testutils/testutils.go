@@ -25,7 +25,15 @@ func GetConfigDir() string {
 
 // SeedUtUser godoc
 func SeedUtUser(db *sql.DB) (err error) {
+	_, err = db.Exec("SET FOREIGN_KEY_CHECKS = 0")
+	if err != nil {
+		return
+	}
 	_, err = db.Exec("truncate table user")
+	if err != nil {
+		return
+	}
+	_, err = db.Exec("SET FOREIGN_KEY_CHECKS = 1")
 	if err != nil {
 		return
 	}
@@ -39,6 +47,34 @@ func SeedUtUser(db *sql.DB) (err error) {
 		ExpirationDate: fixtures.UtUser.ExpirationDate,
 	}
 	err = user.Insert(db, boil.Infer())
+	return
+}
+
+// SeedUtCustomerAndGateway godoc
+func SeedUtCustomerAndGateway(db *sql.DB) (err error) {
+	_, err = db.Exec("SET FOREIGN_KEY_CHECKS = 0")
+	if err != nil {
+		return
+	}
+	_, err = db.Exec("truncate table gateway")
+	if err != nil {
+		return
+	}
+	_, err = db.Exec("truncate table customer")
+	if err != nil {
+		return
+	}
+	_, err = db.Exec("SET FOREIGN_KEY_CHECKS = 1")
+	if err != nil {
+		return
+	}
+	customer := fixtures.UtCustomer
+	err = customer.Insert(db, boil.Infer())
+	if err != nil {
+		return
+	}
+	gateway := fixtures.UtGateway
+	err = gateway.Insert(db, boil.Infer())
 	return
 }
 

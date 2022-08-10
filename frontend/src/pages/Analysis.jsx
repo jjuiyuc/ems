@@ -1,12 +1,16 @@
 import { Button, Stack, TextField } from "@mui/material"
 import { CalendarToday } from "@mui/icons-material"
 // import { DateRangePicker } from "materialui-daterange-picker"
+import { getLanguage, useTranslation } from "react-multi-lang"
 import moment from "moment"
-import { useState } from "react"
-import { useTranslation } from "react-multi-lang"
+import { useEffect, useState } from "react"
 
 import AnalysisCard from "../components/AnalysisCard"
+import BarChart from "../components/BarChart"
+import variables from "../configs/variables"
 import "../assets/css/datePicker.scss"
+
+const { colors } = variables
 
 const dateFormat = "YYYY-MM-DD"
 const defaultDate = {
@@ -17,9 +21,50 @@ const defaultDate = {
 export default function Analysis() {
     const
         t = useTranslation(),
+        commonT = string => t("common." + string),
         pageT = (string, params) => t("analysis." + string, params)
 
+    const fakeDataArray = amount => Array.from(new Array(amount).keys())
+        .map(() => Math.floor(Math.random() * (40 - 10 + 1) + 10))
+
     const
+        days = 7,
+        sevenDays = Array.from(new Array(days).keys()).map(n =>
+            moment().subtract(days - n, "d").startOf("day").toISOString()),
+        fakeData1 = fakeDataArray(days),
+        fakeData2 = fakeDataArray(days),
+        fakeData3 = fakeDataArray(days),
+        fakeData4 = fakeDataArray(days)
+
+    const
+        [barChartData, setBarChartData] = useState({
+            datasets: [
+                {
+                    backgroundColor: colors.green.main,
+                    data: fakeData1,
+                    label: pageT("household")
+                },
+                {
+                    backgroundColor: colors.yellow.main,
+                    data: fakeData2,
+                    label: commonT("solar")
+                },
+                {
+                    backgroundColor: colors.blue.main,
+                    data: fakeData3,
+                    label: commonT("battery")
+                },
+                {
+                    backgroundColor: colors.indigo.main,
+                    data: fakeData4,
+                    label: commonT("grid")
+                }
+            ],
+            labels: sevenDays,
+            tooltipLabel: item =>
+                `${item.dataset.label} ${item.parsed.y} ${commonT("kwh")}`,
+            y: {max: 100, min: 0}
+        }),
         [dateRange, setDateRange] = useState(defaultDate),
         [energyDestinations, setEnergyDestinations] = useState({
             types: [
@@ -30,7 +75,7 @@ export default function Analysis() {
             kwh: 60
         }),
         [open, setOpen] = useState(false),
-        [tab, setTab] = useState("days"),
+        [tab, setTab] = useState("weeks"),
         [totalEnergySources, setTotalEnergySources] = useState({
             types: [
                 { kwh: 7.5, percentage: 15, type: "directSolarSupply" },
@@ -39,6 +84,23 @@ export default function Analysis() {
             ],
             kwh: 50
         })
+
+    const lang = getLanguage()
+
+    useEffect(() => {
+        const
+            chartData = {...barChartData},
+            labels = [
+                pageT("household"),
+                commonT("solar"),
+                commonT("battery"),
+                commonT("grid")
+            ]
+
+            labels.forEach((text, i) => chartData.datasets[i].label = text)
+
+        setBarChartData(chartData)
+    }, [lang])
 
     const toggle = () => setOpen(!open)
 
@@ -114,5 +176,13 @@ export default function Analysis() {
                 data={energyDestinations}
                 title={pageT("energyDestinations")} />
         </div>
+    {tab !== "days"
+        ? <div className="card mt-8">
+            <h1>{pageT("accumulatedKwh")}</h1>
+            <div className="max-h-80vh h-160 mt-8 relative w-full">
+                <BarChart data={barChartData} id="analysisBarChart" />
+            </div>
+        </div>
+        : null}
     </>
 }

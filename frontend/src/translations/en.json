@@ -161,6 +161,11 @@
         "monthlyStackedRevenue":"Monthly Stacked Revenue",
         "thisMonth":"This Month",
         "perviousMonth":"Pervious Month",
-        "thisMonthLastYear":"This Month Last Year"
+        "weeklyRevenueBreakdown":"Weekly Revenue Breakdown",
+        "thisWeek":"This Week",
+        "perviouWeek":"Pervious Week",
+        "thisMonthLastYear":"This Month Last Year",
+        "tOUArbitrage":"TOU Arbitrage",
+        "rec":"REC"
     }
 }

@@ -86,7 +86,9 @@
             "cO2Reduction":"二氧化碳減排",
             "tons":"tons",
             "solarGeneration":"太陽能發電",
-            "onPeak": "On Peak"
+            "onPeak": "On Peak",
+            "realTimeSolarGeneration":"即時太陽能發電 (kW)"
+
         }
     },
     "error": {

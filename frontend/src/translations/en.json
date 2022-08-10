@@ -86,7 +86,8 @@
             "cO2Reduction":"CO2 Reduction",
             "tons":"tons",
             "solarGeneration":"solarGeneration",
-            "onPeak": "On Peak"
+            "onPeak": "On Peak",
+            "realTimeSolarGeneration":"Real-time Solar Generation (kW)"
         }
     },
     "error": {

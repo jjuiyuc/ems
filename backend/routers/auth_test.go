@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -135,20 +134,9 @@ func (s *AuthorizationSuite) Test_GetAuth() {
 		log.Info("test name: ", tt.Name)
 		payloadBuf, err := json.Marshal(tt.args)
 		s.Require().NoError(err)
-		req, err := http.NewRequest("POST", tt.URL, bytes.NewBuffer(payloadBuf))
-		s.Require().NoError(err)
-		rv := httptest.NewRecorder()
-		s.router.ServeHTTP(rv, req)
-		s.Equal(tt.WantStatus, rv.Code)
-
-		var res app.Response
-		err = json.Unmarshal([]byte(rv.Body.String()), &res)
-		s.Require().NoError(err)
-		s.Equal(tt.WantRv.Code, res.Code)
-		s.Equal(tt.WantRv.Msg, res.Msg)
-
+		rvData := testutils.ValidateRequestStatusAndCode(tt.TestInfo, s.Require(), s.router, "POST", bytes.NewBuffer(payloadBuf))
 		if tt.Name == "login" {
-			dataMap := res.Data.(map[string]interface{})
+			dataMap := rvData.(map[string]interface{})
 			s.NotEmpty(dataMap["token"])
 			count, err := s.repo.User.GetLoginLogCount()
 			s.Require().NoError(err)

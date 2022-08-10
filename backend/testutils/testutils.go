@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
@@ -140,9 +141,9 @@ func GetMockConsumerMessage(t *testing.T, seedUtTopic string, seedUtData []byte)
 	return
 }
 
-// ValidateGetRequestStatusAndCode godoc
-func ValidateGetRequestStatusAndCode(tt TestInfo, a *require.Assertions, router *gin.Engine) (rvData interface{}) {
-	req, err := http.NewRequest("GET", fmt.Sprintf(tt.URL), nil)
+// ValidateRequestStatusAndCode godoc
+func ValidateRequestStatusAndCode(tt TestInfo, a *require.Assertions, router *gin.Engine, method string, body io.Reader) (rvData interface{}) {
+	req, err := http.NewRequest(method, fmt.Sprintf(tt.URL), body)
 	a.NoError(err)
 	if tt.Token != "" {
 		req.Header.Set("Authorization", GetAuthorization(tt.Token))

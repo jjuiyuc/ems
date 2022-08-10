@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -83,104 +82,114 @@ func (s *UserSuite) Test_PasswordLostAndResetByToken() {
 		Password string `json:"password"`
 	}
 
-	passwordLostTest := []struct {
-		name       string
-		args       passwordLostArgs
-		wantStatus int
-		wantRv     app.Response
-	}{
+	type passwordLostTestInfo struct {
+		testutils.TestInfo
+		args passwordLostArgs
+	}
+
+	type passwordResetTestInfo struct {
+		testutils.TestInfo
+		args passwordResetArgs
+	}
+
+	seedUtPasswordLostURL := "/api/users/password/lost"
+	passwordLostTest := []passwordLostTestInfo{
 		{
-			name: "passwordLost",
-			args: passwordLostArgs{
+			testutils.TestInfo{
+				Name:       "passwordLost",
+				URL:        seedUtPasswordLostURL,
+				WantStatus: http.StatusOK,
+				WantRv: app.Response{
+					Code: e.Success,
+					Msg:  "ok",
+				},
+			},
+			passwordLostArgs{
 				Username: fixtures.UtUser.Username,
 			},
-			wantStatus: http.StatusOK,
-			wantRv: app.Response{
-				Code: e.Success,
-				Msg:  "ok",
-			},
 		},
 		{
-			name:       "passwordLostInvalidParams",
-			wantStatus: http.StatusBadRequest,
-			wantRv: app.Response{
-				Code: e.InvalidParams,
-				Msg:  "invalid parameters",
+			testutils.TestInfo{
+				Name:       "passwordLostInvalidParams",
+				URL:        seedUtPasswordLostURL,
+				WantStatus: http.StatusBadRequest,
+				WantRv: app.Response{
+					Code: e.InvalidParams,
+					Msg:  "invalid parameters",
+				},
 			},
+			passwordLostArgs{},
 		},
 		{
-			name: "passwordLostError",
-			args: passwordLostArgs{
+			testutils.TestInfo{
+				Name:       "passwordLostError",
+				URL:        seedUtPasswordLostURL,
+				WantStatus: http.StatusUnauthorized,
+				WantRv: app.Response{
+					Code: e.ErrPasswordLost,
+					Msg:  "fail",
+				},
+			},
+			passwordLostArgs{
 				Username: "xxx",
-			},
-			wantStatus: http.StatusUnauthorized,
-			wantRv: app.Response{
-				Code: e.ErrPasswordLost,
-				Msg:  "fail",
 			},
 		},
 	}
 
-	passwordResetTest := []struct {
-		name       string
-		args       passwordResetArgs
-		wantStatus int
-		wantRv     app.Response
-	}{
+	seedUtPasswordResetURL := "/api/users/password/reset-by-token"
+	passwordResetTest := []passwordResetTestInfo{
 		{
-			name: "passwordResetByToken",
-			args: passwordResetArgs{
-				Password: fixtures.UtUser.Password,
+			testutils.TestInfo{
+				Name:       "passwordResetByToken",
+				URL:        seedUtPasswordResetURL,
+				WantStatus: http.StatusOK,
+				WantRv: app.Response{
+					Code: e.Success,
+					Msg:  "ok",
+				},
 			},
-			wantStatus: http.StatusOK,
-			wantRv: app.Response{
-				Code: e.Success,
-				Msg:  "ok",
+			passwordResetArgs{
+				Password: fixtures.UtUser.Password,
 			},
 		},
 		{
-			name: "passwordResetByTokenInvalidParams",
-			args: passwordResetArgs{
-				Password: fixtures.UtUser.Password,
+			testutils.TestInfo{
+				Name:       "passwordResetByTokenInvalidParams",
+				URL:        seedUtPasswordResetURL,
+				WantStatus: http.StatusBadRequest,
+				WantRv: app.Response{
+					Code: e.InvalidParams,
+					Msg:  "invalid parameters",
+				},
 			},
-			wantStatus: http.StatusBadRequest,
-			wantRv: app.Response{
-				Code: e.InvalidParams,
-				Msg:  "invalid parameters",
+			passwordResetArgs{
+				Password: fixtures.UtUser.Password,
 			},
 		},
 		{
-			name: "passwordResetByTokenError",
-			args: passwordResetArgs{
+			testutils.TestInfo{
+				Name:       "passwordResetByTokenError",
+				URL:        seedUtPasswordResetURL,
+				WantStatus: http.StatusUnauthorized,
+				WantRv: app.Response{
+					Code: e.ErrPasswordToken,
+					Msg:  "fail",
+				},
+			},
+			passwordResetArgs{
 				Token:    "xxx",
 				Password: fixtures.UtUser.Password,
-			},
-			wantStatus: http.StatusUnauthorized,
-			wantRv: app.Response{
-				Code: e.ErrPasswordToken,
-				Msg:  "fail",
 			},
 		},
 	}
 
 	for _, tt := range passwordLostTest {
-		log.Info("test name: ", tt.name)
+		log.Info("test name: ", tt.Name)
 		payloadBuf, err := json.Marshal(tt.args)
 		s.Require().NoError(err)
-		req, err := http.NewRequest("PUT", "/api/users/password/lost", bytes.NewBuffer(payloadBuf))
-		s.Require().NoError(err)
-		rv := httptest.NewRecorder()
-		s.router.ServeHTTP(rv, req)
-		s.Equal(tt.wantStatus, rv.Code)
-
-		var res app.Response
-		err = json.Unmarshal([]byte(rv.Body.String()), &res)
-		s.Require().NoError(err)
-		s.Equal(tt.wantRv.Code, res.Code)
-		s.Equal(tt.wantRv.Msg, res.Msg)
-
-		if tt.name == "passwordLost" {
-			dataMap := res.Data.(map[string]interface{})
+		rvData := testutils.ValidateRequestStatusAndCode(tt.TestInfo, s.Require(), s.router, "PUT", bytes.NewBuffer(payloadBuf))
+		if tt.Name == "passwordLost" {
+			dataMap := rvData.(map[string]interface{})
 			s.Equal(fixtures.UtUser.Username, dataMap["username"])
 		}
 	}
@@ -189,24 +198,13 @@ func (s *UserSuite) Test_PasswordLostAndResetByToken() {
 	s.Require().NoError(err)
 
 	for _, tt := range passwordResetTest {
-		log.Info("test name: ", tt.name)
-		if tt.name == "passwordResetByToken" {
+		log.Info("test name: ", tt.Name)
+		if tt.Name == "passwordResetByToken" {
 			tt.args.Token = user.ResetPWDToken.String
 		}
-
 		payloadBuf, err := json.Marshal(tt.args)
 		s.Require().NoError(err)
-		req, err := http.NewRequest("PUT", "/api/users/password/reset-by-token", bytes.NewBuffer(payloadBuf))
-		s.Require().NoError(err)
-		rv := httptest.NewRecorder()
-		s.router.ServeHTTP(rv, req)
-		s.Equal(tt.wantStatus, rv.Code)
-
-		var res app.Response
-		err = json.Unmarshal([]byte(rv.Body.String()), &res)
-		s.Require().NoError(err)
-		s.Equal(tt.wantRv.Code, res.Code)
-		s.Equal(tt.wantRv.Msg, res.Msg)
+		testutils.ValidateRequestStatusAndCode(tt.TestInfo, s.Require(), s.router, "PUT", bytes.NewBuffer(payloadBuf))
 	}
 }
 
@@ -246,7 +244,7 @@ func (s *UserSuite) Test_Authorize() {
 
 	for _, tt := range tests {
 		log.Info("test name: ", tt.Name)
-		testutils.ValidateGetRequestStatusAndCode(tt, s.Require(), s.router)
+		testutils.ValidateRequestStatusAndCode(tt, s.Require(), s.router, "GET", nil)
 	}
 }
 
@@ -264,7 +262,7 @@ func (s *UserSuite) Test_GetProfile() {
 	}
 
 	log.Info("test name: ", tt.Name)
-	rvData := testutils.ValidateGetRequestStatusAndCode(tt, s.Require(), s.router)
+	rvData := testutils.ValidateRequestStatusAndCode(tt, s.Require(), s.router, "GET", nil)
 	dataMap := rvData.(map[string]interface{})
 	dataJSON, err := json.Marshal(dataMap)
 	s.Require().NoError(err)

@@ -125,7 +125,7 @@ func (s *EnergyResourcesSuite) Test_GetBatteryEnergyInfo() {
 
 	for _, tt := range tests {
 		log.Info("test name: ", tt.Name)
-		rvData := testutils.ValidateGetRequestStatusAndCode(tt, s.Require(), s.router)
+		rvData := testutils.ValidateRequestStatusAndCode(tt, s.Require(), s.router, "GET", nil)
 		if tt.Name == "batteryEnergyInfo" {
 			dataMap := rvData.(map[string]interface{})
 			dataJSON, err := json.Marshal(dataMap)
@@ -221,7 +221,7 @@ func (s *EnergyResourcesSuite) Test_GetBatteryPowerState() {
 
 	for _, tt := range tests {
 		log.Info("test name: ", tt.Name)
-		rvData := testutils.ValidateGetRequestStatusAndCode(tt, s.Require(), s.router)
+		rvData := testutils.ValidateRequestStatusAndCode(tt, s.Require(), s.router, "GET", nil)
 		if tt.Name == "batteryPowerState" {
 			dataMap := rvData.(map[string]interface{})
 			dataJSON, err := json.Marshal(dataMap)
@@ -275,7 +275,7 @@ func (s *EnergyResourcesSuite) Test_GetBatteryChargeVoltageState() {
 
 	for _, tt := range tests {
 		log.Info("test name: ", tt.Name)
-		rvData := testutils.ValidateGetRequestStatusAndCode(tt, s.Require(), s.router)
+		rvData := testutils.ValidateRequestStatusAndCode(tt, s.Require(), s.router, "GET", nil)
 		if tt.Name == "batteryChargeVoltageState" {
 			dataMap := rvData.(map[string]interface{})
 			dataJSON, err := json.Marshal(dataMap)

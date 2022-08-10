@@ -3,7 +3,6 @@ package routers
 import (
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	log "github.com/sirupsen/logrus"
 
@@ -20,7 +19,7 @@ type Client struct {
 	Pool        *Pool
 }
 
-func (c *Client) run(w *APIWorker, ctx *gin.Context) {
+func (c *Client) run(w *APIWorker) {
 	isOpen := true
 	var previousLogTime time.Time
 

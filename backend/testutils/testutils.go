@@ -2,20 +2,36 @@ package testutils
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
+	"net/http/httptest"
 	"path/filepath"
 	"runtime"
 	"testing"
 
 	"github.com/Shopify/sarama"
 	"github.com/Shopify/sarama/mocks"
+	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/require"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"golang.org/x/crypto/bcrypt"
 
+	"der-ems/internal/app"
 	deremsmodels "der-ems/models/der-ems"
 	"der-ems/testutils/fixtures"
 )
+
+// TestInfo godoc
+type TestInfo struct {
+	Name       string
+	Token      string
+	URL        string
+	WantStatus int
+	WantRv     app.Response
+}
 
 // GetConfigDir godoc
 func GetConfigDir() string {
@@ -123,4 +139,23 @@ func GetMockConsumerMessage(t *testing.T, seedUtTopic string, seedUtData []byte)
 		"value":     string(testMsg.Value),
 	}).Info("consuming")
 	return
+}
+
+// AssertRequest godoc
+func AssertRequest(tt TestInfo, a *require.Assertions, router *gin.Engine, method string, body io.Reader) (rvData interface{}) {
+	req, err := http.NewRequest(method, fmt.Sprintf(tt.URL), body)
+	a.NoError(err)
+	if tt.Token != "" {
+		req.Header.Set("Authorization", GetAuthorization(tt.Token))
+	}
+	rv := httptest.NewRecorder()
+	router.ServeHTTP(rv, req)
+	a.Equal(tt.WantStatus, rv.Code)
+
+	var res app.Response
+	err = json.Unmarshal([]byte(rv.Body.String()), &res)
+	a.NoError(err)
+	a.Equal(tt.WantRv.Code, res.Code)
+	a.Equal(tt.WantRv.Msg, res.Msg)
+	return res.Data
 }

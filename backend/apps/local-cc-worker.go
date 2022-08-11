@@ -198,8 +198,7 @@ func (h localCCConsumerHandler) validate(msg []byte) (gwIDValue, timestampValue 
 		}).Error()
 		return
 	}
-	_, ok = gwIDValue.(string)
-	if !ok {
+	if _, ok = gwIDValue.(string); !ok {
 		err = e.ErrNewKeyUnexpectedValue(gwID)
 		log.WithFields(log.Fields{
 			"caused-by": gwID,
@@ -216,8 +215,7 @@ func (h localCCConsumerHandler) validate(msg []byte) (gwIDValue, timestampValue 
 		}).Error()
 		return
 	}
-	_, ok = timestampValue.(float64)
-	if !ok {
+	if _, ok = timestampValue.(float64); !ok {
 		err = e.ErrNewKeyUnexpectedValue(timestamp)
 		log.WithFields(log.Fields{
 			"caused-by": timestamp,

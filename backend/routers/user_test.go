@@ -187,7 +187,7 @@ func (s *UserSuite) Test_PasswordLostAndResetByToken() {
 		log.Info("test name: ", tt.Name)
 		payloadBuf, err := json.Marshal(tt.args)
 		s.Require().NoError(err)
-		rvData := testutils.ValidateRequestStatusAndCode(tt.TestInfo, s.Require(), s.router, "PUT", bytes.NewBuffer(payloadBuf))
+		rvData := testutils.AssertRequest(tt.TestInfo, s.Require(), s.router, "PUT", bytes.NewBuffer(payloadBuf))
 		if tt.Name == "passwordLost" {
 			dataMap := rvData.(map[string]interface{})
 			s.Equal(fixtures.UtUser.Username, dataMap["username"])
@@ -204,7 +204,7 @@ func (s *UserSuite) Test_PasswordLostAndResetByToken() {
 		}
 		payloadBuf, err := json.Marshal(tt.args)
 		s.Require().NoError(err)
-		testutils.ValidateRequestStatusAndCode(tt.TestInfo, s.Require(), s.router, "PUT", bytes.NewBuffer(payloadBuf))
+		testutils.AssertRequest(tt.TestInfo, s.Require(), s.router, "PUT", bytes.NewBuffer(payloadBuf))
 	}
 }
 
@@ -244,7 +244,7 @@ func (s *UserSuite) Test_Authorize() {
 
 	for _, tt := range tests {
 		log.Info("test name: ", tt.Name)
-		testutils.ValidateRequestStatusAndCode(tt, s.Require(), s.router, "GET", nil)
+		testutils.AssertRequest(tt, s.Require(), s.router, "GET", nil)
 	}
 }
 
@@ -262,7 +262,7 @@ func (s *UserSuite) Test_GetProfile() {
 	}
 
 	log.Info("test name: ", tt.Name)
-	rvData := testutils.ValidateRequestStatusAndCode(tt, s.Require(), s.router, "GET", nil)
+	rvData := testutils.AssertRequest(tt, s.Require(), s.router, "GET", nil)
 	dataMap := rvData.(map[string]interface{})
 	dataJSON, err := json.Marshal(dataMap)
 	s.Require().NoError(err)

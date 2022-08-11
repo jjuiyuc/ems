@@ -141,8 +141,8 @@ func GetMockConsumerMessage(t *testing.T, seedUtTopic string, seedUtData []byte)
 	return
 }
 
-// ValidateRequestStatusAndCode godoc
-func ValidateRequestStatusAndCode(tt TestInfo, a *require.Assertions, router *gin.Engine, method string, body io.Reader) (rvData interface{}) {
+// AssertRequest godoc
+func AssertRequest(tt TestInfo, a *require.Assertions, router *gin.Engine, method string, body io.Reader) (rvData interface{}) {
 	req, err := http.NewRequest(method, fmt.Sprintf(tt.URL), body)
 	a.NoError(err)
 	if tt.Token != "" {

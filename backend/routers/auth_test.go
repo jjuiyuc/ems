@@ -134,7 +134,7 @@ func (s *AuthorizationSuite) Test_GetAuth() {
 		log.Info("test name: ", tt.Name)
 		payloadBuf, err := json.Marshal(tt.args)
 		s.Require().NoError(err)
-		rvData := testutils.ValidateRequestStatusAndCode(tt.TestInfo, s.Require(), s.router, "POST", bytes.NewBuffer(payloadBuf))
+		rvData := testutils.AssertRequest(tt.TestInfo, s.Require(), s.router, "POST", bytes.NewBuffer(payloadBuf))
 		if tt.Name == "login" {
 			dataMap := rvData.(map[string]interface{})
 			s.NotEmpty(dataMap["token"])

@@ -10,6 +10,7 @@ type Repository struct {
 	CCData   CCDataRepository
 	Customer CustomerRepository
 	TOU      TOURepository
+	AIData   AIDataRepository
 }
 
 // NewRepository godoc
@@ -21,5 +22,6 @@ func NewRepository(db *sql.DB) *Repository {
 		CCData:   NewCCDataRepository(db),
 		Customer: NewCustomerRepository(db),
 		TOU:      NewTOURepository(db),
+		AIData:   NewAIDataRepository(db),
 	}
 }

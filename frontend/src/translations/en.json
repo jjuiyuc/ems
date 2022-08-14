@@ -87,7 +87,8 @@
             "tons":"tons",
             "solarGeneration":"solarGeneration",
             "onPeak": "On Peak",
-            "realTimeSolarGeneration":"Real-time Solar Generation (kW)"
+            "realTimeSolarGeneration":"Real-time Solar Generation (kW)",
+            "thisCalendarMonth":"This Calendar Month"
         }
     },
     "error": {

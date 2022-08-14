@@ -87,8 +87,8 @@
             "tons":"tons",
             "solarGeneration":"太陽能發電",
             "onPeak": "On Peak",
-            "realTimeSolarGeneration":"即時太陽能發電 (kW)"
-
+            "realTimeSolarGeneration":"即時太陽能發電 (kW)",
+            "thisCalendarMonth":"This Calendar Month"
         }
     },
     "error": {

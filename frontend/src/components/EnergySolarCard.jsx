@@ -24,7 +24,7 @@ export default function EnergySolarCard(props) {
 
     const { kwh, types } = props.data
 
-    return <div className="card">
+    return <div className="card ">
         <div className="flex flex-wrap items-baseline mb-6">
             <h2 className="mr-2 whitespace-nowrap">{kwh} {commonT("kwh")}</h2>
             <h5 className="font-bold">{props.title}</h5>
@@ -45,27 +45,26 @@ export default function EnergySolarCard(props) {
                     {pageT(t.type)}
                 </div>)}
         </div>
+
         <div className="grid grid-cols-3 three-columns gap-x-5 sm:gap-x-10">
             {types.map((t, i) => {
                 const Icon = icons[t.type]
-                return <div className="flex justify-between">
-
-                    <div key={"detail-" + i}>
+                return <div key={"detail-" + i} className="flex justify-between items-end">
+                    <div>
                         <h6 className="font-bold text-white">{pageT(t.type)}</h6>
                         <h3 className="my-1">{t.percentage}%</h3>
                         <p className="lg:test text-13px text-white">
                             {t.kwh} {commonT("kwh")}
                         </p>
                     </div>
-                    <div className="flex flex-wrap items-center">
-                        <div
-                            className="items-center grid bg-gray-400-opacity-20  h-12 w-12
+                    <div
+                        className="bg-gray-400-opacity-20 grid h-12 w-12
                             place-items-center rounded-full">
-                            <Icon className="h-8 text-gray-400 w-8" />
-                        </div>
+                        <Icon className="h-8 text-gray-400 w-8" />
                     </div>
                 </div>
             }
+
             )}
         </div>
     </div>

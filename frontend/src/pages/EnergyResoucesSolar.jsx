@@ -3,6 +3,7 @@ import moment from "moment"
 import ReportProblemIcon from "@mui/icons-material/ReportProblem"
 import { useEffect, useState } from "react"
 import { useTranslation } from "react-multi-lang"
+import { Button } from "@mui/material"
 
 import { apiCall } from "../utils/api"
 import variables from "../configs/variables"
@@ -15,6 +16,7 @@ import LineChart from "../components/LineChart"
 import { ReactComponent as SolarIcon } from "../assets/icons/sunny.svg"
 import { ReactComponent as EconomicsIcon } from "../assets/icons/economics.svg"
 import { ReactComponent as UpIcon } from "../assets/icons/up.svg"
+import { ReactComponent as DownIcon } from "../assets/icons/down.svg"
 import { ReactComponent as Co2Icon } from "../assets/icons/co2.svg"
 const { colors } = variables
 
@@ -42,14 +44,25 @@ export default function EnergyResoucesSolar(props) {
         pageT = string => t("energyResources.solar." + string)
 
     const cardsData = {
-        economics: [{
+        economics: {
             title: pageT("economics"),
-            value: `$${economics}`
-        }],
-        cO2Reduction: [{
+            subTitle:
+                <label className="bg-gray-600 rounded-3xl font-normal p-2 ml-2">
+                    {pageT("thisCalendarMonth")}
+                </label>,
+            value:
+                <div className="flex">
+                    <h2 className={`${economics > 0 ? "text-success-main" : ""}`}>
+                        {economics > 0 ? "+" : "-"}
+                    ${Math.abs(economics)}
+                    </h2>
+                    {economics > 0 ? <UpIcon className="text-success-main" /> : <DownIcon />}
+                </div>
+        },
+        cO2Reduction: {
             title: pageT("cO2Reduction"),
             value: `${cO2Reduction} ${pageT("tons")}`
-        }]
+        }
     }
     const
         hours24 = Array.from(new Array(24).keys()),

@@ -10,7 +10,6 @@ import (
 	"github.com/spf13/viper"
 	"github.com/volatiletech/null/v8"
 
-	"der-ems/internal/e"
 	"der-ems/internal/utils"
 	"der-ems/kafka"
 	deremsmodels "der-ems/models/der-ems"
@@ -92,7 +91,7 @@ func (h localAIConsumerHandler) processLocalAIData(msg []byte) {
 }
 
 func (h localAIConsumerHandler) saveLocalAIData(msg []byte) (err error) {
-	gwIDValue, timestampValue, data, err := h.validate(msg)
+	gwIDValue, timestampValue, data, err := utils.AssertGatewayMessage(msg)
 	if err != nil {
 		return
 	}
@@ -126,51 +125,6 @@ func (h localAIConsumerHandler) saveLocalAIData(msg []byte) (err error) {
 	if err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "h.repo.AIData.UpsertAIData",
-			"err":       err,
-		}).Error()
-	}
-	return
-}
-
-func (h localAIConsumerHandler) validate(msg []byte) (gwIDValue, timestampValue interface{}, data map[string]interface{}, err error) {
-	if err = json.Unmarshal(msg, &data); err != nil {
-		log.WithFields(log.Fields{
-			"caused-by": "json.Unmarshal",
-			"err":       err,
-		}).Error()
-		return
-	}
-
-	gwIDValue, ok := data[gwID]
-	if !ok {
-		err = e.ErrNewKeyNotExist(gwID)
-		log.WithFields(log.Fields{
-			"caused-by": gwID,
-			"err":       err,
-		}).Error()
-		return
-	}
-	if _, ok = gwIDValue.(string); !ok {
-		err = e.ErrNewKeyUnexpectedValue(gwID)
-		log.WithFields(log.Fields{
-			"caused-by": gwID,
-			"err":       err,
-		}).Error()
-		return
-	}
-	timestampValue, ok = data[timestamp]
-	if !ok {
-		err = e.ErrNewKeyNotExist(timestamp)
-		log.WithFields(log.Fields{
-			"caused-by": timestamp,
-			"err":       err,
-		}).Error()
-		return
-	}
-	if _, ok = timestampValue.(float64); !ok {
-		err = e.ErrNewKeyUnexpectedValue(timestamp)
-		log.WithFields(log.Fields{
-			"caused-by": timestamp,
 			"err":       err,
 		}).Error()
 	}

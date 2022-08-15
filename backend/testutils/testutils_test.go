@@ -44,7 +44,7 @@ func (s *TestutilsSuite) SetupSuite() {
 func (s *TestutilsSuite) Test_SeedUtUser() {
 	SeedUtUser(s.db)
 	_, err := s.repo.User.GetUserByUsername(fixtures.UtUser.Username)
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 }
 
 func (s *TestutilsSuite) Test_GetAuthorization() {
@@ -63,8 +63,8 @@ func (s *TestutilsSuite) Test_GetMockConsumerMessage() {
 	seedUtTopic := kafka.ReceiveLocalCCData
 
 	dataJSON, err := json.Marshal(s.seedUtData)
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	msg, err := GetMockConsumerMessage(s.T(), seedUtTopic, dataJSON)
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	s.Equalf(seedUtTopic, msg.Topic, e.ErrNewMessageNotEqual.Error())
 }

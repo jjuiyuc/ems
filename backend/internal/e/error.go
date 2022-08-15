@@ -13,6 +13,10 @@ var (
 	ErrNewUnexpectedTimeRange = errors.New("unexpected start time and end time")
 	// ErrNewMessageNotEqual godoc
 	ErrNewMessageNotEqual = errors.New("message when not equal")
+	// ErrNewMessageReceivedUnexpectedErr godoc
+	ErrNewMessageReceivedUnexpectedErr = errors.New("message when received unexpected error")
+	// ErrNewMessageGotNil godoc
+	ErrNewMessageGotNil = errors.New("message when an error is expected but got nil")
 )
 
 // ErrNewKeyNotExist godoc

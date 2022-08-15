@@ -46,15 +46,15 @@ func (s *WeatherWorkerSuite) SetupSuite() {
 
 	// Truncate data
 	_, err := db.Exec("TRUNCATE TABLE weather_forecast")
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	_, err = db.Exec("SET FOREIGN_KEY_CHECKS = 0")
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	_, err = db.Exec("TRUNCATE TABLE gateway")
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	_, err = db.Exec("TRUNCATE TABLE customer")
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	_, err = db.Exec("SET FOREIGN_KEY_CHECKS = 1")
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	// Mock seedUtWeather data
 	s.seedUtTime = time.Now().UTC()
 	s.seedUtWeather = LatestWeather{
@@ -105,7 +105,7 @@ func (s *WeatherWorkerSuite) SetupSuite() {
 		(2,'00001','002',24.75,121.75),
 		(3,'00002','001',24.75,121.75);
 	`)
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 
 	// Mock gateway table
 	_, err = db.Exec(`
@@ -115,7 +115,7 @@ func (s *WeatherWorkerSuite) SetupSuite() {
 		(3,'U00003',2),
 		(4,'U00004',3);
 	`)
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 }
 
 func (s *WeatherWorkerSuite) TearDownSuite() {
@@ -180,9 +180,9 @@ func (s *WeatherWorkerSuite) Test_01_SaveWeatherData() {
 	for _, tt := range tests {
 		log.Info("test name: ", tt.name)
 		dataJSON, err := json.Marshal(tt.args)
-		s.Require().NoError(err)
+		s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 		msg, err := testutils.GetMockConsumerMessage(s.T(), s.seedUtTopic, dataJSON)
-		s.Require().NoError(err)
+		s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 		s.Equalf(s.seedUtTopic, msg.Topic, e.ErrNewMessageNotEqual.Error())
 
 		switch tt.name {
@@ -197,11 +197,11 @@ func (s *WeatherWorkerSuite) Test_01_SaveWeatherData() {
 		}
 
 		currentCount, err := s.repo.Weather.GetWeatherForecastCount()
-		s.Require().NoError(err)
+		s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 		_, _, err = s.handler.saveWeatherData(msg.Value)
-		s.Require().NoError(err)
+		s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 		updatedCount, err := s.repo.Weather.GetWeatherForecastCount()
-		s.Require().NoError(err)
+		s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 		switch tt.name {
 		case "saveWeatherData":
 			s.Equalf(currentCount+2, updatedCount, e.ErrNewMessageNotEqual.Error())
@@ -259,7 +259,7 @@ func (s *WeatherWorkerSuite) Test_02_GenerateWeatherSendingInfo() {
 
 	log.Info("test name: ", tt.name)
 	weatherData, uuids, err := s.handler.generateWeatherSendingInfo(tt.args.Lat, tt.args.Lng)
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	s.Equalf(tt.wantRv.WeatherData, weatherData, e.ErrNewMessageNotEqual.Error())
 	s.Equalf(tt.wantRv.UUIDs, uuids, e.ErrNewMessageNotEqual.Error())
 }

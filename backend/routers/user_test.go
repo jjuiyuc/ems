@@ -49,20 +49,20 @@ func (s *UserSuite) SetupSuite() {
 
 	// Truncate & seed data
 	err := testutils.SeedUtUser(db)
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	err = testutils.SeedUtCustomerAndGateway(db)
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	token, err := utils.GenerateToken(fixtures.UtUser.ID)
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	s.token = token
 	// Mock user_gateway_right table
 	_, err = db.Exec("TRUNCATE TABLE user_gateway_right")
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	_, err = db.Exec(`
 		INSERT INTO user_gateway_right (id,user_id,gw_id) VALUES
 		(1,1,1);
 	`)
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 
 	s.repo = repo
 	s.router = InitRouter(cfg.GetBool("server.cors"), cfg.GetString("server.ginMode"), w)
@@ -186,7 +186,7 @@ func (s *UserSuite) Test_PasswordLostAndResetByToken() {
 	for _, tt := range passwordLostTest {
 		log.Info("test name: ", tt.Name)
 		payloadBuf, err := json.Marshal(tt.args)
-		s.Require().NoError(err)
+		s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 		rvData := testutils.AssertRequest(tt.TestInfo, s.Require(), s.router, "PUT", bytes.NewBuffer(payloadBuf))
 		if tt.Name == "passwordLost" {
 			dataMap := rvData.(map[string]interface{})
@@ -195,7 +195,7 @@ func (s *UserSuite) Test_PasswordLostAndResetByToken() {
 	}
 
 	user, err := s.repo.User.GetUserByUsername(fixtures.UtUser.Username)
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 
 	for _, tt := range passwordResetTest {
 		log.Info("test name: ", tt.Name)
@@ -203,7 +203,7 @@ func (s *UserSuite) Test_PasswordLostAndResetByToken() {
 			tt.args.Token = user.ResetPWDToken.String
 		}
 		payloadBuf, err := json.Marshal(tt.args)
-		s.Require().NoError(err)
+		s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 		testutils.AssertRequest(tt.TestInfo, s.Require(), s.router, "PUT", bytes.NewBuffer(payloadBuf))
 	}
 }
@@ -265,10 +265,10 @@ func (s *UserSuite) Test_GetProfile() {
 	rvData := testutils.AssertRequest(tt, s.Require(), s.router, "GET", nil)
 	dataMap := rvData.(map[string]interface{})
 	dataJSON, err := json.Marshal(dataMap)
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	var data services.ProfileResponse
 	err = json.Unmarshal(dataJSON, &data)
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	s.Equalf(fixtures.UtUser.ID, data.ID, e.ErrNewMessageNotEqual.Error())
 	s.Equalf(fixtures.UtUser.Username, data.Username, e.ErrNewMessageNotEqual.Error())
 	s.Equalf(fixtures.UtUser.ExpirationDate, data.ExpirationDate, e.ErrNewMessageNotEqual.Error())

@@ -40,7 +40,7 @@ func (s *BillingWorkerSuite) SetupSuite() {
 
 	// Truncate & seed data
 	err := testutils.SeedUtCustomerAndGateway(db)
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 
 	// Mock seedUtTime
 	loc, _ := time.LoadLocation("Asia/Taipei")
@@ -80,12 +80,12 @@ func (s *BillingWorkerSuite) Test_GetBillingTypeByCustomerID() {
 	}
 
 	gateways, err := getGateways(s.repo)
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	s.Equalf(tt.wantRv.Gateway.ID, gateways[0].ID, e.ErrNewMessageNotEqual.Error())
 	s.Equalf(tt.wantRv.Gateway.UUID, gateways[0].UUID, e.ErrNewMessageNotEqual.Error())
 	s.Equalf(tt.wantRv.Gateway.CustomerID, gateways[0].CustomerID, e.ErrNewMessageNotEqual.Error())
 	billingType, err := s.billing.GetBillingTypeByCustomerID(gateways[0].CustomerID)
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	s.Equalf(tt.wantRv.BillingType.TOULocationID, billingType.TOULocationID, e.ErrNewMessageNotEqual.Error())
 	s.Equalf(tt.wantRv.BillingType.VoltageType, billingType.VoltageType, e.ErrNewMessageNotEqual.Error())
 	s.Equalf(tt.wantRv.BillingType.TOUType, billingType.TOUType, e.ErrNewMessageNotEqual.Error())
@@ -119,11 +119,11 @@ func (s *BillingWorkerSuite) Test_GetLocalTime() {
 		switch tt.name {
 		case "GetLocalTime":
 			localTime, err := s.billing.GetLocalTime(tt.args.TOULocationID, tt.args.LocalTime)
-			s.Require().NoError(err)
+			s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 			s.Equalf(s.seedUtTime, localTime, e.ErrNewMessageNotEqual.Error())
 		case "GetLocalTimeInvalidInput":
 			_, err := s.billing.GetLocalTime(tt.args.TOULocationID, tt.args.LocalTime)
-			s.Require().Error(err)
+			s.Require().Errorf(err, e.ErrNewMessageGotNil.Error())
 		}
 	}
 }
@@ -224,7 +224,7 @@ func (s *BillingWorkerSuite) Test_getWeeklyBillingParamsByType() {
 	billingParamsJSON, err := getWeeklyBillingParamsByType(s.repo, s.billing, *tt.args.BillingType, tt.args.LocalTime, tt.args.SendNow)
 	var billingParams BillingParams
 	err = json.Unmarshal(billingParamsJSON, &billingParams)
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	s.Equalf(tt.wantRv.BillingParams.Timezone, billingParams.Timezone, e.ErrNewMessageNotEqual.Error())
 	s.Equalf(tt.wantRv.BillingParams.Rates[0], billingParams.Rates[0], e.ErrNewMessageNotEqual.Error())
 }
@@ -232,5 +232,5 @@ func (s *BillingWorkerSuite) Test_getWeeklyBillingParamsByType() {
 func (s *BillingWorkerSuite) Test_generateBillingParams() {
 	gateways, _ := getGateways(s.repo)
 	_, err := generateBillingParams(s.repo, s.billing, gateways[0], true)
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 }

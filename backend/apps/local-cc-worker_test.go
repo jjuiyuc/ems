@@ -48,7 +48,7 @@ func (s *LocalCCWorkerSuite) SetupSuite() {
 
 	// Truncate & seed data
 	err := testutils.SeedUtCustomerAndGateway(db)
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	// Mock seedUtLocalCCData data
 	seedUtLoadLinks := map[string]int{
 		"grid":    0,
@@ -107,7 +107,7 @@ func (s *LocalCCWorkerSuite) TearDownSuite() {
 	_, err := s.db.Exec(`
 		DELETE FROM cc_data_log WHERE id = 3 OR id = 4;
 	`)
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	models.Close()
 }
 
@@ -186,27 +186,27 @@ func (s *LocalCCWorkerSuite) Test_SaveLocalCCDataAndLog() {
 		}
 
 		dataJSON, err := json.Marshal(tt.args.Msg)
-		s.Require().NoError(err)
+		s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 		msg, err := testutils.GetMockConsumerMessage(s.T(), s.seedUtTopic, dataJSON)
-		s.Require().NoError(err)
+		s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 		s.Equalf(s.seedUtTopic, msg.Topic, e.ErrNewMessageNotEqual.Error())
 
 		currentCount, err := s.repo.CCData.GetCCDataCount()
-		s.Require().NoError(err)
+		s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 		currentLogCount, err := s.repo.CCData.GetCCDataLogCount()
-		s.Require().NoError(err)
+		s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 		saveErr := s.handler.saveLocalCCData(msg.Value)
 		saveLogErr := s.handler.saveLocalCCDataLog(msg.Value)
 
 		switch tt.name {
 		case "saveLocalCCData", "saveLocalCCDataNewGW":
-			s.Require().NoError(saveErr)
-			s.Require().NoError(saveLogErr)
+			s.Require().NoErrorf(saveErr, e.ErrNewMessageReceivedUnexpectedErr.Error())
+			s.Require().NoErrorf(saveLogErr, e.ErrNewMessageReceivedUnexpectedErr.Error())
 			updatedCount, err := s.repo.CCData.GetCCDataCount()
-			s.Require().NoError(err)
+			s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 			s.Equalf(currentCount+1, updatedCount, e.ErrNewMessageNotEqual.Error())
 			updatedCount, err = s.repo.CCData.GetCCDataLogCount()
-			s.Require().NoError(err)
+			s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 			s.Equalf(currentLogCount+1, updatedCount, e.ErrNewMessageNotEqual.Error())
 		case "saveLocalCCDataNoGWID":
 			s.Equalf(e.ErrNewKeyNotExist(gwID).Error(), saveErr.Error(), e.ErrNewMessageNotEqual.Error())

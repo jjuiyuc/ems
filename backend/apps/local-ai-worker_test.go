@@ -48,7 +48,7 @@ func (s *LocalAIWorkerSuite) SetupSuite() {
 
 	// Truncate & seed data
 	err := testutils.SeedUtCustomerAndGateway(db)
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	// Mock seedUtLocalAIData data
 	s.seedUtLocalAIData = map[string]interface{}{
 		"gwID":      fixtures.UtGateway.UUID,
@@ -137,20 +137,20 @@ func (s *LocalAIWorkerSuite) Test_SaveLocalAIData() {
 		}
 
 		dataJSON, err := json.Marshal(tt.args.Msg)
-		s.Require().NoError(err)
+		s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 		msg, err := testutils.GetMockConsumerMessage(s.T(), s.seedUtTopic, dataJSON)
-		s.Require().NoError(err)
+		s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 		s.Equalf(s.seedUtTopic, msg.Topic, e.ErrNewMessageNotEqual.Error())
 
 		currentCount, err := s.repo.AIData.GetAIDataCount()
-		s.Require().NoError(err)
+		s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 		saveErr := s.handler.saveLocalAIData(msg.Value)
 
 		switch tt.name {
 		case "saveLocalAIData", "saveLocalAIDataNewGW":
-			s.Require().NoError(saveErr)
+			s.Require().NoErrorf(saveErr, e.ErrNewMessageReceivedUnexpectedErr.Error())
 			updatedCount, err := s.repo.AIData.GetAIDataCount()
-			s.Require().NoError(err)
+			s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 			s.Equalf(currentCount+1, updatedCount, e.ErrNewMessageNotEqual.Error())
 		case "saveLocalAIDataNoGWID":
 			s.Equalf(e.ErrNewKeyNotExist(gwID).Error(), saveErr.Error(), e.ErrNewMessageNotEqual.Error())

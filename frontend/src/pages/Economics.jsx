@@ -54,19 +54,19 @@ export default function Economics(props) {
                 grid: { lineWidth: 0 },
                 time: {
                     displayFormats: {
-                        day: "MM DD"
+                        day: "MMM D"
                     },
-                    tooltipFormat: "MM DD",
+                    tooltipFormat: "MMM D",
                     unit: "day"
                 }
             },
             y: { max: 80, min: 0 }
         })
     const
-        [monthtlyTab, setMonthtlyTab] = useState("monthlyStackedRevenue"),
         monthtlyTabs = ["thisMonth", "perviousMonth", "thisMonthLastYear"],
-        [weeklyTab, setWeeklyTab] = useState("weeklyRevenueBreakdown"),
-        weeklyTabs = ["thisWeek", "perviouWeek"]
+        [monthtlyTab, setMonthtlyTab] = useState(monthtlyTabs[0]),
+        weeklyTabs = ["thisWeek", "perviouWeek"],
+        [weeklyTab, setWeeklyTab] = useState(weeklyTabs[0])
 
     const fakeDataArray = amount => Array.from(new Array(amount).keys())
         .map(() => Math.floor(Math.random() * (40 - 10 + 1) + 10))

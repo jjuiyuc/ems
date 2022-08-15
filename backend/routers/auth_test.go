@@ -140,7 +140,7 @@ func (s *AuthorizationSuite) Test_GetAuth() {
 			s.NotEmpty(dataMap["token"])
 			count, err := s.repo.User.GetLoginLogCount()
 			s.Require().NoError(err)
-			s.Equal(1, int(count))
+			s.Equalf(1, int(count), e.ErrNewMessageNotEqual.Error())
 		}
 	}
 }

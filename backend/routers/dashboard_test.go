@@ -152,13 +152,13 @@ func (s *DashboardSuite) Test_dashboardHandler() {
 	var res response
 	err = json.Unmarshal([]byte(p), &res)
 	s.Require().NoError(err)
-	s.Equal(tt.wantRv.Code, res.Code)
-	s.Equal(tt.wantRv.Msg, res.Msg)
-	s.Equal(tt.wantRv.Data, res.Data)
+	s.Equalf(tt.wantRv.Code, res.Code, e.ErrNewMessageNotEqual.Error())
+	s.Equalf(tt.wantRv.Msg, res.Msg, e.ErrNewMessageNotEqual.Error())
+	s.Equalf(tt.wantRv.Data, res.Data, e.ErrNewMessageNotEqual.Error())
 }
 
 func (s *DashboardSuite) dashboardHandler(writer http.ResponseWriter, request *http.Request) {
-	s.Equal(s.token, request.Header["Sec-Websocket-Protocol"][0])
+	s.Equalf(s.token, request.Header["Sec-Websocket-Protocol"][0], e.ErrNewMessageNotEqual.Error())
 
 	pool := newPool()
 	go pool.start()

@@ -183,16 +183,16 @@ func (s *WeatherWorkerSuite) Test_01_SaveWeatherData() {
 		s.Require().NoError(err)
 		msg, err := testutils.GetMockConsumerMessage(s.T(), s.seedUtTopic, dataJSON)
 		s.Require().NoError(err)
-		s.Equal(s.seedUtTopic, msg.Topic)
+		s.Equalf(s.seedUtTopic, msg.Topic, e.ErrNewMessageNotEqual.Error())
 
 		switch tt.name {
 		case "saveWeatherDataNoValidDate":
 			_, _, err = s.handler.saveWeatherData(msg.Value)
-			s.Equal(e.ErrNewKeyNotExist(validDate).Error(), err.Error())
+			s.Equalf(e.ErrNewKeyNotExist(validDate).Error(), err.Error(), e.ErrNewMessageNotEqual.Error())
 			continue
 		case "saveWeatherDataEmptyInput":
 			_, _, err := s.handler.saveWeatherData(nil)
-			s.Require().Error(e.ErrNewUnexpectedJSONInput, err)
+			s.Equalf(e.ErrNewUnexpectedJSONInput.Error(), err.Error(), e.ErrNewMessageNotEqual.Error())
 			continue
 		}
 
@@ -204,9 +204,9 @@ func (s *WeatherWorkerSuite) Test_01_SaveWeatherData() {
 		s.Require().NoError(err)
 		switch tt.name {
 		case "saveWeatherData":
-			s.Equal(currentCount+2, updatedCount)
+			s.Equalf(currentCount+2, updatedCount, e.ErrNewMessageNotEqual.Error())
 		case "saveWeatherDataUpdated":
-			s.Equal(currentCount+1, updatedCount)
+			s.Equalf(currentCount+1, updatedCount, e.ErrNewMessageNotEqual.Error())
 		}
 	}
 }
@@ -260,6 +260,6 @@ func (s *WeatherWorkerSuite) Test_02_GenerateWeatherSendingInfo() {
 	log.Info("test name: ", tt.name)
 	weatherData, uuids, err := s.handler.generateWeatherSendingInfo(tt.args.Lat, tt.args.Lng)
 	s.Require().NoError(err)
-	s.Equal(tt.wantRv.WeatherData, weatherData)
-	s.Equal(tt.wantRv.UUIDs, uuids)
+	s.Equalf(tt.wantRv.WeatherData, weatherData, e.ErrNewMessageNotEqual.Error())
+	s.Equalf(tt.wantRv.UUIDs, uuids, e.ErrNewMessageNotEqual.Error())
 }

@@ -133,7 +133,7 @@ func (s *EnergyResourcesSuite) Test_GetBatteryEnergyInfo() {
 			var data services.BatteryEnergyInfoResponse
 			err = json.Unmarshal(dataJSON, &data)
 			s.Require().NoError(err)
-			s.Equal(tt.WantRv.Data, data)
+			s.Equalf(tt.WantRv.Data, data, e.ErrNewMessageNotEqual.Error())
 		}
 	}
 }
@@ -229,7 +229,7 @@ func (s *EnergyResourcesSuite) Test_GetBatteryPowerState() {
 			var data services.BatteryPowerStateResponse
 			err = json.Unmarshal(dataJSON, &data)
 			s.Require().NoError(err)
-			s.Equal(tt.WantRv.Data, data)
+			s.Equalf(tt.WantRv.Data, data, e.ErrNewMessageNotEqual.Error())
 		}
 	}
 }
@@ -283,7 +283,7 @@ func (s *EnergyResourcesSuite) Test_GetBatteryChargeVoltageState() {
 			var data services.BatteryChargeVoltageStateResponse
 			err = json.Unmarshal(dataJSON, &data)
 			s.Require().NoError(err)
-			s.Equal(tt.WantRv.Data, data)
+			s.Equalf(tt.WantRv.Data, data, e.ErrNewMessageNotEqual.Error())
 		}
 	}
 }

@@ -181,7 +181,7 @@ func (s *LocalCCWorkerSuite) Test_SaveLocalCCDataAndLog() {
 		log.Info("test name: ", tt.name)
 		if tt.name == "saveLocalCCDataEmptyInput" {
 			err := s.handler.saveLocalCCData(nil)
-			s.Require().Error(e.ErrNewUnexpectedJSONInput, err)
+			s.Equalf(e.ErrNewUnexpectedJSONInput.Error(), err.Error(), e.ErrNewMessageNotEqual.Error())
 			continue
 		}
 
@@ -189,7 +189,7 @@ func (s *LocalCCWorkerSuite) Test_SaveLocalCCDataAndLog() {
 		s.Require().NoError(err)
 		msg, err := testutils.GetMockConsumerMessage(s.T(), s.seedUtTopic, dataJSON)
 		s.Require().NoError(err)
-		s.Equal(s.seedUtTopic, msg.Topic)
+		s.Equalf(s.seedUtTopic, msg.Topic, e.ErrNewMessageNotEqual.Error())
 
 		currentCount, err := s.repo.CCData.GetCCDataCount()
 		s.Require().NoError(err)
@@ -204,22 +204,22 @@ func (s *LocalCCWorkerSuite) Test_SaveLocalCCDataAndLog() {
 			s.Require().NoError(saveLogErr)
 			updatedCount, err := s.repo.CCData.GetCCDataCount()
 			s.Require().NoError(err)
-			s.Equal(currentCount+1, updatedCount)
+			s.Equalf(currentCount+1, updatedCount, e.ErrNewMessageNotEqual.Error())
 			updatedCount, err = s.repo.CCData.GetCCDataLogCount()
 			s.Require().NoError(err)
-			s.Equal(currentLogCount+1, updatedCount)
+			s.Equalf(currentLogCount+1, updatedCount, e.ErrNewMessageNotEqual.Error())
 		case "saveLocalCCDataNoGWID":
-			s.Equal(e.ErrNewKeyNotExist(gwID).Error(), saveErr.Error())
-			s.Equal(e.ErrNewKeyNotExist(gwID).Error(), saveLogErr.Error())
+			s.Equalf(e.ErrNewKeyNotExist(gwID).Error(), saveErr.Error(), e.ErrNewMessageNotEqual.Error())
+			s.Equalf(e.ErrNewKeyNotExist(gwID).Error(), saveLogErr.Error(), e.ErrNewMessageNotEqual.Error())
 		case "saveLocalCCDataNoTimestamp":
-			s.Equal(e.ErrNewKeyNotExist(timestamp).Error(), saveErr.Error())
-			s.Equal(e.ErrNewKeyNotExist(timestamp).Error(), saveLogErr.Error())
+			s.Equalf(e.ErrNewKeyNotExist(timestamp).Error(), saveErr.Error(), e.ErrNewMessageNotEqual.Error())
+			s.Equalf(e.ErrNewKeyNotExist(timestamp).Error(), saveLogErr.Error(), e.ErrNewMessageNotEqual.Error())
 		case "saveLocalCCDataGWIDUnexpectedValue":
-			s.Equal(e.ErrNewKeyUnexpectedValue(gwID).Error(), saveErr.Error())
-			s.Equal(e.ErrNewKeyUnexpectedValue(gwID).Error(), saveLogErr.Error())
+			s.Equalf(e.ErrNewKeyUnexpectedValue(gwID).Error(), saveErr.Error(), e.ErrNewMessageNotEqual.Error())
+			s.Equalf(e.ErrNewKeyUnexpectedValue(gwID).Error(), saveLogErr.Error(), e.ErrNewMessageNotEqual.Error())
 		case "saveLocalCCDataTimestampUnexpectedValue":
-			s.Equal(e.ErrNewKeyUnexpectedValue(timestamp).Error(), saveErr.Error())
-			s.Equal(e.ErrNewKeyUnexpectedValue(timestamp).Error(), saveLogErr.Error())
+			s.Equalf(e.ErrNewKeyUnexpectedValue(timestamp).Error(), saveErr.Error(), e.ErrNewMessageNotEqual.Error())
+			s.Equalf(e.ErrNewKeyUnexpectedValue(timestamp).Error(), saveLogErr.Error(), e.ErrNewMessageNotEqual.Error())
 		}
 	}
 }

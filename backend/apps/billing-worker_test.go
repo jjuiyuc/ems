@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	"der-ems/config"
+	"der-ems/internal/e"
 	"der-ems/internal/utils"
 	"der-ems/models"
 	deremsmodels "der-ems/models/der-ems"
@@ -80,14 +81,14 @@ func (s *BillingWorkerSuite) Test_GetBillingTypeByCustomerID() {
 
 	gateways, err := getGateways(s.repo)
 	s.Require().NoError(err)
-	s.Equal(tt.wantRv.Gateway.ID, gateways[0].ID)
-	s.Equal(tt.wantRv.Gateway.UUID, gateways[0].UUID)
-	s.Equal(tt.wantRv.Gateway.CustomerID, gateways[0].CustomerID)
+	s.Equalf(tt.wantRv.Gateway.ID, gateways[0].ID, e.ErrNewMessageNotEqual.Error())
+	s.Equalf(tt.wantRv.Gateway.UUID, gateways[0].UUID, e.ErrNewMessageNotEqual.Error())
+	s.Equalf(tt.wantRv.Gateway.CustomerID, gateways[0].CustomerID, e.ErrNewMessageNotEqual.Error())
 	billingType, err := s.billing.GetBillingTypeByCustomerID(gateways[0].CustomerID)
 	s.Require().NoError(err)
-	s.Equal(tt.wantRv.BillingType.TOULocationID, billingType.TOULocationID)
-	s.Equal(tt.wantRv.BillingType.VoltageType, billingType.VoltageType)
-	s.Equal(tt.wantRv.BillingType.TOUType, billingType.TOUType)
+	s.Equalf(tt.wantRv.BillingType.TOULocationID, billingType.TOULocationID, e.ErrNewMessageNotEqual.Error())
+	s.Equalf(tt.wantRv.BillingType.VoltageType, billingType.VoltageType, e.ErrNewMessageNotEqual.Error())
+	s.Equalf(tt.wantRv.BillingType.TOUType, billingType.TOUType, e.ErrNewMessageNotEqual.Error())
 }
 
 func (s *BillingWorkerSuite) Test_GetLocalTime() {
@@ -119,7 +120,7 @@ func (s *BillingWorkerSuite) Test_GetLocalTime() {
 		case "GetLocalTime":
 			localTime, err := s.billing.GetLocalTime(tt.args.TOULocationID, tt.args.LocalTime)
 			s.Require().NoError(err)
-			s.Equal(s.seedUtTime, localTime)
+			s.Equalf(s.seedUtTime, localTime, e.ErrNewMessageNotEqual.Error())
 		case "GetLocalTimeInvalidInput":
 			_, err := s.billing.GetLocalTime(tt.args.TOULocationID, tt.args.LocalTime)
 			s.Require().Error(err)
@@ -168,7 +169,7 @@ func (s *BillingWorkerSuite) Test_getSundayOfBillingWeek() {
 
 	for _, tt := range tests {
 		timeOnSunday := getSundayOfBillingWeek(tt.args.LocalTime, tt.args.SendNow)
-		s.Equal(tt.wantRv.TimeOnSunday, timeOnSunday)
+		s.Equalf(tt.wantRv.TimeOnSunday, timeOnSunday, e.ErrNewMessageNotEqual.Error())
 	}
 }
 
@@ -224,8 +225,8 @@ func (s *BillingWorkerSuite) Test_getWeeklyBillingParamsByType() {
 	var billingParams BillingParams
 	err = json.Unmarshal(billingParamsJSON, &billingParams)
 	s.Require().NoError(err)
-	s.Equal(tt.wantRv.BillingParams.Timezone, billingParams.Timezone)
-	s.Equal(tt.wantRv.BillingParams.Rates[0], billingParams.Rates[0])
+	s.Equalf(tt.wantRv.BillingParams.Timezone, billingParams.Timezone, e.ErrNewMessageNotEqual.Error())
+	s.Equalf(tt.wantRv.BillingParams.Rates[0], billingParams.Rates[0], e.ErrNewMessageNotEqual.Error())
 }
 
 func (s *BillingWorkerSuite) Test_generateBillingParams() {

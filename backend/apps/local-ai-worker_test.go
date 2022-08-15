@@ -132,7 +132,7 @@ func (s *LocalAIWorkerSuite) Test_SaveLocalAIData() {
 		log.Info("test name: ", tt.name)
 		if tt.name == "saveLocalAIDataEmptyInput" {
 			err := s.handler.saveLocalAIData(nil)
-			s.Require().Error(e.ErrNewUnexpectedJSONInput, err)
+			s.Equalf(e.ErrNewUnexpectedJSONInput.Error(), err.Error(), e.ErrNewMessageNotEqual.Error())
 			continue
 		}
 
@@ -140,7 +140,7 @@ func (s *LocalAIWorkerSuite) Test_SaveLocalAIData() {
 		s.Require().NoError(err)
 		msg, err := testutils.GetMockConsumerMessage(s.T(), s.seedUtTopic, dataJSON)
 		s.Require().NoError(err)
-		s.Equal(s.seedUtTopic, msg.Topic)
+		s.Equalf(s.seedUtTopic, msg.Topic, e.ErrNewMessageNotEqual.Error())
 
 		currentCount, err := s.repo.AIData.GetAIDataCount()
 		s.Require().NoError(err)
@@ -151,15 +151,15 @@ func (s *LocalAIWorkerSuite) Test_SaveLocalAIData() {
 			s.Require().NoError(saveErr)
 			updatedCount, err := s.repo.AIData.GetAIDataCount()
 			s.Require().NoError(err)
-			s.Equal(currentCount+1, updatedCount)
+			s.Equalf(currentCount+1, updatedCount, e.ErrNewMessageNotEqual.Error())
 		case "saveLocalAIDataNoGWID":
-			s.Equal(e.ErrNewKeyNotExist(gwID).Error(), saveErr.Error())
+			s.Equalf(e.ErrNewKeyNotExist(gwID).Error(), saveErr.Error(), e.ErrNewMessageNotEqual.Error())
 		case "saveLocalAIDataNoTimestamp":
-			s.Equal(e.ErrNewKeyNotExist(timestamp).Error(), saveErr.Error())
+			s.Equalf(e.ErrNewKeyNotExist(timestamp).Error(), saveErr.Error(), e.ErrNewMessageNotEqual.Error())
 		case "saveLocalAIDataGWIDUnexpectedValue":
-			s.Equal(e.ErrNewKeyUnexpectedValue(gwID).Error(), saveErr.Error())
+			s.Equalf(e.ErrNewKeyUnexpectedValue(gwID).Error(), saveErr.Error(), e.ErrNewMessageNotEqual.Error())
 		case "saveLocalAIDataTimestampUnexpectedValue":
-			s.Equal(e.ErrNewKeyUnexpectedValue(timestamp).Error(), saveErr.Error())
+			s.Equalf(e.ErrNewKeyUnexpectedValue(timestamp).Error(), saveErr.Error(), e.ErrNewMessageNotEqual.Error())
 		}
 	}
 }

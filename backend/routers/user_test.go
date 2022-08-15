@@ -190,7 +190,7 @@ func (s *UserSuite) Test_PasswordLostAndResetByToken() {
 		rvData := testutils.AssertRequest(tt.TestInfo, s.Require(), s.router, "PUT", bytes.NewBuffer(payloadBuf))
 		if tt.Name == "passwordLost" {
 			dataMap := rvData.(map[string]interface{})
-			s.Equal(fixtures.UtUser.Username, dataMap["username"])
+			s.Equalf(fixtures.UtUser.Username, dataMap["username"], e.ErrNewMessageNotEqual.Error())
 		}
 	}
 
@@ -269,9 +269,9 @@ func (s *UserSuite) Test_GetProfile() {
 	var data services.ProfileResponse
 	err = json.Unmarshal(dataJSON, &data)
 	s.Require().NoError(err)
-	s.Equal(fixtures.UtUser.ID, data.ID)
-	s.Equal(fixtures.UtUser.Username, data.Username)
-	s.Equal(fixtures.UtUser.ExpirationDate, data.ExpirationDate)
-	s.Equal(fixtures.UtGateway.UUID, data.Gateways[0].GatewayID)
-	s.Equal(fixtures.UtCustomer.Address.String, data.Gateways[0].Address)
+	s.Equalf(fixtures.UtUser.ID, data.ID, e.ErrNewMessageNotEqual.Error())
+	s.Equalf(fixtures.UtUser.Username, data.Username, e.ErrNewMessageNotEqual.Error())
+	s.Equalf(fixtures.UtUser.ExpirationDate, data.ExpirationDate, e.ErrNewMessageNotEqual.Error())
+	s.Equalf(fixtures.UtGateway.UUID, data.Gateways[0].GatewayID, e.ErrNewMessageNotEqual.Error())
+	s.Equalf(fixtures.UtCustomer.Address.String, data.Gateways[0].Address, e.ErrNewMessageNotEqual.Error())
 }

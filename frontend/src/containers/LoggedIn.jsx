@@ -12,6 +12,7 @@ import Sample from "../configs/Sample"
 import Dashboard from "../pages/Dashboard"
 import DemandCharge from "../pages/DemandCharge"
 import EnergyResoucesBattery from "../pages/EnergyResoucesBattery"
+import EnergyResourcesGrid from "../pages/EnergyResourcesGrid"
 import Analysis from "../pages/Analysis"
 import TimeOfUse from "../pages/TimeOfUse"
 
@@ -48,11 +49,14 @@ function LoggedIn(props) {
                         <Route
                             element={<EnergyResoucesBattery />}
                             path="/energy-resources/battery" />
+                        <Route
+                            element={<EnergyResourcesGrid />}
+                            path="/energy-resources/grid" />
                         <Route element={<Sample />} path="/settings" />
                         <Route
                             element={<Navigate
-                                        replace
-                                        to="/energy-resources/battery" />}
+                                replace
+                                to="/energy-resources/battery" />}
                             path="/energy-resources" />
                         <Route
                             element={<Navigate to="/dashboard" replace />}

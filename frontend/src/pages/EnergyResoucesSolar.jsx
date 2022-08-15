@@ -18,8 +18,31 @@ import { ReactComponent as EconomicsIcon } from "../assets/icons/economics.svg"
 import { ReactComponent as UpIcon } from "../assets/icons/up.svg"
 import { ReactComponent as DownIcon } from "../assets/icons/down.svg"
 import { ReactComponent as Co2Icon } from "../assets/icons/co2.svg"
+
 const { colors } = variables
 
+const drawHighPeak = (startHour, endHour) => chart => {
+    if (chart.scales.x._gridLineItems && endHour && startHour) {
+        const
+            ctx = chart.ctx,
+            xLines = chart.scales.x._gridLineItems,
+            xLineFirst = xLines[0],
+            yFirstLine = chart.scales.y._gridLineItems[0],
+            xLeft = yFirstLine.x1,
+            xFullWidth = yFirstLine.x2 - xLeft,
+            xWidth = (endHour - startHour) / 24 * xFullWidth,
+            xStart = startHour / 24 * xFullWidth + xLeft,
+            yTop = xLineFirst.y1,
+            yFullHeight = xLineFirst.y2 - yTop
+
+        ctx.beginPath()
+        ctx.fillStyle = "#ffffff10"
+        ctx.strokeStyle = colors.gray[400]
+        ctx.rect(xStart, yTop, xWidth, yFullHeight)
+        ctx.fill()
+        ctx.stroke()
+    }
+}
 export default function EnergyResoucesSolar(props) {
     const
         [solarPower, setSolarPower] = useState(0),
@@ -73,10 +96,12 @@ export default function EnergyResoucesSolar(props) {
             Math.floor(Math.random() * (60 - 40 + 1) + 40))
 
     const [lineChartData, setLineChartData] = useState({
+        beforeDraw: drawHighPeak(7, 19),
         datasets: [{
             backgroundColor: colors.yellow.main,
             borderColor: colors.yellow.main,
             data: lineChartDataArray,
+            label: commonT("solar"),
             fill: {
                 above: colors.yellow["main-opacity-10"],
                 target: "origin"
@@ -85,7 +110,8 @@ export default function EnergyResoucesSolar(props) {
         }],
         labels: lineChartDateLabels,
         tickCallback: (val, index) => val + commonT("kw"),
-        tooltipLabel: item => `${item.parsed.y}` + commonT("kw"),
+        tooltipLabel: item =>
+            `${item.dataset.label} ${item.parsed.y} ${commonT("kwh")}`,
         x: { grid: { lineWidth: 0 } },
         y: { max: 80, min: 0 }
     })
@@ -94,6 +120,7 @@ export default function EnergyResoucesSolar(props) {
         <h1 className="mb-9">{t("navigator.energyResources")}</h1>
         <EnergyResoucesTabs current="solar" />
         <EnergySolarCard
+            className="lg:grid"
             data={totalSolarEnergyDestinations}
             title={pageT("totalSolarEnergyDestinations")} />
         <div className="font-bold gap-5 grid lg:grid-cols-2 mt-4">
@@ -108,7 +135,7 @@ export default function EnergyResoucesSolar(props) {
         </div>
         <div className="card chart mt-8">
             <h4 className="mb-10">{pageT("realTimeSolarGeneration")}</h4>
-            <div className="max-h-80vh h-160 w-full">
+            <div className="max-h-80vh h-160 relative w-full">
                 <LineChart data={lineChartData} id="ersLineChart" />
             </div>
         </div>

@@ -24,7 +24,7 @@ export default function EnergySolarCard(props) {
 
     const { kwh, types } = props.data
 
-    return <div className="card ">
+    return <div className="card">
         <div className="flex flex-wrap items-baseline mb-6">
             <h2 className="mr-2 whitespace-nowrap">{kwh} {commonT("kwh")}</h2>
             <h5 className="font-bold">{props.title}</h5>
@@ -45,8 +45,7 @@ export default function EnergySolarCard(props) {
                     {pageT(t.type)}
                 </div>)}
         </div>
-
-        <div className="grid grid-cols-3 three-columns gap-x-5 sm:gap-x-10">
+        <div className="grid-cols-3 three-columns gap-x-5 sm:gap-x-10 lg:grid">
             {types.map((t, i) => {
                 const Icon = icons[t.type]
                 return <div key={"detail-" + i} className="flex justify-between items-end">

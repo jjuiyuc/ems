@@ -49,14 +49,15 @@ const theme = createTheme({
                     props: { filter: "selected" },
                     style: props => ({
                         fontWeight: "bold",
-                        background: theme.palette.primary.main,
-                        color: props.theme.palette.gray[900],
+                        background: theme.palette[ownerState.color].main,
+                        color: theme.palette.gray[900],
                         cursor: "default",
                         "&:hover": {
-                            background: theme.palette.primary.main
+                            background: theme.palette[ownerState.color].main
                         }
                     }),
                 },
+
                 {
                     props: { radius: "pill" },
                     style: { borderRadius: "100vh" },

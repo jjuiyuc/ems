@@ -56,16 +56,17 @@ export default function Economics(props) {
                     displayFormats: {
                         day: "MM DD"
                     },
-                    tooltipFormat: "MM DD"
+                    tooltipFormat: "MM DD",
+                    unit: "day"
                 }
             },
             y: { max: 80, min: 0 }
         })
     const
-        [tab, setTab] = useState("monthlyStackedRevenue"),
-        tabs = ["thisMonth", "perviousMonth", "thisMonthLastYear"],
-        [tab2, setTab2] = useState("weeklyRevenueBreakdown"),
-        tab2s = ["thisWeek", "perviouWeek"]
+        [monthtlyTab, setMonthtlyTab] = useState("monthlyStackedRevenue"),
+        monthtlyTabs = ["thisMonth", "perviousMonth", "thisMonthLastYear"],
+        [weeklyTab, setWeeklyTab] = useState("weeklyRevenueBreakdown"),
+        weeklyTabs = ["thisWeek", "perviouWeek"]
 
     const fakeDataArray = amount => Array.from(new Array(amount).keys())
         .map(() => Math.floor(Math.random() * (40 - 10 + 1) + 10))
@@ -123,7 +124,7 @@ export default function Economics(props) {
 
     return <>
         <h1 className="mb-9">{pageT("economics")}</h1>
-        <div className="flex max-w-7xl">
+        <div className="flex">
             <div className="card w-3/12 mb-8 grid grid-row-2">
                 <div>
                     <h5 className="font-bold">{pageT("total")}</h5>
@@ -131,7 +132,8 @@ export default function Economics(props) {
                     <h2 className="font-bold mb-1 pt-4">${total}</h2>
                 </div>
                 <div className="flex justify-end items-end">
-                    <div className="items-center  place-items-center grid bg-primary-main-opacity-20 w-20 h-20 rounded-full">
+                    <div className="items-center place-items-center grid
+                        bg-primary-main-opacity-20 w-20 h-20 rounded-full">
                         <EconomicsIcon className="text-brand-main w-12 h-12" />
                     </div>
                 </div>
@@ -160,13 +162,15 @@ export default function Economics(props) {
             </div>
         </div>
         <div className="card chart">
-            <div className="grid items-center grid-cols-1fr-auto-1fr mb-8">
-                <h4>{pageT("monthlyStackedRevenue")}</h4>
+            <div className="items-center grid-cols-1fr-auto-1fr mb-8 lg:grid">
+                <h4 className="mb-4 lg:mb-0">{pageT("monthlyStackedRevenue")}</h4>
                 <Stack direction="row" spacing={1.5}>
-                    {tabs.map((t, i) =>
+                    {monthtlyTabs.map((t, i) =>
                         <Button
-                            onClick={() => setTab(t)}
-                            filter={tab === t ? "selected" : ""}
+                            className="md:"
+                            color="gray"
+                            onClick={() => setMonthtlyTab(t)}
+                            filter={monthtlyTab === t ? "selected" : ""}
                             key={"ec-m" + i}
                             radius="pill"
                             variant="contained">
@@ -180,13 +184,14 @@ export default function Economics(props) {
             </div>
         </div>
         <div className="card mt-8">
-            <div className="grid items-center grid-cols-1fr-auto-1fr mb-8">
-                <h4>{pageT("weeklyRevenueBreakdown")}</h4>
+            <div className="items-center grid-cols-1fr-auto-1fr mb-8 lg:grid">
+                <h4 className="mb-4 lg:mb-0">{pageT("weeklyRevenueBreakdown")}</h4>
                 <Stack direction="row" spacing={1.5}>
-                    {tab2s.map((t, i) =>
+                    {weeklyTabs.map((t, i) =>
                         <Button
-                            onClick={() => setTab2(t)}
-                            filter={tab2 === t ? "selected" : ""}
+                            color="gray"
+                            onClick={() => setWeeklyTab(t)}
+                            filter={weeklyTab === t ? "selected" : ""}
                             key={"ec-w" + i}
                             radius="pill"
                             variant="contained">
@@ -195,7 +200,7 @@ export default function Economics(props) {
                 </Stack>
             </div>
             <div className="max-h-80vh h-160 mt-8 relative w-full">
-                <BarChart data={barChartData} id="economicsBarChart" />
+                <BarChart data={barChartData} id="econoBarChart" />
             </div>
         </div>
     </>

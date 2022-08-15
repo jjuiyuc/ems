@@ -1,9 +1,6 @@
-import { connect } from "react-redux"
 import moment from "moment"
-import ReportProblemIcon from "@mui/icons-material/ReportProblem"
 import { useEffect, useState } from "react"
 import { useTranslation } from "react-multi-lang"
-import { Button } from "@mui/material"
 
 import { apiCall } from "../utils/api"
 import variables from "../configs/variables"
@@ -13,7 +10,6 @@ import EnergySolarCard from "../components/EnergySolarCard"
 import EnergySolarSubCard from "../components/EnergySolarSubCard"
 import LineChart from "../components/LineChart"
 
-import { ReactComponent as SolarIcon } from "../assets/icons/sunny.svg"
 import { ReactComponent as EconomicsIcon } from "../assets/icons/economics.svg"
 import { ReactComponent as UpIcon } from "../assets/icons/up.svg"
 import { ReactComponent as DownIcon } from "../assets/icons/down.svg"
@@ -45,7 +41,6 @@ const drawHighPeak = (startHour, endHour) => chart => {
 }
 export default function EnergyResoucesSolar(props) {
     const
-        [solarPower, setSolarPower] = useState(0),
         [totalSolarEnergyDestinations, setTotalSolarEnergyDestinations]
             = useState({
                 types: [
@@ -55,9 +50,6 @@ export default function EnergyResoucesSolar(props) {
                 ],
                 kwh: 60
             }),
-        [directUsage, setDirectUsage] = useState(50),
-        [chargeToBattery, setChargeToBattery] = useState(0),
-        [exportToGrid, setExportToGrid] = useState(5),
         [economics, setEconomics] = useState(85),
         [cO2Reduction, setCO2Reduction] = useState(0)
 
@@ -70,7 +62,7 @@ export default function EnergyResoucesSolar(props) {
         economics: {
             title: pageT("economics"),
             subTitle:
-                <label className="bg-gray-600 rounded-3xl font-normal p-2 ml-2">
+                <label className="bg-gray-600 rounded-3xl text-11px px-2 py-1">
                     {pageT("thisCalendarMonth")}
                 </label>,
             value:
@@ -79,12 +71,12 @@ export default function EnergyResoucesSolar(props) {
                         {economics > 0 ? "+" : "-"}
                     ${Math.abs(economics)}
                     </h2>
-                    {economics > 0 ? <UpIcon className="text-success-main" /> : <DownIcon />}
+                    {economics > 0 ? <UpIcon className="text-success-main w-8 h-8 ml-2" /> : <DownIcon className="w-8 h-8 ml-2" />}
                 </div>
         },
         cO2Reduction: {
             title: pageT("cO2Reduction"),
-            value: `${cO2Reduction} ${pageT("tons")}`
+            value: <h2>{`${cO2Reduction} ${pageT("tons")}`}</h2>
         }
     }
     const

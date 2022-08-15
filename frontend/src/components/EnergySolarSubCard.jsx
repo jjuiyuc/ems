@@ -1,11 +1,4 @@
-import { Button } from "@mui/material"
-import { useTranslation } from "react-multi-lang"
-
 export default function EnergySolarSubCard(props) {
-    const
-        t = useTranslation(),
-        commonT = string => t("common." + string),
-        pageT = (string, params) => t("energyResources.solar." + string, params)
 
     const Icon = props.icon
 
@@ -18,9 +11,9 @@ export default function EnergySolarSubCard(props) {
                 </div>
                 {props.data.value}
             </div>
-            <div className="bg-gray-400-opacity-20 grid h-12 w-12
+            <div className="bg-gray-400-opacity-20 grid h-16 w-16
                             place-items-center rounded-full">
-                <Icon className="h-8 text-gray-400 w-8" />
+                <Icon className="h-9 text-gray-400 w-9" />
             </div>
         </div>
     </>

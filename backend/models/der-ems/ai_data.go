@@ -26,6 +26,7 @@ type AiDatum struct {
 	ID          int       `boil:"id" json:"id" toml:"id" yaml:"id"`
 	GWUUID      string    `boil:"gw_uuid" json:"gwUUID" toml:"gwUUID" yaml:"gwUUID"`
 	LogDate     time.Time `boil:"log_date" json:"logDate" toml:"logDate" yaml:"logDate"`
+	GWID        null.Int  `boil:"gw_id" json:"gwID,omitempty" toml:"gwID" yaml:"gwID,omitempty"`
 	CustomerID  null.Int  `boil:"customer_id" json:"customerID,omitempty" toml:"customerID" yaml:"customerID,omitempty"`
 	LocalAiData null.JSON `boil:"local_ai_data" json:"localAiData,omitempty" toml:"localAiData" yaml:"localAiData,omitempty"`
 	CreatedAt   time.Time `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
@@ -39,6 +40,7 @@ var AiDatumColumns = struct {
 	ID          string
 	GWUUID      string
 	LogDate     string
+	GWID        string
 	CustomerID  string
 	LocalAiData string
 	CreatedAt   string
@@ -47,6 +49,7 @@ var AiDatumColumns = struct {
 	ID:          "id",
 	GWUUID:      "gw_uuid",
 	LogDate:     "log_date",
+	GWID:        "gw_id",
 	CustomerID:  "customer_id",
 	LocalAiData: "local_ai_data",
 	CreatedAt:   "created_at",
@@ -57,6 +60,7 @@ var AiDatumTableColumns = struct {
 	ID          string
 	GWUUID      string
 	LogDate     string
+	GWID        string
 	CustomerID  string
 	LocalAiData string
 	CreatedAt   string
@@ -65,6 +69,7 @@ var AiDatumTableColumns = struct {
 	ID:          "ai_data.id",
 	GWUUID:      "ai_data.gw_uuid",
 	LogDate:     "ai_data.log_date",
+	GWID:        "ai_data.gw_id",
 	CustomerID:  "ai_data.customer_id",
 	LocalAiData: "ai_data.local_ai_data",
 	CreatedAt:   "ai_data.created_at",
@@ -216,6 +221,7 @@ var AiDatumWhere = struct {
 	ID          whereHelperint
 	GWUUID      whereHelperstring
 	LogDate     whereHelpertime_Time
+	GWID        whereHelpernull_Int
 	CustomerID  whereHelpernull_Int
 	LocalAiData whereHelpernull_JSON
 	CreatedAt   whereHelpertime_Time
@@ -224,6 +230,7 @@ var AiDatumWhere = struct {
 	ID:          whereHelperint{field: "`ai_data`.`id`"},
 	GWUUID:      whereHelperstring{field: "`ai_data`.`gw_uuid`"},
 	LogDate:     whereHelpertime_Time{field: "`ai_data`.`log_date`"},
+	GWID:        whereHelpernull_Int{field: "`ai_data`.`gw_id`"},
 	CustomerID:  whereHelpernull_Int{field: "`ai_data`.`customer_id`"},
 	LocalAiData: whereHelpernull_JSON{field: "`ai_data`.`local_ai_data`"},
 	CreatedAt:   whereHelpertime_Time{field: "`ai_data`.`created_at`"},
@@ -247,8 +254,8 @@ func (*aiDatumR) NewStruct() *aiDatumR {
 type aiDatumL struct{}
 
 var (
-	aiDatumAllColumns            = []string{"id", "gw_uuid", "log_date", "customer_id", "local_ai_data", "created_at", "updated_at"}
-	aiDatumColumnsWithoutDefault = []string{"gw_uuid", "log_date", "customer_id", "local_ai_data", "updated_at"}
+	aiDatumAllColumns            = []string{"id", "gw_uuid", "log_date", "gw_id", "customer_id", "local_ai_data", "created_at", "updated_at"}
+	aiDatumColumnsWithoutDefault = []string{"gw_uuid", "log_date", "gw_id", "customer_id", "local_ai_data", "updated_at"}
 	aiDatumColumnsWithDefault    = []string{"id", "created_at"}
 	aiDatumPrimaryKeyColumns     = []string{"id"}
 	aiDatumGeneratedColumns      = []string{}

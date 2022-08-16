@@ -107,6 +107,7 @@ func (h localAIConsumerHandler) saveLocalAIData(msg []byte) (err error) {
 
 	gateway, err := h.repo.Gateway.GetGatewayByGatewayUUID(gwUUID)
 	if err == nil {
+		aiData.GWID = null.NewInt(gateway.ID, true)
 		aiData.CustomerID = null.NewInt(gateway.CustomerID, true)
 	} else {
 		log.WithFields(log.Fields{

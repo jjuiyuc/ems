@@ -108,6 +108,7 @@ func (h localCCConsumerHandler) saveLocalCCData(msg []byte) (err error) {
 
 	gateway, err := h.repo.Gateway.GetGatewayByGatewayUUID(gwUUID)
 	if err == nil {
+		ccData.GWID = null.NewInt(gateway.ID, true)
 		ccData.CustomerID = null.NewInt(gateway.CustomerID, true)
 	} else {
 		log.WithFields(log.Fields{

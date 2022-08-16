@@ -33,9 +33,9 @@ export default function EnergyResoucesTabs(props) {
 
             return <Button
                 aria-current={key === props.current}
-                href={"/energy-resources/" + path}
-                key={"ert-" + i}>
-
+                component={NavLink}
+                key={"ert-" + i}
+                to={"/energy-resources/" + path}>
                 <Icon className={`h-5 mr-2 text-${color}-main w-5`} />
                 {t(`common.${key}`)}
             </Button>

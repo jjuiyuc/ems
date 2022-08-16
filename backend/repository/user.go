@@ -32,7 +32,7 @@ func NewUserRepository(db *sql.DB) UserRepository {
 
 // InsertLoginLog godoc
 func (repo defaultUserRepository) InsertLoginLog(loginLog *deremsmodels.LoginLog) error {
-	now := time.Now()
+	now := time.Now().UTC()
 	loginLog.CreatedAt = now
 	loginLog.UpdatedAt = null.NewTime(now, true)
 	return loginLog.Insert(repo.db, boil.Infer())
@@ -40,7 +40,7 @@ func (repo defaultUserRepository) InsertLoginLog(loginLog *deremsmodels.LoginLog
 
 // UpdateUser godoc
 func (repo defaultUserRepository) UpdateUser(user *deremsmodels.User) (err error) {
-	user.UpdatedAt = null.NewTime(time.Now(), true)
+	user.UpdatedAt = null.NewTime(time.Now().UTC(), true)
 	_, err = user.Update(repo.db, boil.Infer())
 	return
 }
@@ -66,5 +66,5 @@ func (repo defaultUserRepository) GetUserByUsername(username string) (*deremsmod
 func (repo defaultUserRepository) GetUserByPasswordToken(token string) (*deremsmodels.User, error) {
 	return deremsmodels.Users(
 		qm.Where("reset_pwd_token = ?", token),
-		qm.Where("pwd_token_expiry > ?", time.Now())).One(repo.db)
+		qm.Where("pwd_token_expiry > ?", time.Now().UTC())).One(repo.db)
 }

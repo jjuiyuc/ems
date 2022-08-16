@@ -53,7 +53,7 @@ func (s defaultUserService) CreatePasswordToken(username string) (name, token st
 
 	token = uuid.New().String()
 	user.ResetPWDToken = null.NewString(token, true)
-	user.PWDTokenExpiry = null.NewTime(time.Now().Add(1*time.Hour), true)
+	user.PWDTokenExpiry = null.NewTime(time.Now().UTC().Add(1*time.Hour), true)
 	err = s.repo.User.UpdateUser(user)
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -87,7 +87,7 @@ func (s defaultUserService) PasswordResetByPasswordToken(token, newPassword stri
 		return
 	}
 	user.Password = string(hashPassword[:])
-	user.PasswordLastChanged = null.NewTime(time.Now(), true)
+	user.PasswordLastChanged = null.NewTime(time.Now().UTC(), true)
 	user.ResetPWDToken = null.NewString("", true)
 	err = s.repo.User.UpdateUser(user)
 	if err != nil {

@@ -9,11 +9,18 @@ import (
 var (
 	// ErrNewUnexpectedJSONInput godoc
 	ErrNewUnexpectedJSONInput = errors.New("unexpected end of JSON input")
+	// ErrNewUnexpectedTimeRange godoc
+	ErrNewUnexpectedTimeRange = errors.New("unexpected start time and end time")
 )
 
 // ErrNewKeyNotExist godoc
 func ErrNewKeyNotExist(key string) error {
 	return fmt.Errorf("Key %s does not exist", key)
+}
+
+// ErrNewKeyUnexpectedValue godoc
+func ErrNewKeyUnexpectedValue(key string) error {
+	return fmt.Errorf("Key %s value is unexpected", key)
 }
 
 // ErrNewUserExpiration godoc

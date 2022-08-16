@@ -10,31 +10,12 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 
+	"der-ems/internal/utils"
 	"der-ems/kafka"
 	deremsmodels "der-ems/models/der-ems"
 	"der-ems/repository"
-	"der-ems/utils"
+	"der-ems/services"
 )
-
-const (
-	// ZHHMM ±hhmm
-	ZHHMM = "Z0700"
-	// YYYY YYYY
-	YYYY = "2006"
-	// YYYYMMDD YYYY-MM-DD
-	YYYYMMDD = "2006-01-02"
-	// HHMMSS24h HH:MM:SS
-	HHMMSS24h = "15:04:05"
-	// HHMM24h HHMM
-	HHMM24h = "1504"
-)
-
-// BillingType godoc
-type BillingType struct {
-	TOULocationID int
-	VoltageType   string
-	TOUType       string
-}
 
 // BillingParams godoc
 type BillingParams struct {
@@ -55,14 +36,15 @@ func NewBillingWorker(
 	ctx context.Context,
 	cfg *viper.Viper,
 	repo *repository.Repository,
+	billing services.BillingService,
 	name string,
 ) {
 	// 1. Send at the beginning
-	sendAIBillingParams(cfg, repo, true)
+	sendAIBillingParams(cfg, repo, billing, true)
 
 	// 2. Send at 04:00 on Saturday in UTC(12:00 on Saturday in UTC+0800)
 	c := cron.New()
-	c.AddFunc(cfg.GetString("cron.billing"), func() { sendAIBillingParams(cfg, repo, false) })
+	c.AddFunc(cfg.GetString("cron.billing"), func() { sendAIBillingParams(cfg, repo, billing, false) })
 	c.Start()
 	log.Info("serving: ", name)
 	<-ctx.Done()
@@ -71,7 +53,7 @@ func NewBillingWorker(
 	log.Info("stopped: ", name)
 }
 
-func sendAIBillingParams(cfg *viper.Viper, repo *repository.Repository, sendNow bool) {
+func sendAIBillingParams(cfg *viper.Viper, repo *repository.Repository, billing services.BillingService, sendNow bool) {
 	utils.PrintFunctionName()
 	gateways, err := getGateways(repo)
 	if err != nil {
@@ -79,7 +61,7 @@ func sendAIBillingParams(cfg *viper.Viper, repo *repository.Repository, sendNow 
 	}
 
 	for _, gateway := range gateways {
-		billingParamsJSON, err := generateBillingParams(repo, gateway, sendNow)
+		billingParamsJSON, err := generateBillingParams(repo, billing, gateway, sendNow)
 		if err != nil {
 			continue
 		}
@@ -98,62 +80,24 @@ func getGateways(repo *repository.Repository) (gateways []*deremsmodels.Gateway,
 	return
 }
 
-func generateBillingParams(repo *repository.Repository, gateway *deremsmodels.Gateway, sendNow bool) (billingParamsJSON []byte, err error) {
-	billingType, err := getBillingTypeByCustomerID(repo, gateway.CustomerID)
+func generateBillingParams(repo *repository.Repository, billing services.BillingService, gateway *deremsmodels.Gateway, sendNow bool) (billingParamsJSON []byte, err error) {
+	billingType, err := billing.GetBillingTypeByCustomerID(gateway.CustomerID)
 	if err != nil {
 		return
 	}
-	localTime, err := getLocalTime(repo, billingType.TOULocationID)
+	localTime, err := billing.GetLocalTime(billingType.TOULocationID, time.Now().UTC())
 	if err != nil {
 		return
 	}
-	billingParamsJSON, err = getWeeklyBillingParamsByType(repo, billingType, localTime, sendNow)
+	billingParamsJSON, err = getWeeklyBillingParamsByType(repo, billing, billingType, localTime, sendNow)
 	return
 }
 
-func getBillingTypeByCustomerID(repo *repository.Repository, customerID int) (billingType BillingType, err error) {
-	customer, err := repo.Customer.GetCustomerByCustomerID(customerID)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"caused-by": "repo.Customer.GetCustomerByCustomerID",
-			"err":       err,
-		}).Error()
-		return
-	}
-	billingType = BillingType{
-		TOULocationID: customer.TOULocationID.Int,
-		VoltageType:   customer.VoltageType.String,
-		TOUType:       customer.TOUType.String,
-	}
-	return
-}
-
-func getLocalTime(repo *repository.Repository, touLocationID int) (localTime time.Time, err error) {
-	touLocation, err := repo.TOU.GetTOULocationByTOULocationID(touLocationID)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"caused-by": "repo.TOU.GetTOULocationByTOULocationID",
-			"err":       err,
-		}).Error()
-		return
-	}
-	localLocation, err := time.LoadLocation(touLocation.Location.String)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"caused-by": "time.LoadLocation",
-			"err":       err,
-		}).Error()
-		return
-	}
-	localTime = time.Now().In(localLocation)
-	return
-}
-
-func getWeeklyBillingParamsByType(repo *repository.Repository, billingType BillingType, localTime time.Time, sendNow bool) (billingParamsJSON []byte, err error) {
+func getWeeklyBillingParamsByType(repo *repository.Repository, billing services.BillingService, billingType services.BillingType, localTime time.Time, sendNow bool) (billingParamsJSON []byte, err error) {
 	var billingParams BillingParams
 	// 1. Get timezone
-	log.Debug("timezone: ", localTime.Format(ZHHMM))
-	billingParams.Timezone = localTime.Format(ZHHMM)
+	log.Debug("timezone: ", localTime.Format(utils.ZHHMM))
+	billingParams.Timezone = localTime.Format(utils.ZHHMM)
 	// 2. Get Sunday of billing week
 	timeOnSunday := getSundayOfBillingWeek(localTime, sendNow)
 	log.Debug("timeOnSunday: ", timeOnSunday)
@@ -162,13 +106,13 @@ func getWeeklyBillingParamsByType(repo *repository.Repository, billingType Billi
 		timeOfEachDay := timeOnSunday.AddDate(0, 0, i)
 		log.Debug("timeOfEachDay: ", timeOfEachDay)
 		// 3-1. Get period type
-		periodType := getPeriodTypeOfDay(repo, billingType.TOULocationID, timeOfEachDay)
+		periodType := billing.GetPeriodTypeOfDay(billingType.TOULocationID, timeOfEachDay)
 		log.Debug("periodType: ", periodType)
 		// 3-2. The day is summmer or not
-		isSummer := isSummer(timeOfEachDay)
+		isSummer := billing.IsSummer(timeOfEachDay)
 		log.Debug("isSummer: ", isSummer)
 		// 3-3. Get billings
-		billings, err := repo.TOU.GetBillingsByTOUInfo(billingType.TOULocationID, billingType.VoltageType, billingType.TOUType, periodType, isSummer, timeOfEachDay.Format(YYYYMMDD))
+		billings, err := repo.TOU.GetBillingsByTOUInfo(billingType.TOULocationID, billingType.VoltageType, billingType.TOUType, periodType, isSummer, timeOfEachDay.Format(utils.YYYYMMDD))
 		if err != nil {
 			log.WithFields(log.Fields{
 				"caused-by": "repo.TOU.GetBillingsByTOUInfo",
@@ -177,26 +121,10 @@ func getWeeklyBillingParamsByType(repo *repository.Repository, billingType Billi
 			break
 		}
 		for _, billing := range billings {
-			log.WithFields(log.Fields{
-				"peak type":    billing.PeakType,
-				"period stime": billing.PeriodStime,
-				"period etime": billing.PeriodEtime,
-				"basic rate":   billing.BasicRate.Float32,
-				"flow rate":    billing.FlowRate.Float32,
-				"enable at":    billing.EnableAt,
-				"disable at":   billing.DisableAt,
-			}).Debug()
-
-			interval, err := getBillingInterval(billing.PeriodStime.String, billing.PeriodEtime.String)
+			rate, err := billingToRate(billing, timeOfEachDay)
 			if err != nil {
 				break
 			}
-
-			var rate RateInfo
-			rate.Date = timeOfEachDay.Format(YYYYMMDD)
-			rate.Interval = interval
-			rate.DemandChargeRate = billing.BasicRate.Float32
-			rate.TOURate = billing.FlowRate.Float32
 			billingParams.Rates = append(billingParams.Rates, rate)
 		}
 	}
@@ -229,33 +157,31 @@ func getSundayOfBillingWeek(t time.Time, sendNow bool) (timeOnSunday time.Time) 
 	return
 }
 
-func getPeriodTypeOfDay(repo *repository.Repository, touLocationID int, t time.Time) (periodType string) {
-	// The day is holiday or not
-	count, _ := repo.TOU.CountHolidayByDay(touLocationID, t.Format(YYYY), t.Format(YYYYMMDD))
+func billingToRate(billing *deremsmodels.Tou, timeOfEachDay time.Time) (rate RateInfo, err error) {
+	log.WithFields(log.Fields{
+		"peak type":    billing.PeakType,
+		"period stime": billing.PeriodStime,
+		"period etime": billing.PeriodEtime,
+		"basic rate":   billing.BasicRate.Float32,
+		"flow rate":    billing.FlowRate.Float32,
+		"enable at":    billing.EnableAt,
+		"disable at":   billing.DisableAt,
+	}).Debug()
 
-	switch {
-	case count > 0 || t.Weekday() == time.Sunday:
-		periodType = "Sunday & Holiday"
-	case t.Weekday() == time.Saturday:
-		periodType = "Saturday"
-	default:
-		periodType = "Weekdays"
+	interval, err := getBillingInterval(billing.PeriodStime.String, billing.PeriodEtime.String)
+	if err != nil {
+		return
 	}
+
+	rate.Date = timeOfEachDay.Format(utils.YYYYMMDD)
+	rate.Interval = interval
+	rate.DemandChargeRate = billing.BasicRate.Float32
+	rate.TOURate = billing.FlowRate.Float32
 	return
 }
 
-func isSummer(t time.Time) bool {
-	// XXX: Hardcode TPC summer is 06/30~09/30
-	switch t.Month() {
-	case time.June, time.July, time.August, time.September:
-		return true
-	}
-	return false
-
-}
-
 func getBillingInterval(periodStime, periodEtime string) (interval string, err error) {
-	startTime, err := time.Parse(HHMMSS24h, periodStime)
+	startTime, err := time.Parse(utils.HHMMSS24h, periodStime)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "time.Parse",
@@ -263,8 +189,8 @@ func getBillingInterval(periodStime, periodEtime string) (interval string, err e
 		}).Error()
 		return
 	}
-	startTimeString := startTime.Format(HHMM24h)
-	endTime, err := time.Parse(HHMMSS24h, periodEtime)
+	startTimeString := startTime.Format(utils.HHMM24h)
+	endTime, err := time.Parse(utils.HHMMSS24h, periodEtime)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "time.Parse",
@@ -272,7 +198,7 @@ func getBillingInterval(periodStime, periodEtime string) (interval string, err e
 		}).Error()
 		return
 	}
-	endTimeString := endTime.Format(HHMM24h)
+	endTimeString := endTime.Format(utils.HHMM24h)
 	if endTimeString == "0000" {
 		endTimeString = "2400"
 	}

@@ -8,6 +8,7 @@ import (
 	"der-ems/infra"
 	"der-ems/models"
 	"der-ems/repository"
+	"der-ems/services"
 )
 
 func main() {
@@ -20,7 +21,9 @@ func main() {
 	models.Init(cfg)
 	db := models.GetDB()
 	defer models.Close()
-	repo := repository.NewRepository(db)
 
-	apps.NewBillingWorker(infra.GetGracefulShutdownCtx(), cfg, repo, name)
+	repo := repository.NewRepository(db)
+	billing := services.NewBillingService(repo)
+
+	apps.NewBillingWorker(infra.GetGracefulShutdownCtx(), cfg, repo, billing, name)
 }

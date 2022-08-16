@@ -29,7 +29,8 @@ module.exports = {
                 "1fr-1px-1fr": "1fr 1px 1fr",
                 "3-auto": "auto auto auto",
                 "5rem-1fr": "5rem 1fr",
-                "15rem-1fr": "15rem 1fr"
+                "15rem-1fr": "15rem 1fr",
+                "1fr-auto-1fr": "1fr auto 1fr",
             },
             gridTemplateRows: {
                 "1fr-auto": "1fr auto",
@@ -52,6 +53,7 @@ module.exports = {
                 "2/3": "66.6%"
             },
             minWidth: {
+                "16": "4rem",
                 "20": "5rem",
                 "42": "10.5rem"
             },

@@ -54,6 +54,7 @@
     "success": {"main": "#0FD76B"},
     "yellow": {
         "main": "#FBE947",
+        "main-opacity-10":"#FBE94710",
         "main-opacity-20":"#FBE94720"
     },
     "positive": {"main": "#0FD76B"},

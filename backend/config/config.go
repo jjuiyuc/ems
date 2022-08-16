@@ -9,8 +9,15 @@ import (
 )
 
 var (
-	config *viper.Viper
+	config    *viper.Viper
+	gitBranch string
+	gitCommit string
 )
+
+// Notes: https://github.com/sirupsen/logrus/issues/444
+type defaultLogger struct {
+	formatter log.Formatter
+}
 
 // OutputSplitter godoc
 type OutputSplitter struct{}
@@ -32,12 +39,19 @@ func Init(dir, env string) {
 	if level, err := log.ParseLevel(config.GetString("log.level")); err == nil {
 		log.SetLevel(level)
 	}
+	log.SetFormatter(defaultLogger{formatter: log.StandardLogger().Formatter})
 	log.SetOutput(&OutputSplitter{})
 }
 
 // GetConfig return config instance
 func GetConfig() *viper.Viper {
 	return config
+}
+
+func (l defaultLogger) Format(entry *log.Entry) ([]byte, error) {
+	entry.Data["branch"] = gitBranch
+	entry.Data["commit"] = gitCommit
+	return l.formatter.Format(entry)
 }
 
 func (splitter *OutputSplitter) Write(p []byte) (n int, err error) {

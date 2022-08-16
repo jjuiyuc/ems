@@ -1,15 +1,15 @@
-import {createTheme} from "@mui/material/styles"
+import { createTheme } from "@mui/material/styles"
 import palette from "./palette"
 
 const theme = createTheme({
     components: {
         MuiButton: {
             styleOverrides: {
-                root: ({ownerState, theme}) => {
+                root: ({ ownerState, theme }) => {
                     let styles = {
                         color: ownerState.color === "primary"
-                                ? "white"
-                                : theme.palette[ownerState.color].main,
+                            ? "white"
+                            : theme.palette[ownerState.color].main,
                         fontSize: "1rem",
                         fontWeight: 400,
                         textTransform: "none",
@@ -38,7 +38,7 @@ const theme = createTheme({
             },
             variants: [
                 {
-                    props: {disabled: true},
+                    props: { disabled: true },
                     style: props => ({
                         background: `${props.theme.palette[props.ownerState.color].main} !important`,
                         color: "white !important",
@@ -46,23 +46,24 @@ const theme = createTheme({
                     })
                 },
                 {
-                    props: {filter: "selected"},
+                    props: { filter: "selected" },
                     style: props => ({
                         fontWeight: "bold",
-                        background: theme.palette.primary.main,
-                        color: props.theme.palette.gray[900],
+                        background: theme.palette[ownerState.color].main,
+                        color: theme.palette.gray[900],
                         cursor: "default",
                         "&:hover": {
-                            background: theme.palette.primary.main
+                            background: theme.palette[ownerState.color].main
                         }
                     }),
                 },
+
                 {
-                    props: {radius: "pill"},
-                    style: {borderRadius: "100vh"},
+                    props: { radius: "pill" },
+                    style: { borderRadius: "100vh" },
                 },
                 {
-                    props: {size: "x-large"},
+                    props: { size: "x-large" },
                     style: {
                         borderRadius: "20px",
                         fontSize: "1rem",
@@ -70,7 +71,7 @@ const theme = createTheme({
                     }
                 },
                 {
-                    props: {size: "small", variant: "text"},
+                    props: { size: "small", variant: "text" },
                     style: {
                         fontWeight: "bold",
                         lineHeight: "1.17",
@@ -81,12 +82,12 @@ const theme = createTheme({
         },
         MuiButtonGroup: {
             styleOverrides: {
-                root: ({ownerState, theme}) => {
+                root: ({ ownerState, theme }) => {
                     if (!ownerState.variant.includes("ubiik")) return null
 
                     let styles = {
                         boxShadow: "none",
-                        "button": {
+                        "button,a": {
                             background: theme.palette.gray[900],
                             border: "none !important",
                             borderRadius: "1.25em",
@@ -116,9 +117,9 @@ const theme = createTheme({
         MuiFormHelperText: {
             styleOverrides: {
                 root: {
-                   fontSize: ".8125rem",
-                   lineHeight: "1.5374",
-                   marginTop: ".5rem"
+                    fontSize: ".8125rem",
+                    lineHeight: "1.5374",
+                    marginTop: ".5rem"
                 }
             }
         },
@@ -127,9 +128,9 @@ const theme = createTheme({
                 root: {
                     borderRadius: "16px !important",
                     color: "white",
-                    "fieldset": {transition: "border-color .3s"}
+                    "fieldset": { transition: "border-color .3s" }
                 },
-                input: ({theme}) => ({
+                input: ({ theme }) => ({
                     "&:-webkit-autofill": {
                         boxShadow: `0 0 0 100.09px ${theme.palette.gray[600]} inset !important`
                     }
@@ -138,7 +139,7 @@ const theme = createTheme({
         },
         MuiInputLabel: {
             styleOverrides: {
-                root: ({theme}) => ({
+                root: ({ theme }) => ({
                     color: theme.palette.gray[300]
                 })
             }
@@ -159,7 +160,7 @@ const theme = createTheme({
             },
             variants: [
                 {
-                    props: {font: "mono"},
+                    props: { font: "mono" },
                     style: {
                         "input": {
                             fontFamily: `Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace`
@@ -167,7 +168,7 @@ const theme = createTheme({
                     }
                 },
                 {
-                    props: {variant: "outlined"},
+                    props: { variant: "outlined" },
                     style: props => ({
                         "& fieldset": {
                             borderColor: props.theme.palette.gray[400]
@@ -179,9 +180,9 @@ const theme = createTheme({
     },
     palette: {
         ...palette,
-        background: {default: "#1C1C1E"},
+        background: { default: "#1C1C1E" },
         mode: "dark",
-        text: {"primary": "#E0E0E0"}
+        text: { "primary": "#E0E0E0" }
     },
     typography: {
         "fontFamily": `"Roboto", "Noto Sans TC", "Helvetica", "Arial", sans-serif`

@@ -28,7 +28,7 @@ func (w *APIWorker) dashboardHandler(c *gin.Context) {
 	pool := newPool()
 	go pool.start()
 
-	conn, err := w.upgrade(c)
+	conn, err := w.upgrade(c.Writer, c.Request)
 	if err != nil {
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
@@ -42,18 +42,18 @@ func (w *APIWorker) dashboardHandler(c *gin.Context) {
 	}
 
 	pool.Register <- client
-	client.run(w, c)
+	client.run(w)
 }
 
-func (w *APIWorker) upgrade(c *gin.Context) (*websocket.Conn, error) {
+func (w *APIWorker) upgrade(writer http.ResponseWriter, request *http.Request) (*websocket.Conn, error) {
 	upgrader := websocket.Upgrader{
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
 		CheckOrigin:     func(r *http.Request) bool { return true },
-		Subprotocols:    []string{c.Request.Header.Get("Sec-WebSocket-Protocol")},
+		Subprotocols:    []string{request.Header.Get("Sec-WebSocket-Protocol")},
 	}
 
-	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
+	conn, err := upgrader.Upgrade(writer, request, nil)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "upGrader.Upgrade",

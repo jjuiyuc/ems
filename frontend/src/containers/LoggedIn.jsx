@@ -13,8 +13,11 @@ import Dashboard from "../pages/Dashboard"
 import DemandCharge from "../pages/DemandCharge"
 import EnergyResoucesBattery from "../pages/EnergyResoucesBattery"
 import EnergyResourcesGrid from "../pages/EnergyResourcesGrid"
+import EnergyResoucesSolar from "../pages/EnergyResoucesSolar"
 import Analysis from "../pages/Analysis"
 import TimeOfUse from "../pages/TimeOfUse"
+import Economics from "../pages/Economics"
+
 
 function LoggedIn(props) {
     const
@@ -42,21 +45,24 @@ function LoggedIn(props) {
                         <Route element={<Dashboard />} path="/dashboard" />
                         <Route element={<Analysis />} path="/analysis" />
                         <Route element={<TimeOfUse />} path="/time-of-use" />
-                        <Route element={<Sample />} path="/economics" />
+                        <Route element={<Economics />} path="/economics" />
                         <Route
                             element={<DemandCharge />}
                             path="/demand-charge" />
+                        <Route element={<Sample />} path="/settings" />
                         <Route
                             element={<EnergyResoucesBattery />}
                             path="/energy-resources/battery" />
                         <Route
                             element={<EnergyResourcesGrid />}
                             path="/energy-resources/grid" />
-                        <Route element={<Sample />} path="/settings" />
+                        <Route
+                            element={<EnergyResoucesSolar />}
+                            path="/energy-resources/solar" />
                         <Route
                             element={<Navigate
                                 replace
-                                to="/energy-resources/battery" />}
+                                to="/energy-resources/solar" />}
                             path="/energy-resources" />
                         <Route
                             element={<Navigate to="/dashboard" replace />}

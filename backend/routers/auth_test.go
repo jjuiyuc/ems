@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -12,6 +11,7 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	"der-ems/config"
+	"der-ems/internal/app"
 	"der-ems/internal/e"
 	"der-ems/models"
 	"der-ems/repository"
@@ -62,85 +62,81 @@ func (s *AuthorizationSuite) Test_GetAuth() {
 		Password string `json:"password"`
 	}
 
-	type response struct {
-		Code int         `json:"code"`
-		Msg  string      `json:"msg"`
-		Data interface{} `json:"data"`
+	type authTestInfo struct {
+		testutils.TestInfo
+		args
 	}
 
-	tests := []struct {
-		name       string
-		args       args
-		wantStatus int
-		wantRv     response
-	}{
+	seedUtURL := "/api/auth"
+	tests := []authTestInfo{
 		{
-			name: "login",
-			args: args{
+			testutils.TestInfo{
+				Name:       "login",
+				URL:        seedUtURL,
+				WantStatus: http.StatusOK,
+				WantRv: app.Response{
+					Code: e.Success,
+					Msg:  "ok",
+				},
+			},
+			args{
 				Username: fixtures.UtUser.Username,
 				Password: fixtures.UtUser.Password,
 			},
-			wantStatus: http.StatusOK,
-			wantRv: response{
-				Code: e.Success,
-				Msg:  "ok",
-			},
 		},
 		{
-			name: "loginInvalidParams",
-			args: args{
+			testutils.TestInfo{
+				Name:       "loginInvalidParams",
+				URL:        seedUtURL,
+				WantStatus: http.StatusBadRequest,
+				WantRv: app.Response{
+					Code: e.InvalidParams,
+					Msg:  "invalid parameters",
+				},
+			},
+			args{
 				Username: fixtures.UtUser.Username,
 			},
-			wantStatus: http.StatusBadRequest,
-			wantRv: response{
-				Code: e.InvalidParams,
-				Msg:  "invalid parameters",
-			},
 		},
 		{
-			name: "loginUserNotExist",
-			args: args{
+			testutils.TestInfo{
+				Name:       "loginUserNotExist",
+				URL:        seedUtURL,
+				WantStatus: http.StatusUnauthorized,
+				WantRv: app.Response{
+					Code: e.ErrAuthUserNotExist,
+					Msg:  "fail",
+				},
+			},
+			args{
 				Username: "xxx",
 				Password: fixtures.UtUser.Password,
 			},
-			wantStatus: http.StatusUnauthorized,
-			wantRv: response{
-				Code: e.ErrAuthUserNotExist,
-				Msg:  "fail",
-			},
 		},
 		{
-			name: "loginPasswordNotMatch",
-			args: args{
+			testutils.TestInfo{
+				Name:       "loginPasswordNotMatch",
+				URL:        seedUtURL,
+				WantStatus: http.StatusUnauthorized,
+				WantRv: app.Response{
+					Code: e.ErrAuthPasswordNotMatch,
+					Msg:  "fail",
+				},
+			},
+			args{
 				Username: fixtures.UtUser.Username,
 				Password: "xxx",
-			},
-			wantStatus: http.StatusUnauthorized,
-			wantRv: response{
-				Code: e.ErrAuthPasswordNotMatch,
-				Msg:  "fail",
 			},
 		},
 	}
 
 	for _, tt := range tests {
-		log.Info("test name: ", tt.name)
+		log.Info("test name: ", tt.Name)
 		payloadBuf, err := json.Marshal(tt.args)
 		s.Require().NoError(err)
-		req, err := http.NewRequest("POST", "/api/auth", bytes.NewBuffer(payloadBuf))
-		s.Require().NoError(err)
-		rv := httptest.NewRecorder()
-		s.router.ServeHTTP(rv, req)
-		s.Equal(tt.wantStatus, rv.Code)
-
-		var res response
-		err = json.Unmarshal([]byte(rv.Body.String()), &res)
-		s.Require().NoError(err)
-		s.Equal(tt.wantRv.Code, res.Code)
-		s.Equal(tt.wantRv.Msg, res.Msg)
-
-		if tt.name == "login" {
-			dataMap := res.Data.(map[string]interface{})
+		rvData := testutils.AssertRequest(tt.TestInfo, s.Require(), s.router, "POST", bytes.NewBuffer(payloadBuf))
+		if tt.Name == "login" {
+			dataMap := rvData.(map[string]interface{})
 			s.NotEmpty(dataMap["token"])
 			count, err := s.repo.User.GetLoginLogCount()
 			s.Require().NoError(err)

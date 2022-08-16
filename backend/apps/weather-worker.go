@@ -13,10 +13,10 @@ import (
 	"github.com/volatiletech/null/v8"
 
 	"der-ems/internal/e"
+	"der-ems/internal/utils"
 	"der-ems/kafka"
 	deremsmodels "der-ems/models/der-ems"
 	"der-ems/repository"
-	"der-ems/utils"
 )
 
 // WeatherWorker godoc

@@ -23,11 +23,11 @@ Chart.register(
     Tooltip
 )
 
-import {checkbox, checkboxChecked, tooltipLabelPoint} from "../utils/chart"
+import { checkbox, checkboxChecked, tooltipLabelPoint } from "../utils/chart"
 import variables from "../configs/variables"
 
 const
-    {colors} = variables,
+    { colors } = variables,
     datasetCommonOpts = {
         borderWidth: 1,
         hoverRadius: 3,
@@ -67,15 +67,15 @@ export default function BarChart(props) {
                             font: {
                                 size: 16
                             },
-                            generateLabels: function(chart) {
+                            generateLabels: function (chart) {
                                 const labels = Chart.defaults.plugins.legend
-                                                .labels.generateLabels(chart)
+                                    .labels.generateLabels(chart)
 
                                 for (var key in labels) {
                                     const
                                         label = labels[key],
                                         color = label.fillStyle
-                                                .replace("#", "%23")
+                                            .replace("#", "%23")
 
                                     label.pointStyle = label.hidden
                                         ? checkbox
@@ -98,7 +98,7 @@ export default function BarChart(props) {
                             label: props.data.tooltipLabel,
                             labelPointStyle: context => {
                                 const color = context.dataset.backgroundColor
-                                                .replace("#", "%23")
+                                    .replace("#", "%23")
 
                                 return { pointStyle: tooltipLabelPoint(color) }
                             }

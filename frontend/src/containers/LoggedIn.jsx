@@ -15,6 +15,8 @@ import EnergyResoucesBattery from "../pages/EnergyResoucesBattery"
 import EnergyResoucesSolar from "../pages/EnergyResoucesSolar"
 import Analysis from "../pages/Analysis"
 import TimeOfUse from "../pages/TimeOfUse"
+import Economics from "../pages/Economics"
+
 
 function LoggedIn(props) {
     const
@@ -42,7 +44,7 @@ function LoggedIn(props) {
                         <Route element={<Dashboard />} path="/dashboard" />
                         <Route element={<Analysis />} path="/analysis" />
                         <Route element={<TimeOfUse />} path="/time-of-use" />
-                        <Route element={<Sample />} path="/economics" />
+                        <Route element={<Economics />} path="/economics" />
                         <Route
                             element={<DemandCharge />}
                             path="/demand-charge" />

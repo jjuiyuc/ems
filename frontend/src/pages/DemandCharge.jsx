@@ -31,7 +31,6 @@ export default function DemandCharge(props) {
         currentHour = moment().hour(),
         lineChartDataArray = hours24.filter(v => v <= currentHour).map(() =>
             Math.floor(Math.random() * (60 - 40 + 1) + 40))
-
     const
         [peak, setPeak] = useState({ active: 0, current: 0, threshhold: 0 }),
         [lineChartData, setLineChartData] = useState({

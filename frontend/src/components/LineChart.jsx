@@ -25,7 +25,7 @@ import {tooltipLabelPoint} from "../utils/chart"
 import variables from "../configs/variables"
 
 const
-    {colors} = variables,
+    { colors } = variables,
     datasetCommonOpts = {
         borderWidth: 1,
         hoverRadius: 3,
@@ -64,7 +64,7 @@ export default function LineChart(props) {
                             label: props.data.tooltipLabel,
                             labelPointStyle: context => {
                                 const color = context.dataset.backgroundColor
-                                                .replace("#", "%23")
+                                            .replace("#", "%23")
 
                                 return { pointStyle: tooltipLabelPoint(color) }
                             }

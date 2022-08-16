@@ -1,6 +1,5 @@
-import { connect } from "react-redux"
-import { Link, NavLink } from "react-router-dom"
-import { Button, ButtonGroup, Fade, Tooltip } from "@mui/material"
+import { Button, ButtonGroup } from "@mui/material"
+import { NavLink } from "react-router-dom"
 import { useTranslation } from "react-multi-lang"
 
 import { ReactComponent as BatteryIcon } from "../assets/icons/battery.svg"
@@ -8,14 +7,6 @@ import { ReactComponent as GridIcon } from "../assets/icons/grid.svg"
 import { ReactComponent as SolarIcon } from "../assets/icons/sunny.svg"
 
 export default function EnergyResoucesTabs(props) {
-    const toggle = () =>
-        props.updateEnergyResoucesTabsStatus(isExpanded ? "collapse" : "expand")
-
-    const
-        { status } = props,
-        isExpanded = status === "expand",
-        transitionClasses = "duration-300 transition "
-            + (isExpanded ? "opacity-100" : "opacity-0")
     const
         tabs = {
             solar: { icon: SolarIcon, path: "solar", color: "yellow" },
@@ -23,9 +14,7 @@ export default function EnergyResoucesTabs(props) {
             grid: { icon: GridIcon, path: "#", color: "indigo" },
         }
 
-    const t = useTranslation(),
-        commonT = string => t("common." + string)
-
+    const t = useTranslation()
 
     return <ButtonGroup amount="3" className="mb-8" variant="contained ubiik">
         {Object.keys(tabs).map((key, i) => {

@@ -45,7 +45,7 @@ export default function EnergySolarCard(props) {
                     {pageT(t.type)}
                 </div>)}
         </div>
-        <div className="grid-cols-3 three-columns gap-x-5 sm:gap-x-10 lg:grid">
+        <div className="grid-cols-3 three-columns gap-x-5 sm:gap-x-10 md:grid">
             {types.map((t, i) => {
                 const Icon = icons[t.type]
                 return <div key={"detail-" + i} className="flex justify-between items-end">
@@ -62,9 +62,7 @@ export default function EnergySolarCard(props) {
                         <Icon className="h-8 text-gray-400 w-8" />
                     </div>
                 </div>
-            }
-
-            )}
+            })}
         </div>
     </div>
 }

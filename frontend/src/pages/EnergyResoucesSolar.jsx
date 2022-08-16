@@ -58,27 +58,15 @@ export default function EnergyResoucesSolar(props) {
         commonT = string => t("common." + string),
         pageT = string => t("energyResources.solar." + string)
 
-    const cardsData = {
-        economics: {
-            title: pageT("economics"),
-            subTitle:
-                <label className="bg-gray-600 rounded-3xl text-11px px-2 py-1">
-                    {pageT("thisCalendarMonth")}
-                </label>,
-            value:
-                <div className="flex">
-                    <h2 className={`${economics > 0 ? "text-success-main" : ""}`}>
-                        {economics > 0 ? "+" : "-"}
-                    ${Math.abs(economics)}
-                    </h2>
-                    {economics > 0 ? <UpIcon className="text-success-main w-8 h-8 ml-2" /> : <DownIcon className="w-8 h-8 ml-2" />}
-                </div>
-        },
-        cO2Reduction: {
-            title: pageT("cO2Reduction"),
-            value: <h2>{`${cO2Reduction} ${pageT("tons")}`}</h2>
-        }
-    }
+    const
+        isEcoPositive = economics > 0,
+        EcoIcon = isEcoPositive ? UpIcon : DownIcon,
+        ecoValue =
+            <span className={isEcoPositive ? "text-success-main" : ""}>
+                {isEcoPositive ? "+" : "-"} ${Math.abs(economics)}
+                <EcoIcon className="h-8 inline-block ml-2 w-8" />
+            </span>
+
     const
         hours24 = Array.from(new Array(24).keys()),
         lineChartDateLabels = hours24.map(n =>
@@ -112,18 +100,18 @@ export default function EnergyResoucesSolar(props) {
         <h1 className="mb-9">{t("navigator.energyResources")}</h1>
         <EnergyResoucesTabs current="solar" />
         <EnergySolarCard
-            className="lg:grid"
             data={totalSolarEnergyDestinations}
             title={pageT("totalSolarEnergyDestinations")} />
-        <div className="font-bold gap-5 grid lg:grid-cols-2 mt-4">
+        <div className="font-bold gap-5 grid md:grid-cols-2 mt-4">
             <EnergySolarSubCard
-                data={cardsData.economics}
                 icon={EconomicsIcon}
-                title={pageT("economics")} />
+                subTitle={pageT("thisCalendarMonth")}
+                title={pageT("economics")}
+                value={ecoValue} />
             <EnergySolarSubCard
-                data={cardsData.cO2Reduction}
                 icon={Co2Icon}
-                title={pageT("cO2Reduction")} />
+                title={pageT("cO2Reduction")}
+                value={cO2Reduction + " " + pageT("tons")} />
         </div>
         <div className="card chart mt-8">
             <h4 className="mb-10">{pageT("realTimeSolarGeneration")}</h4>

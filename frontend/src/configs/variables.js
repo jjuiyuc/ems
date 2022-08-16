@@ -1,12 +1,13 @@
 import palette from "./palette.json"
 
-const {blue, gray, primary} = palette
+const { blue, gray, primary, indigo } = palette
 
 const variables = {
     colors: {
         battery: blue.main,
         blue,
         gray,
+        indigo,
         grid: palette.indigo.main,
         midPeak: palette.green.main,
         primary,

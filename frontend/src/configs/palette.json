@@ -29,6 +29,7 @@
     },
     "indigo": {
         "main": "#7357FF",
+        "main-opacity-10":"#7357FF10",
         "main-opacity-20":"#7357FF20"
     },
     "error": {"main": "#FF4E3E"},

@@ -11,7 +11,7 @@ export default function EnergyResoucesTabs(props) {
         tabs = {
             solar: { icon: SolarIcon, path: "solar", color: "yellow" },
             battery: { icon: BatteryIcon, path: "battery", color: "blue", },
-            grid: { icon: GridIcon, path: "#", color: "indigo" },
+            grid: { icon: GridIcon, path: "grid", color: "indigo" },
         }
 
     const t = useTranslation()

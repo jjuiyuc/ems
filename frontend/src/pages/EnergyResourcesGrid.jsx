@@ -82,16 +82,16 @@ export default function EnergyResourcesGrid(props) {
     return <>
         <h1 className="mb-9">{t("navigator.energyResources")}</h1>
         <EnergyResoucesTabs current="grid" />
-        <div className="lg:grid grid-cols-auto-1fr gap-x-5">
+        <div className="lg:grid grid-cols-auto-19rem gap-x-5">
             <EnergyGridCard
                 data={todayGrid}
                 title={commonT("today")} />
-            <div className="card">
+            <div className="card mt-8 lg:m-0">
                 <div className="mb-8">
                     <h5 className="font-bold">{pageT("thisMonth")}</h5>
                 </div>
                 <div className="flex justify-between items-end">
-                    <div>
+                    <div className="mb-4 lg:0">
                         <h6 className="font-bold text-white mb-2">{pageT("netExport")}</h6>
                         <h3 className="my-2.5">{t.kwh} {commonT("kwh")}</h3>
                     </div>
@@ -103,7 +103,7 @@ export default function EnergyResourcesGrid(props) {
                 </div>
             </div>
         </div>
-        <div className="lg:grid grid-cols-auto">
+        <div className="lg:grid grid-cols-auto pr-3">
             <div className="card chart mt-8">
                 <h4 className="mb-10">{pageT("girdPowerImport")}</h4>
                 <div className="max-h-80vh h-160 w-full">

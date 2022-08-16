@@ -25,8 +25,9 @@ export default function EnergyGridCard(props) {
         <div className="lg:grid grid-cols-3 three-columns gap-x-5">
             {types.map((t, i) => {
                 const Icon = icons[t.type]
-                return <div key={"detail-" + i} className="flex justify-between items-end">
-                    <div>
+                return <div key={"detail-" + i} className="flex justify-between
+                        items-end">
+                    <div className="mb-4 lg:m-0">
                         <h6 className="font-bold text-white mb-2">{pageT(t.type)}</h6>
                         <h3 className="my-2.5">{t.kwh} {commonT("kwh")}</h3>
                     </div>

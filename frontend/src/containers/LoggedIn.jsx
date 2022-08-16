@@ -49,13 +49,12 @@ function LoggedIn(props) {
                         <Route
                             element={<DemandCharge />}
                             path="/demand-charge" />
-                        <Route element={<Sample />} path="/settings" />
-                        <Route
-                            element={<EnergyResoucesBattery />}
-                            path="/energy-resources/battery" />
                         <Route
                             element={<EnergyResourcesGrid />}
                             path="/energy-resources/grid" />
+                        <Route
+                            element={<EnergyResoucesBattery />}
+                            path="/energy-resources/battery" />
                         <Route
                             element={<EnergyResoucesSolar />}
                             path="/energy-resources/solar" />
@@ -67,6 +66,7 @@ function LoggedIn(props) {
                         <Route
                             element={<Navigate to="/dashboard" replace />}
                             path="*" />
+                        <Route element={<Sample />} path="/settings" />
                     </Routes>
                 </div>
             </div>

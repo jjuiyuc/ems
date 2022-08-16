@@ -47,7 +47,7 @@ const theme = createTheme({
                 },
                 {
                     props: { filter: "selected" },
-                    style: props => ({
+                    style: ({ ownerState, theme }) => ({
                         fontWeight: "bold",
                         background: theme.palette[ownerState.color].main,
                         color: theme.palette.gray[900],
@@ -57,7 +57,6 @@ const theme = createTheme({
                         }
                     }),
                 },
-
                 {
                     props: { radius: "pill" },
                     style: { borderRadius: "100vh" },

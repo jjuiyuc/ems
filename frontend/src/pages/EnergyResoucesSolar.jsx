@@ -86,7 +86,7 @@ export default function EnergyResoucesSolar(props) {
                 above: colors.yellow["main-opacity-10"],
                 target: "origin"
             },
-            pointBorderColor: colors.primary["main-opacity-20"]
+            pointBorderColor: colors.yellow["main-opacity-20"]
         }],
         labels: lineChartDateLabels,
         tickCallback: (val, index) => val + commonT("kw"),

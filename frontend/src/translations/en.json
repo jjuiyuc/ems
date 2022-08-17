@@ -76,6 +76,19 @@
             "stateOfCharge": "State of Charge (SOC)",
             "stateOfChargeVoltage": "State of Charge and Voltage",
             "voltage": "Voltage"
+        },
+        "solar":{
+            "totalSolarEnergyDestinations":"Total Solar Energy Destinations",
+            "directUsage":"Direct Usage",
+            "chargeToBattery":"Charge to Battery",
+            "exportToGrid": "Export to Grid",
+            "economics":"Economics",
+            "cO2Reduction":"CO2 Reduction",
+            "tons":"tons",
+            "solarGeneration":"solarGeneration",
+            "onPeak": "On Peak",
+            "realTimeSolarGeneration":"Real-time Solar Generation (kW)",
+            "thisCalendarMonth":"This Calendar Month"
         }
     },
     "error": {

@@ -87,7 +87,7 @@ const theme = createTheme({
 
                     let styles = {
                         boxShadow: "none",
-                        "button": {
+                        "button,a": {
                             background: theme.palette.gray[900],
                             border: "none !important",
                             borderRadius: "1.25em",

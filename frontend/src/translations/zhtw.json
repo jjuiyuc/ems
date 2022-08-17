@@ -76,6 +76,19 @@
             "stateOfCharge": "State of Charge (SOC)",
             "stateOfChargeVoltage": "State of Charge and Voltage",
             "voltage": "Voltage"
+        },
+        "solar":{
+            "totalSolarEnergyDestinations":"Total Solar Energy Destinations",
+            "directUsage":"直接使用",
+            "chargeToBattery":"電池充電",
+            "exportToGrid": "導出至電網",
+            "economics":"Economics",
+            "cO2Reduction":"二氧化碳減排",
+            "tons":"tons",
+            "solarGeneration":"太陽能發電",
+            "onPeak": "On Peak",
+            "realTimeSolarGeneration":"即時太陽能發電 (kW)",
+            "thisCalendarMonth":"This Calendar Month"
         }
     },
     "error": {

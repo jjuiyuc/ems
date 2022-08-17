@@ -65,7 +65,6 @@ export default function LineChart(props) {
                             labelPointStyle: context => {
                                 const color = context.dataset.backgroundColor
                                     .replace("#", "%23")
-
                                 return { pointStyle: tooltipLabelPoint(color) }
                             }
                         },

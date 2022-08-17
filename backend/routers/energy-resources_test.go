@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -12,6 +11,7 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	"der-ems/config"
+	"der-ems/internal/app"
 	"der-ems/internal/e"
 	"der-ems/internal/utils"
 	"der-ems/models"
@@ -20,6 +20,18 @@ import (
 	"der-ems/testutils"
 	"der-ems/testutils/fixtures"
 )
+
+const (
+	UtResolution = "hour"
+	UtStartTime  = "2022-08-03T16:00:00.000Z"
+	UtEndTime    = "2022-08-03T20:15:00.000Z"
+)
+
+var testOnPeakTime = map[string]string{
+	"timezone": "+0800",
+	"start":    "07:30:00",
+	"end":      "22:30:00",
+}
 
 type EnergyResourcesSuite struct {
 	suite.Suite
@@ -69,16 +81,10 @@ func (s *EnergyResourcesSuite) TearDownSuite() {
 }
 
 func (s *EnergyResourcesSuite) Test_GetBatteryEnergyInfo() {
-	type response struct {
-		Code int                                 `json:"code"`
-		Msg  string                              `json:"msg"`
-		Data *services.BatteryEnergyInfoResponse `json:"data"`
-	}
-
-	prefixURL := "/api/" + fixtures.UtGateway.UUID + "/devices/battery/energy-info"
-	seedUtURL := prefixURL + "?startTime=2022-08-03T16:00:00.000Z"
-	seedUtInvalidParamsURL := prefixURL + "?startTime=xxx"
-	testResponseData := &services.BatteryEnergyInfoResponse{
+	prefixURL := fmt.Sprintf("/api/%s/devices/battery/energy-info", fixtures.UtGateway.UUID)
+	seedUtURL := fmt.Sprintf("%s?startTime=%s", prefixURL, UtStartTime)
+	seedUtInvalidParamsURL := fmt.Sprintf("%s?startTime=%s", prefixURL, "xxx")
+	testResponseData := services.BatteryEnergyInfoResponse{
 		BatteryOperationCycles:          8,
 		BatteryLifetimeOperationCycles:  16,
 		BatterySoC:                      80,
@@ -93,30 +99,24 @@ func (s *EnergyResourcesSuite) Test_GetBatteryEnergyInfo() {
 		Voltage:                         153.6,
 	}
 
-	tests := []struct {
-		name       string
-		token      string
-		url        string
-		wantStatus int
-		wantRv     response
-	}{
+	tests := []testutils.TestInfo{
 		{
-			name:       "batteryEnergyInfo",
-			token:      s.token,
-			url:        seedUtURL,
-			wantStatus: http.StatusOK,
-			wantRv: response{
+			Name:       "batteryEnergyInfo",
+			Token:      s.token,
+			URL:        seedUtURL,
+			WantStatus: http.StatusOK,
+			WantRv: app.Response{
 				Code: e.Success,
 				Msg:  "ok",
 				Data: testResponseData,
 			},
 		},
 		{
-			name:       "batteryEnergyInfoInvalidParams",
-			token:      s.token,
-			url:        seedUtInvalidParamsURL,
-			wantStatus: http.StatusBadRequest,
-			wantRv: response{
+			Name:       "batteryEnergyInfoInvalidParams",
+			Token:      s.token,
+			URL:        seedUtInvalidParamsURL,
+			WantStatus: http.StatusBadRequest,
+			WantRv: app.Response{
 				Code: e.InvalidParams,
 				Msg:  "invalid parameters",
 			},
@@ -124,19 +124,166 @@ func (s *EnergyResourcesSuite) Test_GetBatteryEnergyInfo() {
 	}
 
 	for _, tt := range tests {
-		log.Info("test name: ", tt.name)
-		req, err := http.NewRequest("GET", fmt.Sprintf(tt.url), nil)
-		s.Require().NoError(err)
-		req.Header.Set("Authorization", testutils.GetAuthorization(tt.token))
-		rv := httptest.NewRecorder()
-		s.router.ServeHTTP(rv, req)
-		s.Equal(tt.wantStatus, rv.Code)
+		log.Info("test name: ", tt.Name)
+		rvData := testutils.AssertRequest(tt, s.Require(), s.router, "GET", nil)
+		if tt.Name == "batteryEnergyInfo" {
+			dataMap := rvData.(map[string]interface{})
+			dataJSON, err := json.Marshal(dataMap)
+			s.Require().NoError(err)
+			var data services.BatteryEnergyInfoResponse
+			err = json.Unmarshal(dataJSON, &data)
+			s.Require().NoError(err)
+			s.Equal(tt.WantRv.Data, data)
+		}
+	}
+}
 
-		var res response
-		err = json.Unmarshal([]byte(rv.Body.String()), &res)
-		s.Require().NoError(err)
-		s.Equal(tt.wantRv.Code, res.Code)
-		s.Equal(tt.wantRv.Msg, res.Msg)
-		s.Equal(tt.wantRv.Data, res.Data)
+func (s *EnergyResourcesSuite) Test_GetBatteryPowerState() {
+	prefixURL := fmt.Sprintf("/api/%s/devices/battery/power-state", fixtures.UtGateway.UUID)
+	seedUtURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, UtResolution, UtStartTime, UtEndTime)
+	seedUtInvalidResolutionParamURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, "xxx", UtStartTime, UtEndTime)
+	seedUtInvalidStartTimeParamURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, UtResolution, "xxx", UtEndTime)
+	seedUtInvalidEndTimeParamURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, UtResolution, UtStartTime, UtStartTime)
+	seedUtInvalidPeriodEndTimeURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, UtResolution, UtStartTime, "2022-08-03T16:15:00.000Z")
+	seedUtNoResolutionParamURL := fmt.Sprintf("%s?startTime=%s&endTime=%s", prefixURL, UtStartTime, UtEndTime)
+
+	testTimestamps := []int{1659542400, 1659546000, 1659549600, 1659553200, 1659556800}
+	testBatteryAveragePowerACs := []float32{-3.5, 0, 0, 0, 0}
+	testResponseData := services.BatteryPowerStateResponse{
+		Timestamps:             testTimestamps,
+		BatteryAveragePowerACs: testBatteryAveragePowerACs,
+		OnPeakTime:             testOnPeakTime,
+	}
+
+	tests := []testutils.TestInfo{
+		{
+			Name:       "batteryPowerState",
+			Token:      s.token,
+			URL:        seedUtURL,
+			WantStatus: http.StatusOK,
+			WantRv: app.Response{
+				Code: e.Success,
+				Msg:  "ok",
+				Data: testResponseData,
+			},
+		},
+		{
+			Name:       "batteryPowerStateInvalidResolutionParam",
+			Token:      s.token,
+			URL:        seedUtInvalidResolutionParamURL,
+			WantStatus: http.StatusBadRequest,
+			WantRv: app.Response{
+				Code: e.InvalidParams,
+				Msg:  "invalid parameters",
+			},
+		},
+		{
+			Name:       "batteryPowerStateInvalidStartTimeParam",
+			Token:      s.token,
+			URL:        seedUtInvalidStartTimeParamURL,
+			WantStatus: http.StatusBadRequest,
+			WantRv: app.Response{
+				Code: e.InvalidParams,
+				Msg:  "invalid parameters",
+			},
+		},
+		{
+			Name:       "batteryPowerStateInvalidEndTimeParam",
+			Token:      s.token,
+			URL:        seedUtInvalidEndTimeParamURL,
+			WantStatus: http.StatusBadRequest,
+			WantRv: app.Response{
+				Code: e.InvalidParams,
+				Msg:  "invalid parameters",
+			},
+		},
+		{
+			Name:       "batteryPowerStateInvalidPeriodEndTime",
+			Token:      s.token,
+			URL:        seedUtInvalidPeriodEndTimeURL,
+			WantStatus: http.StatusBadRequest,
+			WantRv: app.Response{
+				Code: e.InvalidParams,
+				Msg:  "invalid parameters",
+			},
+		},
+		{
+			Name:       "batteryPowerStateNoResolutionParam",
+			Token:      s.token,
+			URL:        seedUtNoResolutionParamURL,
+			WantStatus: http.StatusBadRequest,
+			WantRv: app.Response{
+				Code: e.InvalidParams,
+				Msg:  "invalid parameters",
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		log.Info("test name: ", tt.Name)
+		rvData := testutils.AssertRequest(tt, s.Require(), s.router, "GET", nil)
+		if tt.Name == "batteryPowerState" {
+			dataMap := rvData.(map[string]interface{})
+			dataJSON, err := json.Marshal(dataMap)
+			s.Require().NoError(err)
+			var data services.BatteryPowerStateResponse
+			err = json.Unmarshal(dataJSON, &data)
+			s.Require().NoError(err)
+			s.Equal(tt.WantRv.Data, data)
+		}
+	}
+}
+
+func (s *EnergyResourcesSuite) Test_GetBatteryChargeVoltageState() {
+	prefixURL := fmt.Sprintf("/api/%s/devices/battery/charge-voltage-state", fixtures.UtGateway.UUID)
+	seedUtURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, UtResolution, UtStartTime, UtEndTime)
+	seedUtInvalidParamsURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, "xxx", UtStartTime, UtEndTime)
+
+	testTimestamps := []int{1659542400, 1659546000, 1659549600, 1659553200, 1659556800}
+	testBatterySoCs := []float32{80, 0, 0, 0, 0}
+	testBatteryVoltages := []float32{28, 0, 0, 0, 0}
+	testResponseData := services.BatteryChargeVoltageStateResponse{
+		Timestamps:      testTimestamps,
+		BatterySoCs:     testBatterySoCs,
+		BatteryVoltages: testBatteryVoltages,
+		OnPeakTime:      testOnPeakTime,
+	}
+
+	tests := []testutils.TestInfo{
+		{
+			Name:       "batteryChargeVoltageState",
+			Token:      s.token,
+			URL:        seedUtURL,
+			WantStatus: http.StatusOK,
+			WantRv: app.Response{
+				Code: e.Success,
+				Msg:  "ok",
+				Data: testResponseData,
+			},
+		},
+		{
+			Name:       "batteryChargeVoltageStateInvalidParams",
+			Token:      s.token,
+			URL:        seedUtInvalidParamsURL,
+			WantStatus: http.StatusBadRequest,
+			WantRv: app.Response{
+				Code: e.InvalidParams,
+				Msg:  "invalid parameters",
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		log.Info("test name: ", tt.Name)
+		rvData := testutils.AssertRequest(tt, s.Require(), s.router, "GET", nil)
+		if tt.Name == "batteryChargeVoltageState" {
+			dataMap := rvData.(map[string]interface{})
+			dataJSON, err := json.Marshal(dataMap)
+			s.Require().NoError(err)
+			var data services.BatteryChargeVoltageStateResponse
+			err = json.Unmarshal(dataJSON, &data)
+			s.Require().NoError(err)
+			s.Equal(tt.WantRv.Data, data)
+		}
 	}
 }

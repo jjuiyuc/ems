@@ -127,6 +127,10 @@ func (s *LocalCCWorkerSuite) Test_SaveLocalCCDataAndLog() {
 	delete(seedUtDataNoGWID, gwID)
 	seedUtDataNoTimestamp := testutils.CopyMap(s.seedUtLocalCCData)
 	delete(seedUtDataNoTimestamp, timestamp)
+	seedUtDataGWIDUnexpectedValue := testutils.CopyMap(s.seedUtLocalCCData)
+	seedUtDataGWIDUnexpectedValue[gwID] = nil
+	seedUtDataTimestampUnexpectedValue := testutils.CopyMap(s.seedUtLocalCCData)
+	seedUtDataTimestampUnexpectedValue[timestamp] = nil
 
 	tests := []struct {
 		name string
@@ -154,6 +158,18 @@ func (s *LocalCCWorkerSuite) Test_SaveLocalCCDataAndLog() {
 			name: "saveLocalCCDataNoTimestamp",
 			args: args{
 				Msg: seedUtDataNoTimestamp,
+			},
+		},
+		{
+			name: "saveLocalCCDataGWIDUnexpectedValue",
+			args: args{
+				Msg: seedUtDataGWIDUnexpectedValue,
+			},
+		},
+		{
+			name: "saveLocalCCDataTimestampUnexpectedValue",
+			args: args{
+				Msg: seedUtDataTimestampUnexpectedValue,
 			},
 		},
 		{
@@ -198,6 +214,12 @@ func (s *LocalCCWorkerSuite) Test_SaveLocalCCDataAndLog() {
 		case "saveLocalCCDataNoTimestamp":
 			s.Equal(e.ErrNewKeyNotExist(timestamp).Error(), saveErr.Error())
 			s.Equal(e.ErrNewKeyNotExist(timestamp).Error(), saveLogErr.Error())
+		case "saveLocalCCDataGWIDUnexpectedValue":
+			s.Equal(e.ErrNewKeyUnexpectedValue(gwID).Error(), saveErr.Error())
+			s.Equal(e.ErrNewKeyUnexpectedValue(gwID).Error(), saveLogErr.Error())
+		case "saveLocalCCDataTimestampUnexpectedValue":
+			s.Equal(e.ErrNewKeyUnexpectedValue(timestamp).Error(), saveErr.Error())
+			s.Equal(e.ErrNewKeyUnexpectedValue(timestamp).Error(), saveLogErr.Error())
 		}
 	}
 }

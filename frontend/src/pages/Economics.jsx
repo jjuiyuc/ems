@@ -34,6 +34,20 @@ export default function Economics(props) {
         currentHour = moment().hour(),
         lineChartDataArray = hours24.filter(v => v <= currentHour).map(() =>
             Math.floor(Math.random() * (60 - 40 + 1) + 40))
+
+    const fakeDataArray = amount => Array.from(new Array(amount).keys())
+        .map(() => Math.floor(Math.random() * (40 - 10 + 1) + 10))
+
+    const
+        days = 7,
+        sevenDays = Array.from(new Array(days).keys()).map(n =>
+            moment().subtract(days - n, "d").startOf("day").toISOString()),
+        fakeData1 = fakeDataArray(days),
+        fakeData2 = fakeDataArray(days),
+        fakeData3 = fakeDataArray(days),
+        fakeData4 = fakeDataArray(days),
+        fakeData5 = fakeDataArray(days),
+        fakeData6 = fakeDataArray(days)
     const
         [lineChartData, setLineChartData] = useState({
             datasets: [{
@@ -46,9 +60,10 @@ export default function Economics(props) {
                 },
                 pointBorderColor: colors.primary["main-opacity-20"]
             }],
-            labels: lineChartDateLabels,
-            tickCallback: (val, index) => val + commonT("kw"),
-            tooltipLabel: item => `${item.parsed.y}` + commonT("kw"),
+            labels: sevenDays,
+            tickCallback: (val, index) => "$" + val,
+            tooltipLabel: item =>
+                `${item.dataset.label} $${item.parsed.y}`,
             x: {
                 type: "time",
                 grid: { lineWidth: 0 },
@@ -67,20 +82,6 @@ export default function Economics(props) {
         [monthtlyTab, setMonthtlyTab] = useState(monthtlyTabs[0]),
         weeklyTabs = ["thisWeek", "perviouWeek"],
         [weeklyTab, setWeeklyTab] = useState(weeklyTabs[0])
-
-    const fakeDataArray = amount => Array.from(new Array(amount).keys())
-        .map(() => Math.floor(Math.random() * (40 - 10 + 1) + 10))
-
-    const
-        days = 7,
-        sevenDays = Array.from(new Array(days).keys()).map(n =>
-            moment().subtract(days - n, "d").startOf("day").toISOString()),
-        fakeData1 = fakeDataArray(days),
-        fakeData2 = fakeDataArray(days),
-        fakeData3 = fakeDataArray(days),
-        fakeData4 = fakeDataArray(days),
-        fakeData5 = fakeDataArray(days),
-        fakeData6 = fakeDataArray(days)
 
     const
         [barChartData, setBarChartData] = useState({

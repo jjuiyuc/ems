@@ -72,7 +72,6 @@ export default function EnergyResourcesGrid(props) {
         tickCallback: (val, index) => val + commonT("kw"),
         tooltipLabel: item =>
             `${item.parsed.y} ${commonT("kwh")}`,
-        x: { grid: { lineWidth: 0 } },
         y: { max: 80, min: 0 }
     })
 
@@ -85,15 +84,13 @@ export default function EnergyResourcesGrid(props) {
                 title={commonT("today")} />
             <div className="card mt-8 lg:m-0">
                 <h5 className="font-bold mb-8">{pageT("thisMonth")}</h5>
-                <div className="flex justify-between items-end">
-                    <div className="mb-4 lg:0">
-                        <h6 className="font-bold text-white mb-2">{pageT("netExport")}</h6>
-                        <h3 className="my-2.5">{t.kwh} {commonT("kwh")}</h3>
-                    </div>
+                <h6 className="font-bold text-white">{pageT("netExport")}</h6>
+                <div className="flex justify-between items-center mt-3.5">
+                    <h3>{t.kwh} {commonT("kwh")}</h3>
                     <div
                         className="bg-gray-400-opacity-20 grid h-12 w-12
                             place-items-center rounded-full">
-                        <GridExportIcon className="h-8 text-gray-400 w-8" />
+                        <GridExportIcon className="text-gray-400 w-8 h-8" />
                     </div>
                 </div>
             </div>

@@ -18,10 +18,12 @@ export default function EnergyGridCard(props) {
 
     return <div className="card">
         <h5 className="font-bold mb-8">{props.title}</h5>
-        <div className="lg:grid grid-cols-3 three-columns gap-x-10">
+        <div className="xl:grid grid-cols-3 three-columns gap-x-10">
             {props.data.map((t, i) => {
                 const Icon = icons[t.type]
-                return <div key={"detail-" + i} className="mb-4 lg:m-0">
+                return <div className={"border-gray-400 xl:border-0 py-4 xl:py-0"
+                    + (i > 0 ? " border-t" : "")}
+                    key={"detail-" + i} >
                     <h6 className="font-bold">{pageT(t.type)}</h6>
                     <div className="flex justify-between items-center mt-3.5">
                         <h3>{t.kwh} {commonT("kwh")}</h3>

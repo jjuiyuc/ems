@@ -42,15 +42,12 @@ export default function EnergyResourcesGrid(props) {
         commonT = string => t("common." + string),
         pageT = string => t("energyResources.grid." + string)
 
-    const
-        [todayGrid, setTodayGrid]
-            = useState({
-                types: [
-                    { kwh: 0, type: "exportToGrid" },
-                    { kwh: 100, type: "importFromGrid" },
-                    { kwh: -10, type: "netExport" }
-                ]
-            })
+    const [todayGrid, setTodayGrid] = useState([
+        { kwh: 0, type: "exportToGrid" },
+        { kwh: 100, type: "importFromGrid" },
+        { kwh: -10, type: "netExport" }
+    ])
+
     const
         hours24 = Array.from(new Array(24).keys()),
         lineChartDateLabels = hours24.map(n =>
@@ -87,9 +84,7 @@ export default function EnergyResourcesGrid(props) {
                 data={todayGrid}
                 title={commonT("today")} />
             <div className="card mt-8 lg:m-0">
-                <div className="mb-8">
-                    <h5 className="font-bold">{pageT("thisMonth")}</h5>
-                </div>
+                <h5 className="font-bold mb-8">{pageT("thisMonth")}</h5>
                 <div className="flex justify-between items-end">
                     <div className="mb-4 lg:0">
                         <h6 className="font-bold text-white mb-2">{pageT("netExport")}</h6>
@@ -103,12 +98,10 @@ export default function EnergyResourcesGrid(props) {
                 </div>
             </div>
         </div>
-        <div className="lg:grid grid-cols-auto pr-3">
-            <div className="card chart mt-8">
-                <h4 className="mb-10">{pageT("girdPowerImport")}</h4>
-                <div className="max-h-80vh h-160 w-full">
-                    <LineChart data={lineChartData} id="ergLineChart" />
-                </div>
+        <div className="card chart mt-8">
+            <h4 className="mb-10">{pageT("girdPowerImport")}</h4>
+            <div className="max-h-80vh h-160 w-full">
+                <LineChart data={lineChartData} id="ergLineChart" />
             </div>
         </div>
     </>

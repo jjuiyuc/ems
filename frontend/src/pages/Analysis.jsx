@@ -35,6 +35,10 @@ export default function Analysis() {
         fakeData2 = fakeDataArray(days),
         fakeData3 = fakeDataArray(days),
         fakeData4 = fakeDataArray(days)
+    const
+        hours24 = Array.from(new Array(24).keys()),
+        lineChartDateLabels = hours24.map(n =>
+            moment().hour(n).startOf("h").toISOString())
 
     const
         [barChartData, setBarChartData] = useState({
@@ -74,8 +78,95 @@ export default function Analysis() {
             ],
             kwh: 60
         }),
+        [ssrLineChartData, setSsrLineChartData] = useState({
+            datasets: [{
+                backgroundColor: colors.primary.main,
+                borderColor: colors.primary.main,
+                data: fakeData1,
+                percent: fakeData1,
+                fill: {
+                    above: colors.primary["main-opacity-10"],
+                    target: "origin"
+                },
+                pointBorderColor: colors.primary["main-opacity-20"]
+            }],
+            labels: sevenDays,
+            tickCallback: (val, index) => val + "%",
+            tooltipLabel: item => `${item.dataset.percent[item.dataIndex]}% (${item.parsed.y} ${commonT("kwh")})`,
+            x: {
+                grid: { lineWidth: 0 },
+                time: {
+                    displayFormats: {
+                        day: "MMM D",
+                    },
+                    tooltipFormat: "MMM D",
+                    unit: "day"
+                }
+            },
+            y: { max: 100, min: 0 }
+        }),
+        [lineChartData, setLineChartData] = useState({
+            datasets: [
+                {
+                    backgroundColor: colors.green.main,
+                    borderColor: colors.green.main,
+                    data: fakeData1,
+                    fill: {
+                        above: colors.green["main-opacity-10"],
+                        target: "origin"
+                    },
+                    id: "household",
+                    pointBorderColor: colors.green["main-opacity-20"],
+                    label: pageT("household")
+                },
+                {
+                    backgroundColor: colors.yellow.main,
+                    borderColor: colors.yellow.main,
+                    data: fakeData2,
+                    fill: {
+                        above: colors.yellow["main-opacity-10"],
+                        target: "origin"
+                    },
+                    id: "solar",
+                    pointBorderColor: colors.yellow["main-opacity-20"],
+                    label: commonT("solar")
+                },
+                {
+                    backgroundColor: colors.blue.main,
+                    borderColor: colors.blue.main,
+                    data: fakeData3,
+                    fill: {
+                        above: colors.yellow["main-opacity-10"],
+                        target: "origin"
+                    },
+                    id: "battery",
+                    pointBorderColor: colors.yellow["main-opacity-20"],
+                    label: commonT("battery")
+                },
+                {
+                    backgroundColor: colors.indigo.main,
+                    borderColor: colors.indigo.main,
+                    data: fakeData4,
+                    fill: {
+                        above: colors.indigo["main-opacity-10"],
+                        target: "origin"
+                    },
+                    id: "grid",
+                    pointBorderColor: colors.indigo["main-opacity-20"],
+                    label: commonT("grid")
+                }
+            ],
+            labels: lineChartDateLabels,
+            legend: true,
+            tickCallback: (val, index) => val + commonT("kw"),
+            tooltipLabel: item => `${item.dataset.label}${item.parsed.y}` + commonT("kw"),
+            x: { grid: { lineWidth: 0 } },
+            y: { max: 60, min: 0 }
+        })
+
+    const
+        [tab, setTab] = useState("days"),
         [open, setOpen] = useState(false),
-        [tab, setTab] = useState("weeks"),
         [totalEnergySources, setTotalEnergySources] = useState({
             types: [
                 { kwh: 7.5, percentage: 15, type: "directSolarSupply" },
@@ -180,12 +271,19 @@ export default function Analysis() {
                 title={pageT("energyDestinations")} />
         </div>
         {tab !== "days"
-            ? <div className="card mt-8">
-                <h1>{pageT("accumulatedKwh")}</h1>
+            ? <><div className="card mt-8">
+                <h4>{pageT("accumulatedKwh")}</h4>
                 <div className="max-h-80vh h-160 mt-8 relative w-full">
                     <BarChart data={barChartData} id="analysisBarChart" />
                 </div>
             </div>
+                <div className="card chart mt-8">
+                    <h4 className="mb-10">{pageT("selfSupplyRate")}</h4>
+                    <div className="max-h-80vh h-160 w-full">
+                        <LineChart data={ssrLineChartData} id="anLineChart" />
+                    </div>
+                </div>
+            </>
             : null}
     </>
 }

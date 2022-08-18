@@ -57,7 +57,6 @@ const theme = createTheme({
                         }
                     }),
                 },
-
                 {
                     props: { radius: "pill" },
                     style: { borderRadius: "100vh" },

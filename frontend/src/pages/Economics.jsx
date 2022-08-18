@@ -18,7 +18,10 @@ export default function Economics(props) {
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
-        pageT = (string, params) => t("economics." + string, params)
+        pageT = (string, params) => t("economics." + string, params),
+        monthtlyTabs = ["thisMonth", "perviousMonth", "thisMonthLastYear"],
+        weeklyTabs = ["thisWeek", "perviouWeek"]
+
     const
         [total, setTotal] = useState(630),
         [ancillaryServices, setAncillaryServices] = useState(15),
@@ -26,12 +29,13 @@ export default function Economics(props) {
         [timeOfUseArbitrage, setTimeOfUseArbitrage] = useState(130),
         [renewableEnergyCertificate, setRenewableEnergyCertificate] = useState(150),
         [solarLocalUsage, setSolarLocalUsage] = useState(160),
-        [exportToGrid, setExportToGrid] = useState(130)
+        [exportToGrid, setExportToGrid] = useState(130),
+        [monthtlyTab, setMonthtlyTab] = useState(monthtlyTabs[0]),
+        [weeklyTab, setWeeklyTab] = useState(weeklyTabs[0])
+
     const
-        hours24 = Array.from(new Array(24).keys()),
-        lineChartDateLabels = hours24.map(n =>
-            moment().hour(n).startOf("h").toISOString()),
         currentHour = moment().hour(),
+        hours24 = Array.from(new Array(24).keys()),
         lineChartDataArray = hours24.filter(v => v <= currentHour).map(() =>
             Math.floor(Math.random() * (60 - 40 + 1) + 40))
 
@@ -48,6 +52,7 @@ export default function Economics(props) {
         fakeData4 = fakeDataArray(days),
         fakeData5 = fakeDataArray(days),
         fakeData6 = fakeDataArray(days)
+
     const
         [lineChartData, setLineChartData] = useState({
             datasets: [{
@@ -76,14 +81,7 @@ export default function Economics(props) {
                 }
             },
             y: { max: 80, min: 0 }
-        })
-    const
-        monthtlyTabs = ["thisMonth", "perviousMonth", "thisMonthLastYear"],
-        [monthtlyTab, setMonthtlyTab] = useState(monthtlyTabs[0]),
-        weeklyTabs = ["thisWeek", "perviouWeek"],
-        [weeklyTab, setWeeklyTab] = useState(weeklyTabs[0])
-
-    const
+        }),
         [barChartData, setBarChartData] = useState({
             datasets: [
                 {
@@ -181,7 +179,7 @@ export default function Economics(props) {
                 <div />
             </div>
             <div className="max-h-80vh h-160 w-full mt-8">
-                <LineChart data={lineChartData} id="dcLineChart" />
+                <LineChart data={lineChartData} id="economicsLineChart" />
             </div>
         </div>
         <div className="card mt-8">
@@ -201,7 +199,7 @@ export default function Economics(props) {
                 </Stack>
             </div>
             <div className="max-h-80vh h-160 mt-8 relative w-full">
-                <BarChart data={barChartData} id="econoBarChart" />
+                <BarChart data={barChartData} id="economicsBarChart" />
             </div>
         </div>
     </>

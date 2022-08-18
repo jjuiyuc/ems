@@ -7,6 +7,7 @@ import { useEffect, useState } from "react"
 
 import AnalysisCard from "../components/AnalysisCard"
 import BarChart from "../components/BarChart"
+import LineChart from "../components/LineChart"
 import variables from "../configs/variables"
 import "../assets/css/datePicker.scss"
 
@@ -68,15 +69,6 @@ export default function Analysis() {
             tooltipLabel: item =>
                 `${item.dataset.label} ${item.parsed.y} ${commonT("kwh")}`,
             y: { max: 100, min: 0 }
-        }),
-        [dateRange, setDateRange] = useState(defaultDate),
-        [energyDestinations, setEnergyDestinations] = useState({
-            types: [
-                { kwh: 10, percentage: 18, type: "load" },
-                { kwh: 25, percentage: 41, type: "exportFromGrid" },
-                { kwh: 25, percentage: 41, type: "chargeToBattery" },
-            ],
-            kwh: 60
         }),
         [ssrLineChartData, setSsrLineChartData] = useState({
             datasets: [{
@@ -176,6 +168,15 @@ export default function Analysis() {
             kwh: 50
         })
 
+        [energyDestinations, setEnergyDestinations] = useState({
+            types: [
+                { kwh: 10, percentage: 18, type: "load" },
+                { kwh: 25, percentage: 41, type: "exportFromGrid" },
+                { kwh: 25, percentage: 41, type: "chargeToBattery" },
+            ],
+            kwh: 60
+        }),
+        [dateRange, setDateRange] = useState(defaultDate)
     const lang = getLanguage()
 
     useEffect(() => {
@@ -270,6 +271,15 @@ export default function Analysis() {
                 data={energyDestinations}
                 title={pageT("energyDestinations")} />
         </div>
+        {tab == "days"
+            ? <div className="card mt-8">
+                <h4>{pageT("realTimePowerkW")}</h4>
+                <div className="max-h-80vh h-160 mt-10 relative w-full">
+                    <LineChart data={ssrLineChartData}
+                        id="analysisLineChart" />
+                </div>
+            </div>
+            : null}
         {tab !== "days"
             ? <><div className="card mt-8">
                 <h4>{pageT("accumulatedKwh")}</h4>

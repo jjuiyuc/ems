@@ -63,7 +63,7 @@ export default function Analysis() {
             labels: sevenDays,
             tooltipLabel: item =>
                 `${item.dataset.label} ${item.parsed.y} ${commonT("kwh")}`,
-            y: {max: 100, min: 0}
+            y: { max: 100, min: 0 }
         }),
         [dateRange, setDateRange] = useState(defaultDate),
         [energyDestinations, setEnergyDestinations] = useState({
@@ -89,7 +89,8 @@ export default function Analysis() {
 
     useEffect(() => {
         const
-            chartData = {...barChartData},
+            barChart = { ...barChartData },
+            lineChart = { ...lineChartData },
             labels = [
                 pageT("household"),
                 commonT("solar"),
@@ -97,9 +98,11 @@ export default function Analysis() {
                 commonT("grid")
             ]
 
-            labels.forEach((text, i) => chartData.datasets[i].label = text)
+        labels.forEach((text, i) => barChart.datasets[i].label = text)
+        labels.forEach((text, i) => lineChart.datasets[i].label = text)
 
-        setBarChartData(chartData)
+        setBarChartData(barChart)
+        setLineChartData(lineChart)
     }, [lang])
 
     const toggle = () => setOpen(!open)
@@ -117,45 +120,45 @@ export default function Analysis() {
         <div className="page-header">
             <h1>{pageT("analysis")}</h1>
             <Stack direction="row" justifyContent="flex-end" spacing={1.5}>
-            {tabs.map((t, i) =>
-                <Button
-                    onClick={() => setTab(t)}
-                    filter={tab === t ? "selected" : ""}
-                    key={"a-t-" + i}
-                    radius="pill"
-                    variant="contained">
-                    {pageT(t)}
-                </Button>)}
+                {tabs.map((t, i) =>
+                    <Button
+                        onClick={() => setTab(t)}
+                        filter={tab === t ? "selected" : ""}
+                        key={"a-t-" + i}
+                        radius="pill"
+                        variant="contained">
+                        {pageT(t)}
+                    </Button>)}
             </Stack>
         </div>
-    {tab === "custom"
-        ? <div className="flex justify-end mb-10 relative w-auto">
-            <div className="flex items-center">
-                <TextField
-                    InputProps={{
-                        endAdornment: <CalendarToday
-                                        className="text-gray-300" />
-                    }}
-                    label={pageT("startDate")}
-                    onFocus={() => setOpen(true)}
-                    style={{ marginBottom: 0 }}
-                    type="text"
-                    value={startDate}
-                    variant="outlined" />
-                <span className="mx-4">{pageT("to")}</span>
-                <TextField
-                    InputProps={{
-                        endAdornment: <CalendarToday
-                                        className="text-gray-300" />
-                    }}
-                    label={pageT("endDate")}
-                    onFocus={() => setOpen(true)}
-                    style={{ marginBottom: 0 }}
-                    type="text"
-                    value={endDate}
-                    variant="outlined" />
-            </div>
-            {/* <div className="absolute mt-2 top-full">
+        {tab === "custom"
+            ? <div className="flex justify-end mb-10 relative w-auto">
+                <div className="flex items-center">
+                    <TextField
+                        InputProps={{
+                            endAdornment: <CalendarToday
+                                className="text-gray-300" />
+                        }}
+                        label={pageT("startDate")}
+                        onFocus={() => setOpen(true)}
+                        style={{ marginBottom: 0 }}
+                        type="text"
+                        value={startDate}
+                        variant="outlined" />
+                    <span className="mx-4">{pageT("to")}</span>
+                    <TextField
+                        InputProps={{
+                            endAdornment: <CalendarToday
+                                className="text-gray-300" />
+                        }}
+                        label={pageT("endDate")}
+                        onFocus={() => setOpen(true)}
+                        style={{ marginBottom: 0 }}
+                        type="text"
+                        value={endDate}
+                        variant="outlined" />
+                </div>
+                {/* <div className="absolute mt-2 top-full">
                 <DateRangePicker
                     onChange={range => setDateRange(range)}
                     open={open}
@@ -166,8 +169,8 @@ export default function Analysis() {
                     wrapperClassName="date-range-picker"
                 />
             </div> */}
-        </div>
-        : null}
+            </div>
+            : null}
         <div className="gap-8 grid md:grid-cols-2 items-start">
             <AnalysisCard
                 data={totalEnergySources}
@@ -176,13 +179,13 @@ export default function Analysis() {
                 data={energyDestinations}
                 title={pageT("energyDestinations")} />
         </div>
-    {tab !== "days"
-        ? <div className="card mt-8">
-            <h1>{pageT("accumulatedKwh")}</h1>
-            <div className="max-h-80vh h-160 mt-8 relative w-full">
-                <BarChart data={barChartData} id="analysisBarChart" />
+        {tab !== "days"
+            ? <div className="card mt-8">
+                <h1>{pageT("accumulatedKwh")}</h1>
+                <div className="max-h-80vh h-160 mt-8 relative w-full">
+                    <BarChart data={barChartData} id="analysisBarChart" />
+                </div>
             </div>
-        </div>
-        : null}
+            : null}
     </>
 }

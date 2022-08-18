@@ -77,6 +77,13 @@
             "stateOfChargeVoltage": "State of Charge and Voltage",
             "voltage": "Voltage"
         },
+        "grid":{
+            "exportToGrid":"輸出至電網",
+            "importFromGrid":"自電網導入",
+            "netExport":"Net Export",
+            "thisMonth":"當月",
+            "girdPowerImport":"電網電力導入"
+        },
         "solar":{
             "totalSolarEnergyDestinations":"Total Solar Energy Destinations",
             "directUsage":"直接使用",

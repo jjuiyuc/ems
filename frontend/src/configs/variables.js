@@ -7,6 +7,7 @@ const variables = {
         battery: blue.main,
         blue,
         gray,
+        indigo,
         green,
         grid: palette.indigo.main,
         indigo,

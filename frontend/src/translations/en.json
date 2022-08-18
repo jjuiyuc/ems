@@ -77,6 +77,13 @@
             "stateOfChargeVoltage": "State of Charge and Voltage",
             "voltage": "Voltage"
         },
+        "grid":{
+            "exportToGrid":"Export To Grid",
+            "importFromGrid":"Import From Grid",
+            "netExport":"Net Export",
+            "thisMonth":"This Month",
+            "girdPowerImport":"Gird Power Import"
+        },
         "solar":{
             "totalSolarEnergyDestinations":"Total Solar Energy Destinations",
             "directUsage":"Direct Usage",

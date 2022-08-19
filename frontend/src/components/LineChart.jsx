@@ -21,7 +21,7 @@ Chart.register(
     Tooltip
 )
 
-import { tooltipLabelPoint } from "../utils/chart"
+import { checkbox, checkboxChecked, tooltipLabelPoint } from "../utils/chart"
 import variables from "../configs/variables"
 
 const

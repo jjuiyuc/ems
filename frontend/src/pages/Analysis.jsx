@@ -151,7 +151,7 @@ export default function Analysis() {
             labels: lineChartDateLabels,
             legend: true,
             tickCallback: (val, index) => val + commonT("kw"),
-            tooltipLabel: item => `${item.dataset.label}${item.parsed.y}` + commonT("kw"),
+            tooltipLabel: item => `${item.dataset.label}  ${item.parsed.y} ${commonT("kwh")}`,
             x: { grid: { lineWidth: 0 } },
             y: { max: 60, min: 0 }
         })

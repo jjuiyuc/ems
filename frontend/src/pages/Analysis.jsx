@@ -166,8 +166,7 @@ export default function Analysis() {
                 { kwh: 12.5, percentage: 25, type: "batteryDischarge" },
             ],
             kwh: 50
-        })
-
+        }),
         [energyDestinations, setEnergyDestinations] = useState({
             types: [
                 { kwh: 10, percentage: 18, type: "load" },

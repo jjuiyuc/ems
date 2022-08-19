@@ -274,7 +274,7 @@ export default function Analysis() {
             ? <div className="card mt-8">
                 <h4>{pageT("realTimePowerkW")}</h4>
                 <div className="max-h-80vh h-160 mt-10 relative w-full">
-                    <LineChart data={ssrLineChartData}
+                    <LineChart data={lineChartData}
                         id="analysisLineChart" />
                 </div>
             </div>

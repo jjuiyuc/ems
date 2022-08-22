@@ -92,6 +92,7 @@ export default function LineChart(props) {
                         boxPadding: 4,
                         bodyFont: { size: 13 },
                         callbacks: {
+                            afterBody: props.data.tooltipAfterBody,
                             label: props.data.tooltipLabel,
                             labelPointStyle: context => {
                                 const color = context.dataset.backgroundColor

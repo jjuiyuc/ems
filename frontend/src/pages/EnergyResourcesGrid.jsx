@@ -42,11 +42,13 @@ export default function EnergyResourcesGrid(props) {
         commonT = string => t("common." + string),
         pageT = string => t("energyResources.grid." + string)
 
-    const [todayGrid, setTodayGrid] = useState([
-        { kwh: 0, type: "exportToGrid" },
-        { kwh: 100, type: "importFromGrid" },
-        { kwh: -10, type: "netExport" }
-    ])
+    const
+        [todayGrid, setTodayGrid] = useState([
+            { kwh: 0, type: "exportToGrid" },
+            { kwh: 100, type: "importFromGrid" },
+            { kwh: -10, type: "netExport" }
+        ]),
+        [thisMonth, setThisMonth] = useState(100)
 
     const
         hours24 = Array.from(new Array(24).keys()),
@@ -79,14 +81,12 @@ export default function EnergyResourcesGrid(props) {
         <h1 className="mb-9">{t("navigator.energyResources")}</h1>
         <EnergyResoucesTabs current="grid" />
         <div className="lg:grid grid-cols-auto-19rem gap-x-5">
-            <EnergyGridCard
-                data={todayGrid}
-                title={commonT("today")} />
+            <EnergyGridCard data={todayGrid} title={commonT("today")} />
             <div className="card mt-8 lg:m-0">
-                <h5 className="font-bold mb-8">{pageT("thisMonth")}</h5>
+                <h5 className="font-bold mb-8">{commonT("thisMonth")}</h5>
                 <h6 className="font-bold text-white">{pageT("netExport")}</h6>
                 <div className="flex justify-between items-center mt-3.5">
-                    <h3>{t.kwh} {commonT("kwh")}</h3>
+                    <h3>{thisMonth} {commonT("kwh")}</h3>
                     <div
                         className="bg-gray-400-opacity-20 grid h-12 w-12
                             place-items-center rounded-full">
@@ -96,7 +96,7 @@ export default function EnergyResourcesGrid(props) {
             </div>
         </div>
         <div className="card chart mt-8">
-            <h4 className="mb-10">{pageT("girdPowerImport")}</h4>
+            <h4 className="mb-10">{pageT("gridPowerImport")}</h4>
             <div className="max-h-80vh h-160 w-full">
                 <LineChart data={lineChartData} id="ergLineChart" />
             </div>

@@ -245,7 +245,7 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
         {title: pageT("modal"), value: modal},
         {title: pageT("capacity"), value: capacity},
         {title: pageT("powerSources"), value: powerSources},
-        {title: pageT("batteryPower"), value: batteryPower},
+        {title: commonT("batteryPower"), value: batteryPower},
         {title: pageT("voltage"), value: voltage},
     ]
 
@@ -322,7 +322,7 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
             <EnergyResoucesCard
                 data={cardsData.chargingState}
                 icon={ChargingIcon}
-                title={pageT("stateOfCharge")} />
+                title={pageT("stateOfChargeSOC")} />
             <EnergyResoucesCard
                 data={cardsData.discharged}
                 icon={DischargeIcon}

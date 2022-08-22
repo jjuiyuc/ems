@@ -74,14 +74,14 @@ export default function DemandCharge(props) {
                             rounded-full w-3" />
                 <div className="bg-negative-main h-2.5 rounded-full w-2.5" />
             </div>
-            <h5 className="text-negative-main">{pageT("active")}</h5>
+            <h5 className="text-negative-main">{commonT("active")}</h5>
         </>
         : null
 
     const peakShaveColor = peak.active ? "negative" : "positive"
 
     return <>
-        <h1 className="mb-9">{pageT("demandCharge")}</h1>
+        <h1 className="mb-9">{commonT("demandCharge")}</h1>
         <div className="gap-8 grid-cols-3 lg:grid ">
             <PriceCard
                 price={currentBillCycle}
@@ -97,7 +97,7 @@ export default function DemandCharge(props) {
             <div className="flex-1">
                 <div className="card">
                     <div className="flex flex-wrap items-baseline">
-                        <h5 className="font-bold">{pageT("peakShave")}</h5>
+                        <h5 className="font-bold">{commonT("peakShave")}</h5>
                     </div>
                     <div className="flex justify-between items-center">
                         <div className="bg-gray-600 flex h-2 overflow-hidden

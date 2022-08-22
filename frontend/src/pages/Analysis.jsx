@@ -274,18 +274,19 @@ export default function Analysis() {
             ? <div className="card mt-8">
                 <h4>{pageT("realTimePowerkW")}</h4>
                 <div className="max-h-80vh h-160 mt-10 relative w-full">
-                    <LineChart data={lineChartData}
-                        id="analysisLineChart" />
+                    <LineChart
+                        data={lineChartData} id="analysisLineChart" />
                 </div>
             </div>
             : null}
         {tab !== "days"
-            ? <><div className="card mt-8">
-                <h4>{pageT("accumulatedKwh")}</h4>
-                <div className="max-h-80vh h-160 mt-8 relative w-full">
-                    <BarChart data={barChartData} id="analysisBarChart" />
+            ? <>
+                <div className="card mt-8">
+                    <h4>{pageT("accumulatedKwh")}</h4>
+                    <div className="max-h-80vh h-160 mt-8 relative w-full">
+                        <BarChart data={barChartData} id="analysisBarChart" />
+                    </div>
                 </div>
-            </div>
                 <div className="card chart mt-8">
                     <h4 className="mb-10">{pageT("selfSupplyRate")}</h4>
                     <div className="max-h-80vh h-160 w-full">

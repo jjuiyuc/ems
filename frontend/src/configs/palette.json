@@ -25,6 +25,7 @@
     },
     "green": {
         "main": "#14EEC7",
+        "main-opacity-10":"#14EEC710",
         "main-opacity-20":"#14EEC720"
     },
     "indigo": {

@@ -175,9 +175,9 @@ export default connect(mapState)(function Dashboard(props) {
 
     const
         batteryData = [
-            {name: pageT("stateOfCharge"), value: `${battery.state}%`},
+            {name: commonT("stateOfCharge"), value: `${battery.state}%`},
             {
-                name: pageT("batteryPower"),
+                name: commonT("batteryPower"),
                 value: `${battery.power} ${commonT("kw")}`
             },
             {
@@ -203,7 +203,7 @@ export default connect(mapState)(function Dashboard(props) {
                 name: pageT("chargeToBattery"),
                 value: `${solar.charge} ${commonT("kw")}`
             },
-            {name: pageT("exportToGrid"), value: solar.export || "-"},
+            {name: commonT("exportToGrid"), value: solar.export || "-"},
         ]
 
     const
@@ -239,7 +239,7 @@ export default connect(mapState)(function Dashboard(props) {
                             rounded-full w-3" />
             <div className="bg-negative-main h-2.5 rounded-full w-2.5" />
         </div>
-        <h5 className="text-negative-main">{pageT("active")}</h5>
+        <h5 className="text-negative-main">{commonT("active")}</h5>
         </>
         : null
 
@@ -268,7 +268,7 @@ export default connect(mapState)(function Dashboard(props) {
             <div className="flex-1">
                 <div className="card">
                     <div className="flex flex-wrap items-baseline mb-6">
-                        <h5 className="font-bold">{pageT("peakShave")}</h5>
+                        <h5 className="font-bold">{commonT("peakShave")}</h5>
                     </div>
                     <div className="bg-gray-600 flex h-2 overflow-hidden
                                     rounded-full w-full ">

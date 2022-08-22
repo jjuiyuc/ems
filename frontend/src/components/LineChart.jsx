@@ -21,7 +21,7 @@ Chart.register(
     Tooltip
 )
 
-import { tooltipLabelPoint } from "../utils/chart"
+import { checkbox, checkboxChecked, tooltipLabelPoint } from "../utils/chart"
 import variables from "../configs/variables"
 
 const
@@ -55,12 +55,44 @@ export default function LineChart(props) {
                     mode: "index"
                 },
                 plugins: {
-                    legend: { display: false },
+                    legend: {
+                        align: "end",
+                        display: props.data.legend || false,
+                        labels: {
+                            boxHeight: 18,
+                            boxWidth: 18,
+                            color: "white",
+                            font: {
+                                size: 16
+                            },
+                            generateLabels: function (chart) {
+                                const labels = Chart.defaults.plugins.legend
+                                    .labels.generateLabels(chart)
+
+                                for (var key in labels) {
+                                    const
+                                        label = labels[key],
+                                        color = label.fillStyle
+                                            .replace("#", "%23")
+
+                                    label.pointStyle = label.hidden
+                                        ? checkbox
+                                        : checkboxChecked(color)
+                                    label.hidden = false
+                                }
+                                return labels
+                            },
+                            padding: 20,
+                            usePointStyle: true
+                        },
+                        position: "top"
+                    },
                     tooltip: {
                         backgroundColor: colors.gray[600],
                         boxPadding: 4,
                         bodyFont: { size: 13 },
                         callbacks: {
+                            afterBody: props.data.tooltipAfterBody,
                             label: props.data.tooltipLabel,
                             labelPointStyle: context => {
                                 const color = context.dataset.backgroundColor

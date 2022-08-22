@@ -13,6 +13,18 @@ import { ReactComponent as EconomicsIcon } from "../assets/icons/economics.svg"
 
 const { colors } = variables
 
+const barChartColors = {
+    ancillaryServices: colors.green.main,
+    demandCharge: colors.yellow.main,
+    exportToGrid: colors.gray[300],
+    touArbitrage: colors.blue.main,
+    rec: colors.indigo.main,
+    solarLocalUsage: colors.purple.main,
+}
+
+const fakeDataArray = amount => Array.from(new Array(amount).keys())
+    .map(() => Math.floor(Math.random() * (40 - 10 + 1) + 10))
+
 export default function Economics(props) {
 
     const
@@ -37,12 +49,7 @@ export default function Economics(props) {
         currentHour = moment().hour(),
         hours24 = Array.from(new Array(24).keys()),
         lineChartDataArray = hours24.filter(v => v <= currentHour).map(() =>
-            Math.floor(Math.random() * (60 - 40 + 1) + 40))
-
-    const fakeDataArray = amount => Array.from(new Array(amount).keys())
-        .map(() => Math.floor(Math.random() * (40 - 10 + 1) + 10))
-
-    const
+            Math.floor(Math.random() * (60 - 40 + 1) + 40)),
         days = 7,
         sevenDays = Array.from(new Array(days).keys()).map(n =>
             moment().subtract(days - n, "d").startOf("day").toISOString()),
@@ -55,71 +62,82 @@ export default function Economics(props) {
 
     const
         [lineChartData, setLineChartData] = useState({
-            datasets: [{
-                backgroundColor: colors.primary.main,
-                borderColor: colors.primary.main,
-                data: lineChartDataArray,
-                fill: {
-                    above: colors.primary["main-opacity-10"],
-                    target: "origin"
-                },
-                pointBorderColor: colors.primary["main-opacity-20"]
-            }],
-            labels: sevenDays,
-            tickCallback: (val, index) => "$" + val,
-            tooltipLabel: item =>
-                `${item.dataset.label} $${item.parsed.y}`,
-            x: {
-                type: "time",
-                grid: { lineWidth: 0 },
-                time: {
-                    displayFormats: {
-                        day: "MMM D"
-                    },
-                    tooltipFormat: "MMM D",
-                    unit: "day"
-                }
-            },
-            y: { max: 80, min: 0 }
+            ancillaryServices: fakeData1,
+            demandCharge: fakeData2,
+            exportToGrid: fakeData3,
+            touArbitrage: fakeData4,
+            rec: fakeData5,
+            solarLocalUsage: fakeData6,
+            total: lineChartDataArray,
+            labels: sevenDays
         }),
         [barChartData, setBarChartData] = useState({
-            datasets: [
-                {
-                    backgroundColor: colors.green.main,
-                    data: fakeData1,
-                    label: pageT("ancillaryServices")
-                },
-                {
-                    backgroundColor: colors.yellow.main,
-                    data: fakeData2,
-                    label: pageT("demandCharge")
-                },
-                {
-                    backgroundColor: colors.blue.main,
-                    data: fakeData3,
-                    label: pageT("tOUArbitrage")
-                },
-                {
-                    backgroundColor: colors.indigo.main,
-                    data: fakeData4,
-                    label: pageT("rec")
-                },
-                {
-                    backgroundColor: colors.purple.main,
-                    data: fakeData5,
-                    label: pageT("solarLocalUsage")
-                },
-                {
-                    backgroundColor: colors.gray[300],
-                    data: fakeData6,
-                    label: pageT("exportToGrid")
-                }
-            ],
             labels: sevenDays,
-            tooltipLabel: item =>
-                `${item.dataset.label} ${item.parsed.y} ${commonT("kwh")}`,
-            y: { max: 70, min: 0 }
+            data: {
+                ancillaryServices: fakeData1,
+                demandCharge: fakeData2,
+                touArbitrage: fakeData3,
+                rec: fakeData4,
+                solarLocalUsage: fakeData5,
+                exportToGrid: fakeData6
+            }
         })
+
+    const barChartProps = data => ({
+        datasets: Object.keys(data.data).map(key => ({
+            backgroundColor: barChartColors[key],
+            data: data.data[key],
+            label: pageT(key)
+        })),
+        labels: data.labels,
+        tooltipLabel: item =>
+            `${item.dataset.label} ${item.parsed.y} ${commonT("kwh")}`,
+        y: { max: 70, min: 0 }
+    })
+
+    const lineChartProps = data => ({
+        datasets: [{
+            backgroundColor: colors.primary.main,
+            borderColor: colors.primary.main,
+            data: data.total,
+            fill: {
+                above: colors.primary["main-opacity-10"],
+                target: "origin"
+            },
+            pointBorderColor: colors.primary["main-opacity-20"],
+            tooltipData: {
+                total: data.total,
+                ancillaryServices: data.ancillaryServices,
+                demandCharge: data.demandCharge,
+                touArbitrage: data.touArbitrage,
+                rec: data.rec,
+                solarLocalUsage: data.solarLocalUsage,
+                exportToGrid: data.exportToGrid
+            }
+        }],
+        labels: data.labels,
+        tickCallback: (val, index) => "$" + val,
+        tooltipAfterBody: context => {
+            const {dataIndex, dataset} = context[0], {tooltipData} = dataset
+
+            return Object.keys(tooltipData).map(key =>
+                pageT(key) + " $" + tooltipData[key][dataIndex])
+        },
+        tooltipLabel: () => null,
+        tooltipUsePointStyle: false,
+        x: {
+            type: "time",
+            grid: { lineWidth: 0 },
+            time: {
+                displayFormats: {
+                    day: "MMM D"
+                },
+                tooltipFormat: "MMM D",
+                unit: "day"
+            }
+        },
+        y: { max: 80, min: 0 }
+    })
 
     return <>
         <h1 className="mb-9">{pageT("economics")}</h1>
@@ -144,7 +162,7 @@ export default function Economics(props) {
                         title={pageT("ancillaryServices")} />
                     <PriceCard
                         price={demandCharge}
-                        title={pageT("demandCharge")} />
+                        title={commonT("demandCharge")} />
                     <PriceCard
                         price={timeOfUseArbitrage}
                         title={pageT("timeOfUseArbitrage")} />
@@ -156,7 +174,7 @@ export default function Economics(props) {
                         title={pageT("solarLocalUsage")} />
                     <PriceCard
                         price={exportToGrid}
-                        title={pageT("exportToGrid")} />
+                        title={commonT("exportToGrid")} />
                 </div>
             </div>
         </div>
@@ -179,7 +197,9 @@ export default function Economics(props) {
                 <div />
             </div>
             <div className="max-h-80vh h-160 w-full mt-8">
-                <LineChart data={lineChartData} id="economicsLineChart" />
+                <LineChart
+                    data={lineChartProps(lineChartData)}
+                    id="economicsLineChart" />
             </div>
         </div>
         <div className="card mt-8">
@@ -199,7 +219,9 @@ export default function Economics(props) {
                 </Stack>
             </div>
             <div className="max-h-80vh h-160 mt-8 relative w-full">
-                <BarChart data={barChartData} id="economicsBarChart" />
+                <BarChart
+                    data={barChartProps(barChartData)}
+                    id="economicsBarChart" />
             </div>
         </div>
     </>

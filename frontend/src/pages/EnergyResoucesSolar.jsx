@@ -13,7 +13,7 @@ import LineChart from "../components/LineChart"
 import { ReactComponent as EconomicsIcon } from "../assets/icons/economics.svg"
 import { ReactComponent as UpIcon } from "../assets/icons/up.svg"
 import { ReactComponent as DownIcon } from "../assets/icons/down.svg"
-import { ReactComponent as Co2Icon } from "../assets/icons/co2.svg"
+import { ReactComponent as CO2Icon } from "../assets/icons/co2.svg"
 
 const { colors } = variables
 
@@ -51,7 +51,7 @@ export default function EnergyResoucesSolar(props) {
                 kwh: 60
             }),
         [economics, setEconomics] = useState(85),
-        [cO2Reduction, setCO2Reduction] = useState(0)
+        [co2Reduction, setCO2Reduction] = useState(0)
 
     const
         t = useTranslation(),
@@ -108,9 +108,9 @@ export default function EnergyResoucesSolar(props) {
                 title={pageT("economics")}
                 value={ecoValue} />
             <EnergySolarSubCard
-                icon={Co2Icon}
-                title={pageT("cO2Reduction")}
-                value={cO2Reduction + " " + pageT("tons")} />
+                icon={CO2Icon}
+                title={pageT("co2Reduction")}
+                value={co2Reduction + " " + pageT("tons")} />
         </div>
         <div className="card chart mt-8">
             <h4 className="mb-10">{pageT("realTimeSolarGeneration")}</h4>

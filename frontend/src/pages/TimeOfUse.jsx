@@ -291,13 +291,13 @@ export default function TimeOfUse() {
                             <div>
                                 <h3>{battery.level}%</h3>
                                 <span className="text-13px">
-                                    {pageT("stateOfCharge")}
+                                    {commonT("stateOfCharge")}
                                 </span>
                             </div>
                             <div>
                                 <h3>{battery.power} {commonT("kw")}</h3>
                                 <span className="text-13px">
-                                    {pageT("batteryPower")}
+                                    {commonT("batteryPower")}
                                 </span>
                             </div>
                             <div>

@@ -13,6 +13,15 @@ import { ReactComponent as EconomicsIcon } from "../assets/icons/economics.svg"
 
 const { colors } = variables
 
+const barChartColors = {
+    ancillaryServices: colors.green.main,
+    demandCharge: colors.yellow.main,
+    exportToGrid: colors.gray[300],
+    touArbitrage: colors.blue.main,
+    rec: colors.indigo.main,
+    solarLocalUsage: colors.purple.main,
+}
+
 const fakeDataArray = amount => Array.from(new Array(amount).keys())
     .map(() => Math.floor(Math.random() * (40 - 10 + 1) + 10))
 
@@ -63,48 +72,23 @@ export default function Economics(props) {
             labels: sevenDays
         }),
         [barChartData, setBarChartData] = useState({
-            ancillaryServices: fakeData1,
-            demandCharge: fakeData2,
-            exportToGrid: fakeData3,
             labels: sevenDays,
-            rec: fakeData4,
-            solarLocalUsage: fakeData5,
-            touArbitrage: fakeData6
+            data: {
+                ancillaryServices: fakeData1,
+                demandCharge: fakeData2,
+                touArbitrage: fakeData3,
+                rec: fakeData4,
+                solarLocalUsage: fakeData5,
+                exportToGrid: fakeData6
+            }
         })
 
     const barChartProps = data => ({
-        datasets: [
-            {
-                backgroundColor: colors.green.main,
-                data: data.ancillaryServices,
-                label: pageT("ancillaryServices")
-            },
-            {
-                backgroundColor: colors.yellow.main,
-                data: data.demandCharge,
-                label: commonT("demandCharge")
-            },
-            {
-                backgroundColor: colors.blue.main,
-                data: data.touArbitrage,
-                label: pageT("touArbitrage")
-            },
-            {
-                backgroundColor: colors.indigo.main,
-                data: data.rec,
-                label: pageT("rec")
-            },
-            {
-                backgroundColor: colors.purple.main,
-                data: data.solarLocalUsage,
-                label: pageT("solarLocalUsage")
-            },
-            {
-                backgroundColor: colors.gray[300],
-                data: data.exportToGrid,
-                label: commonT("exportToGrid")
-            }
-        ],
+        datasets: Object.keys(data.data).map(key => ({
+            backgroundColor: barChartColors[key],
+            data: data.data[key],
+            label: pageT(key)
+        })),
         labels: data.labels,
         tooltipLabel: item =>
             `${item.dataset.label} ${item.parsed.y} ${commonT("kwh")}`,

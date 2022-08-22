@@ -14,6 +14,8 @@
         "importFromGrid": "Import From Grid",
         "load": "Load",
         "month": "Month",
+        "realTimePowerkW": "Real-time Power (kW)",
+        "selfSupplyRate": "Self Supply Rate",
         "startDate": "Start Date",
         "to": "to",
         "totalEnergySources": "Total Energy Sources",

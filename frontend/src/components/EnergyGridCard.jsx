@@ -18,7 +18,7 @@ export default function EnergyGridCard(props) {
 
     return <div className="card">
         <h5 className="font-bold mb-8">{props.title}</h5>
-        <div className="xl:grid grid-cols-3 three-columns gap-x-10">
+        <div className="xl:grid grid-cols-3 gap-x-10 xl:column-separator">
             {props.data.map((t, i) => {
                 const Icon = icons[t.type]
                 return <div className={"border-gray-400 xl:border-0 py-4 xl:py-0"

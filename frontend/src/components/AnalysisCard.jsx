@@ -38,7 +38,7 @@ export default function AnalysisCard(props) {
                     {pageT(t.type)}
                 </div>)}
         </div>
-        <div className="grid grid-cols-3 three-columns gap-x-5 sm:gap-x-10">
+        <div className="grid grid-cols-3 column-separator gap-x-5 sm:gap-x-10">
             {types.map((t, i) =>
                 <div key={"detail-" + i}>
                     <h6 className="font-bold text-white">{pageT(t.type)}</h6>

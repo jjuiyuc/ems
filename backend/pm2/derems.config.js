@@ -30,6 +30,12 @@ module.exports = {
       args: args,
       namespace: "core-derems",
     },
+    {
+      name: "core-local-ai-worker",
+      script: path.join(binPath, "local-ai-worker"),
+      args: args,
+      namespace: "core-derems",
+    },
     /***** test-derems *****/
     {
       name: "test-local-cc-uplink-worker",

@@ -48,20 +48,20 @@ func (s *DashboardSuite) SetupSuite() {
 
 	// Truncate & seed data
 	err := testutils.SeedUtUser(db)
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	err = testutils.SeedUtCustomerAndGateway(db)
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	token, err := utils.GenerateToken(fixtures.UtUser.ID)
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	s.token = token
 	// Mock user_gateway_right table
 	_, err = db.Exec("TRUNCATE TABLE user_gateway_right")
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	_, err = db.Exec(`
 			INSERT INTO user_gateway_right (id,user_id,gw_id) VALUES
 			(1,1,1);
 		`)
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 
 	s.repo = repo
 	s.router = InitRouter(cfg.GetBool("server.cors"), cfg.GetString("server.ginMode"), w)
@@ -143,27 +143,27 @@ func (s *DashboardSuite) Test_dashboardHandler() {
 
 	log.Info("test name: ", tt.name)
 	ws, _, err := websocket.DefaultDialer.Dial(tt.urlStr, http.Header{"Sec-WebSocket-Protocol": {tt.token}})
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	defer ws.Close()
 
 	_, p, err := ws.ReadMessage()
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 
 	var res response
 	err = json.Unmarshal([]byte(p), &res)
-	s.Require().NoError(err)
-	s.Equal(tt.wantRv.Code, res.Code)
-	s.Equal(tt.wantRv.Msg, res.Msg)
-	s.Equal(tt.wantRv.Data, res.Data)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
+	s.Equalf(tt.wantRv.Code, res.Code, e.ErrNewMessageNotEqual.Error())
+	s.Equalf(tt.wantRv.Msg, res.Msg, e.ErrNewMessageNotEqual.Error())
+	s.Equalf(tt.wantRv.Data, res.Data, e.ErrNewMessageNotEqual.Error())
 }
 
 func (s *DashboardSuite) dashboardHandler(writer http.ResponseWriter, request *http.Request) {
-	s.Equal(s.token, request.Header["Sec-Websocket-Protocol"][0])
+	s.Equalf(s.token, request.Header["Sec-Websocket-Protocol"][0], e.ErrNewMessageNotEqual.Error())
 
 	pool := newPool()
 	go pool.start()
 	conn, err := s.worker.upgrade(writer, request)
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	client := &Client{
 		ID:          fixtures.UtUser.ID,
 		Token:       s.token,

@@ -57,20 +57,20 @@ func (s *EnergyResourcesSuite) SetupSuite() {
 
 	// Truncate & seed data
 	err := testutils.SeedUtUser(db)
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	err = testutils.SeedUtCustomerAndGateway(db)
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	token, err := utils.GenerateToken(fixtures.UtUser.ID)
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	s.token = token
 	// Mock user_gateway_right table
 	_, err = db.Exec("TRUNCATE TABLE user_gateway_right")
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	_, err = db.Exec(`
 			INSERT INTO user_gateway_right (id,user_id,gw_id) VALUES
 			(1,1,1);
 		`)
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 
 	s.repo = repo
 	s.router = InitRouter(cfg.GetBool("server.cors"), cfg.GetString("server.ginMode"), w)
@@ -129,11 +129,11 @@ func (s *EnergyResourcesSuite) Test_GetBatteryEnergyInfo() {
 		if tt.Name == "batteryEnergyInfo" {
 			dataMap := rvData.(map[string]interface{})
 			dataJSON, err := json.Marshal(dataMap)
-			s.Require().NoError(err)
+			s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 			var data services.BatteryEnergyInfoResponse
 			err = json.Unmarshal(dataJSON, &data)
-			s.Require().NoError(err)
-			s.Equal(tt.WantRv.Data, data)
+			s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
+			s.Equalf(tt.WantRv.Data, data, e.ErrNewMessageNotEqual.Error())
 		}
 	}
 }
@@ -225,11 +225,11 @@ func (s *EnergyResourcesSuite) Test_GetBatteryPowerState() {
 		if tt.Name == "batteryPowerState" {
 			dataMap := rvData.(map[string]interface{})
 			dataJSON, err := json.Marshal(dataMap)
-			s.Require().NoError(err)
+			s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 			var data services.BatteryPowerStateResponse
 			err = json.Unmarshal(dataJSON, &data)
-			s.Require().NoError(err)
-			s.Equal(tt.WantRv.Data, data)
+			s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
+			s.Equalf(tt.WantRv.Data, data, e.ErrNewMessageNotEqual.Error())
 		}
 	}
 }
@@ -279,11 +279,11 @@ func (s *EnergyResourcesSuite) Test_GetBatteryChargeVoltageState() {
 		if tt.Name == "batteryChargeVoltageState" {
 			dataMap := rvData.(map[string]interface{})
 			dataJSON, err := json.Marshal(dataMap)
-			s.Require().NoError(err)
+			s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 			var data services.BatteryChargeVoltageStateResponse
 			err = json.Unmarshal(dataJSON, &data)
-			s.Require().NoError(err)
-			s.Equal(tt.WantRv.Data, data)
+			s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
+			s.Equalf(tt.WantRv.Data, data, e.ErrNewMessageNotEqual.Error())
 		}
 	}
 }

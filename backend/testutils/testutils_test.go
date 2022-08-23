@@ -9,6 +9,7 @@ import (
 
 	"database/sql"
 	"der-ems/config"
+	"der-ems/internal/e"
 	"der-ems/kafka"
 	"der-ems/models"
 	"der-ems/repository"
@@ -43,27 +44,27 @@ func (s *TestutilsSuite) SetupSuite() {
 func (s *TestutilsSuite) Test_SeedUtUser() {
 	SeedUtUser(s.db)
 	_, err := s.repo.User.GetUserByUsername(fixtures.UtUser.Username)
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 }
 
 func (s *TestutilsSuite) Test_GetAuthorization() {
 	seedUtToken := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZXhwIjoxNjU1MzcxNjU2LCJpc3MiOiJkZXJlbXMifQ.VLBUMzihKZBJQ5zw845bSyokIEy-gQV1kS5w0g_dDdo"
 
 	data := GetAuthorization(seedUtToken)
-	s.Equal(fmt.Sprintf("Bearer %s", seedUtToken), data)
+	s.Equalf(fmt.Sprintf("Bearer %s", seedUtToken), data, e.ErrNewMessageNotEqual.Error())
 }
 
 func (s *TestutilsSuite) Test_CopyMap() {
 	data := CopyMap(s.seedUtData)
-	s.Equal(s.seedUtData, data)
+	s.Equalf(s.seedUtData, data, e.ErrNewMessageNotEqual.Error())
 }
 
 func (s *TestutilsSuite) Test_GetMockConsumerMessage() {
 	seedUtTopic := kafka.ReceiveLocalCCData
 
 	dataJSON, err := json.Marshal(s.seedUtData)
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	msg, err := GetMockConsumerMessage(s.T(), seedUtTopic, dataJSON)
-	s.Require().NoError(err)
-	s.Equal(seedUtTopic, msg.Topic)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
+	s.Equalf(seedUtTopic, msg.Topic, e.ErrNewMessageNotEqual.Error())
 }

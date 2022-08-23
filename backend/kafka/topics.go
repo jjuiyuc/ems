@@ -11,4 +11,7 @@ const (
 
 	// ReceiveLocalCCData godoc
 	ReceiveLocalCCData = "iot.cc.fct.record.0"
+
+	// ReceiveLocalAIData godoc
+	ReceiveLocalAIData = "iot.ai.fct.record.0"
 )

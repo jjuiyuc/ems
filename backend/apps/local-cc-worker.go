@@ -10,16 +10,10 @@ import (
 	"github.com/spf13/viper"
 	"github.com/volatiletech/null/v8"
 
-	"der-ems/internal/e"
 	"der-ems/internal/utils"
 	"der-ems/kafka"
 	deremsmodels "der-ems/models/der-ems"
 	"der-ems/repository"
-)
-
-const (
-	gwID      = "gwID"
-	timestamp = "timestamp"
 )
 
 // LocalCCWorker godoc
@@ -98,7 +92,7 @@ func (h localCCConsumerHandler) processLocalCCData(msg []byte) {
 }
 
 func (h localCCConsumerHandler) saveLocalCCData(msg []byte) (err error) {
-	gwIDValue, timestampValue, data, err := h.validate(msg)
+	gwIDValue, timestampValue, data, err := utils.AssertGatewayMessage(msg)
 	if err != nil {
 		return
 	}
@@ -114,6 +108,7 @@ func (h localCCConsumerHandler) saveLocalCCData(msg []byte) (err error) {
 
 	gateway, err := h.repo.Gateway.GetGatewayByGatewayUUID(gwUUID)
 	if err == nil {
+		ccData.GWID = null.NewInt(gateway.ID, true)
 		ccData.CustomerID = null.NewInt(gateway.CustomerID, true)
 	} else {
 		log.WithFields(log.Fields{
@@ -139,12 +134,12 @@ func (h localCCConsumerHandler) saveLocalCCData(msg []byte) (err error) {
 }
 
 func (h localCCConsumerHandler) saveLocalCCDataLog(msg []byte) (err error) {
-	gwIDValue, timestampValue, data, err := h.validate(msg)
+	gwIDValue, timestampValue, data, err := utils.AssertGatewayMessage(msg)
 	if err != nil {
 		return
 	}
-	delete(data, gwID)
-	delete(data, timestamp)
+	delete(data, "gwID")
+	delete(data, "timestamp")
 
 	dataJSON, err := json.Marshal(data)
 	var ccDataLog deremsmodels.CCDataLog
@@ -174,51 +169,6 @@ func (h localCCConsumerHandler) saveLocalCCDataLog(msg []byte) (err error) {
 	if err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "h.repo.CCData.UpsertCCDataLog",
-			"err":       err,
-		}).Error()
-	}
-	return
-}
-
-func (h localCCConsumerHandler) validate(msg []byte) (gwIDValue, timestampValue interface{}, data map[string]interface{}, err error) {
-	if err = json.Unmarshal(msg, &data); err != nil {
-		log.WithFields(log.Fields{
-			"caused-by": "json.Unmarshal",
-			"err":       err,
-		}).Error()
-		return
-	}
-
-	gwIDValue, ok := data[gwID]
-	if !ok {
-		err = e.ErrNewKeyNotExist(gwID)
-		log.WithFields(log.Fields{
-			"caused-by": gwID,
-			"err":       err,
-		}).Error()
-		return
-	}
-	if _, ok = gwIDValue.(string); !ok {
-		err = e.ErrNewKeyUnexpectedValue(gwID)
-		log.WithFields(log.Fields{
-			"caused-by": gwID,
-			"err":       err,
-		}).Error()
-		return
-	}
-	timestampValue, ok = data[timestamp]
-	if !ok {
-		err = e.ErrNewKeyNotExist(timestamp)
-		log.WithFields(log.Fields{
-			"caused-by": timestamp,
-			"err":       err,
-		}).Error()
-		return
-	}
-	if _, ok = timestampValue.(float64); !ok {
-		err = e.ErrNewKeyUnexpectedValue(timestamp)
-		log.WithFields(log.Fields{
-			"caused-by": timestamp,
 			"err":       err,
 		}).Error()
 	}

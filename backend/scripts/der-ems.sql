@@ -16,6 +16,27 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `ai_data`
+--
+
+DROP TABLE IF EXISTS `ai_data`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `ai_data` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `gw_uuid` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `log_date` datetime NOT NULL,
+  `gw_id` int DEFAULT NULL,
+  `customer_id` int DEFAULT NULL,
+  `local_ai_data` json DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `gw_uuid_log_date_UNIQUE` (`gw_uuid`,`log_date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `cc_data`
 --
 
@@ -26,6 +47,7 @@ CREATE TABLE `cc_data` (
   `id` int NOT NULL AUTO_INCREMENT,
   `gw_uuid` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `log_date` datetime NOT NULL,
+  `gw_id` int DEFAULT NULL,
   `customer_id` int DEFAULT NULL,
   `local_cc_data` json DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,

@@ -44,9 +44,9 @@ func (s *AuthorizationSuite) SetupSuite() {
 
 	// Truncate & seed data
 	_, err := db.Exec("truncate table login_log")
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	err = testutils.SeedUtUser(db)
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 
 	s.repo = repo
 	s.router = InitRouter(cfg.GetBool("server.cors"), cfg.GetString("server.ginMode"), worker)
@@ -133,14 +133,14 @@ func (s *AuthorizationSuite) Test_GetAuth() {
 	for _, tt := range tests {
 		log.Info("test name: ", tt.Name)
 		payloadBuf, err := json.Marshal(tt.args)
-		s.Require().NoError(err)
+		s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 		rvData := testutils.AssertRequest(tt.TestInfo, s.Require(), s.router, "POST", bytes.NewBuffer(payloadBuf))
 		if tt.Name == "login" {
 			dataMap := rvData.(map[string]interface{})
 			s.NotEmpty(dataMap["token"])
 			count, err := s.repo.User.GetLoginLogCount()
-			s.Require().NoError(err)
-			s.Equal(1, int(count))
+			s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
+			s.Equalf(1, int(count), e.ErrNewMessageNotEqual.Error())
 		}
 	}
 }

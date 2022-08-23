@@ -48,7 +48,7 @@ func (s *LocalCCWorkerSuite) SetupSuite() {
 
 	// Truncate & seed data
 	err := testutils.SeedUtCustomerAndGateway(db)
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	// Mock seedUtLocalCCData data
 	seedUtLoadLinks := map[string]int{
 		"grid":    0,
@@ -107,7 +107,7 @@ func (s *LocalCCWorkerSuite) TearDownSuite() {
 	_, err := s.db.Exec(`
 		DELETE FROM cc_data_log WHERE id = 3 OR id = 4;
 	`)
-	s.Require().NoError(err)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	models.Close()
 }
 
@@ -181,45 +181,45 @@ func (s *LocalCCWorkerSuite) Test_SaveLocalCCDataAndLog() {
 		log.Info("test name: ", tt.name)
 		if tt.name == "saveLocalCCDataEmptyInput" {
 			err := s.handler.saveLocalCCData(nil)
-			s.Require().Error(e.ErrNewUnexpectedJSONInput, err)
+			s.Equalf(e.ErrNewUnexpectedJSONInput.Error(), err.Error(), e.ErrNewMessageNotEqual.Error())
 			continue
 		}
 
 		dataJSON, err := json.Marshal(tt.args.Msg)
-		s.Require().NoError(err)
+		s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 		msg, err := testutils.GetMockConsumerMessage(s.T(), s.seedUtTopic, dataJSON)
-		s.Require().NoError(err)
-		s.Equal(s.seedUtTopic, msg.Topic)
+		s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
+		s.Equalf(s.seedUtTopic, msg.Topic, e.ErrNewMessageNotEqual.Error())
 
 		currentCount, err := s.repo.CCData.GetCCDataCount()
-		s.Require().NoError(err)
+		s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 		currentLogCount, err := s.repo.CCData.GetCCDataLogCount()
-		s.Require().NoError(err)
+		s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 		saveErr := s.handler.saveLocalCCData(msg.Value)
 		saveLogErr := s.handler.saveLocalCCDataLog(msg.Value)
 
 		switch tt.name {
 		case "saveLocalCCData", "saveLocalCCDataNewGW":
-			s.Require().NoError(saveErr)
-			s.Require().NoError(saveLogErr)
+			s.Require().NoErrorf(saveErr, e.ErrNewMessageReceivedUnexpectedErr.Error())
+			s.Require().NoErrorf(saveLogErr, e.ErrNewMessageReceivedUnexpectedErr.Error())
 			updatedCount, err := s.repo.CCData.GetCCDataCount()
-			s.Require().NoError(err)
-			s.Equal(currentCount+1, updatedCount)
+			s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
+			s.Equalf(currentCount+1, updatedCount, e.ErrNewMessageNotEqual.Error())
 			updatedCount, err = s.repo.CCData.GetCCDataLogCount()
-			s.Require().NoError(err)
-			s.Equal(currentLogCount+1, updatedCount)
+			s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
+			s.Equalf(currentLogCount+1, updatedCount, e.ErrNewMessageNotEqual.Error())
 		case "saveLocalCCDataNoGWID":
-			s.Equal(e.ErrNewKeyNotExist(gwID).Error(), saveErr.Error())
-			s.Equal(e.ErrNewKeyNotExist(gwID).Error(), saveLogErr.Error())
+			s.Equalf(e.ErrNewKeyNotExist(gwID).Error(), saveErr.Error(), e.ErrNewMessageNotEqual.Error())
+			s.Equalf(e.ErrNewKeyNotExist(gwID).Error(), saveLogErr.Error(), e.ErrNewMessageNotEqual.Error())
 		case "saveLocalCCDataNoTimestamp":
-			s.Equal(e.ErrNewKeyNotExist(timestamp).Error(), saveErr.Error())
-			s.Equal(e.ErrNewKeyNotExist(timestamp).Error(), saveLogErr.Error())
+			s.Equalf(e.ErrNewKeyNotExist(timestamp).Error(), saveErr.Error(), e.ErrNewMessageNotEqual.Error())
+			s.Equalf(e.ErrNewKeyNotExist(timestamp).Error(), saveLogErr.Error(), e.ErrNewMessageNotEqual.Error())
 		case "saveLocalCCDataGWIDUnexpectedValue":
-			s.Equal(e.ErrNewKeyUnexpectedValue(gwID).Error(), saveErr.Error())
-			s.Equal(e.ErrNewKeyUnexpectedValue(gwID).Error(), saveLogErr.Error())
+			s.Equalf(e.ErrNewKeyUnexpectedValue(gwID).Error(), saveErr.Error(), e.ErrNewMessageNotEqual.Error())
+			s.Equalf(e.ErrNewKeyUnexpectedValue(gwID).Error(), saveLogErr.Error(), e.ErrNewMessageNotEqual.Error())
 		case "saveLocalCCDataTimestampUnexpectedValue":
-			s.Equal(e.ErrNewKeyUnexpectedValue(timestamp).Error(), saveErr.Error())
-			s.Equal(e.ErrNewKeyUnexpectedValue(timestamp).Error(), saveLogErr.Error())
+			s.Equalf(e.ErrNewKeyUnexpectedValue(timestamp).Error(), saveErr.Error(), e.ErrNewMessageNotEqual.Error())
+			s.Equalf(e.ErrNewKeyUnexpectedValue(timestamp).Error(), saveLogErr.Error(), e.ErrNewMessageNotEqual.Error())
 		}
 	}
 }

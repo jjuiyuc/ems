@@ -30,5 +30,11 @@ module.exports = {
       args: args,
       namespace: "core-derems",
     },
+    /***** test-derems *****/
+    {
+      name: "test-local-cc-uplink-worker",
+      script: path.join(binPath, "local-cc-uplink-worker.sh"),
+      namespace: "test-derems",
+    },
   ]
 }

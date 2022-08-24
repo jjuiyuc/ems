@@ -1,15 +1,16 @@
 import { Button, Stack, TextField } from "@mui/material"
 import { CalendarToday } from "@mui/icons-material"
-// import { DateRangePicker } from "materialui-daterange-picker"
 import { getLanguage, useTranslation } from "react-multi-lang"
 import moment from "moment"
 import { useEffect, useState } from "react"
 
 import AnalysisCard from "../components/AnalysisCard"
+import DateRangePicker from "../components/DateRangePicker"
 import BarChart from "../components/BarChart"
 import LineChart from "../components/LineChart"
 import variables from "../configs/variables"
-import "../assets/css/datePicker.scss"
+// import "../assets/css/datePicker.scss"
+import "../assets/css/dateRangePicker.css"
 
 const { colors } = variables
 
@@ -227,7 +228,7 @@ export default function Analysis() {
         {tab === "custom"
             ? <div className="flex justify-end mb-10 relative w-auto">
                 <div className="flex items-center">
-                    <TextField
+                    {/* <TextField
                         InputProps={{
                             endAdornment: <CalendarToday
                                 className="text-gray-300" />
@@ -249,10 +250,11 @@ export default function Analysis() {
                         style={{ marginBottom: 0 }}
                         type="text"
                         value={endDate}
-                        variant="outlined" />
+                        variant="outlined" /> */}
+                    <DateRangePicker />
                 </div>
                 {/* <div className="absolute mt-2 top-full">
-                <DateRangePicker
+                    <DateRangePicker
                     onChange={range => setDateRange(range)}
                     open={open}
                     toggle={toggle}
@@ -261,7 +263,7 @@ export default function Analysis() {
                     definedRanges={[]}
                     wrapperClassName="date-range-picker"
                 />
-            </div> */}
+                </div> */}
             </div>
             : null}
         <div className="gap-8 grid md:grid-cols-2 items-start">

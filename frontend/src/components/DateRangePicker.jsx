@@ -22,32 +22,38 @@ export default function DateRangePicker(props) {
 
     return (
         <>
-            <DatePicker
-                dateFormat="yyyy/MM/dd"
-                selected={startDate}
-                onChange={onChange}
-                value={startDate ? moment(startDate).format("yyyy/MM/DD") : ""}
-                selectsStart
-                startDate={startDate}
-                endDate={endDate}
-                minDate={moment().subtract(2, "month")._d}
-                maxDate={new Date()}
-                showDisabledMonthNavigation
-                monthsShown={2}
-                selectsRange
-            />
-            <span className="mx-4">{pageT("to")}</span>
-            <DatePicker
-                dateFormat="yyyy/MM/dd"
-                selected={endDate}
-                onChange={(date) => setEndDate(date)}
-                selectsEnd
-                startDate={startDate}
-                endDate={endDate}
-                minDate={startDate}
-                maxDate={new Date()}
-                disabled={true}
-            />
+            <div>
+                <h6 className="mb-1 ml-1">Start Date</h6>
+                <DatePicker
+                    dateFormat="yyyy/MM/dd"
+                    selected={startDate}
+                    onChange={onChange}
+                    value={startDate ? moment(startDate).format("yyyy/MM/DD") : ""}
+                    selectsStart
+                    startDate={startDate}
+                    endDate={endDate}
+                    minDate={moment().subtract(2, "month")._d}
+                    maxDate={new Date()}
+                    showDisabledMonthNavigation
+                    monthsShown={2}
+                    selectsRange
+                />
+            </div>
+            <span className="mt-6 mx-4">{pageT("to")}</span>
+            <div>
+                <h6 className="mb-1 ml-1">End Date</h6>
+                <DatePicker
+                    dateFormat="yyyy/MM/dd"
+                    selected={endDate}
+                    onChange={(date) => setEndDate(date)}
+                    selectsEnd
+                    startDate={startDate}
+                    endDate={endDate}
+                    minDate={startDate}
+                    maxDate={new Date()}
+                    disabled={true}
+                />
+            </div>
         </>
     )
 }

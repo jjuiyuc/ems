@@ -1,23 +1,16 @@
-import { Button, Stack, TextField } from "@mui/material"
-import { CalendarToday } from "@mui/icons-material"
-// import { DateRangePicker } from "materialui-daterange-picker"
+import { Button, Stack } from "@mui/material"
 import { getLanguage, useTranslation } from "react-multi-lang"
 import moment from "moment"
 import { useEffect, useState } from "react"
 
 import AnalysisCard from "../components/AnalysisCard"
+import DateRangePicker from "../components/DateRangePicker"
 import BarChart from "../components/BarChart"
 import LineChart from "../components/LineChart"
 import variables from "../configs/variables"
-import "../assets/css/datePicker.scss"
+import "../assets/css/dateRangePicker.css"
 
 const { colors } = variables
-
-const dateFormat = "YYYY-MM-DD"
-const defaultDate = {
-    startDate: null,
-    endDate: null
-}
 
 export default function Analysis() {
     const
@@ -176,8 +169,7 @@ export default function Analysis() {
                 { kwh: 25, percentage: 41, type: "chargeToBattery" },
             ],
             kwh: 60
-        }),
-        [dateRange, setDateRange] = useState(defaultDate)
+        })
     const lang = getLanguage()
 
     useEffect(() => {
@@ -198,16 +190,7 @@ export default function Analysis() {
         setLineChartData(lineChart)
     }, [lang])
 
-    const toggle = () => setOpen(!open)
-
-    const
-        endDate = dateRange.endDate
-            ? moment(dateRange.endDate).format(dateFormat)
-            : "",
-        startDate = dateRange.startDate
-            ? moment(dateRange.startDate).format(dateFormat)
-            : "",
-        tabs = ["days", "weeks", "month", "year", "custom"]
+    const tabs = ["days", "weeks", "month", "year", "custom"]
 
     return <>
         <div className="page-header">
@@ -227,41 +210,8 @@ export default function Analysis() {
         {tab === "custom"
             ? <div className="flex justify-end mb-10 relative w-auto">
                 <div className="flex items-center">
-                    <TextField
-                        InputProps={{
-                            endAdornment: <CalendarToday
-                                className="text-gray-300" />
-                        }}
-                        label={pageT("startDate")}
-                        onFocus={() => setOpen(true)}
-                        style={{ marginBottom: 0 }}
-                        type="text"
-                        value={startDate}
-                        variant="outlined" />
-                    <span className="mx-4">{pageT("to")}</span>
-                    <TextField
-                        InputProps={{
-                            endAdornment: <CalendarToday
-                                className="text-gray-300" />
-                        }}
-                        label={pageT("endDate")}
-                        onFocus={() => setOpen(true)}
-                        style={{ marginBottom: 0 }}
-                        type="text"
-                        value={endDate}
-                        variant="outlined" />
+                    <DateRangePicker />
                 </div>
-                {/* <div className="absolute mt-2 top-full">
-                <DateRangePicker
-                    onChange={range => setDateRange(range)}
-                    open={open}
-                    toggle={toggle}
-                    maxDate={new Date()}
-                    minDate={moment().subtract(1, "y")}
-                    definedRanges={[]}
-                    wrapperClassName="date-range-picker"
-                />
-            </div> */}
             </div>
             : null}
         <div className="gap-8 grid md:grid-cols-2 items-start">

@@ -23,7 +23,7 @@ export default function DateRangePicker(props) {
     return (
         <>
             <div>
-                <h6 className="mb-1 ml-1">Start Date</h6>
+                <h6 className="mb-1 ml-1">{pageT("startDate")}</h6>
                 <DatePicker
                     dateFormat="yyyy/MM/dd"
                     selected={startDate}
@@ -41,7 +41,7 @@ export default function DateRangePicker(props) {
             </div>
             <span className="mt-6 mx-4">{pageT("to")}</span>
             <div>
-                <h6 className="mb-1 ml-1">End Date</h6>
+                <h6 className="mb-1 ml-1">{pageT("endDate")}</h6>
                 <DatePicker
                     dateFormat="yyyy/MM/dd"
                     selected={endDate}

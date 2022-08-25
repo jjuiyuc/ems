@@ -9,7 +9,7 @@
         "directSolarSupply": "太陽能供給",
         "endDate": "結束日期",
         "energyDestinations": "能源目標",
-        "exportFromGrid": "自電網輸出",
+        "exportToGrid": "自電網輸出",
         "household": "家庭",
         "importFromGrid": "市電所提供",
         "load": "用電負載",

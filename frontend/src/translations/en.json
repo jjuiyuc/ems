@@ -112,7 +112,7 @@
             "exportToGrid": "Export to Grid",
             "gridPowerImport": "Grid Power Import",
             "importFromGrid": "Import From Grid",
-            "netExport": "Net Export"
+            "netImport": "Net Import"
         },
         "solar": {
             "co2Reduction": "CO2 Reduction",

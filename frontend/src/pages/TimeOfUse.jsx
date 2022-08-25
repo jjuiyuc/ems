@@ -286,8 +286,8 @@ export default function TimeOfUse() {
                                 id="batteryChart"
                                 ref={batteryChart} />
                         </div>
-                        <div className="grid grid-cols-3 my-6 mw-88 three-columns
-                                    gap-x-5 sm:gap-x-10">
+                        <div className="column-separator grid grid-cols-3 my-6
+                            mw-88 gap-x-5 sm:gap-x-10">
                             <div>
                                 <h3>{battery.level}%</h3>
                                 <span className="text-13px">

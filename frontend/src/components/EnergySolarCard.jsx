@@ -45,7 +45,7 @@ export default function EnergySolarCard(props) {
                     {pageT(t.type)}
                 </div>)}
         </div>
-        <div className="lg:grid grid-cols-3 three-columns gap-x-10">
+        <div className="lg:grid grid-cols-3 gap-x-10 lg:column-separator">
             {types.map((t, i) => {
                 const Icon = icons[t.type]
                 return <div className={"border-gray-400 lg:border-0 py-4 lg:py-0"

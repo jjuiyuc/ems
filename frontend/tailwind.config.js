@@ -1,4 +1,5 @@
 const palette = require("./src/configs/palette.json")
+const plugin = require("tailwindcss/plugin")
 
 module.exports = {
     content: [
@@ -91,7 +92,35 @@ module.exports = {
             "sm-xl": { raw: "(min-width: 600px) and (min-height: 1536px)" },
         }
     },
-    plugins: [],
+    plugins: [
+        plugin(function ({ addUtilities }) {
+            const bgImage = gap => {
+                const
+                    gray = palette.gray[400],
+                    halfGap = gap / 2 + "rem",
+                    twiceGap = gap * 2 + "rem",
+                    pos1 = `calc((100% - ${twiceGap}) / 3 + ${halfGap})`,
+                    pos1_1 = `calc((100% - ${twiceGap}) / 3 + ${halfGap} + 1px)`,
+                    pos2 = `calc((100% - ${twiceGap}) / 3 * 2 + ${gap}rem + ${halfGap})`,
+                    pos2_1 = `calc((100% - ${twiceGap}) / 3 * 2 + ${gap}rem + ${halfGap} + 1px)`,
+                    trans = "transparent"
+
+                return ({
+                    "background-image": "linear-gradient(to right, "
+                        + `${trans} ${pos1}, ${gray} ${pos1_1}, ${trans} ${pos1_1}, `
+                        + `${trans} ${pos2}, ${gray} ${pos2}, ${trans} ${pos2_1})`
+                })
+            }
+            addUtilities({
+                "@media (max-width: 599px)": {
+                    ".column-separator": bgImage(1.25)
+                },
+                "@media (min-width: 600px)": {
+                    ".column-separator": bgImage(2.5)
+                }
+            })
+        })
+    ],
     safelist: [
         "bg-blue-main-opacity-20",
         "bg-green-main-opacity-20",

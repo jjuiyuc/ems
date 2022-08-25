@@ -108,34 +108,6 @@ h6 {
     @apply text-xs;
     transform: scale(0.917);
 }
-.three-columns {
-    $gray-400: #606060;
-    $trans: transparent;
-
-    @mixin bgImage($gap) {
-        $halfGap: math.div($gap, 2);
-        $pos1: calc((100% - $gap * 2) / 3 + $halfGap);
-        $pos1_1: calc((100% - $gap * 2) / 3 + $halfGap + 1px);
-        $pos2: calc((100% - $gap * 2) / 3 * 2 + $gap + $halfGap);
-        $pos2_1: calc((100% - $gap * 2) / 3 * 2 + $gap + $halfGap + 1px);
-
-        background-image: linear-gradient(to right,
-            $trans $pos1, $gray-400 $pos1_1, $trans $pos1_1,
-            $trans $pos2, $gray-400 $pos2, $trans $pos2_1
-        );
-    }
-
-    background-position: left bottom;
-    background-repeat: repeat-x;
-    background-size: 100% 3.25rem;
-
-    @media (max-width: 599px) {
-        @include bgImage(1.25rem);
-    }
-    @media (min-width: 600px) {
-        @include bgImage(2.5rem);
-    }
-}
 .userMenu {
     li {
         @apply gap-3 grid cursor-pointer duration-300 items-center px-4 py-2

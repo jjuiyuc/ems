@@ -112,7 +112,7 @@
             "exportToGrid": "回送電網",
             "gridPowerImport": "電網電力導入",
             "importFromGrid": "市電所提供",
-            "netExport": "Net Export"
+            "netImport": "Net Import"
         },
         "solar": {
             "co2Reduction": "二氧化碳減排",

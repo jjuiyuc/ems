@@ -7,7 +7,7 @@ import { ReactComponent as NetExportIcon } from "../assets/icons/emergy_export.s
 const icons = {
     exportToGrid: GridExportIcon,
     importFromGrid: GridImportIcon,
-    netExport: NetExportIcon
+    netImport: NetExportIcon
 }
 
 export default function EnergyGridCard(props) {

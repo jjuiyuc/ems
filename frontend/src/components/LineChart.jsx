@@ -157,8 +157,28 @@ export default function LineChart(props) {
                             padding: 10,
                             callback: props.data.tickCallback
                         },
+                        position: "left",
                         ...props.data?.y
+                    },
+                    y1: {
+                        grid: {
+                            borderDash: [1, 2],
+                            color: colors.gray[400],
+                            drawTicks: false
+                        },
+                        ticks: {
+                            color: colors.gray[200],
+                            font: {
+                                size: 11
+                            },
+                            padding: 10,
+                        },
+                        display: props.data.y1 || false,
+                        position: "right",
+                        ...props.data.y1
                     }
+
+
                 }
             },
             plugins: [

@@ -22,7 +22,7 @@ import { ReactComponent as CycleIcon } from "../assets/icons/battery_cycle.svg"
 import { ReactComponent as DischargeIcon }
     from "../assets/icons/battery_discharge.svg"
 
-const {colors} = variables
+const { colors } = variables
 
 const drawHighPeak = (startHour, endHour) => chart => {
     if (chart.scales.x._gridLineItems && endHour && startHour) {
@@ -46,37 +46,8 @@ const drawHighPeak = (startHour, endHour) => chart => {
         ctx.stroke()
     }
 }
-const chartChargeVoltageSet = ({data, highPeak, labels, unit}) => ({
-    beforeDraw: drawHighPeak(highPeak.start, highPeak.end),
-    datasets: [
-        {
-            backgroundColor: colors.blue.main,
-            borderColor: colors.blue.main,
-            data: data.charge,
-            fill: {
-                above: colors.blue["main-opacity-10"],
-                target: "origin"
-            },
-            id: "charge",
-            pointBorderColor: colors.blue["main-opacity-20"]
-        },
-        {
-            backgroundColor: colors.primary.main,
-            borderColor: colors.primary.main,
-            data: data.voltage,
-            fill: {
-                above: colors.primary["main-opacity-10"],
-                target: "origin"
-            },
-            id: "voltage",
-            pointBorderColor: colors.primary["main-opacity-20"]
-        }
-    ],
-    labels,
-    tooltipLabel: item => item.parsed.y + unit[item.dataset.id],
-    y: {max: 100, min: 0}
-})
-const chartPowerSet = ({data, highPeak, labels, unit}) => ({
+
+const chartPowerSet = ({ data, highPeak, labels, unit }) => ({
     beforeDraw: drawHighPeak(highPeak.start, highPeak.end),
     datasets: [{
         backgroundColor: colors.blue.main,
@@ -92,9 +63,9 @@ const chartPowerSet = ({data, highPeak, labels, unit}) => ({
     labels,
     tickCallback: (val, index) => val + " " + unit,
     tooltipLabel: item => `${item.parsed.y} ${unit}`,
-    y: {max: 15, min: -15}
+    y: { max: 15, min: -15 }
 })
-const ErrorBox = ({error, margin="", message}) => error
+const ErrorBox = ({ error, margin = "", message }) => error
     ? <AlertBox
         boxClass={`${margin} negative`}
         content={<>
@@ -104,11 +75,11 @@ const ErrorBox = ({error, margin="", message}) => error
         icon={ReportProblemIcon}
         iconColor="negative-main" />
     : null
-const LoadingBox = ({loading}) => loading
+const LoadingBox = ({ loading }) => loading
     ? <div className="grid h-24 place-items-center"><Spinner /></div>
     : null
 
-const mapState = state => ({gatewayID: state.gateways.active.gatewayID})
+const mapState = state => ({ gatewayID: state.gateways.active.gatewayID })
 
 export default connect(mapState)(function EnergyResoucesBattery(props) {
     const
@@ -135,6 +106,40 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
         [powerSources, setPowerSources] = useState(""),
         [voltage, setVoltage] = useState(0)
 
+    const chartChargeVoltageSet = ({ data, highPeak, labels, unit }) => ({
+        beforeDraw: drawHighPeak(highPeak.start, highPeak.end),
+        datasets: [
+            {
+                backgroundColor: colors.blue.main,
+                borderColor: colors.blue.main,
+                data: data.charge,
+                fill: {
+                    above: colors.blue["main-opacity-10"],
+                    target: "origin"
+                },
+                id: "charge",
+                pointBorderColor: colors.blue["main-opacity-20"],
+                label: pageT("soc")
+            },
+            {
+                backgroundColor: colors.primary.main,
+                borderColor: colors.primary.main,
+                data: data.voltage,
+                fill: {
+                    above: colors.primary["main-opacity-10"],
+                    target: "origin"
+                },
+                id: "voltage",
+                pointBorderColor: colors.primary["main-opacity-20"],
+                label: pageT("voltage")
+            },
+        ],
+        labels,
+        tooltipLabel: item => `${item.dataset.label} ${item.parsed.y}`
+            + unit[item.dataset.id],
+        y: { max: 100, min: 0 },
+        y1: { max: 100, min: 0 }
+    })
     useEffect(() => {
         if (!props.gatewayID) return
 
@@ -154,7 +159,7 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
             onSuccess: rawData => {
                 if (!rawData || !rawData.data) return
 
-                const {data} = rawData
+                const { data } = rawData
 
                 setBatteryPower(data.batteryPower || 0)
                 setCapacity(data.capcity || 0)
@@ -183,9 +188,9 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
                 if (!rawData || !rawData.data) return
 
                 const
-                    {data} = rawData,
-                    {onPeakTime, timestamps} = data,
-                    {end, start, timezone} = onPeakTime,
+                    { data } = rawData,
+                    { onPeakTime, timestamps } = data,
+                    { end, start, timezone } = onPeakTime,
                     labels = [
                         ...timestamps.map(t => t * 1000),
                         ...oClocks.slice(timestamps.length)
@@ -195,7 +200,7 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
 
                 setPower({
                     data: data.batteryAveragePowerACs,
-                    highPeak: {start: peakStart, end: peakEnd},
+                    highPeak: { start: peakStart, end: peakEnd },
                     labels
                 })
             },
@@ -213,9 +218,9 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
                 if (!rawData || !rawData.data) return
 
                 const
-                    {data} = rawData,
-                    {onPeakTime, timestamps} = data,
-                    {end, start, timezone} = onPeakTime,
+                    { data } = rawData,
+                    { onPeakTime, timestamps } = data,
+                    { end, start, timezone } = onPeakTime,
                     labels = [
                         ...timestamps.map(t => t * 1000),
                         ...oClocks.slice(timestamps.length)
@@ -228,7 +233,7 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
                         charge: data.batterySoCs,
                         voltage: data.batteryVoltages
                     },
-                    highPeak: {start: peakStart, end: peakEnd},
+                    highPeak: { start: peakStart, end: peakEnd },
                     labels
                 })
             },
@@ -242,11 +247,11 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
         pageT = string => t("energyResources.battery." + string)
 
     const batteryInfoData = [
-        {title: pageT("modal"), value: modal},
-        {title: pageT("capacity"), value: capacity},
-        {title: pageT("powerSources"), value: powerSources},
-        {title: commonT("batteryPower"), value: batteryPower},
-        {title: pageT("voltage"), value: voltage},
+        { title: pageT("modal"), value: modal },
+        { title: pageT("capacity"), value: capacity },
+        { title: pageT("powerSources"), value: powerSources },
+        { title: commonT("batteryPower"), value: batteryPower },
+        { title: pageT("voltage"), value: voltage },
     ]
 
     const cardsData = {
@@ -265,8 +270,8 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
             value: `${chargingState} %`
         }],
         cycles: [
-            {title: commonT("today"), value: cyclesToday},
-            {title: pageT("lifetime"),value: cyclesLifetime}
+            { title: commonT("today"), value: cyclesToday },
+            { title: pageT("lifetime"), value: cyclesLifetime }
         ],
         discharged: [
             {
@@ -285,7 +290,7 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
             <LineChart
                 data={chartChargeVoltageSet({
                     ...chargeVoltage,
-                    unit: {charge: "%", voltage: " " + commonT("kw")}
+                    unit: { charge: "%", voltage: " " + commonT("v") },
                 })}
                 id="erbChargeVoltage" />
         </div>
@@ -294,7 +299,7 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
     const powerChart = power
         ? <div className="max-h-80vh h-160 relative w-full">
             <LineChart
-                data={chartPowerSet({...power, unit: commonT("kw")})}
+                data={chartPowerSet({ ...power, unit: commonT("kw") })}
                 id="erbPower" />
         </div>
         : null
@@ -306,9 +311,9 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
         </div>)
 
     const infoErrorBox = <ErrorBox
-                            error={infoError}
-                            margin="mb-8"
-                            message={pageT("infoError")} />
+        error={infoError}
+        margin="mb-8"
+        message={pageT("infoError")} />
 
     return <>
         <h1 className="mb-9">{t("navigator.energyResources")}</h1>
@@ -331,12 +336,12 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
                 data={cardsData.charged}
                 icon={ChargedIcon}
                 title={pageT("charged")} />
-        {infoLoading
-            ? <div className="absolute bg-black-main-opacity-95 grid inset-0
+            {infoLoading
+                ? <div className="absolute bg-black-main-opacity-95 grid inset-0
                                 place-items-center rounded-3xl">
-                <Spinner />
-            </div>
-            : null}
+                    <Spinner />
+                </div>
+                : null}
         </div>
         <div className="card chart mt-8">
             <h4 className="mb-9">{pageT("chargingDischargingPower")}</h4>

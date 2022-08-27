@@ -11,9 +11,9 @@ import Sample from "../configs/Sample"
 
 import Dashboard from "../pages/Dashboard"
 import DemandCharge from "../pages/DemandCharge"
-import EnergyResoucesBattery from "../pages/EnergyResoucesBattery"
+import EnergyResourcesBattery from "../pages/EnergyResourcesBattery"
 import EnergyResourcesGrid from "../pages/EnergyResourcesGrid"
-import EnergyResoucesSolar from "../pages/EnergyResoucesSolar"
+import EnergyResourcesSolar from "../pages/EnergyResourcesSolar"
 import Analysis from "../pages/Analysis"
 import TimeOfUse from "../pages/TimeOfUse"
 import Economics from "../pages/Economics"
@@ -53,10 +53,10 @@ function LoggedIn(props) {
                             element={<EnergyResourcesGrid />}
                             path="/energy-resources/grid" />
                         <Route
-                            element={<EnergyResoucesBattery />}
+                            element={<EnergyResourcesBattery />}
                             path="/energy-resources/battery" />
                         <Route
-                            element={<EnergyResoucesSolar />}
+                            element={<EnergyResourcesSolar />}
                             path="/energy-resources/solar" />
                         <Route
                             element={<Navigate

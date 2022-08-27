@@ -6,7 +6,7 @@ import { useTranslation } from "react-multi-lang"
 import { apiCall } from "../utils/api"
 import variables from "../configs/variables"
 
-import EnergyResoucesTabs from "../components/EnergyResoucesTabs"
+import EnergyResourcesTabs from "../components/EnergyResourcesTabs"
 import EnergyGridCard from "../components/EnergyGridCard"
 import LineChart from "../components/LineChart"
 
@@ -79,7 +79,7 @@ export default function EnergyResourcesGrid(props) {
 
     return <>
         <h1 className="mb-9">{t("navigator.energyResources")}</h1>
-        <EnergyResoucesTabs current="grid" />
+        <EnergyResourcesTabs current="grid" />
         <div className="lg:grid grid-cols-auto-19rem gap-x-5">
             <EnergyGridCard data={todayGrid} title={commonT("today")} />
             <div className="card mt-8 lg:m-0">

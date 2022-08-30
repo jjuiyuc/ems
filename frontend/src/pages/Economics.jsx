@@ -118,7 +118,7 @@ export default function Economics(props) {
         labels: data.labels,
         tickCallback: (val, index) => "$" + val,
         tooltipAfterBody: context => {
-            const {dataIndex, dataset} = context[0], {tooltipData} = dataset
+            const { dataIndex, dataset } = context[0], { tooltipData } = dataset
 
             return Object.keys(tooltipData).map(key =>
                 pageT(key) + " $" + tooltipData[key][dataIndex])
@@ -141,8 +141,8 @@ export default function Economics(props) {
 
     return <>
         <h1 className="mb-9">{pageT("economics")}</h1>
-        <div className="flex">
-            <div className="card w-3/12 mb-8 grid grid-row-2">
+        <div className=" gap-x-5 lg:grid-cols-4 grid">
+            <div className="card mb-8 row-span-2 col-span-1">
                 <div>
                     <h5 className="font-bold">{pageT("total")}</h5>
                     <h2 className="font-bold mb-1 pt-4">{pageT("february")} 2022</h2>
@@ -155,36 +155,32 @@ export default function Economics(props) {
                     </div>
                 </div>
             </div>
-            <div className="flex flex-wrap ml-5">
-                <div className="grid-cols-3 auto-cols-max gap-x-5 md:grid">
-                    <PriceCard
-                        price={ancillaryServices}
-                        title={pageT("ancillaryServices")} />
-                    <PriceCard
-                        price={demandCharge}
-                        title={commonT("demandCharge")} />
-                    <PriceCard
-                        price={timeOfUseArbitrage}
-                        title={pageT("timeOfUseArbitrage")} />
-                    <PriceCard
-                        price={renewableEnergyCertificate}
-                        title={pageT("renewableEnergyCertificate")} />
-                    <PriceCard
-                        price={solarLocalUsage}
-                        title={pageT("solarLocalUsage")} />
-                    <PriceCard
-                        price={exportToGrid}
-                        title={commonT("exportToGrid")} />
-                </div>
-            </div>
+            <PriceCard
+                price={ancillaryServices}
+                title={pageT("ancillaryServices")} />
+            <PriceCard
+                price={demandCharge}
+                title={commonT("demandCharge")} />
+            <PriceCard
+                price={timeOfUseArbitrage}
+                title={pageT("timeOfUseArbitrage")} />
+            <PriceCard
+                price={renewableEnergyCertificate}
+                title={pageT("renewableEnergyCertificate")} />
+            <PriceCard
+                price={solarLocalUsage}
+                title={pageT("solarLocalUsage")} />
+            <PriceCard
+                price={exportToGrid}
+                title={commonT("exportToGrid")} />
         </div>
         <div className="card chart">
             <div className="items-center grid-cols-1fr-auto-1fr mb-8 lg:grid">
                 <h4 className="mb-4 lg:mb-0">{pageT("monthlyStackedRevenue")}</h4>
-                <Stack direction="row" spacing={1.5}>
+                <Stack direction="row" spacing={1.5} className="flex-wrap lg:flex">
                     {monthtlyTabs.map((t, i) =>
                         <Button
-                            className="md:"
+                            className="mb-5"
                             color="gray"
                             onClick={() => setMonthtlyTab(t)}
                             filter={monthtlyTab === t ? "selected" : ""}
@@ -205,7 +201,7 @@ export default function Economics(props) {
         <div className="card mt-8">
             <div className="items-center grid-cols-1fr-auto-1fr mb-8 lg:grid">
                 <h4 className="mb-4 lg:mb-0">{pageT("weeklyRevenueBreakdown")}</h4>
-                <Stack direction="row" spacing={1.5}>
+                <Stack direction="row" spacing={1.5} className="flex-wrap lg:flex">
                     {weeklyTabs.map((t, i) =>
                         <Button
                             color="gray"

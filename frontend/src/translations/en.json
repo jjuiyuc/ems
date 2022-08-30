@@ -9,9 +9,9 @@
         "directSolarSupply": "Direct Solar Supply",
         "endDate": "End Date",
         "energyDestinations": "Energy Destinations",
-        "exportFromGrid": "Export From Grid",
+        "exportToGrid": "Export to Grid",
         "household": "Household",
-        "importFromGrid": "Import From Grid",
+        "importFromGrid": "Import from Grid",
         "load": "Load",
         "month": "Month",
         "realTimePowerkW": "Real-time Power (kW)",
@@ -114,7 +114,7 @@
             "exportToGrid": "Export to Grid",
             "gridPowerImport": "Grid Power Import",
             "importFromGrid": "Import From Grid",
-            "netExport": "Net Export"
+            "netImport": "Net Import"
         },
         "solar": {
             "co2Reduction": "CO2 Reduction",

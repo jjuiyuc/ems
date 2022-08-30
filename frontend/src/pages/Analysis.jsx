@@ -77,8 +77,7 @@ export default function Analysis() {
             }],
             labels: sevenDays,
             tickCallback: (val, index) => val + "%",
-            tooltipLabel: item => item.dataset.percent[item.dataIndex]
-                + `% (${item.parsed.y} ${commonT("kwh")})`,
+            tooltipLabel: item => item.dataset.percent[item.dataIndex] + "%",
             x: {
                 grid: { lineWidth: 0 },
                 time: {
@@ -165,7 +164,7 @@ export default function Analysis() {
         [energyDestinations, setEnergyDestinations] = useState({
             types: [
                 { kwh: 10, percentage: 18, type: "load" },
-                { kwh: 25, percentage: 41, type: "exportFromGrid" },
+                { kwh: 25, percentage: 41, type: "exportToGrid" },
                 { kwh: 25, percentage: 41, type: "chargeToBattery" },
             ],
             kwh: 60

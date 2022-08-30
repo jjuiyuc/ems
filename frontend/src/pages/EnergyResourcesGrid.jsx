@@ -6,7 +6,7 @@ import { useTranslation } from "react-multi-lang"
 import { apiCall } from "../utils/api"
 import variables from "../configs/variables"
 
-import EnergyResoucesTabs from "../components/EnergyResoucesTabs"
+import EnergyResourcesTabs from "../components/EnergyResourcesTabs"
 import EnergyGridCard from "../components/EnergyGridCard"
 import LineChart from "../components/LineChart"
 
@@ -46,7 +46,7 @@ export default function EnergyResourcesGrid(props) {
         [todayGrid, setTodayGrid] = useState([
             { kwh: 0, type: "exportToGrid" },
             { kwh: 100, type: "importFromGrid" },
-            { kwh: -10, type: "netExport" }
+            { kwh: -10, type: "netImport" }
         ]),
         [thisMonth, setThisMonth] = useState(100)
 
@@ -79,12 +79,12 @@ export default function EnergyResourcesGrid(props) {
 
     return <>
         <h1 className="mb-9">{t("navigator.energyResources")}</h1>
-        <EnergyResoucesTabs current="grid" />
+        <EnergyResourcesTabs current="grid" />
         <div className="lg:grid grid-cols-auto-19rem gap-x-5">
             <EnergyGridCard data={todayGrid} title={commonT("today")} />
             <div className="card mt-8 lg:m-0">
                 <h5 className="font-bold mb-8">{commonT("thisMonth")}</h5>
-                <h6 className="font-bold text-white">{pageT("netExport")}</h6>
+                <h6 className="font-bold text-white">{pageT("netImport")}</h6>
                 <div className="flex justify-between items-center mt-3.5">
                     <h3>{thisMonth} {commonT("kwh")}</h3>
                     <div

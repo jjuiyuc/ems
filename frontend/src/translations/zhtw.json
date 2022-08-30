@@ -9,7 +9,7 @@
         "directSolarSupply": "太陽能供給",
         "endDate": "結束日期",
         "energyDestinations": "能源目標",
-        "exportFromGrid": "自電網輸出",
+        "exportToGrid": "自電網輸出",
         "household": "家庭",
         "importFromGrid": "市電所提供",
         "load": "用電負載",
@@ -114,7 +114,7 @@
             "exportToGrid": "回送電網",
             "gridPowerImport": "電網電力導入",
             "importFromGrid": "市電所提供",
-            "netExport": "Net Export"
+            "netImport": "Net Import"
         },
         "solar": {
             "co2Reduction": "二氧化碳減排",

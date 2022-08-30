@@ -5,7 +5,7 @@ const colors = {
     importFromGrid: "bg-indigo-main",
     batteryDischarge: "bg-blue-main",
     load: "bg-green-main",
-    exportFromGrid: "bg-indigo-main",
+    exportToGrid: "bg-indigo-main",
     chargeToBattery: "bg-blue-main"
 }
 

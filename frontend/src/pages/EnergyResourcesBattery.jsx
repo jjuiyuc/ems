@@ -9,8 +9,8 @@ import { ConvertTimeToNumber } from "../utils/utils"
 import variables from "../configs/variables"
 
 import AlertBox from "../components/AlertBox"
-import EnergyResoucesCard from "../components/EnergyResoucesCard"
-import EnergyResoucesTabs from "../components/EnergyResoucesTabs"
+import EnergyResourcesCard from "../components/EnergyResourcesCard"
+import EnergyResourcesTabs from "../components/EnergyResourcesTabs"
 import LineChart from "../components/LineChart"
 import Spinner from "../components/Spinner"
 
@@ -46,7 +46,6 @@ const drawHighPeak = (startHour, endHour) => chart => {
         ctx.stroke()
     }
 }
-
 const chartPowerSet = ({ data, highPeak, labels, unit }) => ({
     beforeDraw: drawHighPeak(highPeak.start, highPeak.end),
     datasets: [{
@@ -320,22 +319,22 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
 
     return <>
         <h1 className="mb-9">{t("navigator.energyResources")}</h1>
-        <EnergyResoucesTabs current="battery" />
+        <EnergyResourcesTabs current="battery" />
         {infoErrorBox}
         <div className="font-bold gap-8 grid lg:grid-cols-2 relative">
-            <EnergyResoucesCard
+            <EnergyResourcesCard
                 data={cardsData.cycles}
                 icon={CycleIcon}
                 title={pageT("batteryOperationCycles")} />
-            <EnergyResoucesCard
+            <EnergyResourcesCard
                 data={cardsData.chargingState}
                 icon={ChargingIcon}
                 title={pageT("stateOfChargeSOC")} />
-            <EnergyResoucesCard
+            <EnergyResourcesCard
                 data={cardsData.discharged}
                 icon={DischargeIcon}
                 title={pageT("discharged")} />
-            <EnergyResoucesCard
+            <EnergyResourcesCard
                 data={cardsData.charged}
                 icon={ChargedIcon}
                 title={pageT("charged")} />

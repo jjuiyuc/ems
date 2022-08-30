@@ -168,6 +168,7 @@ export default function LineChart(props) {
                         },
                         ticks: {
                             color: colors.gray[200],
+                            callback: props.data.y1TickCallback,
                             font: {
                                 size: 11
                             },

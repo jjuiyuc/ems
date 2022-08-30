@@ -131,14 +131,17 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
                 },
                 id: "voltage",
                 pointBorderColor: colors.primary["main-opacity-20"],
-                label: pageT("voltage")
+                label: pageT("voltage"),
+                yAxisID: "y1"
             },
         ],
         labels,
+        tickCallback: val => val + " " + unit.charge,
         tooltipLabel: item => `${item.dataset.label} ${item.parsed.y}`
             + unit[item.dataset.id],
         y: { max: 100, min: 0 },
-        y1: { max: 100, min: 0 }
+        y1: { max: 100, min: 0 },
+        y1TickCallback: val => val + " " + unit.voltage
     })
     useEffect(() => {
         if (!props.gatewayID) return

@@ -5,7 +5,7 @@ import { useTranslation } from "react-multi-lang"
 import { apiCall } from "../utils/api"
 import variables from "../configs/variables"
 
-import EnergyResoucesTabs from "../components/EnergyResoucesTabs"
+import EnergyResourcesTabs from "../components/EnergyResourcesTabs"
 import EnergySolarCard from "../components/EnergySolarCard"
 import EnergySolarSubCard from "../components/EnergySolarSubCard"
 import LineChart from "../components/LineChart"
@@ -97,7 +97,7 @@ export default function EnergyResoucesSolar(props) {
 
     return <>
         <h1 className="mb-9">{t("navigator.energyResources")}</h1>
-        <EnergyResoucesTabs current="solar" />
+        <EnergyResourcesTabs current="solar" />
         <EnergySolarCard
             data={totalSolarEnergyDestinations}
             title={pageT("totalSolarEnergyDestinations")} />

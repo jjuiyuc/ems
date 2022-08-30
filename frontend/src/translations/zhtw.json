@@ -39,7 +39,8 @@
         "solar": "太陽能",
         "stateOfCharge": "電池監控",
         "thisMonth": "當月",
-        "today": "今天"
+        "today": "今天",
+        "v":"V"
     },
     "dashboard": {
         "batteryDischarge": "電池所提供",
@@ -105,6 +106,7 @@
             "percentage": "百分比",
             "powerSources": "充電來源",
             "stateOfChargeSOC": "電池SoC",
+            "soc": "SoC",
             "stateOfChargeVoltage": "電池SoC及電壓監控",
             "voltage": "電壓"
         },

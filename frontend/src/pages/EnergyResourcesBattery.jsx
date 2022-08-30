@@ -46,36 +46,6 @@ const drawHighPeak = (startHour, endHour) => chart => {
         ctx.stroke()
     }
 }
-const chartChargeVoltageSet = ({ data, highPeak, labels, unit }) => ({
-    beforeDraw: drawHighPeak(highPeak.start, highPeak.end),
-    datasets: [
-        {
-            backgroundColor: colors.blue.main,
-            borderColor: colors.blue.main,
-            data: data.charge,
-            fill: {
-                above: colors.blue["main-opacity-10"],
-                target: "origin"
-            },
-            id: "charge",
-            pointBorderColor: colors.blue["main-opacity-20"]
-        },
-        {
-            backgroundColor: colors.primary.main,
-            borderColor: colors.primary.main,
-            data: data.voltage,
-            fill: {
-                above: colors.primary["main-opacity-10"],
-                target: "origin"
-            },
-            id: "voltage",
-            pointBorderColor: colors.primary["main-opacity-20"]
-        }
-    ],
-    labels,
-    tooltipLabel: item => item.parsed.y + unit[item.dataset.id],
-    y: { max: 100, min: 0 }
-})
 const chartPowerSet = ({ data, highPeak, labels, unit }) => ({
     beforeDraw: drawHighPeak(highPeak.start, highPeak.end),
     datasets: [{
@@ -135,6 +105,43 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
         [powerSources, setPowerSources] = useState(""),
         [voltage, setVoltage] = useState(0)
 
+    const chartChargeVoltageSet = ({ data, highPeak, labels, unit }) => ({
+        beforeDraw: drawHighPeak(highPeak.start, highPeak.end),
+        datasets: [
+            {
+                backgroundColor: colors.blue.main,
+                borderColor: colors.blue.main,
+                data: data.charge,
+                fill: {
+                    above: colors.blue["main-opacity-10"],
+                    target: "origin"
+                },
+                id: "charge",
+                pointBorderColor: colors.blue["main-opacity-20"],
+                label: pageT("soc")
+            },
+            {
+                backgroundColor: colors.primary.main,
+                borderColor: colors.primary.main,
+                data: data.voltage,
+                fill: {
+                    above: colors.primary["main-opacity-10"],
+                    target: "origin"
+                },
+                id: "voltage",
+                pointBorderColor: colors.primary["main-opacity-20"],
+                label: pageT("voltage"),
+                yAxisID: "y1"
+            },
+        ],
+        labels,
+        tickCallback: val => val + " " + unit.charge,
+        tooltipLabel: item => `${item.dataset.label} ${item.parsed.y}`
+            + unit[item.dataset.id],
+        y: { max: 100, min: 0 },
+        y1: { max: 100, min: 0 },
+        y1TickCallback: val => val + " " + unit.voltage
+    })
     useEffect(() => {
         if (!props.gatewayID) return
 
@@ -285,7 +292,7 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
             <LineChart
                 data={chartChargeVoltageSet({
                     ...chargeVoltage,
-                    unit: { charge: "%", voltage: " " + commonT("kw") }
+                    unit: { charge: "%", voltage: " " + commonT("v") },
                 })}
                 id="erbChargeVoltage" />
         </div>

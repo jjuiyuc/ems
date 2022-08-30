@@ -39,7 +39,8 @@
         "solar": "Solar",
         "stateOfCharge": "State of Charge",
         "thisMonth": "This Month",
-        "today": "Today"
+        "today": "Today",
+        "v":"V"
     },
     "dashboard": {
         "batteryDischarge": "Battery Discharge",
@@ -104,7 +105,8 @@
             "modal": "Modal",
             "percentage": "Percentage",
             "powerSources": "Power Sources",
-            "stateOfChargeSOC": "State of Charge (SOC)",
+            "stateOfChargeSOC": "State of Charge (SoC)",
+            "soc": "SoC",
             "stateOfChargeVoltage": "State of Charge and Voltage",
             "voltage": "Voltage"
         },

@@ -12,12 +12,10 @@ export default function DateRangePicker(props) {
         [startDate, setStartDate] = useState(null),
         [endDate, setEndDate] = useState(null)
     const onChange = (dates) => {
-        const [start, end] = dates;
-        setStartDate(start);
-        setEndDate(end);
+        const [start, end] = dates
+        setStartDate(start)
+        setEndDate(end)
     }
-
-
     return (
         <>
             <div>
@@ -30,7 +28,7 @@ export default function DateRangePicker(props) {
                     selectsStart
                     startDate={startDate}
                     endDate={endDate}
-                    minDate={moment().subtract(2, "month")._d}
+                    minDate={moment().subtract(2, "week")._d}
                     maxDate={new Date()}
                     showDisabledMonthNavigation
                     monthsShown={2}

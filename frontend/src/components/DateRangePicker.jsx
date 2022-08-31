@@ -12,6 +12,7 @@ export default function DateRangePicker(props) {
         [startDate, setStartDate] = useState(null),
         [endDate, setEndDate] = useState(null)
     const onChange = (dates) => {
+
         const [start, end] = dates
         setStartDate(start)
         setEndDate(end)

@@ -29,7 +29,7 @@ export default function DateRangePicker(props) {
                     startDate={startDate}
                     endDate={endDate}
                     minDate={moment().subtract(2, "week")._d}
-                    maxDate={new Date()}
+                    maxDate={moment(new Date()).add(-1, 'days')._d}
                     showDisabledMonthNavigation
                     monthsShown={2}
                     selectsRange
@@ -46,7 +46,7 @@ export default function DateRangePicker(props) {
                     startDate={startDate}
                     endDate={endDate}
                     minDate={startDate}
-                    maxDate={new Date()}
+                    maxDate={moment(new Date()).add(-1, 'days')._d}
                     disabled={true}
                 />
             </div>

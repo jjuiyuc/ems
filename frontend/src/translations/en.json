@@ -37,6 +37,7 @@
         "passwordRule": "Password must be at least six characters long, and include 3 out of 4 of the following: uppercase letter, lowercase letter, numeric character and special character.",
         "peakShave": "Peak Shave",
         "solar": "Solar",
+        "sources":"Sources",
         "stateOfCharge": "State of Charge",
         "thisMonth": "This Month",
         "today": "Today",

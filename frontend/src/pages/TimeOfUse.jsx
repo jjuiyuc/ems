@@ -10,6 +10,7 @@ import LineChart from "../components/LineChart"
 import variables from "../configs/variables"
 
 import { ReactComponent as EditIcon } from "../assets/icons/edit.svg"
+import { common } from "@mui/material/colors"
 
 const { colors } = variables
 
@@ -65,8 +66,8 @@ export default function TimeOfUse() {
             labels: lineChartDateLabels,
             tickCallback: (val, index) => val + "%",
             tooltipLabel: item => `${item.parsed.y}%`,
-            x: {grid: {lineWidth: 0}},
-            y: {max: 80, min: 0}
+            x: { grid: { lineWidth: 0 } },
+            y: { max: 80, min: 0 }
         }),
         [midPeak, setMidPeak] = useState({
             types: [
@@ -221,20 +222,44 @@ export default function TimeOfUse() {
             <EnergyCard data={onPeak} title={energyCardTitle("onPeak")} />
             <EnergyCard data={offPeak} title={energyCardTitle("offPeak")} />
             <EnergyCard data={midPeak} title={energyCardTitle("midPeak")} />
-            <EnergyCard
-                data={superOffPeak}
-                title={energyCardTitle("superOffPeak")} />
+            <div className="card energyCard">
+                <div className="flex flex-wrap items-baseline mb-8">
+                    <h2 className="mr-2 whitespace-nowrap">{superOffPeak.kwh} {commonT("kwh")}</h2>
+                    <h5 className="font-bold">
+                        <span className="inline-block mr-1">
+                            {pageT("superOffPeak")} {commonT("sources")}
+                        </span>
+                        <span className="inline-block">
+                            ({pageT("totalUntilNow")})
+                        </span>
+                    </h5>
+                </div>
+                <div className="h-2 bg-gray-500 w-full rounded-full" />
+                <div className="mx-2.5 mb-12 mt-4 lg:h-5 w-3 mr-2 sm:h-4" />
+                <div className="grid grid-cols-3 column-separator gap-x-5 sm:gap-x-10">
+                    {superOffPeak.types.map((t, i) =>
+                        <div key={"detail-" + i}
+                            className="">
+                            <h6 className="font-bold text-white">{commonT(t.type)}</h6>
+                            <h3 className="my-1">-</h3>
+                            {/* <p className="lg:test text-13px text-white">
+                                {t.kwh} {commonT("kwh")}
+                            </p> */}
+                            <div className="md:h-6 lg:h-4 w-4"></div>
+                        </div>)}
+                </div>
+            </div>
             <div className="card">
                 <div className="header -mr-4">
                     <h4>{pageT("timeOfUse")}</h4>
-                    <Button
+                    {/* <Button
                         color="brand"
                         radius="pill"
                         size="small"
                         variant="text">
                         <EditIcon className="h-4 mr-1 w-4" />
                         {pageT("editTimeOfUse")}
-                    </Button>
+                    </Button> */}
                 </div>
                 <div className="flex flex-wrap items-center justify-around">
                     <div className="flex flex-wrap items-center justify-center">

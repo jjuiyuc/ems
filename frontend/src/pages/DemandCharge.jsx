@@ -19,9 +19,9 @@ export default function DemandCharge(props) {
         pageT = (string, params) => t("demandCharge." + string, params)
 
     const
-        [currentBillCycle, setCurrentBillCycle] = useState(15),
+        [currentBillingCycle, setCurrentBillingCycle] = useState(15),
         [realizedSavings, setRealizedSavings] = useState(30),
-        [lastMonthBillCycleDemandCharge, setLastMonthBillCycleDemandCharge]
+        [lastMonthBillingCycle, setLastMonthBillingCycle]
             = useState(30)
 
     const
@@ -84,14 +84,14 @@ export default function DemandCharge(props) {
         <h1 className="mb-9">{commonT("demandCharge")}</h1>
         <div className="gap-8 grid-cols-3 lg:grid ">
             <PriceCard
-                price={currentBillCycle}
-                title={pageT("currentBillCycle")} />
+                price={currentBillingCycle}
+                title={pageT("currentBillingCycle")} />
             <PriceCard
                 price={realizedSavings}
                 title={pageT("realizedSavings")} />
             <PriceCard
-                price={lastMonthBillCycleDemandCharge}
-                title={pageT("lastMonthBillCycleDemandCharge")} />
+                price={lastMonthBillingCycle}
+                title={pageT("lastMonthBillingCycle")} />
         </div>
         <div className="lg:flex items-start mb-8">
             <div className="flex-1">

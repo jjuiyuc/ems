@@ -40,7 +40,7 @@ export default function Analysis() {
                 {
                     backgroundColor: colors.green.main,
                     data: fakeData1,
-                    label: pageT("household")
+                    label: pageT("load")
                 },
                 {
                     backgroundColor: colors.yellow.main,
@@ -100,9 +100,9 @@ export default function Analysis() {
                         above: colors.green["main-opacity-10"],
                         target: "origin"
                     },
-                    id: "household",
+                    id: "load",
                     pointBorderColor: colors.green["main-opacity-20"],
-                    label: pageT("household")
+                    label: pageT("load")
                 },
                 {
                     backgroundColor: colors.yellow.main,
@@ -153,7 +153,7 @@ export default function Analysis() {
     const
         [tab, setTab] = useState("days"),
         [open, setOpen] = useState(false),
-        [totalEnergySources, setTotalEnergySources] = useState({
+        [energySourcesTotal, setEnergySourcesTotal] = useState({
             types: [
                 { kwh: 7.5, percentage: 15, type: "directSolarSupply" },
                 { kwh: 30, percentage: 60, type: "importFromGrid" },
@@ -161,7 +161,7 @@ export default function Analysis() {
             ],
             kwh: 50
         }),
-        [energyDestinations, setEnergyDestinations] = useState({
+        [energyDestinationsTotal, setEnergyDestinationsTotal] = useState({
             types: [
                 { kwh: 10, percentage: 18, type: "load" },
                 { kwh: 25, percentage: 41, type: "exportToGrid" },
@@ -176,7 +176,7 @@ export default function Analysis() {
             barChart = { ...barChartData },
             lineChart = { ...lineChartData },
             labels = [
-                pageT("household"),
+                pageT("load"),
                 commonT("solar"),
                 commonT("battery"),
                 commonT("grid")
@@ -215,11 +215,11 @@ export default function Analysis() {
             : null}
         <div className="gap-8 grid md:grid-cols-2 items-start">
             <AnalysisCard
-                data={totalEnergySources}
-                title={pageT("totalEnergySources")} />
+                data={energySourcesTotal}
+                title={pageT("energySourcesTotal")} />
             <AnalysisCard
-                data={energyDestinations}
-                title={pageT("energyDestinations")} />
+                data={energyDestinationsTotal}
+                title={pageT("energyDestinationsTotal")} />
         </div>
         {tab == "days"
             ? <div className="card mt-8">

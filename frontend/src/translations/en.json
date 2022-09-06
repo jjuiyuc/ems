@@ -8,17 +8,16 @@
         "days": "Days",
         "directSolarSupply": "Direct Solar Supply",
         "endDate": "End Date",
-        "energyDestinations": "Energy Destinations",
+        "energyDestinationsTotal": "Energy Destinations (Total)",
+        "energySourcesTotal": "Energy Sources (Total)",
         "exportToGrid": "Export to Grid",
-        "household": "Household",
         "importFromGrid": "Import from Grid",
         "load": "Load",
         "month": "Month",
         "realTimePowerkW": "Real-time Power (kW)",
-        "selfSupplyRate": "Self Supply Rate",
+        "selfSupplyRate": "Self Supply Rate (%)",
         "startDate": "Start Date",
         "to": "to",
-        "totalEnergySources": "Total Energy Sources",
         "weeks": "Weeks",
         "year": "Year"
     },
@@ -56,9 +55,9 @@
         "unableToConnect": "Unable to connect"
     },
     "demandCharge": {
-        "currentBillCycle": "Current Bill Cycle",
+        "currentBillingCycle": "Current Billing Cycle",
         "demandDetails": "Demand Details",
-        "lastMonthBillCycleDemandCharge": "Last Month Bill Cycle Demand Charge",
+        "lastMonthBillingCycle": "Last Month Billing Cycle",
         "realizedSavings": "Realized Savings"
     },
     "economics": {
@@ -113,7 +112,7 @@
         },
         "grid": {
             "exportToGrid": "Export to Grid",
-            "gridPowerImport": "Grid Power Import",
+            "gridPowerImport": "Grid Power Import (kW)",
             "importFromGrid": "Import From Grid",
             "netImport": "Net Import"
         },
@@ -180,7 +179,7 @@
         "offPeak": "Off-peak",
         "onPeak": "On-peak",
         "source": "{type} Energy Sources",
-        "superOffPeak": "Super off-peak",
+        "superOffPeak": "Super off-Peak",
         "timeOfUse": "Time of Use",
         "totalUntilNow": "Total Until Now",
         "yesterday": "Yesterday"

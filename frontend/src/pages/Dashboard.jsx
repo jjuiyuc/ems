@@ -149,7 +149,7 @@ export default connect(mapState)(function Dashboard(props) {
 
         if (window["WebSocket"]) {
             const url
-                = `wss://${API_HOST}/api/${props.gatewayID}/devices/energy-info`
+                = `wss://${API_HOST}/ws/${props.gatewayID}/devices/energy-info`
 
             wssConnection = new WebSocket(url, props.token)
             wssConnection.onerror = () => setError({ url })

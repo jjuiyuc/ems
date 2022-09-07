@@ -15,14 +15,14 @@ import { ReactComponent as SolarIcon } from "../assets/icons/sunny.svg"
 import "../assets/css/dashboard.scss"
 
 const iconMap = {
-    battery: {color: "blue", icon: BatteryIcon},
-    grid: {color: "indigo", icon: GridIcon},
-    home: {color: "green", icon: HomeIcon},
-    solar: {color: "yellow", icon: SolarIcon}
+    battery: { color: "blue", icon: BatteryIcon },
+    grid: { color: "indigo", icon: GridIcon },
+    home: { color: "green", icon: HomeIcon },
+    solar: { color: "yellow", icon: SolarIcon }
 }
 
 const IconSet = props => {
-    const {size} = props, {color, icon} = iconMap[props.icon], Icon = icon
+    const { size } = props, { color, icon } = iconMap[props.icon], Icon = icon
 
     return <div className={`h-${size} bg-${color}-main-opacity-20 grid
                             place-items-center rounded-full w-${size}`}>
@@ -33,7 +33,7 @@ const Card = props => {
     const
         cardClasses = "card narrow px-6"
             + (props.className ? " " + props.className : ""),
-        {data, title} = props
+        { data, title } = props
 
     return <div className={cardClasses}>
         <div className="grid sm:grid-cols-2 text-center
@@ -43,11 +43,11 @@ const Card = props => {
                 <IconSet icon={props.icon} size="10" />
                 <h5 className="font-bold ml-3">{title}</h5>
             </div>
-        {data.map((item, i) =>
-            <div key={"d-c-d-" + i}>
-                <h2 className="font-bold text-3xl mb-1">{item.value}</h2>
-                <p className="lg:test text-sm">{item.name}</p>
-            </div>)}
+            {data.map((item, i) =>
+                <div key={"d-c-d-" + i}>
+                    <h2 className="font-bold text-3xl mb-1">{item.value}</h2>
+                    <p className="lg:test text-sm">{item.name}</p>
+                </div>)}
         </div>
     </div>
 }
@@ -88,26 +88,26 @@ export default connect(mapState)(function Dashboard(props) {
         }),
         [error, setError] = useState(null),
         [lines, setLines] = useState({
-            battery: {grid: 0, load: 0, pv: 0},
-            grid: {battery: 0, load: 0, pv: 0},
-            load: {battery: 0, grid: 0, pv: 0},
-            pv: {battery: 0, grid: 0, load: 0},
+            battery: { grid: 0, load: 0, pv: 0 },
+            grid: { battery: 0, load: 0, pv: 0 },
+            load: { battery: 0, grid: 0, pv: 0 },
+            pv: { battery: 0, grid: 0, load: 0 },
         }),
-        [load, setLoad] = useState({discharge: 0, import: 0, solar: 0}),
-        [peak, setPeak] = useState({active: 0, current: 0, threshhold: 0}),
-        [solar, setSolar] = useState({charge: 0, consume: 0, export: 0}),
+        [load, setLoad] = useState({ discharge: 0, import: 0, solar: 0 }),
+        [peak, setPeak] = useState({ active: 0, current: 0, threshhold: 0 }),
+        [solar, setSolar] = useState({ charge: 0, consume: 0, export: 0 }),
         [websocketSupport, setWebSocketSupport] = useState(true)
 
     const updateData = data => {
         const
             batteryPower = data.batteryProducedAveragePowerAC
-                            + data.batteryConsumedAveragePowerAC
+                + data.batteryConsumedAveragePowerAC
 
         setBattery({
             direction:
                 data.batteryChargingFrom ? "chargingFrom" : "dischargingTo",
             target: (data.batteryChargingFrom || data.batteryDischargingTo)
-                        .toLocaleLowerCase(),
+                .toLocaleLowerCase(),
             import: data.batteryGridAveragePowerAC,
             power: batteryPower,
             state: data.batterySoC
@@ -115,7 +115,7 @@ export default connect(mapState)(function Dashboard(props) {
         setDiagram({
             battery: batteryPower,
             grid: data.gridProducedAveragePowerAC
-                    + data.gridConsumedAveragePowerAC,
+                + data.gridConsumedAveragePowerAC,
             load: data.loadAveragePowerAC,
             solar: data.pvAveragePowerAC
         })
@@ -145,23 +145,23 @@ export default connect(mapState)(function Dashboard(props) {
     useEffect(() => {
         if (!props.gatewayID) return
 
-        let wsConnection = null
+        let wssConnection = null
 
         if (window["WebSocket"]) {
             const url
-                = `ws://${API_HOST}/api/${props.gatewayID}/devices/energy-info`
+                = `wss://${API_HOST}/api/${props.gatewayID}/devices/energy-info`
 
-            wsConnection = new WebSocket(url, props.token)
-            wsConnection.onerror = () => setError({url})
-            wsConnection.onmessage = e => updateData(JSON.parse(e.data).data)
-            wsConnection.onopen = () => setError(null)
+            wssConnection = new WebSocket(url, props.token)
+            wssConnection.onerror = () => setError({ url })
+            wssConnection.onmessage = e => updateData(JSON.parse(e.data).data)
+            wssConnection.onopen = () => setError(null)
         }
         else {
             setWebSocketSupport(false)
         }
 
         return () => {
-            if (wsConnection) wsConnection.close()
+            if (wssConnection) wssConnection.close()
         }
     }, [props.gatewayID])
 
@@ -175,7 +175,7 @@ export default connect(mapState)(function Dashboard(props) {
 
     const
         batteryData = [
-            {name: commonT("stateOfCharge"), value: `${battery.state}%`},
+            { name: commonT("stateOfCharge"), value: `${battery.state}%` },
             {
                 name: commonT("batteryPower"),
                 value: `${battery.power} ${commonT("kw")}`
@@ -184,11 +184,11 @@ export default connect(mapState)(function Dashboard(props) {
                 name: pageT("importFromGrid"),
                 value: `${battery.import} ${commonT("kw")}`
             },
-            {name: pageT(battery.direction), value: commonT(battery.target)}
+            { name: pageT(battery.direction), value: commonT(battery.target) }
         ],
         loadData = [
-            {name: commonT("solar"), value: `${load.solar} ${commonT("kw")}`},
-            {name: pageT("batteryDischarge"), value: load.discharge || "-"},
+            { name: commonT("solar"), value: `${load.solar} ${commonT("kw")}` },
+            { name: pageT("batteryDischarge"), value: load.discharge || "-" },
             {
                 name: pageT("importFromGrid"),
                 value: `${load.import} ${commonT("kw")}`
@@ -203,7 +203,7 @@ export default connect(mapState)(function Dashboard(props) {
                 name: pageT("chargeToBattery"),
                 value: `${solar.charge} ${commonT("kw")}`
             },
-            {name: commonT("exportToGrid"), value: solar.export || "-"},
+            { name: commonT("exportToGrid"), value: solar.export || "-" },
         ]
 
     const
@@ -234,12 +234,12 @@ export default connect(mapState)(function Dashboard(props) {
 
     const activeIndicator = peak.active
         ? <>
-        <div className="grid h-6 ml-6 mr-1 place-items-center relative w-6">
-            <div className="absolute animate-ping bg-negative-main h-3
+            <div className="grid h-6 ml-6 mr-1 place-items-center relative w-6">
+                <div className="absolute animate-ping bg-negative-main h-3
                             rounded-full w-3" />
-            <div className="bg-negative-main h-2.5 rounded-full w-2.5" />
-        </div>
-        <h5 className="text-negative-main">{commonT("active")}</h5>
+                <div className="bg-negative-main h-2.5 rounded-full w-2.5" />
+            </div>
+            <h5 className="text-negative-main">{commonT("active")}</h5>
         </>
         : null
 
@@ -247,23 +247,23 @@ export default connect(mapState)(function Dashboard(props) {
 
     return <>
         <h1 className="mb-9">{pageT("dashboard")}</h1>
-    {websocketSupport
-        ? null
-        : <div className="box mb-8 negative text-center">
-            {pageT("noWebsocketSupport")}
-        </div>}
-    {error
-        ? <AlertBox
-            boxClass="mb-8 negative"
-            content={<div>
-                {pageT("unableToConnect")}
-                <p className="break-all font-mono mt-2 pt-2 border-t border-red-400">
-                    {error.url}
-                </p>
+        {websocketSupport
+            ? null
+            : <div className="box mb-8 negative text-center">
+                {pageT("noWebsocketSupport")}
             </div>}
-            icon={ReportProblemIcon}
-            iconColor="negative-main" />
-        : null}
+        {error
+            ? <AlertBox
+                boxClass="mb-8 negative"
+                content={<div>
+                    {pageT("unableToConnect")}
+                    <p className="break-all font-mono mt-2 pt-2 border-t border-red-400">
+                        {error.url}
+                    </p>
+                </div>}
+                icon={ReportProblemIcon}
+                iconColor="negative-main" />
+            : null}
         <div className="lg:flex items-start">
             <div className="flex-1">
                 <div className="card">

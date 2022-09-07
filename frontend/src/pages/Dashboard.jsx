@@ -145,23 +145,26 @@ export default connect(mapState)(function Dashboard(props) {
     useEffect(() => {
         if (!props.gatewayID) return
 
-        let wssConnection = null
+        const
+            windowProtocol = window.location.protocol,
+            wsProtocol = windowProtocol.replace("http", "ws")
+
+        let wsConnection = null
 
         if (window["WebSocket"]) {
-            const url
-                = `wss://${API_HOST}/ws/${props.gatewayID}/devices/energy-info`
+            const url = `${wsProtocol}//${API_HOST}/ws/${props.gatewayID}`
+                + "/devices/energy-info"
 
-            wssConnection = new WebSocket(url, props.token)
-            wssConnection.onerror = () => setError({ url })
-            wssConnection.onmessage = e => updateData(JSON.parse(e.data).data)
-            wssConnection.onopen = () => setError(null)
+            wsConnection = new WebSocket(url, props.token)
+            wsConnection.onerror = () => setError({ url })
+            wsConnection.onmessage = e => updateData(JSON.parse(e.data).data)
+            wsConnection.onopen = () => setError(null)
         }
         else {
             setWebSocketSupport(false)
         }
-
         return () => {
-            if (wssConnection) wssConnection.close()
+            if (wsConnection) wsConnection.close()
         }
     }, [props.gatewayID])
 

@@ -169,9 +169,72 @@ export default function Analysis() {
             ],
             kwh: 60
         })
+    // [barChart, setBarChart] = useState(null),
+    // [barChartError, setBarChartError] = useState(""),
+    // [barChartLoading, setBarChartLoading] = useState(false),
+    // [barChartRes] = useState("day"),
+    // [ssrLineChart, setSsrLineChart] = useState(null),
+    // [ssrLineChartError, setSsrLineChartError] = useState(""),
+    // [ssrLineChartLoading, setSsrLineChartLoading] = useState(false),
+    // [ssrLineChartRes] = useState("day")
+
     const lang = getLanguage()
 
     useEffect(() => {
+        // const barChartUrl = `${urlPrefix}/accumulated-power-state?`
+        //     + chartParams(barChartRes)
+
+        // apiCall({
+        //     onComplete: () => setBarChartLoading(false),
+        //     onError: error => setBarChartError(error),
+        //     onStart: () => setBarChartLoading(true),
+        //     onSuccess: rawData => {
+        //         if (!rawData || !rawData.data) return
+
+        //         const
+        //             { data } = rawData,
+        //             {  timestamps } = data,
+        //             labels = [
+        //                 ...timestamps.map(t => t * 1000),
+        //                 ...oClocks.slice(timestamps.length)
+        //             ]
+
+        //             setBarChart({
+        //             data: {
+        //                 load: data.loadConsumedLifetimeEnergyACDiffs,
+        //                 solar: data.pvProducedLifetimeEnergyACDiffs,
+        //                 battery: data.batteryLifetimeEnergyACDiffs,
+        //                 grid: data.gridLifetimeEnergyACDiffs,
+        //             },
+        //             labels
+        //         })
+        //     },
+        //     url: barChartUrl
+        // })
+
+        // apiCall({
+        //     onComplete: () => setSsrLineChartLoading(false),
+        //     onError: error => setSsrLineChartError(error),
+        //     onStart: () => setSsrLineChartLoading(true),
+        //     onSuccess: rawData => {
+        //         if (!rawData || !rawData.data) return
+
+        //         const
+        //             { data } = rawData,
+        //             { timestamps } = data,
+        //             labels = [
+        //                 ...timestamps.map(t => t * 1000),
+        //                 ...oClocks.slice(timestamps.length)
+        //             ]
+
+        //             setSsrLineChart({
+        //             data: data.loadSelfConsumedEnergyPercentACs,
+        //             labels
+        //         })
+        //     },
+        //     url: `${urlPrefix}/power-self-supply-rate?${chartParams(ssrLineChartRes)}`
+        // })
+
         const
             barChart = { ...barChartData },
             lineChart = { ...lineChartData },

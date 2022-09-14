@@ -50,10 +50,10 @@ func NewDevicesService(repo *repository.Repository) DevicesService {
 
 // GetLatestDevicesEnergyInfo godoc
 func (s defaultDevicesService) GetLatestDevicesEnergyInfo(gwUUID string) (logTime time.Time, devicesEnergyInfo *DevicesEnergyInfoResponse, err error) {
-	latestLog, err := s.repo.CCData.GetLatestLogByGatewayUUID(gwUUID, time.Time{}, time.Time{})
+	latestLog, err := s.repo.CCData.GetLatestLogByGatewayUUIDAndPeriod(gwUUID, time.Time{}, time.Time{})
 	if err != nil {
 		log.WithFields(log.Fields{
-			"caused-by": "s.repo.CCData.GetLatestLogByGatewayUUID",
+			"caused-by": "s.repo.CCData.GetLatestLogByGatewayUUIDAndPeriod",
 			"err":       err,
 		}).Error()
 		return

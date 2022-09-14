@@ -18,8 +18,8 @@ type CCDataRepository interface {
 	GetCCDataCount() (int64, error)
 	// CC data log
 	UpsertCCDataLog(ccDataLog *deremsmodels.CCDataLog) (err error)
-	GetLatestLogByGatewayUUID(gwUUID string, startTime, endTime time.Time) (*deremsmodels.CCDataLog, error)
-	GetFirstLogByGatewayUUIDAndStartTime(gwUUID string, startTime time.Time) (*deremsmodels.CCDataLog, error)
+	GetLatestLogByGatewayUUIDAndPeriod(gwUUID string, startTime, endTime time.Time) (*deremsmodels.CCDataLog, error)
+	GetFirstLogByGatewayUUIDAndPeriod(gwUUID string, startTime time.Time, endTime time.Time) (*deremsmodels.CCDataLog, error)
 	GetCCDataLogCount() (int64, error)
 }
 
@@ -73,8 +73,8 @@ func (repo defaultCCDataRepository) UpsertCCDataLog(ccDataLog *deremsmodels.CCDa
 	return
 }
 
-// GetLatestLogByGatewayUUID godoc
-func (repo defaultCCDataRepository) GetLatestLogByGatewayUUID(gwUUID string, startTime, endTime time.Time) (*deremsmodels.CCDataLog, error) {
+// GetLatestLogByGatewayUUIDAndPeriod godoc
+func (repo defaultCCDataRepository) GetLatestLogByGatewayUUIDAndPeriod(gwUUID string, startTime, endTime time.Time) (*deremsmodels.CCDataLog, error) {
 	if startTime.IsZero() || endTime.IsZero() {
 		return deremsmodels.CCDataLogs(
 			qm.Where("gw_uuid = ?", gwUUID),
@@ -86,10 +86,16 @@ func (repo defaultCCDataRepository) GetLatestLogByGatewayUUID(gwUUID string, sta
 		qm.OrderBy("log_date DESC")).One(repo.db)
 }
 
-// GetFirstLogByGatewayUUIDAndStartTime godoc
-func (repo defaultCCDataRepository) GetFirstLogByGatewayUUIDAndStartTime(gwUUID string, startTime time.Time) (*deremsmodels.CCDataLog, error) {
+// GetFirstLogByGatewayUUIDAndPeriod godoc
+func (repo defaultCCDataRepository) GetFirstLogByGatewayUUIDAndPeriod(gwUUID string, startTime time.Time, endTime time.Time) (*deremsmodels.CCDataLog, error) {
+	if endTime.IsZero() {
+		return deremsmodels.CCDataLogs(
+			qm.Where("(gw_uuid = ? and log_date > ?)", gwUUID, startTime),
+			qm.OrderBy("log_date ASC")).One(repo.db)
+	}
+
 	return deremsmodels.CCDataLogs(
-		qm.Where("(gw_uuid = ? and log_date >= ?)", gwUUID, startTime),
+		qm.Where("(gw_uuid = ? and log_date > ? and log_date <= ?)", gwUUID, startTime, endTime),
 		qm.OrderBy("log_date ASC")).One(repo.db)
 }
 

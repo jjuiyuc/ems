@@ -60,8 +60,8 @@ func NewBatteryService(repo *repository.Repository, billing BillingService) Batt
 // GetBatteryEnergyInfo godoc
 func (s defaultBatteryService) GetBatteryEnergyInfo(gwUUID string, startTime time.Time) (batteryEnergyInfo *BatteryEnergyInfoResponse) {
 	batteryEnergyInfo = &BatteryEnergyInfoResponse{}
-	firstlog, err1 := s.repo.CCData.GetFirstLogByGatewayUUIDAndStartTime(gwUUID, startTime)
-	latestLog, err2 := s.repo.CCData.GetLatestLogByGatewayUUID(gwUUID, time.Time{}, time.Time{})
+	firstlog, err1 := s.repo.CCData.GetFirstLogByGatewayUUIDAndPeriod(gwUUID, startTime, time.Time{})
+	latestLog, err2 := s.repo.CCData.GetLatestLogByGatewayUUIDAndPeriod(gwUUID, time.Time{}, time.Time{})
 	if err1 == nil && err2 == nil {
 		log.Debug("firstlog.LogDate: ", firstlog.LogDate)
 		log.Debug("latestLog.LogDate: ", latestLog.LogDate)
@@ -74,7 +74,7 @@ func (s defaultBatteryService) GetBatteryEnergyInfo(gwUUID string, startTime tim
 		batteryEnergyInfo.BatteryConsumedLifetimeEnergyAC = latestLog.BatteryConsumedLifetimeEnergyAC.Float32
 	} else {
 		log.WithFields(log.Fields{
-			"caused-by": "s.repo.CCData.GetFirstLogByGatewayUUIDAndStartTime and GetLatestLogByGatewayUUID",
+			"caused-by": "s.repo.CCData.GetFirstLogByGatewayUUIDAndPeriod and GetLatestLogByGatewayUUIDAndPeriod",
 			"err1":      err1,
 			"err2":      err2,
 		}).Error()
@@ -119,7 +119,7 @@ func (s defaultBatteryService) GetBatteryPowerState(gwUUID string, periodStartTi
 	startTimeIndex := periodStartTime.Add(-1 * time.Hour)
 	endTimeIndex := periodStartTime
 	for endTimeIndex.Before(periodEndTime) || endTimeIndex == periodEndTime {
-		latestLog, latestLogErr := s.repo.CCData.GetLatestLogByGatewayUUID(gwUUID, startTimeIndex, endTimeIndex)
+		latestLog, latestLogErr := s.repo.CCData.GetLatestLogByGatewayUUIDAndPeriod(gwUUID, startTimeIndex, endTimeIndex)
 		if latestLogErr == nil {
 			log.WithFields(log.Fields{
 				"log_date":              latestLog.LogDate,
@@ -129,7 +129,7 @@ func (s defaultBatteryService) GetBatteryPowerState(gwUUID string, periodStartTi
 			batteryPowerState.BatteryAveragePowerACs = append(batteryPowerState.BatteryAveragePowerACs, latestLog.BatteryAveragePowerAC.Float32)
 		} else {
 			log.WithFields(log.Fields{
-				"caused-by":      "s.repo.CCData.GetLatestLogByGatewayUUID",
+				"caused-by":      "s.repo.CCData.GetLatestLogByGatewayUUIDAndPeriod",
 				"err":            latestLogErr,
 				"startTimeIndex": startTimeIndex,
 				"endTimeIndex":   endTimeIndex,
@@ -157,7 +157,7 @@ func (s defaultBatteryService) GetBatteryChargeVoltageState(gwUUID string, perio
 	startTimeIndex := periodStartTime.Add(-1 * time.Hour)
 	endTimeIndex := periodStartTime
 	for endTimeIndex.Before(periodEndTime) || endTimeIndex == periodEndTime {
-		latestLog, latestLogErr := s.repo.CCData.GetLatestLogByGatewayUUID(gwUUID, startTimeIndex, endTimeIndex)
+		latestLog, latestLogErr := s.repo.CCData.GetLatestLogByGatewayUUIDAndPeriod(gwUUID, startTimeIndex, endTimeIndex)
 		if latestLogErr == nil {
 			log.WithFields(log.Fields{
 				"log_date":              latestLog.LogDate,
@@ -168,7 +168,7 @@ func (s defaultBatteryService) GetBatteryChargeVoltageState(gwUUID string, perio
 			batteryChargeVoltageState.BatteryVoltages = append(batteryChargeVoltageState.BatteryVoltages, latestLog.BatteryVoltage.Float32)
 		} else {
 			log.WithFields(log.Fields{
-				"caused-by":      "s.repo.CCData.GetLatestLogByGatewayUUID",
+				"caused-by":      "s.repo.CCData.GetLatestLogByGatewayUUIDAndPeriod",
 				"err":            latestLogErr,
 				"startTimeIndex": startTimeIndex,
 				"endTimeIndex":   endTimeIndex,

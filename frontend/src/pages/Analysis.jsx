@@ -3,11 +3,13 @@ import { getLanguage, useTranslation } from "react-multi-lang"
 import moment from "moment"
 import { useEffect, useState } from "react"
 
+import { apiCall } from "../utils/api"
+import variables from "../configs/variables"
+
 import AnalysisCard from "../components/AnalysisCard"
 import DateRangePicker from "../components/DateRangePicker"
 import BarChart from "../components/BarChart"
 import LineChart from "../components/LineChart"
-import variables from "../configs/variables"
 import "../assets/css/dateRangePicker.css"
 
 const { colors } = variables
@@ -172,6 +174,34 @@ export default function Analysis() {
     const lang = getLanguage()
 
     useEffect(() => {
+
+        // if (!props.gatewayID) return
+
+        // const
+        //     startTime = moment().startOf("day").toISOString(),
+        //     chartParams = resolution => new URLSearchParams({
+        //         startTime,
+        //         endTime: moment().endOf("day").toISOString(),
+        //         resolution
+        //     }).toString(),
+        //     urlPrefix = `/api/${props.gatewayID}/devices/battery`
+
+        // apiCall({
+        //     onComplete: () => setInfoLoading(false),
+        //     onError: error => setInfoError(error),
+        //     onStart: () => setInfoLoading(true),
+        //     onSuccess: rawData => {
+        //         if (!rawData || !rawData.data) return
+
+        //         const { data } = rawData
+
+        //         setEnergySourcesTotal(data.allProducedLifetimeEnergyACDiff || 0)
+        //         setCapacity(data.capcity || 0)
+        //
+        //     },
+        //     url: `${urlPrefix}/energy-info?startTime=${startTime}`
+        // })
+
         const
             barChart = { ...barChartData },
             lineChart = { ...lineChartData },

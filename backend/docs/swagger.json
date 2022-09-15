@@ -495,6 +495,88 @@
                     }
                 }
             }
+        },
+        "/{gwid}/devices/energy-distribution-info": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get energy distribution by token, gateway UUID, startTime and endTime",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "analysis"
+                ],
+                "summary": "Show the distribution of energy sources and distinations",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Input user's access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Gateway UUID",
+                        "name": "gwid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "UTC time in ISO-8601",
+                        "name": "endTime",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "UTC time in ISO-8601",
+                        "name": "startTime",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/app.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/services.EnergyDistributionInfoResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -509,6 +591,25 @@
                 },
                 "msg": {
                     "type": "string"
+                }
+            }
+        },
+        "routers.PeriodQuery": {
+            "type": "object",
+            "required": [
+                "endTime",
+                "startTime"
+            ],
+            "properties": {
+                "endTime": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "UTC time in ISO-8601"
+                },
+                "startTime": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "UTC time in ISO-8601"
                 }
             }
         },
@@ -628,6 +729,53 @@
                     "items": {
                         "type": "integer"
                     }
+                }
+            }
+        },
+        "services.EnergyDistributionInfoResponse": {
+            "type": "object",
+            "properties": {
+                "allConsumedLifetimeEnergyACDiff": {
+                    "type": "number"
+                },
+                "allProducedLifetimeEnergyACDiff": {
+                    "type": "number"
+                },
+                "batteryConsumedEnergyPercentAC": {
+                    "type": "number"
+                },
+                "batteryConsumedLifetimeEnergyACDiff": {
+                    "type": "number"
+                },
+                "batteryProducedEnergyPercentAC": {
+                    "type": "number"
+                },
+                "batteryProducedLifetimeEnergyACDiff": {
+                    "type": "number"
+                },
+                "gridConsumedEnergyPercentAC": {
+                    "type": "number"
+                },
+                "gridConsumedLifetimeEnergyACDiff": {
+                    "type": "number"
+                },
+                "gridProducedEnergyPercentAC": {
+                    "type": "number"
+                },
+                "gridProducedLifetimeEnergyACDiff": {
+                    "type": "number"
+                },
+                "loadConsumedEnergyPercentAC": {
+                    "type": "number"
+                },
+                "loadConsumedLifetimeEnergyACDiff": {
+                    "type": "number"
+                },
+                "pvProducedEnergyPercentAC": {
+                    "type": "number"
+                },
+                "pvProducedLifetimeEnergyACDiff": {
+                    "type": "number"
                 }
             }
         },

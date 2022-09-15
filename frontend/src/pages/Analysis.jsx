@@ -4,6 +4,7 @@ import moment from "moment"
 import { useEffect, useState } from "react"
 
 import { apiCall } from "../utils/api"
+import { ConvertTimeToNumber } from "../utils/utils"
 import variables from "../configs/variables"
 
 import AnalysisCard from "../components/AnalysisCard"
@@ -36,6 +37,65 @@ export default function Analysis() {
         lineChartDateLabels = hours24.map(n =>
             moment().hour(n).startOf("h").toISOString())
 
+    const [lineChartPower, setLineChartPower] = useState({
+        datasets: [
+            {
+                backgroundColor: colors.green.main,
+                borderColor: colors.green.main,
+                data: fakeData1,
+                fill: {
+                    above: colors.green["main-opacity-10"],
+                    target: "origin"
+                },
+                id: "load",
+                pointBorderColor: colors.green["main-opacity-20"],
+                label: pageT("load")
+            },
+            {
+                backgroundColor: colors.yellow.main,
+                borderColor: colors.yellow.main,
+                data: fakeData2,
+                fill: {
+                    above: colors.yellow["main-opacity-10"],
+                    target: "origin"
+                },
+                id: "solar",
+                pointBorderColor: colors.yellow["main-opacity-20"],
+                label: commonT("solar")
+            },
+            {
+                backgroundColor: colors.blue.main,
+                borderColor: colors.blue.main,
+                data: fakeData3,
+                fill: {
+                    above: colors.yellow["main-opacity-10"],
+                    target: "origin"
+                },
+                id: "battery",
+                pointBorderColor: colors.yellow["main-opacity-20"],
+                label: commonT("battery")
+            },
+            {
+                backgroundColor: colors.indigo.main,
+                borderColor: colors.indigo.main,
+                data: fakeData4,
+                fill: {
+                    above: colors.indigo["main-opacity-10"],
+                    target: "origin"
+                },
+                id: "grid",
+                pointBorderColor: colors.indigo["main-opacity-20"],
+                label: commonT("grid")
+            }
+        ],
+        labels: lineChartDateLabels,
+        legend: true,
+        tickCallback: (val, index) => val + commonT("kw"),
+        tooltipLabel: item => `${item.dataset.label} ${item.parsed.y} `
+            + commonT("kwh"),
+        x: { grid: { lineWidth: 0 } },
+        y: { max: 60, min: 0 }
+    })
     const
         [barChartData, setBarChartData] = useState({
             datasets: [
@@ -91,65 +151,6 @@ export default function Analysis() {
                 }
             },
             y: { max: 100, min: 0 }
-        }),
-        [lineChartData, setLineChartData] = useState({
-            datasets: [
-                {
-                    backgroundColor: colors.green.main,
-                    borderColor: colors.green.main,
-                    data: fakeData1,
-                    fill: {
-                        above: colors.green["main-opacity-10"],
-                        target: "origin"
-                    },
-                    id: "load",
-                    pointBorderColor: colors.green["main-opacity-20"],
-                    label: pageT("load")
-                },
-                {
-                    backgroundColor: colors.yellow.main,
-                    borderColor: colors.yellow.main,
-                    data: fakeData2,
-                    fill: {
-                        above: colors.yellow["main-opacity-10"],
-                        target: "origin"
-                    },
-                    id: "solar",
-                    pointBorderColor: colors.yellow["main-opacity-20"],
-                    label: commonT("solar")
-                },
-                {
-                    backgroundColor: colors.blue.main,
-                    borderColor: colors.blue.main,
-                    data: fakeData3,
-                    fill: {
-                        above: colors.yellow["main-opacity-10"],
-                        target: "origin"
-                    },
-                    id: "battery",
-                    pointBorderColor: colors.yellow["main-opacity-20"],
-                    label: commonT("battery")
-                },
-                {
-                    backgroundColor: colors.indigo.main,
-                    borderColor: colors.indigo.main,
-                    data: fakeData4,
-                    fill: {
-                        above: colors.indigo["main-opacity-10"],
-                        target: "origin"
-                    },
-                    id: "grid",
-                    pointBorderColor: colors.indigo["main-opacity-20"],
-                    label: commonT("grid")
-                }
-            ],
-            labels: lineChartDateLabels,
-            legend: true,
-            tickCallback: (val, index) => val + commonT("kw"),
-            tooltipLabel: item => `${item.dataset.label} ${item.parsed.y} `
-                + commonT("kwh"),
-            x: { grid: { lineWidth: 0 } },
-            y: { max: 60, min: 0 }
         })
 
     const
@@ -187,7 +188,10 @@ export default function Analysis() {
                 { kwh: 25, percentage: 41, type: "chargeToBattery" },
             ],
             kwh: 60
-        })
+        }),
+        [lineChartRes] = useState("hour")
+
+
     const lang = getLanguage()
 
     useEffect(() => {
@@ -201,27 +205,99 @@ export default function Analysis() {
         //         endTime: moment().endOf("day").toISOString(),
         //         resolution
         //     }).toString(),
-        //     urlPrefix = `/api/${props.gatewayID}/devices/battery`
+        //     urlPrefix = `/api/${props.gatewayID}/devices`
 
         // apiCall({
-        //     onComplete: () => setInfoLoading(false),
-        //     onError: error => setInfoError(error),
-        //     onStart: () => setInfoLoading(true),
+        //     onSuccess: rawData => {
+        //         if (!rawData?.data) return
+
+        //         const { data } = rawData
+        //         setTotalEnergySources({
+        //             types: [
+        //                 {
+        //                     kwh: data.pvProducedLifetimeEnergyACDiff,
+        //                     percentage: data.pvProducedEnergyPercentAC,
+        //                     type: "directSolarSupply"
+        //                 },
+        //                 {
+        //                     kwh: data.gridProducedLifetimeEnergyACDiff,
+        //                     percentage: data.gridProducedEnergyPercentAC,
+        //                     type: "importFromGrid"
+        //                 },
+        //                 {
+        //                     kwh: data.batteryProducedLifetimeEnergyACDiff,
+        //                     percentage: data.batteryProducedEnergyPercentAC,
+        //                     type: "batteryDischarge"
+        //                 },
+        //             ],
+        //             kwh: data.allProducedLifetimeEnergyACDiff
+        //         })
+
+        //         setEnergyDestinations({
+        //             types: [
+        //                 {
+        //                     kwh: data.loadConsumedLifetimeEnergyACDiff,
+        //                     percentage: data.loadConsumedEnergyPercentAC8,
+        //                     type: "load"
+        //                 },
+        //                 {
+        //                     kwh: data.gridConsumedLifetimeEnergyACDiff,
+        //                     percentage: data.gridConsumedEnergyPercentAC,
+        //                     type: "exportToGrid"
+        //                 },
+        //                 {
+        //                     kwh: data.batteryConsumedLifetimeEnergyACDiff,
+        //                     percentage: data.batteryConsumedEnergyPercentAC,
+        //                     type: "chargeToBattery"
+        //                 },
+        //             ],
+        //             kwh: 60
+        //         })
+        //     },
+        //     url: `${urlPrefix}/energy-distribution-info?startTime=${startTime}&endTime=${endTime}`
+        // })
+
+        const oClocks = Array.from(new Array(25).keys()).map(n =>
+            parseInt(moment().hour(n).startOf("h").format("x")))
+
+        //day tab line chart
+        // const lineChartUrl = `${urlPrefix}/power-state?`
+        //     + chartParams(chargeVoltageRes)
+
+        // apiCall({
+        //     // onComplete: () => setChargeVoltageLoading(false),
+        //     // onError: error => setChargeVoltageError(error),
+        //     // onStart: () => setChargeVoltageLoading(true),
         //     onSuccess: rawData => {
         //         if (!rawData || !rawData.data) return
 
-        //         const { data } = rawData
+        //         const
+        //             { data } = rawData,
+        //             { onPeakTime, timestamps } = data,
+        //             { end, start, timezone } = onPeakTime,
+        //             labels = [
+        //                 ...timestamps.map(t => t * 1000),
+        //                 ...oClocks.slice(timestamps.length)
+        //             ],
+        //             peakStart = ConvertTimeToNumber(start, timezone),
+        //             peakEnd = ConvertTimeToNumber(end, timezone)
 
-        //         setEnergySourcesTotal(data.allProducedLifetimeEnergyACDiff || 0)
-        //         setCapacity(data.capcity || 0)
-        //
+        //         setLineChartData({
+        //             data: {
+        //                 load: data.loadAveragePowerACs,
+        //                 solar: data.pvAveragePowerACs,
+        //                 battery: data.batteryAveragePowerACs,
+        //                 grid: data.gridAveragePowerACs
+        //             },
+        //             highPeak: { start: peakStart, end: peakEnd },
+        //             labels
+        //         })
         //     },
-        //     url: `${urlPrefix}/energy-info?startTime=${startTime}`
+        //     url: chargeVoltageUrl
         // })
-
         const
+            lineChart = { ...lineChartPower },
             barChart = { ...barChartData },
-            lineChart = { ...lineChartData },
             labels = [
                 pageT("load"),
                 commonT("solar"),
@@ -229,11 +305,11 @@ export default function Analysis() {
                 commonT("grid")
             ]
 
-        labels.forEach((text, i) => barChart.datasets[i].label = text)
         labels.forEach((text, i) => lineChart.datasets[i].label = text)
-
+        labels.forEach((text, i) => barChart.datasets[i].label = text)
+        setLineChartPower(lineChart)
         setBarChartData(barChart)
-        setLineChartData(lineChart)
+
     }, [lang])
 
     const tabs = ["days", "weeks", "month", "year", "custom"]
@@ -273,7 +349,7 @@ export default function Analysis() {
                 <h4>{pageT("realTimePowerkW")}</h4>
                 <div className="max-h-80vh h-160 mt-10 relative w-full">
                     <LineChart
-                        data={lineChartData} id="analysisLineChart" />
+                        data={lineChartPower} id="analysisLineChart" />
                 </div>
             </div>
             : null}

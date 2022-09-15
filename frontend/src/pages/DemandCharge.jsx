@@ -1,12 +1,12 @@
 import moment from "moment"
-import { useMemo, useState } from "react"
+import { useMemo, useState, useEffect } from "react"
 import { useTranslation } from "react-multi-lang"
 
-import { API_HOST } from "../constant/env"
-import LineChart from "../components/LineChart"
-import PriceCard from "../components/PriceCard"
+import { apiCall } from "../utils/api"
 import variables from "../configs/variables"
 
+import LineChart from "../components/LineChart"
+import PriceCard from "../components/PriceCard"
 import { ReactComponent as DemandPeak }
     from "../assets/icons/demand_charge_line.svg"
 
@@ -19,10 +19,13 @@ export default function DemandCharge(props) {
         pageT = (string, params) => t("demandCharge." + string, params)
 
     const
-        [currentBillingCycle, setCurrentBillingCycle] = useState(15),
-        [realizedSavings, setRealizedSavings] = useState(30),
+        [infoError, setInfoError] = useState(""),
+        [infoLoading, setInfoLoading] = useState(false),
+        [currentBillingCycle, setCurrentBillingCycle] = useState(0),
+        [realizedSavings, setRealizedSavings] = useState(0),
         [lastMonthBillingCycle, setLastMonthBillingCycle]
-            = useState(30)
+            = useState(0),
+        [peak, setPeak] = useState({ active: 0, current: 0, threshhold: 0 })
 
     const
         hours24 = Array.from(new Array(24).keys()),
@@ -32,7 +35,6 @@ export default function DemandCharge(props) {
         lineChartDataArray = hours24.filter(v => v <= currentHour).map(() =>
             Math.floor(Math.random() * (60 - 40 + 1) + 40))
     const
-        [peak, setPeak] = useState({ active: 0, current: 0, threshhold: 0 }),
         [lineChartData, setLineChartData] = useState({
             datasets: [{
                 backgroundColor: colors.primary.main,
@@ -79,6 +81,23 @@ export default function DemandCharge(props) {
         : null
 
     const peakShaveColor = peak.active ? "negative" : "positive"
+
+    useEffect(() => {
+        apiCall({
+            onComplete: () => setInfoLoading(false),
+            onError: error => setInfoError(error),
+            onStart: () => setInfoLoading(true),
+            onSuccess: rawData => {
+                if (!rawData || !rawData.data) return
+
+                const { data } = rawData
+
+                setCurrentBillingCycle(data.gridPowerCost || 0)
+                setRealizedSavings(data.gridPowerCostSavings || 0)
+                setLastMonthBillingCycle(data.gridPowerCostLastMonth || 0)
+            }
+        })
+    }, [])
 
     return <>
         <h1 className="mb-9">{commonT("demandCharge")}</h1>

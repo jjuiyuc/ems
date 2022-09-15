@@ -154,7 +154,24 @@ export default function Analysis() {
 
     const
         [tab, setTab] = useState("days"),
-        [open, setOpen] = useState(false),
+        [infoError, setInfoError] = useState(""),
+        [infoLoading, setInfoLoading] = useState(false),
+        // [energySourcesTotal, setEnergySourcesTotal] = useState({
+        //     types: [
+        //         { kwh: 0, percentage: 0, type: "directSolarSupply" },
+        //         { kwh: 0, percentage: 0, type: "importFromGrid" },
+        //         { kwh: 0, percentage: 0, type: "batteryDischarge" },
+        //     ],
+        //     kwh: 50
+        // }),
+        // [energyDestinationsTotal, setEnergyDestinationsTotal] = useState({
+        //     types: [
+        //         { kwh: 10, percentage: 18, type: "load" },
+        //         { kwh: 25, percentage: 41, type: "exportToGrid" },
+        //         { kwh: 25, percentage: 41, type: "chargeToBattery" },
+        //     ],
+        //     kwh: 60
+        // })
         [energySourcesTotal, setEnergySourcesTotal] = useState({
             types: [
                 { kwh: 7.5, percentage: 15, type: "directSolarSupply" },

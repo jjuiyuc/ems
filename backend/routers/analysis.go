@@ -52,3 +52,28 @@ func (w *APIWorker) GetEnergyDistributionInfo(c *gin.Context) {
 	energyDistributionInfo := w.Services.Devices.GetEnergyDistributionInfo(gatewayUUID, q.StartTime, q.EndTime)
 	appG.Response(http.StatusOK, e.Success, energyDistributionInfo)
 }
+
+// GetPowerState godoc
+func (w *APIWorker) GetPowerState(c *gin.Context) {
+	appG := app.Gin{c}
+	userID, _ := c.Get("userID")
+	if userID == nil {
+		log.WithFields(log.Fields{"caused-by": "error token"}).Error()
+		appG.Response(http.StatusUnauthorized, e.ErrToken, nil)
+		return
+	}
+
+	gatewayUUID := c.Param("gwid")
+	log.Debug("gatewayUUID: ", gatewayUUID)
+
+	var q ZoomableQuery
+	// TODO: Only supports hour now
+	if err := c.BindQuery(&q); err != nil || q.Resolution != "hour" {
+		log.WithFields(log.Fields{"caused-by": "invalid param"}).Error()
+		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
+		return
+	}
+
+	powerState := w.Services.Devices.GetPowerState(gatewayUUID, q.StartTime, q.EndTime)
+	appG.Response(http.StatusOK, e.Success, powerState)
+}

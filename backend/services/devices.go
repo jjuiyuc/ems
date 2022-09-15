@@ -53,10 +53,20 @@ type EnergyDistributionInfoResponse struct {
 	BatteryConsumedLifetimeEnergyACDiff float32 `json:"batteryConsumedLifetimeEnergyACDiff"`
 }
 
+// PowerStateResponse godoc
+type PowerStateResponse struct {
+	Timestamps             []int     `json:"timestamps"`
+	LoadAveragePowerACs    []float32 `json:"loadAveragePowerACs"`
+	PvAveragePowerACs      []float32 `json:"pvAveragePowerACs"`
+	BatteryAveragePowerACs []float32 `json:"batteryAveragePowerACs"`
+	GridAveragePowerACs    []float32 `json:"gridAveragePowerACs"`
+}
+
 // DevicesService godoc
 type DevicesService interface {
 	GetLatestDevicesEnergyInfo(gwUUID string) (updatedTime time.Time, devicesEnergyInfo *DevicesEnergyInfoResponse, err error)
 	GetEnergyDistributionInfo(gwUUID string, startTime, endTime time.Time) (energyDistributionInfo *EnergyDistributionInfoResponse)
+	GetPowerState(gwUUID string, startTime, endTime time.Time) (powerState *PowerStateResponse)
 }
 
 type defaultDevicesService struct {
@@ -166,5 +176,48 @@ func (s defaultDevicesService) GetEnergyDistributionInfo(gwUUID string, startTim
 	energyDistributionInfo.LoadConsumedEnergyPercentAC = utils.Percent(energyDistributionInfo.LoadConsumedLifetimeEnergyACDiff, energyDistributionInfo.AllConsumedLifetimeEnergyACDiff)
 	energyDistributionInfo.GridConsumedEnergyPercentAC = utils.Percent(energyDistributionInfo.GridConsumedLifetimeEnergyACDiff, energyDistributionInfo.AllConsumedLifetimeEnergyACDiff)
 	energyDistributionInfo.BatteryConsumedEnergyPercentAC = utils.Percent(energyDistributionInfo.BatteryConsumedLifetimeEnergyACDiff, energyDistributionInfo.AllConsumedLifetimeEnergyACDiff)
+	return
+}
+
+func (s defaultDevicesService) GetPowerState(gwUUID string, startTime, endTime time.Time) (powerState *PowerStateResponse) {
+	powerState = &PowerStateResponse{}
+	startTimeIndex := startTime
+	endTimeIndex := startTime.Add(1 * time.Hour)
+
+	for startTimeIndex.Before(endTime) {
+		latestLog, latestLogErr := s.repo.CCData.GetLatestLogByGatewayUUIDAndPeriod(gwUUID, startTimeIndex, endTimeIndex)
+		if latestLogErr == nil {
+			log.WithFields(log.Fields{
+				"log_date":              latestLog.LogDate,
+				"loadAveragePowerAC":    latestLog.LoadAveragePowerAC,
+				"batteryAveragePowerAC": latestLog.BatteryAveragePowerAC,
+				"pvAveragePowerAC":      latestLog.PvAveragePowerAC,
+				"gridAveragePowerAC":    latestLog.GridAveragePowerAC,
+			}).Debug()
+			powerState.Timestamps = append(powerState.Timestamps, int(latestLog.LogDate.Unix()))
+			powerState.LoadAveragePowerACs = append(powerState.LoadAveragePowerACs, latestLog.LoadAveragePowerAC.Float32)
+			powerState.BatteryAveragePowerACs = append(powerState.BatteryAveragePowerACs, latestLog.BatteryAveragePowerAC.Float32)
+			powerState.PvAveragePowerACs = append(powerState.PvAveragePowerACs, latestLog.PvAveragePowerAC.Float32)
+			powerState.GridAveragePowerACs = append(powerState.GridAveragePowerACs, latestLog.GridAveragePowerAC.Float32)
+		} else {
+			log.WithFields(log.Fields{
+				"caused-by":      "s.repo.CCData.GetLatestLogByGatewayUUIDAndPeriod",
+				"err":            latestLogErr,
+				"startTimeIndex": startTimeIndex,
+				"endTimeIndex":   endTimeIndex,
+			}).Warn()
+			powerState.Timestamps = append(powerState.Timestamps, int(endTimeIndex.Unix()))
+			powerState.LoadAveragePowerACs = append(powerState.LoadAveragePowerACs, 0)
+			powerState.BatteryAveragePowerACs = append(powerState.BatteryAveragePowerACs, 0)
+			powerState.PvAveragePowerACs = append(powerState.PvAveragePowerACs, 0)
+			powerState.GridAveragePowerACs = append(powerState.GridAveragePowerACs, 0)
+		}
+
+		startTimeIndex = endTimeIndex
+		endTimeIndex = startTimeIndex.Add(+1 * time.Hour)
+		if endTimeIndex.After(endTime) {
+			endTimeIndex = endTime
+		}
+	}
 	return
 }

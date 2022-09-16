@@ -62,11 +62,21 @@ type PowerStateResponse struct {
 	GridAveragePowerACs    []float32 `json:"gridAveragePowerACs"`
 }
 
+// AccumulatedPowerStateResponse godoc
+type AccumulatedPowerStateResponse struct {
+	Timestamps                        []int     `json:"timestamps"`
+	LoadConsumedLifetimeEnergyACDiffs []float32 `json:"loadConsumedLifetimeEnergyACDiffs"`
+	PvProducedLifetimeEnergyACDiffs   []float32 `json:"pvProducedLifetimeEnergyACDiffs"`
+	BatteryLifetimeEnergyACDiffs      []float32 `json:"batteryLifetimeEnergyACDiffs"`
+	GridLifetimeEnergyACDiffs         []float32 `json:"gridLifetimeEnergyACDiffs"`
+}
+
 // DevicesService godoc
 type DevicesService interface {
 	GetLatestDevicesEnergyInfo(gwUUID string) (updatedTime time.Time, devicesEnergyInfo *DevicesEnergyInfoResponse, err error)
 	GetEnergyDistributionInfo(gwUUID string, startTime, endTime time.Time) (energyDistributionInfo *EnergyDistributionInfoResponse)
 	GetPowerState(gwUUID string, startTime, endTime time.Time) (powerState *PowerStateResponse)
+	GetAccumulatedPowerState(gwUUID, resolution string, startTime, endTime time.Time) (accumulatedPowerState *AccumulatedPowerStateResponse)
 }
 
 type defaultDevicesService struct {
@@ -217,6 +227,60 @@ func (s defaultDevicesService) GetPowerState(gwUUID string, startTime, endTime t
 		endTimeIndex = startTimeIndex.Add(+1 * time.Hour)
 		if endTimeIndex.After(endTime) {
 			endTimeIndex = endTime
+		}
+	}
+	return
+}
+
+func (s defaultDevicesService) GetAccumulatedPowerState(gwUUID, resolution string, startTime, endTime time.Time) (accumulatedPowerState *AccumulatedPowerStateResponse) {
+	accumulatedPowerState = &AccumulatedPowerStateResponse{}
+	startTimeIndex := startTime
+	var endTimeIndex time.Time
+	switch resolution {
+	case "day":
+		endTimeIndex = startTime.AddDate(0, 0, 1)
+	case "month":
+		//TODO
+	}
+
+	for startTimeIndex.Before(endTime) {
+		latestLog, latestLogErr := s.repo.CCData.GetLatestCalculatedDailyLog(gwUUID, startTimeIndex, endTimeIndex)
+		if latestLogErr == nil {
+			log.WithFields(log.Fields{
+				"latest_log_date":                  latestLog.LatestLogDate,
+				"loadConsumedLifetimeEnergyACDiff": latestLog.LoadConsumedLifetimeEnergyACDiff,
+				"pvProducedLifetimeEnergyACDiff":   latestLog.PvProducedLifetimeEnergyACDiff,
+				"batteryLifetimeEnergyACDiff":      latestLog.BatteryLifetimeEnergyACDiff,
+				"gridLifetimeEnergyACDiff":         latestLog.GridLifetimeEnergyACDiff,
+			}).Debug()
+			accumulatedPowerState.Timestamps = append(accumulatedPowerState.Timestamps, int(latestLog.LatestLogDate.Unix()))
+			accumulatedPowerState.LoadConsumedLifetimeEnergyACDiffs = append(accumulatedPowerState.LoadConsumedLifetimeEnergyACDiffs, latestLog.LoadConsumedLifetimeEnergyACDiff.Float32)
+			accumulatedPowerState.PvProducedLifetimeEnergyACDiffs = append(accumulatedPowerState.PvProducedLifetimeEnergyACDiffs, latestLog.PvProducedLifetimeEnergyACDiff.Float32)
+			accumulatedPowerState.BatteryLifetimeEnergyACDiffs = append(accumulatedPowerState.BatteryLifetimeEnergyACDiffs, latestLog.BatteryLifetimeEnergyACDiff.Float32)
+			accumulatedPowerState.GridLifetimeEnergyACDiffs = append(accumulatedPowerState.GridLifetimeEnergyACDiffs, latestLog.GridLifetimeEnergyACDiff.Float32)
+		} else {
+			log.WithFields(log.Fields{
+				"caused-by":      "s.repo.CCData.GetLatestCalculatedDailyLog",
+				"err":            latestLogErr,
+				"startTimeIndex": startTimeIndex,
+				"endTimeIndex":   endTimeIndex,
+			}).Warn()
+			accumulatedPowerState.Timestamps = append(accumulatedPowerState.Timestamps, int(endTimeIndex.Unix()))
+			accumulatedPowerState.LoadConsumedLifetimeEnergyACDiffs = append(accumulatedPowerState.LoadConsumedLifetimeEnergyACDiffs, 0)
+			accumulatedPowerState.PvProducedLifetimeEnergyACDiffs = append(accumulatedPowerState.PvProducedLifetimeEnergyACDiffs, 0)
+			accumulatedPowerState.BatteryLifetimeEnergyACDiffs = append(accumulatedPowerState.BatteryLifetimeEnergyACDiffs, 0)
+			accumulatedPowerState.GridLifetimeEnergyACDiffs = append(accumulatedPowerState.GridLifetimeEnergyACDiffs, 0)
+		}
+
+		startTimeIndex = endTimeIndex
+		switch resolution {
+		case "day":
+			endTimeIndex = startTimeIndex.AddDate(0, 0, 1)
+			if endTimeIndex.After(endTime) {
+				endTimeIndex = endTime
+			}
+		case "month":
+			//TODO
 		}
 	}
 	return

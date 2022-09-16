@@ -17,6 +17,13 @@ type PeriodQuery struct {
 	EndTime   time.Time `form:"endTime" binding:"required,gtfield=StartTime" example:"UTC time in ISO-8601" format:"date-time"`
 }
 
+// AccumulatedQuery godoc
+type AccumulatedQuery struct {
+	Resolution string    `form:"resolution" binding:"required" enums:"day,month"`
+	StartTime  time.Time `form:"startTime" binding:"required" example:"UTC time in ISO-8601" format:"date-time"`
+	EndTime    time.Time `form:"endTime" binding:"required,gtfield=StartTime" example:"UTC time in ISO-8601" format:"date-time"`
+}
+
 // GetEnergyDistributionInfo godoc
 // @Summary     Show the distribution of energy sources and distinations
 // @Description get energy distribution by token, gateway UUID, startTime and endTime
@@ -88,4 +95,28 @@ func (w *APIWorker) GetPowerState(c *gin.Context) {
 
 	powerState := w.Services.Devices.GetPowerState(gatewayUUID, q.StartTime, q.EndTime)
 	appG.Response(http.StatusOK, e.Success, powerState)
+}
+
+// GetAccumulatedPowerState godoc
+func (w *APIWorker) GetAccumulatedPowerState(c *gin.Context) {
+	appG := app.Gin{c}
+	userID, _ := c.Get("userID")
+	if userID == nil {
+		log.WithFields(log.Fields{"caused-by": "error token"}).Error()
+		appG.Response(http.StatusUnauthorized, e.ErrToken, nil)
+		return
+	}
+
+	gatewayUUID := c.Param("gwid")
+	log.Debug("gatewayUUID: ", gatewayUUID)
+
+	var q AccumulatedQuery
+	if err := c.BindQuery(&q); err != nil || (q.Resolution != "day" && q.Resolution != "month") {
+		log.WithFields(log.Fields{"caused-by": "invalid param"}).Error()
+		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
+		return
+	}
+
+	accumulatedPowerState := w.Services.Devices.GetAccumulatedPowerState(gatewayUUID, q.Resolution, q.StartTime, q.EndTime)
+	appG.Response(http.StatusOK, e.Success, accumulatedPowerState)
 }

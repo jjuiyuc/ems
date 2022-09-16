@@ -62,6 +62,18 @@ tag-ignore = ["password"]
   grid_pv_consumed_lifetime_energy_ac = "GridPvConsumedLifetimeEnergyAC"
   pv_energy_cost_savings = "PvEnergyCostSavings"
   pv_co2_savings = "PvCo2Savings"
+  [aliases.tables.cc_data_log_calculated_daily.columns]
+  pv_produced_lifetime_energy_ac_diff = "PvProducedLifetimeEnergyACDiff"
+  load_consumed_lifetime_energy_ac_diff = "LoadConsumedLifetimeEnergyACDiff"
+  battery_lifetime_energy_ac_diff = "BatteryLifetimeEnergyACDiff"
+  grid_lifetime_energy_ac_diff = "GridLifetimeEnergyACDiff"
+  load_self_consumed_energy_percent_ac = "LoadSelfConsumedEnergyPercentAC"
+  [aliases.tables.cc_data_log_calculated_monthly.columns]
+  pv_produced_lifetime_energy_ac_diff = "PvProducedLifetimeEnergyACDiff"
+  load_consumed_lifetime_energy_ac_diff = "LoadConsumedLifetimeEnergyACDiff"
+  battery_lifetime_energy_ac_diff = "BatteryLifetimeEnergyACDiff"
+  grid_lifetime_energy_ac_diff = "GridLifetimeEnergyACDiff"
+  load_self_consumed_energy_percent_ac = "LoadSelfConsumedEnergyPercentAC"
 
 [mysql]
 dbname  = "der_ems"
@@ -70,4 +82,4 @@ port    = 3306
 user    = "ubiik"
 pass    = "testing123"
 sslmode = "false"
-whitelist = ["weather_forecast", "customer", "gateway", "device_model", "device", "login_log", "user", "cc_data", "tou", "tou_holiday", "tou_location", "user_gateway_right", "cc_data_log", "ai_data"]
+whitelist = ["weather_forecast", "customer", "gateway", "device_model", "device", "login_log", "user", "cc_data", "tou", "tou_holiday", "tou_location", "user_gateway_right", "cc_data_log", "ai_data", "cc_data_log_calculated_daily", "cc_data_log_calculated_monthly"]

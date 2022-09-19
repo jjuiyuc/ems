@@ -244,9 +244,6 @@ export default connect(mapState)(function Analysis(props) {
             url: `${urlPrefix}/energy-distribution-info?startTime=${startTime}&endTime=${endTime}`
         })
 
-        const oClocks = Array.from(new Array(25).keys()).map(n =>
-            parseInt(moment().hour(n).startOf("h").format("x")))
-
         const lineChartPowerUrl = `${urlPrefix}/power-state?`
             + chartParams(lineChartPowertRes)
 
@@ -260,11 +257,7 @@ export default connect(mapState)(function Analysis(props) {
                 const
                     { data } = rawData,
                     { timestamps } = data,
-                    labels = [
-                        ...timestamps.map(t => t * 1000),
-                        ...oClocks.slice(timestamps.length)
-                    ]
-                console.log(data?.loadAveragePowerACs)
+                    labels = timestamps.map(t => t * 1000)
                 setLineChartPower({
                     data: {
                         load: data.loadAveragePowerACs,

@@ -1,18 +1,24 @@
+import { connect } from "react-redux"
 import { Button, Stack } from "@mui/material"
-import { getLanguage, useTranslation } from "react-multi-lang"
+import { useTranslation } from "react-multi-lang"
 import moment from "moment"
 import { useEffect, useState } from "react"
+
+import { apiCall } from "../utils/api"
+import { ConvertTimeToNumber } from "../utils/utils"
+import variables from "../configs/variables"
 
 import AnalysisCard from "../components/AnalysisCard"
 import DateRangePicker from "../components/DateRangePicker"
 import BarChart from "../components/BarChart"
 import LineChart from "../components/LineChart"
-import variables from "../configs/variables"
 import "../assets/css/dateRangePicker.css"
 
 const { colors } = variables
 
-export default function Analysis() {
+const mapState = state => ({ gatewayID: state.gateways.active.gatewayID })
+
+export default connect(mapState)(function Analysis(props) {
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
@@ -29,10 +35,67 @@ export default function Analysis() {
         fakeData2 = fakeDataArray(days),
         fakeData3 = fakeDataArray(days),
         fakeData4 = fakeDataArray(days)
-    const
-        hours24 = Array.from(new Array(24).keys()),
-        lineChartDateLabels = hours24.map(n =>
-            moment().hour(n).startOf("h").toISOString())
+
+
+    const chartRealTimePowerSet = ({ data, labels }) => ({
+        datasets: [
+            {
+                backgroundColor: colors.green.main,
+                borderColor: colors.green.main,
+                data: data?.load || [],
+                fill: {
+                    above: colors.green["main-opacity-10"],
+                    target: "origin"
+                },
+                id: "load",
+                pointBorderColor: colors.green["main-opacity-20"],
+                label: pageT("load")
+            },
+            {
+                backgroundColor: colors.yellow.main,
+                borderColor: colors.yellow.main,
+                data: data?.solar || [],
+                fill: {
+                    above: colors.yellow["main-opacity-10"],
+                    target: "origin"
+                },
+                id: "solar",
+                pointBorderColor: colors.yellow["main-opacity-20"],
+                label: commonT("solar")
+            },
+            {
+                backgroundColor: colors.blue.main,
+                borderColor: colors.blue.main,
+                data: data?.battery || [],
+                fill: {
+                    above: colors.yellow["main-opacity-10"],
+                    target: "origin"
+                },
+                id: "battery",
+                pointBorderColor: colors.yellow["main-opacity-20"],
+                label: commonT("battery")
+            },
+            {
+                backgroundColor: colors.indigo.main,
+                borderColor: colors.indigo.main,
+                data: data?.grid || [],
+                fill: {
+                    above: colors.indigo["main-opacity-10"],
+                    target: "origin"
+                },
+                id: "grid",
+                pointBorderColor: colors.indigo["main-opacity-20"],
+                label: commonT("grid")
+            }
+        ],
+        labels,
+        legend: true,
+        tickCallback: (val, index) => val + commonT("kw"),
+        tooltipLabel: item => `${item.dataset.label} ${item.parsed.y} `
+            + commonT("kwh"),
+        x: { grid: { lineWidth: 0 } },
+        y: { max: 60, min: 0 }
+    })
 
     const
         [barChartData, setBarChartData] = useState({
@@ -89,168 +152,125 @@ export default function Analysis() {
                 }
             },
             y: { max: 100, min: 0 }
-        }),
-        [lineChartData, setLineChartData] = useState({
-            datasets: [
-                {
-                    backgroundColor: colors.green.main,
-                    borderColor: colors.green.main,
-                    data: fakeData1,
-                    fill: {
-                        above: colors.green["main-opacity-10"],
-                        target: "origin"
-                    },
-                    id: "load",
-                    pointBorderColor: colors.green["main-opacity-20"],
-                    label: pageT("load")
-                },
-                {
-                    backgroundColor: colors.yellow.main,
-                    borderColor: colors.yellow.main,
-                    data: fakeData2,
-                    fill: {
-                        above: colors.yellow["main-opacity-10"],
-                        target: "origin"
-                    },
-                    id: "solar",
-                    pointBorderColor: colors.yellow["main-opacity-20"],
-                    label: commonT("solar")
-                },
-                {
-                    backgroundColor: colors.blue.main,
-                    borderColor: colors.blue.main,
-                    data: fakeData3,
-                    fill: {
-                        above: colors.yellow["main-opacity-10"],
-                        target: "origin"
-                    },
-                    id: "battery",
-                    pointBorderColor: colors.yellow["main-opacity-20"],
-                    label: commonT("battery")
-                },
-                {
-                    backgroundColor: colors.indigo.main,
-                    borderColor: colors.indigo.main,
-                    data: fakeData4,
-                    fill: {
-                        above: colors.indigo["main-opacity-10"],
-                        target: "origin"
-                    },
-                    id: "grid",
-                    pointBorderColor: colors.indigo["main-opacity-20"],
-                    label: commonT("grid")
-                }
-            ],
-            labels: lineChartDateLabels,
-            legend: true,
-            tickCallback: (val, index) => val + commonT("kw"),
-            tooltipLabel: item => `${item.dataset.label} ${item.parsed.y} `
-                + commonT("kwh"),
-            x: { grid: { lineWidth: 0 } },
-            y: { max: 60, min: 0 }
         })
 
     const
         [tab, setTab] = useState("days"),
-        [open, setOpen] = useState(false),
+        [infoError, setInfoError] = useState(""),
+        [infoLoading, setInfoLoading] = useState(false),
         [energySourcesTotal, setEnergySourcesTotal] = useState({
             types: [
-                { kwh: 7.5, percentage: 15, type: "directSolarSupply" },
-                { kwh: 30, percentage: 60, type: "importFromGrid" },
-                { kwh: 12.5, percentage: 25, type: "batteryDischarge" },
+                { kwh: 0, percentage: 0, type: "directSolarSupply" },
+                { kwh: 0, percentage: 0, type: "importFromGrid" },
+                { kwh: 0, percentage: 0, type: "batteryDischarge" },
             ],
-            kwh: 50
+            kwh: 0
         }),
-        [energyDestinationsTotal, setEnergyDestinationsTotal] = useState({
+        [energyDestinations, setEnergyDestinations] = useState({
             types: [
-                { kwh: 10, percentage: 18, type: "load" },
-                { kwh: 25, percentage: 41, type: "exportToGrid" },
-                { kwh: 25, percentage: 41, type: "chargeToBattery" },
+                { kwh: 0, percentage: 0, type: "load" },
+                { kwh: 0, percentage: 0, type: "exportToGrid" },
+                { kwh: 0, percentage: 0, type: "chargeToBattery" },
             ],
-            kwh: 60
-        })
-    // [barChart, setBarChart] = useState(null),
-    // [barChartError, setBarChartError] = useState(""),
-    // [barChartLoading, setBarChartLoading] = useState(false),
-    // [barChartRes] = useState("day"),
-    // [ssrLineChart, setSsrLineChart] = useState(null),
-    // [ssrLineChartError, setSsrLineChartError] = useState(""),
-    // [ssrLineChartLoading, setSsrLineChartLoading] = useState(false),
-    // [ssrLineChartRes] = useState("day")
-
-    const lang = getLanguage()
+            kwh: 0
+        }),
+        [lineChartPower, setLineChartPower] = useState(null),
+        [lineChartPowerError, setLineChartPowerError] = useState(""),
+        [lineChartPowerLoading, setLineChartPowerLoading] = useState(false),
+        [lineChartPowertRes] = useState("hour")
 
     useEffect(() => {
-        // const barChartUrl = `${urlPrefix}/accumulated-power-state?`
-        //     + chartParams(barChartRes)
-
-        // apiCall({
-        //     onComplete: () => setBarChartLoading(false),
-        //     onError: error => setBarChartError(error),
-        //     onStart: () => setBarChartLoading(true),
-        //     onSuccess: rawData => {
-        //         if (!rawData || !rawData.data) return
-
-        //         const
-        //             { data } = rawData,
-        //             {  timestamps } = data,
-        //             labels = [
-        //                 ...timestamps.map(t => t * 1000),
-        //                 ...oClocks.slice(timestamps.length)
-        //             ]
-
-        //             setBarChart({
-        //             data: {
-        //                 load: data.loadConsumedLifetimeEnergyACDiffs,
-        //                 solar: data.pvProducedLifetimeEnergyACDiffs,
-        //                 battery: data.batteryLifetimeEnergyACDiffs,
-        //                 grid: data.gridLifetimeEnergyACDiffs,
-        //             },
-        //             labels
-        //         })
-        //     },
-        //     url: barChartUrl
-        // })
-
-        // apiCall({
-        //     onComplete: () => setSsrLineChartLoading(false),
-        //     onError: error => setSsrLineChartError(error),
-        //     onStart: () => setSsrLineChartLoading(true),
-        //     onSuccess: rawData => {
-        //         if (!rawData || !rawData.data) return
-
-        //         const
-        //             { data } = rawData,
-        //             { timestamps } = data,
-        //             labels = [
-        //                 ...timestamps.map(t => t * 1000),
-        //                 ...oClocks.slice(timestamps.length)
-        //             ]
-
-        //             setSsrLineChart({
-        //             data: data.loadSelfConsumedEnergyPercentACs,
-        //             labels
-        //         })
-        //     },
-        //     url: `${urlPrefix}/power-self-supply-rate?${chartParams(ssrLineChartRes)}`
-        // })
+        if (!props.gatewayID) return
 
         const
-            barChart = { ...barChartData },
-            lineChart = { ...lineChartData },
-            labels = [
-                pageT("load"),
-                commonT("solar"),
-                commonT("battery"),
-                commonT("grid")
-            ]
+            startTime = moment().startOf("day").toISOString(),
+            endTime = moment().toISOString(),
+            chartParams = resolution => new URLSearchParams({
+                startTime,
+                endTime: moment().toISOString(),
+                resolution
+            }).toString(),
+            urlPrefix = `/api/${props.gatewayID}/devices`
 
-        labels.forEach((text, i) => barChart.datasets[i].label = text)
-        labels.forEach((text, i) => lineChart.datasets[i].label = text)
+        apiCall({
+            onComplete: () => setInfoLoading(false),
+            onError: error => setInfoError(error),
+            onStart: () => setInfoLoading(true),
+            onSuccess: rawData => {
+                if (!rawData?.data) return
 
-        setBarChartData(barChart)
-        setLineChartData(lineChart)
-    }, [lang])
+                const { data } = rawData
+                setEnergySourcesTotal({
+                    types: [
+                        {
+                            kwh: data.pvProducedLifetimeEnergyACDiff,
+                            percentage: data.pvProducedEnergyPercentAC,
+                            type: "directSolarSupply"
+                        },
+                        {
+                            kwh: data.gridProducedLifetimeEnergyACDiff,
+                            percentage: data.gridProducedEnergyPercentAC,
+                            type: "importFromGrid"
+                        },
+                        {
+                            kwh: data.batteryProducedLifetimeEnergyACDiff,
+                            percentage: data.batteryProducedEnergyPercentAC,
+                            type: "batteryDischarge"
+                        },
+                    ],
+                    kwh: data.allProducedLifetimeEnergyACDiff
+                })
+                setEnergyDestinations({
+                    types: [
+                        {
+                            kwh: data.loadConsumedLifetimeEnergyACDiff,
+                            percentage: data.loadConsumedEnergyPercentAC,
+                            type: "load"
+                        },
+                        {
+                            kwh: data.gridConsumedLifetimeEnergyACDiff,
+                            percentage: data.gridConsumedEnergyPercentAC,
+                            type: "exportToGrid"
+                        },
+                        {
+                            kwh: data.batteryConsumedLifetimeEnergyACDiff,
+                            percentage: data.batteryConsumedEnergyPercentAC,
+                            type: "chargeToBattery"
+                        },
+                    ],
+                    kwh: 60
+                })
+            },
+            url: `${urlPrefix}/energy-distribution-info?startTime=${startTime}&endTime=${endTime}`
+        })
+
+        const lineChartPowerUrl = `${urlPrefix}/power-state?`
+            + chartParams(lineChartPowertRes)
+
+        apiCall({
+            onComplete: () => setLineChartPowerLoading(false),
+            onError: error => setLineChartPowerError(error),
+            onStart: () => setLineChartPowerLoading(true),
+            onSuccess: rawData => {
+                if (!rawData || !rawData.data) return
+
+                const
+                    { data } = rawData,
+                    { timestamps } = data,
+                    labels = timestamps.map(t => t * 1000)
+                setLineChartPower({
+                    data: {
+                        load: data.loadAveragePowerACs,
+                        solar: data.pvAveragePowerACs,
+                        battery: data.batteryAveragePowerACs,
+                        grid: data.gridAveragePowerACs
+                    },
+                    labels
+                })
+            },
+            url: lineChartPowerUrl
+        })
+    }, [props.gatewayID])
 
     const tabs = ["days", "weeks", "month", "year", "custom"]
 
@@ -281,7 +301,7 @@ export default function Analysis() {
                 data={energySourcesTotal}
                 title={pageT("energySourcesTotal")} />
             <AnalysisCard
-                data={energyDestinationsTotal}
+                data={energyDestinations}
                 title={pageT("energyDestinationsTotal")} />
         </div>
         {tab == "days"
@@ -289,7 +309,9 @@ export default function Analysis() {
                 <h4>{pageT("realTimePowerkW")}</h4>
                 <div className="max-h-80vh h-160 mt-10 relative w-full">
                     <LineChart
-                        data={lineChartData} id="analysisLineChart" />
+                        data={chartRealTimePowerSet({
+                            ...lineChartPower
+                        })} id="analysisLineChart" />
                 </div>
             </div>
             : null}
@@ -310,4 +332,4 @@ export default function Analysis() {
             </>
             : null}
     </>
-}
+})

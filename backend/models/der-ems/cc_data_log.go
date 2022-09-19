@@ -23,182 +23,267 @@ import (
 
 // CCDataLog is an object representing the database table.
 type CCDataLog struct {
-	ID                              int          `boil:"id" json:"id" toml:"id" yaml:"id"`
-	GWUUID                          string       `boil:"gw_uuid" json:"gwUUID" toml:"gwUUID" yaml:"gwUUID"`
-	LogDate                         time.Time    `boil:"log_date" json:"logDate" toml:"logDate" yaml:"logDate"`
-	GWID                            null.Int     `boil:"gw_id" json:"gwID,omitempty" toml:"gwID" yaml:"gwID,omitempty"`
-	CustomerID                      null.Int     `boil:"customer_id" json:"customerID,omitempty" toml:"customerID" yaml:"customerID,omitempty"`
-	GridIsPeakShaving               null.Int     `boil:"grid_is_peak_shaving" json:"gridIsPeakShaving,omitempty" toml:"gridIsPeakShaving" yaml:"gridIsPeakShaving,omitempty"`
-	LoadGridAveragePowerAC          null.Float32 `boil:"load_grid_average_power_ac" json:"loadGridAveragePowerAc,omitempty" toml:"loadGridAveragePowerAc" yaml:"loadGridAveragePowerAc,omitempty"`
-	BatteryGridAveragePowerAC       null.Float32 `boil:"battery_grid_average_power_ac" json:"batteryGridAveragePowerAc,omitempty" toml:"batteryGridAveragePowerAc" yaml:"batteryGridAveragePowerAc,omitempty"`
-	GridContractPowerAC             null.Float32 `boil:"grid_contract_power_ac" json:"gridContractPowerAc,omitempty" toml:"gridContractPowerAc" yaml:"gridContractPowerAc,omitempty"`
-	LoadPvAveragePowerAC            null.Float32 `boil:"load_pv_average_power_ac" json:"loadPVAveragePowerAc,omitempty" toml:"loadPVAveragePowerAc" yaml:"loadPVAveragePowerAc,omitempty"`
-	LoadBatteryAveragePowerAC       null.Float32 `boil:"load_battery_average_power_ac" json:"loadBatteryAveragePowerAc,omitempty" toml:"loadBatteryAveragePowerAc" yaml:"loadBatteryAveragePowerAc,omitempty"`
-	BatterySoC                      null.Float32 `boil:"battery_soc" json:"batterySoc,omitempty" toml:"batterySoc" yaml:"batterySoc,omitempty"`
-	BatteryProducedAveragePowerAC   null.Float32 `boil:"battery_produced_average_power_ac" json:"batteryProducedAveragePowerAc,omitempty" toml:"batteryProducedAveragePowerAc" yaml:"batteryProducedAveragePowerAc,omitempty"`
-	BatteryConsumedAveragePowerAC   null.Float32 `boil:"battery_consumed_average_power_ac" json:"batteryConsumedAveragePowerAc,omitempty" toml:"batteryConsumedAveragePowerAc" yaml:"batteryConsumedAveragePowerAc,omitempty"`
-	BatteryChargingFrom             null.String  `boil:"battery_charging_from" json:"batteryChargingFrom,omitempty" toml:"batteryChargingFrom" yaml:"batteryChargingFrom,omitempty"`
-	BatteryDischargingTo            null.String  `boil:"battery_discharging_to" json:"batteryDischargingTo,omitempty" toml:"batteryDischargingTo" yaml:"batteryDischargingTo,omitempty"`
-	PvAveragePowerAC                null.Float32 `boil:"pv_average_power_ac" json:"pvAveragePowerAc,omitempty" toml:"pvAveragePowerAc" yaml:"pvAveragePowerAc,omitempty"`
-	LoadAveragePowerAC              null.Float32 `boil:"load_average_power_ac" json:"loadAveragePowerAc,omitempty" toml:"loadAveragePowerAc" yaml:"loadAveragePowerAc,omitempty"`
-	LoadLinks                       null.JSON    `boil:"load_links" json:"loadLinks,omitempty" toml:"loadLinks" yaml:"loadLinks,omitempty"`
-	GridLinks                       null.JSON    `boil:"grid_links" json:"gridLinks,omitempty" toml:"gridLinks" yaml:"gridLinks,omitempty"`
-	PvLinks                         null.JSON    `boil:"pv_links" json:"pvLinks,omitempty" toml:"pvLinks" yaml:"pvLinks,omitempty"`
-	BatteryLinks                    null.JSON    `boil:"battery_links" json:"batteryLinks,omitempty" toml:"batteryLinks" yaml:"batteryLinks,omitempty"`
-	BatteryPvAveragePowerAC         null.Float32 `boil:"battery_pv_average_power_ac" json:"batteryPVAveragePowerAc,omitempty" toml:"batteryPVAveragePowerAc" yaml:"batteryPVAveragePowerAc,omitempty"`
-	GridPvAveragePowerAC            null.Float32 `boil:"grid_pv_average_power_ac" json:"gridPVAveragePowerAc,omitempty" toml:"gridPVAveragePowerAc" yaml:"gridPVAveragePowerAc,omitempty"`
-	GridProducedAveragePowerAC      null.Float32 `boil:"grid_produced_average_power_ac" json:"gridProducedAveragePowerAc,omitempty" toml:"gridProducedAveragePowerAc" yaml:"gridProducedAveragePowerAc,omitempty"`
-	GridConsumedAveragePowerAC      null.Float32 `boil:"grid_consumed_average_power_ac" json:"gridConsumedAveragePowerAc,omitempty" toml:"gridConsumedAveragePowerAc" yaml:"gridConsumedAveragePowerAc,omitempty"`
-	BatteryLifetimeOperationCycles  null.Float32 `boil:"battery_lifetime_operation_cycles" json:"batteryLifetimeOperationCycles,omitempty" toml:"batteryLifetimeOperationCycles" yaml:"batteryLifetimeOperationCycles,omitempty"`
-	BatteryProducedLifetimeEnergyAC null.Float32 `boil:"battery_produced_lifetime_energy_ac" json:"batteryProducedLifetimeEnergyAc,omitempty" toml:"batteryProducedLifetimeEnergyAc" yaml:"batteryProducedLifetimeEnergyAc,omitempty"`
-	BatteryConsumedLifetimeEnergyAC null.Float32 `boil:"battery_consumed_lifetime_energy_ac" json:"batteryConsumedLifetimeEnergyAc,omitempty" toml:"batteryConsumedLifetimeEnergyAc" yaml:"batteryConsumedLifetimeEnergyAc,omitempty"`
-	BatteryAveragePowerAC           null.Float32 `boil:"battery_average_power_ac" json:"batteryAveragePowerAc,omitempty" toml:"batteryAveragePowerAc" yaml:"batteryAveragePowerAc,omitempty"`
-	BatteryVoltage                  null.Float32 `boil:"battery_voltage" json:"batteryVoltage,omitempty" toml:"batteryVoltage" yaml:"batteryVoltage,omitempty"`
-	CreatedAt                       time.Time    `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
-	UpdatedAt                       null.Time    `boil:"updated_at" json:"updatedAt,omitempty" toml:"updatedAt" yaml:"updatedAt,omitempty"`
+	ID                                int          `boil:"id" json:"id" toml:"id" yaml:"id"`
+	GWUUID                            string       `boil:"gw_uuid" json:"gwUUID" toml:"gwUUID" yaml:"gwUUID"`
+	LogDate                           time.Time    `boil:"log_date" json:"logDate" toml:"logDate" yaml:"logDate"`
+	GWID                              null.Int     `boil:"gw_id" json:"gwID,omitempty" toml:"gwID" yaml:"gwID,omitempty"`
+	CustomerID                        null.Int     `boil:"customer_id" json:"customerID,omitempty" toml:"customerID" yaml:"customerID,omitempty"`
+	GridIsPeakShaving                 null.Int     `boil:"grid_is_peak_shaving" json:"gridIsPeakShaving,omitempty" toml:"gridIsPeakShaving" yaml:"gridIsPeakShaving,omitempty"`
+	LoadGridAveragePowerAC            null.Float32 `boil:"load_grid_average_power_ac" json:"loadGridAveragePowerAc,omitempty" toml:"loadGridAveragePowerAc" yaml:"loadGridAveragePowerAc,omitempty"`
+	BatteryGridAveragePowerAC         null.Float32 `boil:"battery_grid_average_power_ac" json:"batteryGridAveragePowerAc,omitempty" toml:"batteryGridAveragePowerAc" yaml:"batteryGridAveragePowerAc,omitempty"`
+	GridContractPowerAC               null.Float32 `boil:"grid_contract_power_ac" json:"gridContractPowerAc,omitempty" toml:"gridContractPowerAc" yaml:"gridContractPowerAc,omitempty"`
+	LoadPvAveragePowerAC              null.Float32 `boil:"load_pv_average_power_ac" json:"loadPVAveragePowerAc,omitempty" toml:"loadPVAveragePowerAc" yaml:"loadPVAveragePowerAc,omitempty"`
+	LoadBatteryAveragePowerAC         null.Float32 `boil:"load_battery_average_power_ac" json:"loadBatteryAveragePowerAc,omitempty" toml:"loadBatteryAveragePowerAc" yaml:"loadBatteryAveragePowerAc,omitempty"`
+	BatterySoC                        null.Float32 `boil:"battery_soc" json:"batterySoc,omitempty" toml:"batterySoc" yaml:"batterySoc,omitempty"`
+	BatteryProducedAveragePowerAC     null.Float32 `boil:"battery_produced_average_power_ac" json:"batteryProducedAveragePowerAc,omitempty" toml:"batteryProducedAveragePowerAc" yaml:"batteryProducedAveragePowerAc,omitempty"`
+	BatteryConsumedAveragePowerAC     null.Float32 `boil:"battery_consumed_average_power_ac" json:"batteryConsumedAveragePowerAc,omitempty" toml:"batteryConsumedAveragePowerAc" yaml:"batteryConsumedAveragePowerAc,omitempty"`
+	BatteryChargingFrom               null.String  `boil:"battery_charging_from" json:"batteryChargingFrom,omitempty" toml:"batteryChargingFrom" yaml:"batteryChargingFrom,omitempty"`
+	BatteryDischargingTo              null.String  `boil:"battery_discharging_to" json:"batteryDischargingTo,omitempty" toml:"batteryDischargingTo" yaml:"batteryDischargingTo,omitempty"`
+	PvAveragePowerAC                  null.Float32 `boil:"pv_average_power_ac" json:"pvAveragePowerAc,omitempty" toml:"pvAveragePowerAc" yaml:"pvAveragePowerAc,omitempty"`
+	LoadAveragePowerAC                null.Float32 `boil:"load_average_power_ac" json:"loadAveragePowerAc,omitempty" toml:"loadAveragePowerAc" yaml:"loadAveragePowerAc,omitempty"`
+	LoadLinks                         null.JSON    `boil:"load_links" json:"loadLinks,omitempty" toml:"loadLinks" yaml:"loadLinks,omitempty"`
+	GridLinks                         null.JSON    `boil:"grid_links" json:"gridLinks,omitempty" toml:"gridLinks" yaml:"gridLinks,omitempty"`
+	PvLinks                           null.JSON    `boil:"pv_links" json:"pvLinks,omitempty" toml:"pvLinks" yaml:"pvLinks,omitempty"`
+	BatteryLinks                      null.JSON    `boil:"battery_links" json:"batteryLinks,omitempty" toml:"batteryLinks" yaml:"batteryLinks,omitempty"`
+	BatteryPvAveragePowerAC           null.Float32 `boil:"battery_pv_average_power_ac" json:"batteryPVAveragePowerAc,omitempty" toml:"batteryPVAveragePowerAc" yaml:"batteryPVAveragePowerAc,omitempty"`
+	GridPvAveragePowerAC              null.Float32 `boil:"grid_pv_average_power_ac" json:"gridPVAveragePowerAc,omitempty" toml:"gridPVAveragePowerAc" yaml:"gridPVAveragePowerAc,omitempty"`
+	GridProducedAveragePowerAC        null.Float32 `boil:"grid_produced_average_power_ac" json:"gridProducedAveragePowerAc,omitempty" toml:"gridProducedAveragePowerAc" yaml:"gridProducedAveragePowerAc,omitempty"`
+	GridConsumedAveragePowerAC        null.Float32 `boil:"grid_consumed_average_power_ac" json:"gridConsumedAveragePowerAc,omitempty" toml:"gridConsumedAveragePowerAc" yaml:"gridConsumedAveragePowerAc,omitempty"`
+	BatteryLifetimeOperationCycles    null.Float32 `boil:"battery_lifetime_operation_cycles" json:"batteryLifetimeOperationCycles,omitempty" toml:"batteryLifetimeOperationCycles" yaml:"batteryLifetimeOperationCycles,omitempty"`
+	BatteryProducedLifetimeEnergyAC   null.Float32 `boil:"battery_produced_lifetime_energy_ac" json:"batteryProducedLifetimeEnergyAc,omitempty" toml:"batteryProducedLifetimeEnergyAc" yaml:"batteryProducedLifetimeEnergyAc,omitempty"`
+	BatteryConsumedLifetimeEnergyAC   null.Float32 `boil:"battery_consumed_lifetime_energy_ac" json:"batteryConsumedLifetimeEnergyAc,omitempty" toml:"batteryConsumedLifetimeEnergyAc" yaml:"batteryConsumedLifetimeEnergyAc,omitempty"`
+	BatteryAveragePowerAC             null.Float32 `boil:"battery_average_power_ac" json:"batteryAveragePowerAc,omitempty" toml:"batteryAveragePowerAc" yaml:"batteryAveragePowerAc,omitempty"`
+	BatteryVoltage                    null.Float32 `boil:"battery_voltage" json:"batteryVoltage,omitempty" toml:"batteryVoltage" yaml:"batteryVoltage,omitempty"`
+	AllProducedLifetimeEnergyAC       null.Float32 `boil:"all_produced_lifetime_energy_ac" json:"allProducedLifetimeEnergyAc,omitempty" toml:"allProducedLifetimeEnergyAc" yaml:"allProducedLifetimeEnergyAc,omitempty"`
+	PvProducedLifetimeEnergyAC        null.Float32 `boil:"pv_produced_lifetime_energy_ac" json:"pvProducedLifetimeEnergyAc,omitempty" toml:"pvProducedLifetimeEnergyAc" yaml:"pvProducedLifetimeEnergyAc,omitempty"`
+	GridProducedLifetimeEnergyAC      null.Float32 `boil:"grid_produced_lifetime_energy_ac" json:"gridProducedLifetimeEnergyAc,omitempty" toml:"gridProducedLifetimeEnergyAc" yaml:"gridProducedLifetimeEnergyAc,omitempty"`
+	AllConsumedLifetimeEnergyAC       null.Float32 `boil:"all_consumed_lifetime_energy_ac" json:"allConsumedLifetimeEnergyAc,omitempty" toml:"allConsumedLifetimeEnergyAc" yaml:"allConsumedLifetimeEnergyAc,omitempty"`
+	LoadConsumedLifetimeEnergyAC      null.Float32 `boil:"load_consumed_lifetime_energy_ac" json:"loadConsumedLifetimeEnergyAc,omitempty" toml:"loadConsumedLifetimeEnergyAc" yaml:"loadConsumedLifetimeEnergyAc,omitempty"`
+	GridConsumedLifetimeEnergyAC      null.Float32 `boil:"grid_consumed_lifetime_energy_ac" json:"gridConsumedLifetimeEnergyAc,omitempty" toml:"gridConsumedLifetimeEnergyAc" yaml:"gridConsumedLifetimeEnergyAc,omitempty"`
+	GridAveragePowerAC                null.Float32 `boil:"grid_average_power_ac" json:"gridAveragePowerAc,omitempty" toml:"gridAveragePowerAc" yaml:"gridAveragePowerAc,omitempty"`
+	BatteryLifetimeEnergyAC           null.Float32 `boil:"battery_lifetime_energy_ac" json:"batteryLifetimeEnergyAc,omitempty" toml:"batteryLifetimeEnergyAc" yaml:"batteryLifetimeEnergyAc,omitempty"`
+	GridLifetimeEnergyAC              null.Float32 `boil:"grid_lifetime_energy_ac" json:"gridLifetimeEnergyAc,omitempty" toml:"gridLifetimeEnergyAc" yaml:"gridLifetimeEnergyAc,omitempty"`
+	LoadSelfConsumedLifetimeEnergyAC  null.Float32 `boil:"load_self_consumed_lifetime_energy_ac" json:"loadSelfConsumedLifetimeEnergyAc,omitempty" toml:"loadSelfConsumedLifetimeEnergyAc" yaml:"loadSelfConsumedLifetimeEnergyAc,omitempty"`
+	GridPowerCost                     null.Float32 `boil:"grid_power_cost" json:"gridPowerCost,omitempty" toml:"gridPowerCost" yaml:"gridPowerCost,omitempty"`
+	GridPowerCostSavings              null.Float32 `boil:"grid_power_cost_savings" json:"gridPowerCostSavings,omitempty" toml:"gridPowerCostSavings" yaml:"gridPowerCostSavings,omitempty"`
+	LoadPvConsumedLifetimeEnergyAC    null.Float32 `boil:"load_pv_consumed_lifetime_energy_ac" json:"loadPVConsumedLifetimeEnergyAc,omitempty" toml:"loadPVConsumedLifetimeEnergyAc" yaml:"loadPVConsumedLifetimeEnergyAc,omitempty"`
+	BatteryPvConsumedLifetimeEnergyAC null.Float32 `boil:"battery_pv_consumed_lifetime_energy_ac" json:"batteryPVConsumedLifetimeEnergyAc,omitempty" toml:"batteryPVConsumedLifetimeEnergyAc" yaml:"batteryPVConsumedLifetimeEnergyAc,omitempty"`
+	GridPvConsumedLifetimeEnergyAC    null.Float32 `boil:"grid_pv_consumed_lifetime_energy_ac" json:"gridPVConsumedLifetimeEnergyAc,omitempty" toml:"gridPVConsumedLifetimeEnergyAc" yaml:"gridPVConsumedLifetimeEnergyAc,omitempty"`
+	PvEnergyCostSavings               null.Float32 `boil:"pv_energy_cost_savings" json:"pvEnergyCostSavings,omitempty" toml:"pvEnergyCostSavings" yaml:"pvEnergyCostSavings,omitempty"`
+	PvCo2Savings                      null.Float32 `boil:"pv_co2_savings" json:"pvCo2Savings,omitempty" toml:"pvCo2Savings" yaml:"pvCo2Savings,omitempty"`
+	CreatedAt                         time.Time    `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
+	UpdatedAt                         null.Time    `boil:"updated_at" json:"updatedAt,omitempty" toml:"updatedAt" yaml:"updatedAt,omitempty"`
 
 	R *ccDataLogR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L ccDataLogL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var CCDataLogColumns = struct {
-	ID                              string
-	GWUUID                          string
-	LogDate                         string
-	GWID                            string
-	CustomerID                      string
-	GridIsPeakShaving               string
-	LoadGridAveragePowerAC          string
-	BatteryGridAveragePowerAC       string
-	GridContractPowerAC             string
-	LoadPvAveragePowerAC            string
-	LoadBatteryAveragePowerAC       string
-	BatterySoC                      string
-	BatteryProducedAveragePowerAC   string
-	BatteryConsumedAveragePowerAC   string
-	BatteryChargingFrom             string
-	BatteryDischargingTo            string
-	PvAveragePowerAC                string
-	LoadAveragePowerAC              string
-	LoadLinks                       string
-	GridLinks                       string
-	PvLinks                         string
-	BatteryLinks                    string
-	BatteryPvAveragePowerAC         string
-	GridPvAveragePowerAC            string
-	GridProducedAveragePowerAC      string
-	GridConsumedAveragePowerAC      string
-	BatteryLifetimeOperationCycles  string
-	BatteryProducedLifetimeEnergyAC string
-	BatteryConsumedLifetimeEnergyAC string
-	BatteryAveragePowerAC           string
-	BatteryVoltage                  string
-	CreatedAt                       string
-	UpdatedAt                       string
+	ID                                string
+	GWUUID                            string
+	LogDate                           string
+	GWID                              string
+	CustomerID                        string
+	GridIsPeakShaving                 string
+	LoadGridAveragePowerAC            string
+	BatteryGridAveragePowerAC         string
+	GridContractPowerAC               string
+	LoadPvAveragePowerAC              string
+	LoadBatteryAveragePowerAC         string
+	BatterySoC                        string
+	BatteryProducedAveragePowerAC     string
+	BatteryConsumedAveragePowerAC     string
+	BatteryChargingFrom               string
+	BatteryDischargingTo              string
+	PvAveragePowerAC                  string
+	LoadAveragePowerAC                string
+	LoadLinks                         string
+	GridLinks                         string
+	PvLinks                           string
+	BatteryLinks                      string
+	BatteryPvAveragePowerAC           string
+	GridPvAveragePowerAC              string
+	GridProducedAveragePowerAC        string
+	GridConsumedAveragePowerAC        string
+	BatteryLifetimeOperationCycles    string
+	BatteryProducedLifetimeEnergyAC   string
+	BatteryConsumedLifetimeEnergyAC   string
+	BatteryAveragePowerAC             string
+	BatteryVoltage                    string
+	AllProducedLifetimeEnergyAC       string
+	PvProducedLifetimeEnergyAC        string
+	GridProducedLifetimeEnergyAC      string
+	AllConsumedLifetimeEnergyAC       string
+	LoadConsumedLifetimeEnergyAC      string
+	GridConsumedLifetimeEnergyAC      string
+	GridAveragePowerAC                string
+	BatteryLifetimeEnergyAC           string
+	GridLifetimeEnergyAC              string
+	LoadSelfConsumedLifetimeEnergyAC  string
+	GridPowerCost                     string
+	GridPowerCostSavings              string
+	LoadPvConsumedLifetimeEnergyAC    string
+	BatteryPvConsumedLifetimeEnergyAC string
+	GridPvConsumedLifetimeEnergyAC    string
+	PvEnergyCostSavings               string
+	PvCo2Savings                      string
+	CreatedAt                         string
+	UpdatedAt                         string
 }{
-	ID:                              "id",
-	GWUUID:                          "gw_uuid",
-	LogDate:                         "log_date",
-	GWID:                            "gw_id",
-	CustomerID:                      "customer_id",
-	GridIsPeakShaving:               "grid_is_peak_shaving",
-	LoadGridAveragePowerAC:          "load_grid_average_power_ac",
-	BatteryGridAveragePowerAC:       "battery_grid_average_power_ac",
-	GridContractPowerAC:             "grid_contract_power_ac",
-	LoadPvAveragePowerAC:            "load_pv_average_power_ac",
-	LoadBatteryAveragePowerAC:       "load_battery_average_power_ac",
-	BatterySoC:                      "battery_soc",
-	BatteryProducedAveragePowerAC:   "battery_produced_average_power_ac",
-	BatteryConsumedAveragePowerAC:   "battery_consumed_average_power_ac",
-	BatteryChargingFrom:             "battery_charging_from",
-	BatteryDischargingTo:            "battery_discharging_to",
-	PvAveragePowerAC:                "pv_average_power_ac",
-	LoadAveragePowerAC:              "load_average_power_ac",
-	LoadLinks:                       "load_links",
-	GridLinks:                       "grid_links",
-	PvLinks:                         "pv_links",
-	BatteryLinks:                    "battery_links",
-	BatteryPvAveragePowerAC:         "battery_pv_average_power_ac",
-	GridPvAveragePowerAC:            "grid_pv_average_power_ac",
-	GridProducedAveragePowerAC:      "grid_produced_average_power_ac",
-	GridConsumedAveragePowerAC:      "grid_consumed_average_power_ac",
-	BatteryLifetimeOperationCycles:  "battery_lifetime_operation_cycles",
-	BatteryProducedLifetimeEnergyAC: "battery_produced_lifetime_energy_ac",
-	BatteryConsumedLifetimeEnergyAC: "battery_consumed_lifetime_energy_ac",
-	BatteryAveragePowerAC:           "battery_average_power_ac",
-	BatteryVoltage:                  "battery_voltage",
-	CreatedAt:                       "created_at",
-	UpdatedAt:                       "updated_at",
+	ID:                                "id",
+	GWUUID:                            "gw_uuid",
+	LogDate:                           "log_date",
+	GWID:                              "gw_id",
+	CustomerID:                        "customer_id",
+	GridIsPeakShaving:                 "grid_is_peak_shaving",
+	LoadGridAveragePowerAC:            "load_grid_average_power_ac",
+	BatteryGridAveragePowerAC:         "battery_grid_average_power_ac",
+	GridContractPowerAC:               "grid_contract_power_ac",
+	LoadPvAveragePowerAC:              "load_pv_average_power_ac",
+	LoadBatteryAveragePowerAC:         "load_battery_average_power_ac",
+	BatterySoC:                        "battery_soc",
+	BatteryProducedAveragePowerAC:     "battery_produced_average_power_ac",
+	BatteryConsumedAveragePowerAC:     "battery_consumed_average_power_ac",
+	BatteryChargingFrom:               "battery_charging_from",
+	BatteryDischargingTo:              "battery_discharging_to",
+	PvAveragePowerAC:                  "pv_average_power_ac",
+	LoadAveragePowerAC:                "load_average_power_ac",
+	LoadLinks:                         "load_links",
+	GridLinks:                         "grid_links",
+	PvLinks:                           "pv_links",
+	BatteryLinks:                      "battery_links",
+	BatteryPvAveragePowerAC:           "battery_pv_average_power_ac",
+	GridPvAveragePowerAC:              "grid_pv_average_power_ac",
+	GridProducedAveragePowerAC:        "grid_produced_average_power_ac",
+	GridConsumedAveragePowerAC:        "grid_consumed_average_power_ac",
+	BatteryLifetimeOperationCycles:    "battery_lifetime_operation_cycles",
+	BatteryProducedLifetimeEnergyAC:   "battery_produced_lifetime_energy_ac",
+	BatteryConsumedLifetimeEnergyAC:   "battery_consumed_lifetime_energy_ac",
+	BatteryAveragePowerAC:             "battery_average_power_ac",
+	BatteryVoltage:                    "battery_voltage",
+	AllProducedLifetimeEnergyAC:       "all_produced_lifetime_energy_ac",
+	PvProducedLifetimeEnergyAC:        "pv_produced_lifetime_energy_ac",
+	GridProducedLifetimeEnergyAC:      "grid_produced_lifetime_energy_ac",
+	AllConsumedLifetimeEnergyAC:       "all_consumed_lifetime_energy_ac",
+	LoadConsumedLifetimeEnergyAC:      "load_consumed_lifetime_energy_ac",
+	GridConsumedLifetimeEnergyAC:      "grid_consumed_lifetime_energy_ac",
+	GridAveragePowerAC:                "grid_average_power_ac",
+	BatteryLifetimeEnergyAC:           "battery_lifetime_energy_ac",
+	GridLifetimeEnergyAC:              "grid_lifetime_energy_ac",
+	LoadSelfConsumedLifetimeEnergyAC:  "load_self_consumed_lifetime_energy_ac",
+	GridPowerCost:                     "grid_power_cost",
+	GridPowerCostSavings:              "grid_power_cost_savings",
+	LoadPvConsumedLifetimeEnergyAC:    "load_pv_consumed_lifetime_energy_ac",
+	BatteryPvConsumedLifetimeEnergyAC: "battery_pv_consumed_lifetime_energy_ac",
+	GridPvConsumedLifetimeEnergyAC:    "grid_pv_consumed_lifetime_energy_ac",
+	PvEnergyCostSavings:               "pv_energy_cost_savings",
+	PvCo2Savings:                      "pv_co2_savings",
+	CreatedAt:                         "created_at",
+	UpdatedAt:                         "updated_at",
 }
 
 var CCDataLogTableColumns = struct {
-	ID                              string
-	GWUUID                          string
-	LogDate                         string
-	GWID                            string
-	CustomerID                      string
-	GridIsPeakShaving               string
-	LoadGridAveragePowerAC          string
-	BatteryGridAveragePowerAC       string
-	GridContractPowerAC             string
-	LoadPvAveragePowerAC            string
-	LoadBatteryAveragePowerAC       string
-	BatterySoC                      string
-	BatteryProducedAveragePowerAC   string
-	BatteryConsumedAveragePowerAC   string
-	BatteryChargingFrom             string
-	BatteryDischargingTo            string
-	PvAveragePowerAC                string
-	LoadAveragePowerAC              string
-	LoadLinks                       string
-	GridLinks                       string
-	PvLinks                         string
-	BatteryLinks                    string
-	BatteryPvAveragePowerAC         string
-	GridPvAveragePowerAC            string
-	GridProducedAveragePowerAC      string
-	GridConsumedAveragePowerAC      string
-	BatteryLifetimeOperationCycles  string
-	BatteryProducedLifetimeEnergyAC string
-	BatteryConsumedLifetimeEnergyAC string
-	BatteryAveragePowerAC           string
-	BatteryVoltage                  string
-	CreatedAt                       string
-	UpdatedAt                       string
+	ID                                string
+	GWUUID                            string
+	LogDate                           string
+	GWID                              string
+	CustomerID                        string
+	GridIsPeakShaving                 string
+	LoadGridAveragePowerAC            string
+	BatteryGridAveragePowerAC         string
+	GridContractPowerAC               string
+	LoadPvAveragePowerAC              string
+	LoadBatteryAveragePowerAC         string
+	BatterySoC                        string
+	BatteryProducedAveragePowerAC     string
+	BatteryConsumedAveragePowerAC     string
+	BatteryChargingFrom               string
+	BatteryDischargingTo              string
+	PvAveragePowerAC                  string
+	LoadAveragePowerAC                string
+	LoadLinks                         string
+	GridLinks                         string
+	PvLinks                           string
+	BatteryLinks                      string
+	BatteryPvAveragePowerAC           string
+	GridPvAveragePowerAC              string
+	GridProducedAveragePowerAC        string
+	GridConsumedAveragePowerAC        string
+	BatteryLifetimeOperationCycles    string
+	BatteryProducedLifetimeEnergyAC   string
+	BatteryConsumedLifetimeEnergyAC   string
+	BatteryAveragePowerAC             string
+	BatteryVoltage                    string
+	AllProducedLifetimeEnergyAC       string
+	PvProducedLifetimeEnergyAC        string
+	GridProducedLifetimeEnergyAC      string
+	AllConsumedLifetimeEnergyAC       string
+	LoadConsumedLifetimeEnergyAC      string
+	GridConsumedLifetimeEnergyAC      string
+	GridAveragePowerAC                string
+	BatteryLifetimeEnergyAC           string
+	GridLifetimeEnergyAC              string
+	LoadSelfConsumedLifetimeEnergyAC  string
+	GridPowerCost                     string
+	GridPowerCostSavings              string
+	LoadPvConsumedLifetimeEnergyAC    string
+	BatteryPvConsumedLifetimeEnergyAC string
+	GridPvConsumedLifetimeEnergyAC    string
+	PvEnergyCostSavings               string
+	PvCo2Savings                      string
+	CreatedAt                         string
+	UpdatedAt                         string
 }{
-	ID:                              "cc_data_log.id",
-	GWUUID:                          "cc_data_log.gw_uuid",
-	LogDate:                         "cc_data_log.log_date",
-	GWID:                            "cc_data_log.gw_id",
-	CustomerID:                      "cc_data_log.customer_id",
-	GridIsPeakShaving:               "cc_data_log.grid_is_peak_shaving",
-	LoadGridAveragePowerAC:          "cc_data_log.load_grid_average_power_ac",
-	BatteryGridAveragePowerAC:       "cc_data_log.battery_grid_average_power_ac",
-	GridContractPowerAC:             "cc_data_log.grid_contract_power_ac",
-	LoadPvAveragePowerAC:            "cc_data_log.load_pv_average_power_ac",
-	LoadBatteryAveragePowerAC:       "cc_data_log.load_battery_average_power_ac",
-	BatterySoC:                      "cc_data_log.battery_soc",
-	BatteryProducedAveragePowerAC:   "cc_data_log.battery_produced_average_power_ac",
-	BatteryConsumedAveragePowerAC:   "cc_data_log.battery_consumed_average_power_ac",
-	BatteryChargingFrom:             "cc_data_log.battery_charging_from",
-	BatteryDischargingTo:            "cc_data_log.battery_discharging_to",
-	PvAveragePowerAC:                "cc_data_log.pv_average_power_ac",
-	LoadAveragePowerAC:              "cc_data_log.load_average_power_ac",
-	LoadLinks:                       "cc_data_log.load_links",
-	GridLinks:                       "cc_data_log.grid_links",
-	PvLinks:                         "cc_data_log.pv_links",
-	BatteryLinks:                    "cc_data_log.battery_links",
-	BatteryPvAveragePowerAC:         "cc_data_log.battery_pv_average_power_ac",
-	GridPvAveragePowerAC:            "cc_data_log.grid_pv_average_power_ac",
-	GridProducedAveragePowerAC:      "cc_data_log.grid_produced_average_power_ac",
-	GridConsumedAveragePowerAC:      "cc_data_log.grid_consumed_average_power_ac",
-	BatteryLifetimeOperationCycles:  "cc_data_log.battery_lifetime_operation_cycles",
-	BatteryProducedLifetimeEnergyAC: "cc_data_log.battery_produced_lifetime_energy_ac",
-	BatteryConsumedLifetimeEnergyAC: "cc_data_log.battery_consumed_lifetime_energy_ac",
-	BatteryAveragePowerAC:           "cc_data_log.battery_average_power_ac",
-	BatteryVoltage:                  "cc_data_log.battery_voltage",
-	CreatedAt:                       "cc_data_log.created_at",
-	UpdatedAt:                       "cc_data_log.updated_at",
+	ID:                                "cc_data_log.id",
+	GWUUID:                            "cc_data_log.gw_uuid",
+	LogDate:                           "cc_data_log.log_date",
+	GWID:                              "cc_data_log.gw_id",
+	CustomerID:                        "cc_data_log.customer_id",
+	GridIsPeakShaving:                 "cc_data_log.grid_is_peak_shaving",
+	LoadGridAveragePowerAC:            "cc_data_log.load_grid_average_power_ac",
+	BatteryGridAveragePowerAC:         "cc_data_log.battery_grid_average_power_ac",
+	GridContractPowerAC:               "cc_data_log.grid_contract_power_ac",
+	LoadPvAveragePowerAC:              "cc_data_log.load_pv_average_power_ac",
+	LoadBatteryAveragePowerAC:         "cc_data_log.load_battery_average_power_ac",
+	BatterySoC:                        "cc_data_log.battery_soc",
+	BatteryProducedAveragePowerAC:     "cc_data_log.battery_produced_average_power_ac",
+	BatteryConsumedAveragePowerAC:     "cc_data_log.battery_consumed_average_power_ac",
+	BatteryChargingFrom:               "cc_data_log.battery_charging_from",
+	BatteryDischargingTo:              "cc_data_log.battery_discharging_to",
+	PvAveragePowerAC:                  "cc_data_log.pv_average_power_ac",
+	LoadAveragePowerAC:                "cc_data_log.load_average_power_ac",
+	LoadLinks:                         "cc_data_log.load_links",
+	GridLinks:                         "cc_data_log.grid_links",
+	PvLinks:                           "cc_data_log.pv_links",
+	BatteryLinks:                      "cc_data_log.battery_links",
+	BatteryPvAveragePowerAC:           "cc_data_log.battery_pv_average_power_ac",
+	GridPvAveragePowerAC:              "cc_data_log.grid_pv_average_power_ac",
+	GridProducedAveragePowerAC:        "cc_data_log.grid_produced_average_power_ac",
+	GridConsumedAveragePowerAC:        "cc_data_log.grid_consumed_average_power_ac",
+	BatteryLifetimeOperationCycles:    "cc_data_log.battery_lifetime_operation_cycles",
+	BatteryProducedLifetimeEnergyAC:   "cc_data_log.battery_produced_lifetime_energy_ac",
+	BatteryConsumedLifetimeEnergyAC:   "cc_data_log.battery_consumed_lifetime_energy_ac",
+	BatteryAveragePowerAC:             "cc_data_log.battery_average_power_ac",
+	BatteryVoltage:                    "cc_data_log.battery_voltage",
+	AllProducedLifetimeEnergyAC:       "cc_data_log.all_produced_lifetime_energy_ac",
+	PvProducedLifetimeEnergyAC:        "cc_data_log.pv_produced_lifetime_energy_ac",
+	GridProducedLifetimeEnergyAC:      "cc_data_log.grid_produced_lifetime_energy_ac",
+	AllConsumedLifetimeEnergyAC:       "cc_data_log.all_consumed_lifetime_energy_ac",
+	LoadConsumedLifetimeEnergyAC:      "cc_data_log.load_consumed_lifetime_energy_ac",
+	GridConsumedLifetimeEnergyAC:      "cc_data_log.grid_consumed_lifetime_energy_ac",
+	GridAveragePowerAC:                "cc_data_log.grid_average_power_ac",
+	BatteryLifetimeEnergyAC:           "cc_data_log.battery_lifetime_energy_ac",
+	GridLifetimeEnergyAC:              "cc_data_log.grid_lifetime_energy_ac",
+	LoadSelfConsumedLifetimeEnergyAC:  "cc_data_log.load_self_consumed_lifetime_energy_ac",
+	GridPowerCost:                     "cc_data_log.grid_power_cost",
+	GridPowerCostSavings:              "cc_data_log.grid_power_cost_savings",
+	LoadPvConsumedLifetimeEnergyAC:    "cc_data_log.load_pv_consumed_lifetime_energy_ac",
+	BatteryPvConsumedLifetimeEnergyAC: "cc_data_log.battery_pv_consumed_lifetime_energy_ac",
+	GridPvConsumedLifetimeEnergyAC:    "cc_data_log.grid_pv_consumed_lifetime_energy_ac",
+	PvEnergyCostSavings:               "cc_data_log.pv_energy_cost_savings",
+	PvCo2Savings:                      "cc_data_log.pv_co2_savings",
+	CreatedAt:                         "cc_data_log.created_at",
+	UpdatedAt:                         "cc_data_log.updated_at",
 }
 
 // Generated where
@@ -252,73 +337,107 @@ func (w whereHelpernull_String) IsNull() qm.QueryMod    { return qmhelper.WhereI
 func (w whereHelpernull_String) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
 
 var CCDataLogWhere = struct {
-	ID                              whereHelperint
-	GWUUID                          whereHelperstring
-	LogDate                         whereHelpertime_Time
-	GWID                            whereHelpernull_Int
-	CustomerID                      whereHelpernull_Int
-	GridIsPeakShaving               whereHelpernull_Int
-	LoadGridAveragePowerAC          whereHelpernull_Float32
-	BatteryGridAveragePowerAC       whereHelpernull_Float32
-	GridContractPowerAC             whereHelpernull_Float32
-	LoadPvAveragePowerAC            whereHelpernull_Float32
-	LoadBatteryAveragePowerAC       whereHelpernull_Float32
-	BatterySoC                      whereHelpernull_Float32
-	BatteryProducedAveragePowerAC   whereHelpernull_Float32
-	BatteryConsumedAveragePowerAC   whereHelpernull_Float32
-	BatteryChargingFrom             whereHelpernull_String
-	BatteryDischargingTo            whereHelpernull_String
-	PvAveragePowerAC                whereHelpernull_Float32
-	LoadAveragePowerAC              whereHelpernull_Float32
-	LoadLinks                       whereHelpernull_JSON
-	GridLinks                       whereHelpernull_JSON
-	PvLinks                         whereHelpernull_JSON
-	BatteryLinks                    whereHelpernull_JSON
-	BatteryPvAveragePowerAC         whereHelpernull_Float32
-	GridPvAveragePowerAC            whereHelpernull_Float32
-	GridProducedAveragePowerAC      whereHelpernull_Float32
-	GridConsumedAveragePowerAC      whereHelpernull_Float32
-	BatteryLifetimeOperationCycles  whereHelpernull_Float32
-	BatteryProducedLifetimeEnergyAC whereHelpernull_Float32
-	BatteryConsumedLifetimeEnergyAC whereHelpernull_Float32
-	BatteryAveragePowerAC           whereHelpernull_Float32
-	BatteryVoltage                  whereHelpernull_Float32
-	CreatedAt                       whereHelpertime_Time
-	UpdatedAt                       whereHelpernull_Time
+	ID                                whereHelperint
+	GWUUID                            whereHelperstring
+	LogDate                           whereHelpertime_Time
+	GWID                              whereHelpernull_Int
+	CustomerID                        whereHelpernull_Int
+	GridIsPeakShaving                 whereHelpernull_Int
+	LoadGridAveragePowerAC            whereHelpernull_Float32
+	BatteryGridAveragePowerAC         whereHelpernull_Float32
+	GridContractPowerAC               whereHelpernull_Float32
+	LoadPvAveragePowerAC              whereHelpernull_Float32
+	LoadBatteryAveragePowerAC         whereHelpernull_Float32
+	BatterySoC                        whereHelpernull_Float32
+	BatteryProducedAveragePowerAC     whereHelpernull_Float32
+	BatteryConsumedAveragePowerAC     whereHelpernull_Float32
+	BatteryChargingFrom               whereHelpernull_String
+	BatteryDischargingTo              whereHelpernull_String
+	PvAveragePowerAC                  whereHelpernull_Float32
+	LoadAveragePowerAC                whereHelpernull_Float32
+	LoadLinks                         whereHelpernull_JSON
+	GridLinks                         whereHelpernull_JSON
+	PvLinks                           whereHelpernull_JSON
+	BatteryLinks                      whereHelpernull_JSON
+	BatteryPvAveragePowerAC           whereHelpernull_Float32
+	GridPvAveragePowerAC              whereHelpernull_Float32
+	GridProducedAveragePowerAC        whereHelpernull_Float32
+	GridConsumedAveragePowerAC        whereHelpernull_Float32
+	BatteryLifetimeOperationCycles    whereHelpernull_Float32
+	BatteryProducedLifetimeEnergyAC   whereHelpernull_Float32
+	BatteryConsumedLifetimeEnergyAC   whereHelpernull_Float32
+	BatteryAveragePowerAC             whereHelpernull_Float32
+	BatteryVoltage                    whereHelpernull_Float32
+	AllProducedLifetimeEnergyAC       whereHelpernull_Float32
+	PvProducedLifetimeEnergyAC        whereHelpernull_Float32
+	GridProducedLifetimeEnergyAC      whereHelpernull_Float32
+	AllConsumedLifetimeEnergyAC       whereHelpernull_Float32
+	LoadConsumedLifetimeEnergyAC      whereHelpernull_Float32
+	GridConsumedLifetimeEnergyAC      whereHelpernull_Float32
+	GridAveragePowerAC                whereHelpernull_Float32
+	BatteryLifetimeEnergyAC           whereHelpernull_Float32
+	GridLifetimeEnergyAC              whereHelpernull_Float32
+	LoadSelfConsumedLifetimeEnergyAC  whereHelpernull_Float32
+	GridPowerCost                     whereHelpernull_Float32
+	GridPowerCostSavings              whereHelpernull_Float32
+	LoadPvConsumedLifetimeEnergyAC    whereHelpernull_Float32
+	BatteryPvConsumedLifetimeEnergyAC whereHelpernull_Float32
+	GridPvConsumedLifetimeEnergyAC    whereHelpernull_Float32
+	PvEnergyCostSavings               whereHelpernull_Float32
+	PvCo2Savings                      whereHelpernull_Float32
+	CreatedAt                         whereHelpertime_Time
+	UpdatedAt                         whereHelpernull_Time
 }{
-	ID:                              whereHelperint{field: "`cc_data_log`.`id`"},
-	GWUUID:                          whereHelperstring{field: "`cc_data_log`.`gw_uuid`"},
-	LogDate:                         whereHelpertime_Time{field: "`cc_data_log`.`log_date`"},
-	GWID:                            whereHelpernull_Int{field: "`cc_data_log`.`gw_id`"},
-	CustomerID:                      whereHelpernull_Int{field: "`cc_data_log`.`customer_id`"},
-	GridIsPeakShaving:               whereHelpernull_Int{field: "`cc_data_log`.`grid_is_peak_shaving`"},
-	LoadGridAveragePowerAC:          whereHelpernull_Float32{field: "`cc_data_log`.`load_grid_average_power_ac`"},
-	BatteryGridAveragePowerAC:       whereHelpernull_Float32{field: "`cc_data_log`.`battery_grid_average_power_ac`"},
-	GridContractPowerAC:             whereHelpernull_Float32{field: "`cc_data_log`.`grid_contract_power_ac`"},
-	LoadPvAveragePowerAC:            whereHelpernull_Float32{field: "`cc_data_log`.`load_pv_average_power_ac`"},
-	LoadBatteryAveragePowerAC:       whereHelpernull_Float32{field: "`cc_data_log`.`load_battery_average_power_ac`"},
-	BatterySoC:                      whereHelpernull_Float32{field: "`cc_data_log`.`battery_soc`"},
-	BatteryProducedAveragePowerAC:   whereHelpernull_Float32{field: "`cc_data_log`.`battery_produced_average_power_ac`"},
-	BatteryConsumedAveragePowerAC:   whereHelpernull_Float32{field: "`cc_data_log`.`battery_consumed_average_power_ac`"},
-	BatteryChargingFrom:             whereHelpernull_String{field: "`cc_data_log`.`battery_charging_from`"},
-	BatteryDischargingTo:            whereHelpernull_String{field: "`cc_data_log`.`battery_discharging_to`"},
-	PvAveragePowerAC:                whereHelpernull_Float32{field: "`cc_data_log`.`pv_average_power_ac`"},
-	LoadAveragePowerAC:              whereHelpernull_Float32{field: "`cc_data_log`.`load_average_power_ac`"},
-	LoadLinks:                       whereHelpernull_JSON{field: "`cc_data_log`.`load_links`"},
-	GridLinks:                       whereHelpernull_JSON{field: "`cc_data_log`.`grid_links`"},
-	PvLinks:                         whereHelpernull_JSON{field: "`cc_data_log`.`pv_links`"},
-	BatteryLinks:                    whereHelpernull_JSON{field: "`cc_data_log`.`battery_links`"},
-	BatteryPvAveragePowerAC:         whereHelpernull_Float32{field: "`cc_data_log`.`battery_pv_average_power_ac`"},
-	GridPvAveragePowerAC:            whereHelpernull_Float32{field: "`cc_data_log`.`grid_pv_average_power_ac`"},
-	GridProducedAveragePowerAC:      whereHelpernull_Float32{field: "`cc_data_log`.`grid_produced_average_power_ac`"},
-	GridConsumedAveragePowerAC:      whereHelpernull_Float32{field: "`cc_data_log`.`grid_consumed_average_power_ac`"},
-	BatteryLifetimeOperationCycles:  whereHelpernull_Float32{field: "`cc_data_log`.`battery_lifetime_operation_cycles`"},
-	BatteryProducedLifetimeEnergyAC: whereHelpernull_Float32{field: "`cc_data_log`.`battery_produced_lifetime_energy_ac`"},
-	BatteryConsumedLifetimeEnergyAC: whereHelpernull_Float32{field: "`cc_data_log`.`battery_consumed_lifetime_energy_ac`"},
-	BatteryAveragePowerAC:           whereHelpernull_Float32{field: "`cc_data_log`.`battery_average_power_ac`"},
-	BatteryVoltage:                  whereHelpernull_Float32{field: "`cc_data_log`.`battery_voltage`"},
-	CreatedAt:                       whereHelpertime_Time{field: "`cc_data_log`.`created_at`"},
-	UpdatedAt:                       whereHelpernull_Time{field: "`cc_data_log`.`updated_at`"},
+	ID:                                whereHelperint{field: "`cc_data_log`.`id`"},
+	GWUUID:                            whereHelperstring{field: "`cc_data_log`.`gw_uuid`"},
+	LogDate:                           whereHelpertime_Time{field: "`cc_data_log`.`log_date`"},
+	GWID:                              whereHelpernull_Int{field: "`cc_data_log`.`gw_id`"},
+	CustomerID:                        whereHelpernull_Int{field: "`cc_data_log`.`customer_id`"},
+	GridIsPeakShaving:                 whereHelpernull_Int{field: "`cc_data_log`.`grid_is_peak_shaving`"},
+	LoadGridAveragePowerAC:            whereHelpernull_Float32{field: "`cc_data_log`.`load_grid_average_power_ac`"},
+	BatteryGridAveragePowerAC:         whereHelpernull_Float32{field: "`cc_data_log`.`battery_grid_average_power_ac`"},
+	GridContractPowerAC:               whereHelpernull_Float32{field: "`cc_data_log`.`grid_contract_power_ac`"},
+	LoadPvAveragePowerAC:              whereHelpernull_Float32{field: "`cc_data_log`.`load_pv_average_power_ac`"},
+	LoadBatteryAveragePowerAC:         whereHelpernull_Float32{field: "`cc_data_log`.`load_battery_average_power_ac`"},
+	BatterySoC:                        whereHelpernull_Float32{field: "`cc_data_log`.`battery_soc`"},
+	BatteryProducedAveragePowerAC:     whereHelpernull_Float32{field: "`cc_data_log`.`battery_produced_average_power_ac`"},
+	BatteryConsumedAveragePowerAC:     whereHelpernull_Float32{field: "`cc_data_log`.`battery_consumed_average_power_ac`"},
+	BatteryChargingFrom:               whereHelpernull_String{field: "`cc_data_log`.`battery_charging_from`"},
+	BatteryDischargingTo:              whereHelpernull_String{field: "`cc_data_log`.`battery_discharging_to`"},
+	PvAveragePowerAC:                  whereHelpernull_Float32{field: "`cc_data_log`.`pv_average_power_ac`"},
+	LoadAveragePowerAC:                whereHelpernull_Float32{field: "`cc_data_log`.`load_average_power_ac`"},
+	LoadLinks:                         whereHelpernull_JSON{field: "`cc_data_log`.`load_links`"},
+	GridLinks:                         whereHelpernull_JSON{field: "`cc_data_log`.`grid_links`"},
+	PvLinks:                           whereHelpernull_JSON{field: "`cc_data_log`.`pv_links`"},
+	BatteryLinks:                      whereHelpernull_JSON{field: "`cc_data_log`.`battery_links`"},
+	BatteryPvAveragePowerAC:           whereHelpernull_Float32{field: "`cc_data_log`.`battery_pv_average_power_ac`"},
+	GridPvAveragePowerAC:              whereHelpernull_Float32{field: "`cc_data_log`.`grid_pv_average_power_ac`"},
+	GridProducedAveragePowerAC:        whereHelpernull_Float32{field: "`cc_data_log`.`grid_produced_average_power_ac`"},
+	GridConsumedAveragePowerAC:        whereHelpernull_Float32{field: "`cc_data_log`.`grid_consumed_average_power_ac`"},
+	BatteryLifetimeOperationCycles:    whereHelpernull_Float32{field: "`cc_data_log`.`battery_lifetime_operation_cycles`"},
+	BatteryProducedLifetimeEnergyAC:   whereHelpernull_Float32{field: "`cc_data_log`.`battery_produced_lifetime_energy_ac`"},
+	BatteryConsumedLifetimeEnergyAC:   whereHelpernull_Float32{field: "`cc_data_log`.`battery_consumed_lifetime_energy_ac`"},
+	BatteryAveragePowerAC:             whereHelpernull_Float32{field: "`cc_data_log`.`battery_average_power_ac`"},
+	BatteryVoltage:                    whereHelpernull_Float32{field: "`cc_data_log`.`battery_voltage`"},
+	AllProducedLifetimeEnergyAC:       whereHelpernull_Float32{field: "`cc_data_log`.`all_produced_lifetime_energy_ac`"},
+	PvProducedLifetimeEnergyAC:        whereHelpernull_Float32{field: "`cc_data_log`.`pv_produced_lifetime_energy_ac`"},
+	GridProducedLifetimeEnergyAC:      whereHelpernull_Float32{field: "`cc_data_log`.`grid_produced_lifetime_energy_ac`"},
+	AllConsumedLifetimeEnergyAC:       whereHelpernull_Float32{field: "`cc_data_log`.`all_consumed_lifetime_energy_ac`"},
+	LoadConsumedLifetimeEnergyAC:      whereHelpernull_Float32{field: "`cc_data_log`.`load_consumed_lifetime_energy_ac`"},
+	GridConsumedLifetimeEnergyAC:      whereHelpernull_Float32{field: "`cc_data_log`.`grid_consumed_lifetime_energy_ac`"},
+	GridAveragePowerAC:                whereHelpernull_Float32{field: "`cc_data_log`.`grid_average_power_ac`"},
+	BatteryLifetimeEnergyAC:           whereHelpernull_Float32{field: "`cc_data_log`.`battery_lifetime_energy_ac`"},
+	GridLifetimeEnergyAC:              whereHelpernull_Float32{field: "`cc_data_log`.`grid_lifetime_energy_ac`"},
+	LoadSelfConsumedLifetimeEnergyAC:  whereHelpernull_Float32{field: "`cc_data_log`.`load_self_consumed_lifetime_energy_ac`"},
+	GridPowerCost:                     whereHelpernull_Float32{field: "`cc_data_log`.`grid_power_cost`"},
+	GridPowerCostSavings:              whereHelpernull_Float32{field: "`cc_data_log`.`grid_power_cost_savings`"},
+	LoadPvConsumedLifetimeEnergyAC:    whereHelpernull_Float32{field: "`cc_data_log`.`load_pv_consumed_lifetime_energy_ac`"},
+	BatteryPvConsumedLifetimeEnergyAC: whereHelpernull_Float32{field: "`cc_data_log`.`battery_pv_consumed_lifetime_energy_ac`"},
+	GridPvConsumedLifetimeEnergyAC:    whereHelpernull_Float32{field: "`cc_data_log`.`grid_pv_consumed_lifetime_energy_ac`"},
+	PvEnergyCostSavings:               whereHelpernull_Float32{field: "`cc_data_log`.`pv_energy_cost_savings`"},
+	PvCo2Savings:                      whereHelpernull_Float32{field: "`cc_data_log`.`pv_co2_savings`"},
+	CreatedAt:                         whereHelpertime_Time{field: "`cc_data_log`.`created_at`"},
+	UpdatedAt:                         whereHelpernull_Time{field: "`cc_data_log`.`updated_at`"},
 }
 
 // CCDataLogRels is where relationship names are stored.
@@ -338,8 +457,8 @@ func (*ccDataLogR) NewStruct() *ccDataLogR {
 type ccDataLogL struct{}
 
 var (
-	ccDataLogAllColumns            = []string{"id", "gw_uuid", "log_date", "gw_id", "customer_id", "grid_is_peak_shaving", "load_grid_average_power_ac", "battery_grid_average_power_ac", "grid_contract_power_ac", "load_pv_average_power_ac", "load_battery_average_power_ac", "battery_soc", "battery_produced_average_power_ac", "battery_consumed_average_power_ac", "battery_charging_from", "battery_discharging_to", "pv_average_power_ac", "load_average_power_ac", "load_links", "grid_links", "pv_links", "battery_links", "battery_pv_average_power_ac", "grid_pv_average_power_ac", "grid_produced_average_power_ac", "grid_consumed_average_power_ac", "battery_lifetime_operation_cycles", "battery_produced_lifetime_energy_ac", "battery_consumed_lifetime_energy_ac", "battery_average_power_ac", "battery_voltage", "created_at", "updated_at"}
-	ccDataLogColumnsWithoutDefault = []string{"gw_uuid", "log_date", "gw_id", "customer_id", "grid_is_peak_shaving", "load_grid_average_power_ac", "battery_grid_average_power_ac", "grid_contract_power_ac", "load_pv_average_power_ac", "load_battery_average_power_ac", "battery_soc", "battery_produced_average_power_ac", "battery_consumed_average_power_ac", "battery_charging_from", "battery_discharging_to", "pv_average_power_ac", "load_average_power_ac", "load_links", "grid_links", "pv_links", "battery_links", "battery_pv_average_power_ac", "grid_pv_average_power_ac", "grid_produced_average_power_ac", "grid_consumed_average_power_ac", "battery_lifetime_operation_cycles", "battery_produced_lifetime_energy_ac", "battery_consumed_lifetime_energy_ac", "battery_average_power_ac", "battery_voltage", "updated_at"}
+	ccDataLogAllColumns            = []string{"id", "gw_uuid", "log_date", "gw_id", "customer_id", "grid_is_peak_shaving", "load_grid_average_power_ac", "battery_grid_average_power_ac", "grid_contract_power_ac", "load_pv_average_power_ac", "load_battery_average_power_ac", "battery_soc", "battery_produced_average_power_ac", "battery_consumed_average_power_ac", "battery_charging_from", "battery_discharging_to", "pv_average_power_ac", "load_average_power_ac", "load_links", "grid_links", "pv_links", "battery_links", "battery_pv_average_power_ac", "grid_pv_average_power_ac", "grid_produced_average_power_ac", "grid_consumed_average_power_ac", "battery_lifetime_operation_cycles", "battery_produced_lifetime_energy_ac", "battery_consumed_lifetime_energy_ac", "battery_average_power_ac", "battery_voltage", "all_produced_lifetime_energy_ac", "pv_produced_lifetime_energy_ac", "grid_produced_lifetime_energy_ac", "all_consumed_lifetime_energy_ac", "load_consumed_lifetime_energy_ac", "grid_consumed_lifetime_energy_ac", "grid_average_power_ac", "battery_lifetime_energy_ac", "grid_lifetime_energy_ac", "load_self_consumed_lifetime_energy_ac", "grid_power_cost", "grid_power_cost_savings", "load_pv_consumed_lifetime_energy_ac", "battery_pv_consumed_lifetime_energy_ac", "grid_pv_consumed_lifetime_energy_ac", "pv_energy_cost_savings", "pv_co2_savings", "created_at", "updated_at"}
+	ccDataLogColumnsWithoutDefault = []string{"gw_uuid", "log_date", "gw_id", "customer_id", "grid_is_peak_shaving", "load_grid_average_power_ac", "battery_grid_average_power_ac", "grid_contract_power_ac", "load_pv_average_power_ac", "load_battery_average_power_ac", "battery_soc", "battery_produced_average_power_ac", "battery_consumed_average_power_ac", "battery_charging_from", "battery_discharging_to", "pv_average_power_ac", "load_average_power_ac", "load_links", "grid_links", "pv_links", "battery_links", "battery_pv_average_power_ac", "grid_pv_average_power_ac", "grid_produced_average_power_ac", "grid_consumed_average_power_ac", "battery_lifetime_operation_cycles", "battery_produced_lifetime_energy_ac", "battery_consumed_lifetime_energy_ac", "battery_average_power_ac", "battery_voltage", "all_produced_lifetime_energy_ac", "pv_produced_lifetime_energy_ac", "grid_produced_lifetime_energy_ac", "all_consumed_lifetime_energy_ac", "load_consumed_lifetime_energy_ac", "grid_consumed_lifetime_energy_ac", "grid_average_power_ac", "battery_lifetime_energy_ac", "grid_lifetime_energy_ac", "load_self_consumed_lifetime_energy_ac", "grid_power_cost", "grid_power_cost_savings", "load_pv_consumed_lifetime_energy_ac", "battery_pv_consumed_lifetime_energy_ac", "grid_pv_consumed_lifetime_energy_ac", "pv_energy_cost_savings", "pv_co2_savings", "updated_at"}
 	ccDataLogColumnsWithDefault    = []string{"id", "created_at"}
 	ccDataLogPrimaryKeyColumns     = []string{"id"}
 	ccDataLogGeneratedColumns      = []string{}

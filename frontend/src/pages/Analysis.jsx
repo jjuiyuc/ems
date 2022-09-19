@@ -1,5 +1,6 @@
+import { connect } from "react-redux"
 import { Button, Stack } from "@mui/material"
-import { getLanguage, useTranslation } from "react-multi-lang"
+import { useTranslation } from "react-multi-lang"
 import moment from "moment"
 import { useEffect, useState } from "react"
 
@@ -15,7 +16,9 @@ import "../assets/css/dateRangePicker.css"
 
 const { colors } = variables
 
-export default function Analysis() {
+const mapState = state => ({ gatewayID: state.gateways.active.gatewayID })
+
+export default connect(mapState)(function Analysis(props) {
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
@@ -32,17 +35,14 @@ export default function Analysis() {
         fakeData2 = fakeDataArray(days),
         fakeData3 = fakeDataArray(days),
         fakeData4 = fakeDataArray(days)
-    const
-        hours24 = Array.from(new Array(24).keys()),
-        lineChartDateLabels = hours24.map(n =>
-            moment().hour(n).startOf("h").toISOString())
 
-    const [lineChartPower, setLineChartPower] = useState({
+
+    const chartRealTimePowerSet = ({ data, labels }) => ({
         datasets: [
             {
                 backgroundColor: colors.green.main,
                 borderColor: colors.green.main,
-                data: fakeData1,
+                data: data?.load || [],
                 fill: {
                     above: colors.green["main-opacity-10"],
                     target: "origin"
@@ -54,7 +54,7 @@ export default function Analysis() {
             {
                 backgroundColor: colors.yellow.main,
                 borderColor: colors.yellow.main,
-                data: fakeData2,
+                data: data?.solar || [],
                 fill: {
                     above: colors.yellow["main-opacity-10"],
                     target: "origin"
@@ -66,7 +66,7 @@ export default function Analysis() {
             {
                 backgroundColor: colors.blue.main,
                 borderColor: colors.blue.main,
-                data: fakeData3,
+                data: data?.battery || [],
                 fill: {
                     above: colors.yellow["main-opacity-10"],
                     target: "origin"
@@ -78,7 +78,7 @@ export default function Analysis() {
             {
                 backgroundColor: colors.indigo.main,
                 borderColor: colors.indigo.main,
-                data: fakeData4,
+                data: data?.grid || [],
                 fill: {
                     above: colors.indigo["main-opacity-10"],
                     target: "origin"
@@ -88,7 +88,7 @@ export default function Analysis() {
                 label: commonT("grid")
             }
         ],
-        labels: lineChartDateLabels,
+        labels,
         legend: true,
         tickCallback: (val, index) => val + commonT("kw"),
         tooltipLabel: item => `${item.dataset.label} ${item.parsed.y} `
@@ -96,6 +96,7 @@ export default function Analysis() {
         x: { grid: { lineWidth: 0 } },
         y: { max: 60, min: 0 }
     })
+
     const
         [barChartData, setBarChartData] = useState({
             datasets: [
@@ -157,160 +158,126 @@ export default function Analysis() {
         [tab, setTab] = useState("days"),
         [infoError, setInfoError] = useState(""),
         [infoLoading, setInfoLoading] = useState(false),
-        // [energySourcesTotal, setEnergySourcesTotal] = useState({
-        //     types: [
-        //         { kwh: 0, percentage: 0, type: "directSolarSupply" },
-        //         { kwh: 0, percentage: 0, type: "importFromGrid" },
-        //         { kwh: 0, percentage: 0, type: "batteryDischarge" },
-        //     ],
-        //     kwh: 50
-        // }),
-        // [energyDestinationsTotal, setEnergyDestinationsTotal] = useState({
-        //     types: [
-        //         { kwh: 10, percentage: 18, type: "load" },
-        //         { kwh: 25, percentage: 41, type: "exportToGrid" },
-        //         { kwh: 25, percentage: 41, type: "chargeToBattery" },
-        //     ],
-        //     kwh: 60
-        // })
         [energySourcesTotal, setEnergySourcesTotal] = useState({
             types: [
-                { kwh: 7.5, percentage: 15, type: "directSolarSupply" },
-                { kwh: 30, percentage: 60, type: "importFromGrid" },
-                { kwh: 12.5, percentage: 25, type: "batteryDischarge" },
+                { kwh: 0, percentage: 0, type: "directSolarSupply" },
+                { kwh: 0, percentage: 0, type: "importFromGrid" },
+                { kwh: 0, percentage: 0, type: "batteryDischarge" },
             ],
-            kwh: 50
+            kwh: 0
         }),
-        [energyDestinationsTotal, setEnergyDestinationsTotal] = useState({
+        [energyDestinations, setEnergyDestinations] = useState({
             types: [
-                { kwh: 10, percentage: 18, type: "load" },
-                { kwh: 25, percentage: 41, type: "exportToGrid" },
-                { kwh: 25, percentage: 41, type: "chargeToBattery" },
+                { kwh: 0, percentage: 0, type: "load" },
+                { kwh: 0, percentage: 0, type: "exportToGrid" },
+                { kwh: 0, percentage: 0, type: "chargeToBattery" },
             ],
-            kwh: 60
+            kwh: 0
         }),
-        [lineChartRes] = useState("hour")
-
-
-    const lang = getLanguage()
+        [lineChartPower, setLineChartPower] = useState(null),
+        [lineChartPowerError, setLineChartPowerError] = useState(""),
+        [lineChartPowerLoading, setLineChartPowerLoading] = useState(false),
+        [lineChartPowertRes] = useState("hour")
 
     useEffect(() => {
+        if (!props.gatewayID) return
 
-        // if (!props.gatewayID) return
+        const
+            startTime = moment().startOf("day").toISOString(),
+            endTime = moment().toISOString(),
+            chartParams = resolution => new URLSearchParams({
+                startTime,
+                endTime: moment().toISOString(),
+                resolution
+            }).toString(),
+            urlPrefix = `/api/${props.gatewayID}/devices`
 
-        // const
-        //     startTime = moment().startOf("day").toISOString(),
-        //     chartParams = resolution => new URLSearchParams({
-        //         startTime,
-        //         endTime: moment().endOf("day").toISOString(),
-        //         resolution
-        //     }).toString(),
-        //     urlPrefix = `/api/${props.gatewayID}/devices`
+        apiCall({
+            onComplete: () => setInfoLoading(false),
+            onError: error => setInfoError(error),
+            onStart: () => setInfoLoading(true),
+            onSuccess: rawData => {
+                if (!rawData?.data) return
 
-        // apiCall({
-        //     onSuccess: rawData => {
-        //         if (!rawData?.data) return
-
-        //         const { data } = rawData
-        //         setTotalEnergySources({
-        //             types: [
-        //                 {
-        //                     kwh: data.pvProducedLifetimeEnergyACDiff,
-        //                     percentage: data.pvProducedEnergyPercentAC,
-        //                     type: "directSolarSupply"
-        //                 },
-        //                 {
-        //                     kwh: data.gridProducedLifetimeEnergyACDiff,
-        //                     percentage: data.gridProducedEnergyPercentAC,
-        //                     type: "importFromGrid"
-        //                 },
-        //                 {
-        //                     kwh: data.batteryProducedLifetimeEnergyACDiff,
-        //                     percentage: data.batteryProducedEnergyPercentAC,
-        //                     type: "batteryDischarge"
-        //                 },
-        //             ],
-        //             kwh: data.allProducedLifetimeEnergyACDiff
-        //         })
-
-        //         setEnergyDestinations({
-        //             types: [
-        //                 {
-        //                     kwh: data.loadConsumedLifetimeEnergyACDiff,
-        //                     percentage: data.loadConsumedEnergyPercentAC8,
-        //                     type: "load"
-        //                 },
-        //                 {
-        //                     kwh: data.gridConsumedLifetimeEnergyACDiff,
-        //                     percentage: data.gridConsumedEnergyPercentAC,
-        //                     type: "exportToGrid"
-        //                 },
-        //                 {
-        //                     kwh: data.batteryConsumedLifetimeEnergyACDiff,
-        //                     percentage: data.batteryConsumedEnergyPercentAC,
-        //                     type: "chargeToBattery"
-        //                 },
-        //             ],
-        //             kwh: 60
-        //         })
-        //     },
-        //     url: `${urlPrefix}/energy-distribution-info?startTime=${startTime}&endTime=${endTime}`
-        // })
+                const { data } = rawData
+                setEnergySourcesTotal({
+                    types: [
+                        {
+                            kwh: data.pvProducedLifetimeEnergyACDiff,
+                            percentage: data.pvProducedEnergyPercentAC,
+                            type: "directSolarSupply"
+                        },
+                        {
+                            kwh: data.gridProducedLifetimeEnergyACDiff,
+                            percentage: data.gridProducedEnergyPercentAC,
+                            type: "importFromGrid"
+                        },
+                        {
+                            kwh: data.batteryProducedLifetimeEnergyACDiff,
+                            percentage: data.batteryProducedEnergyPercentAC,
+                            type: "batteryDischarge"
+                        },
+                    ],
+                    kwh: data.allProducedLifetimeEnergyACDiff
+                })
+                setEnergyDestinations({
+                    types: [
+                        {
+                            kwh: data.loadConsumedLifetimeEnergyACDiff,
+                            percentage: data.loadConsumedEnergyPercentAC,
+                            type: "load"
+                        },
+                        {
+                            kwh: data.gridConsumedLifetimeEnergyACDiff,
+                            percentage: data.gridConsumedEnergyPercentAC,
+                            type: "exportToGrid"
+                        },
+                        {
+                            kwh: data.batteryConsumedLifetimeEnergyACDiff,
+                            percentage: data.batteryConsumedEnergyPercentAC,
+                            type: "chargeToBattery"
+                        },
+                    ],
+                    kwh: 60
+                })
+            },
+            url: `${urlPrefix}/energy-distribution-info?startTime=${startTime}&endTime=${endTime}`
+        })
 
         const oClocks = Array.from(new Array(25).keys()).map(n =>
             parseInt(moment().hour(n).startOf("h").format("x")))
 
-        //day tab line chart
-        // const lineChartUrl = `${urlPrefix}/power-state?`
-        //     + chartParams(chargeVoltageRes)
+        const lineChartPowerUrl = `${urlPrefix}/power-state?`
+            + chartParams(lineChartPowertRes)
 
-        // apiCall({
-        //     // onComplete: () => setChargeVoltageLoading(false),
-        //     // onError: error => setChargeVoltageError(error),
-        //     // onStart: () => setChargeVoltageLoading(true),
-        //     onSuccess: rawData => {
-        //         if (!rawData || !rawData.data) return
+        apiCall({
+            onComplete: () => setLineChartPowerLoading(false),
+            onError: error => setLineChartPowerError(error),
+            onStart: () => setLineChartPowerLoading(true),
+            onSuccess: rawData => {
+                if (!rawData || !rawData.data) return
 
-        //         const
-        //             { data } = rawData,
-        //             { onPeakTime, timestamps } = data,
-        //             { end, start, timezone } = onPeakTime,
-        //             labels = [
-        //                 ...timestamps.map(t => t * 1000),
-        //                 ...oClocks.slice(timestamps.length)
-        //             ],
-        //             peakStart = ConvertTimeToNumber(start, timezone),
-        //             peakEnd = ConvertTimeToNumber(end, timezone)
-
-        //         setLineChartData({
-        //             data: {
-        //                 load: data.loadAveragePowerACs,
-        //                 solar: data.pvAveragePowerACs,
-        //                 battery: data.batteryAveragePowerACs,
-        //                 grid: data.gridAveragePowerACs
-        //             },
-        //             highPeak: { start: peakStart, end: peakEnd },
-        //             labels
-        //         })
-        //     },
-        //     url: chargeVoltageUrl
-        // })
-        const
-            lineChart = { ...lineChartPower },
-            barChart = { ...barChartData },
-            labels = [
-                pageT("load"),
-                commonT("solar"),
-                commonT("battery"),
-                commonT("grid")
-            ]
-
-        labels.forEach((text, i) => lineChart.datasets[i].label = text)
-        labels.forEach((text, i) => barChart.datasets[i].label = text)
-        setLineChartPower(lineChart)
-        setBarChartData(barChart)
-
-    }, [lang])
+                const
+                    { data } = rawData,
+                    { timestamps } = data,
+                    labels = [
+                        ...timestamps.map(t => t * 1000),
+                        ...oClocks.slice(timestamps.length)
+                    ]
+                console.log(data?.loadAveragePowerACs)
+                setLineChartPower({
+                    data: {
+                        load: data.loadAveragePowerACs,
+                        solar: data.pvAveragePowerACs,
+                        battery: data.batteryAveragePowerACs,
+                        grid: data.gridAveragePowerACs
+                    },
+                    labels
+                })
+            },
+            url: lineChartPowerUrl
+        })
+    }, [props.gatewayID])
 
     const tabs = ["days", "weeks", "month", "year", "custom"]
 
@@ -341,7 +308,7 @@ export default function Analysis() {
                 data={energySourcesTotal}
                 title={pageT("energySourcesTotal")} />
             <AnalysisCard
-                data={energyDestinationsTotal}
+                data={energyDestinations}
                 title={pageT("energyDestinationsTotal")} />
         </div>
         {tab == "days"
@@ -349,7 +316,9 @@ export default function Analysis() {
                 <h4>{pageT("realTimePowerkW")}</h4>
                 <div className="max-h-80vh h-160 mt-10 relative w-full">
                     <LineChart
-                        data={lineChartPower} id="analysisLineChart" />
+                        data={chartRealTimePowerSet({
+                            ...lineChartPower
+                        })} id="analysisLineChart" />
                 </div>
             </div>
             : null}
@@ -370,4 +339,4 @@ export default function Analysis() {
             </>
             : null}
     </>
-}
+})

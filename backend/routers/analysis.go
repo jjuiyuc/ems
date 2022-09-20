@@ -39,13 +39,6 @@ type AccumulatedQuery struct {
 // @Router      /{gwid}/devices/energy-distribution-info [get]
 func (w *APIWorker) GetEnergyDistributionInfo(c *gin.Context) {
 	appG := app.Gin{c}
-	userID, _ := c.Get("userID")
-	if userID == nil {
-		log.WithFields(log.Fields{"caused-by": "error token"}).Error()
-		appG.Response(http.StatusUnauthorized, e.ErrToken, nil)
-		return
-	}
-
 	gatewayUUID := c.Param("gwid")
 	log.Debug("gatewayUUID: ", gatewayUUID)
 
@@ -75,13 +68,6 @@ func (w *APIWorker) GetEnergyDistributionInfo(c *gin.Context) {
 // @Router      /{gwid}/devices/power-state [get]
 func (w *APIWorker) GetPowerState(c *gin.Context) {
 	appG := app.Gin{c}
-	userID, _ := c.Get("userID")
-	if userID == nil {
-		log.WithFields(log.Fields{"caused-by": "error token"}).Error()
-		appG.Response(http.StatusUnauthorized, e.ErrToken, nil)
-		return
-	}
-
 	gatewayUUID := c.Param("gwid")
 	log.Debug("gatewayUUID: ", gatewayUUID)
 
@@ -100,13 +86,6 @@ func (w *APIWorker) GetPowerState(c *gin.Context) {
 // GetAccumulatedPowerState godoc
 func (w *APIWorker) GetAccumulatedPowerState(c *gin.Context) {
 	appG := app.Gin{c}
-	userID, _ := c.Get("userID")
-	if userID == nil {
-		log.WithFields(log.Fields{"caused-by": "error token"}).Error()
-		appG.Response(http.StatusUnauthorized, e.ErrToken, nil)
-		return
-	}
-
 	gatewayUUID := c.Param("gwid")
 	log.Debug("gatewayUUID: ", gatewayUUID)
 

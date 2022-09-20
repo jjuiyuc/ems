@@ -7,6 +7,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"der-ems/internal/utils"
+	deremsmodels "der-ems/models/der-ems"
 	"der-ems/repository"
 )
 
@@ -61,6 +62,9 @@ type PowerStateResponse struct {
 	BatteryAveragePowerACs []float32 `json:"batteryAveragePowerACs"`
 	GridAveragePowerACs    []float32 `json:"gridAveragePowerACs"`
 }
+
+// CCDataLogCalculated godoc
+type CCDataLogCalculated deremsmodels.CCDataLogCalculatedDaily
 
 // AccumulatedPowerStateResponse godoc
 type AccumulatedPowerStateResponse struct {
@@ -240,12 +244,13 @@ func (s defaultDevicesService) GetAccumulatedPowerState(gwUUID, resolution strin
 	case "day":
 		endTimeIndex = startTime.AddDate(0, 0, 1)
 	case "month":
-		//TODO
+		endTimeIndex = startTime.AddDate(0, 0, 1).AddDate(0, 1, 0).AddDate(0, 0, -1)
 	}
 
 	for startTimeIndex.Before(endTime) {
-		latestLog, latestLogErr := s.repo.CCData.GetLatestCalculatedDailyLog(gwUUID, startTimeIndex, endTimeIndex)
+		latestLogUndefined, latestLogErr := s.repo.CCData.GetLatestCalculatedLog(gwUUID, resolution, startTimeIndex, endTimeIndex)
 		if latestLogErr == nil {
+			latestLog, _ := (latestLogUndefined).(CCDataLogCalculated)
 			log.WithFields(log.Fields{
 				"latest_log_date":                  latestLog.LatestLogDate,
 				"loadConsumedLifetimeEnergyACDiff": latestLog.LoadConsumedLifetimeEnergyACDiff,
@@ -276,11 +281,11 @@ func (s defaultDevicesService) GetAccumulatedPowerState(gwUUID, resolution strin
 		switch resolution {
 		case "day":
 			endTimeIndex = startTimeIndex.AddDate(0, 0, 1)
-			if endTimeIndex.After(endTime) {
-				endTimeIndex = endTime
-			}
 		case "month":
-			//TODO
+			endTimeIndex = startTimeIndex.AddDate(0, 0, 1).AddDate(0, 1, 0).AddDate(0, 0, -1)
+		}
+		if endTimeIndex.After(endTime) {
+			endTimeIndex = endTime
 		}
 	}
 	return

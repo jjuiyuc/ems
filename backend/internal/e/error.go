@@ -17,6 +17,8 @@ var (
 	ErrNewMessageReceivedUnexpectedErr = errors.New("message when received unexpected error")
 	// ErrNewMessageGotNil godoc
 	ErrNewMessageGotNil = errors.New("message when an error is expected but got nil")
+	// ErrNewUnexpectedResolution godoc
+	ErrNewUnexpectedResolution = errors.New("unexpected resolution")
 )
 
 // ErrNewKeyNotExist godoc

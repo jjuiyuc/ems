@@ -111,6 +111,18 @@ func (w *APIWorker) GetAccumulatedPowerState(c *gin.Context) {
 }
 
 // GetPowerSelfSupplyRate godoc
+// @Summary     Show daily/monthly power self supply rate
+// @Description get power self supply rate by token, gateway UUID, resolution, startTime and endTime
+// @Tags        analysis
+// @Security    ApiKeyAuth
+// @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
+// @Param       gwid           path      string true "Gateway UUID"
+// @Param       query          query     AccumulatedQuery true "Query"
+// @Produce     json
+// @Success     200            {object}  app.Response{data=services.PowerSelfSupplyRateResponse}
+// @Failure     400            {object}  app.Response
+// @Failure     401            {object}  app.Response
+// @Router      /{gwid}/devices/power-self-supply-rate [get]
 func (w *APIWorker) GetPowerSelfSupplyRate(c *gin.Context) {
 	w.getAccumulatedInfo(c, PowerSelfSupplyRate)
 }

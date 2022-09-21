@@ -3,6 +3,7 @@
         "accumulatedKwh": "累積電量 (kWh)",
         "analysis": "分析",
         "batteryDischarge": "電池放電",
+        "chartError": "無法取得圖表資料",
         "chargeToBattery": "充入電池",
         "custom": "自訂",
         "days": "日",

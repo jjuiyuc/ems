@@ -24,6 +24,16 @@ type AccumulatedQuery struct {
 	EndTime    time.Time `form:"endTime" binding:"required,gtfield=StartTime" example:"UTC time in ISO-8601" format:"date-time"`
 }
 
+// AccumulatedType godoc
+type AccumulatedType int
+
+const (
+	// AccumulatedPowerState godoc
+	AccumulatedPowerState AccumulatedType = iota
+	// PowerSelfSupplyRate godoc
+	PowerSelfSupplyRate
+)
+
 // GetEnergyDistributionInfo godoc
 // @Summary     Show the distribution of energy sources and distinations
 // @Description get energy distribution by token, gateway UUID, startTime and endTime
@@ -97,6 +107,15 @@ func (w *APIWorker) GetPowerState(c *gin.Context) {
 // @Failure     401            {object}  app.Response
 // @Router      /{gwid}/devices/accumulated-power-state [get]
 func (w *APIWorker) GetAccumulatedPowerState(c *gin.Context) {
+	w.getAccumulatedInfo(c, AccumulatedPowerState)
+}
+
+// GetPowerSelfSupplyRate godoc
+func (w *APIWorker) GetPowerSelfSupplyRate(c *gin.Context) {
+	w.getAccumulatedInfo(c, PowerSelfSupplyRate)
+}
+
+func (w *APIWorker) getAccumulatedInfo(c *gin.Context, accumulatedType AccumulatedType) {
 	appG := app.Gin{c}
 	gatewayUUID := c.Param("gwid")
 	log.Debug("gatewayUUID: ", gatewayUUID)
@@ -108,6 +127,12 @@ func (w *APIWorker) GetAccumulatedPowerState(c *gin.Context) {
 		return
 	}
 
-	accumulatedPowerState := w.Services.Devices.GetAccumulatedPowerState(gatewayUUID, q.Resolution, q.StartTime, q.EndTime)
-	appG.Response(http.StatusOK, e.Success, accumulatedPowerState)
+	var responseData interface{}
+	switch accumulatedType {
+	case AccumulatedPowerState:
+		responseData = w.Services.Devices.GetAccumulatedPowerState(gatewayUUID, q.Resolution, q.StartTime, q.EndTime)
+	case PowerSelfSupplyRate:
+		responseData = w.Services.Devices.GetPowerSelfSupplyRate(gatewayUUID, q.Resolution, q.StartTime, q.EndTime)
+	}
+	appG.Response(http.StatusOK, e.Success, responseData)
 }

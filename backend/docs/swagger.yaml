@@ -52,6 +52,15 @@ definitions:
     required:
     - startTime
     type: object
+  routers.StartTimeQuery:
+    properties:
+      startTime:
+        example: UTC time in ISO-8601
+        format: date-time
+        type: string
+    required:
+    - startTime
+    type: object
   routers.ZoomableQuery:
     properties:
       endTime:

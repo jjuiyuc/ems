@@ -98,6 +98,16 @@ type PowerSelfSupplyRateResponse struct {
 	LoadSelfConsumedEnergyPercentACs []float32 `json:"loadSelfConsumedEnergyPercentACs"`
 }
 
+// ChargeInfoResponse godoc
+type ChargeInfoResponse struct {
+	GridPowerCost              float32 `json:"gridPowerCost"`
+	GridPowerCostSavings       float32 `json:"gridPowerCostSavings"`
+	GridPowerCostLastMonth     float32 `json:"gridPowerCostLastMonth"`
+	GridProducedAveragePowerAC float32 `json:"gridProducedAveragePowerAC"`
+	GridContractPowerAC        float32 `json:"gridContractPowerAC"`
+	GridIsPeakShaving          int     `json:"gridIsPeakShaving"`
+}
+
 // DevicesService godoc
 type DevicesService interface {
 	GetLatestDevicesEnergyInfo(gwUUID string) (updatedTime time.Time, devicesEnergyInfo *DevicesEnergyInfoResponse, err error)
@@ -105,6 +115,7 @@ type DevicesService interface {
 	GetPowerState(gwUUID string, startTime, endTime time.Time) (powerState *PowerStateResponse)
 	GetAccumulatedPowerState(gwUUID, resolution string, startTime, endTime time.Time) (accumulatedPowerState *AccumulatedPowerStateResponse)
 	GetPowerSelfSupplyRate(gwUUID, resolution string, startTime, endTime time.Time) (powerSelfSupplyRate *PowerSelfSupplyRateResponse)
+	GetChargeInfo(gwUUID string, startTime time.Time) (chargeInfo *ChargeInfoResponse)
 }
 
 type defaultDevicesService struct {
@@ -273,6 +284,27 @@ func (s defaultDevicesService) GetAccumulatedPowerState(gwUUID, resolution strin
 		BatteryLifetimeEnergyACDiffs:      accumulatedInfo.BatteryLifetimeEnergyACDiffs,
 		GridLifetimeEnergyACDiffs:         accumulatedInfo.GridLifetimeEnergyACDiffs,
 	}
+	return
+}
+
+func (s defaultDevicesService) GetChargeInfo(gwUUID string, startTime time.Time) (chargeInfo *ChargeInfoResponse) {
+	chargeInfo = &ChargeInfoResponse{}
+	latestLog, err := s.repo.CCData.GetLatestLogByGatewayUUIDAndPeriod(gwUUID, startTime, time.Now().UTC())
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "s.repo.CCData.GetLatestLogByGatewayUUIDAndPeriod",
+			"err":       err,
+		}).Error()
+		return
+	}
+	log.Debug("latestLog.LogDate: ", latestLog.LogDate)
+	// XXX: Hardcode gridPowerCost/gridPowerCostSavings/gridPowerCostLastMonth are return default value 0 now
+	chargeInfo.GridPowerCost = 0
+	chargeInfo.GridPowerCostSavings = 0
+	chargeInfo.GridPowerCostLastMonth = 0
+	chargeInfo.GridProducedAveragePowerAC = latestLog.GridProducedAveragePowerAC.Float32
+	chargeInfo.GridContractPowerAC = latestLog.GridContractPowerAC.Float32
+	chargeInfo.GridIsPeakShaving = latestLog.GridIsPeakShaving.Int
 	return
 }
 

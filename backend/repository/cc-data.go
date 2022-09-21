@@ -85,7 +85,7 @@ func (repo defaultCCDataRepository) GetLatestLogByGatewayUUIDAndPeriod(gwUUID st
 	}
 
 	return deremsmodels.CCDataLogs(
-		qm.Where("(gw_uuid = ? and log_date > ? and log_date <= ?)", gwUUID, startTime, endTime),
+		qm.Where("(gw_uuid = ? and log_date >= ? and log_date < ?)", gwUUID, startTime, endTime),
 		qm.OrderBy("log_date DESC")).One(repo.db)
 }
 
@@ -93,12 +93,12 @@ func (repo defaultCCDataRepository) GetLatestLogByGatewayUUIDAndPeriod(gwUUID st
 func (repo defaultCCDataRepository) GetFirstLogByGatewayUUIDAndPeriod(gwUUID string, startTime time.Time, endTime time.Time) (*deremsmodels.CCDataLog, error) {
 	if endTime.IsZero() {
 		return deremsmodels.CCDataLogs(
-			qm.Where("(gw_uuid = ? and log_date > ?)", gwUUID, startTime),
+			qm.Where("(gw_uuid = ? and log_date >= ?)", gwUUID, startTime),
 			qm.OrderBy("log_date ASC")).One(repo.db)
 	}
 
 	return deremsmodels.CCDataLogs(
-		qm.Where("(gw_uuid = ? and log_date > ? and log_date <= ?)", gwUUID, startTime, endTime),
+		qm.Where("(gw_uuid = ? and log_date >= ? and log_date < ?)", gwUUID, startTime, endTime),
 		qm.OrderBy("log_date ASC")).One(repo.db)
 }
 
@@ -111,11 +111,11 @@ func (repo defaultCCDataRepository) GetLatestCalculatedLog(gwUUID, resolution st
 	switch resolution {
 	case "day":
 		return deremsmodels.CCDataLogCalculatedDailies(
-			qm.Where("(gw_uuid = ? and latest_log_date > ? and latest_log_date <= ?)", gwUUID, startTime, endTime),
+			qm.Where("(gw_uuid = ? and latest_log_date >= ? and latest_log_date < ?)", gwUUID, startTime, endTime),
 			qm.OrderBy("latest_log_date DESC")).One(repo.db)
 	case "month":
 		return deremsmodels.CCDataLogCalculatedMonthlies(
-			qm.Where("(gw_uuid = ? and latest_log_date > ? and latest_log_date <= ?)", gwUUID, startTime, endTime),
+			qm.Where("(gw_uuid = ? and latest_log_date >= ? and latest_log_date < ?)", gwUUID, startTime, endTime),
 			qm.OrderBy("latest_log_date DESC")).One(repo.db)
 	default:
 		return nil, e.ErrNewUnexpectedResolution

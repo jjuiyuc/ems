@@ -226,7 +226,11 @@ func (s defaultDevicesService) GetPowerState(gwUUID string, startTime, endTime t
 				"startTimeIndex": startTimeIndex,
 				"endTimeIndex":   endTimeIndex,
 			}).Warn()
-			powerState.Timestamps = append(powerState.Timestamps, int(endTimeIndex.Unix()))
+			if endTimeIndex == endTime {
+				powerState.Timestamps = append(powerState.Timestamps, int(endTimeIndex.Unix()))
+			} else {
+				powerState.Timestamps = append(powerState.Timestamps, int(endTimeIndex.Add(-1*time.Second).Unix()))
+			}
 			powerState.LoadAveragePowerACs = append(powerState.LoadAveragePowerACs, 0)
 			powerState.BatteryAveragePowerACs = append(powerState.BatteryAveragePowerACs, 0)
 			powerState.PvAveragePowerACs = append(powerState.PvAveragePowerACs, 0)
@@ -254,7 +258,7 @@ func (s defaultDevicesService) GetAccumulatedPowerState(gwUUID, resolution strin
 	}
 
 	for startTimeIndex.Before(endTime) {
-		latestAccumulatedPowerState := s.getLatestAccumulatedPowerState(gwUUID, resolution, startTimeIndex, endTimeIndex)
+		latestAccumulatedPowerState := s.getLatestAccumulatedPowerState(gwUUID, resolution, startTimeIndex, endTimeIndex, endTime)
 		log.Debug("latestAccumulatedPowerState: ", latestAccumulatedPowerState)
 		accumulatedPowerState.Timestamps = append(accumulatedPowerState.Timestamps, latestAccumulatedPowerState.Timestamps)
 		accumulatedPowerState.LoadConsumedLifetimeEnergyACDiffs = append(accumulatedPowerState.LoadConsumedLifetimeEnergyACDiffs, latestAccumulatedPowerState.LoadConsumedLifetimeEnergyACDiff)
@@ -276,7 +280,7 @@ func (s defaultDevicesService) GetAccumulatedPowerState(gwUUID, resolution strin
 	return
 }
 
-func (s defaultDevicesService) getLatestAccumulatedPowerState(gwUUID, resolution string, startTimeIndex, endTimeIndex time.Time) (latestAccumulatedPowerState *LatestAccumulatedPowerState) {
+func (s defaultDevicesService) getLatestAccumulatedPowerState(gwUUID, resolution string, startTimeIndex, endTimeIndex, endTime time.Time) (latestAccumulatedPowerState *LatestAccumulatedPowerState) {
 	latestAccumulatedPowerState = &LatestAccumulatedPowerState{}
 	latestLog, latestLogErr := s.repo.CCData.GetLatestCalculatedLog(gwUUID, resolution, startTimeIndex, endTimeIndex)
 	if latestLogErr != nil {
@@ -286,7 +290,11 @@ func (s defaultDevicesService) getLatestAccumulatedPowerState(gwUUID, resolution
 			"startTimeIndex": startTimeIndex,
 			"endTimeIndex":   endTimeIndex,
 		}).Warn()
-		latestAccumulatedPowerState.Timestamps = int(endTimeIndex.Unix())
+		if endTimeIndex == endTime {
+			latestAccumulatedPowerState.Timestamps = int(endTimeIndex.Unix())
+		} else {
+			latestAccumulatedPowerState.Timestamps = int(endTimeIndex.Add(-1 * time.Second).Unix())
+		}
 		return
 	}
 

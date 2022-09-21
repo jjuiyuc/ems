@@ -606,6 +606,80 @@ var doc = `{
                 }
             }
         },
+        "/{gwid}/devices/charge-info": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get demand charge information by token, gateway UUID and startTime",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "demand charge"
+                ],
+                "summary": "Show the demand charge information",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Input user's access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Gateway UUID",
+                        "name": "gwid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "UTC time in ISO-8601",
+                        "name": "startTime",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/app.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/services.ChargeInfoResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/{gwid}/devices/energy-distribution-info": {
             "get": {
                 "security": [
@@ -933,6 +1007,19 @@ var doc = `{
                 }
             }
         },
+        "routers.StartTimeQuery": {
+            "type": "object",
+            "required": [
+                "startTime"
+            ],
+            "properties": {
+                "startTime": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "UTC time in ISO-8601"
+                }
+            }
+        },
         "routers.ZoomableQuery": {
             "type": "object",
             "required": [
@@ -1084,6 +1171,29 @@ var doc = `{
                     "items": {
                         "type": "integer"
                     }
+                }
+            }
+        },
+        "services.ChargeInfoResponse": {
+            "type": "object",
+            "properties": {
+                "gridContractPowerAC": {
+                    "type": "number"
+                },
+                "gridIsPeakShaving": {
+                    "type": "integer"
+                },
+                "gridPowerCost": {
+                    "type": "number"
+                },
+                "gridPowerCostLastMonth": {
+                    "type": "number"
+                },
+                "gridPowerCostSavings": {
+                    "type": "number"
+                },
+                "gridProducedAveragePowerAC": {
+                    "type": "number"
                 }
             }
         },

@@ -44,3 +44,24 @@ func (w *APIWorker) GetChargeInfo(c *gin.Context) {
 	responseData := w.Services.Devices.GetChargeInfo(gatewayUUID, q.StartTime)
 	appG.Response(http.StatusOK, e.Success, responseData)
 }
+
+// GetDemandState godoc
+func (w *APIWorker) GetDemandState(c *gin.Context) {
+	w.getPeriodInfo(c)
+}
+
+func (w *APIWorker) getPeriodInfo(c *gin.Context) {
+	appG := app.Gin{c}
+	gatewayUUID := c.Param("gwid")
+	log.Debug("gatewayUUID: ", gatewayUUID)
+
+	var q PeriodQuery
+	if err := c.BindQuery(&q); err != nil {
+		log.WithFields(log.Fields{"caused-by": "invalid param"}).Error()
+		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
+		return
+	}
+
+	responseData := w.Services.Devices.GetDemandState(gatewayUUID, q.StartTime, q.EndTime)
+	appG.Response(http.StatusOK, e.Success, responseData)
+}

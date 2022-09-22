@@ -73,6 +73,13 @@ type LatestAccumulatedInfo struct {
 	LoadSelfConsumedEnergyPercentAC  float32
 }
 
+// LatestComputedDemandState godoc
+type LatestComputedDemandState struct {
+	Timestamps                      int
+	GridLifetimeEnergyACDiffToPower float32
+	GridContractPowerAC             float32
+}
+
 // AccumulatedInfo godoc
 type AccumulatedInfo struct {
 	Timestamps                        []int
@@ -108,6 +115,13 @@ type ChargeInfoResponse struct {
 	GridIsPeakShaving          int     `json:"gridIsPeakShaving"`
 }
 
+// DemandStateResponse godoc
+type DemandStateResponse struct {
+	Timestamps                       []int     `json:"timestamps"`
+	GridLifetimeEnergyACDiffToPowers []float32 `json:"gridLifetimeEnergyACDiffToPowers"`
+	GridContractPowerAC              float32   `json:"gridContractPowerAC"`
+}
+
 // DevicesService godoc
 type DevicesService interface {
 	GetLatestDevicesEnergyInfo(gwUUID string) (updatedTime time.Time, devicesEnergyInfo *DevicesEnergyInfoResponse, err error)
@@ -116,6 +130,7 @@ type DevicesService interface {
 	GetAccumulatedPowerState(gwUUID, resolution string, startTime, endTime time.Time) (accumulatedPowerState *AccumulatedPowerStateResponse)
 	GetPowerSelfSupplyRate(gwUUID, resolution string, startTime, endTime time.Time) (powerSelfSupplyRate *PowerSelfSupplyRateResponse)
 	GetChargeInfo(gwUUID string, startTime time.Time) (chargeInfo *ChargeInfoResponse)
+	GetDemandState(gwUUID string, startTime, endTime time.Time) (demandState *DemandStateResponse)
 }
 
 type defaultDevicesService struct {
@@ -317,6 +332,28 @@ func (s defaultDevicesService) GetPowerSelfSupplyRate(gwUUID, resolution string,
 	return
 }
 
+func (s defaultDevicesService) GetDemandState(gwUUID string, startTime, endTime time.Time) (demandState *DemandStateResponse) {
+	demandState = &DemandStateResponse{}
+	startTimeIndex := startTime
+	endTimeIndex := startTime.Add(15 * time.Minute)
+
+	for startTimeIndex.Before(endTime) {
+		latestComputedDemandState := s.getLatestComputedDemandState(gwUUID, startTimeIndex, endTimeIndex, endTime)
+		log.Debug("latestComputedDemandState: ", latestComputedDemandState)
+		demandState.Timestamps = append(demandState.Timestamps, latestComputedDemandState.Timestamps)
+		demandState.GridLifetimeEnergyACDiffToPowers = append(demandState.GridLifetimeEnergyACDiffToPowers, latestComputedDemandState.GridLifetimeEnergyACDiffToPower)
+		demandState.GridContractPowerAC = latestComputedDemandState.GridContractPowerAC
+
+		startTimeIndex = endTimeIndex
+		endTimeIndex = startTimeIndex.Add(15 * time.Minute)
+		if endTimeIndex.After(endTime) {
+			endTimeIndex = endTime
+		}
+	}
+
+	return
+}
+
 func (s defaultDevicesService) getAccumulatedInfo(gwUUID, resolution string, startTime, endTime time.Time) (accumulatedInfo *AccumulatedInfo) {
 	accumulatedInfo = &AccumulatedInfo{}
 	startTimeIndex := startTime
@@ -388,5 +425,27 @@ func (s defaultDevicesService) getLatestAccumulatedInfo(gwUUID, resolution strin
 		latestAccumulatedInfo.GridLifetimeEnergyACDiff = latestLogMonthly.GridLifetimeEnergyACDiff.Float32
 		latestAccumulatedInfo.LoadSelfConsumedEnergyPercentAC = latestLogMonthly.LoadSelfConsumedEnergyPercentAC.Float32
 	}
+	return
+}
+
+func (s defaultDevicesService) getLatestComputedDemandState(gwUUID string, startTimeIndex, endTimeIndex, endTime time.Time) (latestComputedDemandState *LatestComputedDemandState) {
+	latestComputedDemandState = &LatestComputedDemandState{}
+	firstlog, firstLogErr := s.repo.CCData.GetFirstLogByGatewayUUIDAndPeriod(gwUUID, startTimeIndex, endTimeIndex)
+	latestLog, latestLogErr := s.repo.CCData.GetLatestLogByGatewayUUIDAndPeriod(gwUUID, startTimeIndex, endTimeIndex)
+	if firstLogErr != nil || latestLogErr != nil {
+		log.WithFields(log.Fields{
+			"caused-by":      "s.repo.CCData.GetFirstLogByGatewayUUIDAndPeriod and GetLatestLogByGatewayUUIDAndPeriod",
+			"err1":           firstLogErr,
+			"err2":           latestLogErr,
+			"startTimeIndex": startTimeIndex,
+			"endTimeIndex":   endTimeIndex,
+		}).Warn()
+		latestComputedDemandState.Timestamps = int(endTimeIndex.Add(-1 * time.Second).Unix())
+		return
+	}
+
+	latestComputedDemandState.Timestamps = int(latestLog.LogDate.Unix())
+	latestComputedDemandState.GridLifetimeEnergyACDiffToPower = utils.Percent(utils.Diff(latestLog.GridLifetimeEnergyAC.Float32, firstlog.GridLifetimeEnergyAC.Float32), (15 / 60))
+	latestComputedDemandState.GridContractPowerAC = latestLog.GridContractPowerAC.Float32
 	return
 }

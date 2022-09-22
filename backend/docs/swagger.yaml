@@ -170,6 +170,19 @@ definitions:
       gridProducedAveragePowerAC:
         type: number
     type: object
+  services.DemandStateResponse:
+    properties:
+      gridContractPowerAC:
+        type: number
+      gridLifetimeEnergyACDiffToPowers:
+        items:
+          type: number
+        type: array
+      timestamps:
+        items:
+          type: integer
+        type: array
+    type: object
   services.EnergyDistributionInfoResponse:
     properties:
       allConsumedLifetimeEnergyACDiff:
@@ -415,7 +428,7 @@ paths:
         name: gwid
         required: true
         type: string
-      - description: 'Example : UTC time in ISO-8601'
+      - example: UTC time in ISO-8601
         format: date-time
         in: query
         name: startTime
@@ -552,6 +565,58 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Show the demand charge information
+      tags:
+      - demand charge
+  /{gwid}/devices/demand-state:
+    get:
+      description: get demand details by token, gateway UUID, startTime and endTime
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Input user's access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Gateway UUID
+        in: path
+        name: gwid
+        required: true
+        type: string
+      - example: UTC time in ISO-8601
+        format: date-time
+        in: query
+        name: endTime
+        required: true
+        type: string
+      - example: UTC time in ISO-8601
+        format: date-time
+        in: query
+        name: startTime
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/app.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/services.DemandStateResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Show today's demand details
       tags:
       - demand charge
   /{gwid}/devices/energy-distribution-info:

@@ -122,6 +122,19 @@ type DemandStateResponse struct {
 	GridContractPowerAC              float32   `json:"gridContractPowerAC"`
 }
 
+// SolarEnergyInfoResponse godoc
+type SolarEnergyInfoResponse struct {
+	AllConsumedLifetimeEnergyACDiff       float32 `json:"allConsumedLifetimeEnergyACDiff"`
+	LoadPvConsumedEnergyPercentAC         float32 `json:"loadPvConsumedEnergyPercentAC"`
+	LoadPvConsumedLifetimeEnergyACDiff    float32 `json:"loadPvConsumedLifetimeEnergyACDiff"`
+	BatteryPvConsumedEnergyPercentAC      float32 `json:"batteryPvConsumedEnergyPercentAC"`
+	BatteryPvConsumedLifetimeEnergyACDiff float32 `json:"batteryPvConsumedLifetimeEnergyACDiff"`
+	GridPvConsumedEnergyPercentAC         float32 `json:"gridPvConsumedEnergyPercentAC"`
+	GridPvConsumedLifetimeEnergyACDiff    float32 `json:"gridPvConsumedLifetimeEnergyACDiff"`
+	PvEnergyCostSavingsDiff               float32 `json:"pvEnergyCostSavingsDiff"`
+	PvCo2SavingsDiff                      float32 `json:"pvCo2SavingsDiff"`
+}
+
 // DevicesService godoc
 type DevicesService interface {
 	GetLatestDevicesEnergyInfo(gwUUID string) (updatedTime time.Time, devicesEnergyInfo *DevicesEnergyInfoResponse, err error)
@@ -131,6 +144,7 @@ type DevicesService interface {
 	GetPowerSelfSupplyRate(gwUUID, resolution string, startTime, endTime time.Time) (powerSelfSupplyRate *PowerSelfSupplyRateResponse)
 	GetChargeInfo(gwUUID string, startTime time.Time) (chargeInfo *ChargeInfoResponse)
 	GetDemandState(gwUUID string, startTime, endTime time.Time) (demandState *DemandStateResponse)
+	GetSolarEnergyInfo(gwUUID string, startTime time.Time) (solarEnergyInfo *SolarEnergyInfoResponse)
 }
 
 type defaultDevicesService struct {
@@ -351,6 +365,46 @@ func (s defaultDevicesService) GetDemandState(gwUUID string, startTime, endTime 
 		}
 	}
 
+	return
+}
+
+func (s defaultDevicesService) GetSolarEnergyInfo(gwUUID string, startTime time.Time) (solarEnergyInfo *SolarEnergyInfoResponse) {
+	solarEnergyInfo = &SolarEnergyInfoResponse{}
+	now := time.Now().UTC()
+	startTimeThisMonth := startTime.AddDate(0, 0, -startTime.Day())
+	firstlogOfDay, firstlogOfDayErr := s.repo.CCData.GetFirstLogByGatewayUUIDAndPeriod(gwUUID, startTime, now)
+	firstlogOfMonth, firstlogOfMonthErr := s.repo.CCData.GetFirstLogByGatewayUUIDAndPeriod(gwUUID, startTimeThisMonth, now)
+	latestLog, latestLogErr := s.repo.CCData.GetLatestLogByGatewayUUIDAndPeriod(gwUUID, startTime, now)
+	if firstlogOfDayErr != nil || firstlogOfMonthErr != nil || latestLogErr != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "s.repo.CCData.GetFirstLogByGatewayUUIDAndPeriod:Day&Month and GetLatestLogByGatewayUUIDAndPeriod",
+			"err1":      firstlogOfDayErr,
+			"err2":      firstlogOfMonthErr,
+			"err3":      latestLogErr,
+		}).Warn()
+		return
+	}
+
+	log.WithFields(log.Fields{
+		"firstlogOfDay.LogDate":   firstlogOfDay.LogDate,
+		"firstlogOfMonth.LogDate": firstlogOfMonth.LogDate,
+		"latestLog.LogDate":       latestLog.LogDate,
+	}).Debug()
+	solarEnergyInfo.AllConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.AllConsumedLifetimeEnergyAC.Float32, firstlogOfDay.AllConsumedLifetimeEnergyAC.Float32)
+	solarEnergyInfo.LoadPvConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.LoadPvConsumedLifetimeEnergyAC.Float32, firstlogOfDay.LoadPvConsumedLifetimeEnergyAC.Float32)
+	solarEnergyInfo.LoadPvConsumedEnergyPercentAC = utils.Percent(
+		solarEnergyInfo.LoadPvConsumedLifetimeEnergyACDiff,
+		utils.Diff(latestLog.LoadConsumedLifetimeEnergyAC.Float32, firstlogOfDay.LoadConsumedLifetimeEnergyAC.Float32))
+	solarEnergyInfo.BatteryPvConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.BatteryPvConsumedLifetimeEnergyAC.Float32, firstlogOfDay.BatteryPvConsumedLifetimeEnergyAC.Float32)
+	solarEnergyInfo.BatteryPvConsumedEnergyPercentAC = utils.Percent(
+		solarEnergyInfo.BatteryPvConsumedLifetimeEnergyACDiff,
+		utils.Diff(latestLog.BatteryConsumedLifetimeEnergyAC.Float32, firstlogOfDay.BatteryConsumedLifetimeEnergyAC.Float32))
+	solarEnergyInfo.GridPvConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.GridPvConsumedLifetimeEnergyAC.Float32, firstlogOfDay.GridPvConsumedLifetimeEnergyAC.Float32)
+	solarEnergyInfo.GridPvConsumedEnergyPercentAC = utils.Percent(
+		solarEnergyInfo.GridPvConsumedLifetimeEnergyACDiff,
+		utils.Diff(latestLog.GridConsumedLifetimeEnergyAC.Float32, firstlogOfDay.GridConsumedLifetimeEnergyAC.Float32))
+	solarEnergyInfo.PvEnergyCostSavingsDiff = utils.Diff(latestLog.PvEnergyCostSavings.Float32, firstlogOfMonth.PvEnergyCostSavings.Float32)
+	solarEnergyInfo.PvCo2SavingsDiff = utils.Diff(latestLog.PvCo2Savings.Float32, firstlogOfMonth.PvCo2Savings.Float32)
 	return
 }
 

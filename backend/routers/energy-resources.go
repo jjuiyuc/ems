@@ -21,6 +21,11 @@ const (
 	ChargeVoltage
 )
 
+// GetSolarEnergyInfo godoc
+func (w *APIWorker) GetSolarEnergyInfo(c *gin.Context) {
+	w.getStartTimeInfo(c, SolarEnergyInfo)
+}
+
 // GetBatteryEnergyInfo godoc
 // @Summary     Show the detailed information and current state about a battery
 // @Description get battery by token, gateway UUID and startTime

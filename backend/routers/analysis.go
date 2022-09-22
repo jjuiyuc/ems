@@ -11,6 +11,11 @@ import (
 	"der-ems/internal/e"
 )
 
+// StartTimeQuery godoc
+type StartTimeQuery struct {
+	StartTime time.Time `form:"startTime" binding:"required" example:"UTC time in ISO-8601" format:"date-time"`
+}
+
 // PeriodQuery godoc
 type PeriodQuery struct {
 	StartTime time.Time `form:"startTime" binding:"required" example:"UTC time in ISO-8601" format:"date-time"`
@@ -23,6 +28,26 @@ type ResolutionWithPeriodQuery struct {
 	StartTime  time.Time `form:"startTime" binding:"required" example:"UTC time in ISO-8601" format:"date-time"`
 	EndTime    time.Time `form:"endTime" binding:"required,gtfield=StartTime" example:"UTC time in ISO-8601" format:"date-time"`
 }
+
+// StartTimeType godoc
+type StartTimeType int
+
+const (
+	// ChargeInfo godoc
+	ChargeInfo StartTimeType = iota
+	// BatteryEnergyInfo godoc
+	BatteryEnergyInfo
+)
+
+// PeriodType godoc
+type PeriodType int
+
+const (
+	// EnergyDistributionInfo godoc
+	EnergyDistributionInfo PeriodType = iota
+	// DemandState godoc
+	DemandState
+)
 
 // ResolutionWithPeriodAPIType godoc
 type ResolutionWithPeriodAPIType int
@@ -48,19 +73,7 @@ const (
 // @Failure     401            {object}  app.Response
 // @Router      /{gwid}/devices/energy-distribution-info [get]
 func (w *APIWorker) GetEnergyDistributionInfo(c *gin.Context) {
-	appG := app.Gin{c}
-	gatewayUUID := c.Param("gwid")
-	log.Debug("gatewayUUID: ", gatewayUUID)
-
-	var q PeriodQuery
-	if err := c.BindQuery(&q); err != nil {
-		log.WithFields(log.Fields{"caused-by": "invalid param"}).Error()
-		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
-		return
-	}
-
-	energyDistributionInfo := w.Services.Devices.GetEnergyDistributionInfo(gatewayUUID, q.StartTime, q.EndTime)
-	appG.Response(http.StatusOK, e.Success, energyDistributionInfo)
+	w.getPeriodInfo(c, EnergyDistributionInfo)
 }
 
 // GetPowerState godoc
@@ -125,6 +138,50 @@ func (w *APIWorker) GetAccumulatedPowerState(c *gin.Context) {
 // @Router      /{gwid}/devices/power-self-supply-rate [get]
 func (w *APIWorker) GetPowerSelfSupplyRate(c *gin.Context) {
 	w.getResponseByResolutionWithPeriodAPIType(c, PowerSelfSupplyRate)
+}
+
+func (w *APIWorker) getStartTimeInfo(c *gin.Context, startTimeType StartTimeType) {
+	appG := app.Gin{c}
+	gatewayUUID := c.Param("gwid")
+	log.Debug("gatewayUUID: ", gatewayUUID)
+
+	var q StartTimeQuery
+	if err := c.BindQuery(&q); err != nil {
+		log.WithFields(log.Fields{"caused-by": "invalid param"}).Error()
+		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
+		return
+	}
+
+	var responseData interface{}
+	switch startTimeType {
+	case ChargeInfo:
+		responseData = w.Services.Devices.GetChargeInfo(gatewayUUID, q.StartTime)
+	case BatteryEnergyInfo:
+		responseData = w.Services.Battery.GetBatteryEnergyInfo(gatewayUUID, q.StartTime)
+	}
+	appG.Response(http.StatusOK, e.Success, responseData)
+}
+
+func (w *APIWorker) getPeriodInfo(c *gin.Context, periodType PeriodType) {
+	appG := app.Gin{c}
+	gatewayUUID := c.Param("gwid")
+	log.Debug("gatewayUUID: ", gatewayUUID)
+
+	var q PeriodQuery
+	if err := c.BindQuery(&q); err != nil {
+		log.WithFields(log.Fields{"caused-by": "invalid param"}).Error()
+		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
+		return
+	}
+
+	var responseData interface{}
+	switch periodType {
+	case EnergyDistributionInfo:
+		responseData = w.Services.Devices.GetEnergyDistributionInfo(gatewayUUID, q.StartTime, q.EndTime)
+	case DemandState:
+		responseData = w.Services.Devices.GetDemandState(gatewayUUID, q.StartTime, q.EndTime)
+	}
+	appG.Response(http.StatusOK, e.Success, responseData)
 }
 
 func (w *APIWorker) getResponseByResolutionWithPeriodAPIType(c *gin.Context, apiType ResolutionWithPeriodAPIType) {

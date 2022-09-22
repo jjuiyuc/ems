@@ -1,6 +1,6 @@
 import palette from "./palette.json"
 
-const { blue, gray, green, indigo, primary, yellow, purple } = palette
+const { blue, gray, green, indigo, primary, yellow, purple, negative } = palette
 
 const variables = {
     colors: {
@@ -19,7 +19,8 @@ const variables = {
         superOffPeak: palette.yellow.main,
         peakShave: palette.green.main,
         yellow,
-        purple
+        purple,
+        negative
     },
     languages: {
         en: "English",

@@ -1,3 +1,4 @@
+import { connect } from "react-redux"
 import moment from "moment"
 import { useMemo, useState, useEffect } from "react"
 import { useTranslation } from "react-multi-lang"
@@ -12,12 +13,13 @@ import { ReactComponent as DemandPeak }
 
 const { colors } = variables
 
-export default function DemandCharge(props) {
+const mapState = state => ({ gatewayID: state.gateways.active.gatewayID })
+
+export default connect(mapState)(function DemandCharge(props) {
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
         pageT = (string, params) => t("demandCharge." + string, params)
-
     const
         [infoError, setInfoError] = useState(""),
         [infoLoading, setInfoLoading] = useState(false),
@@ -25,42 +27,45 @@ export default function DemandCharge(props) {
         [realizedSavings, setRealizedSavings] = useState(0),
         [lastMonthBillingCycle, setLastMonthBillingCycle]
             = useState(0),
-        [peak, setPeak] = useState({ active: 0, current: 0, threshhold: 0 })
+        [peak, setPeak] = useState({ active: 0, current: 0, threshhold: 0 }),
+        [lineChartDemand, setLineChartDemand] = useState(null),
+        [lineChartDemandError, setLineChartDemandError] = useState(""),
+        [lineChartDemandLoading, setLineChartDemandLoading] = useState(false),
+        [lineChartDemandRes] = useState("")
 
-    const
-        hours24 = Array.from(new Array(24).keys()),
-        lineChartDateLabels = hours24.map(n =>
-            moment().hour(n).startOf("h").toISOString()),
-        currentHour = moment().hour(),
-        lineChartDataArray = hours24.filter(v => v <= currentHour).map(() =>
-            Math.floor(Math.random() * (60 - 40 + 1) + 40))
-    const
-        [lineChartData, setLineChartData] = useState({
-            datasets: [{
-                backgroundColor: colors.primary.main,
-                borderColor: colors.primary.main,
-                data: lineChartDataArray,
-                fill: {
-                    above: colors.primary["main-opacity-10"],
-                    target: "origin"
-                },
-                pointBorderColor: colors.primary["main-opacity-20"]
-            }],
-            labels: lineChartDateLabels,
-            tickCallback: (val, index) => val + commonT("kw"),
-            tooltipLabel: item => `${item.parsed.y}` + commonT("kw"),
-            x: { grid: { lineWidth: 0 } },
-            y: { max: 80, min: 0 }
-        })
+    const chartDemandDetailsSet = ({ data, labels }) => ({
+        datasets: [{
+            backgroundColor: colors.primary.main,
+            borderColor: colors.primary.main,
+            data: data || [],
+            fill: {
+                above: colors.primary["main-opacity-10"],
+                target: "origin"
+            },
+            pointBorderColor: colors.primary["main-opacity-20"]
+        }],
+        labels,
+        tickCallback: (val, index) => val + commonT("kw"),
+        tooltipLabel: item => `${item.parsed.y}` + commonT("kw"),
+        x: { grid: { lineWidth: 0 } },
+        y: { max: 80, min: 0 },
+        beforeDraw: chart => {
+            if (!peak.threshhold) return
+            const
+                xEnd = chart.scales.x.right,
+                xStart = chart.scales.x.left,
+                y = chart.scales["y"].getPixelForValue(peak.threshhold)
 
-    const updateData = data => {
-        setPeak({
-            active: data.gridIsPeakShaving,
-            current: data.gridProducedAveragePowerAC,
-            threshhold: data.gridContractPowerAC
-        })
-    }
+            let ctx = chart.ctx
 
+            ctx.beginPath()
+            ctx.moveTo(xStart, y)
+            ctx.lineTo(xEnd, y)
+            ctx.lineWidth = 1
+            ctx.strokeStyle = colors.negative.main
+            ctx.stroke()
+        }
+    })
     const peakShaveRate = useMemo(() => {
         if (!peak.current || !peak.threshhold) return 0
 
@@ -83,6 +88,13 @@ export default function DemandCharge(props) {
     const peakShaveColor = peak.active ? "negative" : "positive"
 
     useEffect(() => {
+        if (!props.gatewayID) return
+
+        const
+            startTime = moment().startOf("day").toISOString(),
+            endTime = moment().endOf("day").toISOString(),
+            urlPrefix = `/api/${props.gatewayID}/devices`
+
         apiCall({
             onComplete: () => setInfoLoading(false),
             onError: error => setInfoError(error),
@@ -95,9 +107,34 @@ export default function DemandCharge(props) {
                 setCurrentBillingCycle(data.gridPowerCost || 0)
                 setRealizedSavings(data.gridPowerCostSavings || 0)
                 setLastMonthBillingCycle(data.gridPowerCostLastMonth || 0)
-            }
+                setPeak({
+                    active: data.gridIsPeakShaving,
+                    current: data.gridProducedAveragePowerAC,
+                    threshhold: data.gridContractPowerAC
+                })
+            },
+            url: `${urlPrefix}/charge-info?startTime=${startTime}`
         })
-    }, [])
+
+        apiCall({
+            onComplete: () => setLineChartDemandLoading(false),
+            onError: error => setLineChartDemandError(error),
+            onStart: () => setLineChartDemandLoading(true),
+            onSuccess: rawData => {
+                if (!rawData || !rawData.data) return
+
+                const
+                    { data } = rawData,
+                    { timestamps } = data,
+                    labels = timestamps.map(t => t * 1000)
+                setLineChartDemand({
+                    data: data.gridLifetimeEnergyACDiffToPowers,
+                    labels
+                })
+            },
+            url: `${urlPrefix}/demand-state?startTime=${startTime}&endTime=${endTime}`
+        })
+    }, [props.gatewayID])
 
     return <>
         <h1 className="mb-9">{commonT("demandCharge")}</h1>
@@ -147,8 +184,10 @@ export default function DemandCharge(props) {
         <div className="card chart">
             <h4 className="mb-10">{pageT("demandDetails")}</h4>
             <div className="max-h-80vh h-160 w-full">
-                <LineChart data={lineChartData} id="dcLineChart" />
+                <LineChart data={chartDemandDetailsSet({
+                    ...lineChartDemand
+                })} id="dcLineChart" />
             </div>
         </div>
     </>
-}
+})

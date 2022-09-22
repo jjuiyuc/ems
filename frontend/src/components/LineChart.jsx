@@ -132,7 +132,8 @@ export default function LineChart(props) {
                             font: {
                                 size: 11
                             },
-                            padding: 10
+                            padding: 10,
+                            source: props.data?.xTickSource || "auto"
                         },
                         time: {
                             displayFormats: {

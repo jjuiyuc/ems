@@ -68,6 +68,7 @@ func InitRouter(isCORS bool, ginMode string, w *APIWorker) *gin.Engine {
 	}
 
 	apiGroup := r.Group("/api")
+	wsGroup := r.Group("/ws")
 
 	// Auth
 	apiGroup.POST("/auth", w.GetAuth)
@@ -77,13 +78,13 @@ func InitRouter(isCORS bool, ginMode string, w *APIWorker) *gin.Engine {
 	apiGroup.PUT("/users/password/reset-by-token", w.PasswordResetByToken)
 	apiGroup.GET("/users/profile", authorize(REST), w.GetProfile)
 
-	// Dashboard
-	apiGroup.GET("/:gwid/devices/energy-info", authorize(WebSocket), w.dashboardHandler)
-
 	// Energy Resources - Battery tab
 	apiGroup.GET("/:gwid/devices/battery/energy-info", authorize(REST), w.GetBatteryEnergyInfo)
 	apiGroup.GET("/:gwid/devices/battery/power-state", authorize(REST), w.GetBatteryPowerState)
 	apiGroup.GET("/:gwid/devices/battery/charge-voltage-state", authorize(REST), w.GetBatteryChargeVoltageState)
+
+	// Dashboard
+	wsGroup.GET("/:gwid/devices/energy-info", authorize(WebSocket), w.dashboardHandler)
 
 	return r
 }

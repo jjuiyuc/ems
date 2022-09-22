@@ -4,6 +4,7 @@
         "analysis": "Analysis",
         "batteryDischarge": "Battery Discharge",
         "chargeToBattery": "Charge to Battery",
+        "chartError": "Can't get chart data",
         "custom": "Custom",
         "days": "Days",
         "directSolarSupply": "Direct Solar Supply",

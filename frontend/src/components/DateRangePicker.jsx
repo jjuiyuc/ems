@@ -8,9 +8,8 @@ export default function DateRangePicker(props) {
         t = useTranslation(),
         pageT = (string, params) => t("analysis." + string, params)
 
-    const
-        [startDate, setStartDate] = useState(null),
-        [endDate, setEndDate] = useState(null)
+    const { startDate, setStartDate, endDate, setEndDate } = props
+
     const onChange = (dates) => {
         const [start, end] = dates
         setStartDate(start)

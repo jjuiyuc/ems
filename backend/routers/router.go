@@ -78,6 +78,9 @@ func InitRouter(isCORS bool, ginMode string, w *APIWorker) *gin.Engine {
 	apiGroup.PUT("/users/password/reset-by-token", w.PasswordResetByToken)
 	apiGroup.GET("/users/profile", authorize(REST), w.GetProfile)
 
+	// Analysis
+	apiGroup.GET("/:gwid/devices/energy-distribution-info", authorize(REST), w.GetEnergyDistributionInfo)
+
 	// Energy Resources - Battery tab
 	apiGroup.GET("/:gwid/devices/battery/energy-info", authorize(REST), w.GetBatteryEnergyInfo)
 	apiGroup.GET("/:gwid/devices/battery/power-state", authorize(REST), w.GetBatteryPowerState)

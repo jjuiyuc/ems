@@ -577,6 +577,97 @@
                     }
                 }
             }
+        },
+        "/{gwid}/devices/power-state": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get power state by token, gateway UUID, resolution, startTime and endTime",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "analysis"
+                ],
+                "summary": "Show today's hourly power state of Load/Solar/Battery/Grid",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Input user's access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Gateway UUID",
+                        "name": "gwid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "UTC time in ISO-8601",
+                        "name": "endTime",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "hour"
+                        ],
+                        "type": "string",
+                        "name": "resolution",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "UTC time in ISO-8601",
+                        "name": "startTime",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/app.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/services.PowerStateResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -787,6 +878,41 @@
                 },
                 "gatewayID": {
                     "type": "string"
+                }
+            }
+        },
+        "services.PowerStateResponse": {
+            "type": "object",
+            "properties": {
+                "batteryAveragePowerACs": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
+                },
+                "gridAveragePowerACs": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
+                },
+                "loadAveragePowerACs": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
+                },
+                "pvAveragePowerACs": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
+                },
+                "timestamps": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 }
             }
         },

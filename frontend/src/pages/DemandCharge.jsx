@@ -8,6 +8,7 @@ import variables from "../configs/variables"
 
 import LineChart from "../components/LineChart"
 import PriceCard from "../components/PriceCard"
+import Spinner from "../components/Spinner"
 import { ReactComponent as DemandPeak }
     from "../assets/icons/demand_charge_line.svg"
 

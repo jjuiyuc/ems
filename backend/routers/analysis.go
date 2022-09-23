@@ -14,8 +14,14 @@ import (
 type ZoomableType int
 
 const (
+	// PowerState godoc
+	PowerState ZoomableType = iota
 	// SolarPowerState godoc
-	SolarPowerState ZoomableType = iota
+	SolarPowerState
+	// BatteryPowerState godoc
+	BatteryPowerState
+	// BatteryChargeVoltageState godoc
+	BatteryChargeVoltageState
 )
 
 // GetEnergyDistributionInfo godoc
@@ -56,20 +62,7 @@ func (w *APIWorker) GetEnergyDistributionInfo(c *gin.Context) {
 // @Failure     401            {object}  app.Response
 // @Router      /{gwid}/devices/power-state [get]
 func (w *APIWorker) GetPowerState(c *gin.Context) {
-	appG := app.Gin{c}
-	gatewayUUID := c.Param("gwid")
-	log.Debug("gatewayUUID: ", gatewayUUID)
-
-	var q ZoomableQuery
-	// TODO: Only supports hour now
-	if err := c.BindQuery(&q); err != nil || q.Resolution != "hour" {
-		log.WithFields(log.Fields{"caused-by": "invalid param"}).Error()
-		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
-		return
-	}
-
-	powerState := w.Services.Devices.GetPowerState(gatewayUUID, q.StartTime, q.EndTime)
-	appG.Response(http.StatusOK, e.Success, powerState)
+	w.getZoomableInfo(c, PowerState)
 }
 
 // GetAccumulatedPowerState godoc
@@ -136,10 +129,24 @@ func (w *APIWorker) getZoomableInfo(c *gin.Context, zoomableType ZoomableType) {
 	var responseData interface{}
 	var err error
 	switch zoomableType {
+	case PowerState:
+		responseData = w.Services.Devices.GetPowerState(gatewayUUID, q.StartTime, q.EndTime)
 	case SolarPowerState:
 		responseData, err = w.Services.Devices.GetSolarPowerState(gatewayUUID, q.StartTime, q.EndTime)
 		if err != nil {
 			appG.Response(http.StatusInternalServerError, e.ErrSolarPowerStateGen, err.Error())
+			return
+		}
+	case BatteryPowerState:
+		responseData, err = w.Services.Battery.GetBatteryPowerState(gatewayUUID, q.StartTime, q.EndTime)
+		if err != nil {
+			appG.Response(http.StatusInternalServerError, e.ErrBatteryPowerStateGen, err.Error())
+			return
+		}
+	case BatteryChargeVoltageState:
+		responseData, err = w.Services.Battery.GetBatteryChargeVoltageState(gatewayUUID, q.StartTime, q.EndTime)
+		if err != nil {
+			appG.Response(http.StatusInternalServerError, e.ErrBatteryChargeVoltageStateGen, err.Error())
 			return
 		}
 	}

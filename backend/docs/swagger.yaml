@@ -316,6 +316,21 @@ definitions:
       pvEnergyCostSavingsDiff:
         type: number
     type: object
+  services.SolarPowerStateResponse:
+    properties:
+      onPeakTime:
+        additionalProperties:
+          type: string
+        type: object
+      pvAveragePowerACs:
+        items:
+          type: number
+        type: array
+      timestamps:
+        items:
+          type: integer
+        type: array
+    type: object
 info:
   contact: {}
   license: {}
@@ -864,6 +879,68 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Show the detailed information and current state about solar
+      tags:
+      - energy resources
+  /{gwid}/devices/solar/power-state:
+    get:
+      description: get solar by token, gateway UUID, resolution, startTime and endTime
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Input user's access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Gateway UUID
+        in: path
+        name: gwid
+        required: true
+        type: string
+      - example: UTC time in ISO-8601
+        format: date-time
+        in: query
+        name: endTime
+        required: true
+        type: string
+      - enum:
+        - hour
+        in: query
+        name: resolution
+        required: true
+        type: string
+      - example: UTC time in ISO-8601
+        format: date-time
+        in: query
+        name: startTime
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/app.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/services.SolarPowerStateResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Show today's hourly power state of solar
       tags:
       - energy resources
   /auth:

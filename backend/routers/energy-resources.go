@@ -39,6 +39,19 @@ func (w *APIWorker) GetSolarEnergyInfo(c *gin.Context) {
 }
 
 // GetSolarPowerState godoc
+// @Summary     Show today's hourly power state of solar
+// @Description get solar by token, gateway UUID, resolution, startTime and endTime
+// @Tags        energy resources
+// @Security    ApiKeyAuth
+// @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
+// @Param       gwid           path      string true "Gateway UUID"
+// @Param       query          query     ZoomableQuery true "Query"
+// @Produce     json
+// @Success     200            {object}  app.Response{data=services.SolarPowerStateResponse}
+// @Failure     400            {object}  app.Response
+// @Failure     401            {object}  app.Response
+// @Failure     500            {object}  app.Response
+// @Router      /{gwid}/devices/solar/power-state [get]
 func (w *APIWorker) GetSolarPowerState(c *gin.Context) {
 	w.getZoomableInfo(c, SolarPowerState)
 }

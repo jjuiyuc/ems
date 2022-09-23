@@ -295,6 +295,27 @@ definitions:
       username:
         type: string
     type: object
+  services.SolarEnergyInfoResponse:
+    properties:
+      allConsumedLifetimeEnergyACDiff:
+        type: number
+      batteryPvConsumedEnergyPercentAC:
+        type: number
+      batteryPvConsumedLifetimeEnergyACDiff:
+        type: number
+      gridPvConsumedEnergyPercentAC:
+        type: number
+      gridPvConsumedLifetimeEnergyACDiff:
+        type: number
+      loadPvConsumedEnergyPercentAC:
+        type: number
+      loadPvConsumedLifetimeEnergyACDiff:
+        type: number
+      pvCo2SavingsDiff:
+        type: number
+      pvEnergyCostSavingsDiff:
+        type: number
+    type: object
 info:
   contact: {}
   license: {}
@@ -419,7 +440,7 @@ paths:
             $ref: '#/definitions/app.Response'
       security:
       - ApiKeyAuth: []
-      summary: Show today's hourly charge and voltage state of a battery
+      summary: Show today's hourly charge and voltage state of battery
       tags:
       - energy resources
   /{gwid}/devices/battery/energy-info:
@@ -465,7 +486,7 @@ paths:
             $ref: '#/definitions/app.Response'
       security:
       - ApiKeyAuth: []
-      summary: Show the detailed information and current state about a battery
+      summary: Show the detailed information and current state about battery
       tags:
       - energy resources
   /{gwid}/devices/battery/power-state:
@@ -527,7 +548,7 @@ paths:
             $ref: '#/definitions/app.Response'
       security:
       - ApiKeyAuth: []
-      summary: Show today's hourly power state of a battery
+      summary: Show today's hourly power state of battery
       tags:
       - energy resources
   /{gwid}/devices/charge-info:
@@ -799,6 +820,52 @@ paths:
       summary: Show today's hourly power state of Load/Solar/Battery/Grid
       tags:
       - analysis
+  /{gwid}/devices/solar/energy-info:
+    get:
+      description: get solar by token, gateway UUID and startTime
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Input user's access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Gateway UUID
+        in: path
+        name: gwid
+        required: true
+        type: string
+      - example: UTC time in ISO-8601
+        format: date-time
+        in: query
+        name: startTime
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/app.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/services.SolarEnergyInfoResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Show the detailed information and current state about solar
+      tags:
+      - energy resources
   /auth:
     post:
       consumes:

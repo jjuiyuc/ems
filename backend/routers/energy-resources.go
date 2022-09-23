@@ -22,12 +22,24 @@ const (
 )
 
 // GetSolarEnergyInfo godoc
+// @Summary     Show the detailed information and current state about solar
+// @Description get solar by token, gateway UUID and startTime
+// @Tags        energy resources
+// @Security    ApiKeyAuth
+// @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
+// @Param       gwid           path      string true "Gateway UUID"
+// @Param       query          query     StartTimeQuery true "Query"
+// @Produce     json
+// @Success     200            {object}  app.Response{data=services.SolarEnergyInfoResponse}
+// @Failure     400            {object}  app.Response
+// @Failure     401            {object}  app.Response
+// @Router      /{gwid}/devices/solar/energy-info [get]
 func (w *APIWorker) GetSolarEnergyInfo(c *gin.Context) {
 	w.getStartTimeInfo(c, SolarEnergyInfo)
 }
 
 // GetBatteryEnergyInfo godoc
-// @Summary     Show the detailed information and current state about a battery
+// @Summary     Show the detailed information and current state about battery
 // @Description get battery by token, gateway UUID and startTime
 // @Tags        energy resources
 // @Security    ApiKeyAuth
@@ -51,7 +63,7 @@ func (w *APIWorker) GetBatteryEnergyInfo(c *gin.Context) {
 }
 
 // GetBatteryPowerState godoc
-// @Summary     Show today's hourly power state of a battery
+// @Summary     Show today's hourly power state of battery
 // @Description get battery by token, gateway UUID, resolution, startTime and endTime
 // @Tags        energy resources
 // @Security    ApiKeyAuth
@@ -69,7 +81,7 @@ func (w *APIWorker) GetBatteryPowerState(c *gin.Context) {
 }
 
 // GetBatteryChargeVoltageState godoc
-// @Summary     Show today's hourly charge and voltage state of a battery
+// @Summary     Show today's hourly charge and voltage state of battery
 // @Description get battery by token, gateway UUID, resolution, startTime and endTime
 // @Tags        energy resources
 // @Security    ApiKeyAuth

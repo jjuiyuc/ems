@@ -1,3 +1,4 @@
+import { connect } from "react-redux"
 import moment from "moment"
 import { useEffect, useState } from "react"
 import { useTranslation } from "react-multi-lang"
@@ -9,6 +10,7 @@ import EnergyResourcesTabs from "../components/EnergyResourcesTabs"
 import EnergySolarCard from "../components/EnergySolarCard"
 import EnergySolarSubCard from "../components/EnergySolarSubCard"
 import LineChart from "../components/LineChart"
+import Spinner from "../components/Spinner"
 
 import { ReactComponent as EconomicsIcon } from "../assets/icons/economics.svg"
 import { ReactComponent as UpIcon } from "../assets/icons/up.svg"
@@ -39,24 +41,27 @@ const drawHighPeak = (startHour, endHour) => chart => {
         ctx.stroke()
     }
 }
-export default function EnergyResoucesSolar(props) {
-    const
-        [totalSolarEnergyDestinations, setTotalSolarEnergyDestinations]
-            = useState({
-                types: [
-                    { kwh: 450, percentage: 50, type: "directUsage" },
-                    { kwh: 350, percentage: 40, type: "chargeToBattery" },
-                    { kwh: 50, percentage: 10, type: "exportToGrid" },
-                ],
-                kwh: 60
-            }),
-        [economics, setEconomics] = useState(85),
-        [co2Reduction, setCO2Reduction] = useState(0)
-
+const mapState = state => ({ gatewayID: state.gateways.active.gatewayID })
+export default connect(mapState)(function EnergyResoucesSolar(props) {
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
         pageT = string => t("energyResources.solar." + string)
+
+    const
+        [infoError, setInfoError] = useState(""),
+        [infoLoading, setInfoLoading] = useState(false),
+        [totalSolarEnergyDestinations, setTotalSolarEnergyDestinations]
+            = useState({
+                types: [
+                    { kwh: 0, percentage: 0, type: "directUsage" },
+                    { kwh: 0, percentage: 0, type: "chargeToBattery" },
+                    { kwh: 0, percentage: 0, type: "exportToGrid" },
+                ],
+                kwh: 0
+            }),
+        [economics, setEconomics] = useState(0),
+        [co2Reduction, setCO2Reduction] = useState(0)
 
     const
         isEcoPositive = economics > 0,
@@ -94,7 +99,48 @@ export default function EnergyResoucesSolar(props) {
             `${item.dataset.label} ${item.parsed.y} ${commonT("kwh")}`,
         y: { max: 80, min: 0 }
     })
+    useEffect(() => {
+        if (!props.gatewayID) return
 
+        const
+            startTime = moment().startOf("day").toISOString(),
+            urlPrefix = `/api/${props.gatewayID}/devices/solar`
+
+        apiCall({
+            onComplete: () => setInfoLoading(false),
+            onError: error => setInfoError(error),
+            onStart: () => setInfoLoading(true),
+            onSuccess: rawData => {
+                if (!rawData?.data) return
+
+                const { data } = rawData
+
+                setTotalSolarEnergyDestinations({
+                    types: [
+                        {
+                            kwh: data.loadPvConsumedLifetimeEnergyACDiff,
+                            percentage: data.loadPvConsumedEnergyPercentAC,
+                            type: "directUsage"
+                        },
+                        {
+                            kwh: data.batteryPvConsumedLifetimeEnergyACDiff,
+                            percentage: data.batteryPvConsumedEnergyPercentAC,
+                            type: "chargeToBattery"
+                        },
+                        {
+                            kwh: data.gridPvConsumedLifetimeEnergyACDiff,
+                            percentage: data.gridPvConsumedEnergyPercentAC,
+                            type: "exportToGrid"
+                        },
+                    ],
+                    kwh: data.allConsumedLifetimeEnergyACDiff
+                })
+                setEconomics(data.pvEnergyCostSavingsDiff || 0)
+                setCO2Reduction(data.pvCo2SavingsDiff || 0)
+            },
+            url: `${urlPrefix}/energy-info?startTime=${startTime}`
+        })
+    }, [props.gatewayID])
     return <>
         <h1 className="mb-9">{t("navigator.energyResources")}</h1>
         <EnergyResourcesTabs current="solar" />
@@ -119,4 +165,4 @@ export default function EnergyResoucesSolar(props) {
             </div>
         </div>
     </>
-}
+})

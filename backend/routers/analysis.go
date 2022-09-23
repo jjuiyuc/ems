@@ -138,13 +138,13 @@ func (w *APIWorker) getZoomableInfo(c *gin.Context, zoomableType ZoomableType) {
 			return
 		}
 	case BatteryPowerState:
-		responseData, err = w.Services.Battery.GetBatteryPowerState(gatewayUUID, q.StartTime, q.EndTime)
+		responseData, err = w.Services.Devices.GetBatteryPowerState(gatewayUUID, q.StartTime, q.EndTime)
 		if err != nil {
 			appG.Response(http.StatusInternalServerError, e.ErrBatteryPowerStateGen, err.Error())
 			return
 		}
 	case BatteryChargeVoltageState:
-		responseData, err = w.Services.Battery.GetBatteryChargeVoltageState(gatewayUUID, q.StartTime, q.EndTime)
+		responseData, err = w.Services.Devices.GetBatteryChargeVoltageState(gatewayUUID, q.StartTime, q.EndTime)
 		if err != nil {
 			appG.Response(http.StatusInternalServerError, e.ErrBatteryChargeVoltageStateGen, err.Error())
 			return

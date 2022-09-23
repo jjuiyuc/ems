@@ -83,8 +83,13 @@ type LatestComputedDemandState struct {
 
 // RealtimeInfo godoc
 type RealtimeInfo struct {
-	Timestamps        []int
-	PvAveragePowerACs []float32
+	Timestamps             []int
+	LoadAveragePowerACs    []float32
+	BatteryAveragePowerACs []float32
+	PvAveragePowerACs      []float32
+	GridAveragePowerACs    []float32
+	BatterySoCs            []float32
+	BatteryVoltages        []float32
 }
 
 // AccumulatedInfo godoc
@@ -149,6 +154,21 @@ type SolarPowerStateResponse struct {
 	OnPeakTime        map[string]string `json:"onPeakTime"`
 }
 
+// BatteryPowerStateResponse godoc
+type BatteryPowerStateResponse struct {
+	Timestamps             []int             `json:"timestamps"`
+	BatteryAveragePowerACs []float32         `json:"batteryAveragePowerACs"`
+	OnPeakTime             map[string]string `json:"onPeakTime"`
+}
+
+// BatteryChargeVoltageStateResponse godoc
+type BatteryChargeVoltageStateResponse struct {
+	Timestamps      []int             `json:"timestamps"`
+	BatterySoCs     []float32         `json:"batterySoCs"`
+	BatteryVoltages []float32         `json:"batteryVoltages"`
+	OnPeakTime      map[string]string `json:"onPeakTime"`
+}
+
 // DevicesService godoc
 type DevicesService interface {
 	GetLatestDevicesEnergyInfo(gwUUID string) (updatedTime time.Time, devicesEnergyInfo *DevicesEnergyInfoResponse, err error)
@@ -160,6 +180,8 @@ type DevicesService interface {
 	GetDemandState(gwUUID string, startTime, endTime time.Time) (demandState *DemandStateResponse)
 	GetSolarEnergyInfo(gwUUID string, startTime time.Time) (solarEnergyInfo *SolarEnergyInfoResponse)
 	GetSolarPowerState(gwUUID string, startTime, endTime time.Time) (solarPowerState *SolarPowerStateResponse, err error)
+	GetBatteryPowerState(gwUUID string, startTime, endTime time.Time) (batteryPowerState *BatteryPowerStateResponse, err error)
+	GetBatteryChargeVoltageState(gwUUID string, startTime, endTime time.Time) (batteryChargeVoltageState *BatteryChargeVoltageStateResponse, err error)
 }
 
 type defaultDevicesService struct {
@@ -274,48 +296,13 @@ func (s defaultDevicesService) GetEnergyDistributionInfo(gwUUID string, startTim
 }
 
 func (s defaultDevicesService) GetPowerState(gwUUID string, startTime, endTime time.Time) (powerState *PowerStateResponse) {
-	powerState = &PowerStateResponse{}
-	startTimeIndex := startTime
-	endTimeIndex := startTime.Add(1 * time.Hour)
-
-	for startTimeIndex.Before(endTime) {
-		latestLog, latestLogErr := s.repo.CCData.GetLatestLogByGatewayUUIDAndPeriod(gwUUID, startTimeIndex, endTimeIndex)
-		if latestLogErr == nil {
-			log.WithFields(log.Fields{
-				"log_date":              latestLog.LogDate,
-				"loadAveragePowerAC":    latestLog.LoadAveragePowerAC,
-				"batteryAveragePowerAC": latestLog.BatteryAveragePowerAC,
-				"pvAveragePowerAC":      latestLog.PvAveragePowerAC,
-				"gridAveragePowerAC":    latestLog.GridAveragePowerAC,
-			}).Debug()
-			powerState.Timestamps = append(powerState.Timestamps, int(latestLog.LogDate.Unix()))
-			powerState.LoadAveragePowerACs = append(powerState.LoadAveragePowerACs, latestLog.LoadAveragePowerAC.Float32)
-			powerState.BatteryAveragePowerACs = append(powerState.BatteryAveragePowerACs, latestLog.BatteryAveragePowerAC.Float32)
-			powerState.PvAveragePowerACs = append(powerState.PvAveragePowerACs, latestLog.PvAveragePowerAC.Float32)
-			powerState.GridAveragePowerACs = append(powerState.GridAveragePowerACs, latestLog.GridAveragePowerAC.Float32)
-		} else {
-			log.WithFields(log.Fields{
-				"caused-by":      "s.repo.CCData.GetLatestLogByGatewayUUIDAndPeriod",
-				"err":            latestLogErr,
-				"startTimeIndex": startTimeIndex,
-				"endTimeIndex":   endTimeIndex,
-			}).Warn()
-			if endTimeIndex == endTime {
-				powerState.Timestamps = append(powerState.Timestamps, int(endTimeIndex.Unix()))
-			} else {
-				powerState.Timestamps = append(powerState.Timestamps, int(endTimeIndex.Add(-1*time.Second).Unix()))
-			}
-			powerState.LoadAveragePowerACs = append(powerState.LoadAveragePowerACs, 0)
-			powerState.BatteryAveragePowerACs = append(powerState.BatteryAveragePowerACs, 0)
-			powerState.PvAveragePowerACs = append(powerState.PvAveragePowerACs, 0)
-			powerState.GridAveragePowerACs = append(powerState.GridAveragePowerACs, 0)
-		}
-
-		startTimeIndex = endTimeIndex
-		endTimeIndex = startTimeIndex.Add(+1 * time.Hour)
-		if endTimeIndex.After(endTime) {
-			endTimeIndex = endTime
-		}
+	realtimeInfo := s.getRealtimeInfo(gwUUID, startTime, endTime)
+	powerState = &PowerStateResponse{
+		Timestamps:             realtimeInfo.Timestamps,
+		LoadAveragePowerACs:    realtimeInfo.LoadAveragePowerACs,
+		BatteryAveragePowerACs: realtimeInfo.BatteryAveragePowerACs,
+		PvAveragePowerACs:      realtimeInfo.PvAveragePowerACs,
+		GridAveragePowerACs:    realtimeInfo.GridAveragePowerACs,
 	}
 	return
 }
@@ -437,6 +424,33 @@ func (s defaultDevicesService) GetSolarPowerState(gwUUID string, startTime, endT
 	return
 }
 
+func (s defaultDevicesService) GetBatteryPowerState(gwUUID string, startTime, endTime time.Time) (batteryPowerState *BatteryPowerStateResponse, err error) {
+	batteryPowerState = &BatteryPowerStateResponse{}
+	onPeakTime, err := s.getOnPeakTime(gwUUID, startTime)
+	if err != nil {
+		return
+	}
+	batteryPowerState.OnPeakTime = onPeakTime
+	realtimeInfo := s.getRealtimeInfo(gwUUID, startTime, endTime)
+	batteryPowerState.Timestamps = realtimeInfo.Timestamps
+	batteryPowerState.BatteryAveragePowerACs = realtimeInfo.BatteryAveragePowerACs
+	return
+}
+
+func (s defaultDevicesService) GetBatteryChargeVoltageState(gwUUID string, startTime, endTime time.Time) (batteryChargeVoltageState *BatteryChargeVoltageStateResponse, err error) {
+	batteryChargeVoltageState = &BatteryChargeVoltageStateResponse{}
+	onPeakTime, err := s.getOnPeakTime(gwUUID, startTime)
+	if err != nil {
+		return
+	}
+	batteryChargeVoltageState.OnPeakTime = onPeakTime
+	realtimeInfo := s.getRealtimeInfo(gwUUID, startTime, endTime)
+	batteryChargeVoltageState.Timestamps = realtimeInfo.Timestamps
+	batteryChargeVoltageState.BatterySoCs = realtimeInfo.BatterySoCs
+	batteryChargeVoltageState.BatteryVoltages = realtimeInfo.BatteryVoltages
+	return
+}
+
 func (s defaultDevicesService) getRealtimeInfo(gwUUID string, startTime, endTime time.Time) (realtimeInfo *RealtimeInfo) {
 	realtimeInfo = &RealtimeInfo{}
 	startTimeIndex := startTime
@@ -446,7 +460,12 @@ func (s defaultDevicesService) getRealtimeInfo(gwUUID string, startTime, endTime
 		latestRealtimeInfo := s.getLatestRealtimeInfo(gwUUID, startTimeIndex, endTimeIndex, endTime)
 		log.Debug("latestRealtimeInfo.LogDate: ", latestRealtimeInfo.LogDate)
 		realtimeInfo.Timestamps = append(realtimeInfo.Timestamps, int(latestRealtimeInfo.LogDate.Unix()))
+		realtimeInfo.LoadAveragePowerACs = append(realtimeInfo.LoadAveragePowerACs, latestRealtimeInfo.LoadAveragePowerAC.Float32)
+		realtimeInfo.BatteryAveragePowerACs = append(realtimeInfo.BatteryAveragePowerACs, latestRealtimeInfo.BatteryAveragePowerAC.Float32)
 		realtimeInfo.PvAveragePowerACs = append(realtimeInfo.PvAveragePowerACs, latestRealtimeInfo.PvAveragePowerAC.Float32)
+		realtimeInfo.GridAveragePowerACs = append(realtimeInfo.GridAveragePowerACs, latestRealtimeInfo.GridAveragePowerAC.Float32)
+		realtimeInfo.BatterySoCs = append(realtimeInfo.BatterySoCs, latestRealtimeInfo.BatterySoC.Float32)
+		realtimeInfo.BatteryVoltages = append(realtimeInfo.BatteryVoltages, latestRealtimeInfo.BatteryVoltage.Float32)
 
 		startTimeIndex = endTimeIndex
 		endTimeIndex = startTimeIndex.Add(1 * time.Hour)

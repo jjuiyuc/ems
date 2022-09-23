@@ -12,6 +12,19 @@ import { ReactComponent as DemandPeak }
     from "../assets/icons/demand_charge_line.svg"
 
 const { colors } = variables
+const ErrorBox = ({ error, margin = "", message }) => error
+    ? <AlertBox
+        boxClass={`${margin} negative`}
+        content={<>
+            <span className="font-mono ml-2">{error}</span>
+            <span className="ml-2">{message}</span>
+        </>}
+        icon={ReportProblemIcon}
+        iconColor="negative-main" />
+    : null
+const LoadingBox = ({ loading }) => loading
+    ? <div className="grid h-24 place-items-center"><Spinner /></div>
+    : null
 
 const mapState = state => ({ gatewayID: state.gateways.active.gatewayID })
 
@@ -148,6 +161,12 @@ export default connect(mapState)(function DemandCharge(props) {
             <PriceCard
                 price={lastMonthBillingCycle}
                 title={pageT("lastMonthBillingCycle")} />
+            {infoLoading
+                ? <div className="absolute bg-black-main-opacity-95 grid inset-0
+                                place-items-center rounded-3xl">
+                    <Spinner />
+                </div>
+                : null}
         </div>
         <div className="lg:flex items-start mb-8">
             <div className="flex-1">
@@ -187,6 +206,10 @@ export default connect(mapState)(function DemandCharge(props) {
                 <LineChart data={chartDemandDetailsSet({
                     ...lineChartDemand
                 })} id="dcLineChart" />
+                <ErrorBox
+                    error={lineChartDemandError}
+                    message={pageT("chartError")} />
+                <LoadingBox loading={lineChartDemandLoading} />
             </div>
         </div>
     </>

@@ -102,6 +102,39 @@ type PowerStateResponse struct {
 	GridAveragePowerACs    []float32 `json:"gridAveragePowerACs"`
 }
 
+// LatestAccumulatedInfo godoc
+type LatestAccumulatedInfo struct {
+	Timestamps                       int
+	LoadConsumedLifetimeEnergyACDiff float32
+	PvProducedLifetimeEnergyACDiff   float32
+	BatteryLifetimeEnergyACDiff      float32
+	GridLifetimeEnergyACDiff         float32
+	LoadSelfConsumedEnergyPercentAC  float32
+}
+
+// LatestComputedDemandState godoc
+type LatestComputedDemandState struct {
+	Timestamps                      int
+	GridLifetimeEnergyACDiffToPower float32
+	GridContractPowerAC             float32
+}
+
+// RealtimeInfo godoc
+type RealtimeInfo struct {
+	Timestamps        []int
+	PvAveragePowerACs []float32
+}
+
+// AccumulatedInfo godoc
+type AccumulatedInfo struct {
+	Timestamps                        []int
+	LoadConsumedLifetimeEnergyACDiffs []float32
+	PvProducedLifetimeEnergyACDiffs   []float32
+	BatteryLifetimeEnergyACDiffs      []float32
+	GridLifetimeEnergyACDiffs         []float32
+	LoadSelfConsumedEnergyPercentACs  []float32
+}
+
 // AccumulatedPowerStateResponse godoc
 type AccumulatedPowerStateResponse struct {
 	Timestamps                        []int     `json:"timestamps"`
@@ -567,6 +600,39 @@ func (s defaultDevicesService) GetSolarEnergyInfo(gwUUID string, startTime time.
 		utils.Diff(latestLog.GridConsumedLifetimeEnergyAC.Float32, firstlogOfDay.GridConsumedLifetimeEnergyAC.Float32))
 	solarEnergyInfo.PvEnergyCostSavingsDiff = utils.Diff(latestLog.PvEnergyCostSavings.Float32, firstlogOfMonth.PvEnergyCostSavings.Float32)
 	solarEnergyInfo.PvCo2SavingsDiff = utils.Diff(latestLog.PvCo2Savings.Float32, firstlogOfMonth.PvCo2Savings.Float32)
+	return
+}
+
+func (s defaultDevicesService) GetSolarPowerState(gwUUID string, startTime, endTime time.Time) (solarPowerState *SolarPowerStateResponse, err error) {
+	solarPowerState = &SolarPowerStateResponse{}
+	onPeakTime, err := s.getOnPeakTime(gwUUID, startTime)
+	if err != nil {
+		return
+	}
+	solarPowerState.OnPeakTime = onPeakTime
+	realtimeInfo := s.getRealtimeInfo(gwUUID, startTime, endTime)
+	solarPowerState.Timestamps = realtimeInfo.Timestamps
+	solarPowerState.PvAveragePowerACs = realtimeInfo.PvAveragePowerACs
+	return
+}
+
+func (s defaultDevicesService) getRealtimeInfo(gwUUID string, startTime, endTime time.Time) (realtimeInfo *RealtimeInfo) {
+	realtimeInfo = &RealtimeInfo{}
+	startTimeIndex := startTime
+	endTimeIndex := startTime.Add(1 * time.Hour)
+
+	for startTimeIndex.Before(endTime) {
+		latestRealtimeInfo := s.getLatestRealtimeInfo(gwUUID, startTimeIndex, endTimeIndex, endTime)
+		log.Debug("latestRealtimeInfo.LogDate: ", latestRealtimeInfo.LogDate)
+		realtimeInfo.Timestamps = append(realtimeInfo.Timestamps, int(latestRealtimeInfo.LogDate.Unix()))
+		realtimeInfo.PvAveragePowerACs = append(realtimeInfo.PvAveragePowerACs, latestRealtimeInfo.PvAveragePowerAC.Float32)
+
+		startTimeIndex = endTimeIndex
+		endTimeIndex = startTimeIndex.Add(1 * time.Hour)
+		if endTimeIndex.After(endTime) {
+			endTimeIndex = endTime
+		}
+	}
 	return
 }
 

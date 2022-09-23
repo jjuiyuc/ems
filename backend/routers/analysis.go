@@ -10,6 +10,14 @@ import (
 	"der-ems/internal/e"
 )
 
+// ZoomableType godoc
+type ZoomableType int
+
+const (
+	// SolarPowerState godoc
+	SolarPowerState ZoomableType = iota
+)
+
 // GetEnergyDistributionInfo godoc
 // @Summary     Show the distribution of energy sources and distinations
 // @Description get energy distribution by token, gateway UUID, startTime and endTime
@@ -109,5 +117,31 @@ func (w *APIWorker) GetPowerSelfSupplyRate(c *gin.Context) {
 		return
 	}
 	responseData := w.Services.Devices.GetPowerSelfSupplyRate(param.GatewayUUID, param.Query.Resolution, param.Query.StartTime, param.Query.EndTime)
+	appG.Response(http.StatusOK, e.Success, responseData)
+}
+
+func (w *APIWorker) getZoomableInfo(c *gin.Context, zoomableType ZoomableType) {
+	appG := app.Gin{c}
+	gatewayUUID := c.Param("gwid")
+	log.Debug("gatewayUUID: ", gatewayUUID)
+
+	var q ZoomableQuery
+	// TODO: Only supports hour now
+	if err := c.BindQuery(&q); err != nil || q.Resolution != "hour" {
+		log.WithFields(log.Fields{"caused-by": "invalid param"}).Error()
+		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
+		return
+	}
+
+	var responseData interface{}
+	var err error
+	switch zoomableType {
+	case SolarPowerState:
+		responseData, err = w.Services.Devices.GetSolarPowerState(gatewayUUID, q.StartTime, q.EndTime)
+		if err != nil {
+			appG.Response(http.StatusInternalServerError, e.ErrSolarPowerStateGen, err.Error())
+			return
+		}
+	}
 	appG.Response(http.StatusOK, e.Success, responseData)
 }

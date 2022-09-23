@@ -25,4 +25,5 @@ const (
 	ErrDashboardDataGen     = 50001
 	ErrBatteryPowerStateGen = 50002
 	ErrBatteryChargeVoltageStateGen = 50003
+	ErrSolarPowerStateGen = 50004
 )

@@ -844,6 +844,80 @@ var doc = `{
                 }
             }
         },
+        "/{gwid}/devices/grid/energy-info": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get grid by token, gateway UUID and startTime",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "energy resources"
+                ],
+                "summary": "Show the detailed information and current state about grid",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Input user's access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Gateway UUID",
+                        "name": "gwid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "UTC time in ISO-8601",
+                        "name": "startTime",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/app.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/services.GridEnergyInfoResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/{gwid}/devices/power-self-supply-rate": {
             "get": {
                 "security": [
@@ -1525,6 +1599,23 @@ var doc = `{
                 },
                 "gatewayID": {
                     "type": "string"
+                }
+            }
+        },
+        "services.GridEnergyInfoResponse": {
+            "type": "object",
+            "properties": {
+                "gridConsumedLifetimeEnergyACDiff": {
+                    "type": "number"
+                },
+                "gridLifetimeEnergyACDiff": {
+                    "type": "number"
+                },
+                "gridLifetimeEnergyACDiffOfMonth": {
+                    "type": "number"
+                },
+                "gridProducedLifetimeEnergyACDiff": {
+                    "type": "number"
                 }
             }
         },

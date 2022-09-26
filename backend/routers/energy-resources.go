@@ -145,6 +145,18 @@ func (w *APIWorker) GetBatteryChargeVoltageState(c *gin.Context) {
 }
 
 // GetGridEnergyInfo godoc
+// @Summary     Show the detailed information and current state about grid
+// @Description get grid by token, gateway UUID and startTime
+// @Tags        energy resources
+// @Security    ApiKeyAuth
+// @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
+// @Param       gwid           path      string true "Gateway UUID"
+// @Param       query          query     StartTimeQuery true "Query"
+// @Produce     json
+// @Success     200            {object}  app.Response{data=services.GridEnergyInfoResponse}
+// @Failure     400            {object}  app.Response
+// @Failure     401            {object}  app.Response
+// @Router      /{gwid}/devices/grid/energy-info [get]
 func (w *APIWorker) GetGridEnergyInfo(c *gin.Context) {
 	w.getStartTimeInfo(c, GridEnergyInfo)
 }

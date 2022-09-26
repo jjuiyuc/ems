@@ -185,6 +185,14 @@ type BatteryChargeVoltageStateResponse struct {
 	OnPeakTime      map[string]string `json:"onPeakTime"`
 }
 
+// GridEnergyInfoResponse godoc
+type GridEnergyInfoResponse struct {
+	GridConsumedLifetimeEnergyACDiff float32 `json:"gridConsumedLifetimeEnergyACDiff"`
+	GridProducedLifetimeEnergyACDiff float32 `json:"gridProducedLifetimeEnergyACDiff"`
+	GridLifetimeEnergyACDiff         float32 `json:"gridLifetimeEnergyACDiff"`
+	GridLifetimeEnergyACDiffOfMonth  float32 `json:"gridLifetimeEnergyACDiffOfMonth"`
+}
+
 // DevicesService godoc
 type DevicesService interface {
 	GetLatestDevicesEnergyInfo(gwUUID string) (updatedTime time.Time, devicesEnergyInfo *DevicesEnergyInfoResponse, err error)
@@ -199,6 +207,7 @@ type DevicesService interface {
 	GetBatteryEnergyInfo(gwUUID string, startTime time.Time) (batteryEnergyInfo *BatteryEnergyInfoResponse)
 	GetBatteryPowerState(gwUUID string, startTime, endTime time.Time) (batteryPowerState *BatteryPowerStateResponse, err error)
 	GetBatteryChargeVoltageState(gwUUID string, startTime, endTime time.Time) (batteryChargeVoltageState *BatteryChargeVoltageStateResponse, err error)
+	GetGridEnergyInfo(gwUUID string, startTime time.Time) (gridEnergyInfo *GridEnergyInfoResponse)
 }
 
 type defaultDevicesService struct {
@@ -502,6 +511,35 @@ func (s defaultDevicesService) GetBatteryChargeVoltageState(gwUUID string, start
 	batteryChargeVoltageState.Timestamps = realtimeInfo.Timestamps
 	batteryChargeVoltageState.BatterySoCs = realtimeInfo.BatterySoCs
 	batteryChargeVoltageState.BatteryVoltages = realtimeInfo.BatteryVoltages
+	return
+}
+
+func (s defaultDevicesService) GetGridEnergyInfo(gwUUID string, startTime time.Time) (gridEnergyInfo *GridEnergyInfoResponse) {
+	gridEnergyInfo = &GridEnergyInfoResponse{}
+	now := time.Now().UTC()
+	startTimeThisMonth := startTime.AddDate(0, 0, -startTime.Day())
+	firstLogOfDay, err1 := s.repo.CCData.GetFirstLog(gwUUID, startTime, now)
+	firstLogOfMonth, err2 := s.repo.CCData.GetFirstLog(gwUUID, startTimeThisMonth, now)
+	latestLog, err3 := s.repo.CCData.GetLatestLog(gwUUID, startTime, now)
+	if err1 != nil || err2 != nil || err3 != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "s.repo.CCData.GetFirstLog:Day&Month and GetLatestLog",
+			"err1":      err1,
+			"err2":      err2,
+			"err3":      err3,
+		}).Error()
+		return
+	}
+
+	log.WithFields(log.Fields{
+		"firstLogOfDay.LogDate":   firstLogOfDay.LogDate,
+		"firstLogOfMonth.LogDate": firstLogOfMonth.LogDate,
+		"latestLog.LogDate":       latestLog.LogDate,
+	}).Debug()
+	gridEnergyInfo.GridConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.GridConsumedLifetimeEnergyAC.Float32, firstLogOfDay.GridConsumedLifetimeEnergyAC.Float32)
+	gridEnergyInfo.GridProducedLifetimeEnergyACDiff = utils.Diff(latestLog.GridProducedLifetimeEnergyAC.Float32, firstLogOfDay.GridProducedLifetimeEnergyAC.Float32)
+	gridEnergyInfo.GridLifetimeEnergyACDiff = utils.Diff(latestLog.GridLifetimeEnergyAC.Float32, firstLogOfDay.GridLifetimeEnergyAC.Float32)
+	gridEnergyInfo.GridLifetimeEnergyACDiffOfMonth = utils.Diff(latestLog.GridLifetimeEnergyAC.Float32, firstLogOfMonth.GridLifetimeEnergyAC.Float32)
 	return
 }
 

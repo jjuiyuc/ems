@@ -143,3 +143,8 @@ func (w *APIWorker) GetBatteryChargeVoltageState(c *gin.Context) {
 	}
 	appG.Response(http.StatusOK, e.Success, responseData)
 }
+
+// GetGridEnergyInfo godoc
+func (w *APIWorker) GetGridEnergyInfo(c *gin.Context) {
+	w.getStartTimeInfo(c, GridEnergyInfo)
+}

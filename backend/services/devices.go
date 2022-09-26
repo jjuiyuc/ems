@@ -591,11 +591,7 @@ func (s defaultDevicesService) getLatestAccumulatedInfo(gwUUID, resolution strin
 			"startTimeIndex": startTimeIndex,
 			"endTimeIndex":   endTimeIndex,
 		}).Error()
-		if endTimeIndex == endTime {
-			latestAccumulatedInfo.Timestamps = int(endTimeIndex.Unix())
-		} else {
-			latestAccumulatedInfo.Timestamps = int(endTimeIndex.Add(-1 * time.Second).Unix())
-		}
+		latestAccumulatedInfo.Timestamps = int(endTimeIndex.Add(-1 * time.Second).Unix())
 		return
 	}
 

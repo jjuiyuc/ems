@@ -232,6 +232,21 @@ definitions:
       gridProducedLifetimeEnergyACDiff:
         type: number
     type: object
+  services.GridPowerStateResponse:
+    properties:
+      gridAveragePowerACs:
+        items:
+          type: number
+        type: array
+      onPeakTime:
+        additionalProperties:
+          type: string
+        type: object
+      timestamps:
+        items:
+          type: integer
+        type: array
+    type: object
   services.PowerSelfSupplyRateResponse:
     properties:
       loadSelfConsumedEnergyPercentACs:
@@ -762,6 +777,68 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Show the detailed information and current state about grid
+      tags:
+      - energy resources
+  /{gwid}/devices/grid/power-state:
+    get:
+      description: get grid by token, gateway UUID, resolution, startTime and endTime
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Input user's access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Gateway UUID
+        in: path
+        name: gwid
+        required: true
+        type: string
+      - example: UTC time in ISO-8601
+        format: date-time
+        in: query
+        name: endTime
+        required: true
+        type: string
+      - enum:
+        - hour
+        in: query
+        name: resolution
+        required: true
+        type: string
+      - example: UTC time in ISO-8601
+        format: date-time
+        in: query
+        name: startTime
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/app.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/services.GridPowerStateResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Show today's hourly power state of grid
       tags:
       - energy resources
   /{gwid}/devices/power-self-supply-rate:

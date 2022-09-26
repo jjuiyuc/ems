@@ -162,6 +162,19 @@ func (w *APIWorker) GetGridEnergyInfo(c *gin.Context) {
 }
 
 // GetGridPowerState godoc
+// @Summary     Show today's hourly power state of grid
+// @Description get grid by token, gateway UUID, resolution, startTime and endTime
+// @Tags        energy resources
+// @Security    ApiKeyAuth
+// @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
+// @Param       gwid           path      string true "Gateway UUID"
+// @Param       query          query     ZoomableQuery true "Query"
+// @Produce     json
+// @Success     200            {object}  app.Response{data=services.GridPowerStateResponse}
+// @Failure     400            {object}  app.Response
+// @Failure     401            {object}  app.Response
+// @Failure     500            {object}  app.Response
+// @Router      /{gwid}/devices/grid/power-state [get]
 func (w *APIWorker) GetGridPowerState(c *gin.Context) {
 	w.getZoomableInfo(c, GridPowerState)
 }

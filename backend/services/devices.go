@@ -213,10 +213,10 @@ func NewDevicesService(repo *repository.Repository, billing BillingService) Devi
 
 // GetLatestDevicesEnergyInfo godoc
 func (s defaultDevicesService) GetLatestDevicesEnergyInfo(gwUUID string) (logTime time.Time, devicesEnergyInfo *DevicesEnergyInfoResponse, err error) {
-	latestLog, err := s.repo.CCData.GetLatestLogByGatewayUUIDAndPeriod(gwUUID, time.Time{}, time.Time{})
+	latestLog, err := s.repo.CCData.GetLatestLog(gwUUID, time.Time{}, time.Time{})
 	if err != nil {
 		log.WithFields(log.Fields{
-			"caused-by": "s.repo.CCData.GetLatestLogByGatewayUUIDAndPeriod",
+			"caused-by": "s.repo.CCData.GetLatestLog",
 			"err":       err,
 		}).Error()
 		return
@@ -274,11 +274,11 @@ func (s defaultDevicesService) GetLatestDevicesEnergyInfo(gwUUID string) (logTim
 
 func (s defaultDevicesService) GetEnergyDistributionInfo(gwUUID string, startTime, endTime time.Time) (energyDistributionInfo *EnergyDistributionInfoResponse) {
 	energyDistributionInfo = &EnergyDistributionInfoResponse{}
-	firstLog, err1 := s.repo.CCData.GetFirstLogByGatewayUUIDAndPeriod(gwUUID, startTime, endTime)
-	latestLog, err2 := s.repo.CCData.GetLatestLogByGatewayUUIDAndPeriod(gwUUID, startTime, endTime)
+	firstLog, err1 := s.repo.CCData.GetFirstLog(gwUUID, startTime, endTime)
+	latestLog, err2 := s.repo.CCData.GetLatestLog(gwUUID, startTime, endTime)
 	if err1 != nil || err2 != nil {
 		log.WithFields(log.Fields{
-			"caused-by": "s.repo.CCData.GetFirstLogByGatewayUUIDAndPeriod and GetLatestLogByGatewayUUIDAndPeriod",
+			"caused-by": "s.repo.CCData.GetFirstLog and GetLatestLog",
 			"err1":      err1,
 			"err2":      err2,
 		}).Error()
@@ -344,10 +344,10 @@ func (s defaultDevicesService) GetAccumulatedPowerState(gwUUID, resolution strin
 
 func (s defaultDevicesService) GetChargeInfo(gwUUID string, startTime time.Time) (chargeInfo *ChargeInfoResponse) {
 	chargeInfo = &ChargeInfoResponse{}
-	latestLog, err := s.repo.CCData.GetLatestLogByGatewayUUIDAndPeriod(gwUUID, startTime, time.Now().UTC())
+	latestLog, err := s.repo.CCData.GetLatestLog(gwUUID, startTime, time.Now().UTC())
 	if err != nil {
 		log.WithFields(log.Fields{
-			"caused-by": "s.repo.CCData.GetLatestLogByGatewayUUIDAndPeriod",
+			"caused-by": "s.repo.CCData.GetLatestLog",
 			"err":       err,
 		}).Error()
 		return
@@ -398,12 +398,12 @@ func (s defaultDevicesService) GetSolarEnergyInfo(gwUUID string, startTime time.
 	solarEnergyInfo = &SolarEnergyInfoResponse{}
 	now := time.Now().UTC()
 	startTimeThisMonth := startTime.AddDate(0, 0, -startTime.Day())
-	firstLogOfDay, err1 := s.repo.CCData.GetFirstLogByGatewayUUIDAndPeriod(gwUUID, startTime, now)
-	firstLogOfMonth, err2 := s.repo.CCData.GetFirstLogByGatewayUUIDAndPeriod(gwUUID, startTimeThisMonth, now)
-	latestLog, err3 := s.repo.CCData.GetLatestLogByGatewayUUIDAndPeriod(gwUUID, startTime, now)
+	firstLogOfDay, err1 := s.repo.CCData.GetFirstLog(gwUUID, startTime, now)
+	firstLogOfMonth, err2 := s.repo.CCData.GetFirstLog(gwUUID, startTimeThisMonth, now)
+	latestLog, err3 := s.repo.CCData.GetLatestLog(gwUUID, startTime, now)
 	if err1 != nil || err2 != nil || err3 != nil {
 		log.WithFields(log.Fields{
-			"caused-by": "s.repo.CCData.GetFirstLogByGatewayUUIDAndPeriod:Day&Month and GetLatestLogByGatewayUUIDAndPeriod",
+			"caused-by": "s.repo.CCData.GetFirstLog:Day&Month and GetLatestLog",
 			"err1":      err1,
 			"err2":      err2,
 			"err3":      err3,
@@ -451,11 +451,11 @@ func (s defaultDevicesService) GetSolarPowerState(gwUUID string, startTime, endT
 func (s defaultDevicesService) GetBatteryEnergyInfo(gwUUID string, startTime time.Time) (batteryEnergyInfo *BatteryEnergyInfoResponse) {
 	batteryEnergyInfo = &BatteryEnergyInfoResponse{}
 	s.getBatteryInfo(gwUUID, batteryEnergyInfo)
-	firstLog, err1 := s.repo.CCData.GetFirstLogByGatewayUUIDAndPeriod(gwUUID, startTime, time.Time{})
-	latestLog, err2 := s.repo.CCData.GetLatestLogByGatewayUUIDAndPeriod(gwUUID, time.Time{}, time.Time{})
+	firstLog, err1 := s.repo.CCData.GetFirstLog(gwUUID, startTime, time.Time{})
+	latestLog, err2 := s.repo.CCData.GetLatestLog(gwUUID, time.Time{}, time.Time{})
 	if err1 != nil || err2 != nil {
 		log.WithFields(log.Fields{
-			"caused-by": "s.repo.CCData.GetFirstLogByGatewayUUIDAndPeriod and GetLatestLogByGatewayUUIDAndPeriod",
+			"caused-by": "s.repo.CCData.GetFirstLog and GetLatestLog",
 			"err1":      err1,
 			"err2":      err2,
 		}).Error()
@@ -566,10 +566,10 @@ func (s defaultDevicesService) getAccumulatedInfo(gwUUID, resolution string, sta
 }
 
 func (s defaultDevicesService) getLatestRealtimeInfo(gwUUID string, startTimeIndex, endTimeIndex, endTime time.Time) (latestLog *deremsmodels.CCDataLog) {
-	latestLog, err := s.repo.CCData.GetLatestLogByGatewayUUIDAndPeriod(gwUUID, startTimeIndex, endTimeIndex)
+	latestLog, err := s.repo.CCData.GetLatestLog(gwUUID, startTimeIndex, endTimeIndex)
 	if err != nil {
 		log.WithFields(log.Fields{
-			"caused-by":      "s.repo.CCData.GetLatestLogByGatewayUUIDAndPeriod",
+			"caused-by":      "s.repo.CCData.GetLatestLog",
 			"err":            err,
 			"startTimeIndex": startTimeIndex,
 			"endTimeIndex":   endTimeIndex,
@@ -622,11 +622,11 @@ func (s defaultDevicesService) getLatestAccumulatedInfo(gwUUID, resolution strin
 
 func (s defaultDevicesService) getLatestComputedDemandState(gwUUID string, startTimeIndex, endTimeIndex, endTime time.Time) (latestComputedDemandState *LatestComputedDemandState) {
 	latestComputedDemandState = &LatestComputedDemandState{}
-	firstLog, err1 := s.repo.CCData.GetFirstLogByGatewayUUIDAndPeriod(gwUUID, startTimeIndex, endTimeIndex)
-	latestLog, err2 := s.repo.CCData.GetLatestLogByGatewayUUIDAndPeriod(gwUUID, startTimeIndex, endTimeIndex)
+	firstLog, err1 := s.repo.CCData.GetFirstLog(gwUUID, startTimeIndex, endTimeIndex)
+	latestLog, err2 := s.repo.CCData.GetLatestLog(gwUUID, startTimeIndex, endTimeIndex)
 	if err1 != nil || err2 != nil {
 		log.WithFields(log.Fields{
-			"caused-by":      "s.repo.CCData.GetFirstLogByGatewayUUIDAndPeriod and GetLatestLogByGatewayUUIDAndPeriod",
+			"caused-by":      "s.repo.CCData.GetFirstLog and GetLatestLog",
 			"err1":           err1,
 			"err2":           err2,
 			"startTimeIndex": startTimeIndex,

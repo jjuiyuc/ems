@@ -193,6 +193,13 @@ type GridEnergyInfoResponse struct {
 	GridLifetimeEnergyACDiffOfMonth  float32 `json:"gridLifetimeEnergyACDiffOfMonth"`
 }
 
+// GridPowerStateResponse godoc
+type GridPowerStateResponse struct {
+	Timestamps          []int             `json:"timestamps"`
+	GridAveragePowerACs []float32         `json:"gridAveragePowerACs"`
+	OnPeakTime          map[string]string `json:"onPeakTime"`
+}
+
 // DevicesService godoc
 type DevicesService interface {
 	GetLatestDevicesEnergyInfo(gwUUID string) (updatedTime time.Time, devicesEnergyInfo *DevicesEnergyInfoResponse, err error)
@@ -208,6 +215,7 @@ type DevicesService interface {
 	GetBatteryPowerState(gwUUID string, startTime, endTime time.Time) (batteryPowerState *BatteryPowerStateResponse, err error)
 	GetBatteryChargeVoltageState(gwUUID string, startTime, endTime time.Time) (batteryChargeVoltageState *BatteryChargeVoltageStateResponse, err error)
 	GetGridEnergyInfo(gwUUID string, startTime time.Time) (gridEnergyInfo *GridEnergyInfoResponse)
+	GetGridPowerState(gwUUID string, startTime, endTime time.Time) (gridPowerState *GridPowerStateResponse, err error)
 }
 
 type defaultDevicesService struct {
@@ -540,6 +548,20 @@ func (s defaultDevicesService) GetGridEnergyInfo(gwUUID string, startTime time.T
 	gridEnergyInfo.GridProducedLifetimeEnergyACDiff = utils.Diff(latestLog.GridProducedLifetimeEnergyAC.Float32, firstLogOfDay.GridProducedLifetimeEnergyAC.Float32)
 	gridEnergyInfo.GridLifetimeEnergyACDiff = utils.Diff(latestLog.GridLifetimeEnergyAC.Float32, firstLogOfDay.GridLifetimeEnergyAC.Float32)
 	gridEnergyInfo.GridLifetimeEnergyACDiffOfMonth = utils.Diff(latestLog.GridLifetimeEnergyAC.Float32, firstLogOfMonth.GridLifetimeEnergyAC.Float32)
+	return
+}
+
+func (s defaultDevicesService) GetGridPowerState(gwUUID string, startTime, endTime time.Time) (gridPowerState *GridPowerStateResponse, err error) {
+	gridPowerState = &GridPowerStateResponse{}
+	onPeakTime, err := s.getOnPeakTime(gwUUID, startTime)
+	if err != nil {
+		return
+	}
+
+	gridPowerState.OnPeakTime = onPeakTime
+	realtimeInfo := s.getRealtimeInfo(gwUUID, startTime, endTime)
+	gridPowerState.Timestamps = realtimeInfo.Timestamps
+	gridPowerState.GridAveragePowerACs = realtimeInfo.GridAveragePowerACs
 	return
 }
 

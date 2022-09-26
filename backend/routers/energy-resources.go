@@ -160,3 +160,8 @@ func (w *APIWorker) GetBatteryChargeVoltageState(c *gin.Context) {
 func (w *APIWorker) GetGridEnergyInfo(c *gin.Context) {
 	w.getStartTimeInfo(c, GridEnergyInfo)
 }
+
+// GetGridPowerState godoc
+func (w *APIWorker) GetGridPowerState(c *gin.Context) {
+	w.getZoomableInfo(c, GridPowerState)
+}

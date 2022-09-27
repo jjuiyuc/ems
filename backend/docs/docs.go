@@ -1273,19 +1273,6 @@ var doc = `{
                 }
             }
         },
-        "routers.StartTimeQuery": {
-            "type": "object",
-            "required": [
-                "startTime"
-            ],
-            "properties": {
-                "startTime": {
-                    "type": "string",
-                    "format": "date-time",
-                    "example": "UTC time in ISO-8601"
-                }
-            }
-        },
         "routers.ZoomableQuery": {
             "type": "object",
             "required": [

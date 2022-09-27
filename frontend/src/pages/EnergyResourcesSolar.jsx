@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { useTranslation } from "react-multi-lang"
 
 import { apiCall } from "../utils/api"
+import { ConvertTimeToNumber } from "../utils/utils"
 import variables from "../configs/variables"
 
 import EnergyResourcesTabs from "../components/EnergyResourcesTabs"
@@ -24,14 +25,17 @@ const drawHighPeak = (startHour, endHour) => chart => {
         const
             ctx = chart.ctx,
             xLines = chart.scales.x._gridLineItems,
-            xLineFirst = xLines[0],
+            // xLineFirst = ,
             yFirstLine = chart.scales.y._gridLineItems[0],
-            xLeft = yFirstLine.x1,
-            xFullWidth = yFirstLine.x2 - xLeft,
+            xLeft = chart.scales.x.left,
+            xRight = chart.scales.x.right,
+            // xFullWidth = yFirstLine.x2 - xLeft,
+            xFullWidth = xRight - xLeft,
             xWidth = (endHour - startHour) / 24 * xFullWidth,
             xStart = startHour / 24 * xFullWidth + xLeft,
-            yTop = xLineFirst.y1,
-            yFullHeight = xLineFirst.y2 - yTop
+            yTop = chart.scales.y.top,
+            yBottom = chart.scales.y.bottom,
+            yFullHeight = yBottom - yTop
 
         ctx.beginPath()
         ctx.fillStyle = "#ffffff10"
@@ -41,12 +45,15 @@ const drawHighPeak = (startHour, endHour) => chart => {
         ctx.stroke()
     }
 }
+
 const mapState = state => ({ gatewayID: state.gateways.active.gatewayID })
 export default connect(mapState)(function EnergyResoucesSolar(props) {
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
         pageT = string => t("energyResources.solar." + string)
+
+
 
     const
         [infoError, setInfoError] = useState(""),
@@ -61,7 +68,11 @@ export default connect(mapState)(function EnergyResoucesSolar(props) {
                 kwh: 0
             }),
         [economics, setEconomics] = useState(0),
-        [co2Reduction, setCO2Reduction] = useState(0)
+        [co2Reduction, setCO2Reduction] = useState(0),
+        [lineChartSolar, setLineChartSolar] = useState(null),
+        [lineChartSolarError, setLineChartSolarError] = useState(""),
+        [lineChartSolarLoading, setLineChartSolarLoading] = useState(false),
+        [lineChartSolarRes] = useState("hour")
 
     const
         isEcoPositive = economics > 0,
@@ -72,20 +83,12 @@ export default connect(mapState)(function EnergyResoucesSolar(props) {
                 <EcoIcon className="h-8 inline-block ml-2 w-8" />
             </span>
 
-    const
-        hours24 = Array.from(new Array(24).keys()),
-        lineChartDateLabels = hours24.map(n =>
-            moment().hour(n).startOf("h").toISOString()),
-        currentHour = moment().hour(),
-        lineChartDataArray = hours24.filter(v => v <= currentHour).map(() =>
-            Math.floor(Math.random() * (60 - 40 + 1) + 40))
-
-    const [lineChartData, setLineChartData] = useState({
-        beforeDraw: drawHighPeak(7, 19),
+    const chartSolarGenerationSet = ({ data, labels, highPeak }) => ({
+        beforeDraw: drawHighPeak(highPeak?.start, highPeak?.end),
         datasets: [{
             backgroundColor: colors.yellow.main,
             borderColor: colors.yellow.main,
-            data: lineChartDataArray,
+            data,
             label: commonT("solar"),
             fill: {
                 above: colors.yellow["main-opacity-10"],
@@ -93,7 +96,7 @@ export default connect(mapState)(function EnergyResoucesSolar(props) {
             },
             pointBorderColor: colors.yellow["main-opacity-20"]
         }],
-        labels: lineChartDateLabels,
+        labels,
         tickCallback: (val, index) => val + commonT("kw"),
         tooltipLabel: item =>
             `${item.dataset.label} ${item.parsed.y} ${commonT("kwh")}`,
@@ -101,9 +104,13 @@ export default connect(mapState)(function EnergyResoucesSolar(props) {
     })
     useEffect(() => {
         if (!props.gatewayID) return
-
         const
             startTime = moment().startOf("day").toISOString(),
+            chartParams = resolution => new URLSearchParams({
+                startTime,
+                endTime: moment().endOf("day").toISOString(),
+                resolution
+            }).toString(),
             urlPrefix = `/api/${props.gatewayID}/devices/solar`
 
         apiCall({
@@ -140,6 +147,38 @@ export default connect(mapState)(function EnergyResoucesSolar(props) {
             },
             url: `${urlPrefix}/energy-info?startTime=${startTime}`
         })
+        const oClocks = Array.from(new Array(25).keys()).map(n =>
+            parseInt(moment().hour(n).startOf("h").format("x")))
+
+        const solarGenerationUrl = `${urlPrefix}/power-state?`
+            + chartParams(lineChartSolarRes)
+
+        apiCall({
+            onComplete: () => setLineChartSolarLoading(false),
+            onError: error => setLineChartSolarError(error),
+            onStart: () => setLineChartSolarLoading(true),
+            onSuccess: rawData => {
+                if (!rawData || !rawData.data) return
+
+                const
+                    { data } = rawData,
+                    { onPeakTime, timestamps } = data,
+                    { end, start, timezone } = onPeakTime,
+                    labels = [
+                        ...timestamps.map(t => t * 1000),
+                        ...oClocks.slice(timestamps.length)
+                    ],
+                    peakStart = ConvertTimeToNumber(start, timezone),
+                    peakEnd = ConvertTimeToNumber(end, timezone)
+
+                setLineChartSolar({
+                    data: data.pvAveragePowerACs,
+                    highPeak: { start: peakStart, end: peakEnd },
+                    labels
+                })
+            },
+            url: solarGenerationUrl
+        })
     }, [props.gatewayID])
     return <>
         <h1 className="mb-9">{t("navigator.energyResources")}</h1>
@@ -161,7 +200,9 @@ export default connect(mapState)(function EnergyResoucesSolar(props) {
         <div className="card chart mt-8">
             <h4 className="mb-10">{pageT("realTimeSolarGeneration")}</h4>
             <div className="max-h-80vh h-160 relative w-full">
-                <LineChart data={lineChartData} id="ersLineChart" />
+                <LineChart data={chartSolarGenerationSet({
+                    ...lineChartSolar
+                })} id="ersLineChart" />
             </div>
         </div>
     </>

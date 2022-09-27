@@ -45,7 +45,6 @@ export default connect(mapState)(function DemandCharge(props) {
         [lineChartDemand, setLineChartDemand] = useState(null),
         [lineChartDemandError, setLineChartDemandError] = useState(""),
         [lineChartDemandLoading, setLineChartDemandLoading] = useState(false),
-        [lineChartDemandRes] = useState("")
 
     const chartDemandDetailsSet = ({ data, labels }) => ({
         datasets: [{
@@ -150,9 +149,15 @@ export default connect(mapState)(function DemandCharge(props) {
         })
     }, [props.gatewayID])
 
+    const infoErrorBox = <ErrorBox
+        error={infoError}
+        margin="mb-8"
+        message={pageT("infoError")} />
+
     return <>
         <h1 className="mb-9">{commonT("demandCharge")}</h1>
         <div className="gap-8 grid-cols-3 lg:grid ">
+            {infoErrorBox}
             <PriceCard
                 price={currentBillingCycle}
                 title={pageT("currentBillingCycle")} />

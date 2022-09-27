@@ -17,12 +17,22 @@ type PeriodQuery struct {
 	EndTime   time.Time `form:"endTime" binding:"required,gtfield=StartTime" example:"UTC time in ISO-8601" format:"date-time"`
 }
 
-// AccumulatedQuery godoc
-type AccumulatedQuery struct {
+// ResolutionWithPeriodQuery godoc
+type ResolutionWithPeriodQuery struct {
 	Resolution string    `form:"resolution" binding:"required" enums:"day,month"`
 	StartTime  time.Time `form:"startTime" binding:"required" example:"UTC time in ISO-8601" format:"date-time"`
 	EndTime    time.Time `form:"endTime" binding:"required,gtfield=StartTime" example:"UTC time in ISO-8601" format:"date-time"`
 }
+
+// ResolutionWithPeriodAPIType godoc
+type ResolutionWithPeriodAPIType int
+
+const (
+	// AccumulatedPowerState godoc
+	AccumulatedPowerState ResolutionWithPeriodAPIType = iota
+	// PowerSelfSupplyRate godoc
+	PowerSelfSupplyRate
+)
 
 // GetEnergyDistributionInfo godoc
 // @Summary     Show the distribution of energy sources and distinations
@@ -90,24 +100,51 @@ func (w *APIWorker) GetPowerState(c *gin.Context) {
 // @Security    ApiKeyAuth
 // @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
 // @Param       gwid           path      string true "Gateway UUID"
-// @Param       query          query     AccumulatedQuery true "Query"
+// @Param       query          query     ResolutionWithPeriodQuery true "Query"
 // @Produce     json
 // @Success     200            {object}  app.Response{data=services.AccumulatedPowerStateResponse}
 // @Failure     400            {object}  app.Response
 // @Failure     401            {object}  app.Response
 // @Router      /{gwid}/devices/accumulated-power-state [get]
 func (w *APIWorker) GetAccumulatedPowerState(c *gin.Context) {
+	w.getResponseByResolutionWithPeriodAPIType(c, AccumulatedPowerState)
+}
+
+// GetPowerSelfSupplyRate godoc
+// @Summary     Show daily/monthly power self supply rate
+// @Description get power self supply rate by token, gateway UUID, resolution, startTime and endTime
+// @Tags        analysis
+// @Security    ApiKeyAuth
+// @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
+// @Param       gwid           path      string true "Gateway UUID"
+// @Param       query          query     ResolutionWithPeriodQuery true "Query"
+// @Produce     json
+// @Success     200            {object}  app.Response{data=services.PowerSelfSupplyRateResponse}
+// @Failure     400            {object}  app.Response
+// @Failure     401            {object}  app.Response
+// @Router      /{gwid}/devices/power-self-supply-rate [get]
+func (w *APIWorker) GetPowerSelfSupplyRate(c *gin.Context) {
+	w.getResponseByResolutionWithPeriodAPIType(c, PowerSelfSupplyRate)
+}
+
+func (w *APIWorker) getResponseByResolutionWithPeriodAPIType(c *gin.Context, apiType ResolutionWithPeriodAPIType) {
 	appG := app.Gin{c}
 	gatewayUUID := c.Param("gwid")
 	log.Debug("gatewayUUID: ", gatewayUUID)
 
-	var q AccumulatedQuery
+	var q ResolutionWithPeriodQuery
 	if err := c.BindQuery(&q); err != nil || (q.Resolution != "day" && q.Resolution != "month") {
 		log.WithFields(log.Fields{"caused-by": "invalid param"}).Error()
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
 
-	accumulatedPowerState := w.Services.Devices.GetAccumulatedPowerState(gatewayUUID, q.Resolution, q.StartTime, q.EndTime)
-	appG.Response(http.StatusOK, e.Success, accumulatedPowerState)
+	var responseData interface{}
+	switch apiType {
+	case AccumulatedPowerState:
+		responseData = w.Services.Devices.GetAccumulatedPowerState(gatewayUUID, q.Resolution, q.StartTime, q.EndTime)
+	case PowerSelfSupplyRate:
+		responseData = w.Services.Devices.GetPowerSelfSupplyRate(gatewayUUID, q.Resolution, q.StartTime, q.EndTime)
+	}
+	appG.Response(http.StatusOK, e.Success, responseData)
 }

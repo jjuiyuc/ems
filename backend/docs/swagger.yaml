@@ -9,7 +9,21 @@ definitions:
       msg:
         type: string
     type: object
-  routers.AccumulatedQuery:
+  routers.PeriodQuery:
+    properties:
+      endTime:
+        example: UTC time in ISO-8601
+        format: date-time
+        type: string
+      startTime:
+        example: UTC time in ISO-8601
+        format: date-time
+        type: string
+    required:
+    - endTime
+    - startTime
+    type: object
+  routers.ResolutionWithPeriodQuery:
     properties:
       endTime:
         example: UTC time in ISO-8601
@@ -27,20 +41,6 @@ definitions:
     required:
     - endTime
     - resolution
-    - startTime
-    type: object
-  routers.PeriodQuery:
-    properties:
-      endTime:
-        example: UTC time in ISO-8601
-        format: date-time
-        type: string
-      startTime:
-        example: UTC time in ISO-8601
-        format: date-time
-        type: string
-    required:
-    - endTime
     - startTime
     type: object
   routers.ZoomableQuery:
@@ -183,6 +183,17 @@ definitions:
         type: string
       gatewayID:
         type: string
+    type: object
+  services.PowerSelfSupplyRateResponse:
+    properties:
+      loadSelfConsumedEnergyPercentACs:
+        items:
+          type: number
+        type: array
+      timestamps:
+        items:
+          type: integer
+        type: array
     type: object
   services.PowerStateResponse:
     properties:
@@ -523,6 +534,66 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Show the distribution of energy sources and distinations
+      tags:
+      - analysis
+  /{gwid}/devices/power-self-supply-rate:
+    get:
+      description: get power self supply rate by token, gateway UUID, resolution,
+        startTime and endTime
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Input user's access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Gateway UUID
+        in: path
+        name: gwid
+        required: true
+        type: string
+      - example: UTC time in ISO-8601
+        format: date-time
+        in: query
+        name: endTime
+        required: true
+        type: string
+      - enum:
+        - day
+        - month
+        in: query
+        name: resolution
+        required: true
+        type: string
+      - example: UTC time in ISO-8601
+        format: date-time
+        in: query
+        name: startTime
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/app.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/services.PowerSelfSupplyRateResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Show daily/monthly power self supply rate
       tags:
       - analysis
   /{gwid}/devices/power-state:

@@ -158,7 +158,7 @@ func (w *APIWorker) GetBatteryChargeVoltageState(c *gin.Context) {
 // @Failure     401            {object}  app.Response
 // @Router      /{gwid}/devices/grid/energy-info [get]
 func (w *APIWorker) GetGridEnergyInfo(c *gin.Context) {
-	w.getStartTimeInfo(c, GridEnergyInfo)
+	w.getResponseByStartTimeAPIType(c, GridEnergyInfo)
 }
 
 // GetGridPowerState godoc
@@ -176,5 +176,5 @@ func (w *APIWorker) GetGridEnergyInfo(c *gin.Context) {
 // @Failure     500            {object}  app.Response
 // @Router      /{gwid}/devices/grid/power-state [get]
 func (w *APIWorker) GetGridPowerState(c *gin.Context) {
-	w.getZoomableInfo(c, GridPowerState)
+	w.getResponseByZoomableAPIType(c, GridPowerState)
 }

@@ -1,14 +1,16 @@
 import { connect } from "react-redux"
 import moment from "moment"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useTranslation } from "react-multi-lang"
 
 import { apiCall } from "../utils/api"
+import { ConvertTimeToNumber } from "../utils/utils"
 import variables from "../configs/variables"
 
 import EnergyResourcesTabs from "../components/EnergyResourcesTabs"
 import EnergyGridCard from "../components/EnergyGridCard"
 import LineChart from "../components/LineChart"
+import Spinner from "../components/Spinner"
 
 import { ReactComponent as GridExportIcon } from "../assets/icons/grid_export.svg"
 
@@ -36,19 +38,23 @@ const drawHighPeak = (startHour, endHour) => chart => {
         ctx.stroke()
     }
 }
-export default function EnergyResourcesGrid(props) {
+const mapState = state => ({ gatewayID: state.gateways.active.gatewayID })
+
+export default connect(mapState)(function EnergyResourcesGrid(props) {
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
         pageT = string => t("energyResources.grid." + string)
 
     const
+        [infoError, setInfoError] = useState(""),
+        [infoLoading, setInfoLoading] = useState(false),
         [todayGrid, setTodayGrid] = useState([
             { kwh: 0, type: "exportToGrid" },
-            { kwh: 100, type: "importFromGrid" },
-            { kwh: -10, type: "netImport" }
+            { kwh: 0, type: "importFromGrid" },
+            { kwh: 0, type: "netImport" }
         ]),
-        [thisMonth, setThisMonth] = useState(100)
+        [thisMonth, setThisMonth] = useState(0)
 
     const
         hours24 = Array.from(new Array(24).keys()),
@@ -76,6 +82,40 @@ export default function EnergyResourcesGrid(props) {
             `${item.parsed.y} ${commonT("kwh")}`,
         y: { max: 80, min: 0 }
     })
+    useEffect(() => {
+        if (!props.gatewayID) return
+        const
+            startTime = moment().startOf("day").toISOString(),
+            endTime = moment().endOf("day").toISOString(),
+            urlPrefix = `/api/${props.gatewayID}/devices/grid`
+
+        apiCall({
+            onComplete: () => setInfoLoading(false),
+            onError: error => setInfoError(error),
+            onStart: () => setInfoLoading(true),
+            onSuccess: rawData => {
+                if (!rawData || !rawData.data) return
+
+                const { data } = rawData
+                setTodayGrid([
+                    {
+                        kwh: data.gridConsumedLifetimeEnergyACDiff,
+                        type: "exportToGrid"
+                    },
+                    {
+                        kwh: data.gridProducedLifetimeEnergyACDiff,
+                        type: "importFromGrid"
+                    },
+                    {
+                        kwh: data.gridLifetimeEnergyACDiff,
+                        type: "netImport"
+                    }
+                ])
+                setThisMonth(data.gridLifetimeEnergyACDiffOfMonth || 0)
+            },
+            url: `${urlPrefix}/energy-info?startTime=${startTime}&endTime=${endTime}`
+        })
+    }, [props.gatewayID])
 
     return <>
         <h1 className="mb-9">{t("navigator.energyResources")}</h1>
@@ -102,4 +142,4 @@ export default function EnergyResourcesGrid(props) {
             </div>
         </div>
     </>
-}
+})

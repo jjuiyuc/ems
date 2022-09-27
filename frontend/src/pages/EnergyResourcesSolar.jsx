@@ -20,6 +20,20 @@ import { ReactComponent as CO2Icon } from "../assets/icons/co2.svg"
 
 const { colors } = variables
 
+const ErrorBox = ({ error, margin = "", message }) => error
+    ? <AlertBox
+        boxClass={`${margin} negative`}
+        content={<>
+            <span className="font-mono ml-2">{error}</span>
+            <span className="ml-2">{message}</span>
+        </>}
+        icon={ReportProblemIcon}
+        iconColor="negative-main" />
+    : null
+const LoadingBox = ({ loading }) => loading
+    ? <div className="grid h-24 place-items-center"><Spinner /></div>
+    : null
+
 const drawHighPeak = (startHour, endHour) => chart => {
     if (chart.scales.x._gridLineItems && endHour && startHour) {
         const
@@ -52,8 +66,6 @@ export default connect(mapState)(function EnergyResoucesSolar(props) {
         t = useTranslation(),
         commonT = string => t("common." + string),
         pageT = string => t("energyResources.solar." + string)
-
-
 
     const
         [infoError, setInfoError] = useState(""),
@@ -180,9 +192,15 @@ export default connect(mapState)(function EnergyResoucesSolar(props) {
             url: solarGenerationUrl
         })
     }, [props.gatewayID])
+
+    const infoErrorBox = <ErrorBox
+        error={infoError}
+        margin="mb-8"
+        message={pageT("infoError")} />
     return <>
         <h1 className="mb-9">{t("navigator.energyResources")}</h1>
         <EnergyResourcesTabs current="solar" />
+        {infoErrorBox}
         <EnergySolarCard
             data={totalSolarEnergyDestinations}
             title={pageT("totalSolarEnergyDestinations")} />
@@ -196,10 +214,18 @@ export default connect(mapState)(function EnergyResoucesSolar(props) {
                 icon={CO2Icon}
                 title={pageT("co2Reduction")}
                 value={co2Reduction + " " + pageT("tons")} />
+            {infoLoading
+                ? <div className="absolute bg-black-main-opacity-95 grid inset-0
+                                place-items-center rounded-3xl">
+                    <Spinner />
+                </div>
+                : null}
         </div>
         <div className="card chart mt-8">
             <h4 className="mb-10">{pageT("realTimeSolarGeneration")}</h4>
             <div className="max-h-80vh h-160 relative w-full">
+                <ErrorBox error={lineChartSolarError} message={pageT("chartError")} />
+                <LoadingBox loading={lineChartSolarLoading} />
                 <LineChart data={chartSolarGenerationSet({
                     ...lineChartSolar
                 })} id="ersLineChart" />

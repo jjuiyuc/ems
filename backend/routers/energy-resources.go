@@ -36,7 +36,7 @@ func (w *APIWorker) GetSolarEnergyInfo(c *gin.Context) {
 // @Failure     500            {object}  app.Response
 // @Router      /{gwid}/devices/solar/power-state [get]
 func (w *APIWorker) GetSolarPowerState(c *gin.Context) {
-	w.getZoomableInfo(c, SolarPowerState)
+	w.getResponseByZoomableAPIType(c, SolarPowerState)
 }
 
 // GetBatteryEnergyInfo godoc
@@ -78,7 +78,7 @@ func (w *APIWorker) GetBatteryEnergyInfo(c *gin.Context) {
 // @Failure     500            {object}  app.Response
 // @Router      /{gwid}/devices/battery/power-state [get]
 func (w *APIWorker) GetBatteryPowerState(c *gin.Context) {
-	w.getZoomableInfo(c, BatteryPowerState)
+	w.getResponseByZoomableAPIType(c, BatteryPowerState)
 }
 
 // GetBatteryChargeVoltageState godoc
@@ -96,5 +96,5 @@ func (w *APIWorker) GetBatteryPowerState(c *gin.Context) {
 // @Failure     500            {object}  app.Response
 // @Router /{gwid}/devices/battery/charge-voltage-state [get]
 func (w *APIWorker) GetBatteryChargeVoltageState(c *gin.Context) {
-	w.getZoomableInfo(c, BatteryChargeVoltageState)
+	w.getResponseByZoomableAPIType(c, BatteryChargeVoltageState)
 }

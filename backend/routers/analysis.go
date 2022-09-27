@@ -10,12 +10,12 @@ import (
 	"der-ems/internal/e"
 )
 
-// ZoomableType godoc
-type ZoomableType int
+// ZoomableAPIType godoc
+type ZoomableAPIType int
 
 const (
 	// PowerState godoc
-	PowerState ZoomableType = iota
+	PowerState ZoomableAPIType = iota
 	// SolarPowerState godoc
 	SolarPowerState
 	// BatteryPowerState godoc
@@ -62,7 +62,7 @@ func (w *APIWorker) GetEnergyDistributionInfo(c *gin.Context) {
 // @Failure     401            {object}  app.Response
 // @Router      /{gwid}/devices/power-state [get]
 func (w *APIWorker) GetPowerState(c *gin.Context) {
-	w.getZoomableInfo(c, PowerState)
+	w.getResponseByZoomableAPIType(c, PowerState)
 }
 
 // GetAccumulatedPowerState godoc
@@ -113,7 +113,7 @@ func (w *APIWorker) GetPowerSelfSupplyRate(c *gin.Context) {
 	appG.Response(http.StatusOK, e.Success, responseData)
 }
 
-func (w *APIWorker) getZoomableInfo(c *gin.Context, zoomableType ZoomableType) {
+func (w *APIWorker) getResponseByZoomableAPIType(c *gin.Context, apiType ZoomableAPIType) {
 	appG := app.Gin{c}
 	gatewayUUID := c.Param("gwid")
 	log.Debug("gatewayUUID: ", gatewayUUID)
@@ -128,7 +128,7 @@ func (w *APIWorker) getZoomableInfo(c *gin.Context, zoomableType ZoomableType) {
 
 	var responseData interface{}
 	var err error
-	switch zoomableType {
+	switch apiType {
 	case PowerState:
 		responseData = w.Services.Devices.GetPowerState(gatewayUUID, q.StartTime, q.EndTime)
 	case SolarPowerState:

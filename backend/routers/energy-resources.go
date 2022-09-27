@@ -18,7 +18,7 @@ import (
 // @Failure     401            {object}  app.Response
 // @Router      /{gwid}/devices/solar/energy-info [get]
 func (w *APIWorker) GetSolarEnergyInfo(c *gin.Context) {
-	w.getStartTimeInfo(c, SolarEnergyInfo)
+	w.getResponseByStartTimeAPIType(c, SolarEnergyInfo)
 }
 
 // GetSolarPowerState godoc

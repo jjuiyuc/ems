@@ -62,16 +62,6 @@ func (w *APIWorker) GetSolarPowerState(c *gin.Context) {
 	appG.Response(http.StatusOK, e.Success, responseData)
 }
 
-// GetSolarEnergyInfo godoc
-func (w *APIWorker) GetSolarEnergyInfo(c *gin.Context) {
-	w.getStartTimeInfo(c, SolarEnergyInfo)
-}
-
-// GetSolarPowerState godoc
-func (w *APIWorker) GetSolarPowerState(c *gin.Context) {
-	w.getZoomableInfo(c, SolarPowerState)
-}
-
 // GetBatteryEnergyInfo godoc
 // @Summary     Show the detailed information and current state about battery
 // @Description get battery by token, gateway UUID and startTime

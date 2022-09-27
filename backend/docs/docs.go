@@ -887,7 +887,26 @@ var doc = `{
                 }
             }
         },
-        "routers.AccumulatedQuery": {
+        "routers.PeriodQuery": {
+            "type": "object",
+            "required": [
+                "endTime",
+                "startTime"
+            ],
+            "properties": {
+                "endTime": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "UTC time in ISO-8601"
+                },
+                "startTime": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "UTC time in ISO-8601"
+                }
+            }
+        },
+        "routers.ResolutionWithPeriodQuery": {
             "type": "object",
             "required": [
                 "endTime",
@@ -906,25 +925,6 @@ var doc = `{
                         "day",
                         "month"
                     ]
-                },
-                "startTime": {
-                    "type": "string",
-                    "format": "date-time",
-                    "example": "UTC time in ISO-8601"
-                }
-            }
-        },
-        "routers.PeriodQuery": {
-            "type": "object",
-            "required": [
-                "endTime",
-                "startTime"
-            ],
-            "properties": {
-                "endTime": {
-                    "type": "string",
-                    "format": "date-time",
-                    "example": "UTC time in ISO-8601"
                 },
                 "startTime": {
                     "type": "string",

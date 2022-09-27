@@ -9,7 +9,21 @@ definitions:
       msg:
         type: string
     type: object
-  routers.AccumulatedQuery:
+  routers.PeriodQuery:
+    properties:
+      endTime:
+        example: UTC time in ISO-8601
+        format: date-time
+        type: string
+      startTime:
+        example: UTC time in ISO-8601
+        format: date-time
+        type: string
+    required:
+    - endTime
+    - startTime
+    type: object
+  routers.ResolutionWithPeriodQuery:
     properties:
       endTime:
         example: UTC time in ISO-8601
@@ -27,20 +41,6 @@ definitions:
     required:
     - endTime
     - resolution
-    - startTime
-    type: object
-  routers.PeriodQuery:
-    properties:
-      endTime:
-        example: UTC time in ISO-8601
-        format: date-time
-        type: string
-      startTime:
-        example: UTC time in ISO-8601
-        format: date-time
-        type: string
-    required:
-    - endTime
     - startTime
     type: object
   routers.ZoomableQuery:

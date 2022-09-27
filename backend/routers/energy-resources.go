@@ -43,13 +43,6 @@ const (
 // @Router      /{gwid}/devices/battery/energy-info [get]
 func (w *APIWorker) GetBatteryEnergyInfo(c *gin.Context) {
 	appG := app.Gin{c}
-	userID, _ := c.Get("userID")
-	if userID == nil {
-		log.WithFields(log.Fields{"caused-by": "error token"}).Error()
-		appG.Response(http.StatusUnauthorized, e.ErrToken, nil)
-		return
-	}
-
 	gatewayUUID := c.Param("gwid")
 	log.Debug("gatewayUUID: ", gatewayUUID)
 
@@ -102,13 +95,6 @@ func (w *APIWorker) GetBatteryChargeVoltageState(c *gin.Context) {
 
 func (w *APIWorker) getBatteryState(c *gin.Context, batteryState BatteryState) {
 	appG := app.Gin{c}
-	userID, _ := c.Get("userID")
-	if userID == nil {
-		log.WithFields(log.Fields{"caused-by": "error token"}).Error()
-		appG.Response(http.StatusUnauthorized, e.ErrToken, nil)
-		return
-	}
-
 	gatewayUUID := c.Param("gwid")
 	log.Debug("gatewayUUID: ", gatewayUUID)
 

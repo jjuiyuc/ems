@@ -9,6 +9,26 @@ definitions:
       msg:
         type: string
     type: object
+  routers.AccumulatedQuery:
+    properties:
+      endTime:
+        example: UTC time in ISO-8601
+        format: date-time
+        type: string
+      resolution:
+        enum:
+        - day
+        - month
+        type: string
+      startTime:
+        example: UTC time in ISO-8601
+        format: date-time
+        type: string
+    required:
+    - endTime
+    - resolution
+    - startTime
+    type: object
   routers.PeriodQuery:
     properties:
       endTime:
@@ -41,6 +61,29 @@ definitions:
     - endTime
     - resolution
     - startTime
+    type: object
+  services.AccumulatedPowerStateResponse:
+    properties:
+      batteryLifetimeEnergyACDiffs:
+        items:
+          type: number
+        type: array
+      gridLifetimeEnergyACDiffs:
+        items:
+          type: number
+        type: array
+      loadConsumedLifetimeEnergyACDiffs:
+        items:
+          type: number
+        type: array
+      pvProducedLifetimeEnergyACDiffs:
+        items:
+          type: number
+        type: array
+      timestamps:
+        items:
+          type: integer
+        type: array
     type: object
   services.BatteryChargeVoltageStateResponse:
     properties:
@@ -200,6 +243,66 @@ info:
   license: {}
   title: DER-EMS API
 paths:
+  /{gwid}/devices/accumulated-power-state:
+    get:
+      description: get power state by token, gateway UUID, resolution, startTime and
+        endTime
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Input user's access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Gateway UUID
+        in: path
+        name: gwid
+        required: true
+        type: string
+      - example: UTC time in ISO-8601
+        format: date-time
+        in: query
+        name: endTime
+        required: true
+        type: string
+      - enum:
+        - day
+        - month
+        in: query
+        name: resolution
+        required: true
+        type: string
+      - example: UTC time in ISO-8601
+        format: date-time
+        in: query
+        name: startTime
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/app.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/services.AccumulatedPowerStateResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Show daily/monthly accumulated power state of Load/Solar/Battery/Grid
+      tags:
+      - analysis
   /{gwid}/devices/battery/charge-voltage-state:
     get:
       description: get battery by token, gateway UUID, resolution, startTime and endTime

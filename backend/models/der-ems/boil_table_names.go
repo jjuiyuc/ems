@@ -4,33 +4,37 @@
 package deremsmodels
 
 var TableNames = struct {
-	AiData           string
-	CCData           string
-	CCDataLog        string
-	Customer         string
-	Device           string
-	DeviceModel      string
-	Gateway          string
-	LoginLog         string
-	Tou              string
-	TouHoliday       string
-	TouLocation      string
-	User             string
-	UserGatewayRight string
-	WeatherForecast  string
+	AiData                     string
+	CCData                     string
+	CCDataLog                  string
+	CCDataLogCalculatedDaily   string
+	CCDataLogCalculatedMonthly string
+	Customer                   string
+	Device                     string
+	DeviceModel                string
+	Gateway                    string
+	LoginLog                   string
+	Tou                        string
+	TouHoliday                 string
+	TouLocation                string
+	User                       string
+	UserGatewayRight           string
+	WeatherForecast            string
 }{
-	AiData:           "ai_data",
-	CCData:           "cc_data",
-	CCDataLog:        "cc_data_log",
-	Customer:         "customer",
-	Device:           "device",
-	DeviceModel:      "device_model",
-	Gateway:          "gateway",
-	LoginLog:         "login_log",
-	Tou:              "tou",
-	TouHoliday:       "tou_holiday",
-	TouLocation:      "tou_location",
-	User:             "user",
-	UserGatewayRight: "user_gateway_right",
-	WeatherForecast:  "weather_forecast",
+	AiData:                     "ai_data",
+	CCData:                     "cc_data",
+	CCDataLog:                  "cc_data_log",
+	CCDataLogCalculatedDaily:   "cc_data_log_calculated_daily",
+	CCDataLogCalculatedMonthly: "cc_data_log_calculated_monthly",
+	Customer:                   "customer",
+	Device:                     "device",
+	DeviceModel:                "device_model",
+	Gateway:                    "gateway",
+	LoginLog:                   "login_log",
+	Tou:                        "tou",
+	TouHoliday:                 "tou_holiday",
+	TouLocation:                "tou_location",
+	User:                       "user",
+	UserGatewayRight:           "user_gateway_right",
+	WeatherForecast:            "weather_forecast",
 }

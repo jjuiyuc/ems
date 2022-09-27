@@ -246,6 +246,98 @@ var doc = `{
                 }
             }
         },
+        "/{gwid}/devices/accumulated-power-state": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get power state by token, gateway UUID, resolution, startTime and endTime",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "analysis"
+                ],
+                "summary": "Show daily/monthly accumulated power state of Load/Solar/Battery/Grid",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Input user's access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Gateway UUID",
+                        "name": "gwid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "UTC time in ISO-8601",
+                        "name": "endTime",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "day",
+                            "month"
+                        ],
+                        "type": "string",
+                        "name": "resolution",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "UTC time in ISO-8601",
+                        "name": "startTime",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/app.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/services.AccumulatedPowerStateResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/{gwid}/devices/battery/charge-voltage-state": {
             "get": {
                 "security": [
@@ -703,6 +795,33 @@ var doc = `{
                 }
             }
         },
+        "routers.AccumulatedQuery": {
+            "type": "object",
+            "required": [
+                "endTime",
+                "resolution",
+                "startTime"
+            ],
+            "properties": {
+                "endTime": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "UTC time in ISO-8601"
+                },
+                "resolution": {
+                    "type": "string",
+                    "enum": [
+                        "day",
+                        "month"
+                    ]
+                },
+                "startTime": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "UTC time in ISO-8601"
+                }
+            }
+        },
         "routers.PeriodQuery": {
             "type": "object",
             "required": [
@@ -745,6 +864,41 @@ var doc = `{
                     "type": "string",
                     "format": "date-time",
                     "example": "UTC time in ISO-8601"
+                }
+            }
+        },
+        "services.AccumulatedPowerStateResponse": {
+            "type": "object",
+            "properties": {
+                "batteryLifetimeEnergyACDiffs": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
+                },
+                "gridLifetimeEnergyACDiffs": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
+                },
+                "loadConsumedLifetimeEnergyACDiffs": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
+                },
+                "pvProducedLifetimeEnergyACDiffs": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
+                },
+                "timestamps": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 }
             }
         },

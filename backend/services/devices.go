@@ -7,6 +7,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"der-ems/internal/utils"
+	deremsmodels "der-ems/models/der-ems"
 	"der-ems/repository"
 )
 
@@ -62,11 +63,30 @@ type PowerStateResponse struct {
 	GridAveragePowerACs    []float32 `json:"gridAveragePowerACs"`
 }
 
+// LatestAccumulatedPowerState godoc
+type LatestAccumulatedPowerState struct {
+	Timestamps                       int
+	LoadConsumedLifetimeEnergyACDiff float32
+	PvProducedLifetimeEnergyACDiff   float32
+	BatteryLifetimeEnergyACDiff      float32
+	GridLifetimeEnergyACDiff         float32
+}
+
+// AccumulatedPowerStateResponse godoc
+type AccumulatedPowerStateResponse struct {
+	Timestamps                        []int     `json:"timestamps"`
+	LoadConsumedLifetimeEnergyACDiffs []float32 `json:"loadConsumedLifetimeEnergyACDiffs"`
+	PvProducedLifetimeEnergyACDiffs   []float32 `json:"pvProducedLifetimeEnergyACDiffs"`
+	BatteryLifetimeEnergyACDiffs      []float32 `json:"batteryLifetimeEnergyACDiffs"`
+	GridLifetimeEnergyACDiffs         []float32 `json:"gridLifetimeEnergyACDiffs"`
+}
+
 // DevicesService godoc
 type DevicesService interface {
 	GetLatestDevicesEnergyInfo(gwUUID string) (updatedTime time.Time, devicesEnergyInfo *DevicesEnergyInfoResponse, err error)
 	GetEnergyDistributionInfo(gwUUID string, startTime, endTime time.Time) (energyDistributionInfo *EnergyDistributionInfoResponse)
 	GetPowerState(gwUUID string, startTime, endTime time.Time) (powerState *PowerStateResponse)
+	GetAccumulatedPowerState(gwUUID, resolution string, startTime, endTime time.Time) (accumulatedPowerState *AccumulatedPowerStateResponse)
 }
 
 type defaultDevicesService struct {
@@ -206,7 +226,11 @@ func (s defaultDevicesService) GetPowerState(gwUUID string, startTime, endTime t
 				"startTimeIndex": startTimeIndex,
 				"endTimeIndex":   endTimeIndex,
 			}).Warn()
-			powerState.Timestamps = append(powerState.Timestamps, int(endTimeIndex.Unix()))
+			if endTimeIndex == endTime {
+				powerState.Timestamps = append(powerState.Timestamps, int(endTimeIndex.Unix()))
+			} else {
+				powerState.Timestamps = append(powerState.Timestamps, int(endTimeIndex.Add(-1*time.Second).Unix()))
+			}
 			powerState.LoadAveragePowerACs = append(powerState.LoadAveragePowerACs, 0)
 			powerState.BatteryAveragePowerACs = append(powerState.BatteryAveragePowerACs, 0)
 			powerState.PvAveragePowerACs = append(powerState.PvAveragePowerACs, 0)
@@ -218,6 +242,77 @@ func (s defaultDevicesService) GetPowerState(gwUUID string, startTime, endTime t
 		if endTimeIndex.After(endTime) {
 			endTimeIndex = endTime
 		}
+	}
+	return
+}
+
+func (s defaultDevicesService) GetAccumulatedPowerState(gwUUID, resolution string, startTime, endTime time.Time) (accumulatedPowerState *AccumulatedPowerStateResponse) {
+	accumulatedPowerState = &AccumulatedPowerStateResponse{}
+	startTimeIndex := startTime
+	var endTimeIndex time.Time
+	switch resolution {
+	case "day":
+		endTimeIndex = startTime.AddDate(0, 0, 1)
+	case "month":
+		endTimeIndex = startTime.AddDate(0, 0, 1).AddDate(0, 1, 0).AddDate(0, 0, -1)
+	}
+
+	for startTimeIndex.Before(endTime) {
+		latestAccumulatedPowerState := s.getLatestAccumulatedPowerState(gwUUID, resolution, startTimeIndex, endTimeIndex, endTime)
+		log.Debug("latestAccumulatedPowerState: ", latestAccumulatedPowerState)
+		accumulatedPowerState.Timestamps = append(accumulatedPowerState.Timestamps, latestAccumulatedPowerState.Timestamps)
+		accumulatedPowerState.LoadConsumedLifetimeEnergyACDiffs = append(accumulatedPowerState.LoadConsumedLifetimeEnergyACDiffs, latestAccumulatedPowerState.LoadConsumedLifetimeEnergyACDiff)
+		accumulatedPowerState.PvProducedLifetimeEnergyACDiffs = append(accumulatedPowerState.PvProducedLifetimeEnergyACDiffs, latestAccumulatedPowerState.PvProducedLifetimeEnergyACDiff)
+		accumulatedPowerState.BatteryLifetimeEnergyACDiffs = append(accumulatedPowerState.BatteryLifetimeEnergyACDiffs, latestAccumulatedPowerState.BatteryLifetimeEnergyACDiff)
+		accumulatedPowerState.GridLifetimeEnergyACDiffs = append(accumulatedPowerState.GridLifetimeEnergyACDiffs, latestAccumulatedPowerState.GridLifetimeEnergyACDiff)
+
+		startTimeIndex = endTimeIndex
+		switch resolution {
+		case "day":
+			endTimeIndex = startTimeIndex.AddDate(0, 0, 1)
+		case "month":
+			endTimeIndex = startTimeIndex.AddDate(0, 0, 1).AddDate(0, 1, 0).AddDate(0, 0, -1)
+		}
+		if endTimeIndex.After(endTime) {
+			endTimeIndex = endTime
+		}
+	}
+	return
+}
+
+func (s defaultDevicesService) getLatestAccumulatedPowerState(gwUUID, resolution string, startTimeIndex, endTimeIndex, endTime time.Time) (latestAccumulatedPowerState *LatestAccumulatedPowerState) {
+	latestAccumulatedPowerState = &LatestAccumulatedPowerState{}
+	latestLog, latestLogErr := s.repo.CCData.GetLatestCalculatedLog(gwUUID, resolution, startTimeIndex, endTimeIndex)
+	if latestLogErr != nil {
+		log.WithFields(log.Fields{
+			"caused-by":      "s.repo.CCData.GetLatestCalculatedLog",
+			"err":            latestLogErr,
+			"startTimeIndex": startTimeIndex,
+			"endTimeIndex":   endTimeIndex,
+		}).Warn()
+		if endTimeIndex == endTime {
+			latestAccumulatedPowerState.Timestamps = int(endTimeIndex.Unix())
+		} else {
+			latestAccumulatedPowerState.Timestamps = int(endTimeIndex.Add(-1 * time.Second).Unix())
+		}
+		return
+	}
+
+	switch resolution {
+	case "day":
+		latestLogDaily, _ := (latestLog).(*deremsmodels.CCDataLogCalculatedDaily)
+		latestAccumulatedPowerState.Timestamps = int(latestLogDaily.LatestLogDate.Unix())
+		latestAccumulatedPowerState.LoadConsumedLifetimeEnergyACDiff = latestLogDaily.LoadConsumedLifetimeEnergyACDiff.Float32
+		latestAccumulatedPowerState.PvProducedLifetimeEnergyACDiff = latestLogDaily.PvProducedLifetimeEnergyACDiff.Float32
+		latestAccumulatedPowerState.BatteryLifetimeEnergyACDiff = latestLogDaily.BatteryLifetimeEnergyACDiff.Float32
+		latestAccumulatedPowerState.GridLifetimeEnergyACDiff = latestLogDaily.GridLifetimeEnergyACDiff.Float32
+	case "month":
+		latestLogMonthly, _ := (latestLog).(*deremsmodels.CCDataLogCalculatedMonthly)
+		latestAccumulatedPowerState.Timestamps = int(latestLogMonthly.LatestLogDate.Unix())
+		latestAccumulatedPowerState.LoadConsumedLifetimeEnergyACDiff = latestLogMonthly.LoadConsumedLifetimeEnergyACDiff.Float32
+		latestAccumulatedPowerState.PvProducedLifetimeEnergyACDiff = latestLogMonthly.PvProducedLifetimeEnergyACDiff.Float32
+		latestAccumulatedPowerState.BatteryLifetimeEnergyACDiff = latestLogMonthly.BatteryLifetimeEnergyACDiff.Float32
+		latestAccumulatedPowerState.GridLifetimeEnergyACDiff = latestLogMonthly.GridLifetimeEnergyACDiff.Float32
 	}
 	return
 }

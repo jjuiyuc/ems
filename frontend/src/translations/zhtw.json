@@ -56,8 +56,10 @@
         "unableToConnect": "無法建立連線"
     },
     "demandCharge": {
+        "chartError": "無法取得圖表資料",
         "currentBillingCycle": "當下計費週期",
         "demandDetails": "即時負載",
+        "infoError": "無法取得資料",
         "lastMonthBillingCycle": "前一計費週期",
         "realizedSavings": "已避免罰款"
     },
@@ -120,9 +122,11 @@
         "solar": {
             "co2Reduction": "減碳量",
             "chargeToBattery": "充進電池",
+            "chartError": "無法取得圖表資料",
             "directUsage": "直接消耗",
             "economics": "發電收益",
             "exportToGrid": "回送電網",
+            "infoError": "無法取得太陽能資料",
             "realTimeSolarGeneration": "即時太陽能發電功率 (kW)",
             "solarGeneration": "太陽能發電",
             "thisCalendarMonth": "This Calendar Month",

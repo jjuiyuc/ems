@@ -56,10 +56,13 @@
         "unableToConnect": "Unable to connect"
     },
     "demandCharge": {
+        "chartError": "Can't get chart data",
         "currentBillingCycle": "Current Billing Cycle",
         "demandDetails": "Demand Details",
+        "infoError": "Can't get info",
         "lastMonthBillingCycle": "Last Month Billing Cycle",
         "realizedSavings": "Realized Savings"
+
     },
     "economics": {
         "ancillaryServices": "Ancillary Services",
@@ -120,9 +123,11 @@
         "solar": {
             "co2Reduction": "CO2 Reduction",
             "chargeToBattery": "Charge to Battery",
+            "chartError": "Can't get chart data",
             "directUsage": "Direct Usage",
             "economics": "Economics",
             "exportToGrid": "Export to Grid",
+            "infoError": "Can't get solar info",
             "realTimeSolarGeneration": "Real-time Solar Generation (kW)",
             "solarGeneration": "solarGeneration",
             "thisCalendarMonth": "This Calendar Month",

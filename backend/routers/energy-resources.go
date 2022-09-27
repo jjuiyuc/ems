@@ -42,7 +42,7 @@ const (
 // @Failure     401            {object}  app.Response
 // @Router      /{gwid}/devices/battery/energy-info [get]
 func (w *APIWorker) GetBatteryEnergyInfo(c *gin.Context) {
-	w.getStartTimeInfo(c, BatteryEnergyInfo)
+	w.getResponseByStartTimeAPIType(c, BatteryEnergyInfo)
 }
 
 // GetBatteryPowerState godoc

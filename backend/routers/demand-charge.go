@@ -18,7 +18,7 @@ import (
 // @Failure     401            {object}  app.Response
 // @Router      /{gwid}/devices/charge-info [get]
 func (w *APIWorker) GetChargeInfo(c *gin.Context) {
-	w.getStartTimeInfo(c, ChargeInfo)
+	w.getResponseByStartTimeAPIType(c, ChargeInfo)
 }
 
 // GetDemandState godoc
@@ -35,5 +35,5 @@ func (w *APIWorker) GetChargeInfo(c *gin.Context) {
 // @Failure     401            {object}  app.Response
 // @Router      /{gwid}/devices/demand-state [get]
 func (w *APIWorker) GetDemandState(c *gin.Context) {
-	w.getPeriodInfo(c, DemandState)
+	w.getResponseByPeriodAPIType(c, DemandState)
 }

@@ -29,22 +29,22 @@ type ResolutionWithPeriodQuery struct {
 	EndTime    time.Time `form:"endTime" binding:"required,gtfield=StartTime" example:"UTC time in ISO-8601" format:"date-time"`
 }
 
-// StartTimeType godoc
-type StartTimeType int
+// StartTimeAPIType godoc
+type StartTimeAPIType int
 
 const (
 	// ChargeInfo godoc
-	ChargeInfo StartTimeType = iota
+	ChargeInfo StartTimeAPIType = iota
 	// BatteryEnergyInfo godoc
 	BatteryEnergyInfo
 )
 
-// PeriodType godoc
-type PeriodType int
+// PeriodAPIType godoc
+type PeriodAPIType int
 
 const (
 	// EnergyDistributionInfo godoc
-	EnergyDistributionInfo PeriodType = iota
+	EnergyDistributionInfo PeriodAPIType = iota
 	// DemandState godoc
 	DemandState
 )
@@ -73,7 +73,7 @@ const (
 // @Failure     401            {object}  app.Response
 // @Router      /{gwid}/devices/energy-distribution-info [get]
 func (w *APIWorker) GetEnergyDistributionInfo(c *gin.Context) {
-	w.getPeriodInfo(c, EnergyDistributionInfo)
+	w.getResponseByPeriodAPIType(c, EnergyDistributionInfo)
 }
 
 // GetPowerState godoc
@@ -140,7 +140,7 @@ func (w *APIWorker) GetPowerSelfSupplyRate(c *gin.Context) {
 	w.getResponseByResolutionWithPeriodAPIType(c, PowerSelfSupplyRate)
 }
 
-func (w *APIWorker) getStartTimeInfo(c *gin.Context, startTimeType StartTimeType) {
+func (w *APIWorker) getResponseByStartTimeAPIType(c *gin.Context, apiType StartTimeAPIType) {
 	appG := app.Gin{c}
 	gatewayUUID := c.Param("gwid")
 	log.Debug("gatewayUUID: ", gatewayUUID)
@@ -153,7 +153,7 @@ func (w *APIWorker) getStartTimeInfo(c *gin.Context, startTimeType StartTimeType
 	}
 
 	var responseData interface{}
-	switch startTimeType {
+	switch apiType {
 	case ChargeInfo:
 		responseData = w.Services.Devices.GetChargeInfo(gatewayUUID, q.StartTime)
 	case BatteryEnergyInfo:
@@ -162,7 +162,7 @@ func (w *APIWorker) getStartTimeInfo(c *gin.Context, startTimeType StartTimeType
 	appG.Response(http.StatusOK, e.Success, responseData)
 }
 
-func (w *APIWorker) getPeriodInfo(c *gin.Context, periodType PeriodType) {
+func (w *APIWorker) getResponseByPeriodAPIType(c *gin.Context, apiType PeriodAPIType) {
 	appG := app.Gin{c}
 	gatewayUUID := c.Param("gwid")
 	log.Debug("gatewayUUID: ", gatewayUUID)
@@ -175,7 +175,7 @@ func (w *APIWorker) getPeriodInfo(c *gin.Context, periodType PeriodType) {
 	}
 
 	var responseData interface{}
-	switch periodType {
+	switch apiType {
 	case EnergyDistributionInfo:
 		responseData = w.Services.Devices.GetEnergyDistributionInfo(gatewayUUID, q.StartTime, q.EndTime)
 	case DemandState:

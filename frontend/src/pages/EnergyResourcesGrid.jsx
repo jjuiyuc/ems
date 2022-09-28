@@ -16,6 +16,20 @@ import { ReactComponent as GridExportIcon } from "../assets/icons/grid_export.sv
 
 const { colors } = variables
 
+const ErrorBox = ({ error, margin = "", message }) => error
+    ? <AlertBox
+        boxClass={`${margin} negative`}
+        content={<>
+            <span className="font-mono ml-2">{error}</span>
+            <span className="ml-2">{message}</span>
+        </>}
+        icon={ReportProblemIcon}
+        iconColor="negative-main" />
+    : null
+const LoadingBox = ({ loading }) => loading
+    ? <div className="grid h-24 place-items-center"><Spinner /></div>
+    : null
+
 const drawHighPeak = (startHour, endHour) => chart => {
     if (chart.scales.x._gridLineItems && endHour && startHour) {
         const
@@ -117,9 +131,12 @@ export default connect(mapState)(function EnergyResourcesGrid(props) {
             },
             url: `${urlPrefix}/energy-info?startTime=${startTime}&endTime=${endTime}`
         })
+
+        const oClocks = Array.from(new Array(25).keys()).map(n =>
+            parseInt(moment().hour(n).startOf("h").format("x")))
+
         const GridPowerUrl = `${urlPrefix}/power-state?`
             + chartParams(lineChartGridPowertRes)
-
         apiCall({
             onComplete: () => setLineChartGridPowerLoading(false),
             onError: error => setLineChartGridPowerError(error),
@@ -150,13 +167,20 @@ export default connect(mapState)(function EnergyResourcesGrid(props) {
 
     const gridPowerChart = lineChartGridPower
         ? <LineChart
-            data={chartGridPowerSet(...lineChartGridPower)}
+            data={chartGridPowerSet(lineChartGridPower)}
             id="erbChargeVoltage" />
         : null
+
+    const infoErrorBox = <ErrorBox
+        error={infoError}
+        margin="mb-8"
+        message={pageT("infoError")} />
+
     return <>
         <h1 className="mb-9">{t("navigator.energyResources")}</h1>
         <EnergyResourcesTabs current="grid" />
         <div className="lg:grid grid-cols-auto-19rem gap-x-5">
+            {infoErrorBox}
             <EnergyGridCard data={todayGrid} title={commonT("today")} />
             <div className="card mt-8 lg:m-0">
                 <h5 className="font-bold mb-8">{commonT("thisMonth")}</h5>
@@ -170,10 +194,18 @@ export default connect(mapState)(function EnergyResourcesGrid(props) {
                     </div>
                 </div>
             </div>
+            {infoLoading
+                ? <div className="absolute bg-black-main-opacity-95 grid inset-0
+                                place-items-center rounded-3xl">
+                    <Spinner />
+                </div>
+                : null}
         </div>
         <div className="card chart mt-8">
             <h4 className="mb-10">{pageT("gridPowerImport")}</h4>
             <div className="max-h-80vh h-160 w-full">
+                <ErrorBox error={lineChartGridPowerError} message={pageT("chartError")} />
+                <LoadingBox loading={lineChartGridPowerLoading} />
                 {gridPowerChart}
             </div>
         </div>

@@ -158,7 +158,14 @@ func (w *APIWorker) GetBatteryChargeVoltageState(c *gin.Context) {
 // @Failure     401            {object}  app.Response
 // @Router      /{gwid}/devices/grid/energy-info [get]
 func (w *APIWorker) GetGridEnergyInfo(c *gin.Context) {
-	w.getResponseByStartTimeAPIType(c, GridEnergyInfo)
+	appG := app.Gin{c}
+	param := &StartTimeParam{}
+	if err := param.validate(c); err != nil {
+		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
+		return
+	}
+	responseData := w.Services.Devices.GetGridEnergyInfo(param.GatewayUUID, param.Query.StartTime)
+	appG.Response(http.StatusOK, e.Success, responseData)
 }
 
 // GetGridPowerState godoc
@@ -176,5 +183,16 @@ func (w *APIWorker) GetGridEnergyInfo(c *gin.Context) {
 // @Failure     500            {object}  app.Response
 // @Router      /{gwid}/devices/grid/power-state [get]
 func (w *APIWorker) GetGridPowerState(c *gin.Context) {
-	w.getResponseByZoomableAPIType(c, GridPowerState)
+	appG := app.Gin{c}
+	param := &ZoomableParam{}
+	if err := param.validate(c); err != nil {
+		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
+		return
+	}
+	responseData, err := w.Services.Devices.GetGridPowerState(param.GatewayUUID, param.Query.StartTime, param.Query.EndTime)
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ErrGridPowerStateGen, err.Error())
+		return
+	}
+	appG.Response(http.StatusOK, e.Success, responseData)
 }

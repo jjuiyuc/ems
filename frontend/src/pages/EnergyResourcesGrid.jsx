@@ -54,39 +54,41 @@ export default connect(mapState)(function EnergyResourcesGrid(props) {
             { kwh: 0, type: "importFromGrid" },
             { kwh: 0, type: "netImport" }
         ]),
-        [thisMonth, setThisMonth] = useState(0)
+        [thisMonth, setThisMonth] = useState(0),
+        [lineChartGridPower, setLineChartGridPower] = useState(null),
+        [lineChartGridPowerError, setLineChartGridPowerError] = useState(""),
+        [lineChartGridPowerLoading, setLineChartGridPowerLoading] = useState(false),
+        [lineChartGridPowertRes] = useState("hour")
 
-    const
-        hours24 = Array.from(new Array(24).keys()),
-        lineChartDateLabels = hours24.map(n =>
-            moment().hour(n).startOf("h").toISOString()),
-        currentHour = moment().hour(),
-        lineChartDataArray = hours24.filter(v => v <= currentHour).map(() =>
-            Math.floor(Math.random() * (60 - 40 + 1) + 40))
-
-    const [lineChartData, setLineChartData] = useState({
-        beforeDraw: drawHighPeak(7, 19),
+    const chartGridPowerSet = ({ data, highPeak, labels }) => ({
+        beforeDraw: drawHighPeak(highPeak.start, highPeak.end),
         datasets: [{
             backgroundColor: colors.indigo.main,
             borderColor: colors.indigo.main,
-            data: lineChartDataArray,
+            data: data || [],
             fill: {
                 above: colors.indigo["main-opacity-10"],
                 target: "origin"
             },
             pointBorderColor: colors.primary["main-opacity-20"]
         }],
-        labels: lineChartDateLabels,
+        labels,
         tickCallback: (val, index) => val + commonT("kw"),
         tooltipLabel: item =>
             `${item.parsed.y} ${commonT("kwh")}`,
         y: { max: 80, min: 0 }
     })
+
     useEffect(() => {
         if (!props.gatewayID) return
         const
             startTime = moment().startOf("day").toISOString(),
             endTime = moment().endOf("day").toISOString(),
+            chartParams = resolution => new URLSearchParams({
+                startTime,
+                endTime,
+                resolution
+            }).toString(),
             urlPrefix = `/api/${props.gatewayID}/devices/grid`
 
         apiCall({
@@ -115,8 +117,42 @@ export default connect(mapState)(function EnergyResourcesGrid(props) {
             },
             url: `${urlPrefix}/energy-info?startTime=${startTime}&endTime=${endTime}`
         })
+        const GridPowerUrl = `${urlPrefix}/power-state?`
+            + chartParams(lineChartGridPowertRes)
+
+        apiCall({
+            onComplete: () => setLineChartGridPowerLoading(false),
+            onError: error => setLineChartGridPowerError(error),
+            onStart: () => setLineChartGridPowerLoading(true),
+            onSuccess: rawData => {
+                if (!rawData || !rawData.data) return
+
+                const
+                    { data } = rawData,
+                    { onPeakTime, timestamps } = data,
+                    { end, start, timezone } = onPeakTime,
+                    labels = [
+                        ...timestamps.map(t => t * 1000),
+                        ...oClocks.slice(timestamps.length)
+                    ],
+                    peakStart = ConvertTimeToNumber(start, timezone),
+                    peakEnd = ConvertTimeToNumber(end, timezone)
+
+                setLineChartGridPower({
+                    data: data.gridAveragePowerACs,
+                    highPeak: { start: peakStart, end: peakEnd },
+                    labels
+                })
+            },
+            url: GridPowerUrl
+        })
     }, [props.gatewayID])
 
+    const gridPowerChart = lineChartGridPower
+        ? <LineChart
+            data={chartGridPowerSet(...lineChartGridPower)}
+            id="erbChargeVoltage" />
+        : null
     return <>
         <h1 className="mb-9">{t("navigator.energyResources")}</h1>
         <EnergyResourcesTabs current="grid" />
@@ -138,7 +174,7 @@ export default connect(mapState)(function EnergyResourcesGrid(props) {
         <div className="card chart mt-8">
             <h4 className="mb-10">{pageT("gridPowerImport")}</h4>
             <div className="max-h-80vh h-160 w-full">
-                <LineChart data={lineChartData} id="ergLineChart" />
+                {gridPowerChart}
             </div>
         </div>
     </>

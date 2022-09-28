@@ -1,7 +1,12 @@
 package routers
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
+
+	"der-ems/internal/app"
+	"der-ems/internal/e"
 )
 
 // GetChargeInfo godoc
@@ -18,7 +23,14 @@ import (
 // @Failure     401            {object}  app.Response
 // @Router      /{gwid}/devices/charge-info [get]
 func (w *APIWorker) GetChargeInfo(c *gin.Context) {
-	w.getResponseByStartTimeAPIType(c, ChargeInfo)
+	appG := app.Gin{c}
+	param := &StartTimeParam{}
+	if err := param.validate(c); err != nil {
+		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
+		return
+	}
+	responseData := w.Services.Devices.GetChargeInfo(param.GatewayUUID, param.Query.StartTime)
+	appG.Response(http.StatusOK, e.Success, responseData)
 }
 
 // GetDemandState godoc
@@ -35,5 +47,12 @@ func (w *APIWorker) GetChargeInfo(c *gin.Context) {
 // @Failure     401            {object}  app.Response
 // @Router      /{gwid}/devices/demand-state [get]
 func (w *APIWorker) GetDemandState(c *gin.Context) {
-	w.getResponseByPeriodAPIType(c, DemandState)
+	appG := app.Gin{c}
+	param := &PeriodParam{}
+	if err := param.validate(c); err != nil {
+		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
+		return
+	}
+	responseData := w.Services.Devices.GetDemandState(param.GatewayUUID, param.Query.StartTime, param.Query.EndTime)
+	appG.Response(http.StatusOK, e.Success, responseData)
 }

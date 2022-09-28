@@ -11,13 +11,6 @@ import (
 	"der-ems/internal/e"
 )
 
-// ZoomableQuery godoc
-type ZoomableQuery struct {
-	Resolution string    `form:"resolution" binding:"required" enums:"hour"`
-	StartTime  time.Time `form:"startTime" binding:"required" example:"UTC time in ISO-8601" format:"date-time"`
-	EndTime    time.Time `form:"endTime" binding:"required,gtfield=StartTime" example:"UTC time in ISO-8601" format:"date-time"`
-}
-
 // BatteryState godoc
 type BatteryState int
 
@@ -42,7 +35,14 @@ const (
 // @Failure     401            {object}  app.Response
 // @Router      /{gwid}/devices/battery/energy-info [get]
 func (w *APIWorker) GetBatteryEnergyInfo(c *gin.Context) {
-	w.getResponseByStartTimeAPIType(c, BatteryEnergyInfo)
+	appG := app.Gin{c}
+	param := &StartTimeParam{}
+	if err := param.validate(c); err != nil {
+		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
+		return
+	}
+	responseData := w.Services.Battery.GetBatteryEnergyInfo(param.GatewayUUID, param.Query.StartTime)
+	appG.Response(http.StatusOK, e.Success, responseData)
 }
 
 // GetBatteryPowerState godoc

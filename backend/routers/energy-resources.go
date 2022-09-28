@@ -1,7 +1,12 @@
 package routers
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
+
+	"der-ems/internal/app"
+	"der-ems/internal/e"
 )
 
 // GetSolarEnergyInfo godoc
@@ -18,7 +23,14 @@ import (
 // @Failure     401            {object}  app.Response
 // @Router      /{gwid}/devices/solar/energy-info [get]
 func (w *APIWorker) GetSolarEnergyInfo(c *gin.Context) {
-	w.getResponseByStartTimeAPIType(c, SolarEnergyInfo)
+	appG := app.Gin{c}
+	param := &StartTimeParam{}
+	if err := param.validate(c); err != nil {
+		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
+		return
+	}
+	responseData := w.Services.Devices.GetSolarEnergyInfo(param.GatewayUUID, param.Query.StartTime)
+	appG.Response(http.StatusOK, e.Success, responseData)
 }
 
 // GetSolarPowerState godoc
@@ -36,7 +48,18 @@ func (w *APIWorker) GetSolarEnergyInfo(c *gin.Context) {
 // @Failure     500            {object}  app.Response
 // @Router      /{gwid}/devices/solar/power-state [get]
 func (w *APIWorker) GetSolarPowerState(c *gin.Context) {
-	w.getResponseByZoomableAPIType(c, SolarPowerState)
+	appG := app.Gin{c}
+	param := &ZoomableParam{}
+	if err := param.validate(c); err != nil {
+		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
+		return
+	}
+	responseData, err := w.Services.Devices.GetSolarPowerState(param.GatewayUUID, param.Query.StartTime, param.Query.EndTime)
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ErrSolarPowerStateGen, err.Error())
+		return
+	}
+	appG.Response(http.StatusOK, e.Success, responseData)
 }
 
 // GetBatteryEnergyInfo godoc
@@ -59,7 +82,7 @@ func (w *APIWorker) GetBatteryEnergyInfo(c *gin.Context) {
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
-	responseData := w.Services.Battery.GetBatteryEnergyInfo(param.GatewayUUID, param.Query.StartTime)
+	responseData := w.Services.Devices.GetBatteryEnergyInfo(param.GatewayUUID, param.Query.StartTime)
 	appG.Response(http.StatusOK, e.Success, responseData)
 }
 
@@ -78,7 +101,18 @@ func (w *APIWorker) GetBatteryEnergyInfo(c *gin.Context) {
 // @Failure     500            {object}  app.Response
 // @Router      /{gwid}/devices/battery/power-state [get]
 func (w *APIWorker) GetBatteryPowerState(c *gin.Context) {
-	w.getResponseByZoomableAPIType(c, BatteryPowerState)
+	appG := app.Gin{c}
+	param := &ZoomableParam{}
+	if err := param.validate(c); err != nil {
+		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
+		return
+	}
+	responseData, err := w.Services.Devices.GetBatteryPowerState(param.GatewayUUID, param.Query.StartTime, param.Query.EndTime)
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ErrBatteryPowerStateGen, err.Error())
+		return
+	}
+	appG.Response(http.StatusOK, e.Success, responseData)
 }
 
 // GetBatteryChargeVoltageState godoc
@@ -96,5 +130,16 @@ func (w *APIWorker) GetBatteryPowerState(c *gin.Context) {
 // @Failure     500            {object}  app.Response
 // @Router /{gwid}/devices/battery/charge-voltage-state [get]
 func (w *APIWorker) GetBatteryChargeVoltageState(c *gin.Context) {
-	w.getResponseByZoomableAPIType(c, BatteryChargeVoltageState)
+	appG := app.Gin{c}
+	param := &ZoomableParam{}
+	if err := param.validate(c); err != nil {
+		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
+		return
+	}
+	responseData, err := w.Services.Devices.GetBatteryChargeVoltageState(param.GatewayUUID, param.Query.StartTime, param.Query.EndTime)
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ErrBatteryChargeVoltageStateGen, err.Error())
+		return
+	}
+	appG.Response(http.StatusOK, e.Success, responseData)
 }

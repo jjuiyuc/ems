@@ -4,24 +4,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	log "github.com/sirupsen/logrus"
 
 	"der-ems/internal/app"
 	"der-ems/internal/e"
-)
-
-// ZoomableAPIType godoc
-type ZoomableAPIType int
-
-const (
-	// PowerState godoc
-	PowerState ZoomableAPIType = iota
-	// SolarPowerState godoc
-	SolarPowerState
-	// BatteryPowerState godoc
-	BatteryPowerState
-	// BatteryChargeVoltageState godoc
-	BatteryChargeVoltageState
 )
 
 // GetEnergyDistributionInfo godoc
@@ -62,7 +47,14 @@ func (w *APIWorker) GetEnergyDistributionInfo(c *gin.Context) {
 // @Failure     401            {object}  app.Response
 // @Router      /{gwid}/devices/power-state [get]
 func (w *APIWorker) GetPowerState(c *gin.Context) {
-	w.getResponseByZoomableAPIType(c, PowerState)
+	appG := app.Gin{c}
+	param := &ZoomableParam{}
+	if err := param.validate(c); err != nil {
+		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
+		return
+	}
+	responseData := w.Services.Devices.GetPowerState(param.GatewayUUID, param.Query.StartTime, param.Query.EndTime)
+	appG.Response(http.StatusOK, e.Success, responseData)
 }
 
 // GetAccumulatedPowerState godoc
@@ -110,45 +102,5 @@ func (w *APIWorker) GetPowerSelfSupplyRate(c *gin.Context) {
 		return
 	}
 	responseData := w.Services.Devices.GetPowerSelfSupplyRate(param.GatewayUUID, param.Query.Resolution, param.Query.StartTime, param.Query.EndTime)
-	appG.Response(http.StatusOK, e.Success, responseData)
-}
-
-func (w *APIWorker) getResponseByZoomableAPIType(c *gin.Context, apiType ZoomableAPIType) {
-	appG := app.Gin{c}
-	gatewayUUID := c.Param("gwid")
-	log.Debug("gatewayUUID: ", gatewayUUID)
-
-	var q ZoomableQuery
-	// TODO: Only supports hour now
-	if err := c.BindQuery(&q); err != nil || q.Resolution != "hour" {
-		log.WithFields(log.Fields{"caused-by": "invalid param"}).Error()
-		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
-		return
-	}
-
-	var responseData interface{}
-	var err error
-	switch apiType {
-	case PowerState:
-		responseData = w.Services.Devices.GetPowerState(gatewayUUID, q.StartTime, q.EndTime)
-	case SolarPowerState:
-		responseData, err = w.Services.Devices.GetSolarPowerState(gatewayUUID, q.StartTime, q.EndTime)
-		if err != nil {
-			appG.Response(http.StatusInternalServerError, e.ErrSolarPowerStateGen, err.Error())
-			return
-		}
-	case BatteryPowerState:
-		responseData, err = w.Services.Devices.GetBatteryPowerState(gatewayUUID, q.StartTime, q.EndTime)
-		if err != nil {
-			appG.Response(http.StatusInternalServerError, e.ErrBatteryPowerStateGen, err.Error())
-			return
-		}
-	case BatteryChargeVoltageState:
-		responseData, err = w.Services.Devices.GetBatteryChargeVoltageState(gatewayUUID, q.StartTime, q.EndTime)
-		if err != nil {
-			appG.Response(http.StatusInternalServerError, e.ErrBatteryChargeVoltageStateGen, err.Error())
-			return
-		}
-	}
 	appG.Response(http.StatusOK, e.Success, responseData)
 }

@@ -39,17 +39,14 @@ const drawHighPeak = (startHour, endHour) => chart => {
         const
             ctx = chart.ctx,
             xLines = chart.scales.x._gridLineItems,
-            // xLineFirst = ,
+            xLineFirst = xLines[0],
             yFirstLine = chart.scales.y._gridLineItems[0],
-            xLeft = chart.scales.x.left,
-            xRight = chart.scales.x.right,
-            // xFullWidth = yFirstLine.x2 - xLeft,
-            xFullWidth = xRight - xLeft,
+            xLeft = yFirstLine.x1,
+            xFullWidth = yFirstLine.x2 - xLeft,
             xWidth = (endHour - startHour) / 24 * xFullWidth,
             xStart = startHour / 24 * xFullWidth + xLeft,
-            yTop = chart.scales.y.top,
-            yBottom = chart.scales.y.bottom,
-            yFullHeight = yBottom - yTop
+            yTop = xLineFirst.y1,
+            yFullHeight = xLineFirst.y2 - yTop
 
         ctx.beginPath()
         ctx.fillStyle = "#ffffff10"
@@ -59,7 +56,6 @@ const drawHighPeak = (startHour, endHour) => chart => {
         ctx.stroke()
     }
 }
-
 const mapState = state => ({ gatewayID: state.gateways.active.gatewayID })
 export default connect(mapState)(function EnergyResoucesSolar(props) {
     const
@@ -193,10 +189,17 @@ export default connect(mapState)(function EnergyResoucesSolar(props) {
         })
     }, [props.gatewayID])
 
+    const solarGenerationchart = lineChartSolar
+        ? <LineChart
+            data={chartSolarGenerationSet(lineChartSolar)}
+            id="ersLineChart" />
+        : null
+
     const infoErrorBox = <ErrorBox
         error={infoError}
         margin="mb-8"
         message={pageT("infoError")} />
+
     return <>
         <h1 className="mb-9">{t("navigator.energyResources")}</h1>
         <EnergyResourcesTabs current="solar" />
@@ -226,9 +229,7 @@ export default connect(mapState)(function EnergyResoucesSolar(props) {
             <div className="max-h-80vh h-160 relative w-full">
                 <ErrorBox error={lineChartSolarError} message={pageT("chartError")} />
                 <LoadingBox loading={lineChartSolarLoading} />
-                <LineChart data={chartSolarGenerationSet({
-                    ...lineChartSolar
-                })} id="ersLineChart" />
+                {solarGenerationchart}
             </div>
         </div>
     </>

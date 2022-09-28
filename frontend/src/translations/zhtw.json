@@ -112,9 +112,11 @@
             "voltage": "電壓"
         },
         "grid": {
+            "chartError": "無法取得圖表資料",
             "exportToGrid": "回送電網總電量",
             "gridPowerImport": "即時電網取電功率 (kW)",
             "importFromGrid": "電網取電總電量",
+            "infoError": "無法取得電網資料",
             "netImport": "淨電網取電電量"
         },
         "solar": {

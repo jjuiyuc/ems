@@ -112,9 +112,11 @@
             "voltage": "Voltage"
         },
         "grid": {
+            "chartError": "Can't get chart data",
             "exportToGrid": "Export to Grid",
             "gridPowerImport": "Grid Power Import (kW)",
             "importFromGrid": "Import From Grid",
+            "infoError": "Can't get grid info",
             "netImport": "Net Import"
         },
         "solar": {

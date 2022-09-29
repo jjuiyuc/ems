@@ -156,12 +156,12 @@ type SolarPowerStateResponse struct {
 
 // BatteryEnergyInfoResponse godoc
 type BatteryEnergyInfoResponse struct {
-	BatteryOperationCycles          float32 `json:"batteryOperationCycles"`
+	BatteryLifetimeOperationCyclesDiff          float32 `json:"batteryLifetimeOperationCyclesDiff"`
 	BatteryLifetimeOperationCycles  float32 `json:"batteryLifetimeOperationCycles"`
 	BatterySoC                      float32 `json:"batterySoC"`
-	BatteryProducedEnergyAC         float32 `json:"batteryProducedEnergyAC"`
+	BatteryProducedLifetimeEnergyACDiff         float32 `json:"batteryProducedLifetimeEnergyACDiff"`
 	BatteryProducedLifetimeEnergyAC float32 `json:"batteryProducedLifetimeEnergyAC"`
-	BatteryConsumedEnergyAC         float32 `json:"batteryConsumedEnergyAC"`
+	BatteryConsumedLifetimeEnergyACDiff         float32 `json:"batteryConsumedLifetimeEnergyACDiff"`
 	BatteryConsumedLifetimeEnergyAC float32 `json:"batteryConsumedLifetimeEnergyAC"`
 	Model                           string  `json:"model"`
 	Capcity                         float32 `json:"capcity"`
@@ -483,12 +483,12 @@ func (s defaultDevicesService) GetBatteryEnergyInfo(gwUUID string, startTime tim
 		"firstLog.LogDate":  firstLog.LogDate,
 		"latestLog.LogDate": latestLog.LogDate,
 	}).Debug()
-	batteryEnergyInfo.BatteryOperationCycles = utils.Diff(latestLog.BatteryLifetimeOperationCycles.Float32, firstLog.BatteryLifetimeOperationCycles.Float32)
+	batteryEnergyInfo.BatteryLifetimeOperationCyclesDiff = utils.Diff(latestLog.BatteryLifetimeOperationCycles.Float32, firstLog.BatteryLifetimeOperationCycles.Float32)
 	batteryEnergyInfo.BatteryLifetimeOperationCycles = latestLog.BatteryLifetimeOperationCycles.Float32
 	batteryEnergyInfo.BatterySoC = latestLog.BatterySoC.Float32
-	batteryEnergyInfo.BatteryProducedEnergyAC = utils.Diff(latestLog.BatteryProducedLifetimeEnergyAC.Float32, firstLog.BatteryProducedLifetimeEnergyAC.Float32)
+	batteryEnergyInfo.BatteryProducedLifetimeEnergyACDiff = utils.Diff(latestLog.BatteryProducedLifetimeEnergyAC.Float32, firstLog.BatteryProducedLifetimeEnergyAC.Float32)
 	batteryEnergyInfo.BatteryProducedLifetimeEnergyAC = latestLog.BatteryProducedLifetimeEnergyAC.Float32
-	batteryEnergyInfo.BatteryConsumedEnergyAC = utils.Diff(latestLog.BatteryConsumedLifetimeEnergyAC.Float32, firstLog.BatteryConsumedLifetimeEnergyAC.Float32)
+	batteryEnergyInfo.BatteryConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.BatteryConsumedLifetimeEnergyAC.Float32, firstLog.BatteryConsumedLifetimeEnergyAC.Float32)
 	batteryEnergyInfo.BatteryConsumedLifetimeEnergyAC = latestLog.BatteryConsumedLifetimeEnergyAC.Float32
 	return
 }

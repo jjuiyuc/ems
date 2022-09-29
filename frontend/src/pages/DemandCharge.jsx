@@ -44,7 +44,7 @@ export default connect(mapState)(function DemandCharge(props) {
         [peak, setPeak] = useState({ active: 0, current: 0, threshhold: 0 }),
         [lineChartDemand, setLineChartDemand] = useState(null),
         [lineChartDemandError, setLineChartDemandError] = useState(""),
-        [lineChartDemandLoading, setLineChartDemandLoading] = useState(false),
+        [lineChartDemandLoading, setLineChartDemandLoading] = useState(false)
 
     const chartDemandDetailsSet = ({ data, labels }) => ({
         datasets: [{

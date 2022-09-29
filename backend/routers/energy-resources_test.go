@@ -87,7 +87,7 @@ func (s *EnergyResourcesSuite) Test_GetBatteryEnergyInfo() {
 	testResponseData := services.BatteryEnergyInfoResponse{
 		BatteryLifetimeOperationCyclesDiff:  8,
 		BatteryLifetimeOperationCycles:      16,
-		BatterySoC:                          80,
+		BatterySoC:                          160,
 		BatteryProducedLifetimeEnergyACDiff: 250,
 		BatteryProducedLifetimeEnergyAC:     500,
 		BatteryConsumedLifetimeEnergyACDiff: 250,
@@ -147,8 +147,8 @@ func (s *EnergyResourcesSuite) Test_GetBatteryPowerState() {
 	seedUtInvalidPeriodEndTimeURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, UtResolution, UtStartTime, "2022-08-03T15:15:00.000Z")
 	seedUtNoResolutionParamURL := fmt.Sprintf("%s?startTime=%s&endTime=%s", prefixURL, UtStartTime, UtEndTime)
 
-	testTimestamps := []int{1659543000, 1659549599, 1659553199, 1659556799, 1659557699}
-	testBatteryAveragePowerACs := []float32{-3.5, 0, 0, 0, 0}
+	testTimestamps := []int{1659543000, 1659549599, 1659553199, 1659556799, 1659557100}
+	testBatteryAveragePowerACs := []float32{-3.5, 0, 0, 0, -7}
 	testResponseData := services.BatteryPowerStateResponse{
 		Timestamps:             testTimestamps,
 		BatteryAveragePowerACs: testBatteryAveragePowerACs,
@@ -239,9 +239,9 @@ func (s *EnergyResourcesSuite) Test_GetBatteryChargeVoltageState() {
 	seedUtURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, UtResolution, UtStartTime, UtEndTime)
 	seedUtInvalidParamsURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, "xxx", UtStartTime, UtEndTime)
 
-	testTimestamps := []int{1659543000, 1659549599, 1659553199, 1659556799, 1659557699}
-	testBatterySoCs := []float32{80, 0, 0, 0, 0}
-	testBatteryVoltages := []float32{28, 0, 0, 0, 0}
+	testTimestamps := []int{1659543000, 1659549599, 1659553199, 1659556799, 1659557100}
+	testBatterySoCs := []float32{80, 0, 0, 0, 160}
+	testBatteryVoltages := []float32{28, 0, 0, 0, 56}
 	testResponseData := services.BatteryChargeVoltageStateResponse{
 		Timestamps:      testTimestamps,
 		BatterySoCs:     testBatterySoCs,

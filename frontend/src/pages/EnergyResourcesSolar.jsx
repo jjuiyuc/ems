@@ -116,7 +116,8 @@ export default connect(mapState)(function EnergyResoucesSolar(props) {
             startTime = moment().startOf("day").toISOString(),
             chartParams = resolution => new URLSearchParams({
                 startTime,
-                endTime: moment().endOf("day").toISOString(),
+                endTime: moment().toISOString(),
+                // endTime: moment().endOf("day").toISOString(),
                 resolution
             }).toString(),
             urlPrefix = `/api/${props.gatewayID}/devices/solar`

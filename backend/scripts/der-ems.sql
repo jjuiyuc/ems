@@ -121,6 +121,56 @@ CREATE TABLE `cc_data_log` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `cc_data_log_calculated_daily`
+--
+
+DROP TABLE IF EXISTS `cc_data_log_calculated_daily`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `cc_data_log_calculated_daily` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `gw_uuid` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `latest_log_date` datetime NOT NULL,
+  `gw_id` int DEFAULT NULL,
+  `customer_id` int DEFAULT NULL,
+  `pv_produced_lifetime_energy_ac_diff` float DEFAULT NULL,
+  `load_consumed_lifetime_energy_ac_diff` float DEFAULT NULL,
+  `battery_lifetime_energy_ac_diff` float DEFAULT NULL,
+  `grid_lifetime_energy_ac_diff` float DEFAULT NULL,
+  `load_self_consumed_energy_percent_ac` float DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `gw_uuid_latest_log_date_UNIQUE` (`gw_uuid`,`latest_log_date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `cc_data_log_calculated_monthly`
+--
+
+DROP TABLE IF EXISTS `cc_data_log_calculated_monthly`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `cc_data_log_calculated_monthly` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `gw_uuid` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `latest_log_date` datetime NOT NULL,
+  `gw_id` int DEFAULT NULL,
+  `customer_id` int DEFAULT NULL,
+  `pv_produced_lifetime_energy_ac_diff` float DEFAULT NULL,
+  `load_consumed_lifetime_energy_ac_diff` float DEFAULT NULL,
+  `battery_lifetime_energy_ac_diff` float DEFAULT NULL,
+  `grid_lifetime_energy_ac_diff` float DEFAULT NULL,
+  `load_self_consumed_energy_percent_ac` float DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `gw_uuid_latest_log_date_UNIQUE` (`gw_uuid`,`latest_log_date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `customer`
 --
 

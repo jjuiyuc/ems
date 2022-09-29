@@ -347,11 +347,11 @@ export default connect(mapState)(function Analysis(props) {
 
         } else if (tab === "year") {
             startTime = moment().startOf("year").toISOString()
-            endTime = moment().startOf("day").toISOString()
+            endTime = moment().startOf("month").toISOString()
 
         } else if (tab === "custom") {
             startTime = startDate ? moment(startDate).toISOString() : ""
-            endTime = endDate ? moment(endDate).startOf("day").toISOString() : ""
+            endTime = endDate ? moment(endDate).add(1, "day").startOf("day").toISOString() : ""
         }
         if (startTime && endTime) {
             callCards(startTime, endTime)

@@ -19,8 +19,8 @@ type CCDataRepository interface {
 	GetCCDataCount() (int64, error)
 	// CC data log
 	UpsertCCDataLog(ccDataLog *deremsmodels.CCDataLog) (err error)
-	GetLatestLogByGatewayUUIDAndPeriod(gwUUID string, startTime, endTime time.Time) (*deremsmodels.CCDataLog, error)
-	GetFirstLogByGatewayUUIDAndPeriod(gwUUID string, startTime time.Time, endTime time.Time) (*deremsmodels.CCDataLog, error)
+	GetLatestLog(gwUUID string, startTime, endTime time.Time) (*deremsmodels.CCDataLog, error)
+	GetFirstLog(gwUUID string, startTime, endTime time.Time) (*deremsmodels.CCDataLog, error)
 	GetCCDataLogCount() (int64, error)
 	// CC data calculated log
 	GetLatestCalculatedLog(gwUUID, resolution string, startTime, endTime time.Time) (interface{}, error)
@@ -76,8 +76,8 @@ func (repo defaultCCDataRepository) UpsertCCDataLog(ccDataLog *deremsmodels.CCDa
 	return
 }
 
-// GetLatestLogByGatewayUUIDAndPeriod godoc
-func (repo defaultCCDataRepository) GetLatestLogByGatewayUUIDAndPeriod(gwUUID string, startTime, endTime time.Time) (*deremsmodels.CCDataLog, error) {
+// GetLatestLog godoc
+func (repo defaultCCDataRepository) GetLatestLog(gwUUID string, startTime, endTime time.Time) (*deremsmodels.CCDataLog, error) {
 	if startTime.IsZero() || endTime.IsZero() {
 		return deremsmodels.CCDataLogs(
 			qm.Where("gw_uuid = ?", gwUUID),
@@ -89,8 +89,8 @@ func (repo defaultCCDataRepository) GetLatestLogByGatewayUUIDAndPeriod(gwUUID st
 		qm.OrderBy("log_date DESC")).One(repo.db)
 }
 
-// GetFirstLogByGatewayUUIDAndPeriod godoc
-func (repo defaultCCDataRepository) GetFirstLogByGatewayUUIDAndPeriod(gwUUID string, startTime time.Time, endTime time.Time) (*deremsmodels.CCDataLog, error) {
+// GetFirstLog godoc
+func (repo defaultCCDataRepository) GetFirstLog(gwUUID string, startTime, endTime time.Time) (*deremsmodels.CCDataLog, error) {
 	if endTime.IsZero() {
 		return deremsmodels.CCDataLogs(
 			qm.Where("(gw_uuid = ? and log_date >= ?)", gwUUID, startTime),

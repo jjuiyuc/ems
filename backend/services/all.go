@@ -12,7 +12,6 @@ type Services struct {
 	Email   EmailService
 	User    UserService
 	Devices DevicesService
-	Battery BatteryService
 	Billing BillingService
 }
 
@@ -22,9 +21,8 @@ func NewServices(cfg *viper.Viper, repo *repository.Repository) (services *Servi
 		Auth:    NewAuthService(repo),
 		Email:   NewEmailService(cfg),
 		User:    NewUserService(repo),
-		Devices: NewDevicesService(repo),
 		Billing: NewBillingService(repo),
 	}
-	services.Battery = NewBatteryService(repo, services.Billing)
+	services.Devices = NewDevicesService(repo, services.Billing)
 	return
 }

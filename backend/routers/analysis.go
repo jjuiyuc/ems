@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	log "github.com/sirupsen/logrus"
 
 	"der-ems/internal/app"
 	"der-ems/internal/e"
@@ -49,19 +48,13 @@ func (w *APIWorker) GetEnergyDistributionInfo(c *gin.Context) {
 // @Router      /{gwid}/devices/power-state [get]
 func (w *APIWorker) GetPowerState(c *gin.Context) {
 	appG := app.Gin{c}
-	gatewayUUID := c.Param("gwid")
-	log.Debug("gatewayUUID: ", gatewayUUID)
-
-	var q ZoomableQuery
-	// TODO: Only supports hour now
-	if err := c.BindQuery(&q); err != nil || q.Resolution != "hour" {
-		log.WithFields(log.Fields{"caused-by": "invalid param"}).Error()
+	param := &ZoomableParam{}
+	if err := param.validate(c); err != nil {
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
-
-	powerState := w.Services.Devices.GetPowerState(gatewayUUID, q.StartTime, q.EndTime)
-	appG.Response(http.StatusOK, e.Success, powerState)
+	responseData := w.Services.Devices.GetPowerState(param.GatewayUUID, param.Query.StartTime, param.Query.EndTime)
+	appG.Response(http.StatusOK, e.Success, responseData)
 }
 
 // GetAccumulatedPowerState godoc

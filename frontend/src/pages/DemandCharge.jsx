@@ -105,7 +105,7 @@ export default connect(mapState)(function DemandCharge(props) {
 
         const
             startTime = moment().startOf("day").toISOString(),
-            endTime = moment().endOf("day").toISOString(),
+            endTime = moment().toISOString(),
             urlPrefix = `/api/${props.gatewayID}/devices`
 
         apiCall({

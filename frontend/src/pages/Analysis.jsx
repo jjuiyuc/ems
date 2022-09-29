@@ -339,20 +339,19 @@ export default connect(mapState)(function Analysis(props) {
 
         } else if (tab === "weeks") {
             startTime = moment().startOf("week").toISOString()
-            endTime = moment().subtract(1, "day").endOf("day").toISOString()
+            endTime = moment().startOf("day").toISOString()
 
         } else if (tab === "month") {
             startTime = moment().startOf("month").toISOString()
-            endTime = moment().subtract(1, "d").endOf("day").toISOString()
+            endTime = moment().startOf("day").toISOString()
 
         } else if (tab === "year") {
             startTime = moment().startOf("year").toISOString()
-            endTime = moment().subtract(1, "month").endOf("month").toISOString()
+            endTime = moment().startOf("month").toISOString()
 
         } else if (tab === "custom") {
             startTime = startDate ? moment(startDate).toISOString() : ""
-            endTime = endDate ? moment(endDate).endOf("day").toISOString() : ""
-
+            endTime = endDate ? moment(endDate).add(1, "day").startOf("day").toISOString() : ""
         }
         if (startTime && endTime) {
             callCards(startTime, endTime)

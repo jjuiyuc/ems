@@ -469,7 +469,7 @@ var doc = `{
                     {
                         "type": "string",
                         "format": "date-time",
-                        "description": "Example : UTC time in ISO-8601",
+                        "example": "UTC time in ISO-8601",
                         "name": "startTime",
                         "in": "query",
                         "required": true
@@ -599,6 +599,162 @@ var doc = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/{gwid}/devices/charge-info": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get demand charge information by token, gateway UUID and startTime",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "demand charge"
+                ],
+                "summary": "Show the demand charge information",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Input user's access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Gateway UUID",
+                        "name": "gwid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "UTC time in ISO-8601",
+                        "name": "startTime",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/app.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/services.ChargeInfoResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/{gwid}/devices/demand-state": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get demand details by token, gateway UUID, startTime and endTime",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "demand charge"
+                ],
+                "summary": "Show today's demand details",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Input user's access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Gateway UUID",
+                        "name": "gwid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "UTC time in ISO-8601",
+                        "name": "endTime",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "UTC time in ISO-8601",
+                        "name": "startTime",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/app.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/services.DemandStateResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/app.Response"
                         }
@@ -933,6 +1089,19 @@ var doc = `{
                 }
             }
         },
+        "routers.StartTimeQuery": {
+            "type": "object",
+            "required": [
+                "startTime"
+            ],
+            "properties": {
+                "startTime": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "UTC time in ISO-8601"
+                }
+            }
+        },
         "routers.ZoomableQuery": {
             "type": "object",
             "required": [
@@ -1077,6 +1246,49 @@ var doc = `{
                     "type": "object",
                     "additionalProperties": {
                         "type": "string"
+                    }
+                },
+                "timestamps": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "services.ChargeInfoResponse": {
+            "type": "object",
+            "properties": {
+                "gridContractPowerAC": {
+                    "type": "number"
+                },
+                "gridIsPeakShaving": {
+                    "type": "integer"
+                },
+                "gridPowerCost": {
+                    "type": "number"
+                },
+                "gridPowerCostLastMonth": {
+                    "type": "number"
+                },
+                "gridPowerCostSavings": {
+                    "type": "number"
+                },
+                "gridProducedAveragePowerAC": {
+                    "type": "number"
+                }
+            }
+        },
+        "services.DemandStateResponse": {
+            "type": "object",
+            "properties": {
+                "gridContractPowerAC": {
+                    "type": "number"
+                },
+                "gridLifetimeEnergyACDiffToPowers": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
                     }
                 },
                 "timestamps": {

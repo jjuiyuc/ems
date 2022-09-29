@@ -11,13 +11,6 @@ import (
 	"der-ems/internal/e"
 )
 
-// ZoomableQuery godoc
-type ZoomableQuery struct {
-	Resolution string    `form:"resolution" binding:"required" enums:"hour"`
-	StartTime  time.Time `form:"startTime" binding:"required" example:"UTC time in ISO-8601" format:"date-time"`
-	EndTime    time.Time `form:"endTime" binding:"required,gtfield=StartTime" example:"UTC time in ISO-8601" format:"date-time"`
-}
-
 // BatteryState godoc
 type BatteryState int
 
@@ -35,7 +28,7 @@ const (
 // @Security    ApiKeyAuth
 // @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
 // @Param       gwid           path      string true "Gateway UUID"
-// @Param       startTime      query     string true "Example : UTC time in ISO-8601" format(date-time)
+// @Param       query          query     StartTimeQuery true "Query"
 // @Produce     json
 // @Success     200            {object}  app.Response{data=services.BatteryEnergyInfoResponse}
 // @Failure     400            {object}  app.Response
@@ -43,18 +36,13 @@ const (
 // @Router      /{gwid}/devices/battery/energy-info [get]
 func (w *APIWorker) GetBatteryEnergyInfo(c *gin.Context) {
 	appG := app.Gin{c}
-	gatewayUUID := c.Param("gwid")
-	log.Debug("gatewayUUID: ", gatewayUUID)
-
-	startTime, err := time.Parse(time.RFC3339, c.Query("startTime"))
-	if err != nil {
-		log.WithFields(log.Fields{"caused-by": "invalid param"}).Error()
+	param := &StartTimeParam{}
+	if err := param.validate(c); err != nil {
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
-
-	batteryEnergyInfo := w.Services.Battery.GetBatteryEnergyInfo(gatewayUUID, startTime)
-	appG.Response(http.StatusOK, e.Success, batteryEnergyInfo)
+	responseData := w.Services.Battery.GetBatteryEnergyInfo(param.GatewayUUID, param.Query.StartTime)
+	appG.Response(http.StatusOK, e.Success, responseData)
 }
 
 // GetBatteryPowerState godoc

@@ -115,19 +115,19 @@ definitions:
     type: object
   services.BatteryEnergyInfoResponse:
     properties:
-      batteryConsumedEnergyAC:
-        type: number
       batteryConsumedLifetimeEnergyAC:
+        type: number
+      batteryConsumedLifetimeEnergyACDiff:
         type: number
       batteryLifetimeOperationCycles:
         type: number
-      batteryOperationCycles:
+      batteryLifetimeOperationCyclesDiff:
         type: number
       batteryPower:
         type: number
-      batteryProducedEnergyAC:
-        type: number
       batteryProducedLifetimeEnergyAC:
+        type: number
+      batteryProducedLifetimeEnergyACDiff:
         type: number
       batterySoC:
         type: number

@@ -156,18 +156,18 @@ type SolarPowerStateResponse struct {
 
 // BatteryEnergyInfoResponse godoc
 type BatteryEnergyInfoResponse struct {
-	BatteryLifetimeOperationCyclesDiff          float32 `json:"batteryLifetimeOperationCyclesDiff"`
-	BatteryLifetimeOperationCycles  float32 `json:"batteryLifetimeOperationCycles"`
-	BatterySoC                      float32 `json:"batterySoC"`
-	BatteryProducedLifetimeEnergyACDiff         float32 `json:"batteryProducedLifetimeEnergyACDiff"`
-	BatteryProducedLifetimeEnergyAC float32 `json:"batteryProducedLifetimeEnergyAC"`
-	BatteryConsumedLifetimeEnergyACDiff         float32 `json:"batteryConsumedLifetimeEnergyACDiff"`
-	BatteryConsumedLifetimeEnergyAC float32 `json:"batteryConsumedLifetimeEnergyAC"`
-	Model                           string  `json:"model"`
-	Capcity                         float32 `json:"capcity"`
-	PowerSources                    string  `json:"powerSources"`
-	BatteryPower                    float32 `json:"batteryPower"`
-	Voltage                         float32 `json:"voltage"`
+	BatteryLifetimeOperationCyclesDiff  float32 `json:"batteryLifetimeOperationCyclesDiff"`
+	BatteryLifetimeOperationCycles      float32 `json:"batteryLifetimeOperationCycles"`
+	BatterySoC                          float32 `json:"batterySoC"`
+	BatteryProducedLifetimeEnergyACDiff float32 `json:"batteryProducedLifetimeEnergyACDiff"`
+	BatteryProducedLifetimeEnergyAC     float32 `json:"batteryProducedLifetimeEnergyAC"`
+	BatteryConsumedLifetimeEnergyACDiff float32 `json:"batteryConsumedLifetimeEnergyACDiff"`
+	BatteryConsumedLifetimeEnergyAC     float32 `json:"batteryConsumedLifetimeEnergyAC"`
+	Model                               string  `json:"model"`
+	Capcity                             float32 `json:"capcity"`
+	PowerSources                        string  `json:"powerSources"`
+	BatteryPower                        float32 `json:"batteryPower"`
+	Voltage                             float32 `json:"voltage"`
 }
 
 // BatteryPowerStateResponse godoc

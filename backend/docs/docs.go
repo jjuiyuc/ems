@@ -1537,25 +1537,25 @@ var doc = `{
         "services.BatteryEnergyInfoResponse": {
             "type": "object",
             "properties": {
-                "batteryConsumedEnergyAC": {
+                "batteryConsumedLifetimeEnergyAC": {
                     "type": "number"
                 },
-                "batteryConsumedLifetimeEnergyAC": {
+                "batteryConsumedLifetimeEnergyACDiff": {
                     "type": "number"
                 },
                 "batteryLifetimeOperationCycles": {
                     "type": "number"
                 },
-                "batteryOperationCycles": {
+                "batteryLifetimeOperationCyclesDiff": {
                     "type": "number"
                 },
                 "batteryPower": {
                     "type": "number"
                 },
-                "batteryProducedEnergyAC": {
+                "batteryProducedLifetimeEnergyAC": {
                     "type": "number"
                 },
-                "batteryProducedLifetimeEnergyAC": {
+                "batteryProducedLifetimeEnergyACDiff": {
                     "type": "number"
                 },
                 "batterySoC": {

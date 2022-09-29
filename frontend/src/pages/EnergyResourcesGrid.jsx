@@ -97,7 +97,7 @@ export default connect(mapState)(function EnergyResourcesGrid(props) {
         if (!props.gatewayID) return
         const
             startTime = moment().startOf("day").toISOString(),
-            endTime = moment().endOf("day").toISOString(),
+            endTime = moment().toISOString(),
             chartParams = resolution => new URLSearchParams({
                 startTime,
                 endTime,

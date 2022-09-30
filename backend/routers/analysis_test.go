@@ -22,8 +22,10 @@ import (
 
 var _ = Describe("Analysis", func() {
 	const (
-		UtStartTime = "2022-08-03T16:00:00.000Z"
-		UtEndTime   = "2022-08-03T20:15:00.000Z"
+		UtStartTime        = "2022-08-03T16:00:00.000Z"
+		UtEndTime          = "2022-08-03T20:15:00.000Z"
+		UtStartTimeForWeek = "2022-07-30T16:00:00.000Z"
+		UtEndTimeForWeek   = "2022-08-02T16:00:00.000Z"
 	)
 
 	var (
@@ -161,6 +163,60 @@ var _ = Describe("Analysis", func() {
 			It("should return invalid parameters", func() {
 				prefixURL := fmt.Sprintf("/api/%s/devices/power-state", fixtures.UtGateway.UUID)
 				seedUtInvalidParamsURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, "xxx", UtStartTime, UtEndTime)
+				tt := testutils.TestInfo{
+					Token:      token,
+					URL:        seedUtInvalidParamsURL,
+					WantStatus: http.StatusBadRequest,
+					WantRv: app.Response{
+						Code: e.InvalidParams,
+						Msg:  "invalid parameters",
+					},
+				}
+				testutils.GinkgoAssertRequest(tt, router, "GET", nil)
+			})
+		})
+	})
+	Describe("GetAccumulatedPowerState", func() {
+		Context("success", func() {
+			It("should be ok", func() {
+				prefixURL := fmt.Sprintf("/api/%s/devices/accumulated-power-state", fixtures.UtGateway.UUID)
+				seedUtURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, "day", UtStartTimeForWeek, UtEndTimeForWeek)
+				expectedTimestamps := []int{1659283140, 1659369555, 1659455970}
+				expectedLoadConsumedLifetimeEnergyACDiffs := []float32{10, 20, 30}
+				expectedPvProducedLifetimeEnergyACDiffs := []float32{5, 10, 15}
+				expectedBatteryLifetimeEnergyACDiffs := []float32{15, 30, 45}
+				expectedGridLifetimeEnergyACDiffs := []float32{5, 15, 25}
+				expectedResponseData := services.AccumulatedPowerStateResponse{
+					Timestamps:                        expectedTimestamps,
+					LoadConsumedLifetimeEnergyACDiffs: expectedLoadConsumedLifetimeEnergyACDiffs,
+					PvProducedLifetimeEnergyACDiffs:   expectedPvProducedLifetimeEnergyACDiffs,
+					BatteryLifetimeEnergyACDiffs:      expectedBatteryLifetimeEnergyACDiffs,
+					GridLifetimeEnergyACDiffs:         expectedGridLifetimeEnergyACDiffs,
+				}
+				tt := testutils.TestInfo{
+					Token:      token,
+					URL:        seedUtURL,
+					WantStatus: http.StatusOK,
+					WantRv: app.Response{
+						Code: e.Success,
+						Msg:  "ok",
+						Data: expectedResponseData,
+					},
+				}
+				rvData := testutils.GinkgoAssertRequest(tt, router, "GET", nil)
+				dataMap := rvData.(map[string]interface{})
+				dataJSON, err := json.Marshal(dataMap)
+				Expect(err).Should(BeNil())
+				var data services.AccumulatedPowerStateResponse
+				err = json.Unmarshal(dataJSON, &data)
+				Expect(err).Should(BeNil())
+				Expect(data).To(Equal(expectedResponseData))
+			})
+		})
+		Context("fail", func() {
+			It("should return invalid parameters", func() {
+				prefixURL := fmt.Sprintf("/api/%s/devices/accumulated-power-state", fixtures.UtGateway.UUID)
+				seedUtInvalidParamsURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, "xxx", UtStartTimeForWeek, UtEndTimeForWeek)
 				tt := testutils.TestInfo{
 					Token:      token,
 					URL:        seedUtInvalidParamsURL,

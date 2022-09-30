@@ -230,4 +230,52 @@ var _ = Describe("Analysis", func() {
 			})
 		})
 	})
+	Describe("GetPowerSelfSupplyRate", func() {
+		Context("success", func() {
+			It("should be ok", func() {
+				prefixURL := fmt.Sprintf("/api/%s/devices/power-self-supply-rate", fixtures.UtGateway.UUID)
+				seedUtURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, "day", UtStartTimeForWeek, UtEndTimeForWeek)
+				expectedTimestamps := []int{1659283140, 1659369555, 1659455970}
+				expectedLoadSelfConsumedEnergyPercentACs := []float32{10, 15, 20}
+				expectedResponseData := services.PowerSelfSupplyRateResponse{
+					Timestamps:                       expectedTimestamps,
+					LoadSelfConsumedEnergyPercentACs: expectedLoadSelfConsumedEnergyPercentACs,
+				}
+				tt := testutils.TestInfo{
+					Token:      token,
+					URL:        seedUtURL,
+					WantStatus: http.StatusOK,
+					WantRv: app.Response{
+						Code: e.Success,
+						Msg:  "ok",
+						Data: expectedResponseData,
+					},
+				}
+				rvData := testutils.GinkgoAssertRequest(tt, router, "GET", nil)
+				dataMap := rvData.(map[string]interface{})
+				dataJSON, err := json.Marshal(dataMap)
+				Expect(err).Should(BeNil())
+				var data services.PowerSelfSupplyRateResponse
+				err = json.Unmarshal(dataJSON, &data)
+				Expect(err).Should(BeNil())
+				Expect(data).To(Equal(expectedResponseData))
+			})
+		})
+		Context("fail", func() {
+			It("should return invalid parameters", func() {
+				prefixURL := fmt.Sprintf("/api/%s/devices/power-self-supply-rate", fixtures.UtGateway.UUID)
+				seedUtInvalidParamsURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, "xxx", UtStartTimeForWeek, UtEndTimeForWeek)
+				tt := testutils.TestInfo{
+					Token:      token,
+					URL:        seedUtInvalidParamsURL,
+					WantStatus: http.StatusBadRequest,
+					WantRv: app.Response{
+						Code: e.InvalidParams,
+						Msg:  "invalid parameters",
+					},
+				}
+				testutils.GinkgoAssertRequest(tt, router, "GET", nil)
+			})
+		})
+	})
 })

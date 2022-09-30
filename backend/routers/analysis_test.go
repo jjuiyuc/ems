@@ -27,7 +27,6 @@ var _ = Describe("Analysis", func() {
 	)
 
 	var (
-		repo   *repository.Repository
 		router *gin.Engine
 		token  string
 		err    error
@@ -39,7 +38,7 @@ var _ = Describe("Analysis", func() {
 		models.Init(cfg)
 		db := models.GetDB()
 
-		repo = repository.NewRepository(db)
+		repo := repository.NewRepository(db)
 		w := &APIWorker{
 			Services: services.NewServices(cfg, repo),
 		}
@@ -63,7 +62,7 @@ var _ = Describe("Analysis", func() {
 		router = InitRouter(cfg.GetBool("server.cors"), cfg.GetString("server.ginMode"), w)
 	})
 
-	Describe("EnergyDistributionInfo", func() {
+	Describe("GetEnergyDistributionInfo", func() {
 		Context("success", func() {
 			It("should be ok", func() {
 				prefixURL := fmt.Sprintf("/api/%s/devices/energy-distribution-info", fixtures.UtGateway.UUID)
@@ -105,7 +104,7 @@ var _ = Describe("Analysis", func() {
 			})
 		})
 		Context("fail", func() {
-			It("should be invalid parameters", func() {
+			It("should return invalid parameters", func() {
 				prefixURL := fmt.Sprintf("/api/%s/devices/energy-distribution-info", fixtures.UtGateway.UUID)
 				seedUtInvalidParamsURL := fmt.Sprintf("%s?startTime=%s&endTime=%s", prefixURL, UtStartTime, "xxx")
 				tt := testutils.TestInfo{

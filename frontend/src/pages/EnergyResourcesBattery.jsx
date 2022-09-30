@@ -149,7 +149,7 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
             startTime = moment().startOf("day").toISOString(),
             chartParams = resolution => new URLSearchParams({
                 startTime,
-                endTime: moment().endOf("day").toISOString(),
+                endTime: moment().toISOString(),
                 resolution
             }).toString(),
             urlPrefix = `/api/${props.gatewayID}/devices/battery`
@@ -166,11 +166,11 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
                 setBatteryPower(data.batteryPower || 0)
                 setCapacity(data.capcity || 0)
                 setChargedLifetime(data.batteryConsumedLifetimeEnergyAC || 0)
-                setChargedToday(data.batteryConsumedEnergyAC || 0)
+                setChargedToday(data.batteryConsumedLifetimeEnergyACDiff || 0)
                 setChargingState(data.batterySoC || 0)
                 setDischargedLifetime(data.batteryProducedLifetimeEnergyAC || 0)
-                setDischargedToday(data.batteryProducedEnergyAC || 0)
-                setCyclesToday(data.batteryOperationCycles || 0)
+                setDischargedToday(data.batteryProducedLifetimeEnergyACDiff || 0)
+                setCyclesToday(data.batteryLifetimeOperationCyclesDiff || 0)
                 setCyclesLifetime(data.batteryLifetimeOperationCycles || 0)
                 setModal(data.model || "-")
                 setPowerSources(data.powerSources || "-")

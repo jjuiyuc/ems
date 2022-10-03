@@ -122,6 +122,7 @@ var _ = Describe("Analysis", func() {
 			})
 		})
 	})
+
 	Describe("GetPowerState", func() {
 		Context("success", func() {
 			It("should be ok", func() {
@@ -176,6 +177,7 @@ var _ = Describe("Analysis", func() {
 			})
 		})
 	})
+
 	Describe("GetAccumulatedPowerState", func() {
 		Context("success", func() {
 			It("should be ok", func() {
@@ -230,6 +232,7 @@ var _ = Describe("Analysis", func() {
 			})
 		})
 	})
+
 	Describe("GetPowerSelfSupplyRate", func() {
 		Context("success", func() {
 			It("should be ok", func() {

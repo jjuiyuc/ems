@@ -176,6 +176,17 @@
         "reset": "重設",
         "resetPassword": "重設密碼"
     },
+    "settings":{
+        "availableRegularUsage":"Available Regular Usage",
+        "backupReserve":"Backup Reserve",
+        "chargingSources":"Charging Sources",
+        "regularUsage":"Regular Usage",
+        "reservedForGrid":"Reserved for Grid",
+        "reservedForGridOutage":"Reserved for Grid Outage",
+        "save":"儲存",
+        "settings":"設定"
+
+    },
     "timeOfUse": {
         "batteryStatus": "電池狀態",
         "chargingFrom": "充電來源",

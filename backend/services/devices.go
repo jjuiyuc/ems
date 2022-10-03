@@ -693,9 +693,9 @@ func (s defaultDevicesService) getLatestComputedDemandState(gwUUID string, start
 	}
 
 	latestComputedDemandState.Timestamps = int(latestLog.LogDate.Unix())
-	latestComputedDemandState.GridLifetimeEnergyACDiffToPower = utils.Percent(
+	latestComputedDemandState.GridLifetimeEnergyACDiffToPower = utils.Division(
 		utils.Diff(latestLog.GridLifetimeEnergyAC.Float32,
-			firstLog.GridLifetimeEnergyAC.Float32), (15 / 60))
+			firstLog.GridLifetimeEnergyAC.Float32), (15.0 / 60.0))
 	latestComputedDemandState.GridContractPowerAC = latestLog.GridContractPowerAC.Float32
 	return
 }

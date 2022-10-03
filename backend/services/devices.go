@@ -704,7 +704,7 @@ func (s defaultDevicesService) getBatteryInfo(gwUUID string, batteryEnergyInfo *
 	// XXX: Hardcode battery information by gateway UUID
 	const (
 		Huayu      = "0324DE7B51B262F3B11A643CBA8E12CE"
-		Serenegray = "04F1FD6D9C6F64C3352285CCEAF59EE1"
+		Serenegray = "0E0BA27A8175AF978C49396BDE9D7A1E"
 	)
 	switch gwUUID {
 	case Huayu:

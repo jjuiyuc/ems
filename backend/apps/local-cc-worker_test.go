@@ -122,7 +122,7 @@ func (s *LocalCCWorkerSuite) SetupSuite() {
 func (s *LocalCCWorkerSuite) TearDownSuite() {
 	// Delete test data in cc_data_log table
 	_, err := s.db.Exec(`
-		DELETE FROM cc_data_log WHERE id = 3 OR id = 4;
+		DELETE FROM cc_data_log WHERE id = 4 OR id = 5;
 	`)
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	models.Close()

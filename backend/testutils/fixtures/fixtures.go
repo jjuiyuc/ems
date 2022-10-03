@@ -35,6 +35,6 @@ var UtCustomer = &deremsmodels.Customer{
 // UtGateway godoc
 var UtGateway = &deremsmodels.Gateway{
 	ID:         1,
-	UUID:       "04F1FD6D9C6F64C3352285CCEAF59EE1",
+	UUID:       "0E0BA27A8175AF978C49396BDE9D7A1E",
 	CustomerID: 1,
 }

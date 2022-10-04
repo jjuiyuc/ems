@@ -95,6 +95,9 @@ func InitRouter(isCORS bool, ginMode string, w *APIWorker) *gin.Engine {
 	apiGroup.GET("/:gwid/devices/battery/energy-info", authorize(REST), w.GetBatteryEnergyInfo)
 	apiGroup.GET("/:gwid/devices/battery/power-state", authorize(REST), w.GetBatteryPowerState)
 	apiGroup.GET("/:gwid/devices/battery/charge-voltage-state", authorize(REST), w.GetBatteryChargeVoltageState)
+	// Energy Resources - Grid tab
+	apiGroup.GET("/:gwid/devices/grid/energy-info", authorize(REST), w.GetGridEnergyInfo)
+	apiGroup.GET("/:gwid/devices/grid/power-state", authorize(REST), w.GetGridPowerState)
 
 	// Dashboard
 	wsGroup.GET("/:gwid/devices/energy-info", authorize(WebSocket), w.dashboardHandler)

@@ -156,18 +156,18 @@ type SolarPowerStateResponse struct {
 
 // BatteryEnergyInfoResponse godoc
 type BatteryEnergyInfoResponse struct {
-	BatteryOperationCycles          float32 `json:"batteryOperationCycles"`
-	BatteryLifetimeOperationCycles  float32 `json:"batteryLifetimeOperationCycles"`
-	BatterySoC                      float32 `json:"batterySoC"`
-	BatteryProducedEnergyAC         float32 `json:"batteryProducedEnergyAC"`
-	BatteryProducedLifetimeEnergyAC float32 `json:"batteryProducedLifetimeEnergyAC"`
-	BatteryConsumedEnergyAC         float32 `json:"batteryConsumedEnergyAC"`
-	BatteryConsumedLifetimeEnergyAC float32 `json:"batteryConsumedLifetimeEnergyAC"`
-	Model                           string  `json:"model"`
-	Capcity                         float32 `json:"capcity"`
-	PowerSources                    string  `json:"powerSources"`
-	BatteryPower                    float32 `json:"batteryPower"`
-	Voltage                         float32 `json:"voltage"`
+	BatteryLifetimeOperationCyclesDiff  float32 `json:"batteryLifetimeOperationCyclesDiff"`
+	BatteryLifetimeOperationCycles      float32 `json:"batteryLifetimeOperationCycles"`
+	BatterySoC                          float32 `json:"batterySoC"`
+	BatteryProducedLifetimeEnergyACDiff float32 `json:"batteryProducedLifetimeEnergyACDiff"`
+	BatteryProducedLifetimeEnergyAC     float32 `json:"batteryProducedLifetimeEnergyAC"`
+	BatteryConsumedLifetimeEnergyACDiff float32 `json:"batteryConsumedLifetimeEnergyACDiff"`
+	BatteryConsumedLifetimeEnergyAC     float32 `json:"batteryConsumedLifetimeEnergyAC"`
+	Model                               string  `json:"model"`
+	Capcity                             float32 `json:"capcity"`
+	PowerSources                        string  `json:"powerSources"`
+	BatteryPower                        float32 `json:"batteryPower"`
+	Voltage                             float32 `json:"voltage"`
 }
 
 // BatteryPowerStateResponse godoc
@@ -185,6 +185,21 @@ type BatteryChargeVoltageStateResponse struct {
 	OnPeakTime      map[string]string `json:"onPeakTime"`
 }
 
+// GridEnergyInfoResponse godoc
+type GridEnergyInfoResponse struct {
+	GridConsumedLifetimeEnergyACDiff float32 `json:"gridConsumedLifetimeEnergyACDiff"`
+	GridProducedLifetimeEnergyACDiff float32 `json:"gridProducedLifetimeEnergyACDiff"`
+	GridLifetimeEnergyACDiff         float32 `json:"gridLifetimeEnergyACDiff"`
+	GridLifetimeEnergyACDiffOfMonth  float32 `json:"gridLifetimeEnergyACDiffOfMonth"`
+}
+
+// GridPowerStateResponse godoc
+type GridPowerStateResponse struct {
+	Timestamps          []int             `json:"timestamps"`
+	GridAveragePowerACs []float32         `json:"gridAveragePowerACs"`
+	OnPeakTime          map[string]string `json:"onPeakTime"`
+}
+
 // DevicesService godoc
 type DevicesService interface {
 	GetLatestDevicesEnergyInfo(gwUUID string) (updatedTime time.Time, devicesEnergyInfo *DevicesEnergyInfoResponse, err error)
@@ -199,6 +214,8 @@ type DevicesService interface {
 	GetBatteryEnergyInfo(gwUUID string, startTime time.Time) (batteryEnergyInfo *BatteryEnergyInfoResponse)
 	GetBatteryPowerState(gwUUID string, startTime, endTime time.Time) (batteryPowerState *BatteryPowerStateResponse, err error)
 	GetBatteryChargeVoltageState(gwUUID string, startTime, endTime time.Time) (batteryChargeVoltageState *BatteryChargeVoltageStateResponse, err error)
+	GetGridEnergyInfo(gwUUID string, startTime time.Time) (gridEnergyInfo *GridEnergyInfoResponse)
+	GetGridPowerState(gwUUID string, startTime, endTime time.Time) (gridPowerState *GridPowerStateResponse, err error)
 }
 
 type defaultDevicesService struct {
@@ -466,12 +483,12 @@ func (s defaultDevicesService) GetBatteryEnergyInfo(gwUUID string, startTime tim
 		"firstLog.LogDate":  firstLog.LogDate,
 		"latestLog.LogDate": latestLog.LogDate,
 	}).Debug()
-	batteryEnergyInfo.BatteryOperationCycles = utils.Diff(latestLog.BatteryLifetimeOperationCycles.Float32, firstLog.BatteryLifetimeOperationCycles.Float32)
+	batteryEnergyInfo.BatteryLifetimeOperationCyclesDiff = utils.Diff(latestLog.BatteryLifetimeOperationCycles.Float32, firstLog.BatteryLifetimeOperationCycles.Float32)
 	batteryEnergyInfo.BatteryLifetimeOperationCycles = latestLog.BatteryLifetimeOperationCycles.Float32
 	batteryEnergyInfo.BatterySoC = latestLog.BatterySoC.Float32
-	batteryEnergyInfo.BatteryProducedEnergyAC = utils.Diff(latestLog.BatteryProducedLifetimeEnergyAC.Float32, firstLog.BatteryProducedLifetimeEnergyAC.Float32)
+	batteryEnergyInfo.BatteryProducedLifetimeEnergyACDiff = utils.Diff(latestLog.BatteryProducedLifetimeEnergyAC.Float32, firstLog.BatteryProducedLifetimeEnergyAC.Float32)
 	batteryEnergyInfo.BatteryProducedLifetimeEnergyAC = latestLog.BatteryProducedLifetimeEnergyAC.Float32
-	batteryEnergyInfo.BatteryConsumedEnergyAC = utils.Diff(latestLog.BatteryConsumedLifetimeEnergyAC.Float32, firstLog.BatteryConsumedLifetimeEnergyAC.Float32)
+	batteryEnergyInfo.BatteryConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.BatteryConsumedLifetimeEnergyAC.Float32, firstLog.BatteryConsumedLifetimeEnergyAC.Float32)
 	batteryEnergyInfo.BatteryConsumedLifetimeEnergyAC = latestLog.BatteryConsumedLifetimeEnergyAC.Float32
 	return
 }
@@ -502,6 +519,49 @@ func (s defaultDevicesService) GetBatteryChargeVoltageState(gwUUID string, start
 	batteryChargeVoltageState.Timestamps = realtimeInfo.Timestamps
 	batteryChargeVoltageState.BatterySoCs = realtimeInfo.BatterySoCs
 	batteryChargeVoltageState.BatteryVoltages = realtimeInfo.BatteryVoltages
+	return
+}
+
+func (s defaultDevicesService) GetGridEnergyInfo(gwUUID string, startTime time.Time) (gridEnergyInfo *GridEnergyInfoResponse) {
+	gridEnergyInfo = &GridEnergyInfoResponse{}
+	now := time.Now().UTC()
+	startTimeThisMonth := startTime.AddDate(0, 0, -startTime.Day())
+	firstLogOfDay, err1 := s.repo.CCData.GetFirstLog(gwUUID, startTime, now)
+	firstLogOfMonth, err2 := s.repo.CCData.GetFirstLog(gwUUID, startTimeThisMonth, now)
+	latestLog, err3 := s.repo.CCData.GetLatestLog(gwUUID, startTime, now)
+	if err1 != nil || err2 != nil || err3 != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "s.repo.CCData.GetFirstLog:Day&Month and GetLatestLog",
+			"err1":      err1,
+			"err2":      err2,
+			"err3":      err3,
+		}).Error()
+		return
+	}
+
+	log.WithFields(log.Fields{
+		"firstLogOfDay.LogDate":   firstLogOfDay.LogDate,
+		"firstLogOfMonth.LogDate": firstLogOfMonth.LogDate,
+		"latestLog.LogDate":       latestLog.LogDate,
+	}).Debug()
+	gridEnergyInfo.GridConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.GridConsumedLifetimeEnergyAC.Float32, firstLogOfDay.GridConsumedLifetimeEnergyAC.Float32)
+	gridEnergyInfo.GridProducedLifetimeEnergyACDiff = utils.Diff(latestLog.GridProducedLifetimeEnergyAC.Float32, firstLogOfDay.GridProducedLifetimeEnergyAC.Float32)
+	gridEnergyInfo.GridLifetimeEnergyACDiff = utils.Diff(latestLog.GridLifetimeEnergyAC.Float32, firstLogOfDay.GridLifetimeEnergyAC.Float32)
+	gridEnergyInfo.GridLifetimeEnergyACDiffOfMonth = utils.Diff(latestLog.GridLifetimeEnergyAC.Float32, firstLogOfMonth.GridLifetimeEnergyAC.Float32)
+	return
+}
+
+func (s defaultDevicesService) GetGridPowerState(gwUUID string, startTime, endTime time.Time) (gridPowerState *GridPowerStateResponse, err error) {
+	gridPowerState = &GridPowerStateResponse{}
+	onPeakTime, err := s.getOnPeakTime(gwUUID, startTime)
+	if err != nil {
+		return
+	}
+
+	gridPowerState.OnPeakTime = onPeakTime
+	realtimeInfo := s.getRealtimeInfo(gwUUID, startTime, endTime)
+	gridPowerState.Timestamps = realtimeInfo.Timestamps
+	gridPowerState.GridAveragePowerACs = realtimeInfo.GridAveragePowerACs
 	return
 }
 

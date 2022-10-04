@@ -85,18 +85,18 @@ func (s *EnergyResourcesSuite) Test_GetBatteryEnergyInfo() {
 	seedUtURL := fmt.Sprintf("%s?startTime=%s", prefixURL, UtStartTime)
 	seedUtInvalidParamsURL := fmt.Sprintf("%s?startTime=%s", prefixURL, "xxx")
 	testResponseData := services.BatteryEnergyInfoResponse{
-		BatteryOperationCycles:          8,
-		BatteryLifetimeOperationCycles:  16,
-		BatterySoC:                      80,
-		BatteryProducedEnergyAC:         250,
-		BatteryProducedLifetimeEnergyAC: 500,
-		BatteryConsumedEnergyAC:         250,
-		BatteryConsumedLifetimeEnergyAC: 500,
-		Model:                           "L051100-A UZ-Energy Battery",
-		Capcity:                         30,
-		PowerSources:                    "Solar + Grid",
-		BatteryPower:                    24,
-		Voltage:                         153.6,
+		BatteryLifetimeOperationCyclesDiff:  8,
+		BatteryLifetimeOperationCycles:      16,
+		BatterySoC:                          80,
+		BatteryProducedLifetimeEnergyACDiff: 250,
+		BatteryProducedLifetimeEnergyAC:     500,
+		BatteryConsumedLifetimeEnergyACDiff: 250,
+		BatteryConsumedLifetimeEnergyAC:     500,
+		Model:                               "L051100-A UZ-Energy Battery",
+		Capcity:                             30,
+		PowerSources:                        "Solar + Grid",
+		BatteryPower:                        24,
+		Voltage:                             153.6,
 	}
 
 	tests := []testutils.TestInfo{

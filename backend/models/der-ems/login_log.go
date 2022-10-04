@@ -23,7 +23,7 @@ import (
 
 // LoginLog is an object representing the database table.
 type LoginLog struct {
-	ID        int       `boil:"id" json:"id" toml:"id" yaml:"id"`
+	ID        int64     `boil:"id" json:"id" toml:"id" yaml:"id"`
 	UserID    null.Int  `boil:"user_id" json:"userID,omitempty" toml:"userID" yaml:"userID,omitempty"`
 	CreatedAt time.Time `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
 	UpdatedAt null.Time `boil:"updated_at" json:"updatedAt,omitempty" toml:"updatedAt" yaml:"updatedAt,omitempty"`
@@ -59,12 +59,12 @@ var LoginLogTableColumns = struct {
 // Generated where
 
 var LoginLogWhere = struct {
-	ID        whereHelperint
+	ID        whereHelperint64
 	UserID    whereHelpernull_Int
 	CreatedAt whereHelpertime_Time
 	UpdatedAt whereHelpernull_Time
 }{
-	ID:        whereHelperint{field: "`login_log`.`id`"},
+	ID:        whereHelperint64{field: "`login_log`.`id`"},
 	UserID:    whereHelpernull_Int{field: "`login_log`.`user_id`"},
 	CreatedAt: whereHelpertime_Time{field: "`login_log`.`created_at`"},
 	UpdatedAt: whereHelpernull_Time{field: "`login_log`.`updated_at`"},
@@ -198,7 +198,7 @@ func LoginLogs(mods ...qm.QueryMod) loginLogQuery {
 
 // FindLoginLog retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindLoginLog(exec boil.Executor, iD int, selectCols ...string) (*LoginLog, error) {
+func FindLoginLog(exec boil.Executor, iD int64, selectCols ...string) (*LoginLog, error) {
 	loginLogObj := &LoginLog{}
 
 	sel := "*"
@@ -302,7 +302,7 @@ func (o *LoginLog) Insert(exec boil.Executor, columns boil.Columns) error {
 		return ErrSyncFail
 	}
 
-	o.ID = int(lastID)
+	o.ID = int64(lastID)
 	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == loginLogMapping["id"] {
 		goto CacheNoHooks
 	}
@@ -576,7 +576,7 @@ func (o *LoginLog) Upsert(exec boil.Executor, updateColumns, insertColumns boil.
 		return ErrSyncFail
 	}
 
-	o.ID = int(lastID)
+	o.ID = int64(lastID)
 	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == loginLogMapping["id"] {
 		goto CacheNoHooks
 	}
@@ -728,7 +728,7 @@ func (o *LoginLogSlice) ReloadAll(exec boil.Executor) error {
 }
 
 // LoginLogExists checks if the LoginLog row exists.
-func LoginLogExists(exec boil.Executor, iD int) (bool, error) {
+func LoginLogExists(exec boil.Executor, iD int64) (bool, error) {
 	var exists bool
 	sql := "select exists(select 1 from `login_log` where `id`=? limit 1)"
 

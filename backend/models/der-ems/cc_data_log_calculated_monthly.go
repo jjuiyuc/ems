@@ -23,11 +23,11 @@ import (
 
 // CCDataLogCalculatedMonthly is an object representing the database table.
 type CCDataLogCalculatedMonthly struct {
-	ID                               int          `boil:"id" json:"id" toml:"id" yaml:"id"`
+	ID                               int64        `boil:"id" json:"id" toml:"id" yaml:"id"`
 	GWUUID                           string       `boil:"gw_uuid" json:"gwUUID" toml:"gwUUID" yaml:"gwUUID"`
 	LatestLogDate                    time.Time    `boil:"latest_log_date" json:"latestLogDate" toml:"latestLogDate" yaml:"latestLogDate"`
-	GWID                             null.Int     `boil:"gw_id" json:"gwID,omitempty" toml:"gwID" yaml:"gwID,omitempty"`
-	CustomerID                       null.Int     `boil:"customer_id" json:"customerID,omitempty" toml:"customerID" yaml:"customerID,omitempty"`
+	GWID                             null.Int64   `boil:"gw_id" json:"gwID,omitempty" toml:"gwID" yaml:"gwID,omitempty"`
+	CustomerID                       null.Int64   `boil:"customer_id" json:"customerID,omitempty" toml:"customerID" yaml:"customerID,omitempty"`
 	PvProducedLifetimeEnergyACDiff   null.Float32 `boil:"pv_produced_lifetime_energy_ac_diff" json:"pvProducedLifetimeEnergyAcDiff,omitempty" toml:"pvProducedLifetimeEnergyAcDiff" yaml:"pvProducedLifetimeEnergyAcDiff,omitempty"`
 	LoadConsumedLifetimeEnergyACDiff null.Float32 `boil:"load_consumed_lifetime_energy_ac_diff" json:"loadConsumedLifetimeEnergyAcDiff,omitempty" toml:"loadConsumedLifetimeEnergyAcDiff" yaml:"loadConsumedLifetimeEnergyAcDiff,omitempty"`
 	BatteryLifetimeEnergyACDiff      null.Float32 `boil:"battery_lifetime_energy_ac_diff" json:"batteryLifetimeEnergyAcDiff,omitempty" toml:"batteryLifetimeEnergyAcDiff" yaml:"batteryLifetimeEnergyAcDiff,omitempty"`
@@ -99,11 +99,11 @@ var CCDataLogCalculatedMonthlyTableColumns = struct {
 // Generated where
 
 var CCDataLogCalculatedMonthlyWhere = struct {
-	ID                               whereHelperint
+	ID                               whereHelperint64
 	GWUUID                           whereHelperstring
 	LatestLogDate                    whereHelpertime_Time
-	GWID                             whereHelpernull_Int
-	CustomerID                       whereHelpernull_Int
+	GWID                             whereHelpernull_Int64
+	CustomerID                       whereHelpernull_Int64
 	PvProducedLifetimeEnergyACDiff   whereHelpernull_Float32
 	LoadConsumedLifetimeEnergyACDiff whereHelpernull_Float32
 	BatteryLifetimeEnergyACDiff      whereHelpernull_Float32
@@ -112,11 +112,11 @@ var CCDataLogCalculatedMonthlyWhere = struct {
 	CreatedAt                        whereHelpertime_Time
 	UpdatedAt                        whereHelpertime_Time
 }{
-	ID:                               whereHelperint{field: "`cc_data_log_calculated_monthly`.`id`"},
+	ID:                               whereHelperint64{field: "`cc_data_log_calculated_monthly`.`id`"},
 	GWUUID:                           whereHelperstring{field: "`cc_data_log_calculated_monthly`.`gw_uuid`"},
 	LatestLogDate:                    whereHelpertime_Time{field: "`cc_data_log_calculated_monthly`.`latest_log_date`"},
-	GWID:                             whereHelpernull_Int{field: "`cc_data_log_calculated_monthly`.`gw_id`"},
-	CustomerID:                       whereHelpernull_Int{field: "`cc_data_log_calculated_monthly`.`customer_id`"},
+	GWID:                             whereHelpernull_Int64{field: "`cc_data_log_calculated_monthly`.`gw_id`"},
+	CustomerID:                       whereHelpernull_Int64{field: "`cc_data_log_calculated_monthly`.`customer_id`"},
 	PvProducedLifetimeEnergyACDiff:   whereHelpernull_Float32{field: "`cc_data_log_calculated_monthly`.`pv_produced_lifetime_energy_ac_diff`"},
 	LoadConsumedLifetimeEnergyACDiff: whereHelpernull_Float32{field: "`cc_data_log_calculated_monthly`.`load_consumed_lifetime_energy_ac_diff`"},
 	BatteryLifetimeEnergyACDiff:      whereHelpernull_Float32{field: "`cc_data_log_calculated_monthly`.`battery_lifetime_energy_ac_diff`"},
@@ -254,7 +254,7 @@ func CCDataLogCalculatedMonthlies(mods ...qm.QueryMod) ccDataLogCalculatedMonthl
 
 // FindCCDataLogCalculatedMonthly retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindCCDataLogCalculatedMonthly(exec boil.Executor, iD int, selectCols ...string) (*CCDataLogCalculatedMonthly, error) {
+func FindCCDataLogCalculatedMonthly(exec boil.Executor, iD int64, selectCols ...string) (*CCDataLogCalculatedMonthly, error) {
 	ccDataLogCalculatedMonthlyObj := &CCDataLogCalculatedMonthly{}
 
 	sel := "*"
@@ -358,7 +358,7 @@ func (o *CCDataLogCalculatedMonthly) Insert(exec boil.Executor, columns boil.Col
 		return ErrSyncFail
 	}
 
-	o.ID = int(lastID)
+	o.ID = int64(lastID)
 	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == ccDataLogCalculatedMonthlyMapping["id"] {
 		goto CacheNoHooks
 	}
@@ -632,7 +632,7 @@ func (o *CCDataLogCalculatedMonthly) Upsert(exec boil.Executor, updateColumns, i
 		return ErrSyncFail
 	}
 
-	o.ID = int(lastID)
+	o.ID = int64(lastID)
 	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == ccDataLogCalculatedMonthlyMapping["id"] {
 		goto CacheNoHooks
 	}
@@ -784,7 +784,7 @@ func (o *CCDataLogCalculatedMonthlySlice) ReloadAll(exec boil.Executor) error {
 }
 
 // CCDataLogCalculatedMonthlyExists checks if the CCDataLogCalculatedMonthly row exists.
-func CCDataLogCalculatedMonthlyExists(exec boil.Executor, iD int) (bool, error) {
+func CCDataLogCalculatedMonthlyExists(exec boil.Executor, iD int64) (bool, error) {
 	var exists bool
 	sql := "select exists(select 1 from `cc_data_log_calculated_monthly` where `id`=? limit 1)"
 

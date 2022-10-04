@@ -23,7 +23,7 @@ import (
 
 // WeatherForecast is an object representing the database table.
 type WeatherForecast struct {
-	ID        int          `boil:"id" json:"id" toml:"id" yaml:"id"`
+	ID        int64        `boil:"id" json:"id" toml:"id" yaml:"id"`
 	Lat       float32      `boil:"lat" json:"lat" toml:"lat" yaml:"lat"`
 	Lng       float32      `boil:"lng" json:"lng" toml:"lng" yaml:"lng"`
 	Alt       null.Float32 `boil:"alt" json:"alt,omitempty" toml:"alt" yaml:"alt,omitempty"`
@@ -108,7 +108,7 @@ func (w whereHelperfloat32) NIN(slice []float32) qm.QueryMod {
 }
 
 var WeatherForecastWhere = struct {
-	ID        whereHelperint
+	ID        whereHelperint64
 	Lat       whereHelperfloat32
 	Lng       whereHelperfloat32
 	Alt       whereHelpernull_Float32
@@ -117,7 +117,7 @@ var WeatherForecastWhere = struct {
 	CreatedAt whereHelpertime_Time
 	UpdatedAt whereHelpernull_Time
 }{
-	ID:        whereHelperint{field: "`weather_forecast`.`id`"},
+	ID:        whereHelperint64{field: "`weather_forecast`.`id`"},
 	Lat:       whereHelperfloat32{field: "`weather_forecast`.`lat`"},
 	Lng:       whereHelperfloat32{field: "`weather_forecast`.`lng`"},
 	Alt:       whereHelpernull_Float32{field: "`weather_forecast`.`alt`"},
@@ -255,7 +255,7 @@ func WeatherForecasts(mods ...qm.QueryMod) weatherForecastQuery {
 
 // FindWeatherForecast retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindWeatherForecast(exec boil.Executor, iD int, selectCols ...string) (*WeatherForecast, error) {
+func FindWeatherForecast(exec boil.Executor, iD int64, selectCols ...string) (*WeatherForecast, error) {
 	weatherForecastObj := &WeatherForecast{}
 
 	sel := "*"
@@ -359,7 +359,7 @@ func (o *WeatherForecast) Insert(exec boil.Executor, columns boil.Columns) error
 		return ErrSyncFail
 	}
 
-	o.ID = int(lastID)
+	o.ID = int64(lastID)
 	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == weatherForecastMapping["id"] {
 		goto CacheNoHooks
 	}
@@ -633,7 +633,7 @@ func (o *WeatherForecast) Upsert(exec boil.Executor, updateColumns, insertColumn
 		return ErrSyncFail
 	}
 
-	o.ID = int(lastID)
+	o.ID = int64(lastID)
 	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == weatherForecastMapping["id"] {
 		goto CacheNoHooks
 	}
@@ -785,7 +785,7 @@ func (o *WeatherForecastSlice) ReloadAll(exec boil.Executor) error {
 }
 
 // WeatherForecastExists checks if the WeatherForecast row exists.
-func WeatherForecastExists(exec boil.Executor, iD int) (bool, error) {
+func WeatherForecastExists(exec boil.Executor, iD int64) (bool, error) {
 	var exists bool
 	sql := "select exists(select 1 from `weather_forecast` where `id`=? limit 1)"
 

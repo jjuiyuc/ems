@@ -23,7 +23,7 @@ import (
 
 // TouHoliday is an object representing the database table.
 type TouHoliday struct {
-	ID            int         `boil:"id" json:"id" toml:"id" yaml:"id"`
+	ID            int64       `boil:"id" json:"id" toml:"id" yaml:"id"`
 	TOULocationID null.Int    `boil:"tou_location_id" json:"touLocationID,omitempty" toml:"touLocationID" yaml:"touLocationID,omitempty"`
 	Year          null.String `boil:"year" json:"year,omitempty" toml:"year" yaml:"year,omitempty"`
 	Day           null.Time   `boil:"day" json:"day,omitempty" toml:"day" yaml:"day,omitempty"`
@@ -69,14 +69,14 @@ var TouHolidayTableColumns = struct {
 // Generated where
 
 var TouHolidayWhere = struct {
-	ID            whereHelperint
+	ID            whereHelperint64
 	TOULocationID whereHelpernull_Int
 	Year          whereHelpernull_String
 	Day           whereHelpernull_Time
 	CreatedAt     whereHelpertime_Time
 	UpdatedAt     whereHelpernull_Time
 }{
-	ID:            whereHelperint{field: "`tou_holiday`.`id`"},
+	ID:            whereHelperint64{field: "`tou_holiday`.`id`"},
 	TOULocationID: whereHelpernull_Int{field: "`tou_holiday`.`tou_location_id`"},
 	Year:          whereHelpernull_String{field: "`tou_holiday`.`year`"},
 	Day:           whereHelpernull_Time{field: "`tou_holiday`.`day`"},
@@ -212,7 +212,7 @@ func TouHolidays(mods ...qm.QueryMod) touHolidayQuery {
 
 // FindTouHoliday retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindTouHoliday(exec boil.Executor, iD int, selectCols ...string) (*TouHoliday, error) {
+func FindTouHoliday(exec boil.Executor, iD int64, selectCols ...string) (*TouHoliday, error) {
 	touHolidayObj := &TouHoliday{}
 
 	sel := "*"
@@ -316,7 +316,7 @@ func (o *TouHoliday) Insert(exec boil.Executor, columns boil.Columns) error {
 		return ErrSyncFail
 	}
 
-	o.ID = int(lastID)
+	o.ID = int64(lastID)
 	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == touHolidayMapping["id"] {
 		goto CacheNoHooks
 	}
@@ -590,7 +590,7 @@ func (o *TouHoliday) Upsert(exec boil.Executor, updateColumns, insertColumns boi
 		return ErrSyncFail
 	}
 
-	o.ID = int(lastID)
+	o.ID = int64(lastID)
 	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == touHolidayMapping["id"] {
 		goto CacheNoHooks
 	}
@@ -742,7 +742,7 @@ func (o *TouHolidaySlice) ReloadAll(exec boil.Executor) error {
 }
 
 // TouHolidayExists checks if the TouHoliday row exists.
-func TouHolidayExists(exec boil.Executor, iD int) (bool, error) {
+func TouHolidayExists(exec boil.Executor, iD int64) (bool, error) {
 	var exists bool
 	sql := "select exists(select 1 from `tou_holiday` where `id`=? limit 1)"
 

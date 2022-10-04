@@ -23,11 +23,11 @@ import (
 
 // CCDataLog is an object representing the database table.
 type CCDataLog struct {
-	ID                                int          `boil:"id" json:"id" toml:"id" yaml:"id"`
+	ID                                int64        `boil:"id" json:"id" toml:"id" yaml:"id"`
 	GWUUID                            string       `boil:"gw_uuid" json:"gwUUID" toml:"gwUUID" yaml:"gwUUID"`
 	LogDate                           time.Time    `boil:"log_date" json:"logDate" toml:"logDate" yaml:"logDate"`
-	GWID                              null.Int     `boil:"gw_id" json:"gwID,omitempty" toml:"gwID" yaml:"gwID,omitempty"`
-	CustomerID                        null.Int     `boil:"customer_id" json:"customerID,omitempty" toml:"customerID" yaml:"customerID,omitempty"`
+	GWID                              null.Int64   `boil:"gw_id" json:"gwID,omitempty" toml:"gwID" yaml:"gwID,omitempty"`
+	CustomerID                        null.Int64   `boil:"customer_id" json:"customerID,omitempty" toml:"customerID" yaml:"customerID,omitempty"`
 	GridIsPeakShaving                 null.Int     `boil:"grid_is_peak_shaving" json:"gridIsPeakShaving,omitempty" toml:"gridIsPeakShaving" yaml:"gridIsPeakShaving,omitempty"`
 	LoadGridAveragePowerAC            null.Float32 `boil:"load_grid_average_power_ac" json:"loadGridAveragePowerAc,omitempty" toml:"loadGridAveragePowerAc" yaml:"loadGridAveragePowerAc,omitempty"`
 	BatteryGridAveragePowerAC         null.Float32 `boil:"battery_grid_average_power_ac" json:"batteryGridAveragePowerAc,omitempty" toml:"batteryGridAveragePowerAc" yaml:"batteryGridAveragePowerAc,omitempty"`
@@ -288,6 +288,30 @@ var CCDataLogTableColumns = struct {
 
 // Generated where
 
+type whereHelpernull_Int struct{ field string }
+
+func (w whereHelpernull_Int) EQ(x null.Int) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, false, x)
+}
+func (w whereHelpernull_Int) NEQ(x null.Int) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, true, x)
+}
+func (w whereHelpernull_Int) LT(x null.Int) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LT, x)
+}
+func (w whereHelpernull_Int) LTE(x null.Int) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LTE, x)
+}
+func (w whereHelpernull_Int) GT(x null.Int) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GT, x)
+}
+func (w whereHelpernull_Int) GTE(x null.Int) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GTE, x)
+}
+
+func (w whereHelpernull_Int) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
+func (w whereHelpernull_Int) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
+
 type whereHelpernull_Float32 struct{ field string }
 
 func (w whereHelpernull_Float32) EQ(x null.Float32) qm.QueryMod {
@@ -337,11 +361,11 @@ func (w whereHelpernull_String) IsNull() qm.QueryMod    { return qmhelper.WhereI
 func (w whereHelpernull_String) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
 
 var CCDataLogWhere = struct {
-	ID                                whereHelperint
+	ID                                whereHelperint64
 	GWUUID                            whereHelperstring
 	LogDate                           whereHelpertime_Time
-	GWID                              whereHelpernull_Int
-	CustomerID                        whereHelpernull_Int
+	GWID                              whereHelpernull_Int64
+	CustomerID                        whereHelpernull_Int64
 	GridIsPeakShaving                 whereHelpernull_Int
 	LoadGridAveragePowerAC            whereHelpernull_Float32
 	BatteryGridAveragePowerAC         whereHelpernull_Float32
@@ -388,11 +412,11 @@ var CCDataLogWhere = struct {
 	CreatedAt                         whereHelpertime_Time
 	UpdatedAt                         whereHelpernull_Time
 }{
-	ID:                                whereHelperint{field: "`cc_data_log`.`id`"},
+	ID:                                whereHelperint64{field: "`cc_data_log`.`id`"},
 	GWUUID:                            whereHelperstring{field: "`cc_data_log`.`gw_uuid`"},
 	LogDate:                           whereHelpertime_Time{field: "`cc_data_log`.`log_date`"},
-	GWID:                              whereHelpernull_Int{field: "`cc_data_log`.`gw_id`"},
-	CustomerID:                        whereHelpernull_Int{field: "`cc_data_log`.`customer_id`"},
+	GWID:                              whereHelpernull_Int64{field: "`cc_data_log`.`gw_id`"},
+	CustomerID:                        whereHelpernull_Int64{field: "`cc_data_log`.`customer_id`"},
 	GridIsPeakShaving:                 whereHelpernull_Int{field: "`cc_data_log`.`grid_is_peak_shaving`"},
 	LoadGridAveragePowerAC:            whereHelpernull_Float32{field: "`cc_data_log`.`load_grid_average_power_ac`"},
 	BatteryGridAveragePowerAC:         whereHelpernull_Float32{field: "`cc_data_log`.`battery_grid_average_power_ac`"},
@@ -568,7 +592,7 @@ func CCDataLogs(mods ...qm.QueryMod) ccDataLogQuery {
 
 // FindCCDataLog retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindCCDataLog(exec boil.Executor, iD int, selectCols ...string) (*CCDataLog, error) {
+func FindCCDataLog(exec boil.Executor, iD int64, selectCols ...string) (*CCDataLog, error) {
 	ccDataLogObj := &CCDataLog{}
 
 	sel := "*"
@@ -672,7 +696,7 @@ func (o *CCDataLog) Insert(exec boil.Executor, columns boil.Columns) error {
 		return ErrSyncFail
 	}
 
-	o.ID = int(lastID)
+	o.ID = int64(lastID)
 	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == ccDataLogMapping["id"] {
 		goto CacheNoHooks
 	}
@@ -946,7 +970,7 @@ func (o *CCDataLog) Upsert(exec boil.Executor, updateColumns, insertColumns boil
 		return ErrSyncFail
 	}
 
-	o.ID = int(lastID)
+	o.ID = int64(lastID)
 	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == ccDataLogMapping["id"] {
 		goto CacheNoHooks
 	}
@@ -1098,7 +1122,7 @@ func (o *CCDataLogSlice) ReloadAll(exec boil.Executor) error {
 }
 
 // CCDataLogExists checks if the CCDataLog row exists.
-func CCDataLogExists(exec boil.Executor, iD int) (bool, error) {
+func CCDataLogExists(exec boil.Executor, iD int64) (bool, error) {
 	var exists bool
 	sql := "select exists(select 1 from `cc_data_log` where `id`=? limit 1)"
 

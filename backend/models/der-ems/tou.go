@@ -23,7 +23,7 @@ import (
 
 // Tou is an object representing the database table.
 type Tou struct {
-	ID            int          `boil:"id" json:"id" toml:"id" yaml:"id"`
+	ID            int64        `boil:"id" json:"id" toml:"id" yaml:"id"`
 	TOULocationID null.Int     `boil:"tou_location_id" json:"touLocationID,omitempty" toml:"touLocationID" yaml:"touLocationID,omitempty"`
 	VoltageType   null.String  `boil:"voltage_type" json:"voltageType,omitempty" toml:"voltageType" yaml:"voltageType,omitempty"`
 	TOUType       null.String  `boil:"tou_type" json:"touType,omitempty" toml:"touType" yaml:"touType,omitempty"`
@@ -119,7 +119,7 @@ var TouTableColumns = struct {
 // Generated where
 
 var TouWhere = struct {
-	ID            whereHelperint
+	ID            whereHelperint64
 	TOULocationID whereHelpernull_Int
 	VoltageType   whereHelpernull_String
 	TOUType       whereHelpernull_String
@@ -136,7 +136,7 @@ var TouWhere = struct {
 	CreatedAt     whereHelpertime_Time
 	UpdatedAt     whereHelpernull_Time
 }{
-	ID:            whereHelperint{field: "`tou`.`id`"},
+	ID:            whereHelperint64{field: "`tou`.`id`"},
 	TOULocationID: whereHelpernull_Int{field: "`tou`.`tou_location_id`"},
 	VoltageType:   whereHelpernull_String{field: "`tou`.`voltage_type`"},
 	TOUType:       whereHelpernull_String{field: "`tou`.`tou_type`"},
@@ -282,7 +282,7 @@ func Tous(mods ...qm.QueryMod) touQuery {
 
 // FindTou retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindTou(exec boil.Executor, iD int, selectCols ...string) (*Tou, error) {
+func FindTou(exec boil.Executor, iD int64, selectCols ...string) (*Tou, error) {
 	touObj := &Tou{}
 
 	sel := "*"
@@ -386,7 +386,7 @@ func (o *Tou) Insert(exec boil.Executor, columns boil.Columns) error {
 		return ErrSyncFail
 	}
 
-	o.ID = int(lastID)
+	o.ID = int64(lastID)
 	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == touMapping["id"] {
 		goto CacheNoHooks
 	}
@@ -660,7 +660,7 @@ func (o *Tou) Upsert(exec boil.Executor, updateColumns, insertColumns boil.Colum
 		return ErrSyncFail
 	}
 
-	o.ID = int(lastID)
+	o.ID = int64(lastID)
 	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == touMapping["id"] {
 		goto CacheNoHooks
 	}
@@ -812,7 +812,7 @@ func (o *TouSlice) ReloadAll(exec boil.Executor) error {
 }
 
 // TouExists checks if the Tou row exists.
-func TouExists(exec boil.Executor, iD int) (bool, error) {
+func TouExists(exec boil.Executor, iD int64) (bool, error) {
 	var exists bool
 	sql := "select exists(select 1 from `tou` where `id`=? limit 1)"
 

@@ -23,7 +23,7 @@ import (
 
 // DeviceModel is an object representing the database table.
 type DeviceModel struct {
-	ID         int         `boil:"id" json:"id" toml:"id" yaml:"id"`
+	ID         int64       `boil:"id" json:"id" toml:"id" yaml:"id"`
 	DeviceType null.String `boil:"device_type" json:"deviceType,omitempty" toml:"deviceType" yaml:"deviceType,omitempty"`
 	ModelName  null.String `boil:"model_name" json:"modelName,omitempty" toml:"modelName" yaml:"modelName,omitempty"`
 	Capacity   null.String `boil:"capacity" json:"capacity,omitempty" toml:"capacity" yaml:"capacity,omitempty"`
@@ -69,14 +69,14 @@ var DeviceModelTableColumns = struct {
 // Generated where
 
 var DeviceModelWhere = struct {
-	ID         whereHelperint
+	ID         whereHelperint64
 	DeviceType whereHelpernull_String
 	ModelName  whereHelpernull_String
 	Capacity   whereHelpernull_String
 	CreatedAt  whereHelpertime_Time
 	UpdatedAt  whereHelpernull_Time
 }{
-	ID:         whereHelperint{field: "`device_model`.`id`"},
+	ID:         whereHelperint64{field: "`device_model`.`id`"},
 	DeviceType: whereHelpernull_String{field: "`device_model`.`device_type`"},
 	ModelName:  whereHelpernull_String{field: "`device_model`.`model_name`"},
 	Capacity:   whereHelpernull_String{field: "`device_model`.`capacity`"},
@@ -380,7 +380,7 @@ func DeviceModels(mods ...qm.QueryMod) deviceModelQuery {
 
 // FindDeviceModel retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindDeviceModel(exec boil.Executor, iD int, selectCols ...string) (*DeviceModel, error) {
+func FindDeviceModel(exec boil.Executor, iD int64, selectCols ...string) (*DeviceModel, error) {
 	deviceModelObj := &DeviceModel{}
 
 	sel := "*"
@@ -484,7 +484,7 @@ func (o *DeviceModel) Insert(exec boil.Executor, columns boil.Columns) error {
 		return ErrSyncFail
 	}
 
-	o.ID = int(lastID)
+	o.ID = int64(lastID)
 	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == deviceModelMapping["id"] {
 		goto CacheNoHooks
 	}
@@ -758,7 +758,7 @@ func (o *DeviceModel) Upsert(exec boil.Executor, updateColumns, insertColumns bo
 		return ErrSyncFail
 	}
 
-	o.ID = int(lastID)
+	o.ID = int64(lastID)
 	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == deviceModelMapping["id"] {
 		goto CacheNoHooks
 	}
@@ -910,7 +910,7 @@ func (o *DeviceModelSlice) ReloadAll(exec boil.Executor) error {
 }
 
 // DeviceModelExists checks if the DeviceModel row exists.
-func DeviceModelExists(exec boil.Executor, iD int) (bool, error) {
+func DeviceModelExists(exec boil.Executor, iD int64) (bool, error) {
 	var exists bool
 	sql := "select exists(select 1 from `device_model` where `id`=? limit 1)"
 

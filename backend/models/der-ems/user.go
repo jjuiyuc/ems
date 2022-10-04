@@ -23,7 +23,7 @@ import (
 
 // User is an object representing the database table.
 type User struct {
-	ID                  int         `boil:"id" json:"id" toml:"id" yaml:"id"`
+	ID                  int64       `boil:"id" json:"id" toml:"id" yaml:"id"`
 	Username            string      `boil:"username" json:"username" toml:"username" yaml:"username"`
 	Password            string      `boil:"password" json:"-" toml:"-" yaml:"-"`
 	PasswordLastChanged null.Time   `boil:"password_last_changed" json:"passwordLastChanged,omitempty" toml:"passwordLastChanged" yaml:"passwordLastChanged,omitempty"`
@@ -104,7 +104,7 @@ var UserTableColumns = struct {
 // Generated where
 
 var UserWhere = struct {
-	ID                  whereHelperint
+	ID                  whereHelperint64
 	Username            whereHelperstring
 	Password            whereHelperstring
 	PasswordLastChanged whereHelpernull_Time
@@ -118,7 +118,7 @@ var UserWhere = struct {
 	UpdatedAt           whereHelpernull_Time
 	DeletedAt           whereHelpernull_Time
 }{
-	ID:                  whereHelperint{field: "`user`.`id`"},
+	ID:                  whereHelperint64{field: "`user`.`id`"},
 	Username:            whereHelperstring{field: "`user`.`username`"},
 	Password:            whereHelperstring{field: "`user`.`password`"},
 	PasswordLastChanged: whereHelpernull_Time{field: "`user`.`password_last_changed`"},
@@ -502,7 +502,7 @@ func Users(mods ...qm.QueryMod) userQuery {
 
 // FindUser retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindUser(exec boil.Executor, iD int, selectCols ...string) (*User, error) {
+func FindUser(exec boil.Executor, iD int64, selectCols ...string) (*User, error) {
 	userObj := &User{}
 
 	sel := "*"
@@ -606,7 +606,7 @@ func (o *User) Insert(exec boil.Executor, columns boil.Columns) error {
 		return ErrSyncFail
 	}
 
-	o.ID = int(lastID)
+	o.ID = int64(lastID)
 	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == userMapping["id"] {
 		goto CacheNoHooks
 	}
@@ -880,7 +880,7 @@ func (o *User) Upsert(exec boil.Executor, updateColumns, insertColumns boil.Colu
 		return ErrSyncFail
 	}
 
-	o.ID = int(lastID)
+	o.ID = int64(lastID)
 	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == userMapping["id"] {
 		goto CacheNoHooks
 	}
@@ -1032,7 +1032,7 @@ func (o *UserSlice) ReloadAll(exec boil.Executor) error {
 }
 
 // UserExists checks if the User row exists.
-func UserExists(exec boil.Executor, iD int) (bool, error) {
+func UserExists(exec boil.Executor, iD int64) (bool, error) {
 	var exists bool
 	sql := "select exists(select 1 from `user` where `id`=? limit 1)"
 

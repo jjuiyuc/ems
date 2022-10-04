@@ -23,11 +23,11 @@ import (
 
 // UserGatewayRight is an object representing the database table.
 type UserGatewayRight struct {
-	ID        int       `boil:"id" json:"id" toml:"id" yaml:"id"`
-	UserID    null.Int  `boil:"user_id" json:"userID,omitempty" toml:"userID" yaml:"userID,omitempty"`
-	GWID      null.Int  `boil:"gw_id" json:"gwID,omitempty" toml:"gwID" yaml:"gwID,omitempty"`
-	CreatedAt time.Time `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
-	UpdatedAt null.Time `boil:"updated_at" json:"updatedAt,omitempty" toml:"updatedAt" yaml:"updatedAt,omitempty"`
+	ID        int64      `boil:"id" json:"id" toml:"id" yaml:"id"`
+	UserID    null.Int64 `boil:"user_id" json:"userID,omitempty" toml:"userID" yaml:"userID,omitempty"`
+	GWID      null.Int64 `boil:"gw_id" json:"gwID,omitempty" toml:"gwID" yaml:"gwID,omitempty"`
+	CreatedAt time.Time  `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
+	UpdatedAt null.Time  `boil:"updated_at" json:"updatedAt,omitempty" toml:"updatedAt" yaml:"updatedAt,omitempty"`
 
 	R *userGatewayRightR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L userGatewayRightL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -64,15 +64,15 @@ var UserGatewayRightTableColumns = struct {
 // Generated where
 
 var UserGatewayRightWhere = struct {
-	ID        whereHelperint
-	UserID    whereHelpernull_Int
-	GWID      whereHelpernull_Int
+	ID        whereHelperint64
+	UserID    whereHelpernull_Int64
+	GWID      whereHelpernull_Int64
 	CreatedAt whereHelpertime_Time
 	UpdatedAt whereHelpernull_Time
 }{
-	ID:        whereHelperint{field: "`user_gateway_right`.`id`"},
-	UserID:    whereHelpernull_Int{field: "`user_gateway_right`.`user_id`"},
-	GWID:      whereHelpernull_Int{field: "`user_gateway_right`.`gw_id`"},
+	ID:        whereHelperint64{field: "`user_gateway_right`.`id`"},
+	UserID:    whereHelpernull_Int64{field: "`user_gateway_right`.`user_id`"},
+	GWID:      whereHelpernull_Int64{field: "`user_gateway_right`.`gw_id`"},
 	CreatedAt: whereHelpertime_Time{field: "`user_gateway_right`.`created_at`"},
 	UpdatedAt: whereHelpernull_Time{field: "`user_gateway_right`.`updated_at`"},
 }
@@ -606,7 +606,7 @@ func UserGatewayRights(mods ...qm.QueryMod) userGatewayRightQuery {
 
 // FindUserGatewayRight retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindUserGatewayRight(exec boil.Executor, iD int, selectCols ...string) (*UserGatewayRight, error) {
+func FindUserGatewayRight(exec boil.Executor, iD int64, selectCols ...string) (*UserGatewayRight, error) {
 	userGatewayRightObj := &UserGatewayRight{}
 
 	sel := "*"
@@ -710,7 +710,7 @@ func (o *UserGatewayRight) Insert(exec boil.Executor, columns boil.Columns) erro
 		return ErrSyncFail
 	}
 
-	o.ID = int(lastID)
+	o.ID = int64(lastID)
 	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == userGatewayRightMapping["id"] {
 		goto CacheNoHooks
 	}
@@ -984,7 +984,7 @@ func (o *UserGatewayRight) Upsert(exec boil.Executor, updateColumns, insertColum
 		return ErrSyncFail
 	}
 
-	o.ID = int(lastID)
+	o.ID = int64(lastID)
 	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == userGatewayRightMapping["id"] {
 		goto CacheNoHooks
 	}
@@ -1136,7 +1136,7 @@ func (o *UserGatewayRightSlice) ReloadAll(exec boil.Executor) error {
 }
 
 // UserGatewayRightExists checks if the UserGatewayRight row exists.
-func UserGatewayRightExists(exec boil.Executor, iD int) (bool, error) {
+func UserGatewayRightExists(exec boil.Executor, iD int64) (bool, error) {
 	var exists bool
 	sql := "select exists(select 1 from `user_gateway_right` where `id`=? limit 1)"
 

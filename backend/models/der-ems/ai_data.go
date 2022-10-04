@@ -23,14 +23,14 @@ import (
 
 // AiDatum is an object representing the database table.
 type AiDatum struct {
-	ID          int       `boil:"id" json:"id" toml:"id" yaml:"id"`
-	GWUUID      string    `boil:"gw_uuid" json:"gwUUID" toml:"gwUUID" yaml:"gwUUID"`
-	LogDate     time.Time `boil:"log_date" json:"logDate" toml:"logDate" yaml:"logDate"`
-	GWID        null.Int  `boil:"gw_id" json:"gwID,omitempty" toml:"gwID" yaml:"gwID,omitempty"`
-	CustomerID  null.Int  `boil:"customer_id" json:"customerID,omitempty" toml:"customerID" yaml:"customerID,omitempty"`
-	LocalAiData null.JSON `boil:"local_ai_data" json:"localAiData,omitempty" toml:"localAiData" yaml:"localAiData,omitempty"`
-	CreatedAt   time.Time `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
-	UpdatedAt   null.Time `boil:"updated_at" json:"updatedAt,omitempty" toml:"updatedAt" yaml:"updatedAt,omitempty"`
+	ID          int64      `boil:"id" json:"id" toml:"id" yaml:"id"`
+	GWUUID      string     `boil:"gw_uuid" json:"gwUUID" toml:"gwUUID" yaml:"gwUUID"`
+	LogDate     time.Time  `boil:"log_date" json:"logDate" toml:"logDate" yaml:"logDate"`
+	GWID        null.Int64 `boil:"gw_id" json:"gwID,omitempty" toml:"gwID" yaml:"gwID,omitempty"`
+	CustomerID  null.Int64 `boil:"customer_id" json:"customerID,omitempty" toml:"customerID" yaml:"customerID,omitempty"`
+	LocalAiData null.JSON  `boil:"local_ai_data" json:"localAiData,omitempty" toml:"localAiData" yaml:"localAiData,omitempty"`
+	CreatedAt   time.Time  `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
+	UpdatedAt   null.Time  `boil:"updated_at" json:"updatedAt,omitempty" toml:"updatedAt" yaml:"updatedAt,omitempty"`
 
 	R *aiDatumR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L aiDatumL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -78,22 +78,22 @@ var AiDatumTableColumns = struct {
 
 // Generated where
 
-type whereHelperint struct{ field string }
+type whereHelperint64 struct{ field string }
 
-func (w whereHelperint) EQ(x int) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.EQ, x) }
-func (w whereHelperint) NEQ(x int) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.NEQ, x) }
-func (w whereHelperint) LT(x int) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.LT, x) }
-func (w whereHelperint) LTE(x int) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.LTE, x) }
-func (w whereHelperint) GT(x int) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.GT, x) }
-func (w whereHelperint) GTE(x int) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GTE, x) }
-func (w whereHelperint) IN(slice []int) qm.QueryMod {
+func (w whereHelperint64) EQ(x int64) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.EQ, x) }
+func (w whereHelperint64) NEQ(x int64) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.NEQ, x) }
+func (w whereHelperint64) LT(x int64) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.LT, x) }
+func (w whereHelperint64) LTE(x int64) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.LTE, x) }
+func (w whereHelperint64) GT(x int64) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.GT, x) }
+func (w whereHelperint64) GTE(x int64) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GTE, x) }
+func (w whereHelperint64) IN(slice []int64) qm.QueryMod {
 	values := make([]interface{}, 0, len(slice))
 	for _, value := range slice {
 		values = append(values, value)
 	}
 	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
 }
-func (w whereHelperint) NIN(slice []int) qm.QueryMod {
+func (w whereHelperint64) NIN(slice []int64) qm.QueryMod {
 	values := make([]interface{}, 0, len(slice))
 	for _, value := range slice {
 		values = append(values, value)
@@ -145,29 +145,29 @@ func (w whereHelpertime_Time) GTE(x time.Time) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.GTE, x)
 }
 
-type whereHelpernull_Int struct{ field string }
+type whereHelpernull_Int64 struct{ field string }
 
-func (w whereHelpernull_Int) EQ(x null.Int) qm.QueryMod {
+func (w whereHelpernull_Int64) EQ(x null.Int64) qm.QueryMod {
 	return qmhelper.WhereNullEQ(w.field, false, x)
 }
-func (w whereHelpernull_Int) NEQ(x null.Int) qm.QueryMod {
+func (w whereHelpernull_Int64) NEQ(x null.Int64) qm.QueryMod {
 	return qmhelper.WhereNullEQ(w.field, true, x)
 }
-func (w whereHelpernull_Int) LT(x null.Int) qm.QueryMod {
+func (w whereHelpernull_Int64) LT(x null.Int64) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.LT, x)
 }
-func (w whereHelpernull_Int) LTE(x null.Int) qm.QueryMod {
+func (w whereHelpernull_Int64) LTE(x null.Int64) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.LTE, x)
 }
-func (w whereHelpernull_Int) GT(x null.Int) qm.QueryMod {
+func (w whereHelpernull_Int64) GT(x null.Int64) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.GT, x)
 }
-func (w whereHelpernull_Int) GTE(x null.Int) qm.QueryMod {
+func (w whereHelpernull_Int64) GTE(x null.Int64) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.GTE, x)
 }
 
-func (w whereHelpernull_Int) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
-func (w whereHelpernull_Int) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
+func (w whereHelpernull_Int64) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
+func (w whereHelpernull_Int64) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
 
 type whereHelpernull_JSON struct{ field string }
 
@@ -218,20 +218,20 @@ func (w whereHelpernull_Time) IsNull() qm.QueryMod    { return qmhelper.WhereIsN
 func (w whereHelpernull_Time) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
 
 var AiDatumWhere = struct {
-	ID          whereHelperint
+	ID          whereHelperint64
 	GWUUID      whereHelperstring
 	LogDate     whereHelpertime_Time
-	GWID        whereHelpernull_Int
-	CustomerID  whereHelpernull_Int
+	GWID        whereHelpernull_Int64
+	CustomerID  whereHelpernull_Int64
 	LocalAiData whereHelpernull_JSON
 	CreatedAt   whereHelpertime_Time
 	UpdatedAt   whereHelpernull_Time
 }{
-	ID:          whereHelperint{field: "`ai_data`.`id`"},
+	ID:          whereHelperint64{field: "`ai_data`.`id`"},
 	GWUUID:      whereHelperstring{field: "`ai_data`.`gw_uuid`"},
 	LogDate:     whereHelpertime_Time{field: "`ai_data`.`log_date`"},
-	GWID:        whereHelpernull_Int{field: "`ai_data`.`gw_id`"},
-	CustomerID:  whereHelpernull_Int{field: "`ai_data`.`customer_id`"},
+	GWID:        whereHelpernull_Int64{field: "`ai_data`.`gw_id`"},
+	CustomerID:  whereHelpernull_Int64{field: "`ai_data`.`customer_id`"},
 	LocalAiData: whereHelpernull_JSON{field: "`ai_data`.`local_ai_data`"},
 	CreatedAt:   whereHelpertime_Time{field: "`ai_data`.`created_at`"},
 	UpdatedAt:   whereHelpernull_Time{field: "`ai_data`.`updated_at`"},
@@ -365,7 +365,7 @@ func AiData(mods ...qm.QueryMod) aiDatumQuery {
 
 // FindAiDatum retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindAiDatum(exec boil.Executor, iD int, selectCols ...string) (*AiDatum, error) {
+func FindAiDatum(exec boil.Executor, iD int64, selectCols ...string) (*AiDatum, error) {
 	aiDatumObj := &AiDatum{}
 
 	sel := "*"
@@ -469,7 +469,7 @@ func (o *AiDatum) Insert(exec boil.Executor, columns boil.Columns) error {
 		return ErrSyncFail
 	}
 
-	o.ID = int(lastID)
+	o.ID = int64(lastID)
 	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == aiDatumMapping["id"] {
 		goto CacheNoHooks
 	}
@@ -743,7 +743,7 @@ func (o *AiDatum) Upsert(exec boil.Executor, updateColumns, insertColumns boil.C
 		return ErrSyncFail
 	}
 
-	o.ID = int(lastID)
+	o.ID = int64(lastID)
 	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == aiDatumMapping["id"] {
 		goto CacheNoHooks
 	}
@@ -895,7 +895,7 @@ func (o *AiDatumSlice) ReloadAll(exec boil.Executor) error {
 }
 
 // AiDatumExists checks if the AiDatum row exists.
-func AiDatumExists(exec boil.Executor, iD int) (bool, error) {
+func AiDatumExists(exec boil.Executor, iD int64) (bool, error) {
 	var exists bool
 	sql := "select exists(select 1 from `ai_data` where `id`=? limit 1)"
 

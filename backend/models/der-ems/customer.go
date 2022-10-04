@@ -23,7 +23,7 @@ import (
 
 // Customer is an object representing the database table.
 type Customer struct {
-	ID             int          `boil:"id" json:"id" toml:"id" yaml:"id"`
+	ID             int64        `boil:"id" json:"id" toml:"id" yaml:"id"`
 	CustomerNumber string       `boil:"customer_number" json:"customerNumber" toml:"customerNumber" yaml:"customerNumber"`
 	FieldNumber    string       `boil:"field_number" json:"fieldNumber" toml:"fieldNumber" yaml:"fieldNumber"`
 	Address        null.String  `boil:"address" json:"address,omitempty" toml:"address" yaml:"address,omitempty"`
@@ -133,7 +133,7 @@ func (w whereHelpernull_Float64) IsNull() qm.QueryMod    { return qmhelper.Where
 func (w whereHelpernull_Float64) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
 
 var CustomerWhere = struct {
-	ID             whereHelperint
+	ID             whereHelperint64
 	CustomerNumber whereHelperstring
 	FieldNumber    whereHelperstring
 	Address        whereHelpernull_String
@@ -148,7 +148,7 @@ var CustomerWhere = struct {
 	CreatedAt      whereHelpertime_Time
 	UpdatedAt      whereHelpernull_Time
 }{
-	ID:             whereHelperint{field: "`customer`.`id`"},
+	ID:             whereHelperint64{field: "`customer`.`id`"},
 	CustomerNumber: whereHelperstring{field: "`customer`.`customer_number`"},
 	FieldNumber:    whereHelperstring{field: "`customer`.`field_number`"},
 	Address:        whereHelpernull_String{field: "`customer`.`address`"},
@@ -460,7 +460,7 @@ func Customers(mods ...qm.QueryMod) customerQuery {
 
 // FindCustomer retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindCustomer(exec boil.Executor, iD int, selectCols ...string) (*Customer, error) {
+func FindCustomer(exec boil.Executor, iD int64, selectCols ...string) (*Customer, error) {
 	customerObj := &Customer{}
 
 	sel := "*"
@@ -564,7 +564,7 @@ func (o *Customer) Insert(exec boil.Executor, columns boil.Columns) error {
 		return ErrSyncFail
 	}
 
-	o.ID = int(lastID)
+	o.ID = int64(lastID)
 	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == customerMapping["id"] {
 		goto CacheNoHooks
 	}
@@ -838,7 +838,7 @@ func (o *Customer) Upsert(exec boil.Executor, updateColumns, insertColumns boil.
 		return ErrSyncFail
 	}
 
-	o.ID = int(lastID)
+	o.ID = int64(lastID)
 	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == customerMapping["id"] {
 		goto CacheNoHooks
 	}
@@ -990,7 +990,7 @@ func (o *CustomerSlice) ReloadAll(exec boil.Executor) error {
 }
 
 // CustomerExists checks if the Customer row exists.
-func CustomerExists(exec boil.Executor, iD int) (bool, error) {
+func CustomerExists(exec boil.Executor, iD int64) (bool, error) {
 	var exists bool
 	sql := "select exists(select 1 from `customer` where `id`=? limit 1)"
 

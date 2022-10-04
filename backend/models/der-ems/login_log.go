@@ -23,10 +23,10 @@ import (
 
 // LoginLog is an object representing the database table.
 type LoginLog struct {
-	ID        int64     `boil:"id" json:"id" toml:"id" yaml:"id"`
-	UserID    null.Int  `boil:"user_id" json:"userID,omitempty" toml:"userID" yaml:"userID,omitempty"`
-	CreatedAt time.Time `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
-	UpdatedAt time.Time `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
+	ID        int64      `boil:"id" json:"id" toml:"id" yaml:"id"`
+	UserID    null.Int64 `boil:"user_id" json:"userID,omitempty" toml:"userID" yaml:"userID,omitempty"`
+	CreatedAt time.Time  `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
+	UpdatedAt time.Time  `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
 
 	R *loginLogR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L loginLogL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -60,12 +60,12 @@ var LoginLogTableColumns = struct {
 
 var LoginLogWhere = struct {
 	ID        whereHelperint64
-	UserID    whereHelpernull_Int
+	UserID    whereHelpernull_Int64
 	CreatedAt whereHelpertime_Time
 	UpdatedAt whereHelpertime_Time
 }{
 	ID:        whereHelperint64{field: "`login_log`.`id`"},
-	UserID:    whereHelpernull_Int{field: "`login_log`.`user_id`"},
+	UserID:    whereHelpernull_Int64{field: "`login_log`.`user_id`"},
 	CreatedAt: whereHelpertime_Time{field: "`login_log`.`created_at`"},
 	UpdatedAt: whereHelpertime_Time{field: "`login_log`.`updated_at`"},
 }

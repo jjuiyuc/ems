@@ -24,7 +24,7 @@ import (
 // TouHoliday is an object representing the database table.
 type TouHoliday struct {
 	ID            int64       `boil:"id" json:"id" toml:"id" yaml:"id"`
-	TOULocationID null.Int    `boil:"tou_location_id" json:"touLocationID,omitempty" toml:"touLocationID" yaml:"touLocationID,omitempty"`
+	TOULocationID null.Int64  `boil:"tou_location_id" json:"touLocationID,omitempty" toml:"touLocationID" yaml:"touLocationID,omitempty"`
 	Year          null.String `boil:"year" json:"year,omitempty" toml:"year" yaml:"year,omitempty"`
 	Day           null.Time   `boil:"day" json:"day,omitempty" toml:"day" yaml:"day,omitempty"`
 	CreatedAt     time.Time   `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
@@ -70,14 +70,14 @@ var TouHolidayTableColumns = struct {
 
 var TouHolidayWhere = struct {
 	ID            whereHelperint64
-	TOULocationID whereHelpernull_Int
+	TOULocationID whereHelpernull_Int64
 	Year          whereHelpernull_String
 	Day           whereHelpernull_Time
 	CreatedAt     whereHelpertime_Time
 	UpdatedAt     whereHelpertime_Time
 }{
 	ID:            whereHelperint64{field: "`tou_holiday`.`id`"},
-	TOULocationID: whereHelpernull_Int{field: "`tou_holiday`.`tou_location_id`"},
+	TOULocationID: whereHelpernull_Int64{field: "`tou_holiday`.`tou_location_id`"},
 	Year:          whereHelpernull_String{field: "`tou_holiday`.`year`"},
 	Day:           whereHelpernull_Time{field: "`tou_holiday`.`day`"},
 	CreatedAt:     whereHelpertime_Time{field: "`tou_holiday`.`created_at`"},

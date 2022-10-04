@@ -32,7 +32,7 @@ type Customer struct {
 	WeatherLat     null.Float32 `boil:"weather_lat" json:"weatherLat,omitempty" toml:"weatherLat" yaml:"weatherLat,omitempty"`
 	WeatherLng     null.Float32 `boil:"weather_lng" json:"weatherLNG,omitempty" toml:"weatherLNG" yaml:"weatherLNG,omitempty"`
 	Timezone       null.String  `boil:"timezone" json:"timezone,omitempty" toml:"timezone" yaml:"timezone,omitempty"`
-	TOULocationID  null.Int     `boil:"tou_location_id" json:"touLocationID,omitempty" toml:"touLocationID" yaml:"touLocationID,omitempty"`
+	TOULocationID  null.Int64   `boil:"tou_location_id" json:"touLocationID,omitempty" toml:"touLocationID" yaml:"touLocationID,omitempty"`
 	VoltageType    null.String  `boil:"voltage_type" json:"voltageType,omitempty" toml:"voltageType" yaml:"voltageType,omitempty"`
 	TOUType        null.String  `boil:"tou_type" json:"touType,omitempty" toml:"touType" yaml:"touType,omitempty"`
 	CreatedAt      time.Time    `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
@@ -142,7 +142,7 @@ var CustomerWhere = struct {
 	WeatherLat     whereHelpernull_Float32
 	WeatherLng     whereHelpernull_Float32
 	Timezone       whereHelpernull_String
-	TOULocationID  whereHelpernull_Int
+	TOULocationID  whereHelpernull_Int64
 	VoltageType    whereHelpernull_String
 	TOUType        whereHelpernull_String
 	CreatedAt      whereHelpertime_Time
@@ -157,7 +157,7 @@ var CustomerWhere = struct {
 	WeatherLat:     whereHelpernull_Float32{field: "`customer`.`weather_lat`"},
 	WeatherLng:     whereHelpernull_Float32{field: "`customer`.`weather_lng`"},
 	Timezone:       whereHelpernull_String{field: "`customer`.`timezone`"},
-	TOULocationID:  whereHelpernull_Int{field: "`customer`.`tou_location_id`"},
+	TOULocationID:  whereHelpernull_Int64{field: "`customer`.`tou_location_id`"},
 	VoltageType:    whereHelpernull_String{field: "`customer`.`voltage_type`"},
 	TOUType:        whereHelpernull_String{field: "`customer`.`tou_type`"},
 	CreatedAt:      whereHelpertime_Time{field: "`customer`.`created_at`"},

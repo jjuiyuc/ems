@@ -27,7 +27,7 @@ type UserGatewayRight struct {
 	UserID    null.Int64 `boil:"user_id" json:"userID,omitempty" toml:"userID" yaml:"userID,omitempty"`
 	GWID      null.Int64 `boil:"gw_id" json:"gwID,omitempty" toml:"gwID" yaml:"gwID,omitempty"`
 	CreatedAt time.Time  `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
-	UpdatedAt null.Time  `boil:"updated_at" json:"updatedAt,omitempty" toml:"updatedAt" yaml:"updatedAt,omitempty"`
+	UpdatedAt time.Time  `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
 
 	R *userGatewayRightR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L userGatewayRightL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -68,13 +68,13 @@ var UserGatewayRightWhere = struct {
 	UserID    whereHelpernull_Int64
 	GWID      whereHelpernull_Int64
 	CreatedAt whereHelpertime_Time
-	UpdatedAt whereHelpernull_Time
+	UpdatedAt whereHelpertime_Time
 }{
 	ID:        whereHelperint64{field: "`user_gateway_right`.`id`"},
 	UserID:    whereHelpernull_Int64{field: "`user_gateway_right`.`user_id`"},
 	GWID:      whereHelpernull_Int64{field: "`user_gateway_right`.`gw_id`"},
 	CreatedAt: whereHelpertime_Time{field: "`user_gateway_right`.`created_at`"},
-	UpdatedAt: whereHelpernull_Time{field: "`user_gateway_right`.`updated_at`"},
+	UpdatedAt: whereHelpertime_Time{field: "`user_gateway_right`.`updated_at`"},
 }
 
 // UserGatewayRightRels is where relationship names are stored.
@@ -116,8 +116,8 @@ type userGatewayRightL struct{}
 
 var (
 	userGatewayRightAllColumns            = []string{"id", "user_id", "gw_id", "created_at", "updated_at"}
-	userGatewayRightColumnsWithoutDefault = []string{"user_id", "gw_id", "updated_at"}
-	userGatewayRightColumnsWithDefault    = []string{"id", "created_at"}
+	userGatewayRightColumnsWithoutDefault = []string{"user_id", "gw_id"}
+	userGatewayRightColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	userGatewayRightPrimaryKeyColumns     = []string{"id"}
 	userGatewayRightGeneratedColumns      = []string{}
 )
@@ -643,8 +643,8 @@ func (o *UserGatewayRight) Insert(exec boil.Executor, columns boil.Columns) erro
 	if o.CreatedAt.IsZero() {
 		o.CreatedAt = currTime
 	}
-	if queries.MustTime(o.UpdatedAt).IsZero() {
-		queries.SetScanner(&o.UpdatedAt, currTime)
+	if o.UpdatedAt.IsZero() {
+		o.UpdatedAt = currTime
 	}
 
 	nzDefaults := queries.NonZeroDefaultSet(userGatewayRightColumnsWithDefault, o)
@@ -744,7 +744,7 @@ CacheNoHooks:
 func (o *UserGatewayRight) Update(exec boil.Executor, columns boil.Columns) (int64, error) {
 	currTime := time.Now().In(boil.GetLocation())
 
-	queries.SetScanner(&o.UpdatedAt, currTime)
+	o.UpdatedAt = currTime
 
 	var err error
 	key := makeCacheKey(columns, nil)
@@ -880,7 +880,7 @@ func (o *UserGatewayRight) Upsert(exec boil.Executor, updateColumns, insertColum
 	if o.CreatedAt.IsZero() {
 		o.CreatedAt = currTime
 	}
-	queries.SetScanner(&o.UpdatedAt, currTime)
+	o.UpdatedAt = currTime
 
 	nzDefaults := queries.NonZeroDefaultSet(userGatewayRightColumnsWithDefault, o)
 	nzUniques := queries.NonZeroDefaultSet(mySQLUserGatewayRightUniqueColumns, o)

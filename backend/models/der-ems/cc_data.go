@@ -30,7 +30,7 @@ type CCDatum struct {
 	CustomerID  null.Int64 `boil:"customer_id" json:"customerID,omitempty" toml:"customerID" yaml:"customerID,omitempty"`
 	LocalCCData null.JSON  `boil:"local_cc_data" json:"localCCData,omitempty" toml:"localCCData" yaml:"localCCData,omitempty"`
 	CreatedAt   time.Time  `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
-	UpdatedAt   null.Time  `boil:"updated_at" json:"updatedAt,omitempty" toml:"updatedAt" yaml:"updatedAt,omitempty"`
+	UpdatedAt   time.Time  `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
 
 	R *ccDatumR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L ccDatumL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -86,7 +86,7 @@ var CCDatumWhere = struct {
 	CustomerID  whereHelpernull_Int64
 	LocalCCData whereHelpernull_JSON
 	CreatedAt   whereHelpertime_Time
-	UpdatedAt   whereHelpernull_Time
+	UpdatedAt   whereHelpertime_Time
 }{
 	ID:          whereHelperint64{field: "`cc_data`.`id`"},
 	GWUUID:      whereHelperstring{field: "`cc_data`.`gw_uuid`"},
@@ -95,7 +95,7 @@ var CCDatumWhere = struct {
 	CustomerID:  whereHelpernull_Int64{field: "`cc_data`.`customer_id`"},
 	LocalCCData: whereHelpernull_JSON{field: "`cc_data`.`local_cc_data`"},
 	CreatedAt:   whereHelpertime_Time{field: "`cc_data`.`created_at`"},
-	UpdatedAt:   whereHelpernull_Time{field: "`cc_data`.`updated_at`"},
+	UpdatedAt:   whereHelpertime_Time{field: "`cc_data`.`updated_at`"},
 }
 
 // CCDatumRels is where relationship names are stored.
@@ -116,8 +116,8 @@ type ccDatumL struct{}
 
 var (
 	ccDatumAllColumns            = []string{"id", "gw_uuid", "log_date", "gw_id", "customer_id", "local_cc_data", "created_at", "updated_at"}
-	ccDatumColumnsWithoutDefault = []string{"gw_uuid", "log_date", "gw_id", "customer_id", "local_cc_data", "updated_at"}
-	ccDatumColumnsWithDefault    = []string{"id", "created_at"}
+	ccDatumColumnsWithoutDefault = []string{"gw_uuid", "log_date", "gw_id", "customer_id", "local_cc_data"}
+	ccDatumColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	ccDatumPrimaryKeyColumns     = []string{"id"}
 	ccDatumGeneratedColumns      = []string{}
 )
@@ -263,8 +263,8 @@ func (o *CCDatum) Insert(exec boil.Executor, columns boil.Columns) error {
 	if o.CreatedAt.IsZero() {
 		o.CreatedAt = currTime
 	}
-	if queries.MustTime(o.UpdatedAt).IsZero() {
-		queries.SetScanner(&o.UpdatedAt, currTime)
+	if o.UpdatedAt.IsZero() {
+		o.UpdatedAt = currTime
 	}
 
 	nzDefaults := queries.NonZeroDefaultSet(ccDatumColumnsWithDefault, o)
@@ -364,7 +364,7 @@ CacheNoHooks:
 func (o *CCDatum) Update(exec boil.Executor, columns boil.Columns) (int64, error) {
 	currTime := time.Now().In(boil.GetLocation())
 
-	queries.SetScanner(&o.UpdatedAt, currTime)
+	o.UpdatedAt = currTime
 
 	var err error
 	key := makeCacheKey(columns, nil)
@@ -500,7 +500,7 @@ func (o *CCDatum) Upsert(exec boil.Executor, updateColumns, insertColumns boil.C
 	if o.CreatedAt.IsZero() {
 		o.CreatedAt = currTime
 	}
-	queries.SetScanner(&o.UpdatedAt, currTime)
+	o.UpdatedAt = currTime
 
 	nzDefaults := queries.NonZeroDefaultSet(ccDatumColumnsWithDefault, o)
 	nzUniques := queries.NonZeroDefaultSet(mySQLCCDatumUniqueColumns, o)

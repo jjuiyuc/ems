@@ -27,7 +27,7 @@ type TouLocation struct {
 	PowerCompany null.String `boil:"power_company" json:"powerCompany,omitempty" toml:"powerCompany" yaml:"powerCompany,omitempty"`
 	Location     null.String `boil:"location" json:"location,omitempty" toml:"location" yaml:"location,omitempty"`
 	CreatedAt    time.Time   `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
-	UpdatedAt    null.Time   `boil:"updated_at" json:"updatedAt,omitempty" toml:"updatedAt" yaml:"updatedAt,omitempty"`
+	UpdatedAt    time.Time   `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
 
 	R *touLocationR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L touLocationL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -68,13 +68,13 @@ var TouLocationWhere = struct {
 	PowerCompany whereHelpernull_String
 	Location     whereHelpernull_String
 	CreatedAt    whereHelpertime_Time
-	UpdatedAt    whereHelpernull_Time
+	UpdatedAt    whereHelpertime_Time
 }{
 	ID:           whereHelperint64{field: "`tou_location`.`id`"},
 	PowerCompany: whereHelpernull_String{field: "`tou_location`.`power_company`"},
 	Location:     whereHelpernull_String{field: "`tou_location`.`location`"},
 	CreatedAt:    whereHelpertime_Time{field: "`tou_location`.`created_at`"},
-	UpdatedAt:    whereHelpernull_Time{field: "`tou_location`.`updated_at`"},
+	UpdatedAt:    whereHelpertime_Time{field: "`tou_location`.`updated_at`"},
 }
 
 // TouLocationRels is where relationship names are stored.
@@ -95,8 +95,8 @@ type touLocationL struct{}
 
 var (
 	touLocationAllColumns            = []string{"id", "power_company", "location", "created_at", "updated_at"}
-	touLocationColumnsWithoutDefault = []string{"power_company", "location", "updated_at"}
-	touLocationColumnsWithDefault    = []string{"id", "created_at"}
+	touLocationColumnsWithoutDefault = []string{"power_company", "location"}
+	touLocationColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	touLocationPrimaryKeyColumns     = []string{"id"}
 	touLocationGeneratedColumns      = []string{}
 )
@@ -242,8 +242,8 @@ func (o *TouLocation) Insert(exec boil.Executor, columns boil.Columns) error {
 	if o.CreatedAt.IsZero() {
 		o.CreatedAt = currTime
 	}
-	if queries.MustTime(o.UpdatedAt).IsZero() {
-		queries.SetScanner(&o.UpdatedAt, currTime)
+	if o.UpdatedAt.IsZero() {
+		o.UpdatedAt = currTime
 	}
 
 	nzDefaults := queries.NonZeroDefaultSet(touLocationColumnsWithDefault, o)
@@ -343,7 +343,7 @@ CacheNoHooks:
 func (o *TouLocation) Update(exec boil.Executor, columns boil.Columns) (int64, error) {
 	currTime := time.Now().In(boil.GetLocation())
 
-	queries.SetScanner(&o.UpdatedAt, currTime)
+	o.UpdatedAt = currTime
 
 	var err error
 	key := makeCacheKey(columns, nil)
@@ -479,7 +479,7 @@ func (o *TouLocation) Upsert(exec boil.Executor, updateColumns, insertColumns bo
 	if o.CreatedAt.IsZero() {
 		o.CreatedAt = currTime
 	}
-	queries.SetScanner(&o.UpdatedAt, currTime)
+	o.UpdatedAt = currTime
 
 	nzDefaults := queries.NonZeroDefaultSet(touLocationColumnsWithDefault, o)
 	nzUniques := queries.NonZeroDefaultSet(mySQLTouLocationUniqueColumns, o)

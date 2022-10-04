@@ -26,7 +26,7 @@ type LoginLog struct {
 	ID        int64     `boil:"id" json:"id" toml:"id" yaml:"id"`
 	UserID    null.Int  `boil:"user_id" json:"userID,omitempty" toml:"userID" yaml:"userID,omitempty"`
 	CreatedAt time.Time `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
-	UpdatedAt null.Time `boil:"updated_at" json:"updatedAt,omitempty" toml:"updatedAt" yaml:"updatedAt,omitempty"`
+	UpdatedAt time.Time `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
 
 	R *loginLogR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L loginLogL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -62,12 +62,12 @@ var LoginLogWhere = struct {
 	ID        whereHelperint64
 	UserID    whereHelpernull_Int
 	CreatedAt whereHelpertime_Time
-	UpdatedAt whereHelpernull_Time
+	UpdatedAt whereHelpertime_Time
 }{
 	ID:        whereHelperint64{field: "`login_log`.`id`"},
 	UserID:    whereHelpernull_Int{field: "`login_log`.`user_id`"},
 	CreatedAt: whereHelpertime_Time{field: "`login_log`.`created_at`"},
-	UpdatedAt: whereHelpernull_Time{field: "`login_log`.`updated_at`"},
+	UpdatedAt: whereHelpertime_Time{field: "`login_log`.`updated_at`"},
 }
 
 // LoginLogRels is where relationship names are stored.
@@ -88,8 +88,8 @@ type loginLogL struct{}
 
 var (
 	loginLogAllColumns            = []string{"id", "user_id", "created_at", "updated_at"}
-	loginLogColumnsWithoutDefault = []string{"user_id", "updated_at"}
-	loginLogColumnsWithDefault    = []string{"id", "created_at"}
+	loginLogColumnsWithoutDefault = []string{"user_id"}
+	loginLogColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	loginLogPrimaryKeyColumns     = []string{"id"}
 	loginLogGeneratedColumns      = []string{}
 )
@@ -235,8 +235,8 @@ func (o *LoginLog) Insert(exec boil.Executor, columns boil.Columns) error {
 	if o.CreatedAt.IsZero() {
 		o.CreatedAt = currTime
 	}
-	if queries.MustTime(o.UpdatedAt).IsZero() {
-		queries.SetScanner(&o.UpdatedAt, currTime)
+	if o.UpdatedAt.IsZero() {
+		o.UpdatedAt = currTime
 	}
 
 	nzDefaults := queries.NonZeroDefaultSet(loginLogColumnsWithDefault, o)
@@ -336,7 +336,7 @@ CacheNoHooks:
 func (o *LoginLog) Update(exec boil.Executor, columns boil.Columns) (int64, error) {
 	currTime := time.Now().In(boil.GetLocation())
 
-	queries.SetScanner(&o.UpdatedAt, currTime)
+	o.UpdatedAt = currTime
 
 	var err error
 	key := makeCacheKey(columns, nil)
@@ -472,7 +472,7 @@ func (o *LoginLog) Upsert(exec boil.Executor, updateColumns, insertColumns boil.
 	if o.CreatedAt.IsZero() {
 		o.CreatedAt = currTime
 	}
-	queries.SetScanner(&o.UpdatedAt, currTime)
+	o.UpdatedAt = currTime
 
 	nzDefaults := queries.NonZeroDefaultSet(loginLogColumnsWithDefault, o)
 	nzUniques := queries.NonZeroDefaultSet(mySQLLoginLogUniqueColumns, o)

@@ -30,7 +30,7 @@ type AiDatum struct {
 	CustomerID  null.Int64 `boil:"customer_id" json:"customerID,omitempty" toml:"customerID" yaml:"customerID,omitempty"`
 	LocalAiData null.JSON  `boil:"local_ai_data" json:"localAiData,omitempty" toml:"localAiData" yaml:"localAiData,omitempty"`
 	CreatedAt   time.Time  `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
-	UpdatedAt   null.Time  `boil:"updated_at" json:"updatedAt,omitempty" toml:"updatedAt" yaml:"updatedAt,omitempty"`
+	UpdatedAt   time.Time  `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
 
 	R *aiDatumR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L aiDatumL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -193,30 +193,6 @@ func (w whereHelpernull_JSON) GTE(x null.JSON) qm.QueryMod {
 func (w whereHelpernull_JSON) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
 func (w whereHelpernull_JSON) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
 
-type whereHelpernull_Time struct{ field string }
-
-func (w whereHelpernull_Time) EQ(x null.Time) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, false, x)
-}
-func (w whereHelpernull_Time) NEQ(x null.Time) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, true, x)
-}
-func (w whereHelpernull_Time) LT(x null.Time) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LT, x)
-}
-func (w whereHelpernull_Time) LTE(x null.Time) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LTE, x)
-}
-func (w whereHelpernull_Time) GT(x null.Time) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GT, x)
-}
-func (w whereHelpernull_Time) GTE(x null.Time) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GTE, x)
-}
-
-func (w whereHelpernull_Time) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
-func (w whereHelpernull_Time) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
-
 var AiDatumWhere = struct {
 	ID          whereHelperint64
 	GWUUID      whereHelperstring
@@ -225,7 +201,7 @@ var AiDatumWhere = struct {
 	CustomerID  whereHelpernull_Int64
 	LocalAiData whereHelpernull_JSON
 	CreatedAt   whereHelpertime_Time
-	UpdatedAt   whereHelpernull_Time
+	UpdatedAt   whereHelpertime_Time
 }{
 	ID:          whereHelperint64{field: "`ai_data`.`id`"},
 	GWUUID:      whereHelperstring{field: "`ai_data`.`gw_uuid`"},
@@ -234,7 +210,7 @@ var AiDatumWhere = struct {
 	CustomerID:  whereHelpernull_Int64{field: "`ai_data`.`customer_id`"},
 	LocalAiData: whereHelpernull_JSON{field: "`ai_data`.`local_ai_data`"},
 	CreatedAt:   whereHelpertime_Time{field: "`ai_data`.`created_at`"},
-	UpdatedAt:   whereHelpernull_Time{field: "`ai_data`.`updated_at`"},
+	UpdatedAt:   whereHelpertime_Time{field: "`ai_data`.`updated_at`"},
 }
 
 // AiDatumRels is where relationship names are stored.
@@ -255,8 +231,8 @@ type aiDatumL struct{}
 
 var (
 	aiDatumAllColumns            = []string{"id", "gw_uuid", "log_date", "gw_id", "customer_id", "local_ai_data", "created_at", "updated_at"}
-	aiDatumColumnsWithoutDefault = []string{"gw_uuid", "log_date", "gw_id", "customer_id", "local_ai_data", "updated_at"}
-	aiDatumColumnsWithDefault    = []string{"id", "created_at"}
+	aiDatumColumnsWithoutDefault = []string{"gw_uuid", "log_date", "gw_id", "customer_id", "local_ai_data"}
+	aiDatumColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	aiDatumPrimaryKeyColumns     = []string{"id"}
 	aiDatumGeneratedColumns      = []string{}
 )
@@ -402,8 +378,8 @@ func (o *AiDatum) Insert(exec boil.Executor, columns boil.Columns) error {
 	if o.CreatedAt.IsZero() {
 		o.CreatedAt = currTime
 	}
-	if queries.MustTime(o.UpdatedAt).IsZero() {
-		queries.SetScanner(&o.UpdatedAt, currTime)
+	if o.UpdatedAt.IsZero() {
+		o.UpdatedAt = currTime
 	}
 
 	nzDefaults := queries.NonZeroDefaultSet(aiDatumColumnsWithDefault, o)
@@ -503,7 +479,7 @@ CacheNoHooks:
 func (o *AiDatum) Update(exec boil.Executor, columns boil.Columns) (int64, error) {
 	currTime := time.Now().In(boil.GetLocation())
 
-	queries.SetScanner(&o.UpdatedAt, currTime)
+	o.UpdatedAt = currTime
 
 	var err error
 	key := makeCacheKey(columns, nil)
@@ -639,7 +615,7 @@ func (o *AiDatum) Upsert(exec boil.Executor, updateColumns, insertColumns boil.C
 	if o.CreatedAt.IsZero() {
 		o.CreatedAt = currTime
 	}
-	queries.SetScanner(&o.UpdatedAt, currTime)
+	o.UpdatedAt = currTime
 
 	nzDefaults := queries.NonZeroDefaultSet(aiDatumColumnsWithDefault, o)
 	nzUniques := queries.NonZeroDefaultSet(mySQLAiDatumUniqueColumns, o)

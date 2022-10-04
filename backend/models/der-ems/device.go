@@ -31,7 +31,7 @@ type Device struct {
 	Remark    null.String `boil:"remark" json:"remark,omitempty" toml:"remark" yaml:"remark,omitempty"`
 	Enable    null.Bool   `boil:"enable" json:"enable,omitempty" toml:"enable" yaml:"enable,omitempty"`
 	CreatedAt time.Time   `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
-	UpdatedAt null.Time   `boil:"updated_at" json:"updatedAt,omitempty" toml:"updatedAt" yaml:"updatedAt,omitempty"`
+	UpdatedAt time.Time   `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
 
 	R *deviceR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L deviceL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -116,7 +116,7 @@ var DeviceWhere = struct {
 	Remark    whereHelpernull_String
 	Enable    whereHelpernull_Bool
 	CreatedAt whereHelpertime_Time
-	UpdatedAt whereHelpernull_Time
+	UpdatedAt whereHelpertime_Time
 }{
 	ID:        whereHelperint64{field: "`device`.`id`"},
 	ModbusID:  whereHelperstring{field: "`device`.`modbusid`"},
@@ -126,7 +126,7 @@ var DeviceWhere = struct {
 	Remark:    whereHelpernull_String{field: "`device`.`remark`"},
 	Enable:    whereHelpernull_Bool{field: "`device`.`enable`"},
 	CreatedAt: whereHelpertime_Time{field: "`device`.`created_at`"},
-	UpdatedAt: whereHelpernull_Time{field: "`device`.`updated_at`"},
+	UpdatedAt: whereHelpertime_Time{field: "`device`.`updated_at`"},
 }
 
 // DeviceRels is where relationship names are stored.
@@ -168,8 +168,8 @@ type deviceL struct{}
 
 var (
 	deviceAllColumns            = []string{"id", "modbusid", "uueid", "model_id", "gw_uuid", "remark", "enable", "created_at", "updated_at"}
-	deviceColumnsWithoutDefault = []string{"modbusid", "uueid", "model_id", "gw_uuid", "remark", "enable", "updated_at"}
-	deviceColumnsWithDefault    = []string{"id", "created_at"}
+	deviceColumnsWithoutDefault = []string{"modbusid", "uueid", "model_id", "gw_uuid", "remark", "enable"}
+	deviceColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	devicePrimaryKeyColumns     = []string{"id"}
 	deviceGeneratedColumns      = []string{}
 )
@@ -621,8 +621,8 @@ func (o *Device) Insert(exec boil.Executor, columns boil.Columns) error {
 	if o.CreatedAt.IsZero() {
 		o.CreatedAt = currTime
 	}
-	if queries.MustTime(o.UpdatedAt).IsZero() {
-		queries.SetScanner(&o.UpdatedAt, currTime)
+	if o.UpdatedAt.IsZero() {
+		o.UpdatedAt = currTime
 	}
 
 	nzDefaults := queries.NonZeroDefaultSet(deviceColumnsWithDefault, o)
@@ -722,7 +722,7 @@ CacheNoHooks:
 func (o *Device) Update(exec boil.Executor, columns boil.Columns) (int64, error) {
 	currTime := time.Now().In(boil.GetLocation())
 
-	queries.SetScanner(&o.UpdatedAt, currTime)
+	o.UpdatedAt = currTime
 
 	var err error
 	key := makeCacheKey(columns, nil)
@@ -858,7 +858,7 @@ func (o *Device) Upsert(exec boil.Executor, updateColumns, insertColumns boil.Co
 	if o.CreatedAt.IsZero() {
 		o.CreatedAt = currTime
 	}
-	queries.SetScanner(&o.UpdatedAt, currTime)
+	o.UpdatedAt = currTime
 
 	nzDefaults := queries.NonZeroDefaultSet(deviceColumnsWithDefault, o)
 	nzUniques := queries.NonZeroDefaultSet(mySQLDeviceUniqueColumns, o)

@@ -34,7 +34,7 @@ type User struct {
 	LockedAt            null.Time   `boil:"locked_at" json:"lockedAt,omitempty" toml:"lockedAt" yaml:"lockedAt,omitempty"`
 	ExpirationDate      null.Time   `boil:"expiration_date" json:"expirationDate,omitempty" toml:"expirationDate" yaml:"expirationDate,omitempty"`
 	CreatedAt           time.Time   `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
-	UpdatedAt           null.Time   `boil:"updated_at" json:"updatedAt,omitempty" toml:"updatedAt" yaml:"updatedAt,omitempty"`
+	UpdatedAt           time.Time   `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
 	DeletedAt           null.Time   `boil:"deleted_at" json:"deletedAt,omitempty" toml:"deletedAt" yaml:"deletedAt,omitempty"`
 
 	R *userR `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -115,7 +115,7 @@ var UserWhere = struct {
 	LockedAt            whereHelpernull_Time
 	ExpirationDate      whereHelpernull_Time
 	CreatedAt           whereHelpertime_Time
-	UpdatedAt           whereHelpernull_Time
+	UpdatedAt           whereHelpertime_Time
 	DeletedAt           whereHelpernull_Time
 }{
 	ID:                  whereHelperint64{field: "`user`.`id`"},
@@ -129,7 +129,7 @@ var UserWhere = struct {
 	LockedAt:            whereHelpernull_Time{field: "`user`.`locked_at`"},
 	ExpirationDate:      whereHelpernull_Time{field: "`user`.`expiration_date`"},
 	CreatedAt:           whereHelpertime_Time{field: "`user`.`created_at`"},
-	UpdatedAt:           whereHelpernull_Time{field: "`user`.`updated_at`"},
+	UpdatedAt:           whereHelpertime_Time{field: "`user`.`updated_at`"},
 	DeletedAt:           whereHelpernull_Time{field: "`user`.`deleted_at`"},
 }
 
@@ -162,8 +162,8 @@ type userL struct{}
 
 var (
 	userAllColumns            = []string{"id", "username", "password", "password_last_changed", "password_retry_count", "reset_pwd_token", "pwd_token_expiry", "name", "locked_at", "expiration_date", "created_at", "updated_at", "deleted_at"}
-	userColumnsWithoutDefault = []string{"username", "password", "password_last_changed", "reset_pwd_token", "pwd_token_expiry", "name", "locked_at", "expiration_date", "updated_at", "deleted_at"}
-	userColumnsWithDefault    = []string{"id", "password_retry_count", "created_at"}
+	userColumnsWithoutDefault = []string{"username", "password", "password_last_changed", "reset_pwd_token", "pwd_token_expiry", "name", "locked_at", "expiration_date", "deleted_at"}
+	userColumnsWithDefault    = []string{"id", "password_retry_count", "created_at", "updated_at"}
 	userPrimaryKeyColumns     = []string{"id"}
 	userGeneratedColumns      = []string{}
 )
@@ -539,8 +539,8 @@ func (o *User) Insert(exec boil.Executor, columns boil.Columns) error {
 	if o.CreatedAt.IsZero() {
 		o.CreatedAt = currTime
 	}
-	if queries.MustTime(o.UpdatedAt).IsZero() {
-		queries.SetScanner(&o.UpdatedAt, currTime)
+	if o.UpdatedAt.IsZero() {
+		o.UpdatedAt = currTime
 	}
 
 	nzDefaults := queries.NonZeroDefaultSet(userColumnsWithDefault, o)
@@ -640,7 +640,7 @@ CacheNoHooks:
 func (o *User) Update(exec boil.Executor, columns boil.Columns) (int64, error) {
 	currTime := time.Now().In(boil.GetLocation())
 
-	queries.SetScanner(&o.UpdatedAt, currTime)
+	o.UpdatedAt = currTime
 
 	var err error
 	key := makeCacheKey(columns, nil)
@@ -776,7 +776,7 @@ func (o *User) Upsert(exec boil.Executor, updateColumns, insertColumns boil.Colu
 	if o.CreatedAt.IsZero() {
 		o.CreatedAt = currTime
 	}
-	queries.SetScanner(&o.UpdatedAt, currTime)
+	o.UpdatedAt = currTime
 
 	nzDefaults := queries.NonZeroDefaultSet(userColumnsWithDefault, o)
 	nzUniques := queries.NonZeroDefaultSet(mySQLUserUniqueColumns, o)

@@ -36,7 +36,7 @@ type Customer struct {
 	VoltageType    null.String  `boil:"voltage_type" json:"voltageType,omitempty" toml:"voltageType" yaml:"voltageType,omitempty"`
 	TOUType        null.String  `boil:"tou_type" json:"touType,omitempty" toml:"touType" yaml:"touType,omitempty"`
 	CreatedAt      time.Time    `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
-	UpdatedAt      null.Time    `boil:"updated_at" json:"updatedAt,omitempty" toml:"updatedAt" yaml:"updatedAt,omitempty"`
+	UpdatedAt      time.Time    `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
 
 	R *customerR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L customerL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -146,7 +146,7 @@ var CustomerWhere = struct {
 	VoltageType    whereHelpernull_String
 	TOUType        whereHelpernull_String
 	CreatedAt      whereHelpertime_Time
-	UpdatedAt      whereHelpernull_Time
+	UpdatedAt      whereHelpertime_Time
 }{
 	ID:             whereHelperint64{field: "`customer`.`id`"},
 	CustomerNumber: whereHelperstring{field: "`customer`.`customer_number`"},
@@ -161,7 +161,7 @@ var CustomerWhere = struct {
 	VoltageType:    whereHelpernull_String{field: "`customer`.`voltage_type`"},
 	TOUType:        whereHelpernull_String{field: "`customer`.`tou_type`"},
 	CreatedAt:      whereHelpertime_Time{field: "`customer`.`created_at`"},
-	UpdatedAt:      whereHelpernull_Time{field: "`customer`.`updated_at`"},
+	UpdatedAt:      whereHelpertime_Time{field: "`customer`.`updated_at`"},
 }
 
 // CustomerRels is where relationship names are stored.
@@ -193,8 +193,8 @@ type customerL struct{}
 
 var (
 	customerAllColumns            = []string{"id", "customer_number", "field_number", "address", "lat", "lng", "weather_lat", "weather_lng", "timezone", "tou_location_id", "voltage_type", "tou_type", "created_at", "updated_at"}
-	customerColumnsWithoutDefault = []string{"customer_number", "field_number", "address", "lat", "lng", "weather_lat", "weather_lng", "timezone", "tou_location_id", "voltage_type", "tou_type", "updated_at"}
-	customerColumnsWithDefault    = []string{"id", "created_at"}
+	customerColumnsWithoutDefault = []string{"customer_number", "field_number", "address", "lat", "lng", "weather_lat", "weather_lng", "timezone", "tou_location_id", "voltage_type", "tou_type"}
+	customerColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	customerPrimaryKeyColumns     = []string{"id"}
 	customerGeneratedColumns      = []string{}
 )
@@ -497,8 +497,8 @@ func (o *Customer) Insert(exec boil.Executor, columns boil.Columns) error {
 	if o.CreatedAt.IsZero() {
 		o.CreatedAt = currTime
 	}
-	if queries.MustTime(o.UpdatedAt).IsZero() {
-		queries.SetScanner(&o.UpdatedAt, currTime)
+	if o.UpdatedAt.IsZero() {
+		o.UpdatedAt = currTime
 	}
 
 	nzDefaults := queries.NonZeroDefaultSet(customerColumnsWithDefault, o)
@@ -598,7 +598,7 @@ CacheNoHooks:
 func (o *Customer) Update(exec boil.Executor, columns boil.Columns) (int64, error) {
 	currTime := time.Now().In(boil.GetLocation())
 
-	queries.SetScanner(&o.UpdatedAt, currTime)
+	o.UpdatedAt = currTime
 
 	var err error
 	key := makeCacheKey(columns, nil)
@@ -734,7 +734,7 @@ func (o *Customer) Upsert(exec boil.Executor, updateColumns, insertColumns boil.
 	if o.CreatedAt.IsZero() {
 		o.CreatedAt = currTime
 	}
-	queries.SetScanner(&o.UpdatedAt, currTime)
+	o.UpdatedAt = currTime
 
 	nzDefaults := queries.NonZeroDefaultSet(customerColumnsWithDefault, o)
 	nzUniques := queries.NonZeroDefaultSet(mySQLCustomerUniqueColumns, o)

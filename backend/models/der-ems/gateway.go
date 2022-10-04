@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"github.com/friendsofgo/errors"
-	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
@@ -27,7 +26,7 @@ type Gateway struct {
 	UUID       string    `boil:"uuid" json:"uuid" toml:"uuid" yaml:"uuid"`
 	CustomerID int64     `boil:"customer_id" json:"customerID" toml:"customerID" yaml:"customerID"`
 	CreatedAt  time.Time `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
-	UpdatedAt  null.Time `boil:"updated_at" json:"updatedAt,omitempty" toml:"updatedAt" yaml:"updatedAt,omitempty"`
+	UpdatedAt  time.Time `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
 
 	R *gatewayR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L gatewayL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -68,13 +67,13 @@ var GatewayWhere = struct {
 	UUID       whereHelperstring
 	CustomerID whereHelperint64
 	CreatedAt  whereHelpertime_Time
-	UpdatedAt  whereHelpernull_Time
+	UpdatedAt  whereHelpertime_Time
 }{
 	ID:         whereHelperint64{field: "`gateway`.`id`"},
 	UUID:       whereHelperstring{field: "`gateway`.`uuid`"},
 	CustomerID: whereHelperint64{field: "`gateway`.`customer_id`"},
 	CreatedAt:  whereHelpertime_Time{field: "`gateway`.`created_at`"},
-	UpdatedAt:  whereHelpernull_Time{field: "`gateway`.`updated_at`"},
+	UpdatedAt:  whereHelpertime_Time{field: "`gateway`.`updated_at`"},
 }
 
 // GatewayRels is where relationship names are stored.
@@ -126,8 +125,8 @@ type gatewayL struct{}
 
 var (
 	gatewayAllColumns            = []string{"id", "uuid", "customer_id", "created_at", "updated_at"}
-	gatewayColumnsWithoutDefault = []string{"uuid", "customer_id", "updated_at"}
-	gatewayColumnsWithDefault    = []string{"id", "created_at"}
+	gatewayColumnsWithoutDefault = []string{"uuid", "customer_id"}
+	gatewayColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	gatewayPrimaryKeyColumns     = []string{"id"}
 	gatewayGeneratedColumns      = []string{}
 )
@@ -813,8 +812,8 @@ func (o *Gateway) Insert(exec boil.Executor, columns boil.Columns) error {
 	if o.CreatedAt.IsZero() {
 		o.CreatedAt = currTime
 	}
-	if queries.MustTime(o.UpdatedAt).IsZero() {
-		queries.SetScanner(&o.UpdatedAt, currTime)
+	if o.UpdatedAt.IsZero() {
+		o.UpdatedAt = currTime
 	}
 
 	nzDefaults := queries.NonZeroDefaultSet(gatewayColumnsWithDefault, o)
@@ -914,7 +913,7 @@ CacheNoHooks:
 func (o *Gateway) Update(exec boil.Executor, columns boil.Columns) (int64, error) {
 	currTime := time.Now().In(boil.GetLocation())
 
-	queries.SetScanner(&o.UpdatedAt, currTime)
+	o.UpdatedAt = currTime
 
 	var err error
 	key := makeCacheKey(columns, nil)
@@ -1051,7 +1050,7 @@ func (o *Gateway) Upsert(exec boil.Executor, updateColumns, insertColumns boil.C
 	if o.CreatedAt.IsZero() {
 		o.CreatedAt = currTime
 	}
-	queries.SetScanner(&o.UpdatedAt, currTime)
+	o.UpdatedAt = currTime
 
 	nzDefaults := queries.NonZeroDefaultSet(gatewayColumnsWithDefault, o)
 	nzUniques := queries.NonZeroDefaultSet(mySQLGatewayUniqueColumns, o)

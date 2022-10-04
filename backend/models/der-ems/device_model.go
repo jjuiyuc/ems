@@ -28,7 +28,7 @@ type DeviceModel struct {
 	ModelName  null.String `boil:"model_name" json:"modelName,omitempty" toml:"modelName" yaml:"modelName,omitempty"`
 	Capacity   null.String `boil:"capacity" json:"capacity,omitempty" toml:"capacity" yaml:"capacity,omitempty"`
 	CreatedAt  time.Time   `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
-	UpdatedAt  null.Time   `boil:"updated_at" json:"updatedAt,omitempty" toml:"updatedAt" yaml:"updatedAt,omitempty"`
+	UpdatedAt  time.Time   `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
 
 	R *deviceModelR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L deviceModelL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -74,14 +74,14 @@ var DeviceModelWhere = struct {
 	ModelName  whereHelpernull_String
 	Capacity   whereHelpernull_String
 	CreatedAt  whereHelpertime_Time
-	UpdatedAt  whereHelpernull_Time
+	UpdatedAt  whereHelpertime_Time
 }{
 	ID:         whereHelperint64{field: "`device_model`.`id`"},
 	DeviceType: whereHelpernull_String{field: "`device_model`.`device_type`"},
 	ModelName:  whereHelpernull_String{field: "`device_model`.`model_name`"},
 	Capacity:   whereHelpernull_String{field: "`device_model`.`capacity`"},
 	CreatedAt:  whereHelpertime_Time{field: "`device_model`.`created_at`"},
-	UpdatedAt:  whereHelpernull_Time{field: "`device_model`.`updated_at`"},
+	UpdatedAt:  whereHelpertime_Time{field: "`device_model`.`updated_at`"},
 }
 
 // DeviceModelRels is where relationship names are stored.
@@ -113,8 +113,8 @@ type deviceModelL struct{}
 
 var (
 	deviceModelAllColumns            = []string{"id", "device_type", "model_name", "capacity", "created_at", "updated_at"}
-	deviceModelColumnsWithoutDefault = []string{"device_type", "model_name", "capacity", "updated_at"}
-	deviceModelColumnsWithDefault    = []string{"id", "created_at"}
+	deviceModelColumnsWithoutDefault = []string{"device_type", "model_name", "capacity"}
+	deviceModelColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	deviceModelPrimaryKeyColumns     = []string{"id"}
 	deviceModelGeneratedColumns      = []string{}
 )
@@ -417,8 +417,8 @@ func (o *DeviceModel) Insert(exec boil.Executor, columns boil.Columns) error {
 	if o.CreatedAt.IsZero() {
 		o.CreatedAt = currTime
 	}
-	if queries.MustTime(o.UpdatedAt).IsZero() {
-		queries.SetScanner(&o.UpdatedAt, currTime)
+	if o.UpdatedAt.IsZero() {
+		o.UpdatedAt = currTime
 	}
 
 	nzDefaults := queries.NonZeroDefaultSet(deviceModelColumnsWithDefault, o)
@@ -518,7 +518,7 @@ CacheNoHooks:
 func (o *DeviceModel) Update(exec boil.Executor, columns boil.Columns) (int64, error) {
 	currTime := time.Now().In(boil.GetLocation())
 
-	queries.SetScanner(&o.UpdatedAt, currTime)
+	o.UpdatedAt = currTime
 
 	var err error
 	key := makeCacheKey(columns, nil)
@@ -654,7 +654,7 @@ func (o *DeviceModel) Upsert(exec boil.Executor, updateColumns, insertColumns bo
 	if o.CreatedAt.IsZero() {
 		o.CreatedAt = currTime
 	}
-	queries.SetScanner(&o.UpdatedAt, currTime)
+	o.UpdatedAt = currTime
 
 	nzDefaults := queries.NonZeroDefaultSet(deviceModelColumnsWithDefault, o)
 	nzUniques := queries.NonZeroDefaultSet(mySQLDeviceModelUniqueColumns, o)

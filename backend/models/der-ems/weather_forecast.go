@@ -30,7 +30,7 @@ type WeatherForecast struct {
 	ValidDate time.Time    `boil:"valid_date" json:"validDate" toml:"validDate" yaml:"validDate"`
 	Data      null.JSON    `boil:"data" json:"data,omitempty" toml:"data" yaml:"data,omitempty"`
 	CreatedAt time.Time    `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
-	UpdatedAt null.Time    `boil:"updated_at" json:"updatedAt,omitempty" toml:"updatedAt" yaml:"updatedAt,omitempty"`
+	UpdatedAt time.Time    `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
 
 	R *weatherForecastR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L weatherForecastL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -115,7 +115,7 @@ var WeatherForecastWhere = struct {
 	ValidDate whereHelpertime_Time
 	Data      whereHelpernull_JSON
 	CreatedAt whereHelpertime_Time
-	UpdatedAt whereHelpernull_Time
+	UpdatedAt whereHelpertime_Time
 }{
 	ID:        whereHelperint64{field: "`weather_forecast`.`id`"},
 	Lat:       whereHelperfloat32{field: "`weather_forecast`.`lat`"},
@@ -124,7 +124,7 @@ var WeatherForecastWhere = struct {
 	ValidDate: whereHelpertime_Time{field: "`weather_forecast`.`valid_date`"},
 	Data:      whereHelpernull_JSON{field: "`weather_forecast`.`data`"},
 	CreatedAt: whereHelpertime_Time{field: "`weather_forecast`.`created_at`"},
-	UpdatedAt: whereHelpernull_Time{field: "`weather_forecast`.`updated_at`"},
+	UpdatedAt: whereHelpertime_Time{field: "`weather_forecast`.`updated_at`"},
 }
 
 // WeatherForecastRels is where relationship names are stored.
@@ -145,8 +145,8 @@ type weatherForecastL struct{}
 
 var (
 	weatherForecastAllColumns            = []string{"id", "lat", "lng", "alt", "valid_date", "data", "created_at", "updated_at"}
-	weatherForecastColumnsWithoutDefault = []string{"lat", "lng", "alt", "valid_date", "data", "updated_at"}
-	weatherForecastColumnsWithDefault    = []string{"id", "created_at"}
+	weatherForecastColumnsWithoutDefault = []string{"lat", "lng", "alt", "valid_date", "data"}
+	weatherForecastColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	weatherForecastPrimaryKeyColumns     = []string{"id"}
 	weatherForecastGeneratedColumns      = []string{}
 )
@@ -292,8 +292,8 @@ func (o *WeatherForecast) Insert(exec boil.Executor, columns boil.Columns) error
 	if o.CreatedAt.IsZero() {
 		o.CreatedAt = currTime
 	}
-	if queries.MustTime(o.UpdatedAt).IsZero() {
-		queries.SetScanner(&o.UpdatedAt, currTime)
+	if o.UpdatedAt.IsZero() {
+		o.UpdatedAt = currTime
 	}
 
 	nzDefaults := queries.NonZeroDefaultSet(weatherForecastColumnsWithDefault, o)
@@ -393,7 +393,7 @@ CacheNoHooks:
 func (o *WeatherForecast) Update(exec boil.Executor, columns boil.Columns) (int64, error) {
 	currTime := time.Now().In(boil.GetLocation())
 
-	queries.SetScanner(&o.UpdatedAt, currTime)
+	o.UpdatedAt = currTime
 
 	var err error
 	key := makeCacheKey(columns, nil)
@@ -529,7 +529,7 @@ func (o *WeatherForecast) Upsert(exec boil.Executor, updateColumns, insertColumn
 	if o.CreatedAt.IsZero() {
 		o.CreatedAt = currTime
 	}
-	queries.SetScanner(&o.UpdatedAt, currTime)
+	o.UpdatedAt = currTime
 
 	nzDefaults := queries.NonZeroDefaultSet(weatherForecastColumnsWithDefault, o)
 	nzUniques := queries.NonZeroDefaultSet(mySQLWeatherForecastUniqueColumns, o)

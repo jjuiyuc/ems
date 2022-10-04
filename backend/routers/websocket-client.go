@@ -12,7 +12,7 @@ import (
 
 // Client godoc
 type Client struct {
-	ID          int
+	ID          int64
 	Token       string
 	GatewayUUID string
 	Conn        *websocket.Conn

@@ -11,16 +11,16 @@ import (
 
 // BillingType godoc
 type BillingType struct {
-	TOULocationID int
+	TOULocationID int64
 	VoltageType   string
 	TOUType       string
 }
 
 // BillingService godoc
 type BillingService interface {
-	GetBillingTypeByCustomerID(customerID int) (billingType BillingType, err error)
-	GetLocalTime(touLocationID int, t time.Time) (localTime time.Time, err error)
-	GetPeriodTypeOfDay(touLocationID int, t time.Time) (periodType string)
+	GetBillingTypeByCustomerID(customerID int64) (billingType BillingType, err error)
+	GetLocalTime(touLocationID int64, t time.Time) (localTime time.Time, err error)
+	GetPeriodTypeOfDay(touLocationID int64, t time.Time) (periodType string)
 	IsSummer(t time.Time) bool
 }
 
@@ -34,7 +34,7 @@ func NewBillingService(repo *repository.Repository) BillingService {
 }
 
 // GetBillingTypeByCustomerID godoc
-func (s defaultBillingService) GetBillingTypeByCustomerID(customerID int) (billingType BillingType, err error) {
+func (s defaultBillingService) GetBillingTypeByCustomerID(customerID int64) (billingType BillingType, err error) {
 	customer, err := s.repo.Customer.GetCustomerByCustomerID(customerID)
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -44,7 +44,7 @@ func (s defaultBillingService) GetBillingTypeByCustomerID(customerID int) (billi
 		return
 	}
 	billingType = BillingType{
-		TOULocationID: customer.TOULocationID.Int,
+		TOULocationID: customer.TOULocationID.Int64,
 		VoltageType:   customer.VoltageType.String,
 		TOUType:       customer.TOUType.String,
 	}
@@ -52,7 +52,7 @@ func (s defaultBillingService) GetBillingTypeByCustomerID(customerID int) (billi
 }
 
 // GetLocalTime godoc
-func (s defaultBillingService) GetLocalTime(touLocationID int, t time.Time) (localTime time.Time, err error) {
+func (s defaultBillingService) GetLocalTime(touLocationID int64, t time.Time) (localTime time.Time, err error) {
 	touLocation, err := s.repo.TOU.GetTOULocationByTOULocationID(touLocationID)
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -74,7 +74,7 @@ func (s defaultBillingService) GetLocalTime(touLocationID int, t time.Time) (loc
 }
 
 // GetPeriodTypeOfDay godoc
-func (s defaultBillingService) GetPeriodTypeOfDay(touLocationID int, t time.Time) (periodType string) {
+func (s defaultBillingService) GetPeriodTypeOfDay(touLocationID int64, t time.Time) (periodType string) {
 	// The day is holiday or not
 	count, _ := s.repo.TOU.CountHolidayByDay(touLocationID, t.Format(utils.YYYY), t.Format(utils.YYYYMMDD))
 

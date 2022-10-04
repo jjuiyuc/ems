@@ -12,7 +12,7 @@ import (
 type GatewayRepository interface {
 	GetGatewayByGatewayUUID(gwUUID string) (*deremsmodels.Gateway, error)
 	GetGatewaysByLocation(lat, lng float32) ([]*deremsmodels.Gateway, error)
-	GetGatewaysByUserID(userID int) ([]*deremsmodels.Gateway, error)
+	GetGatewaysByUserID(userID int64) ([]*deremsmodels.Gateway, error)
 	GetGateways() ([]*deremsmodels.Gateway, error)
 }
 
@@ -39,7 +39,7 @@ func (repo defaultGatewayRepository) GetGatewaysByLocation(lat, lng float32) ([]
 }
 
 // GetGatewaysByUserID godoc
-func (repo defaultGatewayRepository) GetGatewaysByUserID(userID int) ([]*deremsmodels.Gateway, error) {
+func (repo defaultGatewayRepository) GetGatewaysByUserID(userID int64) ([]*deremsmodels.Gateway, error) {
 	return deremsmodels.Gateways(
 		qm.InnerJoin("user_gateway_right AS u ON gateway.id = u.gw_id"),
 		qm.Where("(u.user_id = ?)", userID)).All(repo.db)

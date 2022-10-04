@@ -8,7 +8,7 @@ import (
 
 // CustomerRepository godoc
 type CustomerRepository interface {
-	GetCustomerByCustomerID(customerID int) (*deremsmodels.Customer, error)
+	GetCustomerByCustomerID(customerID int64) (*deremsmodels.Customer, error)
 }
 
 type defaultCustomerRepository struct {
@@ -21,6 +21,6 @@ func NewCustomerRepository(db *sql.DB) CustomerRepository {
 }
 
 // GetCustomerByCustomerID godoc
-func (repo defaultCustomerRepository) GetCustomerByCustomerID(customerID int) (*deremsmodels.Customer, error) {
+func (repo defaultCustomerRepository) GetCustomerByCustomerID(customerID int64) (*deremsmodels.Customer, error) {
 	return deremsmodels.FindCustomer(repo.db, customerID)
 }

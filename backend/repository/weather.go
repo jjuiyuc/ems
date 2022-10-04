@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 
@@ -35,7 +34,7 @@ func (repo defaultWeatherRepository) UpsertWeatherForecast(weatherForecast *dere
 		qm.Where("lng = ?", weatherForecast.Lng),
 		qm.Where("valid_date = ?", weatherForecast.ValidDate)).One(repo.db)
 	now := time.Now().UTC()
-	weatherForecast.UpdatedAt = null.NewTime(now, true)
+	weatherForecast.UpdatedAt = now
 	if err != nil {
 		weatherForecast.CreatedAt = now
 		err = weatherForecast.Insert(repo.db, boil.Infer())

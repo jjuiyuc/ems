@@ -177,6 +177,18 @@
         "reset": "Reset",
         "resetPassword": "Reset Password"
     },
+    "settings":{
+        "availableRegularUsage":"Available Regular Usage",
+        "backupReserve":"Backup Reserve",
+        "chargingSources":"Charging Sources",
+        "regularUsage":"Regular Usage",
+        "reservedForGrid":"Reserved for Grid",
+        "reservedForGridOutage":"Reserved for Grid Outage",
+        "save":"Save",
+        "settings":"Settings",
+        "timeOfUse": "Time of Use"
+
+    },
     "timeOfUse": {
         "batteryStatus": "Battery Status",
         "chargingFrom": "Charging From",

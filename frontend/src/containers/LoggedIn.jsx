@@ -17,6 +17,7 @@ import EnergyResourcesSolar from "../pages/EnergyResourcesSolar"
 import Analysis from "../pages/Analysis"
 import TimeOfUse from "../pages/TimeOfUse"
 import Economics from "../pages/Economics"
+import Settings from "../pages/Settings"
 
 
 function LoggedIn(props) {
@@ -66,7 +67,7 @@ function LoggedIn(props) {
                         <Route
                             element={<Navigate to="/dashboard" replace />}
                             path="*" />
-                        <Route element={<Sample />} path="/settings" />
+                        <Route element={<Settings />} path="/settings" />
                     </Routes>
                 </div>
             </div>

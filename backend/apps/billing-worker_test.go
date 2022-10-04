@@ -63,7 +63,7 @@ func (s *BillingWorkerSuite) Test_GetBillingTypeByCustomerID() {
 		CustomerID: fixtures.UtCustomer.ID,
 	}
 	testBillingType := &services.BillingType{
-		TOULocationID: fixtures.UtCustomer.TOULocationID.Int,
+		TOULocationID: fixtures.UtCustomer.TOULocationID.Int64,
 		VoltageType:   fixtures.UtCustomer.VoltageType.String,
 		TOUType:       fixtures.UtCustomer.TOUType.String,
 	}
@@ -93,11 +93,11 @@ func (s *BillingWorkerSuite) Test_GetBillingTypeByCustomerID() {
 
 func (s *BillingWorkerSuite) Test_GetLocalTime() {
 	type args struct {
-		TOULocationID int
+		TOULocationID int64
 		LocalTime     time.Time
 	}
 
-	seedUtTOULocationID := 1
+	var seedUtTOULocationID int64 = 1
 
 	tests := []struct {
 		name string
@@ -185,7 +185,7 @@ func (s *BillingWorkerSuite) Test_getWeeklyBillingParamsByType() {
 	}
 
 	seedUtBillingType := &services.BillingType{
-		TOULocationID: fixtures.UtCustomer.TOULocationID.Int,
+		TOULocationID: fixtures.UtCustomer.TOULocationID.Int64,
 		VoltageType:   fixtures.UtCustomer.VoltageType.String,
 		TOUType:       fixtures.UtCustomer.TOUType.String,
 	}

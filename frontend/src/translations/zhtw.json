@@ -184,7 +184,8 @@
         "reservedForGrid":"Reserved for Grid",
         "reservedForGridOutage":"Reserved for Grid Outage",
         "save":"儲存",
-        "settings":"設定"
+        "settings":"設定",
+        "timeOfUse": "時間電價"
 
     },
     "timeOfUse": {

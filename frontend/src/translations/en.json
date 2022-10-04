@@ -185,7 +185,8 @@
         "reservedForGrid":"Reserved for Grid",
         "reservedForGridOutage":"Reserved for Grid Outage",
         "save":"Save",
-        "settings":"Settings"
+        "settings":"Settings",
+        "timeOfUse": "Time of Use"
 
     },
     "timeOfUse": {

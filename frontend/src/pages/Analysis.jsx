@@ -93,7 +93,7 @@ export default connect(mapState)(function Analysis(props) {
         legend: true,
         tickCallback: (val, index) => val + commonT("kw"),
         tooltipLabel: item => `${item.dataset.label} ${item.parsed.y} `
-            + commonT("kwh"),
+            + commonT("kw"),
         x: { grid: { lineWidth: 0 } },
         y: { max: 60, min: 0 }
     })

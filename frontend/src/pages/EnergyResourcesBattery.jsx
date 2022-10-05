@@ -252,7 +252,7 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
         { title: pageT("modal"), value: modal },
         { title: pageT("capacity"), value: capacity },
         { title: pageT("powerSources"), value: powerSources },
-        { title: commonT("batteryPower"), value: batteryPower },
+        { title: pageT("batteryPower"), value: batteryPower },
         { title: pageT("voltage"), value: voltage },
     ]
 

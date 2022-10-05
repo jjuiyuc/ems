@@ -230,7 +230,7 @@ export default function TimeOfUse() {
                             {pageT("superOffPeak")} {commonT("sources")}
                         </span>
                         <span className="inline-block">
-                            {pageT("totalUntilNow")}
+                            ({pageT("totalUntilNow")})
                         </span>
                     </h5>
                 </div>

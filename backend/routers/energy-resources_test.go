@@ -72,6 +72,61 @@ var _ = Describe("DemandCharge", func() {
 		models.Close()
 	})
 
+	Describe("GetSolarEnergyInfo", func() {
+		Context("success", func() {
+			It("should be ok", func() {
+				prefixURL := fmt.Sprintf("/api/%s/devices/solar/energy-info", fixtures.UtGateway.UUID)
+				seedUtURL := fmt.Sprintf("%s?startTime=%s", prefixURL, UtStartTime)
+				expectedResponseData := services.SolarEnergyInfoResponse{
+					AllConsumedLifetimeEnergyACDiff:       25,
+					LoadPvConsumedEnergyPercentAC:         100,
+					LoadPvConsumedLifetimeEnergyACDiff:    10,
+					BatteryPvConsumedEnergyPercentAC:      0,
+					BatteryPvConsumedLifetimeEnergyACDiff: 0,
+					GridPvConsumedEnergyPercentAC:         100,
+					GridPvConsumedLifetimeEnergyACDiff:    15,
+					PvEnergyCostSavingsDiff:               85,
+					PvCo2SavingsDiff:                      19,
+				}
+				tt := testutils.TestInfo{
+					Token:      token,
+					URL:        seedUtURL,
+					WantStatus: http.StatusOK,
+					WantRv: app.Response{
+						Code: e.Success,
+						Msg:  "ok",
+						Data: expectedResponseData,
+					},
+				}
+				rvData := testutils.GinkgoAssertRequest(tt, router, "GET", nil)
+				dataMap := rvData.(map[string]interface{})
+				dataJSON, err := json.Marshal(dataMap)
+				Expect(err).Should(BeNil())
+				var data services.SolarEnergyInfoResponse
+				err = json.Unmarshal(dataJSON, &data)
+				Expect(err).Should(BeNil())
+				Expect(data).To(Equal(expectedResponseData))
+			})
+		})
+
+		Context("fail", func() {
+			It("should return invalid parameters", func() {
+				prefixURL := fmt.Sprintf("/api/%s/devices/solar/energy-info", fixtures.UtGateway.UUID)
+				seedUtInvalidParamsURL := fmt.Sprintf("%s?startTime=%s", prefixURL, "xxx")
+				tt := testutils.TestInfo{
+					Token:      token,
+					URL:        seedUtInvalidParamsURL,
+					WantStatus: http.StatusBadRequest,
+					WantRv: app.Response{
+						Code: e.InvalidParams,
+						Msg:  "invalid parameters",
+					},
+				}
+				testutils.GinkgoAssertRequest(tt, router, "GET", nil)
+			})
+		})
+	})
+
 	Describe("GetBatteryEnergyInfo", func() {
 		Context("success", func() {
 			It("should be ok", func() {

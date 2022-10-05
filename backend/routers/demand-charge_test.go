@@ -62,6 +62,10 @@ var _ = Describe("DemandCharge", func() {
 		router = InitRouter(cfg.GetBool("server.cors"), cfg.GetString("server.ginMode"), w)
 	})
 
+	AfterEach(func() {
+		models.Close()
+	})
+
 	Describe("GetChargeInfo", func() {
 		Context("success", func() {
 			It("should be ok", func() {
@@ -95,6 +99,7 @@ var _ = Describe("DemandCharge", func() {
 				Expect(data).To(Equal(expectedResponseData))
 			})
 		})
+
 		Context("fail", func() {
 			It("should return invalid parameters", func() {
 				prefixURL := fmt.Sprintf("/api/%s/devices/charge-info", fixtures.UtGateway.UUID)
@@ -148,6 +153,7 @@ var _ = Describe("DemandCharge", func() {
 				Expect(data).To(Equal(expectedResponseData))
 			})
 		})
+
 		Context("fail", func() {
 			It("should return invalid parameters", func() {
 				prefixURL := fmt.Sprintf("/api/%s/devices/demand-state", fixtures.UtGateway.UUID)

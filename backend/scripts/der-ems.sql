@@ -216,8 +216,8 @@ CREATE TABLE `device` (
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `modbusid_uueid_UNIQUE` (`modbusid`,`uueid`),
-  KEY `device_gw_uuid_gateway_uuid_foreign` (`gw_uuid`),
   KEY `device_model_id_device_model_id_foreign` (`model_id`),
+  KEY `device_gw_uuid_gateway_uuid_foreign` (`gw_uuid`),
   CONSTRAINT `device_gw_uuid_gateway_uuid_foreign` FOREIGN KEY (`gw_uuid`) REFERENCES `gateway` (`uuid`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `device_model_id_device_model_id_foreign` FOREIGN KEY (`model_id`) REFERENCES `device_model` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

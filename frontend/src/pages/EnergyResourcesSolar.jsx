@@ -66,7 +66,7 @@ export default connect(mapState)(function EnergyResoucesSolar(props) {
     const
         [infoError, setInfoError] = useState(""),
         [infoLoading, setInfoLoading] = useState(false),
-        [totalSolarEnergyDestinations, setTotalSolarEnergyDestinations]
+        [totalSolarEnergyGeneration, setTotalSolarEnergyGeneration]
             = useState({
                 types: [
                     { kwh: 0, percentage: 0, type: "directUsage" },
@@ -107,7 +107,7 @@ export default connect(mapState)(function EnergyResoucesSolar(props) {
         labels,
         tickCallback: (val, index) => val + commonT("kw"),
         tooltipLabel: item =>
-            `${item.dataset.label} ${item.parsed.y} ${commonT("kwh")}`,
+            `${item.dataset.label} ${item.parsed.y} ${commonT("kw")}`,
         y: { max: 80, min: 0 }
     })
     useEffect(() => {
@@ -130,7 +130,7 @@ export default connect(mapState)(function EnergyResoucesSolar(props) {
 
                 const { data } = rawData
 
-                setTotalSolarEnergyDestinations({
+                setTotalSolarEnergyGeneration({
                     types: [
                         {
                             kwh: data.loadPvConsumedLifetimeEnergyACDiff,
@@ -205,8 +205,8 @@ export default connect(mapState)(function EnergyResoucesSolar(props) {
         <EnergyResourcesTabs current="solar" />
         {infoErrorBox}
         <EnergySolarCard
-            data={totalSolarEnergyDestinations}
-            title={pageT("totalSolarEnergyDestinations")} />
+            data={totalSolarEnergyGeneration}
+            title={pageT("totalSolarEnergyGeneration")} />
         <div className="font-bold gap-5 grid md:grid-cols-2 mt-4">
             <EnergySolarSubCard
                 icon={EconomicsIcon}

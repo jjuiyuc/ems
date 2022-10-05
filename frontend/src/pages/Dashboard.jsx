@@ -184,13 +184,13 @@ export default connect(mapState)(function Dashboard(props) {
                 value: `${battery.power} ${commonT("kw")}`
             },
             {
-                name: pageT("importFromGrid"),
+                name: commonT("importFromGrid"),
                 value: `${battery.import} ${commonT("kw")}`
             },
-            { name: pageT(battery.direction), value: commonT(battery.target) }
+            { name: pageT(battery.direction), value: battery.target || "-" }
         ],
         loadData = [
-            { name: commonT("solar"), value: `${load.solar} ${commonT("kw")}` },
+            { name: pageT("solar"), value: `${load.solar} ${commonT("kw")}` },
             { name: pageT("batteryDischarge"), value: load.discharge || "-" },
             {
                 name: pageT("importFromGrid"),

@@ -457,4 +457,55 @@ var _ = Describe("DemandCharge", func() {
 			})
 		})
 	})
+
+	Describe("GetGridPowerState", func() {
+		Context("success", func() {
+			It("should be ok", func() {
+				prefixURL := fmt.Sprintf("/api/%s/devices/grid/power-state", fixtures.UtGateway.UUID)
+				seedUtURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, "hour", UtStartTime, UtEndTime)
+				expectedTimestamps := []int{1659543000, 1659549599, 1659553199, 1659556799, 1659557100}
+				expectedGridAveragePowerACs := []float32{50, 0, 0, 0, 50}
+				expectedResponseData := services.GridPowerStateResponse{
+					Timestamps:          expectedTimestamps,
+					GridAveragePowerACs: expectedGridAveragePowerACs,
+					OnPeakTime:          expectedOnPeakTime,
+				}
+				tt := testutils.TestInfo{
+					Token:      token,
+					URL:        seedUtURL,
+					WantStatus: http.StatusOK,
+					WantRv: app.Response{
+						Code: e.Success,
+						Msg:  "ok",
+						Data: expectedResponseData,
+					},
+				}
+				rvData := testutils.GinkgoAssertRequest(tt, router, "GET", nil)
+				dataMap := rvData.(map[string]interface{})
+				dataJSON, err := json.Marshal(dataMap)
+				Expect(err).Should(BeNil())
+				var data services.GridPowerStateResponse
+				err = json.Unmarshal(dataJSON, &data)
+				Expect(err).Should(BeNil())
+				Expect(data).To(Equal(expectedResponseData))
+			})
+		})
+
+		Context("fail", func() {
+			It("should return invalid parameters", func() {
+				prefixURL := fmt.Sprintf("/api/%s/devices/grid/power-state", fixtures.UtGateway.UUID)
+				seedUtInvalidParamsURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, "xxx", UtStartTime, UtEndTime)
+				tt := testutils.TestInfo{
+					Token:      token,
+					URL:        seedUtInvalidParamsURL,
+					WantStatus: http.StatusBadRequest,
+					WantRv: app.Response{
+						Code: e.InvalidParams,
+						Msg:  "invalid parameters",
+					},
+				}
+				testutils.GinkgoAssertRequest(tt, router, "GET", nil)
+			})
+		})
+	})
 })

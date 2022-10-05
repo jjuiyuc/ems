@@ -16,7 +16,7 @@
         "load": "Load",
         "month": "Month",
         "realTimePowerkW": "Real-time Power (kW)",
-        "selfSupplyRate": "Self Supply Rate (%)",
+        "selfSupplyRate": "Self-supply Rate (%)",
         "startDate": "Start Date",
         "to": "to",
         "weeks": "Weeks",
@@ -53,16 +53,16 @@
         "importFromGrid": "Import From Grid",
         "load": "Load",
         "noWebsocketSupport": "Your browser does not support WebSockets.",
+        "solar":"solar",
         "unableToConnect": "Unable to connect"
     },
     "demandCharge": {
         "chartError": "Can't get chart data",
         "currentBillingCycle": "Current Billing Cycle",
-        "demandDetails": "Demand Details",
+        "demandDetails": "Demand Details (kW)",
         "infoError": "Can't get info",
         "lastMonthBillingCycle": "Last Month Billing Cycle",
         "realizedSavings": "Realized Savings"
-
     },
     "economics": {
         "ancillaryServices": "Ancillary Services",
@@ -99,7 +99,7 @@
         "battery": {
             "batteryInformation": "Battery Information",
             "batteryOperationCycles": "Battery Operation Cycles",
-            "capacity": "Capacity",
+            "capacity": "Capacity (kWh)",
             "charged": "Charged",
             "chargingDischargingPower": "Charging / Discharging Power",
             "chartError": "Can't get chart data",
@@ -123,7 +123,7 @@
             "netImport": "Net Import"
         },
         "solar": {
-            "co2Reduction": "CO2 Reduction",
+            "co2Reduction": "CO₂ Reduction",
             "chargeToBattery": "Charge to Battery",
             "chartError": "Can't get chart data",
             "directUsage": "Direct Usage",
@@ -134,7 +134,7 @@
             "solarGeneration": "solarGeneration",
             "thisCalendarMonth": "This Calendar Month",
             "tons": "tons",
-            "totalSolarEnergyDestinations": "Total Solar Energy Destinations"
+            "totalSolarEnergyGeneration": "Total Solar Energy Generation"
         }
     },
     "error": {
@@ -193,7 +193,7 @@
         "batteryStatus": "Battery Status",
         "chargingFrom": "Charging From",
         "current": "Current",
-        "directSolarUsage": "Direct Solar Usage",
+        "directSolarUsage": "Direct Solar Usage(%)",
         "editTimeOfUse": "Edit Time of Use",
         "midPeak": "Mid-peak",
         "offPeak": "Off-peak",

@@ -64,6 +64,10 @@ var _ = Describe("Analysis", func() {
 		router = InitRouter(cfg.GetBool("server.cors"), cfg.GetString("server.ginMode"), w)
 	})
 
+	AfterEach(func() {
+		models.Close()
+	})
+
 	Describe("GetEnergyDistributionInfo", func() {
 		Context("success", func() {
 			It("should be ok", func() {
@@ -105,6 +109,7 @@ var _ = Describe("Analysis", func() {
 				Expect(data).To(Equal(expectedResponseData))
 			})
 		})
+
 		Context("fail", func() {
 			It("should return invalid parameters", func() {
 				prefixURL := fmt.Sprintf("/api/%s/devices/energy-distribution-info", fixtures.UtGateway.UUID)
@@ -160,6 +165,7 @@ var _ = Describe("Analysis", func() {
 				Expect(data).To(Equal(expectedResponseData))
 			})
 		})
+
 		Context("fail", func() {
 			It("should return invalid parameters", func() {
 				prefixURL := fmt.Sprintf("/api/%s/devices/power-state", fixtures.UtGateway.UUID)
@@ -215,6 +221,7 @@ var _ = Describe("Analysis", func() {
 				Expect(data).To(Equal(expectedResponseData))
 			})
 		})
+
 		Context("fail", func() {
 			It("should return invalid parameters", func() {
 				prefixURL := fmt.Sprintf("/api/%s/devices/accumulated-power-state", fixtures.UtGateway.UUID)
@@ -264,6 +271,7 @@ var _ = Describe("Analysis", func() {
 				Expect(data).To(Equal(expectedResponseData))
 			})
 		})
+
 		Context("fail", func() {
 			It("should return invalid parameters", func() {
 				prefixURL := fmt.Sprintf("/api/%s/devices/power-self-supply-rate", fixtures.UtGateway.UUID)

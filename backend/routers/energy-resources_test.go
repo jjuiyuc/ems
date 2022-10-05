@@ -407,4 +407,54 @@ var _ = Describe("DemandCharge", func() {
 			})
 		})
 	})
+
+	Describe("GetGridEnergyInfo", func() {
+		Context("success", func() {
+			It("should be ok", func() {
+				prefixURL := fmt.Sprintf("/api/%s/devices/grid/energy-info", fixtures.UtGateway.UUID)
+				seedUtURL := fmt.Sprintf("%s?startTime=%s", prefixURL, UtStartTime)
+				expectedResponseData := services.GridEnergyInfoResponse{
+					GridConsumedLifetimeEnergyACDiff: 15,
+					GridProducedLifetimeEnergyACDiff: 25,
+					GridLifetimeEnergyACDiff:         10,
+					GridLifetimeEnergyACDiffOfMonth:  10,
+				}
+				tt := testutils.TestInfo{
+					Token:      token,
+					URL:        seedUtURL,
+					WantStatus: http.StatusOK,
+					WantRv: app.Response{
+						Code: e.Success,
+						Msg:  "ok",
+						Data: expectedResponseData,
+					},
+				}
+				rvData := testutils.GinkgoAssertRequest(tt, router, "GET", nil)
+				dataMap := rvData.(map[string]interface{})
+				dataJSON, err := json.Marshal(dataMap)
+				Expect(err).Should(BeNil())
+				var data services.GridEnergyInfoResponse
+				err = json.Unmarshal(dataJSON, &data)
+				Expect(err).Should(BeNil())
+				Expect(data).To(Equal(expectedResponseData))
+			})
+		})
+
+		Context("fail", func() {
+			It("should return invalid parameters", func() {
+				prefixURL := fmt.Sprintf("/api/%s/devices/grid/energy-info", fixtures.UtGateway.UUID)
+				seedUtInvalidParamsURL := fmt.Sprintf("%s?startTime=%s", prefixURL, "xxx")
+				tt := testutils.TestInfo{
+					Token:      token,
+					URL:        seedUtInvalidParamsURL,
+					WantStatus: http.StatusBadRequest,
+					WantRv: app.Response{
+						Code: e.InvalidParams,
+						Msg:  "invalid parameters",
+					},
+				}
+				testutils.GinkgoAssertRequest(tt, router, "GET", nil)
+			})
+		})
+	})
 })

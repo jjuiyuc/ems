@@ -124,6 +124,23 @@ export default connect(mapState)(function Analysis(props) {
         tooltipLabel: item =>
             `${item.dataset.label} ${item.parsed.y} ${commonT("kwh")}`,
         y: { max: 100, min: 0 },
+        x: {
+            time: tab === "year"
+                ? {
+                    displayFormats: {
+                        month: "YYYY MMM",
+                    },
+                    tooltipFormat: "YYYY MMM",
+                    unit: "month"
+                }
+                : {
+                    displayFormats: {
+                        day: "MMM D",
+                    },
+                    tooltipFormat: "MMM D",
+                    unit: "day"
+                },
+        },
         xTickSource: "labels"
     })
     const chartSelfSupplySet = ({ data, labels }) => ({
@@ -142,13 +159,21 @@ export default connect(mapState)(function Analysis(props) {
         tooltipLabel: item => item.parsed.y + "%",
         x: {
             grid: { lineWidth: 0 },
-            time: {
-                displayFormats: {
-                    day: "MMM D",
+            time: tab === "year"
+                ? {
+                    displayFormats: {
+                        month: "YYYY MMM",
+                    },
+                    tooltipFormat: "YYYY MMM",
+                    unit: "month"
+                }
+                : {
+                    displayFormats: {
+                        day: "MMM D",
+                    },
+                    tooltipFormat: "MMM D",
+                    unit: "day"
                 },
-                tooltipFormat: "MMM D",
-                unit: "day"
-            },
         },
         y: { max: 100, min: 0 },
         xTickSource: "labels"
@@ -180,11 +205,9 @@ export default connect(mapState)(function Analysis(props) {
         [barChartData, setBarChartData] = useState(null),
         [barChartDataError, setBarChartDataError] = useState(""),
         [barChartDataLoading, setBarChartDataLoading] = useState(false),
-        [barChartDataRes] = useState("day"),
         [lineChartSupply, setLineChartSupply] = useState(null),
         [lineChartSupplyError, setLineChartSupplyError] = useState(""),
         [lineChartSupplyLoading, setLineChartSupplyLoading] = useState(false),
-        [lineChartSupplyRes] = useState("day"),
         [startDate, setStartDate] = useState(null),
         [endDate, setEndDate] = useState(null)
 
@@ -276,9 +299,8 @@ export default connect(mapState)(function Analysis(props) {
         callBarChartData = (startTime, endTime) => {
             const barChartDataUrl = `${urlPrefix}/accumulated-power-state?`
                 + new URLSearchParams({
-                    startTime, endTime, resolution: barChartDataRes
+                    startTime, endTime, resolution: tab == "year" ? "month" : "day"
                 }).toString()
-
             apiCall({
                 onComplete: () => setBarChartDataLoading(false),
                 onError: error => setBarChartDataError(error),
@@ -307,7 +329,7 @@ export default connect(mapState)(function Analysis(props) {
         callLineChartSupply = (startTime, endTime) => {
             const lineChartSupplyUrl = `${urlPrefix}/power-self-supply-rate?`
                 + new URLSearchParams({
-                    startTime, endTime, resolution: lineChartSupplyRes
+                    startTime, endTime, resolution: tab == "year" ? "month" : "day"
                 }).toString()
 
             apiCall({

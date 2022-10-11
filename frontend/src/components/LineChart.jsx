@@ -217,6 +217,9 @@ export default function LineChart(props) {
         if (chart && chart.canvas) {
             chart.data.datasets = createDatasets(props.data.datasets)
             chart.data.labels = props.data.labels
+            if (props.data?.x?.time) {
+                chart.options.scales.x.time = props.data.x.time
+            }
             chart.update()
         }
     }, [chart, props.data])

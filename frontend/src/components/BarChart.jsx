@@ -144,9 +144,11 @@ export default function BarChart(props) {
                                 day: "MMM D",
                             },
                             tooltipFormat: "MMM D",
-                            unit: "day"
+                            unit: "day",
+                            source: props.data?.xTickSource || "auto",
+                            ...props.data?.time
                         },
-                        type: "time",
+                        type: "timeseries",
                         ...props.data?.x
                     },
                     y: {
@@ -176,9 +178,13 @@ export default function BarChart(props) {
     }, [])
 
     useEffect(() => {
+
         if (chart && chart.canvas) {
             chart.data.datasets = createDatasets(props.data.datasets)
             chart.data.labels = props.data.labels
+            if (props.data?.x?.time) {
+                chart.options.scales.x.time = props.data.x.time
+            }
             chart.update()
         }
     }, [chart, props.data])

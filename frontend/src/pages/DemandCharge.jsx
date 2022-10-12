@@ -213,7 +213,8 @@ export default connect(mapState)(function DemandCharge(props) {
                     ? <LineChart data={chartDemandDetailsSet({
                         ...lineChartDemand,
                         peak: peak.threshhold
-                    })} id="dcLineChart" />
+                    })}
+                        id="dcLineChart" />
                     : null}
                 <ErrorBox
                     error={lineChartDemandError}

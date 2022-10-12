@@ -40,8 +40,7 @@ function LoggedIn(props) {
             <div className="flex-auto bg-gray grid grid-rows-auto-1fr">
                 <TopNav className="z-10" />
                 <div className={"bg-gray-700 min-w-0 shadow-main z-0 "
-                    + "pl-10 pr-8 py-8 lg:pl-25 lg:pr-20 lg:py-20"
-                    + (isDashboard ? " bg-image-grid" : "")}>
+                    + "pl-10 pr-8 py-8 lg:pl-25 lg:pr-20 lg:py-20"}>
                     <Routes>
                         <Route element={<Dashboard />} path="/dashboard" />
                         <Route element={<Analysis />} path="/analysis" />

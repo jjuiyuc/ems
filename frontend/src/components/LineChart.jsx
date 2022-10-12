@@ -141,7 +141,7 @@ export default function LineChart(props) {
                             },
                             tooltipFormat: "hh:mm:ss A"
                         },
-                        type: "timeseries",
+                        type: "time",
                         ...props.data?.x
                     },
                     y: {
@@ -179,8 +179,6 @@ export default function LineChart(props) {
                         position: "right",
                         ...props.data.y1
                     }
-
-
                 }
             },
             plugins: [
@@ -202,6 +200,7 @@ export default function LineChart(props) {
                         if (props.data.beforeDraw) {
                             props.data.beforeDraw(chart)
                         }
+
                     }
                 }
             ],

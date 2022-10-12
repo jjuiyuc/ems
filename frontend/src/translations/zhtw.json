@@ -102,10 +102,10 @@
             "batteryOperationCycles": "累積充放電循環次數",
             "batteryPower": "額定功率 (kW)",
             "capacity": "額定電量 (kWh)",
-            "charged": "累積充電里程",
+            "charged": "累積充電量",
             "chargingDischargingPower": "充/放電功率監控",
             "chartError": "無法取得圖表資料",
-            "discharged": "累積放電里程",
+            "discharged": "累積放電量",
             "infoError": "無法取得電池資料",
             "lifetime": "全生命週期",
             "modal": "型號",
@@ -114,7 +114,7 @@
             "stateOfChargeSOC": "電池電量",
             "soc": "電量",
             "stateOfChargeVoltage": "電池電量及電壓監控",
-            "voltage": "電壓"
+            "voltage": "電壓 (V)"
         },
         "grid": {
             "chartError": "無法取得圖表資料",

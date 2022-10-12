@@ -46,7 +46,7 @@ export default connect(mapState)(function DemandCharge(props) {
         [lineChartDemandError, setLineChartDemandError] = useState(""),
         [lineChartDemandLoading, setLineChartDemandLoading] = useState(false)
 
-    const chartDemandDetailsSet = ({ data, labels }) => ({
+    const chartDemandDetailsSet = ({ data, labels, peak }) => ({
         datasets: [{
             backgroundColor: colors.primary.main,
             borderColor: colors.primary.main,
@@ -63,11 +63,11 @@ export default connect(mapState)(function DemandCharge(props) {
         x: { grid: { lineWidth: 0 } },
         y: { max: 80, min: 0 },
         beforeDraw: chart => {
-            if (!peak.threshhold) return
+            if (peak == null) return
             const
                 xEnd = chart.scales.x.right,
                 xStart = chart.scales.x.left,
-                y = chart.scales["y"].getPixelForValue(peak.threshhold)
+                y = chart.scales["y"].getPixelForValue(peak)
 
             let ctx = chart.ctx
 
@@ -209,9 +209,13 @@ export default connect(mapState)(function DemandCharge(props) {
         <div className="card chart">
             <h4 className="mb-10">{pageT("demandDetails")}</h4>
             <div className="max-h-80vh h-160 w-full">
-                <LineChart data={chartDemandDetailsSet({
-                    ...lineChartDemand
-                })} id="dcLineChart" />
+                {lineChartDemand && peak.threshhold
+                    ? <LineChart data={chartDemandDetailsSet({
+                        ...lineChartDemand,
+                        peak: peak.threshhold
+                    })}
+                        id="dcLineChart" />
+                    : null}
                 <ErrorBox
                     error={lineChartDemandError}
                     message={pageT("chartError")} />

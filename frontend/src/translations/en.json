@@ -100,7 +100,7 @@
         "battery": {
             "batteryInformation": "Battery Information",
             "batteryOperationCycles": "Battery Operation Cycles",
-            "batteryPower": "Battery Power",
+            "batteryPower": "Battery Power (kW)",
             "capacity": "Capacity (kWh)",
             "charged": "Charged",
             "chargingDischargingPower": "Charging / Discharging Power",
@@ -114,7 +114,7 @@
             "stateOfChargeSOC": "State of Charge (SoC)",
             "soc": "SoC",
             "stateOfChargeVoltage": "State of Charge and Voltage",
-            "voltage": "Voltage"
+            "voltage": "Voltage (V)"
         },
         "grid": {
             "chartError": "Can't get chart data",

@@ -148,7 +148,7 @@ export default function BarChart(props) {
                             source: props.data?.xTickSource || "auto",
                             ...props.data?.time
                         },
-                        type: "timeseries",
+                        type: "time",
                         ...props.data?.x
                     },
                     y: {

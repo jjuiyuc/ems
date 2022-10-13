@@ -95,7 +95,7 @@ export default connect(mapState)(function Analysis(props) {
         tooltipLabel: item => `${item.dataset.label} ${item.parsed.y} `
             + commonT("kw"),
         x: { grid: { lineWidth: 0 } },
-        y: { max: 60, min: 0 }
+        y: { max: 60, min: -20 }
     })
     const chartAccumulatedPowerSet = ({ data, labels }) => ({
         datasets: [

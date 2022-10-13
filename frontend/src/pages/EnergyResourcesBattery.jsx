@@ -62,7 +62,11 @@ const chartPowerSet = ({ data, highPeak, labels, unit }) => ({
     labels,
     tickCallback: (val, index) => val + " " + unit,
     tooltipLabel: item => `${item.parsed.y} ${unit}`,
-    y: { max: 15, min: -15 }
+    y: { max: 15, min: -15 },
+    x: {
+        max: moment().add(1, "day").startOf("day"),
+        min: moment().startOf("day")
+    }
 })
 const ErrorBox = ({ error, margin = "", message }) => error
     ? <AlertBox
@@ -140,7 +144,11 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
             + unit[item.dataset.id],
         y: { max: 100, min: 0 },
         y1: { max: 100, min: 0 },
-        y1TickCallback: val => val + " " + unit.voltage
+        y1TickCallback: val => val + " " + unit.voltage,
+        x: {
+            max: moment().add(1, "day").startOf("day"),
+            min: moment().startOf("day")
+        }
     })
     useEffect(() => {
         if (!props.gatewayID) return

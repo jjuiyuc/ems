@@ -195,7 +195,7 @@ var _ = Describe("EnergyResources", func() {
 					Capcity:                             30,
 					PowerSources:                        "Solar + Grid",
 					BatteryPower:                        24,
-					Voltage:                             153.6,
+					Voltage:                             51.2,
 				}
 				tt := testutils.TestInfo{
 					Token:      token,

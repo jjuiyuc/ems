@@ -140,6 +140,7 @@ export default connect(mapState)(function Analysis(props) {
                     tooltipFormat: "MMM D",
                     unit: "day"
                 },
+            type: "timeseries"
         },
         xTickSource: "labels"
     })
@@ -174,6 +175,7 @@ export default connect(mapState)(function Analysis(props) {
                     tooltipFormat: "MMM D",
                     unit: "day"
                 },
+            type: "timeseries"
         },
         y: { max: 100, min: 0 },
         xTickSource: "labels"

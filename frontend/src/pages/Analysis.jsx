@@ -46,6 +46,7 @@ export default connect(mapState)(function Analysis(props) {
                 data: data?.load || [],
                 fill: {
                     above: colors.green["main-opacity-10"],
+                    below: colors.green["main-opacity-10"],
                     target: "origin"
                 },
                 id: "load",
@@ -58,6 +59,7 @@ export default connect(mapState)(function Analysis(props) {
                 data: data?.solar || [],
                 fill: {
                     above: colors.yellow["main-opacity-10"],
+                    below: colors.yellow["main-opacity-10"],
                     target: "origin"
                 },
                 id: "solar",
@@ -69,11 +71,12 @@ export default connect(mapState)(function Analysis(props) {
                 borderColor: colors.blue.main,
                 data: data?.battery || [],
                 fill: {
-                    above: colors.yellow["main-opacity-10"],
+                    above: colors.blue["main-opacity-10"],
+                    below: colors.blue["main-opacity-10"],
                     target: "origin"
                 },
                 id: "battery",
-                pointBorderColor: colors.yellow["main-opacity-20"],
+                pointBorderColor: colors.blue["main-opacity-20"],
                 label: commonT("battery")
             },
             {
@@ -82,6 +85,7 @@ export default connect(mapState)(function Analysis(props) {
                 data: data?.grid || [],
                 fill: {
                     above: colors.indigo["main-opacity-10"],
+                    below: colors.indigo["main-opacity-10"],
                     target: "origin"
                 },
                 id: "grid",

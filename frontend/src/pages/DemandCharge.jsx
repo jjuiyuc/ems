@@ -37,6 +37,7 @@ export default connect(mapState)(function DemandCharge(props) {
     const
         [infoError, setInfoError] = useState(""),
         [infoLoading, setInfoLoading] = useState(false),
+        [infoFetched, setInfoFetched] = useState(false),
         [currentBillingCycle, setCurrentBillingCycle] = useState(0),
         [realizedSavings, setRealizedSavings] = useState(0),
         [lastMonthBillingCycle, setLastMonthBillingCycle]
@@ -130,7 +131,10 @@ export default connect(mapState)(function DemandCharge(props) {
         })
 
         apiCall({
-            onComplete: () => setLineChartDemandLoading(false),
+            onComplete: () => {
+                setLineChartDemandLoading(false)
+                setInfoFetched(true)
+            },
             onError: error => setLineChartDemandError(error),
             onStart: () => setLineChartDemandLoading(true),
             onSuccess: rawData => {
@@ -209,7 +213,7 @@ export default connect(mapState)(function DemandCharge(props) {
         <div className="card chart">
             <h4 className="mb-10">{pageT("demandDetails")}</h4>
             <div className="max-h-80vh h-160 w-full">
-                {lineChartDemand && peak.threshhold
+                {lineChartDemand && infoFetched
                     ? <LineChart data={chartDemandDetailsSet({
                         ...lineChartDemand,
                         peak: peak.threshhold

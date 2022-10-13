@@ -45,7 +45,7 @@ function LoggedIn(props) {
                         <Route element={<Dashboard />} path="/dashboard" />
                         <Route element={<Analysis />} path="/analysis" />
                         <Route element={<TimeOfUse />} path="/time-of-use" />
-                        <Route element={<Economics />} path="/economics" />
+                        {/* <Route element={<Economics />} path="/economics" /> */}
                         <Route
                             element={<DemandCharge />}
                             path="/demand-charge" />
@@ -66,7 +66,7 @@ function LoggedIn(props) {
                         <Route
                             element={<Navigate to="/dashboard" replace />}
                             path="*" />
-                        <Route element={<Settings />} path="/settings" />
+                        {/* <Route element={<Settings />} path="/settings" /> */}
                     </Routes>
                 </div>
             </div>

@@ -718,7 +718,7 @@ func (s defaultDevicesService) getBatteryInfo(gwUUID string, batteryEnergyInfo *
 		batteryEnergyInfo.Model = "L051100-A UZ-Energy Battery"
 		batteryEnergyInfo.Capcity = 30
 		batteryEnergyInfo.BatteryPower = 24
-		batteryEnergyInfo.Voltage = 153.6
+		batteryEnergyInfo.Voltage = 51.2
 	}
 	batteryEnergyInfo.PowerSources = "Solar + Grid"
 	return

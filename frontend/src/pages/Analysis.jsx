@@ -260,7 +260,7 @@ export default connect(mapState)(function Analysis(props) {
                                 type: "chargeToBattery"
                             },
                         ],
-                        kwh: 60
+                        kwh: data.allConsumedLifetimeEnergyACDiff
                     })
                 },
                 url: `${urlPrefix}/energy-distribution-info?startTime=${startTime}&endTime=${endTime}`

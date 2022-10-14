@@ -105,7 +105,7 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
         [power, setPower] = useState(null),
         [powerError, setPowerError] = useState(""),
         [powerLoading, setPowerLoading] = useState(false),
-        [powerRes] = useState("minute"),
+        [powerRes] = useState("hour"),
         [powerSources, setPowerSources] = useState(""),
         [voltage, setVoltage] = useState(0)
 

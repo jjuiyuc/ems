@@ -30,6 +30,7 @@
         "demandCharge": "契約容量超約",
         "exportToGrid": "回送市電",
         "grid": "市電",
+        "inactive":"未動",
         "importFromGrid": "市電充電功率",
         "kw": "kW",
         "kwh": "kWh",

@@ -97,7 +97,7 @@ func (s *BillingWorkerSuite) Test_GetLocalTime() {
 		LocalTime     time.Time
 	}
 
-	var seedUtTOULocationID int64 = 1
+	seedUtTOULocationID := int64(1)
 
 	tests := []struct {
 		name string

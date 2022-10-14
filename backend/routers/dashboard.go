@@ -34,7 +34,7 @@ func (w *APIWorker) dashboardHandler(c *gin.Context) {
 		return
 	}
 	client := &Client{
-		ID:          userID.(int),
+		ID:          userID.(int64),
 		Token:       token.(string),
 		GatewayUUID: gatewayUUID,
 		Conn:        conn,

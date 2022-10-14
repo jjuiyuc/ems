@@ -93,7 +93,7 @@ func (s defaultAuthService) Login(username, password string) (user *deremsmodels
 // CreateLoginLog godoc
 func (s defaultAuthService) CreateLoginLog(user *deremsmodels.User, token string) (err error) {
 	loginLog := &deremsmodels.LoginLog{
-		UserID: null.NewInt(user.ID, true),
+		UserID: null.NewInt64(user.ID, true),
 	}
 
 	err = s.repo.User.InsertLoginLog(loginLog)

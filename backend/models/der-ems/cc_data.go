@@ -23,14 +23,14 @@ import (
 
 // CCDatum is an object representing the database table.
 type CCDatum struct {
-	ID          int       `boil:"id" json:"id" toml:"id" yaml:"id"`
-	GWUUID      string    `boil:"gw_uuid" json:"gwUUID" toml:"gwUUID" yaml:"gwUUID"`
-	LogDate     time.Time `boil:"log_date" json:"logDate" toml:"logDate" yaml:"logDate"`
-	GWID        null.Int  `boil:"gw_id" json:"gwID,omitempty" toml:"gwID" yaml:"gwID,omitempty"`
-	CustomerID  null.Int  `boil:"customer_id" json:"customerID,omitempty" toml:"customerID" yaml:"customerID,omitempty"`
-	LocalCCData null.JSON `boil:"local_cc_data" json:"localCCData,omitempty" toml:"localCCData" yaml:"localCCData,omitempty"`
-	CreatedAt   time.Time `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
-	UpdatedAt   null.Time `boil:"updated_at" json:"updatedAt,omitempty" toml:"updatedAt" yaml:"updatedAt,omitempty"`
+	ID          int64      `boil:"id" json:"id" toml:"id" yaml:"id"`
+	GWUUID      string     `boil:"gw_uuid" json:"gwUUID" toml:"gwUUID" yaml:"gwUUID"`
+	LogDate     time.Time  `boil:"log_date" json:"logDate" toml:"logDate" yaml:"logDate"`
+	GWID        null.Int64 `boil:"gw_id" json:"gwID,omitempty" toml:"gwID" yaml:"gwID,omitempty"`
+	CustomerID  null.Int64 `boil:"customer_id" json:"customerID,omitempty" toml:"customerID" yaml:"customerID,omitempty"`
+	LocalCCData null.JSON  `boil:"local_cc_data" json:"localCCData,omitempty" toml:"localCCData" yaml:"localCCData,omitempty"`
+	CreatedAt   time.Time  `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
+	UpdatedAt   time.Time  `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
 
 	R *ccDatumR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L ccDatumL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -79,23 +79,23 @@ var CCDatumTableColumns = struct {
 // Generated where
 
 var CCDatumWhere = struct {
-	ID          whereHelperint
+	ID          whereHelperint64
 	GWUUID      whereHelperstring
 	LogDate     whereHelpertime_Time
-	GWID        whereHelpernull_Int
-	CustomerID  whereHelpernull_Int
+	GWID        whereHelpernull_Int64
+	CustomerID  whereHelpernull_Int64
 	LocalCCData whereHelpernull_JSON
 	CreatedAt   whereHelpertime_Time
-	UpdatedAt   whereHelpernull_Time
+	UpdatedAt   whereHelpertime_Time
 }{
-	ID:          whereHelperint{field: "`cc_data`.`id`"},
+	ID:          whereHelperint64{field: "`cc_data`.`id`"},
 	GWUUID:      whereHelperstring{field: "`cc_data`.`gw_uuid`"},
 	LogDate:     whereHelpertime_Time{field: "`cc_data`.`log_date`"},
-	GWID:        whereHelpernull_Int{field: "`cc_data`.`gw_id`"},
-	CustomerID:  whereHelpernull_Int{field: "`cc_data`.`customer_id`"},
+	GWID:        whereHelpernull_Int64{field: "`cc_data`.`gw_id`"},
+	CustomerID:  whereHelpernull_Int64{field: "`cc_data`.`customer_id`"},
 	LocalCCData: whereHelpernull_JSON{field: "`cc_data`.`local_cc_data`"},
 	CreatedAt:   whereHelpertime_Time{field: "`cc_data`.`created_at`"},
-	UpdatedAt:   whereHelpernull_Time{field: "`cc_data`.`updated_at`"},
+	UpdatedAt:   whereHelpertime_Time{field: "`cc_data`.`updated_at`"},
 }
 
 // CCDatumRels is where relationship names are stored.
@@ -116,8 +116,8 @@ type ccDatumL struct{}
 
 var (
 	ccDatumAllColumns            = []string{"id", "gw_uuid", "log_date", "gw_id", "customer_id", "local_cc_data", "created_at", "updated_at"}
-	ccDatumColumnsWithoutDefault = []string{"gw_uuid", "log_date", "gw_id", "customer_id", "local_cc_data", "updated_at"}
-	ccDatumColumnsWithDefault    = []string{"id", "created_at"}
+	ccDatumColumnsWithoutDefault = []string{"gw_uuid", "log_date", "gw_id", "customer_id", "local_cc_data"}
+	ccDatumColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	ccDatumPrimaryKeyColumns     = []string{"id"}
 	ccDatumGeneratedColumns      = []string{}
 )
@@ -226,7 +226,7 @@ func CCData(mods ...qm.QueryMod) ccDatumQuery {
 
 // FindCCDatum retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindCCDatum(exec boil.Executor, iD int, selectCols ...string) (*CCDatum, error) {
+func FindCCDatum(exec boil.Executor, iD int64, selectCols ...string) (*CCDatum, error) {
 	ccDatumObj := &CCDatum{}
 
 	sel := "*"
@@ -263,8 +263,8 @@ func (o *CCDatum) Insert(exec boil.Executor, columns boil.Columns) error {
 	if o.CreatedAt.IsZero() {
 		o.CreatedAt = currTime
 	}
-	if queries.MustTime(o.UpdatedAt).IsZero() {
-		queries.SetScanner(&o.UpdatedAt, currTime)
+	if o.UpdatedAt.IsZero() {
+		o.UpdatedAt = currTime
 	}
 
 	nzDefaults := queries.NonZeroDefaultSet(ccDatumColumnsWithDefault, o)
@@ -330,7 +330,7 @@ func (o *CCDatum) Insert(exec boil.Executor, columns boil.Columns) error {
 		return ErrSyncFail
 	}
 
-	o.ID = int(lastID)
+	o.ID = int64(lastID)
 	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == ccDatumMapping["id"] {
 		goto CacheNoHooks
 	}
@@ -364,7 +364,7 @@ CacheNoHooks:
 func (o *CCDatum) Update(exec boil.Executor, columns boil.Columns) (int64, error) {
 	currTime := time.Now().In(boil.GetLocation())
 
-	queries.SetScanner(&o.UpdatedAt, currTime)
+	o.UpdatedAt = currTime
 
 	var err error
 	key := makeCacheKey(columns, nil)
@@ -500,7 +500,7 @@ func (o *CCDatum) Upsert(exec boil.Executor, updateColumns, insertColumns boil.C
 	if o.CreatedAt.IsZero() {
 		o.CreatedAt = currTime
 	}
-	queries.SetScanner(&o.UpdatedAt, currTime)
+	o.UpdatedAt = currTime
 
 	nzDefaults := queries.NonZeroDefaultSet(ccDatumColumnsWithDefault, o)
 	nzUniques := queries.NonZeroDefaultSet(mySQLCCDatumUniqueColumns, o)
@@ -604,7 +604,7 @@ func (o *CCDatum) Upsert(exec boil.Executor, updateColumns, insertColumns boil.C
 		return ErrSyncFail
 	}
 
-	o.ID = int(lastID)
+	o.ID = int64(lastID)
 	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == ccDatumMapping["id"] {
 		goto CacheNoHooks
 	}
@@ -756,7 +756,7 @@ func (o *CCDatumSlice) ReloadAll(exec boil.Executor) error {
 }
 
 // CCDatumExists checks if the CCDatum row exists.
-func CCDatumExists(exec boil.Executor, iD int) (bool, error) {
+func CCDatumExists(exec boil.Executor, iD int64) (bool, error) {
 	var exists bool
 	sql := "select exists(select 1 from `cc_data` where `id`=? limit 1)"
 

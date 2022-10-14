@@ -9,9 +9,9 @@ import (
 
 // TOURepository godoc
 type TOURepository interface {
-	GetTOULocationByTOULocationID(touLocationID int) (*deremsmodels.TouLocation, error)
-	GetBillingsByTOUInfo(touLocationID int, voltageType, touType, periodType string, isSummer bool, day string) ([]*deremsmodels.Tou, error)
-	CountHolidayByDay(touLocationID int, year, day string) (int64, error)
+	GetTOULocationByTOULocationID(touLocationID int64) (*deremsmodels.TouLocation, error)
+	GetBillingsByTOUInfo(touLocationID int64, voltageType, touType, periodType string, isSummer bool, day string) ([]*deremsmodels.Tou, error)
+	CountHolidayByDay(touLocationID int64, year, day string) (int64, error)
 }
 
 type defaultTOURepository struct {
@@ -24,12 +24,12 @@ func NewTOURepository(db *sql.DB) TOURepository {
 }
 
 // GetTOULocationByTOULocationID godoc
-func (repo defaultTOURepository) GetTOULocationByTOULocationID(touLocationID int) (*deremsmodels.TouLocation, error) {
+func (repo defaultTOURepository) GetTOULocationByTOULocationID(touLocationID int64) (*deremsmodels.TouLocation, error) {
 	return deremsmodels.FindTouLocation(repo.db, touLocationID)
 }
 
 // GetBillingsByTOUInfo godoc
-func (repo defaultTOURepository) GetBillingsByTOUInfo(touLocationID int, voltageType, touType, periodType string, isSummer bool, day string) ([]*deremsmodels.Tou, error) {
+func (repo defaultTOURepository) GetBillingsByTOUInfo(touLocationID int64, voltageType, touType, periodType string, isSummer bool, day string) ([]*deremsmodels.Tou, error) {
 	return deremsmodels.Tous(
 		qm.Where("enable_at <= ?", day),
 		qm.Where("disable_at >= ?", day),
@@ -41,7 +41,7 @@ func (repo defaultTOURepository) GetBillingsByTOUInfo(touLocationID int, voltage
 }
 
 // CountHolidayByDay godoc
-func (repo defaultTOURepository) CountHolidayByDay(touLocationID int, year, day string) (int64, error) {
+func (repo defaultTOURepository) CountHolidayByDay(touLocationID int64, year, day string) (int64, error) {
 	return deremsmodels.Tous(
 		qm.Where("day = ?", day),
 		qm.Where("year = ?", year),

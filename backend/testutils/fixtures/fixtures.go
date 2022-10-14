@@ -27,7 +27,7 @@ var UtCustomer = &deremsmodels.Customer{
 	WeatherLat:     null.NewFloat32(24.75, true),
 	WeatherLng:     null.NewFloat32(121.75, true),
 	Timezone:       null.NewString("+0800", true),
-	TOULocationID:  null.NewInt(1, true),
+	TOULocationID:  null.NewInt64(1, true),
 	VoltageType:    null.NewString("Low voltage", true),
 	TOUType:        null.NewString("Two-section", true),
 }

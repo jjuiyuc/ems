@@ -23,12 +23,12 @@ import (
 
 // TouHoliday is an object representing the database table.
 type TouHoliday struct {
-	ID            int         `boil:"id" json:"id" toml:"id" yaml:"id"`
-	TOULocationID null.Int    `boil:"tou_location_id" json:"touLocationID,omitempty" toml:"touLocationID" yaml:"touLocationID,omitempty"`
+	ID            int64       `boil:"id" json:"id" toml:"id" yaml:"id"`
+	TOULocationID null.Int64  `boil:"tou_location_id" json:"touLocationID,omitempty" toml:"touLocationID" yaml:"touLocationID,omitempty"`
 	Year          null.String `boil:"year" json:"year,omitempty" toml:"year" yaml:"year,omitempty"`
 	Day           null.Time   `boil:"day" json:"day,omitempty" toml:"day" yaml:"day,omitempty"`
 	CreatedAt     time.Time   `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
-	UpdatedAt     null.Time   `boil:"updated_at" json:"updatedAt,omitempty" toml:"updatedAt" yaml:"updatedAt,omitempty"`
+	UpdatedAt     time.Time   `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
 
 	R *touHolidayR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L touHolidayL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -69,19 +69,19 @@ var TouHolidayTableColumns = struct {
 // Generated where
 
 var TouHolidayWhere = struct {
-	ID            whereHelperint
-	TOULocationID whereHelpernull_Int
+	ID            whereHelperint64
+	TOULocationID whereHelpernull_Int64
 	Year          whereHelpernull_String
 	Day           whereHelpernull_Time
 	CreatedAt     whereHelpertime_Time
-	UpdatedAt     whereHelpernull_Time
+	UpdatedAt     whereHelpertime_Time
 }{
-	ID:            whereHelperint{field: "`tou_holiday`.`id`"},
-	TOULocationID: whereHelpernull_Int{field: "`tou_holiday`.`tou_location_id`"},
+	ID:            whereHelperint64{field: "`tou_holiday`.`id`"},
+	TOULocationID: whereHelpernull_Int64{field: "`tou_holiday`.`tou_location_id`"},
 	Year:          whereHelpernull_String{field: "`tou_holiday`.`year`"},
 	Day:           whereHelpernull_Time{field: "`tou_holiday`.`day`"},
 	CreatedAt:     whereHelpertime_Time{field: "`tou_holiday`.`created_at`"},
-	UpdatedAt:     whereHelpernull_Time{field: "`tou_holiday`.`updated_at`"},
+	UpdatedAt:     whereHelpertime_Time{field: "`tou_holiday`.`updated_at`"},
 }
 
 // TouHolidayRels is where relationship names are stored.
@@ -102,8 +102,8 @@ type touHolidayL struct{}
 
 var (
 	touHolidayAllColumns            = []string{"id", "tou_location_id", "year", "day", "created_at", "updated_at"}
-	touHolidayColumnsWithoutDefault = []string{"tou_location_id", "year", "day", "updated_at"}
-	touHolidayColumnsWithDefault    = []string{"id", "created_at"}
+	touHolidayColumnsWithoutDefault = []string{"tou_location_id", "year", "day"}
+	touHolidayColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	touHolidayPrimaryKeyColumns     = []string{"id"}
 	touHolidayGeneratedColumns      = []string{}
 )
@@ -212,7 +212,7 @@ func TouHolidays(mods ...qm.QueryMod) touHolidayQuery {
 
 // FindTouHoliday retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindTouHoliday(exec boil.Executor, iD int, selectCols ...string) (*TouHoliday, error) {
+func FindTouHoliday(exec boil.Executor, iD int64, selectCols ...string) (*TouHoliday, error) {
 	touHolidayObj := &TouHoliday{}
 
 	sel := "*"
@@ -249,8 +249,8 @@ func (o *TouHoliday) Insert(exec boil.Executor, columns boil.Columns) error {
 	if o.CreatedAt.IsZero() {
 		o.CreatedAt = currTime
 	}
-	if queries.MustTime(o.UpdatedAt).IsZero() {
-		queries.SetScanner(&o.UpdatedAt, currTime)
+	if o.UpdatedAt.IsZero() {
+		o.UpdatedAt = currTime
 	}
 
 	nzDefaults := queries.NonZeroDefaultSet(touHolidayColumnsWithDefault, o)
@@ -316,7 +316,7 @@ func (o *TouHoliday) Insert(exec boil.Executor, columns boil.Columns) error {
 		return ErrSyncFail
 	}
 
-	o.ID = int(lastID)
+	o.ID = int64(lastID)
 	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == touHolidayMapping["id"] {
 		goto CacheNoHooks
 	}
@@ -350,7 +350,7 @@ CacheNoHooks:
 func (o *TouHoliday) Update(exec boil.Executor, columns boil.Columns) (int64, error) {
 	currTime := time.Now().In(boil.GetLocation())
 
-	queries.SetScanner(&o.UpdatedAt, currTime)
+	o.UpdatedAt = currTime
 
 	var err error
 	key := makeCacheKey(columns, nil)
@@ -486,7 +486,7 @@ func (o *TouHoliday) Upsert(exec boil.Executor, updateColumns, insertColumns boi
 	if o.CreatedAt.IsZero() {
 		o.CreatedAt = currTime
 	}
-	queries.SetScanner(&o.UpdatedAt, currTime)
+	o.UpdatedAt = currTime
 
 	nzDefaults := queries.NonZeroDefaultSet(touHolidayColumnsWithDefault, o)
 	nzUniques := queries.NonZeroDefaultSet(mySQLTouHolidayUniqueColumns, o)
@@ -590,7 +590,7 @@ func (o *TouHoliday) Upsert(exec boil.Executor, updateColumns, insertColumns boi
 		return ErrSyncFail
 	}
 
-	o.ID = int(lastID)
+	o.ID = int64(lastID)
 	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == touHolidayMapping["id"] {
 		goto CacheNoHooks
 	}
@@ -742,7 +742,7 @@ func (o *TouHolidaySlice) ReloadAll(exec boil.Executor) error {
 }
 
 // TouHolidayExists checks if the TouHoliday row exists.
-func TouHolidayExists(exec boil.Executor, iD int) (bool, error) {
+func TouHolidayExists(exec boil.Executor, iD int64) (bool, error) {
 	var exists bool
 	sql := "select exists(select 1 from `tou_holiday` where `id`=? limit 1)"
 

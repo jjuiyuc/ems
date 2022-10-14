@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 
@@ -16,7 +15,7 @@ type UserRepository interface {
 	InsertLoginLog(loginLog *deremsmodels.LoginLog) error
 	UpdateUser(user *deremsmodels.User) (err error)
 	GetLoginLogCount() (int64, error)
-	GetUserByUserID(userID int) (*deremsmodels.User, error)
+	GetUserByUserID(userID int64) (*deremsmodels.User, error)
 	GetUserByUsername(username string) (*deremsmodels.User, error)
 	GetUserByPasswordToken(token string) (*deremsmodels.User, error)
 }
@@ -34,13 +33,13 @@ func NewUserRepository(db *sql.DB) UserRepository {
 func (repo defaultUserRepository) InsertLoginLog(loginLog *deremsmodels.LoginLog) error {
 	now := time.Now().UTC()
 	loginLog.CreatedAt = now
-	loginLog.UpdatedAt = null.NewTime(now, true)
+	loginLog.UpdatedAt = now
 	return loginLog.Insert(repo.db, boil.Infer())
 }
 
 // UpdateUser godoc
 func (repo defaultUserRepository) UpdateUser(user *deremsmodels.User) (err error) {
-	user.UpdatedAt = null.NewTime(time.Now().UTC(), true)
+	user.UpdatedAt = time.Now().UTC()
 	_, err = user.Update(repo.db, boil.Infer())
 	return
 }
@@ -51,7 +50,7 @@ func (repo defaultUserRepository) GetLoginLogCount() (int64, error) {
 }
 
 // GetUserByUserID godoc
-func (repo defaultUserRepository) GetUserByUserID(userID int) (*deremsmodels.User, error) {
+func (repo defaultUserRepository) GetUserByUserID(userID int64) (*deremsmodels.User, error) {
 	return deremsmodels.FindUser(repo.db, userID)
 }
 

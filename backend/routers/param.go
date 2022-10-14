@@ -91,8 +91,7 @@ func (p *ZoomableParam) validate(c *gin.Context) (err error) {
 		log.WithFields(log.Fields{"caused-by": err}).Error()
 		return
 	}
-	// TODO: Only supports hour now
-	if p.Query.Resolution != "hour" {
+	if p.Query.Resolution != "hour" && p.Query.Resolution != "5minute" {
 		err = e.ErrNewUnexpectedResolution
 		log.WithFields(log.Fields{"caused-by": err}).Error()
 	}

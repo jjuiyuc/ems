@@ -212,7 +212,7 @@ type DevicesService interface {
 	GetSolarEnergyInfo(gwUUID string, startTime time.Time) (solarEnergyInfo *SolarEnergyInfoResponse)
 	GetSolarPowerState(gwUUID string, startTime, endTime time.Time) (solarPowerState *SolarPowerStateResponse, err error)
 	GetBatteryEnergyInfo(gwUUID string, startTime time.Time) (batteryEnergyInfo *BatteryEnergyInfoResponse)
-	GetBatteryPowerState(gwUUID string, startTime, endTime time.Time) (batteryPowerState *BatteryPowerStateResponse, err error)
+	GetBatteryPowerState(gwUUID, resolution string, startTime, endTime time.Time) (batteryPowerState *BatteryPowerStateResponse, err error)
 	GetBatteryChargeVoltageState(gwUUID string, startTime, endTime time.Time) (batteryChargeVoltageState *BatteryChargeVoltageStateResponse, err error)
 	GetGridEnergyInfo(gwUUID string, startTime time.Time) (gridEnergyInfo *GridEnergyInfoResponse)
 	GetGridPowerState(gwUUID string, startTime, endTime time.Time) (gridPowerState *GridPowerStateResponse, err error)
@@ -336,7 +336,7 @@ func (s defaultDevicesService) GetEnergyDistributionInfo(gwUUID string, startTim
 }
 
 func (s defaultDevicesService) GetPowerState(gwUUID string, startTime, endTime time.Time) (powerState *PowerStateResponse) {
-	realtimeInfo := s.getRealtimeInfo(gwUUID, startTime, endTime)
+	realtimeInfo := s.getRealtimeInfo(gwUUID, "hour", startTime, endTime)
 	powerState = &PowerStateResponse{
 		Timestamps:             realtimeInfo.Timestamps,
 		LoadAveragePowerACs:    realtimeInfo.LoadAveragePowerACs,
@@ -461,7 +461,7 @@ func (s defaultDevicesService) GetSolarPowerState(gwUUID string, startTime, endT
 	}
 
 	solarPowerState.OnPeakTime = onPeakTime
-	realtimeInfo := s.getRealtimeInfo(gwUUID, startTime, endTime)
+	realtimeInfo := s.getRealtimeInfo(gwUUID, "hour", startTime, endTime)
 	solarPowerState.Timestamps = realtimeInfo.Timestamps
 	solarPowerState.PvAveragePowerACs = realtimeInfo.PvAveragePowerACs
 	return
@@ -495,7 +495,7 @@ func (s defaultDevicesService) GetBatteryEnergyInfo(gwUUID string, startTime tim
 	return
 }
 
-func (s defaultDevicesService) GetBatteryPowerState(gwUUID string, startTime, endTime time.Time) (batteryPowerState *BatteryPowerStateResponse, err error) {
+func (s defaultDevicesService) GetBatteryPowerState(gwUUID, resolution string, startTime, endTime time.Time) (batteryPowerState *BatteryPowerStateResponse, err error) {
 	batteryPowerState = &BatteryPowerStateResponse{}
 	onPeakTime, err := s.getOnPeakTime(gwUUID, startTime)
 	if err != nil {
@@ -503,7 +503,7 @@ func (s defaultDevicesService) GetBatteryPowerState(gwUUID string, startTime, en
 	}
 
 	batteryPowerState.OnPeakTime = onPeakTime
-	realtimeInfo := s.getRealtimeInfo(gwUUID, startTime, endTime)
+	realtimeInfo := s.getRealtimeInfo(gwUUID, resolution, startTime, endTime)
 	batteryPowerState.Timestamps = realtimeInfo.Timestamps
 	batteryPowerState.BatteryAveragePowerACs = realtimeInfo.BatteryAveragePowerACs
 	return
@@ -517,7 +517,7 @@ func (s defaultDevicesService) GetBatteryChargeVoltageState(gwUUID string, start
 	}
 
 	batteryChargeVoltageState.OnPeakTime = onPeakTime
-	realtimeInfo := s.getRealtimeInfo(gwUUID, startTime, endTime)
+	realtimeInfo := s.getRealtimeInfo(gwUUID, "hour", startTime, endTime)
 	batteryChargeVoltageState.Timestamps = realtimeInfo.Timestamps
 	batteryChargeVoltageState.BatterySoCs = realtimeInfo.BatterySoCs
 	batteryChargeVoltageState.BatteryVoltages = realtimeInfo.BatteryVoltages
@@ -561,16 +561,22 @@ func (s defaultDevicesService) GetGridPowerState(gwUUID string, startTime, endTi
 	}
 
 	gridPowerState.OnPeakTime = onPeakTime
-	realtimeInfo := s.getRealtimeInfo(gwUUID, startTime, endTime)
+	realtimeInfo := s.getRealtimeInfo(gwUUID, "hour", startTime, endTime)
 	gridPowerState.Timestamps = realtimeInfo.Timestamps
 	gridPowerState.GridAveragePowerACs = realtimeInfo.GridAveragePowerACs
 	return
 }
 
-func (s defaultDevicesService) getRealtimeInfo(gwUUID string, startTime, endTime time.Time) (realtimeInfo *RealtimeInfo) {
+func (s defaultDevicesService) getRealtimeInfo(gwUUID, resolution string, startTime, endTime time.Time) (realtimeInfo *RealtimeInfo) {
 	realtimeInfo = &RealtimeInfo{}
 	startTimeIndex := startTime
-	endTimeIndex := startTime.Add(1 * time.Hour)
+	var endTimeIndex time.Time
+	switch resolution {
+	case "hour":
+		endTimeIndex = startTime.Add(1 * time.Hour)
+	case "5minute":
+		endTimeIndex = startTime.Add(5 * time.Minute)
+	}
 
 	for startTimeIndex.Before(endTime) {
 		latestRealtimeInfo := s.getLatestRealtimeInfo(gwUUID, startTimeIndex, endTimeIndex, endTime)
@@ -584,7 +590,12 @@ func (s defaultDevicesService) getRealtimeInfo(gwUUID string, startTime, endTime
 		realtimeInfo.BatteryVoltages = append(realtimeInfo.BatteryVoltages, latestRealtimeInfo.BatteryVoltage.Float32)
 
 		startTimeIndex = endTimeIndex
-		endTimeIndex = startTimeIndex.Add(1 * time.Hour)
+		switch resolution {
+		case "hour":
+			endTimeIndex = startTimeIndex.Add(1 * time.Hour)
+		case "5minute":
+			endTimeIndex = startTimeIndex.Add(5 * time.Minute)
+		}
 		if endTimeIndex.After(endTime) {
 			endTimeIndex = endTime
 		}

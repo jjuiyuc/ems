@@ -385,7 +385,7 @@ func (s defaultDevicesService) GetPowerSelfSupplyRate(gwUUID, resolution string,
 	accumulatedInfo := s.getAccumulatedInfo(gwUUID, resolution, startTime, endTime)
 	powerSelfSupplyRate = &PowerSelfSupplyRateResponse{
 		Timestamps:                       accumulatedInfo.Timestamps,
-		LoadSelfConsumedEnergyPercentACs: accumulatedInfo.LoadConsumedLifetimeEnergyACDiffs,
+		LoadSelfConsumedEnergyPercentACs: accumulatedInfo.LoadSelfConsumedEnergyPercentACs,
 	}
 	return
 }

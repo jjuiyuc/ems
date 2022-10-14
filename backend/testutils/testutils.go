@@ -14,6 +14,7 @@ import (
 	"github.com/Shopify/sarama"
 	"github.com/Shopify/sarama/mocks"
 	"github.com/gin-gonic/gin"
+	. "github.com/onsi/gomega"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 	"github.com/volatiletech/sqlboiler/v4/boil"
@@ -157,5 +158,24 @@ func AssertRequest(tt TestInfo, a *require.Assertions, router *gin.Engine, metho
 	a.NoError(err)
 	a.Equal(tt.WantRv.Code, res.Code)
 	a.Equal(tt.WantRv.Msg, res.Msg)
+	return res.Data
+}
+
+// GinkgoAssertRequest godoc
+func GinkgoAssertRequest(tt TestInfo, router *gin.Engine, method string, body io.Reader) (rvData interface{}) {
+	req, err := http.NewRequest(method, fmt.Sprintf(tt.URL), body)
+	Expect(err).Should(BeNil())
+	if tt.Token != "" {
+		req.Header.Set("Authorization", GetAuthorization(tt.Token))
+	}
+	rv := httptest.NewRecorder()
+	router.ServeHTTP(rv, req)
+	Expect(rv.Code).To(Equal(tt.WantStatus))
+
+	var res app.Response
+	err = json.Unmarshal([]byte(rv.Body.String()), &res)
+	Expect(err).Should(BeNil())
+	Expect(res.Code).To(Equal(tt.WantRv.Code))
+	Expect(res.Msg).To(Equal(tt.WantRv.Msg))
 	return res.Data
 }

@@ -30,6 +30,7 @@
         "demandCharge": "Demand Charge",
         "exportToGrid": "Export to Grid",
         "grid": "Grid",
+        "inactive":"Inactive",
         "importFromGrid": "Import from Grid",
         "logIn": "Log In",
         "logOut": "Log Out",

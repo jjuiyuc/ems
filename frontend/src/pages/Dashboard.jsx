@@ -244,7 +244,14 @@ export default connect(mapState)(function Dashboard(props) {
             </div>
             <h5 className="text-negative-main">{commonT("active")}</h5>
         </>
-        : null
+        : <>
+            <div className="grid h-6 ml-6 mr-1 place-items-center relative w-6">
+                <div className="absolute bg-gray-300 h-3
+                    rounded-full w-3" />
+                <div className="bg-gray-300 h-2.5 rounded-full w-2.5" />
+            </div>
+            <h5 className="">{commonT("inactive")}</h5>
+        </>
 
     const peakShaveColor = peak.active ? "negative" : "positive"
 
@@ -272,6 +279,7 @@ export default connect(mapState)(function Dashboard(props) {
                 <div className="card">
                     <div className="flex flex-wrap items-baseline mb-6">
                         <h5 className="font-bold">{commonT("peakShave")}</h5>
+                        {activeIndicator}
                     </div>
                     <div className="bg-gray-600 flex h-2 overflow-hidden
                                     rounded-full w-full ">
@@ -286,7 +294,6 @@ export default connect(mapState)(function Dashboard(props) {
                                 {peak.current}
                             </span> / {peak.threshhold} {commonT("kw")}
                         </div>
-                        {activeIndicator}
                     </div>
                 </div>
                 <div className="grid-cols-3-auto items-stretch

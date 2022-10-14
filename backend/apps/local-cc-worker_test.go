@@ -120,7 +120,7 @@ func (s *LocalCCWorkerSuite) SetupSuite() {
 }
 
 func (s *LocalCCWorkerSuite) TearDownSuite() {
-	// Delete test data in cc_data_log table
+	// Delete this time test data in cc_data_log table (Default is 3 records in DB, that's way delete index 4 and 5)
 	_, err := s.db.Exec(`
 		DELETE FROM cc_data_log WHERE id = 4 OR id = 5;
 	`)

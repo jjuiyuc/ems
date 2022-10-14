@@ -693,9 +693,9 @@ func (s defaultDevicesService) getLatestComputedDemandState(gwUUID string, start
 	}
 
 	latestComputedDemandState.Timestamps = int(latestLog.LogDate.Unix())
-	latestComputedDemandState.GridLifetimeEnergyACDiffToPower = utils.Percent(
+	latestComputedDemandState.GridLifetimeEnergyACDiffToPower = utils.Division(
 		utils.Diff(latestLog.GridLifetimeEnergyAC.Float32,
-			firstLog.GridLifetimeEnergyAC.Float32), (15 / 60))
+			firstLog.GridLifetimeEnergyAC.Float32), (15.0 / 60.0))
 	latestComputedDemandState.GridContractPowerAC = latestLog.GridContractPowerAC.Float32
 	return
 }
@@ -704,7 +704,7 @@ func (s defaultDevicesService) getBatteryInfo(gwUUID string, batteryEnergyInfo *
 	// XXX: Hardcode battery information by gateway UUID
 	const (
 		Huayu      = "0324DE7B51B262F3B11A643CBA8E12CE"
-		Serenegray = "04F1FD6D9C6F64C3352285CCEAF59EE1"
+		Serenegray = "0E0BA27A8175AF978C49396BDE9D7A1E"
 	)
 	switch gwUUID {
 	case Huayu:

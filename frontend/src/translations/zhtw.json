@@ -197,6 +197,7 @@
         "chargingFrom": "充電自/放電至",
         "current": "目前",
         "directSolarUsage": "太陽能直接消耗比率(%)",
+        "dischargingTo": "電池放電至",
         "editTimeOfUse": "Edit Time of Use",
         "midPeak": "半尖峰時段電力",
         "offPeak": "離峰時段電力",

@@ -196,6 +196,7 @@
         "batteryStatus": "Battery Status",
         "chargingFrom": "Charging From",
         "current": "Current",
+        "dischargingTo": "Discharging To",
         "directSolarUsage": "Direct Solar Usage(%)",
         "editTimeOfUse": "Edit Time of Use",
         "midPeak": "Mid-peak",

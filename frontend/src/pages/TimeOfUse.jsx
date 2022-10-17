@@ -1,21 +1,25 @@
+import { connect } from "react-redux"
 import { Button, Stack } from "@mui/material"
-import { Fragment as Frag, useEffect, useRef, useState } from "react"
+import { Fragment as Frag, useEffect, useState } from "react"
 import moment from "moment"
 import { useTranslation } from "react-multi-lang"
-import WaterChart from "water-chart"
 
+import { apiCall } from "../utils/api"
+import variables from "../configs/variables"
+
+import BatteryStatusCard from "../components/BatteryStatusCard"
 import Clock from "../components/Clock"
 import EnergyCard from "../components/EnergyCard"
 import LineChart from "../components/LineChart"
-import variables from "../configs/variables"
 
 import { ReactComponent as EditIcon } from "../assets/icons/edit.svg"
 import { common } from "@mui/material/colors"
 
 const { colors } = variables
 
-export default function TimeOfUse() {
-    const batteryChart = useRef()
+const mapState = state => ({ gatewayID: state.gateways.active.gatewayID })
+
+export default connect(mapState)(function TimeOfUse(props) {
     const showFullSections = parseInt(import.meta.env.VITE_APP_API_TOU_SHOW_FULL_SECTIONS)
     const
         t = useTranslation(),
@@ -42,16 +46,19 @@ export default function TimeOfUse() {
             Math.floor(Math.random() * (60 - 40 + 1) + 40))
 
     const
-        [battery, setBattery] = useState({
-            source: "solar",
-            level: 52.5,
-            power: 20,
-        }),
         [clockDataset, setClockDataset] = useState({
             data: [], backgroundColor: []
         }),
         [currentPeriod, setCurrentPeriod] = useState(""),
         [currentTime, setCurrentTime] = useState(""),
+        [batteryStatusLoading, setBatteryStatusLoading] = useState(false),
+        [batteryStatusError, setBatteryStatusError] = useState(false),
+        [batteryStatus, setBatteryStatus] = useState({
+            direction: "",
+            target: "",
+            power: 0,
+            state: 0
+        }),
         [lineChartData, setLineChartData] = useState({
             datasets: [{
                 backgroundColor: colors.primary.main,
@@ -193,27 +200,33 @@ export default function TimeOfUse() {
     }, [timeOfUse])
 
     useEffect(() => {
-        if (!batteryChart.current) return
+        if (!props.gatewayID) return
+        const startTime = moment().startOf("day").toISOString()
 
-        batteryChart.current.innerHTML = ""
+        apiCall({
+            onComplete: () => setBatteryStatusLoading(false),
+            onError: error => setBatteryStatusError(error),
+            onStart: () => setBatteryStatusLoading(true),
+            onSuccess: rawData => {
+                if (!rawData || !rawData.data) return
 
-        new WaterChart({
-            container: "#batteryChart",
-            fillOpacity: .4,
-            margin: 6,
-            maxValue: 100,
-            minValue: 0,
-            series: [battery.level],
-            stroke: colors.gray[400],
-            strokeWidth: 2,
-            textColor1: "white",
-            textPositionY: .45,
-            textSize: .3,
-            textUnitSize: "32px",
-            waveColor1: colors.primary.main,
-            waveColor2: colors.primary.main
+                const { data } = rawData
+
+                setBatteryStatus({
+                    direction:
+                        data.batteryChargingFrom ? "chargingFrom" : "dischargingTo",
+                    target: (data.batteryChargingFrom || data.batteryDischargingTo)
+                        .toLocaleLowerCase(),
+                    power: (data.batteryProducedAveragePowerAC
+                        + data.batteryConsumedAveragePowerAC || 0),
+                    state: (data.batterySoC || 0)
+                })
+
+
+            },
+            url: `/api/${props.gatewayID}/devices/battery/usage-info?startTime=${startTime}`
         })
-    }, [battery, tab])
+    }, [props.gatewayID])
 
     return <>
         <div className="page-header">
@@ -261,15 +274,14 @@ export default function TimeOfUse() {
                                     className="">
                                     <h6 className="font-bold text-white">{commonT(t.type)}</h6>
                                     <h3 className="my-1">-</h3>
-                                    <p className="lg:test text-13px text-white">
-                                        {t.kwh} {commonT("kwh")}
-                                    </p>
+                                    {/* <p className="lg:test text-13px text-white">
+                                {t.kwh} {commonT("kwh")}
+                            </p> */}
                                     <div className="md:h-6 lg:h-4 w-4"></div>
                                 </div>)}
                         </div>
                     </div>
-                </>
-                : null
+                </> : null
             }
             <div className="card">
                 <div className="header -mr-4">
@@ -320,42 +332,9 @@ export default function TimeOfUse() {
                 </div>
             </div>
             {tab === "today"
-                ? <div className="card">
-                    <div className="header">
-                        <h4>{pageT("batteryStatus")}</h4>
-                    </div>
-                    <div className="flex flex-wrap items-center justify-around">
-                        <div className="h-48 relative w-48">
-                            <div className="absolute bg-gray-800 h-44 m-2
-                                        rounded-full w-44" />
-                            <svg
-                                className="h-48 relative w-48"
-                                id="batteryChart"
-                                ref={batteryChart} />
-                        </div>
-                        <div className="column-separator grid grid-cols-3 my-6
-                            mw-88 gap-x-5 sm:gap-x-10">
-                            <div>
-                                <h3>{battery.level}%</h3>
-                                <span className="text-13px">
-                                    {commonT("stateOfCharge")}
-                                </span>
-                            </div>
-                            <div>
-                                <h3>{battery.power} {commonT("kw")}</h3>
-                                <span className="text-13px">
-                                    {commonT("batteryPower")}
-                                </span>
-                            </div>
-                            <div>
-                                <h3>{commonT(battery.source)}</h3>
-                                <span className="text-13px">
-                                    {pageT("chargingFrom")}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                ? <BatteryStatusCard
+                    data={batteryStatus}
+                />
                 : null}
         </div>
         {tab === "today"
@@ -369,4 +348,4 @@ export default function TimeOfUse() {
             </>
             : null}
     </>
-}
+})

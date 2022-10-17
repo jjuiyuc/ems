@@ -57,7 +57,10 @@ const chartPowerSet = ({ data, highPeak, labels, unit }) => ({
             below: colors.blue["main-opacity-10"],
             target: "origin"
         },
-        pointBorderColor: colors.blue["main-opacity-20"]
+        pointBorderColor: colors.blue["main-opacity-20"],
+        hoverRadius: 2,
+        pointHoverBorderWidth: 2,
+        radius: 2,
     }],
     labels,
     tickCallback: (val, index) => val + " " + unit,

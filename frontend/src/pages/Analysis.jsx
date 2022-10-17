@@ -51,6 +51,9 @@ export default connect(mapState)(function Analysis(props) {
                 },
                 id: "load",
                 pointBorderColor: colors.green["main-opacity-20"],
+                hoverRadius: 2,
+                pointHoverBorderWidth: 2,
+                radius: 2,
                 label: pageT("load")
             },
             {
@@ -64,6 +67,9 @@ export default connect(mapState)(function Analysis(props) {
                 },
                 id: "solar",
                 pointBorderColor: colors.yellow["main-opacity-20"],
+                hoverRadius: 2,
+                pointHoverBorderWidth: 2,
+                radius: 2,
                 label: commonT("solar")
             },
             {
@@ -77,6 +83,9 @@ export default connect(mapState)(function Analysis(props) {
                 },
                 id: "battery",
                 pointBorderColor: colors.blue["main-opacity-20"],
+                hoverRadius: 2,
+                pointHoverBorderWidth: 2,
+                radius: 2,
                 label: commonT("battery")
             },
             {
@@ -90,6 +99,9 @@ export default connect(mapState)(function Analysis(props) {
                 },
                 id: "grid",
                 pointBorderColor: colors.indigo["main-opacity-20"],
+                hoverRadius: 2,
+                pointHoverBorderWidth: 2,
+                radius: 2,
                 label: commonT("grid")
             }
         ],
@@ -207,7 +219,7 @@ export default connect(mapState)(function Analysis(props) {
         [lineChartPower, setLineChartPower] = useState(null),
         [lineChartPowerError, setLineChartPowerError] = useState(""),
         [lineChartPowerLoading, setLineChartPowerLoading] = useState(false),
-        [lineChartPowertRes] = useState("hour"),
+        [lineChartPowertRes] = useState("5minute"),
         [barChartData, setBarChartData] = useState(null),
         [barChartDataError, setBarChartDataError] = useState(""),
         [barChartDataLoading, setBarChartDataLoading] = useState(false),

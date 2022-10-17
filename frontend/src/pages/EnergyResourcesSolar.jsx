@@ -80,7 +80,7 @@ export default connect(mapState)(function EnergyResoucesSolar(props) {
         [lineChartSolar, setLineChartSolar] = useState(null),
         [lineChartSolarError, setLineChartSolarError] = useState(""),
         [lineChartSolarLoading, setLineChartSolarLoading] = useState(false),
-        [lineChartSolarRes] = useState("hour")
+        [lineChartSolarRes] = useState("5minute")
 
     const
         isEcoPositive = economics > 0,
@@ -102,7 +102,10 @@ export default connect(mapState)(function EnergyResoucesSolar(props) {
                 above: colors.yellow["main-opacity-10"],
                 target: "origin"
             },
-            pointBorderColor: colors.yellow["main-opacity-20"]
+            pointBorderColor: colors.yellow["main-opacity-20"],
+            hoverRadius: 2,
+            pointHoverBorderWidth: 2,
+            radius: 2,
         }],
         labels,
         tickCallback: (val, index) => val + commonT("kw"),

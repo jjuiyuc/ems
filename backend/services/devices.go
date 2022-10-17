@@ -117,6 +117,15 @@ type PowerSelfSupplyRateResponse struct {
 	LoadSelfConsumedEnergyPercentACs []float32 `json:"loadSelfConsumedEnergyPercentACs"`
 }
 
+// BatteryUsageInfoResponse godoc
+type BatteryUsageInfoResponse struct {
+	BatterySoC                    float32 `json:"batterySoC"`
+	BatteryProducedAveragePowerAC float32 `json:"batteryProducedAveragePowerAC"`
+	BatteryConsumedAveragePowerAC float32 `json:"batteryConsumedAveragePowerAC"`
+	BatteryChargingFrom           string  `json:"batteryChargingFrom"`
+	BatteryDischargingTo          string  `json:"batteryDischargingTo"`
+}
+
 // ChargeInfoResponse godoc
 type ChargeInfoResponse struct {
 	GridPowerCost              float32 `json:"gridPowerCost"`
@@ -207,6 +216,7 @@ type DevicesService interface {
 	GetPowerState(gwUUID string, startTime, endTime time.Time) (powerState *PowerStateResponse)
 	GetAccumulatedPowerState(gwUUID, resolution string, startTime, endTime time.Time) (accumulatedPowerState *AccumulatedPowerStateResponse)
 	GetPowerSelfSupplyRate(gwUUID, resolution string, startTime, endTime time.Time) (powerSelfSupplyRate *PowerSelfSupplyRateResponse)
+	GetBatteryUsageInfo(gwUUID string, startTime time.Time) (batteryUsageInfo *BatteryUsageInfoResponse)
 	GetChargeInfo(gwUUID string, startTime time.Time) (chargeInfo *ChargeInfoResponse)
 	GetDemandState(gwUUID string, startTime, endTime time.Time) (demandState *DemandStateResponse)
 	GetSolarEnergyInfo(gwUUID string, startTime time.Time) (solarEnergyInfo *SolarEnergyInfoResponse)
@@ -387,6 +397,26 @@ func (s defaultDevicesService) GetPowerSelfSupplyRate(gwUUID, resolution string,
 		Timestamps:                       accumulatedInfo.Timestamps,
 		LoadSelfConsumedEnergyPercentACs: accumulatedInfo.LoadSelfConsumedEnergyPercentACs,
 	}
+	return
+}
+
+func (s defaultDevicesService) GetBatteryUsageInfo(gwUUID string, startTime time.Time) (batteryUsageInfo *BatteryUsageInfoResponse) {
+	batteryUsageInfo = &BatteryUsageInfoResponse{}
+	latestLog, err := s.repo.CCData.GetLatestLog(gwUUID, startTime, time.Now().UTC())
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "s.repo.CCData.GetLatestLog",
+			"err":       err,
+		}).Error()
+		return
+	}
+
+	log.Debug("latestLog.LogDate: ", latestLog.LogDate)
+	batteryUsageInfo.BatterySoC = latestLog.BatterySoC.Float32
+	batteryUsageInfo.BatteryProducedAveragePowerAC = latestLog.BatteryProducedAveragePowerAC.Float32
+	batteryUsageInfo.BatteryConsumedAveragePowerAC = latestLog.BatteryConsumedAveragePowerAC.Float32
+	batteryUsageInfo.BatteryChargingFrom = latestLog.BatteryChargingFrom.String
+	batteryUsageInfo.BatteryDischargingTo = latestLog.BatteryDischargingTo.String
 	return
 }
 

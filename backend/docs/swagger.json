@@ -588,6 +588,80 @@
                 }
             }
         },
+        "/{gwid}/devices/battery/usage-info": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get battery by token, gateway UUID and startTime",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "time of use"
+                ],
+                "summary": "Show current usage state about battery",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Input user's access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Gateway UUID",
+                        "name": "gwid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "UTC time in ISO-8601",
+                        "name": "startTime",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/app.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/services.BatteryUsageInfoResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/{gwid}/devices/charge-info": {
             "get": {
                 "security": [
@@ -1577,6 +1651,26 @@
                     "items": {
                         "type": "integer"
                     }
+                }
+            }
+        },
+        "services.BatteryUsageInfoResponse": {
+            "type": "object",
+            "properties": {
+                "batteryChargingFrom": {
+                    "type": "string"
+                },
+                "batteryConsumedAveragePowerAC": {
+                    "type": "number"
+                },
+                "batteryDischargingTo": {
+                    "type": "string"
+                },
+                "batteryProducedAveragePowerAC": {
+                    "type": "number"
+                },
+                "batterySoC": {
+                    "type": "number"
                 }
             }
         },

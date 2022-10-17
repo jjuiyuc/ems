@@ -53,7 +53,7 @@ func (w *APIWorker) GetPowerState(c *gin.Context) {
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
-	responseData := w.Services.Devices.GetPowerState(param.GatewayUUID, param.Query.StartTime, param.Query.EndTime)
+	responseData := w.Services.Devices.GetPowerState(param.GatewayUUID, param.Query.Resolution, param.Query.StartTime, param.Query.EndTime)
 	appG.Response(http.StatusOK, e.Success, responseData)
 }
 

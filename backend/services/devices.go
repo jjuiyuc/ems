@@ -213,19 +213,19 @@ type GridPowerStateResponse struct {
 type DevicesService interface {
 	GetLatestDevicesEnergyInfo(gwUUID string) (updatedTime time.Time, devicesEnergyInfo *DevicesEnergyInfoResponse, err error)
 	GetEnergyDistributionInfo(gwUUID string, startTime, endTime time.Time) (energyDistributionInfo *EnergyDistributionInfoResponse)
-	GetPowerState(gwUUID string, startTime, endTime time.Time) (powerState *PowerStateResponse)
+	GetPowerState(gwUUID, resolution string, startTime, endTime time.Time) (powerState *PowerStateResponse)
 	GetAccumulatedPowerState(gwUUID, resolution string, startTime, endTime time.Time) (accumulatedPowerState *AccumulatedPowerStateResponse)
 	GetPowerSelfSupplyRate(gwUUID, resolution string, startTime, endTime time.Time) (powerSelfSupplyRate *PowerSelfSupplyRateResponse)
 	GetBatteryUsageInfo(gwUUID string, startTime time.Time) (batteryUsageInfo *BatteryUsageInfoResponse)
 	GetChargeInfo(gwUUID string, startTime time.Time) (chargeInfo *ChargeInfoResponse)
 	GetDemandState(gwUUID string, startTime, endTime time.Time) (demandState *DemandStateResponse)
 	GetSolarEnergyInfo(gwUUID string, startTime time.Time) (solarEnergyInfo *SolarEnergyInfoResponse)
-	GetSolarPowerState(gwUUID string, startTime, endTime time.Time) (solarPowerState *SolarPowerStateResponse, err error)
+	GetSolarPowerState(gwUUID, resolution string, startTime, endTime time.Time) (solarPowerState *SolarPowerStateResponse, err error)
 	GetBatteryEnergyInfo(gwUUID string, startTime time.Time) (batteryEnergyInfo *BatteryEnergyInfoResponse)
 	GetBatteryPowerState(gwUUID, resolution string, startTime, endTime time.Time) (batteryPowerState *BatteryPowerStateResponse, err error)
 	GetBatteryChargeVoltageState(gwUUID string, startTime, endTime time.Time) (batteryChargeVoltageState *BatteryChargeVoltageStateResponse, err error)
 	GetGridEnergyInfo(gwUUID string, startTime time.Time) (gridEnergyInfo *GridEnergyInfoResponse)
-	GetGridPowerState(gwUUID string, startTime, endTime time.Time) (gridPowerState *GridPowerStateResponse, err error)
+	GetGridPowerState(gwUUID, resolution string, startTime, endTime time.Time) (gridPowerState *GridPowerStateResponse, err error)
 }
 
 type defaultDevicesService struct {
@@ -345,8 +345,8 @@ func (s defaultDevicesService) GetEnergyDistributionInfo(gwUUID string, startTim
 	return
 }
 
-func (s defaultDevicesService) GetPowerState(gwUUID string, startTime, endTime time.Time) (powerState *PowerStateResponse) {
-	realtimeInfo := s.getRealtimeInfo(gwUUID, "hour", startTime, endTime)
+func (s defaultDevicesService) GetPowerState(gwUUID, resolution string, startTime, endTime time.Time) (powerState *PowerStateResponse) {
+	realtimeInfo := s.getRealtimeInfo(gwUUID, resolution, startTime, endTime)
 	powerState = &PowerStateResponse{
 		Timestamps:             realtimeInfo.Timestamps,
 		LoadAveragePowerACs:    realtimeInfo.LoadAveragePowerACs,
@@ -483,7 +483,7 @@ func (s defaultDevicesService) GetSolarEnergyInfo(gwUUID string, startTime time.
 	return
 }
 
-func (s defaultDevicesService) GetSolarPowerState(gwUUID string, startTime, endTime time.Time) (solarPowerState *SolarPowerStateResponse, err error) {
+func (s defaultDevicesService) GetSolarPowerState(gwUUID, resolution string, startTime, endTime time.Time) (solarPowerState *SolarPowerStateResponse, err error) {
 	solarPowerState = &SolarPowerStateResponse{}
 	onPeakTime, err := s.getOnPeakTime(gwUUID, startTime)
 	if err != nil {
@@ -491,7 +491,7 @@ func (s defaultDevicesService) GetSolarPowerState(gwUUID string, startTime, endT
 	}
 
 	solarPowerState.OnPeakTime = onPeakTime
-	realtimeInfo := s.getRealtimeInfo(gwUUID, "hour", startTime, endTime)
+	realtimeInfo := s.getRealtimeInfo(gwUUID, resolution, startTime, endTime)
 	solarPowerState.Timestamps = realtimeInfo.Timestamps
 	solarPowerState.PvAveragePowerACs = realtimeInfo.PvAveragePowerACs
 	return
@@ -583,7 +583,7 @@ func (s defaultDevicesService) GetGridEnergyInfo(gwUUID string, startTime time.T
 	return
 }
 
-func (s defaultDevicesService) GetGridPowerState(gwUUID string, startTime, endTime time.Time) (gridPowerState *GridPowerStateResponse, err error) {
+func (s defaultDevicesService) GetGridPowerState(gwUUID, resolution string, startTime, endTime time.Time) (gridPowerState *GridPowerStateResponse, err error) {
 	gridPowerState = &GridPowerStateResponse{}
 	onPeakTime, err := s.getOnPeakTime(gwUUID, startTime)
 	if err != nil {
@@ -591,7 +591,7 @@ func (s defaultDevicesService) GetGridPowerState(gwUUID string, startTime, endTi
 	}
 
 	gridPowerState.OnPeakTime = onPeakTime
-	realtimeInfo := s.getRealtimeInfo(gwUUID, "hour", startTime, endTime)
+	realtimeInfo := s.getRealtimeInfo(gwUUID, resolution, startTime, endTime)
 	gridPowerState.Timestamps = realtimeInfo.Timestamps
 	gridPowerState.GridAveragePowerACs = realtimeInfo.GridAveragePowerACs
 	return

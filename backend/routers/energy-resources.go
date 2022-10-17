@@ -54,7 +54,7 @@ func (w *APIWorker) GetSolarPowerState(c *gin.Context) {
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
-	responseData, err := w.Services.Devices.GetSolarPowerState(param.GatewayUUID, param.Query.StartTime, param.Query.EndTime)
+	responseData, err := w.Services.Devices.GetSolarPowerState(param.GatewayUUID, param.Query.Resolution, param.Query.StartTime, param.Query.EndTime)
 	if err != nil {
 		appG.Response(http.StatusInternalServerError, e.ErrSolarPowerStateGen, err.Error())
 		return
@@ -189,7 +189,7 @@ func (w *APIWorker) GetGridPowerState(c *gin.Context) {
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
-	responseData, err := w.Services.Devices.GetGridPowerState(param.GatewayUUID, param.Query.StartTime, param.Query.EndTime)
+	responseData, err := w.Services.Devices.GetGridPowerState(param.GatewayUUID, param.Query.Resolution, param.Query.StartTime, param.Query.EndTime)
 	if err != nil {
 		appG.Response(http.StatusInternalServerError, e.ErrGridPowerStateGen, err.Error())
 		return

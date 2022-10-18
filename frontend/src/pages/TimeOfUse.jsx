@@ -1,13 +1,13 @@
 import { connect } from "react-redux"
 import { Button, Stack } from "@mui/material"
-import { Fragment as Frag, useEffect, useRef, useState } from "react"
+import { Fragment as Frag, useEffect, useState } from "react"
 import moment from "moment"
 import { useTranslation } from "react-multi-lang"
-import WaterChart from "water-chart"
 
 import { apiCall } from "../utils/api"
 import variables from "../configs/variables"
 
+import BatteryStatusCard from "../components/BatteryStatusCard"
 import Clock from "../components/Clock"
 import EnergyCard from "../components/EnergyCard"
 import LineChart from "../components/LineChart"
@@ -20,7 +20,6 @@ const { colors } = variables
 const mapState = state => ({ gatewayID: state.gateways.active.gatewayID })
 
 export default connect(mapState)(function TimeOfUse(props) {
-    const batteryChart = useRef()
     const showFullSections = parseInt(import.meta.env.VITE_APP_API_TOU_SHOW_FULL_SECTIONS)
     const
         t = useTranslation(),
@@ -37,45 +36,6 @@ export default connect(mapState)(function TimeOfUse(props) {
             ({pageT("totalUntilNow")})
         </span>
     </>
-    const BatteryStatusCard = ({ data }) => {
-
-        return <div className="card">
-            <div className="header">
-                <h4>{pageT("batteryStatus")}</h4>
-            </div>
-            <div className="flex flex-wrap items-center justify-around">
-                <div className="h-48 relative w-48">
-                    <div className="absolute bg-gray-800 h-44 m-2
-                    rounded-full w-44" />
-                    <svg
-                        className="h-48 relative w-48"
-                        id="batteryChart"
-                        ref={batteryChart} />
-                </div>
-                <div className="column-separator grid grid-cols-3 my-6
-        mw-88 gap-x-5 sm:gap-x-10">
-                    <div>
-                        <h3>{data.state}%</h3>
-                        <span className="text-13px">
-                            {commonT("stateOfCharge")}
-                        </span>
-                    </div>
-                    <div>
-                        <h3>{data.power} {commonT("kw")}</h3>
-                        <span className="text-13px">
-                            {commonT("batteryPower")}
-                        </span>
-                    </div>
-                    <div>
-                        <h3>{data.target ? commonT(data.target) : "-"}</h3>
-                        <span className="text-13px">
-                            {pageT(data.direction)}
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    }
 
     const
         hours24 = Array.from(new Array(24).keys()),
@@ -222,30 +182,7 @@ export default connect(mapState)(function TimeOfUse(props) {
         setPrices(prices)
     }, [timeOfUse])
 
-    useEffect(() => {
-        console.log("1")
-        if (!batteryChart.current) return
-        console.log("2")
 
-        batteryChart.current.innerHTML = ""
-
-        new WaterChart({
-            container: "#batteryChart",
-            fillOpacity: .4,
-            margin: 6,
-            maxValue: 100,
-            minValue: 0,
-            series: [batteryStatus.state],
-            stroke: colors.gray[400],
-            strokeWidth: 2,
-            textColor1: "white",
-            textPositionY: .45,
-            textSize: .3,
-            textUnitSize: "32px",
-            waveColor1: colors.primary.main,
-            waveColor2: colors.primary.main
-        })
-    }, [batteryStatus, tab])
 
     useEffect(() => {
         if (!props.gatewayID) return

@@ -2,6 +2,7 @@ package services
 
 import (
 	"encoding/json"
+	"math"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -250,13 +251,16 @@ func (s defaultDevicesService) GetLatestDevicesEnergyInfo(gwUUID string) (logTim
 	}
 
 	logTime = latestLog.LogDate
+	positiveLoadGridAveragePowerAC := float32(math.Abs(float64(latestLog.LoadGridAveragePowerAC.Float32)))
+	positiveLoadPvAveragePowerAC := float32(math.Abs(float64(latestLog.LoadPvAveragePowerAC.Float32)))
+	positiveLoadBatteryAveragePowerAC := float32(math.Abs(float64(latestLog.LoadBatteryAveragePowerAC.Float32)))
 	devicesEnergyInfo = &DevicesEnergyInfoResponse{
 		GridIsPeakShaving:             latestLog.GridIsPeakShaving.Int,
-		LoadGridAveragePowerAC:        latestLog.LoadGridAveragePowerAC.Float32,
+		LoadGridAveragePowerAC:        positiveLoadGridAveragePowerAC,
 		BatteryGridAveragePowerAC:     latestLog.BatteryGridAveragePowerAC.Float32,
 		GridContractPowerAC:           latestLog.GridContractPowerAC.Float32,
-		LoadPvAveragePowerAC:          latestLog.LoadPvAveragePowerAC.Float32,
-		LoadBatteryAveragePowerAC:     latestLog.LoadBatteryAveragePowerAC.Float32,
+		LoadPvAveragePowerAC:          positiveLoadPvAveragePowerAC,
+		LoadBatteryAveragePowerAC:     positiveLoadBatteryAveragePowerAC,
 		BatterySoC:                    latestLog.BatterySoC.Float32,
 		BatteryProducedAveragePowerAC: latestLog.BatteryProducedAveragePowerAC.Float32,
 		BatteryConsumedAveragePowerAC: latestLog.BatteryConsumedAveragePowerAC.Float32,

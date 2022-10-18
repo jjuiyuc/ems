@@ -7,6 +7,19 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// TwoDecimalPlaces godoc
+func TwoDecimalPlaces(x float32) float32 {
+	value, err := strconv.ParseFloat(fmt.Sprintf("%.2f", x), 32)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "two decimal places parse",
+			"err":       err,
+		}).Error()
+		return 0
+	}
+	return float32(value)
+}
+
 // Diff godoc
 func Diff(x, y float32) float32 {
 	value, err := strconv.ParseFloat(fmt.Sprintf("%.2f", x-y), 32)

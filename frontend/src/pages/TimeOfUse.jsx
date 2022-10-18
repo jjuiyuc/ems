@@ -150,14 +150,20 @@ export default connect(mapState)(function TimeOfUse(props) {
                 end: "07:30",
                 name: "offPeak",
                 price: 1.46,
-                start: "22:30"
+                start: "00:00"
             },
             {
                 end: "22:30",
                 name: "onPeak",
                 price: 3.42,
                 start: "07:30"
-            }
+            },
+            {
+                end: "24:00",
+                name: "offPeak",
+                price: 1.46,
+                start: "22:30"
+            },
         ])
 
     const getMoment = string => {
@@ -192,7 +198,6 @@ export default connect(mapState)(function TimeOfUse(props) {
                 currentPeriod = item.name
             }
         })
-
         setClockDataset(dataset)
         setCurrentPeriod(currentPeriod)
         setCurrentTime(currentTime.format("hh:mm A"))

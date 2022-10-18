@@ -157,8 +157,8 @@ export default connect(mapState)(function EnergyResoucesSolar(props) {
                     ],
                     kwh: data.allConsumedLifetimeEnergyACDiff
                 })
-                setEconomics(data.pvEnergyCostSavingsDiff || 0)
-                setCO2Reduction(data.pvCo2SavingsDiff || 0)
+                setEconomics(data.pvEnergyCostSavingsSum || 0)
+                setCO2Reduction(data.pvCo2SavingsSum || 0)
             },
             url: `${urlPrefix}/energy-info?startTime=${startTime}`
         })

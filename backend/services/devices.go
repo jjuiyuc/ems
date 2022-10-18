@@ -454,12 +454,14 @@ func (s defaultDevicesService) GetSolarEnergyInfo(gwUUID string, startTime time.
 	firstLogOfDay, err1 := s.repo.CCData.GetFirstLog(gwUUID, startTime, now)
 	firstLogOfMonth, err2 := s.repo.CCData.GetFirstLog(gwUUID, startTimeThisMonth, now)
 	latestLog, err3 := s.repo.CCData.GetLatestLog(gwUUID, startTime, now)
-	if err1 != nil || err2 != nil || err3 != nil {
+	logsOfMonth, err4 := s.repo.CCData.GetLogs(gwUUID, startTimeThisMonth, now)
+	if err1 != nil || err2 != nil || err3 != nil || err4 != nil {
 		log.WithFields(log.Fields{
-			"caused-by": "s.repo.CCData.GetFirstLog:Day&Month and GetLatestLog",
+			"caused-by": "s.repo.CCData.GetFirstLog:Day&Month or GetLatestLog or GetLogs",
 			"err1":      err1,
 			"err2":      err2,
 			"err3":      err3,
+			"err4":      err4,
 		}).Error()
 		return
 	}
@@ -482,8 +484,13 @@ func (s defaultDevicesService) GetSolarEnergyInfo(gwUUID string, startTime time.
 	solarEnergyInfo.GridPvConsumedEnergyPercentAC = utils.Percent(
 		solarEnergyInfo.GridPvConsumedLifetimeEnergyACDiff,
 		utils.Diff(latestLog.GridConsumedLifetimeEnergyAC.Float32, firstLogOfDay.GridConsumedLifetimeEnergyAC.Float32))
-	solarEnergyInfo.PvEnergyCostSavingsDiff = utils.Diff(latestLog.PvEnergyCostSavings.Float32, firstLogOfMonth.PvEnergyCostSavings.Float32)
-	solarEnergyInfo.PvCo2SavingsDiff = utils.Diff(latestLog.PvCo2Savings.Float32, firstLogOfMonth.PvCo2Savings.Float32)
+	var sumOfPvEnergyCostSavings, sumOfPvCo2Savings float32
+	for _, logOfMonth := range logsOfMonth {
+		sumOfPvEnergyCostSavings = sumOfPvEnergyCostSavings + logOfMonth.PvEnergyCostSavings.Float32
+		sumOfPvCo2Savings = sumOfPvCo2Savings + logOfMonth.PvCo2Savings.Float32
+	}
+	solarEnergyInfo.PvEnergyCostSavingsDiff = utils.TwoDecimalPlaces(sumOfPvEnergyCostSavings)
+	solarEnergyInfo.PvCo2SavingsDiff = utils.TwoDecimalPlaces(sumOfPvCo2Savings)
 	return
 }
 

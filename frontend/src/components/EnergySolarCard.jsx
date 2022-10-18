@@ -29,7 +29,7 @@ export default function EnergySolarCard(props) {
             <h2 className="mr-2 whitespace-nowrap">{kwh} {commonT("kwh")}</h2>
             <h5 className="font-bold">{props.title}</h5>
         </div>
-        <div className="flex h-2 overflow-hidden rounded-full w-full">
+        <div className="flex h-2 overflow-hidden rounded-full w-full bg-gray-600">
             {types.map((t, i) =>
                 <div
                     className={colors[t.type] + " h-full"}

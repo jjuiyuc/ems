@@ -153,8 +153,8 @@ type SolarEnergyInfoResponse struct {
 	BatteryPvConsumedLifetimeEnergyACDiff float32 `json:"batteryPvConsumedLifetimeEnergyACDiff"`
 	GridPvConsumedEnergyPercentAC         float32 `json:"gridPvConsumedEnergyPercentAC"`
 	GridPvConsumedLifetimeEnergyACDiff    float32 `json:"gridPvConsumedLifetimeEnergyACDiff"`
-	PvEnergyCostSavingsDiff               float32 `json:"pvEnergyCostSavingsDiff"`
-	PvCo2SavingsDiff                      float32 `json:"pvCo2SavingsDiff"`
+	PvEnergyCostSavingsSum                float32 `json:"pvEnergyCostSavingsSum"`
+	PvCo2SavingsSum                       float32 `json:"pvCo2SavingsSum"`
 }
 
 // SolarPowerStateResponse godoc
@@ -489,8 +489,8 @@ func (s defaultDevicesService) GetSolarEnergyInfo(gwUUID string, startTime time.
 		sumOfPvEnergyCostSavings = sumOfPvEnergyCostSavings + logOfMonth.PvEnergyCostSavings.Float32
 		sumOfPvCo2Savings = sumOfPvCo2Savings + logOfMonth.PvCo2Savings.Float32
 	}
-	solarEnergyInfo.PvEnergyCostSavingsDiff = utils.TwoDecimalPlaces(sumOfPvEnergyCostSavings)
-	solarEnergyInfo.PvCo2SavingsDiff = utils.TwoDecimalPlaces(sumOfPvCo2Savings)
+	solarEnergyInfo.PvEnergyCostSavingsSum = utils.TwoDecimalPlaces(sumOfPvEnergyCostSavings)
+	solarEnergyInfo.PvCo2SavingsSum = utils.TwoDecimalPlaces(sumOfPvCo2Savings)
 	return
 }
 

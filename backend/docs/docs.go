@@ -1956,10 +1956,10 @@ var doc = `{
                 "loadPvConsumedLifetimeEnergyACDiff": {
                     "type": "number"
                 },
-                "pvCo2SavingsDiff": {
+                "pvCo2SavingsSum": {
                     "type": "number"
                 },
-                "pvEnergyCostSavingsDiff": {
+                "pvEnergyCostSavingsSum": {
                     "type": "number"
                 }
             }

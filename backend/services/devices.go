@@ -224,7 +224,7 @@ type DevicesService interface {
 	GetSolarPowerState(gwUUID, resolution string, startTime, endTime time.Time) (solarPowerState *SolarPowerStateResponse, err error)
 	GetBatteryEnergyInfo(gwUUID string, startTime time.Time) (batteryEnergyInfo *BatteryEnergyInfoResponse)
 	GetBatteryPowerState(gwUUID, resolution string, startTime, endTime time.Time) (batteryPowerState *BatteryPowerStateResponse, err error)
-	GetBatteryChargeVoltageState(gwUUID string, startTime, endTime time.Time) (batteryChargeVoltageState *BatteryChargeVoltageStateResponse, err error)
+	GetBatteryChargeVoltageState(gwUUID, resolution string, startTime, endTime time.Time) (batteryChargeVoltageState *BatteryChargeVoltageStateResponse, err error)
 	GetGridEnergyInfo(gwUUID string, startTime time.Time) (gridEnergyInfo *GridEnergyInfoResponse)
 	GetGridPowerState(gwUUID, resolution string, startTime, endTime time.Time) (gridPowerState *GridPowerStateResponse, err error)
 }
@@ -551,7 +551,7 @@ func (s defaultDevicesService) GetBatteryPowerState(gwUUID, resolution string, s
 	return
 }
 
-func (s defaultDevicesService) GetBatteryChargeVoltageState(gwUUID string, startTime, endTime time.Time) (batteryChargeVoltageState *BatteryChargeVoltageStateResponse, err error) {
+func (s defaultDevicesService) GetBatteryChargeVoltageState(gwUUID, resolution string, startTime, endTime time.Time) (batteryChargeVoltageState *BatteryChargeVoltageStateResponse, err error) {
 	batteryChargeVoltageState = &BatteryChargeVoltageStateResponse{}
 	onPeakTime, err := s.getOnPeakTime(gwUUID, startTime)
 	if err != nil {
@@ -559,7 +559,7 @@ func (s defaultDevicesService) GetBatteryChargeVoltageState(gwUUID string, start
 	}
 
 	batteryChargeVoltageState.OnPeakTime = onPeakTime
-	realtimeInfo := s.getRealtimeInfo(gwUUID, "hour", startTime, endTime)
+	realtimeInfo := s.getRealtimeInfo(gwUUID, resolution, startTime, endTime)
 	batteryChargeVoltageState.Timestamps = realtimeInfo.Timestamps
 	batteryChargeVoltageState.BatterySoCs = realtimeInfo.BatterySoCs
 	batteryChargeVoltageState.BatteryVoltages = realtimeInfo.BatteryVoltages

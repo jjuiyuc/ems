@@ -476,15 +476,15 @@ func (s defaultDevicesService) GetSolarEnergyInfo(gwUUID string, startTime time.
 	solarEnergyInfo.LoadPvConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.LoadPvConsumedLifetimeEnergyAC.Float32, firstLogOfDay.LoadPvConsumedLifetimeEnergyAC.Float32)
 	solarEnergyInfo.LoadPvConsumedEnergyPercentAC = utils.Percent(
 		solarEnergyInfo.LoadPvConsumedLifetimeEnergyACDiff,
-		utils.Diff(latestLog.LoadConsumedLifetimeEnergyAC.Float32, firstLogOfDay.LoadConsumedLifetimeEnergyAC.Float32))
+		utils.Diff(latestLog.PvProducedLifetimeEnergyAC.Float32, firstLogOfDay.PvProducedLifetimeEnergyAC.Float32))
 	solarEnergyInfo.BatteryPvConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.BatteryPvConsumedLifetimeEnergyAC.Float32, firstLogOfDay.BatteryPvConsumedLifetimeEnergyAC.Float32)
 	solarEnergyInfo.BatteryPvConsumedEnergyPercentAC = utils.Percent(
 		solarEnergyInfo.BatteryPvConsumedLifetimeEnergyACDiff,
-		utils.Diff(latestLog.BatteryConsumedLifetimeEnergyAC.Float32, firstLogOfDay.BatteryConsumedLifetimeEnergyAC.Float32))
+		utils.Diff(latestLog.PvProducedLifetimeEnergyAC.Float32, firstLogOfDay.PvProducedLifetimeEnergyAC.Float32))
 	solarEnergyInfo.GridPvConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.GridPvConsumedLifetimeEnergyAC.Float32, firstLogOfDay.GridPvConsumedLifetimeEnergyAC.Float32)
 	solarEnergyInfo.GridPvConsumedEnergyPercentAC = utils.Percent(
 		solarEnergyInfo.GridPvConsumedLifetimeEnergyACDiff,
-		utils.Diff(latestLog.GridConsumedLifetimeEnergyAC.Float32, firstLogOfDay.GridConsumedLifetimeEnergyAC.Float32))
+		utils.Diff(latestLog.PvProducedLifetimeEnergyAC.Float32, firstLogOfDay.PvProducedLifetimeEnergyAC.Float32))
 	var sumOfPvEnergyCostSavings, sumOfPvCo2Savings float32
 	for _, logOfMonth := range logsOfMonth {
 		sumOfPvEnergyCostSavings = sumOfPvEnergyCostSavings + logOfMonth.PvEnergyCostSavings.Float32

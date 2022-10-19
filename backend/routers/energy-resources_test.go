@@ -83,7 +83,7 @@ var _ = Describe("EnergyResources", func() {
 					LoadPvConsumedLifetimeEnergyACDiff:    10,
 					BatteryPvConsumedEnergyPercentAC:      0,
 					BatteryPvConsumedLifetimeEnergyACDiff: 0,
-					GridPvConsumedEnergyPercentAC:         100,
+					GridPvConsumedEnergyPercentAC:         150,
 					GridPvConsumedLifetimeEnergyACDiff:    15,
 					PvEnergyCostSavingsSum:                170,
 					PvCo2SavingsSum:                       38,

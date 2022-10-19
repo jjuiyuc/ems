@@ -60,7 +60,7 @@ export default connect(mapState)(function DemandCharge(props) {
         }],
         labels,
         tickCallback: (val, index) => val + commonT("kw"),
-        tooltipLabel: item => `${item.parsed.y}` + commonT("kw"),
+        tooltipLabel: item => `${item.parsed.y}` + " " + commonT("kw"),
         x: { grid: { lineWidth: 0 } },
         y: { max: 80, min: 0 },
         beforeDraw: chart => {

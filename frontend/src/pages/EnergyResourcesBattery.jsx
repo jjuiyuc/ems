@@ -97,7 +97,7 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
         [chargeVoltage, setChargeVoltage] = useState(null),
         [chargeVoltageError, setChargeVoltageError] = useState(""),
         [chargeVoltageLoading, setChargeVoltageLoading] = useState(false),
-        [chargeVoltageRes] = useState("hour"),
+        [chargeVoltageRes] = useState("5minute"),
         [cyclesLifetime, setCyclesLifetime] = useState(0),
         [cyclesToday, setCyclesToday] = useState(0),
         [dischargedLifetime, setDischargedLifetime] = useState(0),

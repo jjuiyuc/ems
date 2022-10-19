@@ -7,12 +7,12 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// TwoDecimalPlaces godoc
-func TwoDecimalPlaces(x float32) float32 {
-	value, err := strconv.ParseFloat(fmt.Sprintf("%.2f", x), 32)
+// ThreeDecimalPlaces godoc
+func ThreeDecimalPlaces(x float32) float32 {
+	value, err := strconv.ParseFloat(fmt.Sprintf("%.3f", x), 32)
 	if err != nil {
 		log.WithFields(log.Fields{
-			"caused-by": "two decimal places parse",
+			"caused-by": "three decimal places parse",
 			"err":       err,
 		}).Error()
 		return 0
@@ -22,7 +22,7 @@ func TwoDecimalPlaces(x float32) float32 {
 
 // Diff godoc
 func Diff(x, y float32) float32 {
-	value, err := strconv.ParseFloat(fmt.Sprintf("%.2f", x-y), 32)
+	value, err := strconv.ParseFloat(fmt.Sprintf("%.3f", x-y), 32)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "diff parse",
@@ -39,7 +39,7 @@ func Division(x, y float32) float32 {
 		log.WithFields(log.Fields{"caused-by": "numerator/denominator is zero"}).Error()
 		return 0
 	}
-	value, err := strconv.ParseFloat(fmt.Sprintf("%.2f", x/y), 32)
+	value, err := strconv.ParseFloat(fmt.Sprintf("%.3f", x/y), 32)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "division parse",

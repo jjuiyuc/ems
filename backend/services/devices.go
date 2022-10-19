@@ -257,22 +257,22 @@ func (s defaultDevicesService) GetLatestDevicesEnergyInfo(gwUUID string) (logTim
 	positiveLoadAveragePowerAC := float32(math.Abs(float64(latestLog.LoadAveragePowerAC.Float32)))
 	devicesEnergyInfo = &DevicesEnergyInfoResponse{
 		GridIsPeakShaving:             latestLog.GridIsPeakShaving.Int,
-		LoadGridAveragePowerAC:        utils.TwoDecimalPlaces(positiveLoadGridAveragePowerAC),
-		BatteryGridAveragePowerAC:     utils.TwoDecimalPlaces(latestLog.BatteryGridAveragePowerAC.Float32),
-		GridContractPowerAC:           utils.TwoDecimalPlaces(latestLog.GridContractPowerAC.Float32),
-		LoadPvAveragePowerAC:          utils.TwoDecimalPlaces(positiveLoadPvAveragePowerAC),
-		LoadBatteryAveragePowerAC:     utils.TwoDecimalPlaces(positiveLoadBatteryAveragePowerAC),
-		BatterySoC:                    utils.TwoDecimalPlaces(latestLog.BatterySoC.Float32),
-		BatteryProducedAveragePowerAC: utils.TwoDecimalPlaces(latestLog.BatteryProducedAveragePowerAC.Float32),
-		BatteryConsumedAveragePowerAC: utils.TwoDecimalPlaces(latestLog.BatteryConsumedAveragePowerAC.Float32),
+		LoadGridAveragePowerAC:        utils.ThreeDecimalPlaces(positiveLoadGridAveragePowerAC),
+		BatteryGridAveragePowerAC:     utils.ThreeDecimalPlaces(latestLog.BatteryGridAveragePowerAC.Float32),
+		GridContractPowerAC:           utils.ThreeDecimalPlaces(latestLog.GridContractPowerAC.Float32),
+		LoadPvAveragePowerAC:          utils.ThreeDecimalPlaces(positiveLoadPvAveragePowerAC),
+		LoadBatteryAveragePowerAC:     utils.ThreeDecimalPlaces(positiveLoadBatteryAveragePowerAC),
+		BatterySoC:                    utils.ThreeDecimalPlaces(latestLog.BatterySoC.Float32),
+		BatteryProducedAveragePowerAC: utils.ThreeDecimalPlaces(latestLog.BatteryProducedAveragePowerAC.Float32),
+		BatteryConsumedAveragePowerAC: utils.ThreeDecimalPlaces(latestLog.BatteryConsumedAveragePowerAC.Float32),
 		BatteryChargingFrom:           latestLog.BatteryChargingFrom.String,
 		BatteryDischargingTo:          latestLog.BatteryDischargingTo.String,
-		PvAveragePowerAC:              utils.TwoDecimalPlaces(latestLog.PvAveragePowerAC.Float32),
-		LoadAveragePowerAC:            utils.TwoDecimalPlaces(positiveLoadAveragePowerAC),
-		BatteryPvAveragePowerAC:       utils.TwoDecimalPlaces(latestLog.BatteryPvAveragePowerAC.Float32),
-		GridPvAveragePowerAC:          utils.TwoDecimalPlaces(latestLog.GridPvAveragePowerAC.Float32),
-		GridProducedAveragePowerAC:    utils.TwoDecimalPlaces(latestLog.GridProducedAveragePowerAC.Float32),
-		GridConsumedAveragePowerAC:    utils.TwoDecimalPlaces(latestLog.GridConsumedAveragePowerAC.Float32),
+		PvAveragePowerAC:              utils.ThreeDecimalPlaces(latestLog.PvAveragePowerAC.Float32),
+		LoadAveragePowerAC:            utils.ThreeDecimalPlaces(positiveLoadAveragePowerAC),
+		BatteryPvAveragePowerAC:       utils.ThreeDecimalPlaces(latestLog.BatteryPvAveragePowerAC.Float32),
+		GridPvAveragePowerAC:          utils.ThreeDecimalPlaces(latestLog.GridPvAveragePowerAC.Float32),
+		GridProducedAveragePowerAC:    utils.ThreeDecimalPlaces(latestLog.GridProducedAveragePowerAC.Float32),
+		GridConsumedAveragePowerAC:    utils.ThreeDecimalPlaces(latestLog.GridConsumedAveragePowerAC.Float32),
 	}
 	if err = json.Unmarshal(latestLog.LoadLinks.JSON, &devicesEnergyInfo.LoadLinks); err != nil {
 		log.WithFields(log.Fields{
@@ -390,8 +390,8 @@ func (s defaultDevicesService) GetChargeInfo(gwUUID string, startTime time.Time)
 	chargeInfo.GridPowerCost = 0
 	chargeInfo.GridPowerCostSavings = 0
 	chargeInfo.GridPowerCostLastMonth = 0
-	chargeInfo.GridProducedAveragePowerAC = utils.TwoDecimalPlaces(latestLog.GridProducedAveragePowerAC.Float32)
-	chargeInfo.GridContractPowerAC = utils.TwoDecimalPlaces(latestLog.GridContractPowerAC.Float32)
+	chargeInfo.GridProducedAveragePowerAC = utils.ThreeDecimalPlaces(latestLog.GridProducedAveragePowerAC.Float32)
+	chargeInfo.GridContractPowerAC = utils.ThreeDecimalPlaces(latestLog.GridContractPowerAC.Float32)
 	chargeInfo.GridIsPeakShaving = latestLog.GridIsPeakShaving.Int
 	return
 }
@@ -417,9 +417,9 @@ func (s defaultDevicesService) GetBatteryUsageInfo(gwUUID string, startTime time
 	}
 
 	log.Debug("latestLog.LogDate: ", latestLog.LogDate)
-	batteryUsageInfo.BatterySoC = utils.TwoDecimalPlaces(latestLog.BatterySoC.Float32)
-	batteryUsageInfo.BatteryProducedAveragePowerAC = utils.TwoDecimalPlaces(latestLog.BatteryProducedAveragePowerAC.Float32)
-	batteryUsageInfo.BatteryConsumedAveragePowerAC = utils.TwoDecimalPlaces(latestLog.BatteryConsumedAveragePowerAC.Float32)
+	batteryUsageInfo.BatterySoC = utils.ThreeDecimalPlaces(latestLog.BatterySoC.Float32)
+	batteryUsageInfo.BatteryProducedAveragePowerAC = utils.ThreeDecimalPlaces(latestLog.BatteryProducedAveragePowerAC.Float32)
+	batteryUsageInfo.BatteryConsumedAveragePowerAC = utils.ThreeDecimalPlaces(latestLog.BatteryConsumedAveragePowerAC.Float32)
 	batteryUsageInfo.BatteryChargingFrom = latestLog.BatteryChargingFrom.String
 	batteryUsageInfo.BatteryDischargingTo = latestLog.BatteryDischargingTo.String
 	return
@@ -490,8 +490,8 @@ func (s defaultDevicesService) GetSolarEnergyInfo(gwUUID string, startTime time.
 		sumOfPvEnergyCostSavings = sumOfPvEnergyCostSavings + logOfMonth.PvEnergyCostSavings.Float32
 		sumOfPvCo2Savings = sumOfPvCo2Savings + logOfMonth.PvCo2Savings.Float32
 	}
-	solarEnergyInfo.PvEnergyCostSavingsSum = utils.TwoDecimalPlaces(sumOfPvEnergyCostSavings)
-	solarEnergyInfo.PvCo2SavingsSum = utils.TwoDecimalPlaces(sumOfPvCo2Savings)
+	solarEnergyInfo.PvEnergyCostSavingsSum = utils.ThreeDecimalPlaces(sumOfPvEnergyCostSavings)
+	solarEnergyInfo.PvCo2SavingsSum = utils.ThreeDecimalPlaces(sumOfPvCo2Savings)
 	return
 }
 
@@ -528,12 +528,12 @@ func (s defaultDevicesService) GetBatteryEnergyInfo(gwUUID string, startTime tim
 		"latestLog.LogDate": latestLog.LogDate,
 	}).Debug()
 	batteryEnergyInfo.BatteryLifetimeOperationCyclesDiff = utils.Diff(latestLog.BatteryLifetimeOperationCycles.Float32, firstLog.BatteryLifetimeOperationCycles.Float32)
-	batteryEnergyInfo.BatteryLifetimeOperationCycles = utils.TwoDecimalPlaces(latestLog.BatteryLifetimeOperationCycles.Float32)
-	batteryEnergyInfo.BatterySoC = utils.TwoDecimalPlaces(latestLog.BatterySoC.Float32)
+	batteryEnergyInfo.BatteryLifetimeOperationCycles = utils.ThreeDecimalPlaces(latestLog.BatteryLifetimeOperationCycles.Float32)
+	batteryEnergyInfo.BatterySoC = utils.ThreeDecimalPlaces(latestLog.BatterySoC.Float32)
 	batteryEnergyInfo.BatteryProducedLifetimeEnergyACDiff = utils.Diff(latestLog.BatteryProducedLifetimeEnergyAC.Float32, firstLog.BatteryProducedLifetimeEnergyAC.Float32)
-	batteryEnergyInfo.BatteryProducedLifetimeEnergyAC = utils.TwoDecimalPlaces(latestLog.BatteryProducedLifetimeEnergyAC.Float32)
+	batteryEnergyInfo.BatteryProducedLifetimeEnergyAC = utils.ThreeDecimalPlaces(latestLog.BatteryProducedLifetimeEnergyAC.Float32)
 	batteryEnergyInfo.BatteryConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.BatteryConsumedLifetimeEnergyAC.Float32, firstLog.BatteryConsumedLifetimeEnergyAC.Float32)
-	batteryEnergyInfo.BatteryConsumedLifetimeEnergyAC = utils.TwoDecimalPlaces(latestLog.BatteryConsumedLifetimeEnergyAC.Float32)
+	batteryEnergyInfo.BatteryConsumedLifetimeEnergyAC = utils.ThreeDecimalPlaces(latestLog.BatteryConsumedLifetimeEnergyAC.Float32)
 	return
 }
 
@@ -624,12 +624,12 @@ func (s defaultDevicesService) getRealtimeInfo(gwUUID, resolution string, startT
 		latestRealtimeInfo := s.getLatestRealtimeInfo(gwUUID, startTimeIndex, endTimeIndex, endTime)
 		log.Debug("latestRealtimeInfo.LogDate: ", latestRealtimeInfo.LogDate)
 		realtimeInfo.Timestamps = append(realtimeInfo.Timestamps, int(latestRealtimeInfo.LogDate.Unix()))
-		realtimeInfo.LoadAveragePowerACs = append(realtimeInfo.LoadAveragePowerACs, utils.TwoDecimalPlaces(latestRealtimeInfo.LoadAveragePowerAC.Float32))
-		realtimeInfo.BatteryAveragePowerACs = append(realtimeInfo.BatteryAveragePowerACs, utils.TwoDecimalPlaces(latestRealtimeInfo.BatteryAveragePowerAC.Float32))
-		realtimeInfo.PvAveragePowerACs = append(realtimeInfo.PvAveragePowerACs, utils.TwoDecimalPlaces(latestRealtimeInfo.PvAveragePowerAC.Float32))
-		realtimeInfo.GridAveragePowerACs = append(realtimeInfo.GridAveragePowerACs, utils.TwoDecimalPlaces(latestRealtimeInfo.GridAveragePowerAC.Float32))
-		realtimeInfo.BatterySoCs = append(realtimeInfo.BatterySoCs, utils.TwoDecimalPlaces(latestRealtimeInfo.BatterySoC.Float32))
-		realtimeInfo.BatteryVoltages = append(realtimeInfo.BatteryVoltages, utils.TwoDecimalPlaces(latestRealtimeInfo.BatteryVoltage.Float32))
+		realtimeInfo.LoadAveragePowerACs = append(realtimeInfo.LoadAveragePowerACs, utils.ThreeDecimalPlaces(latestRealtimeInfo.LoadAveragePowerAC.Float32))
+		realtimeInfo.BatteryAveragePowerACs = append(realtimeInfo.BatteryAveragePowerACs, utils.ThreeDecimalPlaces(latestRealtimeInfo.BatteryAveragePowerAC.Float32))
+		realtimeInfo.PvAveragePowerACs = append(realtimeInfo.PvAveragePowerACs, utils.ThreeDecimalPlaces(latestRealtimeInfo.PvAveragePowerAC.Float32))
+		realtimeInfo.GridAveragePowerACs = append(realtimeInfo.GridAveragePowerACs, utils.ThreeDecimalPlaces(latestRealtimeInfo.GridAveragePowerAC.Float32))
+		realtimeInfo.BatterySoCs = append(realtimeInfo.BatterySoCs, utils.ThreeDecimalPlaces(latestRealtimeInfo.BatterySoC.Float32))
+		realtimeInfo.BatteryVoltages = append(realtimeInfo.BatteryVoltages, utils.ThreeDecimalPlaces(latestRealtimeInfo.BatteryVoltage.Float32))
 
 		startTimeIndex = endTimeIndex
 		switch resolution {
@@ -714,19 +714,19 @@ func (s defaultDevicesService) getLatestAccumulatedInfo(gwUUID, resolution strin
 	case "day":
 		latestLogDaily, _ := (latestLog).(*deremsmodels.CCDataLogCalculatedDaily)
 		latestAccumulatedInfo.Timestamps = int(latestLogDaily.LatestLogDate.Unix())
-		latestAccumulatedInfo.LoadConsumedLifetimeEnergyACDiff = utils.TwoDecimalPlaces(latestLogDaily.LoadConsumedLifetimeEnergyACDiff.Float32)
-		latestAccumulatedInfo.PvProducedLifetimeEnergyACDiff = utils.TwoDecimalPlaces(latestLogDaily.PvProducedLifetimeEnergyACDiff.Float32)
-		latestAccumulatedInfo.BatteryLifetimeEnergyACDiff = utils.TwoDecimalPlaces(latestLogDaily.BatteryLifetimeEnergyACDiff.Float32)
-		latestAccumulatedInfo.GridLifetimeEnergyACDiff = utils.TwoDecimalPlaces(latestLogDaily.GridLifetimeEnergyACDiff.Float32)
-		latestAccumulatedInfo.LoadSelfConsumedEnergyPercentAC = utils.TwoDecimalPlaces(latestLogDaily.LoadSelfConsumedEnergyPercentAC.Float32)
+		latestAccumulatedInfo.LoadConsumedLifetimeEnergyACDiff = utils.ThreeDecimalPlaces(latestLogDaily.LoadConsumedLifetimeEnergyACDiff.Float32)
+		latestAccumulatedInfo.PvProducedLifetimeEnergyACDiff = utils.ThreeDecimalPlaces(latestLogDaily.PvProducedLifetimeEnergyACDiff.Float32)
+		latestAccumulatedInfo.BatteryLifetimeEnergyACDiff = utils.ThreeDecimalPlaces(latestLogDaily.BatteryLifetimeEnergyACDiff.Float32)
+		latestAccumulatedInfo.GridLifetimeEnergyACDiff = utils.ThreeDecimalPlaces(latestLogDaily.GridLifetimeEnergyACDiff.Float32)
+		latestAccumulatedInfo.LoadSelfConsumedEnergyPercentAC = utils.ThreeDecimalPlaces(latestLogDaily.LoadSelfConsumedEnergyPercentAC.Float32)
 	case "month":
 		latestLogMonthly, _ := (latestLog).(*deremsmodels.CCDataLogCalculatedMonthly)
 		latestAccumulatedInfo.Timestamps = int(latestLogMonthly.LatestLogDate.Unix())
-		latestAccumulatedInfo.LoadConsumedLifetimeEnergyACDiff = utils.TwoDecimalPlaces(latestLogMonthly.LoadConsumedLifetimeEnergyACDiff.Float32)
-		latestAccumulatedInfo.PvProducedLifetimeEnergyACDiff = utils.TwoDecimalPlaces(latestLogMonthly.PvProducedLifetimeEnergyACDiff.Float32)
-		latestAccumulatedInfo.BatteryLifetimeEnergyACDiff = utils.TwoDecimalPlaces(latestLogMonthly.BatteryLifetimeEnergyACDiff.Float32)
-		latestAccumulatedInfo.GridLifetimeEnergyACDiff = utils.TwoDecimalPlaces(latestLogMonthly.GridLifetimeEnergyACDiff.Float32)
-		latestAccumulatedInfo.LoadSelfConsumedEnergyPercentAC = utils.TwoDecimalPlaces(latestLogMonthly.LoadSelfConsumedEnergyPercentAC.Float32)
+		latestAccumulatedInfo.LoadConsumedLifetimeEnergyACDiff = utils.ThreeDecimalPlaces(latestLogMonthly.LoadConsumedLifetimeEnergyACDiff.Float32)
+		latestAccumulatedInfo.PvProducedLifetimeEnergyACDiff = utils.ThreeDecimalPlaces(latestLogMonthly.PvProducedLifetimeEnergyACDiff.Float32)
+		latestAccumulatedInfo.BatteryLifetimeEnergyACDiff = utils.ThreeDecimalPlaces(latestLogMonthly.BatteryLifetimeEnergyACDiff.Float32)
+		latestAccumulatedInfo.GridLifetimeEnergyACDiff = utils.ThreeDecimalPlaces(latestLogMonthly.GridLifetimeEnergyACDiff.Float32)
+		latestAccumulatedInfo.LoadSelfConsumedEnergyPercentAC = utils.ThreeDecimalPlaces(latestLogMonthly.LoadSelfConsumedEnergyPercentAC.Float32)
 	}
 	return
 }
@@ -751,7 +751,7 @@ func (s defaultDevicesService) getLatestComputedDemandState(gwUUID string, start
 	latestComputedDemandState.GridLifetimeEnergyACDiffToPower = utils.Division(
 		utils.Diff(latestLog.GridLifetimeEnergyAC.Float32,
 			firstLog.GridLifetimeEnergyAC.Float32), (15.0 / 60.0))
-	latestComputedDemandState.GridContractPowerAC = utils.TwoDecimalPlaces(latestLog.GridContractPowerAC.Float32)
+	latestComputedDemandState.GridContractPowerAC = utils.ThreeDecimalPlaces(latestLog.GridContractPowerAC.Float32)
 	return
 }
 

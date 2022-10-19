@@ -22,7 +22,7 @@ type PeriodQuery struct {
 
 // ZoomableQuery godoc
 type ZoomableQuery struct {
-	Resolution string    `form:"resolution" binding:"required" enums:"hour"`
+	Resolution string    `form:"resolution" binding:"required" enums:"hour,5minute"`
 	StartTime  time.Time `form:"startTime" binding:"required" example:"UTC time in ISO-8601" format:"date-time"`
 	EndTime    time.Time `form:"endTime" binding:"required,gtfield=StartTime" example:"UTC time in ISO-8601" format:"date-time"`
 }

@@ -379,7 +379,8 @@ var doc = `{
                     },
                     {
                         "enum": [
-                            "hour"
+                            "hour",
+                            "5minute"
                         ],
                         "type": "string",
                         "name": "resolution",
@@ -550,7 +551,8 @@ var doc = `{
                     },
                     {
                         "enum": [
-                            "hour"
+                            "hour",
+                            "5minute"
                         ],
                         "type": "string",
                         "name": "resolution",
@@ -1033,7 +1035,8 @@ var doc = `{
                     },
                     {
                         "enum": [
-                            "hour"
+                            "hour",
+                            "5minute"
                         ],
                         "type": "string",
                         "name": "resolution",
@@ -1222,7 +1225,8 @@ var doc = `{
                     },
                     {
                         "enum": [
-                            "hour"
+                            "hour",
+                            "5minute"
                         ],
                         "type": "string",
                         "name": "resolution",
@@ -1387,7 +1391,8 @@ var doc = `{
                     },
                     {
                         "enum": [
-                            "hour"
+                            "hour",
+                            "5minute"
                         ],
                         "type": "string",
                         "name": "resolution",
@@ -1534,7 +1539,8 @@ var doc = `{
                 "resolution": {
                     "type": "string",
                     "enum": [
-                        "hour"
+                        "hour",
+                        "5minute"
                     ]
                 },
                 "startTime": {

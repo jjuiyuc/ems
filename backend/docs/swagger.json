@@ -361,7 +361,8 @@
                     },
                     {
                         "enum": [
-                            "hour"
+                            "hour",
+                            "5minute"
                         ],
                         "type": "string",
                         "name": "resolution",
@@ -532,7 +533,8 @@
                     },
                     {
                         "enum": [
-                            "hour"
+                            "hour",
+                            "5minute"
                         ],
                         "type": "string",
                         "name": "resolution",
@@ -1015,7 +1017,8 @@
                     },
                     {
                         "enum": [
-                            "hour"
+                            "hour",
+                            "5minute"
                         ],
                         "type": "string",
                         "name": "resolution",
@@ -1204,7 +1207,8 @@
                     },
                     {
                         "enum": [
-                            "hour"
+                            "hour",
+                            "5minute"
                         ],
                         "type": "string",
                         "name": "resolution",
@@ -1369,7 +1373,8 @@
                     },
                     {
                         "enum": [
-                            "hour"
+                            "hour",
+                            "5minute"
                         ],
                         "type": "string",
                         "name": "resolution",
@@ -1516,7 +1521,8 @@
                 "resolution": {
                     "type": "string",
                     "enum": [
-                        "hour"
+                        "hour",
+                        "5minute"
                     ]
                 },
                 "startTime": {

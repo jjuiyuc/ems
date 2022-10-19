@@ -204,6 +204,8 @@ export default connect(mapState)(function TimeOfUse(props) {
         setPrices(prices)
     }, [timeOfUse])
 
+
+
     useEffect(() => {
         if (!props.gatewayID) return
         const startTime = moment().startOf("day").toISOString()

@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 
@@ -33,7 +32,7 @@ func (repo defaultAIDataRepository) UpsertAIData(aiData *deremsmodels.AiDatum) (
 		qm.Where("gw_uuid = ?", aiData.GWUUID),
 		qm.Where("log_date = ?", aiData.LogDate)).One(repo.db)
 	now := time.Now().UTC()
-	aiData.UpdatedAt = null.NewTime(now, true)
+	aiData.UpdatedAt = now
 	if err != nil {
 		aiData.CreatedAt = now
 		err = aiData.Insert(repo.db, boil.Infer())

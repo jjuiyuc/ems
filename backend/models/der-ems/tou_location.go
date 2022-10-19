@@ -23,11 +23,11 @@ import (
 
 // TouLocation is an object representing the database table.
 type TouLocation struct {
-	ID           int         `boil:"id" json:"id" toml:"id" yaml:"id"`
+	ID           int64       `boil:"id" json:"id" toml:"id" yaml:"id"`
 	PowerCompany null.String `boil:"power_company" json:"powerCompany,omitempty" toml:"powerCompany" yaml:"powerCompany,omitempty"`
 	Location     null.String `boil:"location" json:"location,omitempty" toml:"location" yaml:"location,omitempty"`
 	CreatedAt    time.Time   `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
-	UpdatedAt    null.Time   `boil:"updated_at" json:"updatedAt,omitempty" toml:"updatedAt" yaml:"updatedAt,omitempty"`
+	UpdatedAt    time.Time   `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
 
 	R *touLocationR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L touLocationL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -64,17 +64,17 @@ var TouLocationTableColumns = struct {
 // Generated where
 
 var TouLocationWhere = struct {
-	ID           whereHelperint
+	ID           whereHelperint64
 	PowerCompany whereHelpernull_String
 	Location     whereHelpernull_String
 	CreatedAt    whereHelpertime_Time
-	UpdatedAt    whereHelpernull_Time
+	UpdatedAt    whereHelpertime_Time
 }{
-	ID:           whereHelperint{field: "`tou_location`.`id`"},
+	ID:           whereHelperint64{field: "`tou_location`.`id`"},
 	PowerCompany: whereHelpernull_String{field: "`tou_location`.`power_company`"},
 	Location:     whereHelpernull_String{field: "`tou_location`.`location`"},
 	CreatedAt:    whereHelpertime_Time{field: "`tou_location`.`created_at`"},
-	UpdatedAt:    whereHelpernull_Time{field: "`tou_location`.`updated_at`"},
+	UpdatedAt:    whereHelpertime_Time{field: "`tou_location`.`updated_at`"},
 }
 
 // TouLocationRels is where relationship names are stored.
@@ -95,8 +95,8 @@ type touLocationL struct{}
 
 var (
 	touLocationAllColumns            = []string{"id", "power_company", "location", "created_at", "updated_at"}
-	touLocationColumnsWithoutDefault = []string{"power_company", "location", "updated_at"}
-	touLocationColumnsWithDefault    = []string{"id", "created_at"}
+	touLocationColumnsWithoutDefault = []string{"power_company", "location"}
+	touLocationColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	touLocationPrimaryKeyColumns     = []string{"id"}
 	touLocationGeneratedColumns      = []string{}
 )
@@ -205,7 +205,7 @@ func TouLocations(mods ...qm.QueryMod) touLocationQuery {
 
 // FindTouLocation retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindTouLocation(exec boil.Executor, iD int, selectCols ...string) (*TouLocation, error) {
+func FindTouLocation(exec boil.Executor, iD int64, selectCols ...string) (*TouLocation, error) {
 	touLocationObj := &TouLocation{}
 
 	sel := "*"
@@ -242,8 +242,8 @@ func (o *TouLocation) Insert(exec boil.Executor, columns boil.Columns) error {
 	if o.CreatedAt.IsZero() {
 		o.CreatedAt = currTime
 	}
-	if queries.MustTime(o.UpdatedAt).IsZero() {
-		queries.SetScanner(&o.UpdatedAt, currTime)
+	if o.UpdatedAt.IsZero() {
+		o.UpdatedAt = currTime
 	}
 
 	nzDefaults := queries.NonZeroDefaultSet(touLocationColumnsWithDefault, o)
@@ -309,7 +309,7 @@ func (o *TouLocation) Insert(exec boil.Executor, columns boil.Columns) error {
 		return ErrSyncFail
 	}
 
-	o.ID = int(lastID)
+	o.ID = int64(lastID)
 	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == touLocationMapping["id"] {
 		goto CacheNoHooks
 	}
@@ -343,7 +343,7 @@ CacheNoHooks:
 func (o *TouLocation) Update(exec boil.Executor, columns boil.Columns) (int64, error) {
 	currTime := time.Now().In(boil.GetLocation())
 
-	queries.SetScanner(&o.UpdatedAt, currTime)
+	o.UpdatedAt = currTime
 
 	var err error
 	key := makeCacheKey(columns, nil)
@@ -479,7 +479,7 @@ func (o *TouLocation) Upsert(exec boil.Executor, updateColumns, insertColumns bo
 	if o.CreatedAt.IsZero() {
 		o.CreatedAt = currTime
 	}
-	queries.SetScanner(&o.UpdatedAt, currTime)
+	o.UpdatedAt = currTime
 
 	nzDefaults := queries.NonZeroDefaultSet(touLocationColumnsWithDefault, o)
 	nzUniques := queries.NonZeroDefaultSet(mySQLTouLocationUniqueColumns, o)
@@ -583,7 +583,7 @@ func (o *TouLocation) Upsert(exec boil.Executor, updateColumns, insertColumns bo
 		return ErrSyncFail
 	}
 
-	o.ID = int(lastID)
+	o.ID = int64(lastID)
 	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == touLocationMapping["id"] {
 		goto CacheNoHooks
 	}
@@ -735,7 +735,7 @@ func (o *TouLocationSlice) ReloadAll(exec boil.Executor) error {
 }
 
 // TouLocationExists checks if the TouLocation row exists.
-func TouLocationExists(exec boil.Executor, iD int) (bool, error) {
+func TouLocationExists(exec boil.Executor, iD int64) (bool, error) {
 	var exists bool
 	sql := "select exists(select 1 from `tou_location` where `id`=? limit 1)"
 

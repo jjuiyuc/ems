@@ -27,7 +27,7 @@ var UtCustomer = &deremsmodels.Customer{
 	WeatherLat:     null.NewFloat32(24.75, true),
 	WeatherLng:     null.NewFloat32(121.75, true),
 	Timezone:       null.NewString("+0800", true),
-	TOULocationID:  null.NewInt(1, true),
+	TOULocationID:  null.NewInt64(1, true),
 	VoltageType:    null.NewString("Low voltage", true),
 	TOUType:        null.NewString("Two-section", true),
 }
@@ -35,6 +35,6 @@ var UtCustomer = &deremsmodels.Customer{
 // UtGateway godoc
 var UtGateway = &deremsmodels.Gateway{
 	ID:         1,
-	UUID:       "04F1FD6D9C6F64C3352285CCEAF59EE1",
+	UUID:       "0E0BA27A8175AF978C49396BDE9D7A1E",
 	CustomerID: 1,
 }

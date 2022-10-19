@@ -23,7 +23,7 @@ import (
 
 // Customer is an object representing the database table.
 type Customer struct {
-	ID             int          `boil:"id" json:"id" toml:"id" yaml:"id"`
+	ID             int64        `boil:"id" json:"id" toml:"id" yaml:"id"`
 	CustomerNumber string       `boil:"customer_number" json:"customerNumber" toml:"customerNumber" yaml:"customerNumber"`
 	FieldNumber    string       `boil:"field_number" json:"fieldNumber" toml:"fieldNumber" yaml:"fieldNumber"`
 	Address        null.String  `boil:"address" json:"address,omitempty" toml:"address" yaml:"address,omitempty"`
@@ -32,11 +32,11 @@ type Customer struct {
 	WeatherLat     null.Float32 `boil:"weather_lat" json:"weatherLat,omitempty" toml:"weatherLat" yaml:"weatherLat,omitempty"`
 	WeatherLng     null.Float32 `boil:"weather_lng" json:"weatherLNG,omitempty" toml:"weatherLNG" yaml:"weatherLNG,omitempty"`
 	Timezone       null.String  `boil:"timezone" json:"timezone,omitempty" toml:"timezone" yaml:"timezone,omitempty"`
-	TOULocationID  null.Int     `boil:"tou_location_id" json:"touLocationID,omitempty" toml:"touLocationID" yaml:"touLocationID,omitempty"`
+	TOULocationID  null.Int64   `boil:"tou_location_id" json:"touLocationID,omitempty" toml:"touLocationID" yaml:"touLocationID,omitempty"`
 	VoltageType    null.String  `boil:"voltage_type" json:"voltageType,omitempty" toml:"voltageType" yaml:"voltageType,omitempty"`
 	TOUType        null.String  `boil:"tou_type" json:"touType,omitempty" toml:"touType" yaml:"touType,omitempty"`
 	CreatedAt      time.Time    `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
-	UpdatedAt      null.Time    `boil:"updated_at" json:"updatedAt,omitempty" toml:"updatedAt" yaml:"updatedAt,omitempty"`
+	UpdatedAt      time.Time    `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
 
 	R *customerR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L customerL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -133,7 +133,7 @@ func (w whereHelpernull_Float64) IsNull() qm.QueryMod    { return qmhelper.Where
 func (w whereHelpernull_Float64) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
 
 var CustomerWhere = struct {
-	ID             whereHelperint
+	ID             whereHelperint64
 	CustomerNumber whereHelperstring
 	FieldNumber    whereHelperstring
 	Address        whereHelpernull_String
@@ -142,13 +142,13 @@ var CustomerWhere = struct {
 	WeatherLat     whereHelpernull_Float32
 	WeatherLng     whereHelpernull_Float32
 	Timezone       whereHelpernull_String
-	TOULocationID  whereHelpernull_Int
+	TOULocationID  whereHelpernull_Int64
 	VoltageType    whereHelpernull_String
 	TOUType        whereHelpernull_String
 	CreatedAt      whereHelpertime_Time
-	UpdatedAt      whereHelpernull_Time
+	UpdatedAt      whereHelpertime_Time
 }{
-	ID:             whereHelperint{field: "`customer`.`id`"},
+	ID:             whereHelperint64{field: "`customer`.`id`"},
 	CustomerNumber: whereHelperstring{field: "`customer`.`customer_number`"},
 	FieldNumber:    whereHelperstring{field: "`customer`.`field_number`"},
 	Address:        whereHelpernull_String{field: "`customer`.`address`"},
@@ -157,11 +157,11 @@ var CustomerWhere = struct {
 	WeatherLat:     whereHelpernull_Float32{field: "`customer`.`weather_lat`"},
 	WeatherLng:     whereHelpernull_Float32{field: "`customer`.`weather_lng`"},
 	Timezone:       whereHelpernull_String{field: "`customer`.`timezone`"},
-	TOULocationID:  whereHelpernull_Int{field: "`customer`.`tou_location_id`"},
+	TOULocationID:  whereHelpernull_Int64{field: "`customer`.`tou_location_id`"},
 	VoltageType:    whereHelpernull_String{field: "`customer`.`voltage_type`"},
 	TOUType:        whereHelpernull_String{field: "`customer`.`tou_type`"},
 	CreatedAt:      whereHelpertime_Time{field: "`customer`.`created_at`"},
-	UpdatedAt:      whereHelpernull_Time{field: "`customer`.`updated_at`"},
+	UpdatedAt:      whereHelpertime_Time{field: "`customer`.`updated_at`"},
 }
 
 // CustomerRels is where relationship names are stored.
@@ -193,8 +193,8 @@ type customerL struct{}
 
 var (
 	customerAllColumns            = []string{"id", "customer_number", "field_number", "address", "lat", "lng", "weather_lat", "weather_lng", "timezone", "tou_location_id", "voltage_type", "tou_type", "created_at", "updated_at"}
-	customerColumnsWithoutDefault = []string{"customer_number", "field_number", "address", "lat", "lng", "weather_lat", "weather_lng", "timezone", "tou_location_id", "voltage_type", "tou_type", "updated_at"}
-	customerColumnsWithDefault    = []string{"id", "created_at"}
+	customerColumnsWithoutDefault = []string{"customer_number", "field_number", "address", "lat", "lng", "weather_lat", "weather_lng", "timezone", "tou_location_id", "voltage_type", "tou_type"}
+	customerColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	customerPrimaryKeyColumns     = []string{"id"}
 	customerGeneratedColumns      = []string{}
 )
@@ -460,7 +460,7 @@ func Customers(mods ...qm.QueryMod) customerQuery {
 
 // FindCustomer retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindCustomer(exec boil.Executor, iD int, selectCols ...string) (*Customer, error) {
+func FindCustomer(exec boil.Executor, iD int64, selectCols ...string) (*Customer, error) {
 	customerObj := &Customer{}
 
 	sel := "*"
@@ -497,8 +497,8 @@ func (o *Customer) Insert(exec boil.Executor, columns boil.Columns) error {
 	if o.CreatedAt.IsZero() {
 		o.CreatedAt = currTime
 	}
-	if queries.MustTime(o.UpdatedAt).IsZero() {
-		queries.SetScanner(&o.UpdatedAt, currTime)
+	if o.UpdatedAt.IsZero() {
+		o.UpdatedAt = currTime
 	}
 
 	nzDefaults := queries.NonZeroDefaultSet(customerColumnsWithDefault, o)
@@ -564,7 +564,7 @@ func (o *Customer) Insert(exec boil.Executor, columns boil.Columns) error {
 		return ErrSyncFail
 	}
 
-	o.ID = int(lastID)
+	o.ID = int64(lastID)
 	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == customerMapping["id"] {
 		goto CacheNoHooks
 	}
@@ -598,7 +598,7 @@ CacheNoHooks:
 func (o *Customer) Update(exec boil.Executor, columns boil.Columns) (int64, error) {
 	currTime := time.Now().In(boil.GetLocation())
 
-	queries.SetScanner(&o.UpdatedAt, currTime)
+	o.UpdatedAt = currTime
 
 	var err error
 	key := makeCacheKey(columns, nil)
@@ -734,7 +734,7 @@ func (o *Customer) Upsert(exec boil.Executor, updateColumns, insertColumns boil.
 	if o.CreatedAt.IsZero() {
 		o.CreatedAt = currTime
 	}
-	queries.SetScanner(&o.UpdatedAt, currTime)
+	o.UpdatedAt = currTime
 
 	nzDefaults := queries.NonZeroDefaultSet(customerColumnsWithDefault, o)
 	nzUniques := queries.NonZeroDefaultSet(mySQLCustomerUniqueColumns, o)
@@ -838,7 +838,7 @@ func (o *Customer) Upsert(exec boil.Executor, updateColumns, insertColumns boil.
 		return ErrSyncFail
 	}
 
-	o.ID = int(lastID)
+	o.ID = int64(lastID)
 	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == customerMapping["id"] {
 		goto CacheNoHooks
 	}
@@ -990,7 +990,7 @@ func (o *CustomerSlice) ReloadAll(exec boil.Executor) error {
 }
 
 // CustomerExists checks if the Customer row exists.
-func CustomerExists(exec boil.Executor, iD int) (bool, error) {
+func CustomerExists(exec boil.Executor, iD int64) (bool, error) {
 	var exists bool
 	sql := "select exists(select 1 from `customer` where `id`=? limit 1)"
 

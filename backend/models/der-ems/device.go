@@ -23,15 +23,15 @@ import (
 
 // Device is an object representing the database table.
 type Device struct {
-	ID        int         `boil:"id" json:"id" toml:"id" yaml:"id"`
+	ID        int64       `boil:"id" json:"id" toml:"id" yaml:"id"`
 	ModbusID  string      `boil:"modbusid" json:"modbusid" toml:"modbusid" yaml:"modbusid"`
 	UUEID     string      `boil:"uueid" json:"uueid" toml:"uueid" yaml:"uueid"`
-	ModelID   int         `boil:"model_id" json:"modelID" toml:"modelID" yaml:"modelID"`
+	ModelID   int64       `boil:"model_id" json:"modelID" toml:"modelID" yaml:"modelID"`
 	GWUUID    string      `boil:"gw_uuid" json:"gwUUID" toml:"gwUUID" yaml:"gwUUID"`
 	Remark    null.String `boil:"remark" json:"remark,omitempty" toml:"remark" yaml:"remark,omitempty"`
 	Enable    null.Bool   `boil:"enable" json:"enable,omitempty" toml:"enable" yaml:"enable,omitempty"`
 	CreatedAt time.Time   `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
-	UpdatedAt null.Time   `boil:"updated_at" json:"updatedAt,omitempty" toml:"updatedAt" yaml:"updatedAt,omitempty"`
+	UpdatedAt time.Time   `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
 
 	R *deviceR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L deviceL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -108,25 +108,25 @@ func (w whereHelpernull_Bool) IsNull() qm.QueryMod    { return qmhelper.WhereIsN
 func (w whereHelpernull_Bool) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
 
 var DeviceWhere = struct {
-	ID        whereHelperint
+	ID        whereHelperint64
 	ModbusID  whereHelperstring
 	UUEID     whereHelperstring
-	ModelID   whereHelperint
+	ModelID   whereHelperint64
 	GWUUID    whereHelperstring
 	Remark    whereHelpernull_String
 	Enable    whereHelpernull_Bool
 	CreatedAt whereHelpertime_Time
-	UpdatedAt whereHelpernull_Time
+	UpdatedAt whereHelpertime_Time
 }{
-	ID:        whereHelperint{field: "`device`.`id`"},
+	ID:        whereHelperint64{field: "`device`.`id`"},
 	ModbusID:  whereHelperstring{field: "`device`.`modbusid`"},
 	UUEID:     whereHelperstring{field: "`device`.`uueid`"},
-	ModelID:   whereHelperint{field: "`device`.`model_id`"},
+	ModelID:   whereHelperint64{field: "`device`.`model_id`"},
 	GWUUID:    whereHelperstring{field: "`device`.`gw_uuid`"},
 	Remark:    whereHelpernull_String{field: "`device`.`remark`"},
 	Enable:    whereHelpernull_Bool{field: "`device`.`enable`"},
 	CreatedAt: whereHelpertime_Time{field: "`device`.`created_at`"},
-	UpdatedAt: whereHelpernull_Time{field: "`device`.`updated_at`"},
+	UpdatedAt: whereHelpertime_Time{field: "`device`.`updated_at`"},
 }
 
 // DeviceRels is where relationship names are stored.
@@ -168,8 +168,8 @@ type deviceL struct{}
 
 var (
 	deviceAllColumns            = []string{"id", "modbusid", "uueid", "model_id", "gw_uuid", "remark", "enable", "created_at", "updated_at"}
-	deviceColumnsWithoutDefault = []string{"modbusid", "uueid", "model_id", "gw_uuid", "remark", "enable", "updated_at"}
-	deviceColumnsWithDefault    = []string{"id", "created_at"}
+	deviceColumnsWithoutDefault = []string{"modbusid", "uueid", "model_id", "gw_uuid", "remark", "enable"}
+	deviceColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	devicePrimaryKeyColumns     = []string{"id"}
 	deviceGeneratedColumns      = []string{}
 )
@@ -584,7 +584,7 @@ func Devices(mods ...qm.QueryMod) deviceQuery {
 
 // FindDevice retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindDevice(exec boil.Executor, iD int, selectCols ...string) (*Device, error) {
+func FindDevice(exec boil.Executor, iD int64, selectCols ...string) (*Device, error) {
 	deviceObj := &Device{}
 
 	sel := "*"
@@ -621,8 +621,8 @@ func (o *Device) Insert(exec boil.Executor, columns boil.Columns) error {
 	if o.CreatedAt.IsZero() {
 		o.CreatedAt = currTime
 	}
-	if queries.MustTime(o.UpdatedAt).IsZero() {
-		queries.SetScanner(&o.UpdatedAt, currTime)
+	if o.UpdatedAt.IsZero() {
+		o.UpdatedAt = currTime
 	}
 
 	nzDefaults := queries.NonZeroDefaultSet(deviceColumnsWithDefault, o)
@@ -688,7 +688,7 @@ func (o *Device) Insert(exec boil.Executor, columns boil.Columns) error {
 		return ErrSyncFail
 	}
 
-	o.ID = int(lastID)
+	o.ID = int64(lastID)
 	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == deviceMapping["id"] {
 		goto CacheNoHooks
 	}
@@ -722,7 +722,7 @@ CacheNoHooks:
 func (o *Device) Update(exec boil.Executor, columns boil.Columns) (int64, error) {
 	currTime := time.Now().In(boil.GetLocation())
 
-	queries.SetScanner(&o.UpdatedAt, currTime)
+	o.UpdatedAt = currTime
 
 	var err error
 	key := makeCacheKey(columns, nil)
@@ -858,7 +858,7 @@ func (o *Device) Upsert(exec boil.Executor, updateColumns, insertColumns boil.Co
 	if o.CreatedAt.IsZero() {
 		o.CreatedAt = currTime
 	}
-	queries.SetScanner(&o.UpdatedAt, currTime)
+	o.UpdatedAt = currTime
 
 	nzDefaults := queries.NonZeroDefaultSet(deviceColumnsWithDefault, o)
 	nzUniques := queries.NonZeroDefaultSet(mySQLDeviceUniqueColumns, o)
@@ -962,7 +962,7 @@ func (o *Device) Upsert(exec boil.Executor, updateColumns, insertColumns boil.Co
 		return ErrSyncFail
 	}
 
-	o.ID = int(lastID)
+	o.ID = int64(lastID)
 	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == deviceMapping["id"] {
 		goto CacheNoHooks
 	}
@@ -1114,7 +1114,7 @@ func (o *DeviceSlice) ReloadAll(exec boil.Executor) error {
 }
 
 // DeviceExists checks if the Device row exists.
-func DeviceExists(exec boil.Executor, iD int) (bool, error) {
+func DeviceExists(exec boil.Executor, iD int64) (bool, error) {
 	var exists bool
 	sql := "select exists(select 1 from `device` where `id`=? limit 1)"
 

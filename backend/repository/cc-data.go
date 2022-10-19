@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 
@@ -42,7 +41,7 @@ func (repo defaultCCDataRepository) UpsertCCData(ccData *deremsmodels.CCDatum) (
 		qm.Where("gw_uuid = ?", ccData.GWUUID),
 		qm.Where("log_date = ?", ccData.LogDate)).One(repo.db)
 	now := time.Now().UTC()
-	ccData.UpdatedAt = null.NewTime(now, true)
+	ccData.UpdatedAt = now
 	if err != nil {
 		ccData.CreatedAt = now
 		err = ccData.Insert(repo.db, boil.Infer())
@@ -65,7 +64,7 @@ func (repo defaultCCDataRepository) UpsertCCDataLog(ccDataLog *deremsmodels.CCDa
 		qm.Where("gw_uuid = ?", ccDataLog.GWUUID),
 		qm.Where("log_date = ?", ccDataLog.LogDate)).One(repo.db)
 	now := time.Now().UTC()
-	ccDataLog.UpdatedAt = null.NewTime(now, true)
+	ccDataLog.UpdatedAt = now
 	if err != nil {
 		ccDataLog.CreatedAt = now
 		err = ccDataLog.Insert(repo.db, boil.Infer())

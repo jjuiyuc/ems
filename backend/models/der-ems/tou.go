@@ -23,7 +23,7 @@ import (
 
 // Tou is an object representing the database table.
 type Tou struct {
-	ID            int          `boil:"id" json:"id" toml:"id" yaml:"id"`
+	ID            int64        `boil:"id" json:"id" toml:"id" yaml:"id"`
 	TOULocationID null.Int     `boil:"tou_location_id" json:"touLocationID,omitempty" toml:"touLocationID" yaml:"touLocationID,omitempty"`
 	VoltageType   null.String  `boil:"voltage_type" json:"voltageType,omitempty" toml:"voltageType" yaml:"voltageType,omitempty"`
 	TOUType       null.String  `boil:"tou_type" json:"touType,omitempty" toml:"touType" yaml:"touType,omitempty"`
@@ -38,7 +38,7 @@ type Tou struct {
 	EnableAt      null.Time    `boil:"enable_at" json:"enableAt,omitempty" toml:"enableAt" yaml:"enableAt,omitempty"`
 	DisableAt     null.Time    `boil:"disable_at" json:"disableAt,omitempty" toml:"disableAt" yaml:"disableAt,omitempty"`
 	CreatedAt     time.Time    `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
-	UpdatedAt     null.Time    `boil:"updated_at" json:"updatedAt,omitempty" toml:"updatedAt" yaml:"updatedAt,omitempty"`
+	UpdatedAt     time.Time    `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
 
 	R *touR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L touL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -118,8 +118,32 @@ var TouTableColumns = struct {
 
 // Generated where
 
+type whereHelpernull_Time struct{ field string }
+
+func (w whereHelpernull_Time) EQ(x null.Time) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, false, x)
+}
+func (w whereHelpernull_Time) NEQ(x null.Time) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, true, x)
+}
+func (w whereHelpernull_Time) LT(x null.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LT, x)
+}
+func (w whereHelpernull_Time) LTE(x null.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LTE, x)
+}
+func (w whereHelpernull_Time) GT(x null.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GT, x)
+}
+func (w whereHelpernull_Time) GTE(x null.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GTE, x)
+}
+
+func (w whereHelpernull_Time) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
+func (w whereHelpernull_Time) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
+
 var TouWhere = struct {
-	ID            whereHelperint
+	ID            whereHelperint64
 	TOULocationID whereHelpernull_Int
 	VoltageType   whereHelpernull_String
 	TOUType       whereHelpernull_String
@@ -134,9 +158,9 @@ var TouWhere = struct {
 	EnableAt      whereHelpernull_Time
 	DisableAt     whereHelpernull_Time
 	CreatedAt     whereHelpertime_Time
-	UpdatedAt     whereHelpernull_Time
+	UpdatedAt     whereHelpertime_Time
 }{
-	ID:            whereHelperint{field: "`tou`.`id`"},
+	ID:            whereHelperint64{field: "`tou`.`id`"},
 	TOULocationID: whereHelpernull_Int{field: "`tou`.`tou_location_id`"},
 	VoltageType:   whereHelpernull_String{field: "`tou`.`voltage_type`"},
 	TOUType:       whereHelpernull_String{field: "`tou`.`tou_type`"},
@@ -151,7 +175,7 @@ var TouWhere = struct {
 	EnableAt:      whereHelpernull_Time{field: "`tou`.`enable_at`"},
 	DisableAt:     whereHelpernull_Time{field: "`tou`.`disable_at`"},
 	CreatedAt:     whereHelpertime_Time{field: "`tou`.`created_at`"},
-	UpdatedAt:     whereHelpernull_Time{field: "`tou`.`updated_at`"},
+	UpdatedAt:     whereHelpertime_Time{field: "`tou`.`updated_at`"},
 }
 
 // TouRels is where relationship names are stored.
@@ -172,8 +196,8 @@ type touL struct{}
 
 var (
 	touAllColumns            = []string{"id", "tou_location_id", "voltage_type", "tou_type", "period_type", "peak_type", "is_summer", "period_stime", "period_etime", "basic_charge", "basic_rate", "flow_rate", "enable_at", "disable_at", "created_at", "updated_at"}
-	touColumnsWithoutDefault = []string{"tou_location_id", "voltage_type", "tou_type", "period_type", "peak_type", "is_summer", "period_stime", "period_etime", "basic_charge", "basic_rate", "flow_rate", "enable_at", "disable_at", "updated_at"}
-	touColumnsWithDefault    = []string{"id", "created_at"}
+	touColumnsWithoutDefault = []string{"tou_location_id", "voltage_type", "tou_type", "period_type", "peak_type", "is_summer", "period_stime", "period_etime", "basic_charge", "basic_rate", "flow_rate", "enable_at", "disable_at"}
+	touColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	touPrimaryKeyColumns     = []string{"id"}
 	touGeneratedColumns      = []string{}
 )
@@ -282,7 +306,7 @@ func Tous(mods ...qm.QueryMod) touQuery {
 
 // FindTou retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindTou(exec boil.Executor, iD int, selectCols ...string) (*Tou, error) {
+func FindTou(exec boil.Executor, iD int64, selectCols ...string) (*Tou, error) {
 	touObj := &Tou{}
 
 	sel := "*"
@@ -319,8 +343,8 @@ func (o *Tou) Insert(exec boil.Executor, columns boil.Columns) error {
 	if o.CreatedAt.IsZero() {
 		o.CreatedAt = currTime
 	}
-	if queries.MustTime(o.UpdatedAt).IsZero() {
-		queries.SetScanner(&o.UpdatedAt, currTime)
+	if o.UpdatedAt.IsZero() {
+		o.UpdatedAt = currTime
 	}
 
 	nzDefaults := queries.NonZeroDefaultSet(touColumnsWithDefault, o)
@@ -386,7 +410,7 @@ func (o *Tou) Insert(exec boil.Executor, columns boil.Columns) error {
 		return ErrSyncFail
 	}
 
-	o.ID = int(lastID)
+	o.ID = int64(lastID)
 	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == touMapping["id"] {
 		goto CacheNoHooks
 	}
@@ -420,7 +444,7 @@ CacheNoHooks:
 func (o *Tou) Update(exec boil.Executor, columns boil.Columns) (int64, error) {
 	currTime := time.Now().In(boil.GetLocation())
 
-	queries.SetScanner(&o.UpdatedAt, currTime)
+	o.UpdatedAt = currTime
 
 	var err error
 	key := makeCacheKey(columns, nil)
@@ -556,7 +580,7 @@ func (o *Tou) Upsert(exec boil.Executor, updateColumns, insertColumns boil.Colum
 	if o.CreatedAt.IsZero() {
 		o.CreatedAt = currTime
 	}
-	queries.SetScanner(&o.UpdatedAt, currTime)
+	o.UpdatedAt = currTime
 
 	nzDefaults := queries.NonZeroDefaultSet(touColumnsWithDefault, o)
 	nzUniques := queries.NonZeroDefaultSet(mySQLTouUniqueColumns, o)
@@ -660,7 +684,7 @@ func (o *Tou) Upsert(exec boil.Executor, updateColumns, insertColumns boil.Colum
 		return ErrSyncFail
 	}
 
-	o.ID = int(lastID)
+	o.ID = int64(lastID)
 	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == touMapping["id"] {
 		goto CacheNoHooks
 	}
@@ -812,7 +836,7 @@ func (o *TouSlice) ReloadAll(exec boil.Executor) error {
 }
 
 // TouExists checks if the Tou row exists.
-func TouExists(exec boil.Executor, iD int) (bool, error) {
+func TouExists(exec boil.Executor, iD int64) (bool, error) {
 	var exists bool
 	sql := "select exists(select 1 from `tou` where `id`=? limit 1)"
 

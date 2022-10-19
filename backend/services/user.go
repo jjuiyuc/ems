@@ -16,7 +16,7 @@ import (
 type UserService interface {
 	CreatePasswordToken(username string) (name, token string, err error)
 	PasswordResetByPasswordToken(token, newPassword string) (err error)
-	GetProfile(userID int) (profile *ProfileResponse, err error)
+	GetProfile(userID int64) (profile *ProfileResponse, err error)
 }
 
 type defaultUserService struct {
@@ -100,7 +100,7 @@ func (s defaultUserService) PasswordResetByPasswordToken(token, newPassword stri
 }
 
 // GetProfile godoc
-func (s defaultUserService) GetProfile(userID int) (profile *ProfileResponse, err error) {
+func (s defaultUserService) GetProfile(userID int64) (profile *ProfileResponse, err error) {
 	// Get user information
 	user, err := s.repo.User.GetUserByUserID(userID)
 	if err != nil {

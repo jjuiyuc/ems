@@ -87,7 +87,7 @@ export default connect(mapState)(function EnergyResourcesGrid(props) {
             pointBorderColor: colors.primary["main-opacity-20"],
             hoverRadius: 2,
             pointHoverBorderWidth: 2,
-            radius: 2,
+            radius: 2
         }],
         labels,
         tickCallback: (val, index) => val + commonT("kw"),

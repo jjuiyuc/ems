@@ -105,7 +105,7 @@ func (s *DashboardSuite) Test_dashboardHandler() {
 		GridContractPowerAC:           15,
 		LoadPvAveragePowerAC:          20,
 		LoadBatteryAveragePowerAC:     0,
-		BatterySoC:                    80,
+		BatterySoC:                    160,
 		BatteryProducedAveragePowerAC: 20,
 		BatteryConsumedAveragePowerAC: 0,
 		BatteryChargingFrom:           "Solar",

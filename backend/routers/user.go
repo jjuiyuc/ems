@@ -113,7 +113,7 @@ func (w *APIWorker) GetProfile(c *gin.Context) {
 		return
 	}
 
-	profile, err := w.Services.User.GetProfile(userID.(int))
+	profile, err := w.Services.User.GetProfile(userID.(int64))
 	if err != nil {
 		log.WithFields(log.Fields{"caused-by": "get profile"}).Error()
 		appG.Response(http.StatusInternalServerError, e.ErrUserProfileGen, err.Error())

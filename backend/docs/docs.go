@@ -1450,21 +1450,7 @@ var doc = `{
         }
     },
     "definitions": {
-        "app.Response": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "type": "integer"
-                },
-                "data": {
-                    "type": "object"
-                },
-                "msg": {
-                    "type": "string"
-                }
-            }
-        },
-        "routers.PeriodQuery": {
+        "app.PeriodQuery": {
             "type": "object",
             "required": [
                 "endTime",
@@ -1483,7 +1469,7 @@ var doc = `{
                 }
             }
         },
-        "routers.ResolutionWithPeriodQuery": {
+        "app.ResolutionWithPeriodQuery": {
             "type": "object",
             "required": [
                 "endTime",
@@ -1510,7 +1496,21 @@ var doc = `{
                 }
             }
         },
-        "routers.StartTimeQuery": {
+        "app.Response": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {
+                    "type": "object"
+                },
+                "msg": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.StartTimeQuery": {
             "type": "object",
             "required": [
                 "startTime"
@@ -1523,7 +1523,7 @@ var doc = `{
                 }
             }
         },
-        "routers.ZoomableQuery": {
+        "app.ZoomableQuery": {
             "type": "object",
             "required": [
                 "endTime",

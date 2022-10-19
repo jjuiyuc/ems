@@ -1,15 +1,6 @@
 basePath: /api
 definitions:
-  app.Response:
-    properties:
-      code:
-        type: integer
-      data:
-        type: object
-      msg:
-        type: string
-    type: object
-  routers.PeriodQuery:
+  app.PeriodQuery:
     properties:
       endTime:
         example: UTC time in ISO-8601
@@ -23,7 +14,7 @@ definitions:
     - endTime
     - startTime
     type: object
-  routers.ResolutionWithPeriodQuery:
+  app.ResolutionWithPeriodQuery:
     properties:
       endTime:
         example: UTC time in ISO-8601
@@ -43,7 +34,16 @@ definitions:
     - resolution
     - startTime
     type: object
-  routers.StartTimeQuery:
+  app.Response:
+    properties:
+      code:
+        type: integer
+      data:
+        type: object
+      msg:
+        type: string
+    type: object
+  app.StartTimeQuery:
     properties:
       startTime:
         example: UTC time in ISO-8601
@@ -52,7 +52,7 @@ definitions:
     required:
     - startTime
     type: object
-  routers.ZoomableQuery:
+  app.ZoomableQuery:
     properties:
       endTime:
         example: UTC time in ISO-8601

@@ -1,4 +1,4 @@
-package routers
+package app
 
 import (
 	"time"
@@ -63,7 +63,7 @@ type ResolutionWithPeriodParam struct {
 	Query       ResolutionWithPeriodQuery
 }
 
-func (p *StartTimeParam) validate(c *gin.Context) (err error) {
+func (p *StartTimeParam) Validate(c *gin.Context) (err error) {
 	p.GatewayUUID = c.Param("gwid")
 	log.Debug("gatewayUUID: ", p.GatewayUUID)
 
@@ -73,7 +73,7 @@ func (p *StartTimeParam) validate(c *gin.Context) (err error) {
 	return
 }
 
-func (p *PeriodParam) validate(c *gin.Context) (err error) {
+func (p *PeriodParam) Validate(c *gin.Context) (err error) {
 	p.GatewayUUID = c.Param("gwid")
 	log.Debug("gatewayUUID: ", p.GatewayUUID)
 
@@ -83,7 +83,7 @@ func (p *PeriodParam) validate(c *gin.Context) (err error) {
 	return
 }
 
-func (p *ZoomableParam) validate(c *gin.Context) (err error) {
+func (p *ZoomableParam) Validate(c *gin.Context) (err error) {
 	p.GatewayUUID = c.Param("gwid")
 	log.Debug("gatewayUUID: ", p.GatewayUUID)
 
@@ -98,7 +98,7 @@ func (p *ZoomableParam) validate(c *gin.Context) (err error) {
 	return
 }
 
-func (p *ResolutionWithPeriodParam) validate(c *gin.Context) (err error) {
+func (p *ResolutionWithPeriodParam) Validate(c *gin.Context) (err error) {
 	p.GatewayUUID = c.Param("gwid")
 	log.Debug("gatewayUUID: ", p.GatewayUUID)
 

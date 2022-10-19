@@ -7,6 +7,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
+	"der-ems/internal/app"
 	"der-ems/internal/e"
 	"der-ems/internal/utils"
 	deremsmodels "der-ems/models/der-ems"
@@ -213,20 +214,20 @@ type GridPowerStateResponse struct {
 // DevicesService godoc
 type DevicesService interface {
 	GetLatestDevicesEnergyInfo(gwUUID string) (updatedTime time.Time, devicesEnergyInfo *DevicesEnergyInfoResponse, err error)
-	GetEnergyDistributionInfo(gwUUID string, startTime, endTime time.Time) (energyDistributionInfo *EnergyDistributionInfoResponse)
-	GetPowerState(gwUUID, resolution string, startTime, endTime time.Time) (powerState *PowerStateResponse)
-	GetAccumulatedPowerState(gwUUID, resolution string, startTime, endTime time.Time) (accumulatedPowerState *AccumulatedPowerStateResponse)
-	GetPowerSelfSupplyRate(gwUUID, resolution string, startTime, endTime time.Time) (powerSelfSupplyRate *PowerSelfSupplyRateResponse)
-	GetBatteryUsageInfo(gwUUID string, startTime time.Time) (batteryUsageInfo *BatteryUsageInfoResponse)
-	GetChargeInfo(gwUUID string, startTime time.Time) (chargeInfo *ChargeInfoResponse)
-	GetDemandState(gwUUID string, startTime, endTime time.Time) (demandState *DemandStateResponse)
-	GetSolarEnergyInfo(gwUUID string, startTime time.Time) (solarEnergyInfo *SolarEnergyInfoResponse)
-	GetSolarPowerState(gwUUID, resolution string, startTime, endTime time.Time) (solarPowerState *SolarPowerStateResponse, err error)
-	GetBatteryEnergyInfo(gwUUID string, startTime time.Time) (batteryEnergyInfo *BatteryEnergyInfoResponse)
-	GetBatteryPowerState(gwUUID, resolution string, startTime, endTime time.Time) (batteryPowerState *BatteryPowerStateResponse, err error)
-	GetBatteryChargeVoltageState(gwUUID, resolution string, startTime, endTime time.Time) (batteryChargeVoltageState *BatteryChargeVoltageStateResponse, err error)
-	GetGridEnergyInfo(gwUUID string, startTime time.Time) (gridEnergyInfo *GridEnergyInfoResponse)
-	GetGridPowerState(gwUUID, resolution string, startTime, endTime time.Time) (gridPowerState *GridPowerStateResponse, err error)
+	GetEnergyDistributionInfo(param *app.PeriodParam) (energyDistributionInfo *EnergyDistributionInfoResponse)
+	GetPowerState(param *app.ZoomableParam) (powerState *PowerStateResponse)
+	GetAccumulatedPowerState(param *app.ResolutionWithPeriodParam) (accumulatedPowerState *AccumulatedPowerStateResponse)
+	GetPowerSelfSupplyRate(param *app.ResolutionWithPeriodParam) (powerSelfSupplyRate *PowerSelfSupplyRateResponse)
+	GetBatteryUsageInfo(param *app.StartTimeParam) (batteryUsageInfo *BatteryUsageInfoResponse)
+	GetChargeInfo(param *app.StartTimeParam) (chargeInfo *ChargeInfoResponse)
+	GetDemandState(param *app.PeriodParam) (demandState *DemandStateResponse)
+	GetSolarEnergyInfo(param *app.StartTimeParam) (solarEnergyInfo *SolarEnergyInfoResponse)
+	GetSolarPowerState(param *app.ZoomableParam) (solarPowerState *SolarPowerStateResponse, err error)
+	GetBatteryEnergyInfo(param *app.StartTimeParam) (batteryEnergyInfo *BatteryEnergyInfoResponse)
+	GetBatteryPowerState(param *app.ZoomableParam) (batteryPowerState *BatteryPowerStateResponse, err error)
+	GetBatteryChargeVoltageState(param *app.ZoomableParam) (batteryChargeVoltageState *BatteryChargeVoltageStateResponse, err error)
+	GetGridEnergyInfo(param *app.StartTimeParam) (gridEnergyInfo *GridEnergyInfoResponse)
+	GetGridPowerState(param *app.ZoomableParam) (gridPowerState *GridPowerStateResponse, err error)
 }
 
 type defaultDevicesService struct {
@@ -306,10 +307,10 @@ func (s defaultDevicesService) GetLatestDevicesEnergyInfo(gwUUID string) (logTim
 	return
 }
 
-func (s defaultDevicesService) GetEnergyDistributionInfo(gwUUID string, startTime, endTime time.Time) (energyDistributionInfo *EnergyDistributionInfoResponse) {
+func (s defaultDevicesService) GetEnergyDistributionInfo(param *app.PeriodParam) (energyDistributionInfo *EnergyDistributionInfoResponse) {
 	energyDistributionInfo = &EnergyDistributionInfoResponse{}
-	firstLog, err1 := s.repo.CCData.GetFirstLog(gwUUID, startTime, endTime)
-	latestLog, err2 := s.repo.CCData.GetLatestLog(gwUUID, startTime, endTime)
+	firstLog, err1 := s.repo.CCData.GetFirstLog(param.GatewayUUID, param.Query.StartTime, param.Query.EndTime)
+	latestLog, err2 := s.repo.CCData.GetLatestLog(param.GatewayUUID, param.Query.StartTime, param.Query.EndTime)
 	if err1 != nil || err2 != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "s.repo.CCData.GetFirstLog and GetLatestLog",
@@ -352,8 +353,8 @@ func (s defaultDevicesService) GetEnergyDistributionInfo(gwUUID string, startTim
 	return
 }
 
-func (s defaultDevicesService) GetPowerState(gwUUID, resolution string, startTime, endTime time.Time) (powerState *PowerStateResponse) {
-	realtimeInfo := s.getRealtimeInfo(gwUUID, resolution, startTime, endTime)
+func (s defaultDevicesService) GetPowerState(param *app.ZoomableParam) (powerState *PowerStateResponse) {
+	realtimeInfo := s.getRealtimeInfo(param)
 	powerState = &PowerStateResponse{
 		Timestamps:             realtimeInfo.Timestamps,
 		LoadAveragePowerACs:    realtimeInfo.LoadAveragePowerACs,
@@ -364,8 +365,8 @@ func (s defaultDevicesService) GetPowerState(gwUUID, resolution string, startTim
 	return
 }
 
-func (s defaultDevicesService) GetAccumulatedPowerState(gwUUID, resolution string, startTime, endTime time.Time) (accumulatedPowerState *AccumulatedPowerStateResponse) {
-	accumulatedInfo := s.getAccumulatedInfo(gwUUID, resolution, startTime, endTime)
+func (s defaultDevicesService) GetAccumulatedPowerState(param *app.ResolutionWithPeriodParam) (accumulatedPowerState *AccumulatedPowerStateResponse) {
+	accumulatedInfo := s.getAccumulatedInfo(param)
 	accumulatedPowerState = &AccumulatedPowerStateResponse{
 		Timestamps:                        accumulatedInfo.Timestamps,
 		LoadConsumedLifetimeEnergyACDiffs: accumulatedInfo.LoadConsumedLifetimeEnergyACDiffs,
@@ -376,9 +377,9 @@ func (s defaultDevicesService) GetAccumulatedPowerState(gwUUID, resolution strin
 	return
 }
 
-func (s defaultDevicesService) GetChargeInfo(gwUUID string, startTime time.Time) (chargeInfo *ChargeInfoResponse) {
+func (s defaultDevicesService) GetChargeInfo(param *app.StartTimeParam) (chargeInfo *ChargeInfoResponse) {
 	chargeInfo = &ChargeInfoResponse{}
-	latestLog, err := s.repo.CCData.GetLatestLog(gwUUID, startTime, time.Now().UTC())
+	latestLog, err := s.repo.CCData.GetLatestLog(param.GatewayUUID, param.Query.StartTime, time.Now().UTC())
 	if err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "s.repo.CCData.GetLatestLog",
@@ -398,8 +399,8 @@ func (s defaultDevicesService) GetChargeInfo(gwUUID string, startTime time.Time)
 	return
 }
 
-func (s defaultDevicesService) GetPowerSelfSupplyRate(gwUUID, resolution string, startTime, endTime time.Time) (powerSelfSupplyRate *PowerSelfSupplyRateResponse) {
-	accumulatedInfo := s.getAccumulatedInfo(gwUUID, resolution, startTime, endTime)
+func (s defaultDevicesService) GetPowerSelfSupplyRate(param *app.ResolutionWithPeriodParam) (powerSelfSupplyRate *PowerSelfSupplyRateResponse) {
+	accumulatedInfo := s.getAccumulatedInfo(param)
 	powerSelfSupplyRate = &PowerSelfSupplyRateResponse{
 		Timestamps:                       accumulatedInfo.Timestamps,
 		LoadSelfConsumedEnergyPercentACs: accumulatedInfo.LoadSelfConsumedEnergyPercentACs,
@@ -407,9 +408,9 @@ func (s defaultDevicesService) GetPowerSelfSupplyRate(gwUUID, resolution string,
 	return
 }
 
-func (s defaultDevicesService) GetBatteryUsageInfo(gwUUID string, startTime time.Time) (batteryUsageInfo *BatteryUsageInfoResponse) {
+func (s defaultDevicesService) GetBatteryUsageInfo(param *app.StartTimeParam) (batteryUsageInfo *BatteryUsageInfoResponse) {
 	batteryUsageInfo = &BatteryUsageInfoResponse{}
-	latestLog, err := s.repo.CCData.GetLatestLog(gwUUID, startTime, time.Now().UTC())
+	latestLog, err := s.repo.CCData.GetLatestLog(param.GatewayUUID, param.Query.StartTime, time.Now().UTC())
 	if err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "s.repo.CCData.GetLatestLog",
@@ -427,13 +428,13 @@ func (s defaultDevicesService) GetBatteryUsageInfo(gwUUID string, startTime time
 	return
 }
 
-func (s defaultDevicesService) GetDemandState(gwUUID string, startTime, endTime time.Time) (demandState *DemandStateResponse) {
+func (s defaultDevicesService) GetDemandState(param *app.PeriodParam) (demandState *DemandStateResponse) {
 	demandState = &DemandStateResponse{}
-	startTimeIndex := startTime
-	endTimeIndex := startTime.Add(15 * time.Minute)
+	startTimeIndex := param.Query.StartTime
+	endTimeIndex := param.Query.StartTime.Add(15 * time.Minute)
 
-	for startTimeIndex.Before(endTime) {
-		latestComputedDemandState := s.getLatestComputedDemandState(gwUUID, startTimeIndex, endTimeIndex, endTime)
+	for startTimeIndex.Before(param.Query.EndTime) {
+		latestComputedDemandState := s.getLatestComputedDemandState(param.GatewayUUID, startTimeIndex, endTimeIndex, param.Query.EndTime)
 		log.Debug("latestComputedDemandState: ", latestComputedDemandState)
 		demandState.Timestamps = append(demandState.Timestamps, latestComputedDemandState.Timestamps)
 		demandState.GridLifetimeEnergyACDiffToPowers = append(demandState.GridLifetimeEnergyACDiffToPowers, latestComputedDemandState.GridLifetimeEnergyACDiffToPower)
@@ -443,21 +444,21 @@ func (s defaultDevicesService) GetDemandState(gwUUID string, startTime, endTime 
 
 		startTimeIndex = endTimeIndex
 		endTimeIndex = startTimeIndex.Add(15 * time.Minute)
-		if endTimeIndex.After(endTime) {
-			endTimeIndex = endTime
+		if endTimeIndex.After(param.Query.EndTime) {
+			endTimeIndex = param.Query.EndTime
 		}
 	}
 	return
 }
 
-func (s defaultDevicesService) GetSolarEnergyInfo(gwUUID string, startTime time.Time) (solarEnergyInfo *SolarEnergyInfoResponse) {
+func (s defaultDevicesService) GetSolarEnergyInfo(param *app.StartTimeParam) (solarEnergyInfo *SolarEnergyInfoResponse) {
 	solarEnergyInfo = &SolarEnergyInfoResponse{}
 	now := time.Now().UTC()
-	startTimeThisMonth := startTime.AddDate(0, 0, -startTime.Day())
-	firstLogOfDay, err1 := s.repo.CCData.GetFirstLog(gwUUID, startTime, now)
-	firstLogOfMonth, err2 := s.repo.CCData.GetFirstLog(gwUUID, startTimeThisMonth, now)
-	latestLog, err3 := s.repo.CCData.GetLatestLog(gwUUID, startTime, now)
-	logsOfMonth, err4 := s.repo.CCData.GetLogs(gwUUID, startTimeThisMonth, now)
+	startTimeThisMonth := param.Query.StartTime.AddDate(0, 0, -param.Query.StartTime.Day())
+	firstLogOfDay, err1 := s.repo.CCData.GetFirstLog(param.GatewayUUID, param.Query.StartTime, now)
+	firstLogOfMonth, err2 := s.repo.CCData.GetFirstLog(param.GatewayUUID, startTimeThisMonth, now)
+	latestLog, err3 := s.repo.CCData.GetLatestLog(param.GatewayUUID, param.Query.StartTime, now)
+	logsOfMonth, err4 := s.repo.CCData.GetLogs(param.GatewayUUID, startTimeThisMonth, now)
 	if err1 != nil || err2 != nil || err3 != nil || err4 != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "s.repo.CCData.GetFirstLog:Day&Month or GetLatestLog or GetLogs",
@@ -497,25 +498,25 @@ func (s defaultDevicesService) GetSolarEnergyInfo(gwUUID string, startTime time.
 	return
 }
 
-func (s defaultDevicesService) GetSolarPowerState(gwUUID, resolution string, startTime, endTime time.Time) (solarPowerState *SolarPowerStateResponse, err error) {
+func (s defaultDevicesService) GetSolarPowerState(param *app.ZoomableParam) (solarPowerState *SolarPowerStateResponse, err error) {
 	solarPowerState = &SolarPowerStateResponse{}
-	onPeakTime, err := s.getOnPeakTime(gwUUID, startTime)
+	onPeakTime, err := s.getOnPeakTime(param.GatewayUUID, param.Query.StartTime)
 	if err != nil {
 		return
 	}
 
 	solarPowerState.OnPeakTime = onPeakTime
-	realtimeInfo := s.getRealtimeInfo(gwUUID, resolution, startTime, endTime)
+	realtimeInfo := s.getRealtimeInfo(param)
 	solarPowerState.Timestamps = realtimeInfo.Timestamps
 	solarPowerState.PvAveragePowerACs = realtimeInfo.PvAveragePowerACs
 	return
 }
 
-func (s defaultDevicesService) GetBatteryEnergyInfo(gwUUID string, startTime time.Time) (batteryEnergyInfo *BatteryEnergyInfoResponse) {
+func (s defaultDevicesService) GetBatteryEnergyInfo(param *app.StartTimeParam) (batteryEnergyInfo *BatteryEnergyInfoResponse) {
 	batteryEnergyInfo = &BatteryEnergyInfoResponse{}
-	s.getBatteryInfo(gwUUID, batteryEnergyInfo)
-	firstLog, err1 := s.repo.CCData.GetFirstLog(gwUUID, startTime, time.Time{})
-	latestLog, err2 := s.repo.CCData.GetLatestLog(gwUUID, time.Time{}, time.Time{})
+	s.getBatteryInfo(param.GatewayUUID, batteryEnergyInfo)
+	firstLog, err1 := s.repo.CCData.GetFirstLog(param.GatewayUUID, param.Query.StartTime, time.Time{})
+	latestLog, err2 := s.repo.CCData.GetLatestLog(param.GatewayUUID, time.Time{}, time.Time{})
 	if err1 != nil || err2 != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "s.repo.CCData.GetFirstLog and GetLatestLog",
@@ -539,42 +540,42 @@ func (s defaultDevicesService) GetBatteryEnergyInfo(gwUUID string, startTime tim
 	return
 }
 
-func (s defaultDevicesService) GetBatteryPowerState(gwUUID, resolution string, startTime, endTime time.Time) (batteryPowerState *BatteryPowerStateResponse, err error) {
+func (s defaultDevicesService) GetBatteryPowerState(param *app.ZoomableParam) (batteryPowerState *BatteryPowerStateResponse, err error) {
 	batteryPowerState = &BatteryPowerStateResponse{}
-	onPeakTime, err := s.getOnPeakTime(gwUUID, startTime)
+	onPeakTime, err := s.getOnPeakTime(param.GatewayUUID, param.Query.StartTime)
 	if err != nil {
 		return
 	}
 
 	batteryPowerState.OnPeakTime = onPeakTime
-	realtimeInfo := s.getRealtimeInfo(gwUUID, resolution, startTime, endTime)
+	realtimeInfo := s.getRealtimeInfo(param)
 	batteryPowerState.Timestamps = realtimeInfo.Timestamps
 	batteryPowerState.BatteryAveragePowerACs = realtimeInfo.BatteryAveragePowerACs
 	return
 }
 
-func (s defaultDevicesService) GetBatteryChargeVoltageState(gwUUID, resolution string, startTime, endTime time.Time) (batteryChargeVoltageState *BatteryChargeVoltageStateResponse, err error) {
+func (s defaultDevicesService) GetBatteryChargeVoltageState(param *app.ZoomableParam) (batteryChargeVoltageState *BatteryChargeVoltageStateResponse, err error) {
 	batteryChargeVoltageState = &BatteryChargeVoltageStateResponse{}
-	onPeakTime, err := s.getOnPeakTime(gwUUID, startTime)
+	onPeakTime, err := s.getOnPeakTime(param.GatewayUUID, param.Query.StartTime)
 	if err != nil {
 		return
 	}
 
 	batteryChargeVoltageState.OnPeakTime = onPeakTime
-	realtimeInfo := s.getRealtimeInfo(gwUUID, resolution, startTime, endTime)
+	realtimeInfo := s.getRealtimeInfo(param)
 	batteryChargeVoltageState.Timestamps = realtimeInfo.Timestamps
 	batteryChargeVoltageState.BatterySoCs = realtimeInfo.BatterySoCs
 	batteryChargeVoltageState.BatteryVoltages = realtimeInfo.BatteryVoltages
 	return
 }
 
-func (s defaultDevicesService) GetGridEnergyInfo(gwUUID string, startTime time.Time) (gridEnergyInfo *GridEnergyInfoResponse) {
+func (s defaultDevicesService) GetGridEnergyInfo(param *app.StartTimeParam) (gridEnergyInfo *GridEnergyInfoResponse) {
 	gridEnergyInfo = &GridEnergyInfoResponse{}
 	now := time.Now().UTC()
-	startTimeThisMonth := startTime.AddDate(0, 0, -startTime.Day())
-	firstLogOfDay, err1 := s.repo.CCData.GetFirstLog(gwUUID, startTime, now)
-	firstLogOfMonth, err2 := s.repo.CCData.GetFirstLog(gwUUID, startTimeThisMonth, now)
-	latestLog, err3 := s.repo.CCData.GetLatestLog(gwUUID, startTime, now)
+	startTimeThisMonth := param.Query.StartTime.AddDate(0, 0, -param.Query.StartTime.Day())
+	firstLogOfDay, err1 := s.repo.CCData.GetFirstLog(param.GatewayUUID, param.Query.StartTime, now)
+	firstLogOfMonth, err2 := s.repo.CCData.GetFirstLog(param.GatewayUUID, startTimeThisMonth, now)
+	latestLog, err3 := s.repo.CCData.GetLatestLog(param.GatewayUUID, param.Query.StartTime, now)
 	if err1 != nil || err2 != nil || err3 != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "s.repo.CCData.GetFirstLog:Day&Month and GetLatestLog",
@@ -597,33 +598,33 @@ func (s defaultDevicesService) GetGridEnergyInfo(gwUUID string, startTime time.T
 	return
 }
 
-func (s defaultDevicesService) GetGridPowerState(gwUUID, resolution string, startTime, endTime time.Time) (gridPowerState *GridPowerStateResponse, err error) {
+func (s defaultDevicesService) GetGridPowerState(param *app.ZoomableParam) (gridPowerState *GridPowerStateResponse, err error) {
 	gridPowerState = &GridPowerStateResponse{}
-	onPeakTime, err := s.getOnPeakTime(gwUUID, startTime)
+	onPeakTime, err := s.getOnPeakTime(param.GatewayUUID, param.Query.StartTime)
 	if err != nil {
 		return
 	}
 
 	gridPowerState.OnPeakTime = onPeakTime
-	realtimeInfo := s.getRealtimeInfo(gwUUID, resolution, startTime, endTime)
+	realtimeInfo := s.getRealtimeInfo(param)
 	gridPowerState.Timestamps = realtimeInfo.Timestamps
 	gridPowerState.GridAveragePowerACs = realtimeInfo.GridAveragePowerACs
 	return
 }
 
-func (s defaultDevicesService) getRealtimeInfo(gwUUID, resolution string, startTime, endTime time.Time) (realtimeInfo *RealtimeInfo) {
+func (s defaultDevicesService) getRealtimeInfo(param *app.ZoomableParam) (realtimeInfo *RealtimeInfo) {
 	realtimeInfo = &RealtimeInfo{}
-	startTimeIndex := startTime
+	startTimeIndex := param.Query.StartTime
 	var endTimeIndex time.Time
-	switch resolution {
+	switch param.Query.Resolution {
 	case "hour":
-		endTimeIndex = startTime.Add(1 * time.Hour)
+		endTimeIndex = param.Query.StartTime.Add(1 * time.Hour)
 	case "5minute":
-		endTimeIndex = startTime.Add(5 * time.Minute)
+		endTimeIndex = param.Query.StartTime.Add(5 * time.Minute)
 	}
 
-	for startTimeIndex.Before(endTime) {
-		latestRealtimeInfo := s.getLatestRealtimeInfo(gwUUID, startTimeIndex, endTimeIndex, endTime)
+	for startTimeIndex.Before(param.Query.EndTime) {
+		latestRealtimeInfo := s.getLatestRealtimeInfo(param.GatewayUUID, startTimeIndex, endTimeIndex, param.Query.EndTime)
 		log.Debug("latestRealtimeInfo.LogDate: ", latestRealtimeInfo.LogDate)
 		realtimeInfo.Timestamps = append(realtimeInfo.Timestamps, int(latestRealtimeInfo.LogDate.Unix()))
 		realtimeInfo.LoadAveragePowerACs = append(realtimeInfo.LoadAveragePowerACs, utils.ThreeDecimalPlaces(latestRealtimeInfo.LoadAveragePowerAC.Float32))
@@ -634,32 +635,32 @@ func (s defaultDevicesService) getRealtimeInfo(gwUUID, resolution string, startT
 		realtimeInfo.BatteryVoltages = append(realtimeInfo.BatteryVoltages, utils.ThreeDecimalPlaces(latestRealtimeInfo.BatteryVoltage.Float32))
 
 		startTimeIndex = endTimeIndex
-		switch resolution {
+		switch param.Query.Resolution {
 		case "hour":
 			endTimeIndex = startTimeIndex.Add(1 * time.Hour)
 		case "5minute":
 			endTimeIndex = startTimeIndex.Add(5 * time.Minute)
 		}
-		if endTimeIndex.After(endTime) {
-			endTimeIndex = endTime
+		if endTimeIndex.After(param.Query.EndTime) {
+			endTimeIndex = param.Query.EndTime
 		}
 	}
 	return
 }
 
-func (s defaultDevicesService) getAccumulatedInfo(gwUUID, resolution string, startTime, endTime time.Time) (accumulatedInfo *AccumulatedInfo) {
+func (s defaultDevicesService) getAccumulatedInfo(param *app.ResolutionWithPeriodParam) (accumulatedInfo *AccumulatedInfo) {
 	accumulatedInfo = &AccumulatedInfo{}
-	startTimeIndex := startTime
+	startTimeIndex := param.Query.StartTime
 	var endTimeIndex time.Time
-	switch resolution {
+	switch param.Query.Resolution {
 	case "day":
-		endTimeIndex = startTime.AddDate(0, 0, 1)
+		endTimeIndex = param.Query.StartTime.AddDate(0, 0, 1)
 	case "month":
-		endTimeIndex = startTime.AddDate(0, 0, 1).AddDate(0, 1, 0).AddDate(0, 0, -1)
+		endTimeIndex = param.Query.StartTime.AddDate(0, 0, 1).AddDate(0, 1, 0).AddDate(0, 0, -1)
 	}
 
-	for startTimeIndex.Before(endTime) {
-		latestAccumulatedInfo := s.getLatestAccumulatedInfo(gwUUID, resolution, startTimeIndex, endTimeIndex, endTime)
+	for startTimeIndex.Before(param.Query.EndTime) {
+		latestAccumulatedInfo := s.getLatestAccumulatedInfo(param.GatewayUUID, param.Query.Resolution, startTimeIndex, endTimeIndex, param.Query.EndTime)
 		log.Debug("latestAccumulatedInfo: ", latestAccumulatedInfo)
 		accumulatedInfo.Timestamps = append(accumulatedInfo.Timestamps, latestAccumulatedInfo.Timestamps)
 		accumulatedInfo.LoadConsumedLifetimeEnergyACDiffs = append(accumulatedInfo.LoadConsumedLifetimeEnergyACDiffs, latestAccumulatedInfo.LoadConsumedLifetimeEnergyACDiff)
@@ -669,14 +670,14 @@ func (s defaultDevicesService) getAccumulatedInfo(gwUUID, resolution string, sta
 		accumulatedInfo.LoadSelfConsumedEnergyPercentACs = append(accumulatedInfo.LoadSelfConsumedEnergyPercentACs, latestAccumulatedInfo.LoadSelfConsumedEnergyPercentAC)
 
 		startTimeIndex = endTimeIndex
-		switch resolution {
+		switch param.Query.Resolution {
 		case "day":
 			endTimeIndex = startTimeIndex.AddDate(0, 0, 1)
 		case "month":
 			endTimeIndex = startTimeIndex.AddDate(0, 0, 1).AddDate(0, 1, 0).AddDate(0, 0, -1)
 		}
-		if endTimeIndex.After(endTime) {
-			endTimeIndex = endTime
+		if endTimeIndex.After(param.Query.EndTime) {
+			endTimeIndex = param.Query.EndTime
 		}
 	}
 	return

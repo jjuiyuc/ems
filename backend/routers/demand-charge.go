@@ -29,7 +29,7 @@ func (w *APIWorker) GetChargeInfo(c *gin.Context) {
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
-	responseData := w.Services.Devices.GetChargeInfo(param.GatewayUUID, param.Query.StartTime)
+	responseData := w.Services.Devices.GetChargeInfo(param)
 	appG.Response(http.StatusOK, e.Success, responseData)
 }
 
@@ -53,6 +53,6 @@ func (w *APIWorker) GetDemandState(c *gin.Context) {
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
-	responseData := w.Services.Devices.GetDemandState(param.GatewayUUID, param.Query.StartTime, param.Query.EndTime)
+	responseData := w.Services.Devices.GetDemandState(param)
 	appG.Response(http.StatusOK, e.Success, responseData)
 }

@@ -29,7 +29,7 @@ func (w *APIWorker) GetSolarEnergyInfo(c *gin.Context) {
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
-	responseData := w.Services.Devices.GetSolarEnergyInfo(param.GatewayUUID, param.Query.StartTime)
+	responseData := w.Services.Devices.GetSolarEnergyInfo(param)
 	appG.Response(http.StatusOK, e.Success, responseData)
 }
 
@@ -54,7 +54,7 @@ func (w *APIWorker) GetSolarPowerState(c *gin.Context) {
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
-	responseData, err := w.Services.Devices.GetSolarPowerState(param.GatewayUUID, param.Query.Resolution, param.Query.StartTime, param.Query.EndTime)
+	responseData, err := w.Services.Devices.GetSolarPowerState(param)
 	if err != nil {
 		appG.Response(http.StatusInternalServerError, e.ErrSolarPowerStateGen, err.Error())
 		return
@@ -82,7 +82,7 @@ func (w *APIWorker) GetBatteryEnergyInfo(c *gin.Context) {
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
-	responseData := w.Services.Devices.GetBatteryEnergyInfo(param.GatewayUUID, param.Query.StartTime)
+	responseData := w.Services.Devices.GetBatteryEnergyInfo(param)
 	appG.Response(http.StatusOK, e.Success, responseData)
 }
 
@@ -107,7 +107,7 @@ func (w *APIWorker) GetBatteryPowerState(c *gin.Context) {
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
-	responseData, err := w.Services.Devices.GetBatteryPowerState(param.GatewayUUID, param.Query.Resolution, param.Query.StartTime, param.Query.EndTime)
+	responseData, err := w.Services.Devices.GetBatteryPowerState(param)
 	if err != nil {
 		appG.Response(http.StatusInternalServerError, e.ErrBatteryPowerStateGen, err.Error())
 		return
@@ -136,7 +136,7 @@ func (w *APIWorker) GetBatteryChargeVoltageState(c *gin.Context) {
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
-	responseData, err := w.Services.Devices.GetBatteryChargeVoltageState(param.GatewayUUID, param.Query.Resolution, param.Query.StartTime, param.Query.EndTime)
+	responseData, err := w.Services.Devices.GetBatteryChargeVoltageState(param)
 	if err != nil {
 		appG.Response(http.StatusInternalServerError, e.ErrBatteryChargeVoltageStateGen, err.Error())
 		return
@@ -164,7 +164,7 @@ func (w *APIWorker) GetGridEnergyInfo(c *gin.Context) {
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
-	responseData := w.Services.Devices.GetGridEnergyInfo(param.GatewayUUID, param.Query.StartTime)
+	responseData := w.Services.Devices.GetGridEnergyInfo(param)
 	appG.Response(http.StatusOK, e.Success, responseData)
 }
 
@@ -189,7 +189,7 @@ func (w *APIWorker) GetGridPowerState(c *gin.Context) {
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
-	responseData, err := w.Services.Devices.GetGridPowerState(param.GatewayUUID, param.Query.Resolution, param.Query.StartTime, param.Query.EndTime)
+	responseData, err := w.Services.Devices.GetGridPowerState(param)
 	if err != nil {
 		appG.Response(http.StatusInternalServerError, e.ErrGridPowerStateGen, err.Error())
 		return

@@ -29,6 +29,6 @@ func (w *APIWorker) GetBatteryUsageInfo(c *gin.Context) {
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
-	responseData := w.Services.Devices.GetBatteryUsageInfo(param.GatewayUUID, param.Query.StartTime)
+	responseData := w.Services.Devices.GetBatteryUsageInfo(param)
 	appG.Response(http.StatusOK, e.Success, responseData)
 }

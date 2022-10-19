@@ -29,7 +29,7 @@ func (w *APIWorker) GetEnergyDistributionInfo(c *gin.Context) {
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
-	responseData := w.Services.Devices.GetEnergyDistributionInfo(param.GatewayUUID, param.Query.StartTime, param.Query.EndTime)
+	responseData := w.Services.Devices.GetEnergyDistributionInfo(param)
 	appG.Response(http.StatusOK, e.Success, responseData)
 }
 
@@ -53,7 +53,7 @@ func (w *APIWorker) GetPowerState(c *gin.Context) {
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
-	responseData := w.Services.Devices.GetPowerState(param.GatewayUUID, param.Query.Resolution, param.Query.StartTime, param.Query.EndTime)
+	responseData := w.Services.Devices.GetPowerState(param)
 	appG.Response(http.StatusOK, e.Success, responseData)
 }
 
@@ -77,7 +77,7 @@ func (w *APIWorker) GetAccumulatedPowerState(c *gin.Context) {
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
-	responseData := w.Services.Devices.GetAccumulatedPowerState(param.GatewayUUID, param.Query.Resolution, param.Query.StartTime, param.Query.EndTime)
+	responseData := w.Services.Devices.GetAccumulatedPowerState(param)
 	appG.Response(http.StatusOK, e.Success, responseData)
 }
 
@@ -101,6 +101,6 @@ func (w *APIWorker) GetPowerSelfSupplyRate(c *gin.Context) {
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
-	responseData := w.Services.Devices.GetPowerSelfSupplyRate(param.GatewayUUID, param.Query.Resolution, param.Query.StartTime, param.Query.EndTime)
+	responseData := w.Services.Devices.GetPowerSelfSupplyRate(param)
 	appG.Response(http.StatusOK, e.Success, responseData)
 }

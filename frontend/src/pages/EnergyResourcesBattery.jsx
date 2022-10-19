@@ -97,7 +97,7 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
         [chargeVoltage, setChargeVoltage] = useState(null),
         [chargeVoltageError, setChargeVoltageError] = useState(""),
         [chargeVoltageLoading, setChargeVoltageLoading] = useState(false),
-        [chargeVoltageRes] = useState("hour"),
+        [chargeVoltageRes] = useState("5minute"),
         [cyclesLifetime, setCyclesLifetime] = useState(0),
         [cyclesToday, setCyclesToday] = useState(0),
         [dischargedLifetime, setDischargedLifetime] = useState(0),
@@ -125,6 +125,9 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
                 },
                 id: "charge",
                 pointBorderColor: colors.blue["main-opacity-20"],
+                hoverRadius: 2,
+                pointHoverBorderWidth: 2,
+                radius: 2,
                 label: pageT("soc")
             },
             {
@@ -137,6 +140,9 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
                 },
                 id: "voltage",
                 pointBorderColor: colors.primary["main-opacity-20"],
+                hoverRadius: 2,
+                pointHoverBorderWidth: 2,
+                radius: 2,
                 label: pageT("voltage"),
                 yAxisID: "y1"
             },
@@ -264,7 +270,7 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
         { title: pageT("capacity"), value: capacity },
         { title: pageT("powerSources"), value: powerSources },
         { title: pageT("batteryPower"), value: batteryPower },
-        { title: pageT("voltage"), value: voltage },
+        { title: pageT("voltageV"), value: voltage },
     ]
 
     const cardsData = {

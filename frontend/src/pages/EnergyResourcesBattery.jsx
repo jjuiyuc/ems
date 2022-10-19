@@ -125,6 +125,9 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
                 },
                 id: "charge",
                 pointBorderColor: colors.blue["main-opacity-20"],
+                hoverRadius: 2,
+                pointHoverBorderWidth: 2,
+                radius: 2,
                 label: pageT("soc")
             },
             {
@@ -137,6 +140,9 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
                 },
                 id: "voltage",
                 pointBorderColor: colors.primary["main-opacity-20"],
+                hoverRadius: 2,
+                pointHoverBorderWidth: 2,
+                radius: 2,
                 label: pageT("voltage"),
                 yAxisID: "y1"
             },

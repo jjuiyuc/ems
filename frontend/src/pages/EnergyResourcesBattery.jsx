@@ -270,7 +270,7 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
         { title: pageT("capacity"), value: capacity },
         { title: pageT("powerSources"), value: powerSources },
         { title: pageT("batteryPower"), value: batteryPower },
-        { title: pageT("voltage"), value: voltage },
+        { title: pageT("voltageV"), value: voltage },
     ]
 
     const cardsData = {

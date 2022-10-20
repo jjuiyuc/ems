@@ -1941,9 +1941,6 @@ var doc = `{
         "services.SolarEnergyInfoResponse": {
             "type": "object",
             "properties": {
-                "allConsumedLifetimeEnergyACDiff": {
-                    "type": "number"
-                },
                 "batteryPvConsumedEnergyPercentAC": {
                     "type": "number"
                 },
@@ -1966,6 +1963,9 @@ var doc = `{
                     "type": "number"
                 },
                 "pvEnergyCostSavingsSum": {
+                    "type": "number"
+                },
+                "pvProducedLifetimeEnergyACDiff": {
                     "type": "number"
                 }
             }

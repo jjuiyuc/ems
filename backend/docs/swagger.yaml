@@ -328,8 +328,6 @@ definitions:
     type: object
   services.SolarEnergyInfoResponse:
     properties:
-      allConsumedLifetimeEnergyACDiff:
-        type: number
       batteryPvConsumedEnergyPercentAC:
         type: number
       batteryPvConsumedLifetimeEnergyACDiff:
@@ -345,6 +343,8 @@ definitions:
       pvCo2SavingsSum:
         type: number
       pvEnergyCostSavingsSum:
+        type: number
+      pvProducedLifetimeEnergyACDiff:
         type: number
     type: object
   services.SolarPowerStateResponse:

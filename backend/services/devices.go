@@ -146,7 +146,7 @@ type DemandStateResponse struct {
 
 // SolarEnergyInfoResponse godoc
 type SolarEnergyInfoResponse struct {
-	AllConsumedLifetimeEnergyACDiff       float32 `json:"allConsumedLifetimeEnergyACDiff"`
+	PvProducedLifetimeEnergyACDiff        float32 `json:"pvProducedLifetimeEnergyACDiff"`
 	LoadPvConsumedEnergyPercentAC         float32 `json:"loadPvConsumedEnergyPercentAC"`
 	LoadPvConsumedLifetimeEnergyACDiff    float32 `json:"loadPvConsumedLifetimeEnergyACDiff"`
 	BatteryPvConsumedEnergyPercentAC      float32 `json:"batteryPvConsumedEnergyPercentAC"`
@@ -472,7 +472,7 @@ func (s defaultDevicesService) GetSolarEnergyInfo(gwUUID string, startTime time.
 		"firstLogOfMonth.LogDate": firstLogOfMonth.LogDate,
 		"latestLog.LogDate":       latestLog.LogDate,
 	}).Debug()
-	solarEnergyInfo.AllConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.AllConsumedLifetimeEnergyAC.Float32, firstLogOfDay.AllConsumedLifetimeEnergyAC.Float32)
+	solarEnergyInfo.PvProducedLifetimeEnergyACDiff = utils.Diff(latestLog.PvProducedLifetimeEnergyAC.Float32, firstLogOfDay.PvProducedLifetimeEnergyAC.Float32)
 	solarEnergyInfo.LoadPvConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.LoadPvConsumedLifetimeEnergyAC.Float32, firstLogOfDay.LoadPvConsumedLifetimeEnergyAC.Float32)
 	solarEnergyInfo.LoadPvConsumedEnergyPercentAC = utils.Percent(
 		solarEnergyInfo.LoadPvConsumedLifetimeEnergyACDiff,

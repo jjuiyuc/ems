@@ -155,7 +155,7 @@ export default connect(mapState)(function EnergyResoucesSolar(props) {
                             type: "exportToGrid"
                         },
                     ],
-                    kwh: data.allConsumedLifetimeEnergyACDiff
+                    kwh: data.pvProducedLifetimeEnergyACDiff
                 })
                 setEconomics(data.pvEnergyCostSavingsSum || 0)
                 setCO2Reduction(data.pvCo2SavingsSum || 0)

@@ -223,7 +223,7 @@ export default connect(mapState)(function EnergyResoucesSolar(props) {
             <EnergySolarSubCard
                 icon={CO2Icon}
                 title={pageT("co2Reduction")}
-                value={co2Reduction + " " + pageT("tons")} />
+                value={co2Reduction + " " + pageT("kg")} />
             {infoLoading
                 ? <div className="absolute bg-black-main-opacity-95 grid inset-0
                                 place-items-center rounded-3xl">

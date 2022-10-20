@@ -137,10 +137,10 @@
             "economics": "發電收益",
             "exportToGrid": "回送市電",
             "infoError": "無法取得太陽能資料",
+            "kg":"公斤",
             "realTimeSolarGeneration": "即時太陽能發電功率 (kW)",
             "solarGeneration": "太陽能發電",
             "thisCalendarMonth": "當月",
-            "tons": "噸",
             "totalSolarEnergyGeneration": "太電能發電量"
         }
     },

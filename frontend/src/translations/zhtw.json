@@ -117,7 +117,9 @@
             "stateOfChargeSOC": "電池電量",
             "soc": "電量",
             "stateOfChargeVoltage": "電池電量及電壓監控",
-            "voltage": "電壓 (V)"
+            "voltage": "電壓",
+            "voltageV": "電壓 (V)"
+
         },
         "grid": {
             "chartError": "無法取得圖表資料",

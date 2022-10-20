@@ -117,7 +117,9 @@
             "stateOfChargeSOC": "State of Charge (SoC)",
             "soc": "SoC",
             "stateOfChargeVoltage": "State of Charge and Voltage",
-            "voltage": "Voltage (V)"
+            "voltage": "Voltage",
+            "voltageV": "Voltage (V)"
+
         },
         "grid": {
             "chartError": "Can't get chart data",

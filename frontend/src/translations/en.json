@@ -54,10 +54,10 @@
         "dashboard": "Dashboard",
         "directConsumption": "Direct Consumption",
         "dischargingTo": "Discharging To",
-        "importFromGrid": "Import From Grid",
+        "importFromGrid": "Import from Grid",
         "load": "Load",
         "noWebsocketSupport": "Your browser does not support WebSockets.",
-        "solar":"solar",
+        "solar":"Solar",
         "unableToConnect": "Unable to connect"
     },
     "demandCharge": {

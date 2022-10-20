@@ -615,13 +615,7 @@ func (s defaultDevicesService) GetGridPowerState(param *app.ZoomableParam) (grid
 func (s defaultDevicesService) getRealtimeInfo(param *app.ZoomableParam) (realtimeInfo *RealtimeInfo) {
 	realtimeInfo = &RealtimeInfo{}
 	startTimeIndex := param.Query.StartTime
-	var endTimeIndex time.Time
-	switch param.Query.Resolution {
-	case "hour":
-		endTimeIndex = param.Query.StartTime.Add(1 * time.Hour)
-	case "5minute":
-		endTimeIndex = param.Query.StartTime.Add(5 * time.Minute)
-	}
+	endTimeIndex := param.GetEndTimeIndex()
 
 	for startTimeIndex.Before(param.Query.EndTime) {
 		latestRealtimeInfo := s.getLatestRealtimeInfo(param.GatewayUUID, startTimeIndex, endTimeIndex, param.Query.EndTime)
@@ -651,13 +645,7 @@ func (s defaultDevicesService) getRealtimeInfo(param *app.ZoomableParam) (realti
 func (s defaultDevicesService) getAccumulatedInfo(param *app.ResolutionWithPeriodParam) (accumulatedInfo *AccumulatedInfo) {
 	accumulatedInfo = &AccumulatedInfo{}
 	startTimeIndex := param.Query.StartTime
-	var endTimeIndex time.Time
-	switch param.Query.Resolution {
-	case "day":
-		endTimeIndex = param.Query.StartTime.AddDate(0, 0, 1)
-	case "month":
-		endTimeIndex = param.Query.StartTime.AddDate(0, 0, 1).AddDate(0, 1, 0).AddDate(0, 0, -1)
-	}
+	endTimeIndex := param.GetEndTimeIndex()
 
 	for startTimeIndex.Before(param.Query.EndTime) {
 		latestAccumulatedInfo := s.getLatestAccumulatedInfo(param.GatewayUUID, param.Query.Resolution, startTimeIndex, endTimeIndex, param.Query.EndTime)

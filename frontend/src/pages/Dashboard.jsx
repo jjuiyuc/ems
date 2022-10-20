@@ -101,7 +101,9 @@ export default connect(mapState)(function Dashboard(props) {
     const updateData = data => {
         const
             batteryPower = data.batteryProducedAveragePowerAC
-                + data.batteryConsumedAveragePowerAC
+                + data.batteryConsumedAveragePowerAC,
+            solarPowerExport = Math.abs(data.gridProducedAveragePowerAC
+                + data.gridConsumedAveragePowerAC)
 
         setBattery({
             direction:
@@ -114,8 +116,7 @@ export default connect(mapState)(function Dashboard(props) {
         })
         setDiagram({
             battery: batteryPower,
-            grid: data.gridProducedAveragePowerAC
-                + data.gridConsumedAveragePowerAC,
+            grid: solarPowerExport,
             load: data.loadAveragePowerAC,
             solar: data.pvAveragePowerAC
         })
@@ -138,7 +139,7 @@ export default connect(mapState)(function Dashboard(props) {
         setSolar({
             charge: data.batteryPvAveragePowerAC,
             consume: data.loadPvAveragePowerAC,
-            export: data.gridPvAveragePowerAC
+            export: solarPowerExport
         })
     }
 
@@ -191,7 +192,7 @@ export default connect(mapState)(function Dashboard(props) {
         ],
         loadData = [
             { name: pageT("solar"), value: `${load.solar} ${commonT("kw")}` },
-            { name: pageT("batteryDischarge"), value: load.discharge || "-" },
+            { name: pageT("batteryDischarge"), value: `${load.discharge} ${commonT("kw")}` },
             {
                 name: pageT("importFromGrid"),
                 value: `${load.import} ${commonT("kw")}`
@@ -206,7 +207,7 @@ export default connect(mapState)(function Dashboard(props) {
                 name: pageT("chargeToBattery"),
                 value: `${solar.charge} ${commonT("kw")}`
             },
-            { name: commonT("exportToGrid"), value: solar.export || "-" },
+            { name: commonT("exportToGrid"), value: `${solar.export} ${commonT("kw")}` },
         ]
 
     const

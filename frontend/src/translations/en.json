@@ -137,10 +137,10 @@
             "economics": "Economics",
             "exportToGrid": "Export to Grid",
             "infoError": "Can't get solar info",
+            "kg":"kg",
             "realTimeSolarGeneration": "Real-time Solar Generation (kW)",
             "solarGeneration": "solarGeneration",
             "thisCalendarMonth": "This Calendar Month",
-            "tons": "tons",
             "totalSolarEnergyGeneration": "Total Solar Energy Generation"
         }
     },

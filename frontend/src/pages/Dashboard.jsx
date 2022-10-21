@@ -45,7 +45,7 @@ const Card = props => {
             </div>
             {data.map((item, i) =>
                 <div key={"d-c-d-" + i}>
-                    <h2 className="font-bold text-3xl mb-1">{item.value}</h2>
+                    <h2 className="font-bold text-2xl mb-1">{item.value}</h2>
                     <p className="lg:test text-sm">{item.name}</p>
                 </div>)}
         </div>

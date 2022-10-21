@@ -139,7 +139,7 @@ export default connect(mapState)(function Dashboard(props) {
         setSolar({
             charge: data.batteryPvAveragePowerAC,
             consume: data.loadPvAveragePowerAC,
-            export: solarPowerExport
+            export: data.gridPvAveragePowerAC
         })
     }
 

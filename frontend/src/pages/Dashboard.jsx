@@ -139,10 +139,9 @@ export default connect(mapState)(function Dashboard(props) {
         setSolar({
             charge: data.batteryPvAveragePowerAC,
             consume: data.loadPvAveragePowerAC,
-            export: solarPowerExport
+            export: data.gridPvAveragePowerAC
         })
     }
-
     useEffect(() => {
         if (!props.gatewayID) return
 
@@ -207,7 +206,10 @@ export default connect(mapState)(function Dashboard(props) {
                 name: pageT("chargeToBattery"),
                 value: `${solar.charge} ${commonT("kw")}`
             },
-            { name: commonT("exportToGrid"), value: `${solar.export} ${commonT("kw")}` },
+            {
+                name: commonT("exportToGrid"),
+                value: `${solar.export} ${commonT("kw")}`
+            },
         ]
 
     const

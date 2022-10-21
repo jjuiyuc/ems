@@ -258,6 +258,7 @@ func (s defaultDevicesService) GetLatestDevicesEnergyInfo(gwUUID string) (logTim
 	positiveLoadBatteryAveragePowerAC := float32(math.Abs(float64(latestLog.LoadBatteryAveragePowerAC.Float32)))
 	positiveLoadAveragePowerAC := float32(math.Abs(float64(latestLog.LoadAveragePowerAC.Float32)))
 	positiveBatteryPvAveragePowerAC := float32(math.Abs(float64(latestLog.BatteryPvAveragePowerAC.Float32)))
+	positiveGridPvAveragePowerAC := float32(math.Abs(float64(latestLog.GridPvAveragePowerAC.Float32)))
 	devicesEnergyInfo = &DevicesEnergyInfoResponse{
 		GridIsPeakShaving:             latestLog.GridIsPeakShaving.Int,
 		LoadGridAveragePowerAC:        utils.ThreeDecimalPlaces(positiveLoadGridAveragePowerAC),
@@ -273,7 +274,7 @@ func (s defaultDevicesService) GetLatestDevicesEnergyInfo(gwUUID string) (logTim
 		PvAveragePowerAC:              utils.ThreeDecimalPlaces(latestLog.PvAveragePowerAC.Float32),
 		LoadAveragePowerAC:            utils.ThreeDecimalPlaces(positiveLoadAveragePowerAC),
 		BatteryPvAveragePowerAC:       utils.ThreeDecimalPlaces(positiveBatteryPvAveragePowerAC),
-		GridPvAveragePowerAC:          utils.ThreeDecimalPlaces(latestLog.GridPvAveragePowerAC.Float32),
+		GridPvAveragePowerAC:          utils.ThreeDecimalPlaces(positiveGridPvAveragePowerAC),
 		GridProducedAveragePowerAC:    utils.ThreeDecimalPlaces(latestLog.GridProducedAveragePowerAC.Float32),
 		GridConsumedAveragePowerAC:    utils.ThreeDecimalPlaces(latestLog.GridConsumedAveragePowerAC.Float32),
 	}

@@ -383,10 +383,8 @@ export default connect(mapState)(function Analysis(props) {
             startTime = moment().startOf("week").toISOString()
             endTime = moment().startOf("day").toISOString()
 
-            if (startTime == endTime) {
-                startTime = moment().startOf("week").subtract(7, "day").toISOString()
-            } else {
-                startTime = moment().startOf("week").toISOString()
+            if (moment().get("day") == 0) {
+                startTime = moment().subtract(1, "week").startOf("week").toISOString()
             }
         } else if (tab === "month") {
             startTime = moment().startOf("month").toISOString()

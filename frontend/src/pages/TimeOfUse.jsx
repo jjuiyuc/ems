@@ -68,7 +68,10 @@ export default connect(mapState)(function TimeOfUse(props) {
                     above: colors.primary["main-opacity-10"],
                     target: "origin"
                 },
-                pointBorderColor: colors.primary["main-opacity-20"]
+                pointBorderColor: colors.primary["main-opacity-20"],
+                hoverRadius: 0,
+                pointHoverBorderWidth: 0,
+                radius: 0
             }],
             labels: lineChartDateLabels,
             tickCallback: (val, index) => val + "%",

@@ -103,9 +103,9 @@ export default connect(mapState)(function EnergyResoucesSolar(props) {
                 target: "origin"
             },
             pointBorderColor: colors.yellow["main-opacity-20"],
-            hoverRadius: 2,
-            pointHoverBorderWidth: 2,
-            radius: 2,
+            hoverRadius: 0,
+            pointHoverBorderWidth: 0,
+            radius: 0
         }],
         labels,
         tickCallback: (val, index) => val + commonT("kw"),

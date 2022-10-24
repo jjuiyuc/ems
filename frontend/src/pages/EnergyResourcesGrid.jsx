@@ -72,7 +72,7 @@ export default connect(mapState)(function EnergyResourcesGrid(props) {
         [lineChartGridPower, setLineChartGridPower] = useState(null),
         [lineChartGridPowerError, setLineChartGridPowerError] = useState(""),
         [lineChartGridPowerLoading, setLineChartGridPowerLoading] = useState(false),
-        [lineChartGridPowertRes] = useState("5minute")
+        [lineChartGridPowerRes] = useState("5minute")
 
     const chartGridPowerSet = ({ data, highPeak, labels }) => ({
         beforeDraw: drawHighPeak(highPeak.start, highPeak.end),
@@ -93,7 +93,7 @@ export default connect(mapState)(function EnergyResourcesGrid(props) {
         tickCallback: (val, index) => val + commonT("kw"),
         tooltipLabel: item =>
             `${item.parsed.y} ${commonT("kw")}`,
-        y: { max: 80, min: 0 },
+        y: { max: 40, min: 0 },
         x: {
             max: moment().add(1, "day").startOf("day"),
             min: moment().startOf("day")

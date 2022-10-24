@@ -111,7 +111,7 @@ export default connect(mapState)(function EnergyResoucesSolar(props) {
         tickCallback: (val, index) => val + commonT("kw"),
         tooltipLabel: item =>
             `${item.dataset.label} ${item.parsed.y} ${commonT("kw")}`,
-        y: { max: 80, min: 0 },
+        y: { max: 20, min: 0 },
         x: {
             max: moment().add(1, "day").startOf("day"),
             min: moment().startOf("day")

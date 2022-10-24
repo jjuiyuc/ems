@@ -276,26 +276,6 @@ export default connect(mapState)(function Dashboard(props) {
             : null}
         <div className="lg:flex items-start">
             <div className="flex-1">
-                <div className="card">
-                    <div className="flex flex-wrap items-baseline mb-6">
-                        <h5 className="font-bold">{commonT("peakShave")}</h5>
-                        {activeIndicator}
-                    </div>
-                    <div className="bg-gray-600 flex h-2 overflow-hidden
-                                    rounded-full w-full ">
-                        <div
-                            className={`bg-${peakShaveColor}-main rounded-full`}
-                            style={{ width: `${peakShaveRate * 100}%` }}
-                        />
-                    </div>
-                    <div className="flex font-bold items-center mt-2">
-                        <div className="text-28px">
-                            <span className={`text-${peakShaveColor}-main`}>
-                                {peak.current}
-                            </span> / {peak.threshhold} {commonT("kw")}
-                        </div>
-                    </div>
-                </div>
                 <div className="grid-cols-3-auto items-stretch
                                 block md:grid lg:block xl:grid
                                 mx-5 lg:mx-9 my-10 lg:my-18">
@@ -326,6 +306,26 @@ export default connect(mapState)(function Dashboard(props) {
                                     hidden md:flex lg:hidden xl:flex">
                         <div><GridCard arrow="left" /></div>
                         <div><SolarCard arrow="left" /></div>
+                    </div>
+                </div>
+                <div className="card">
+                    <div className="flex flex-wrap items-baseline mb-6">
+                        <h5 className="font-bold">{commonT("peakShave")}</h5>
+                        {activeIndicator}
+                    </div>
+                    <div className="bg-gray-600 flex h-2 overflow-hidden
+                                    rounded-full w-full ">
+                        <div
+                            className={`bg-${peakShaveColor}-main rounded-full`}
+                            style={{ width: `${peakShaveRate * 100}%` }}
+                        />
+                    </div>
+                    <div className="flex font-bold items-center mt-2">
+                        <div className="text-28px">
+                            <span className={`text-${peakShaveColor}-main`}>
+                                {peak.current}
+                            </span> / {peak.threshhold} {commonT("kw")}
+                        </div>
                     </div>
                 </div>
             </div>

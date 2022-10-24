@@ -72,7 +72,7 @@ export default connect(mapState)(function EnergyResourcesGrid(props) {
         [lineChartGridPower, setLineChartGridPower] = useState(null),
         [lineChartGridPowerError, setLineChartGridPowerError] = useState(""),
         [lineChartGridPowerLoading, setLineChartGridPowerLoading] = useState(false),
-        [lineChartGridPowertRes] = useState("5minute")
+        [lineChartGridPowerRes] = useState("5minute")
 
     const chartGridPowerSet = ({ data, highPeak, labels }) => ({
         beforeDraw: drawHighPeak(highPeak.start, highPeak.end),
@@ -143,7 +143,7 @@ export default connect(mapState)(function EnergyResourcesGrid(props) {
             parseInt(moment().hour(n).startOf("h").format("x")))
 
         const GridPowerUrl = `${urlPrefix}/power-state?`
-            + chartParams(lineChartGridPowertRes)
+            + chartParams(lineChartGridPowerRes)
         apiCall({
             onComplete: () => setLineChartGridPowerLoading(false),
             onError: error => setLineChartGridPowerError(error),

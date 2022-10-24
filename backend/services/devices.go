@@ -230,17 +230,27 @@ type SolarEnergyInfoResponse struct {
 func (r *SolarEnergyInfoResponse) ComputedValues(firstLogOfDay, firstLogOfMonth, latestLog *deremsmodels.CCDataLog, logsOfMonth []*deremsmodels.CCDataLog) {
 	r.PvProducedLifetimeEnergyACDiff = utils.Diff(latestLog.PvProducedLifetimeEnergyAC.Float32, firstLogOfDay.PvProducedLifetimeEnergyAC.Float32)
 	r.LoadPvConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.LoadPvConsumedLifetimeEnergyAC.Float32, firstLogOfDay.LoadPvConsumedLifetimeEnergyAC.Float32)
-	r.LoadPvConsumedEnergyPercentAC = utils.Percent(
-		r.LoadPvConsumedLifetimeEnergyACDiff,
-		utils.Diff(latestLog.PvProducedLifetimeEnergyAC.Float32, firstLogOfDay.PvProducedLifetimeEnergyAC.Float32))
 	r.BatteryPvConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.BatteryPvConsumedLifetimeEnergyAC.Float32, firstLogOfDay.BatteryPvConsumedLifetimeEnergyAC.Float32)
+	r.GridPvConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.GridPvConsumedLifetimeEnergyAC.Float32, firstLogOfDay.GridPvConsumedLifetimeEnergyAC.Float32)
+	// Percent and value are recomputed by PvProducedLifetimeEnergyACDiff
+	sumOfPvConsumedLifetimeEnergyAC := r.LoadPvConsumedLifetimeEnergyACDiff + r.BatteryPvConsumedLifetimeEnergyACDiff + r.GridPvConsumedLifetimeEnergyACDiff
+	if sumOfPvConsumedLifetimeEnergyAC == 0 {
+		r.PvProducedLifetimeEnergyACDiff = 0
+	} else {
+		r.LoadPvConsumedLifetimeEnergyACDiff = r.PvProducedLifetimeEnergyACDiff * utils.Division(r.LoadPvConsumedLifetimeEnergyACDiff, sumOfPvConsumedLifetimeEnergyAC)
+		r.BatteryPvConsumedLifetimeEnergyACDiff = r.PvProducedLifetimeEnergyACDiff * utils.Division(r.BatteryPvConsumedLifetimeEnergyACDiff, sumOfPvConsumedLifetimeEnergyAC)
+		r.GridPvConsumedLifetimeEnergyACDiff = r.PvProducedLifetimeEnergyACDiff * utils.Division(r.GridPvConsumedLifetimeEnergyACDiff, sumOfPvConsumedLifetimeEnergyAC)
+	}
+	r.LoadPvConsumedEnergyPercentAC = utils.Percent(
+		float32(r.LoadPvConsumedLifetimeEnergyACDiff),
+		utils.Diff(latestLog.PvProducedLifetimeEnergyAC.Float32, firstLogOfDay.PvProducedLifetimeEnergyAC.Float32))
 	r.BatteryPvConsumedEnergyPercentAC = utils.Percent(
 		r.BatteryPvConsumedLifetimeEnergyACDiff,
 		utils.Diff(latestLog.PvProducedLifetimeEnergyAC.Float32, firstLogOfDay.PvProducedLifetimeEnergyAC.Float32))
-	r.GridPvConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.GridPvConsumedLifetimeEnergyAC.Float32, firstLogOfDay.GridPvConsumedLifetimeEnergyAC.Float32)
 	r.GridPvConsumedEnergyPercentAC = utils.Percent(
 		r.GridPvConsumedLifetimeEnergyACDiff,
 		utils.Diff(latestLog.PvProducedLifetimeEnergyAC.Float32, firstLogOfDay.PvProducedLifetimeEnergyAC.Float32))
+
 	var sumOfPvEnergyCostSavings, sumOfPvCo2Savings float32
 	for _, logOfMonth := range logsOfMonth {
 		sumOfPvEnergyCostSavings = sumOfPvEnergyCostSavings + logOfMonth.PvEnergyCostSavings.Float32

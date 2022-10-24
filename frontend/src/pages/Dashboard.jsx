@@ -108,8 +108,7 @@ export default connect(mapState)(function Dashboard(props) {
         setBattery({
             direction:
                 data.batteryChargingFrom ? "chargingFrom" : "dischargingTo",
-            target: (data.batteryChargingFrom || data.batteryDischargingTo)
-                .toLocaleLowerCase(),
+            target: (data.batteryChargingFrom || data.batteryDischargingTo),
             import: data.batteryGridAveragePowerAC,
             power: batteryPower,
             state: data.batterySoC

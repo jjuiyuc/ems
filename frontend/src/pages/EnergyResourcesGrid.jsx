@@ -85,9 +85,9 @@ export default connect(mapState)(function EnergyResourcesGrid(props) {
                 target: "origin"
             },
             pointBorderColor: colors.primary["main-opacity-20"],
-            hoverRadius: 2,
-            pointHoverBorderWidth: 2,
-            radius: 2
+            hoverRadius: 0,
+            pointHoverBorderWidth: 0,
+            radius: 0,
         }],
         labels,
         tickCallback: (val, index) => val + commonT("kw"),
@@ -143,7 +143,7 @@ export default connect(mapState)(function EnergyResourcesGrid(props) {
             parseInt(moment().hour(n).startOf("h").format("x")))
 
         const GridPowerUrl = `${urlPrefix}/power-state?`
-            + chartParams(lineChartGridPowertRes)
+            + chartParams(lineChartGridPowerRes)
         apiCall({
             onComplete: () => setLineChartGridPowerLoading(false),
             onError: error => setLineChartGridPowerError(error),

@@ -207,7 +207,7 @@
         "midPeak": "半尖峰時段電力",
         "offPeak": "離峰時段電力",
         "onPeak": "尖峰時段電力",
-        "source": "{type} 供給",
+        "source": "{type}供給",
         "superOffPeak": "超級離峰時段電力",
         "timeOfUse": "時間電價",
         "totalUntilNow": "截至當下",

@@ -135,10 +135,13 @@ type EnergyDistributionInfoResponse struct {
 
 // ComputedValues godoc
 func (r *EnergyDistributionInfoResponse) ComputedValues(firstLog, latestLog *deremsmodels.CCDataLog) {
-	r.AllProducedLifetimeEnergyACDiff = utils.Diff(latestLog.AllProducedLifetimeEnergyAC.Float32, firstLog.AllProducedLifetimeEnergyAC.Float32)
 	r.PvProducedLifetimeEnergyACDiff = utils.Diff(latestLog.PvProducedLifetimeEnergyAC.Float32, firstLog.PvProducedLifetimeEnergyAC.Float32)
 	r.GridProducedLifetimeEnergyACDiff = utils.Diff(latestLog.GridProducedLifetimeEnergyAC.Float32, firstLog.GridProducedLifetimeEnergyAC.Float32)
 	r.BatteryProducedLifetimeEnergyACDiff = utils.Diff(latestLog.BatteryProducedLifetimeEnergyAC.Float32, firstLog.BatteryProducedLifetimeEnergyAC.Float32)
+	r.AllProducedLifetimeEnergyACDiff =
+		r.PvProducedLifetimeEnergyACDiff +
+			r.GridProducedLifetimeEnergyACDiff +
+			r.BatteryProducedLifetimeEnergyACDiff
 	r.PvProducedEnergyPercentAC = utils.Percent(
 		r.PvProducedLifetimeEnergyACDiff,
 		r.AllProducedLifetimeEnergyACDiff)
@@ -148,10 +151,12 @@ func (r *EnergyDistributionInfoResponse) ComputedValues(firstLog, latestLog *der
 	r.BatteryProducedEnergyPercentAC = utils.Percent(
 		r.BatteryProducedLifetimeEnergyACDiff,
 		r.AllProducedLifetimeEnergyACDiff)
-	r.AllConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.AllConsumedLifetimeEnergyAC.Float32, firstLog.AllConsumedLifetimeEnergyAC.Float32)
-	r.LoadConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.LoadConsumedLifetimeEnergyAC.Float32, firstLog.LoadConsumedLifetimeEnergyAC.Float32)
+	r.AllConsumedLifetimeEnergyACDiff = r.AllProducedLifetimeEnergyACDiff
 	r.GridConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.GridConsumedLifetimeEnergyAC.Float32, firstLog.GridConsumedLifetimeEnergyAC.Float32)
 	r.BatteryConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.BatteryConsumedLifetimeEnergyAC.Float32, firstLog.BatteryConsumedLifetimeEnergyAC.Float32)
+	r.LoadConsumedLifetimeEnergyACDiff = utils.ThreeDecimalPlaces(
+		r.AllConsumedLifetimeEnergyACDiff -
+			(r.GridConsumedLifetimeEnergyACDiff + r.BatteryConsumedLifetimeEnergyACDiff))
 	r.LoadConsumedEnergyPercentAC = utils.Percent(
 		r.LoadConsumedLifetimeEnergyACDiff,
 		r.AllConsumedLifetimeEnergyACDiff)

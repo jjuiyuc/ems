@@ -11,11 +11,13 @@ export default function EnergyCard(props) {
         t = useTranslation(),
         commonT = string => t("common." + string)
 
-    const { kwh, types } = props.data
+    const { kwh, types, color } = props.data
 
     return <div className="card energyCard">
         <div className="flex flex-wrap items-baseline mb-8">
-            <h2 className="mr-2 whitespace-nowrap">{kwh} {commonT("kwh")}</h2>
+            <h2 className={"mr-2 whitespace-nowrap " + (color || "")}>
+                {kwh} {commonT("kwh")}
+            </h2>
             <h5 className="font-bold">{props.title}</h5>
         </div>
         <div className="flex h-2 overflow-hidden rounded-full w-full bg-gray-600">

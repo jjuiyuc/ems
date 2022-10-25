@@ -111,7 +111,7 @@
             "chartError": "Can't get chart data",
             "discharged": "Discharged",
             "infoError": "Can't get battery info",
-            "lifetime": "Lifetime",
+            "accumulated": "Accumulated",
             "modal": "Modal",
             "percentage": "Percentage",
             "powerSources": "Power Sources",

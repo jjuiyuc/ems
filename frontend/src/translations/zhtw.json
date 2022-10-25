@@ -7,10 +7,10 @@
         "chargeToBattery": "電池充電",
         "custom": "自訂",
         "days": "日",
-        "directSolarSupply": "太陽能直接供應",
+        "directSolarSupply": "太陽能直供",
         "endDate": "結束日期",
-        "energyDestinationsTotal": "電能去向",
-        "energySourcesTotal": "電能來源",
+        "energyDestinationsTotal": "電力去向",
+        "energySourcesTotal": "電力來源",
         "exportToGrid": "回送市電",
         "importFromGrid": "市電輸入",
         "load": "用電負載",
@@ -67,7 +67,7 @@
         "demandDetails": "即時負載 (kW)",
         "infoError": "無法取得資料",
         "lastMonthBillingCycle": "前一計費週期",
-        "realizedSavings": "已避免罰款"
+        "realizedSavings": "已避免超約費用"
     },
     "economics": {
         "ancillaryServices": "輔助服務",
@@ -111,7 +111,7 @@
             "chartError": "無法取得圖表資料",
             "discharged": "累積放電量",
             "infoError": "無法取得電池資料",
-            "lifetime": "全生命週期",
+            "accumulated": "累計",
             "modal": "型號",
             "percentage": "百分比",
             "powerSources": "充電來源",
@@ -142,7 +142,7 @@
             "realTimeSolarGeneration": "即時太陽能發電功率 (kW)",
             "solarGeneration": "太陽能發電",
             "thisCalendarMonth": "當月",
-            "totalSolarEnergyGeneration": "太電能發電量"
+            "totalSolarEnergyGeneration": "太陽電能發電量"
         }
     },
     "error": {

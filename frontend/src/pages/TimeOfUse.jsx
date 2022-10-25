@@ -93,7 +93,7 @@ export default connect(mapState)(function TimeOfUse(props) {
                 { kwh: 20, percentage: 40, type: "battery" },
             ],
             kwh: 50,
-            color: "text-negative-main"
+            color: "text-red-main"
         }),
         [offPeak, setOffPeak] = useState({
             types: [

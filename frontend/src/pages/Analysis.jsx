@@ -205,8 +205,8 @@ export default connect(mapState)(function Analysis(props) {
         [infoLoading, setInfoLoading] = useState(false),
         [energySourcesTotal, setEnergySourcesTotal] = useState({
             types: [
-                { kwh: 0, percentage: 0, type: "directSolarSupply" },
                 { kwh: 0, percentage: 0, type: "importFromGrid" },
+                { kwh: 0, percentage: 0, type: "directSolarSupply" },
                 { kwh: 0, percentage: 0, type: "batteryDischarge" },
             ],
             kwh: 0
@@ -246,14 +246,14 @@ export default connect(mapState)(function Analysis(props) {
                     setEnergySourcesTotal({
                         types: [
                             {
-                                kwh: data.pvProducedLifetimeEnergyACDiff,
-                                percentage: data.pvProducedEnergyPercentAC,
-                                type: "directSolarSupply"
-                            },
-                            {
                                 kwh: data.gridProducedLifetimeEnergyACDiff,
                                 percentage: data.gridProducedEnergyPercentAC,
                                 type: "importFromGrid"
+                            },
+                            {
+                                kwh: data.pvProducedLifetimeEnergyACDiff,
+                                percentage: data.pvProducedEnergyPercentAC,
+                                type: "directSolarSupply"
                             },
                             {
                                 kwh: data.batteryProducedLifetimeEnergyACDiff,

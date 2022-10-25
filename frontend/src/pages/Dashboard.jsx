@@ -41,7 +41,7 @@ const Card = props => {
                         gap-y-6 sm:gap-y-8">
             <div className="flex flex-wrap sm:col-span-2 items-center">
                 <IconSet icon={props.icon} size="10" />
-                <h5 className="font-bold ml-3 text-lg">{title}</h5>
+                <h5 className="font-bold ml-3 text-2xl">{title}</h5>
             </div>
             {data.map((item, i) =>
                 <div key={"d-c-d-" + i}>
@@ -178,35 +178,35 @@ export default connect(mapState)(function Dashboard(props) {
 
     const
         batteryData = [
-            { name: commonT("stateOfCharge"), value: `${battery.state}%` },
+            { name: commonT("stateOfCharge"), value: `${battery?.state}%` },
             {
                 name: commonT("batteryPower"),
-                value: `${battery.power} ${commonT("kw")}`
+                value: `${battery?.power} ${commonT("kw")}`
             },
             {
                 name: commonT("importFromGrid"),
-                value: `${battery.import} ${commonT("kw")}`
+                value: `${battery?.import} ${commonT("kw")}`
             },
-            { name: pageT(battery.direction), value: battery.target || "-" }
+            { name: pageT(battery?.direction), value: battery?.target || "-" }
         ],
         loadData = [
-            { name: pageT("solar"), value: `${load.solar} ${commonT("kw")}` },
-            { name: pageT("batteryDischarge"), value: `${load.discharge} ${commonT("kw")}` },
+            { name: pageT("solar"), value: `${load?.solar} ${commonT("kw")}` },
+            { name: pageT("batteryDischarge"), value: `${load?.discharge} ${commonT("kw")}` },
             {
                 name: pageT("importFromGrid"),
-                value: `${load.import} ${commonT("kw")}`
+                value: `${load?.import} ${commonT("kw")}`
             }
         ],
         solarData = [
             {
                 name: pageT("directConsumption"),
-                value: `${solar.consume} ${commonT("kw")}`
+                value: `${solar?.consume} ${commonT("kw")}`
             },
             {
                 name: pageT("chargeToBattery"),
-                value: `${solar.charge} ${commonT("kw")}`
+                value: `${solar?.charge} ${commonT("kw")}`
             },
-            { name: commonT("exportToGrid"), value: `${solar.export} ${commonT("kw")}` },
+            { name: commonT("exportToGrid"), value: `${solar?.export} ${commonT("kw")}` },
         ]
 
     const

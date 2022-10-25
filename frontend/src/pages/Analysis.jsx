@@ -51,9 +51,9 @@ export default connect(mapState)(function Analysis(props) {
                 },
                 id: "load",
                 pointBorderColor: colors.green["main-opacity-20"],
-                hoverRadius: 2,
-                pointHoverBorderWidth: 2,
-                radius: 2,
+                hoverRadius: 0,
+                pointHoverBorderWidth: 0,
+                radius: 0,
                 label: pageT("load")
             },
             {
@@ -67,9 +67,9 @@ export default connect(mapState)(function Analysis(props) {
                 },
                 id: "solar",
                 pointBorderColor: colors.yellow["main-opacity-20"],
-                hoverRadius: 2,
-                pointHoverBorderWidth: 2,
-                radius: 2,
+                hoverRadius: 0,
+                pointHoverBorderWidth: 0,
+                radius: 0,
                 label: commonT("solar")
             },
             {
@@ -83,9 +83,9 @@ export default connect(mapState)(function Analysis(props) {
                 },
                 id: "battery",
                 pointBorderColor: colors.blue["main-opacity-20"],
-                hoverRadius: 2,
-                pointHoverBorderWidth: 2,
-                radius: 2,
+                hoverRadius: 0,
+                pointHoverBorderWidth: 0,
+                radius: 0,
                 label: commonT("battery")
             },
             {
@@ -99,9 +99,9 @@ export default connect(mapState)(function Analysis(props) {
                 },
                 id: "grid",
                 pointBorderColor: colors.indigo["main-opacity-20"],
-                hoverRadius: 2,
-                pointHoverBorderWidth: 2,
-                radius: 2,
+                hoverRadius: 0,
+                pointHoverBorderWidth: 0,
+                radius: 0,
                 label: commonT("grid")
             }
         ],
@@ -111,7 +111,7 @@ export default connect(mapState)(function Analysis(props) {
         tooltipLabel: item => `${item.dataset.label} ${item.parsed.y} `
             + commonT("kw"),
         x: { grid: { lineWidth: 0 } },
-        y: { max: 60, min: -60 }
+        y: { max: 30, min: -30 }
     })
     const chartAccumulatedPowerSet = ({ data, labels }) => ({
         datasets: [
@@ -169,7 +169,10 @@ export default connect(mapState)(function Analysis(props) {
                 above: colors.primary["main-opacity-10"],
                 target: "origin"
             },
-            pointBorderColor: colors.primary["main-opacity-20"]
+            pointBorderColor: colors.primary["main-opacity-20"],
+            hoverRadius: 0,
+            pointHoverBorderWidth: 0,
+            radius: 0
         }],
         labels,
         tickCallback: (val, index) => val + "%",

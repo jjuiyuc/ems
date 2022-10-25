@@ -58,14 +58,14 @@ const chartPowerSet = ({ data, highPeak, labels, unit }) => ({
             target: "origin"
         },
         pointBorderColor: colors.blue["main-opacity-20"],
-        hoverRadius: 2,
-        pointHoverBorderWidth: 2,
-        radius: 2,
+        hoverRadius: 0,
+        pointHoverBorderWidth: 0,
+        radius: 0
     }],
     labels,
     tickCallback: (val, index) => val + " " + unit,
     tooltipLabel: item => `${item.parsed.y} ${unit}`,
-    y: { max: 15, min: -15 },
+    y: { max: 25, min: -25 },
     x: {
         max: moment().add(1, "day").startOf("day"),
         min: moment().startOf("day")
@@ -125,9 +125,9 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
                 },
                 id: "charge",
                 pointBorderColor: colors.blue["main-opacity-20"],
-                hoverRadius: 2,
-                pointHoverBorderWidth: 2,
-                radius: 2,
+                hoverRadius: 0,
+                pointHoverBorderWidth: 0,
+                radius: 0,
                 label: pageT("soc")
             },
             {
@@ -140,9 +140,9 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
                 },
                 id: "voltage",
                 pointBorderColor: colors.primary["main-opacity-20"],
-                hoverRadius: 2,
-                pointHoverBorderWidth: 2,
-                radius: 2,
+                hoverRadius: 0,
+                pointHoverBorderWidth: 0,
+                radius: 0,
                 label: pageT("voltage"),
                 yAxisID: "y1"
             },

@@ -34,6 +34,7 @@
         "grid": "Grid",
         "inactive":"Inactive",
         "importFromGrid": "Import from Grid",
+        "load": "Load",
         "logIn": "Log In",
         "logOut": "Log Out",
         "kw": "kW",

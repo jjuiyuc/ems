@@ -1,12 +1,12 @@
 import { useTranslation } from "react-multi-lang"
 
-import { ReactComponent as GridExportIcon } from "../assets/icons/grid_export.svg"
 import { ReactComponent as GridImportIcon } from "../assets/icons/grid_import.svg"
+import { ReactComponent as GridExportIcon } from "../assets/icons/grid_export.svg"
 import { ReactComponent as NetExportIcon } from "../assets/icons/emergy_export.svg"
 
 const icons = {
-    exportToGrid: GridExportIcon,
     importFromGrid: GridImportIcon,
+    exportToGrid: GridExportIcon,
     netImport: NetExportIcon
 }
 

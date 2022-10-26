@@ -102,6 +102,7 @@
     },
     "energyResources": {
         "battery": {
+            "accumulated": "Accumulated",
             "batteryInformation": "Battery Information",
             "batteryOperationCycles": "Battery Operation Cycles",
             "batteryPower": "Battery Power (kW)",
@@ -111,7 +112,6 @@
             "chartError": "Can't get chart data",
             "discharged": "Discharged",
             "infoError": "Can't get battery info",
-            "lifetime": "Lifetime",
             "modal": "Modal",
             "percentage": "Percentage",
             "powerSources": "Power Sources",

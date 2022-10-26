@@ -32,9 +32,9 @@ export default connect(mapState)(function TimeOfUse(props) {
         <span className="inline-block mr-1">
             {pageT("source", { type: pageT(source) })}
         </span>
-        <span className="inline-block">
+        {/* <span className="inline-block">
             ({pageT("totalUntilNow")})
-        </span>
+        </span> */}
     </>
 
     const
@@ -93,7 +93,8 @@ export default connect(mapState)(function TimeOfUse(props) {
                 { kwh: 52, percentage: 50, type: "solar" },
                 { kwh: 20, percentage: 40, type: "battery" },
             ],
-            kwh: 50
+            kwh: 50,
+            color: "text-negative-main"
         }),
         [offPeak, setOffPeak] = useState({
             types: [
@@ -101,7 +102,8 @@ export default connect(mapState)(function TimeOfUse(props) {
                 { kwh: 25, percentage: 41, type: "solar" },
                 { kwh: 25, percentage: 41, type: "battery" },
             ],
-            kwh: 60
+            kwh: 60,
+            color: "text-green-main"
         }),
         [prices, setPrices]
             = useState({ onPeak: 0, midPeak: 0, offPeak: 0, superOffPeak: 0 }),
@@ -185,8 +187,6 @@ export default connect(mapState)(function TimeOfUse(props) {
         setPrices(prices)
     }, [timeOfUse])
 
-
-
     useEffect(() => {
         if (!props.gatewayID) return
         const startTime = moment().startOf("day").toISOString()
@@ -203,14 +203,11 @@ export default connect(mapState)(function TimeOfUse(props) {
                 setBatteryStatus({
                     direction:
                         data.batteryChargingFrom ? "chargingFrom" : "dischargingTo",
-                    target: (data.batteryChargingFrom || data.batteryDischargingTo)
-                        .toLocaleLowerCase(),
+                    target: (data.batteryChargingFrom || data.batteryDischargingTo),
                     power: (data.batteryProducedAveragePowerAC
                         + data.batteryConsumedAveragePowerAC || 0),
                     state: (data.batterySoC || 0)
                 })
-
-
             },
             url: `/api/${props.gatewayID}/devices/battery/usage-info?startTime=${startTime}`
         })

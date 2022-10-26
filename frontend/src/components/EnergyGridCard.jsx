@@ -5,8 +5,8 @@ import { ReactComponent as GridImportIcon } from "../assets/icons/grid_import.sv
 import { ReactComponent as NetExportIcon } from "../assets/icons/emergy_export.svg"
 
 const icons = {
-    exportToGrid: GridExportIcon,
     importFromGrid: GridImportIcon,
+    exportToGrid: GridExportIcon,
     netImport: NetExportIcon
 }
 

@@ -64,8 +64,8 @@ export default connect(mapState)(function EnergyResourcesGrid(props) {
         [infoError, setInfoError] = useState(""),
         [infoLoading, setInfoLoading] = useState(false),
         [todayGrid, setTodayGrid] = useState([
-            { kwh: 0, type: "exportToGrid" },
             { kwh: 0, type: "importFromGrid" },
+            { kwh: 0, type: "exportToGrid" },
             { kwh: 0, type: "netImport" }
         ]),
         [thisMonth, setThisMonth] = useState(0),
@@ -93,7 +93,6 @@ export default connect(mapState)(function EnergyResourcesGrid(props) {
         tickCallback: (val, index) => val + commonT("kw"),
         tooltipLabel: item =>
             `${item.parsed.y} ${commonT("kw")}`,
-        y: { max: 40, min: 0 },
         x: {
             max: moment().add(1, "day").startOf("day"),
             min: moment().startOf("day")
@@ -122,12 +121,12 @@ export default connect(mapState)(function EnergyResourcesGrid(props) {
                 const { data } = rawData
                 setTodayGrid([
                     {
-                        kwh: data.gridConsumedLifetimeEnergyACDiff,
-                        type: "exportToGrid"
-                    },
-                    {
                         kwh: data.gridProducedLifetimeEnergyACDiff,
                         type: "importFromGrid"
+                    },
+                    {
+                        kwh: data.gridConsumedLifetimeEnergyACDiff,
+                        type: "exportToGrid"
                     },
                     {
                         kwh: data.gridLifetimeEnergyACDiff,

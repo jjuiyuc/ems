@@ -65,7 +65,7 @@ const chartPowerSet = ({ data, highPeak, labels, unit }) => ({
     labels,
     tickCallback: (val, index) => val + " " + unit,
     tooltipLabel: item => `${item.parsed.y} ${unit}`,
-    y: { max: 25, min: -25 },
+    // y: { max: 25, min: -25 },
     x: {
         max: moment().add(1, "day").startOf("day"),
         min: moment().startOf("day")
@@ -182,13 +182,13 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
 
                 setBatteryPower(data.batteryPower || 0)
                 setCapacity(data.capcity || 0)
-                setChargedLifetime(data.batteryConsumedLifetimeEnergyAC || 0)
+                setChargedLifetime(data.batteryConsumedLifetimeEnergyAC.toFixed(1) || 0)
                 setChargedToday(data.batteryConsumedLifetimeEnergyACDiff || 0)
                 setChargingState(data.batterySoC || 0)
-                setDischargedLifetime(data.batteryProducedLifetimeEnergyAC || 0)
+                setDischargedLifetime(data.batteryProducedLifetimeEnergyAC.toFixed(1) || 0)
                 setDischargedToday(data.batteryProducedLifetimeEnergyACDiff || 0)
                 setCyclesToday(data.batteryLifetimeOperationCyclesDiff || 0)
-                setCyclesLifetime(data.batteryLifetimeOperationCycles || 0)
+                setCyclesLifetime(data.batteryLifetimeOperationCycles.toFixed(1) || 0)
                 setModal(data.model || "-")
                 setPowerSources(data.powerSources || "-")
                 setVoltage(data.voltage || 0)
@@ -280,7 +280,7 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
                 value: `${chargedToday} ${commonT("kwh")}`
             },
             {
-                title: pageT("lifetime"),
+                title: pageT("accumulated"),
                 value: `${chargedLifetime} ${commonT("kwh")}`
             }
         ],
@@ -290,7 +290,7 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
         }],
         cycles: [
             { title: commonT("today"), value: cyclesToday },
-            { title: pageT("lifetime"), value: cyclesLifetime }
+            { title: pageT("accumulated"), value: cyclesLifetime }
         ],
         discharged: [
             {
@@ -298,7 +298,7 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
                 value: `${dischargedToday} ${commonT("kwh")}`
             },
             {
-                title: pageT("lifetime"),
+                title: pageT("accumulated"),
                 value: `${dischargedLifetime} ${commonT("kwh")}`
             }
         ]

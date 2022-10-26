@@ -20,6 +20,7 @@ module.exports = {
             colors: { ...palette },
             fontSize: {
                 "13px": ".8125rem",
+                "22px": "1.375rem",
                 "28px": "1.75rem",
                 "3.5xl": "2rem"
             },

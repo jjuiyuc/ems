@@ -66,7 +66,7 @@ export default function BatteryStatusCard({ data }) {
                     </span>
                 </div>
                 <div>
-                    <h3 className="text-22px">{data.target ? commonT(data.target) : "-"}</h3>
+                    <h3 className="text-22px">{data.target ? data.target : "-"}</h3>
                     <span className="text-13px">
                         {pageT(data.direction)}
                     </span>

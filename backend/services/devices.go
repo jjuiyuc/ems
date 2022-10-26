@@ -852,6 +852,9 @@ func (s defaultDevicesService) getLatestAccumulatedInfo(gwUUID, resolution strin
 }
 
 func (s defaultDevicesService) getLatestComputedDemandState(gwUUID string, startTimeIndex, endTimeIndex, endTime time.Time) (latestComputedDemandState *LatestComputedDemandState) {
+	if endTimeIndex == endTime && startTimeIndex.Add(15*time.Minute).Unix() > endTimeIndex.Unix() {
+		return nil
+	}
 	latestComputedDemandState = &LatestComputedDemandState{}
 	firstLog, err1 := s.repo.CCData.GetFirstLog(gwUUID, startTimeIndex, endTimeIndex)
 	latestLog, err2 := s.repo.CCData.GetLatestLog(gwUUID, startTimeIndex, endTimeIndex)

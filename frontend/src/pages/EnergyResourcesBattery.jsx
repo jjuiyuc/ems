@@ -65,7 +65,7 @@ const chartPowerSet = ({ data, highPeak, labels, unit }) => ({
     labels,
     tickCallback: (val, index) => val + " " + unit,
     tooltipLabel: item => `${item.parsed.y} ${unit}`,
-    y: { max: 25, min: -25 },
+    // y: { max: 25, min: -25 },
     x: {
         max: moment().add(1, "day").startOf("day"),
         min: moment().startOf("day")

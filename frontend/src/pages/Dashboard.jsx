@@ -41,7 +41,7 @@ const Card = props => {
                         gap-y-6 sm:gap-y-8">
             <div className="flex flex-wrap sm:col-span-2 items-center">
                 <IconSet icon={props.icon} size="10" />
-                <h5 className="font-bold ml-3">{title}</h5>
+                <h5 className="font-bold ml-3 text-lg">{title}</h5>
             </div>
             {data.map((item, i) =>
                 <div key={"d-c-d-" + i}>

@@ -419,32 +419,57 @@ func (s defaultDevicesService) GetLatestDevicesEnergyInfo(gwUUID string) (logTim
 		GridProducedAveragePowerAC:    Float32Format(latestLog.GridProducedAveragePowerAC.Float32),
 		GridConsumedAveragePowerAC:    Float32Format(latestLog.GridConsumedAveragePowerAC.Float32),
 	}
-	if err = json.Unmarshal(latestLog.LoadLinks.JSON, &devicesEnergyInfo.LoadLinks); err != nil {
+	if err1 := json.Unmarshal(latestLog.LoadLinks.JSON, &devicesEnergyInfo.LoadLinks); err1 != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "json.Unmarshal: loadLinksValue",
-			"err":       err,
+			"err1":      err1,
 		}).Error()
-		return
 	}
-	if err = json.Unmarshal(latestLog.GridLinks.JSON, &devicesEnergyInfo.GridLinks); err != nil {
+	if devicesEnergyInfo.LoadLinks == nil {
+		devicesEnergyInfo.LoadLinks = map[string]interface{}{
+			"pv":      0,
+			"grid":    0,
+			"battery": 0,
+		}
+	}
+	if err1 := json.Unmarshal(latestLog.GridLinks.JSON, &devicesEnergyInfo.GridLinks); err1 != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "json.Unmarshal: gridLinksValue",
-			"err":       err,
+			"err1":      err1,
 		}).Error()
-		return
 	}
-	if err = json.Unmarshal(latestLog.PvLinks.JSON, &devicesEnergyInfo.PVLinks); err != nil {
+	if devicesEnergyInfo.GridLinks == nil {
+		devicesEnergyInfo.GridLinks = map[string]interface{}{
+			"pv":      0,
+			"load":    0,
+			"battery": 0,
+		}
+	}
+	if err1 := json.Unmarshal(latestLog.PvLinks.JSON, &devicesEnergyInfo.PVLinks); err1 != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "json.Unmarshal: pvLinksValue",
-			"err":       err,
+			"err1":      err1,
 		}).Error()
-		return
 	}
-	if err = json.Unmarshal(latestLog.BatteryLinks.JSON, &devicesEnergyInfo.BatteryLinks); err != nil {
+	if devicesEnergyInfo.PVLinks == nil {
+		devicesEnergyInfo.PVLinks = map[string]interface{}{
+			"grid":    0,
+			"load":    0,
+			"battery": 0,
+		}
+	}
+	if err1 := json.Unmarshal(latestLog.BatteryLinks.JSON, &devicesEnergyInfo.BatteryLinks); err1 != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "json.Unmarshal: batteryLinksValue",
-			"err":       err,
+			"err1":      err1,
 		}).Error()
+	}
+	if devicesEnergyInfo.BatteryLinks == nil {
+		devicesEnergyInfo.BatteryLinks = map[string]interface{}{
+			"pv":   0,
+			"grid": 0,
+			"load": 0,
+		}
 	}
 	return
 }

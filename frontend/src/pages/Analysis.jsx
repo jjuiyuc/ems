@@ -139,7 +139,6 @@ export default connect(mapState)(function Analysis(props) {
         labels,
         tooltipLabel: item =>
             `${item.dataset.label} ${item.parsed.y} ${commonT("kwh")}`,
-        y: { min: 0 },
         x: {
             time: tab === "year"
                 ? {

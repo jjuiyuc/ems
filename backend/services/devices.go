@@ -138,10 +138,10 @@ func (r *EnergyDistributionInfoResponse) ComputedValues(firstLog, latestLog *der
 	r.PvProducedLifetimeEnergyACDiff = utils.Diff(latestLog.PvProducedLifetimeEnergyAC.Float32, firstLog.PvProducedLifetimeEnergyAC.Float32)
 	r.GridProducedLifetimeEnergyACDiff = utils.Diff(latestLog.GridProducedLifetimeEnergyAC.Float32, firstLog.GridProducedLifetimeEnergyAC.Float32)
 	r.BatteryProducedLifetimeEnergyACDiff = utils.Diff(latestLog.BatteryProducedLifetimeEnergyAC.Float32, firstLog.BatteryProducedLifetimeEnergyAC.Float32)
-	r.AllProducedLifetimeEnergyACDiff =
+	r.AllProducedLifetimeEnergyACDiff = utils.ThreeDecimalPlaces(
 		r.PvProducedLifetimeEnergyACDiff +
 			r.GridProducedLifetimeEnergyACDiff +
-			r.BatteryProducedLifetimeEnergyACDiff
+			r.BatteryProducedLifetimeEnergyACDiff)
 	r.PvProducedEnergyPercentAC = utils.Percent(
 		r.PvProducedLifetimeEnergyACDiff,
 		r.AllProducedLifetimeEnergyACDiff)

@@ -280,7 +280,7 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
                 value: `${chargedToday} ${commonT("kwh")}`
             },
             {
-                title: pageT("lifetime"),
+                title: pageT("accumulated"),
                 value: `${chargedLifetime} ${commonT("kwh")}`
             }
         ],
@@ -290,7 +290,7 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
         }],
         cycles: [
             { title: commonT("today"), value: cyclesToday },
-            { title: pageT("lifetime"), value: cyclesLifetime }
+            { title: pageT("accumulated"), value: cyclesLifetime }
         ],
         discharged: [
             {
@@ -298,7 +298,7 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
                 value: `${dischargedToday} ${commonT("kwh")}`
             },
             {
-                title: pageT("lifetime"),
+                title: pageT("accumulated"),
                 value: `${dischargedLifetime} ${commonT("kwh")}`
             }
         ]

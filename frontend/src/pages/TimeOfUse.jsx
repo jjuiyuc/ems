@@ -185,8 +185,6 @@ export default connect(mapState)(function TimeOfUse(props) {
         setPrices(prices)
     }, [timeOfUse])
 
-
-
     useEffect(() => {
         if (!props.gatewayID) return
         const startTime = moment().startOf("day").toISOString()
@@ -203,14 +201,11 @@ export default connect(mapState)(function TimeOfUse(props) {
                 setBatteryStatus({
                     direction:
                         data.batteryChargingFrom ? "chargingFrom" : "dischargingTo",
-                    target: (data.batteryChargingFrom || data.batteryDischargingTo)
-                        .toLocaleLowerCase(),
+                    target: (data.batteryChargingFrom || data.batteryDischargingTo),
                     power: (data.batteryProducedAveragePowerAC
                         + data.batteryConsumedAveragePowerAC || 0),
                     state: (data.batterySoC || 0)
                 })
-
-
             },
             url: `/api/${props.gatewayID}/devices/battery/usage-info?startTime=${startTime}`
         })

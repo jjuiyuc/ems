@@ -577,6 +577,9 @@ func (s defaultDevicesService) GetDemandState(param *app.PeriodParam) (demandSta
 
 	for startTimeIndex.Before(param.Query.EndTime) {
 		latestComputedDemandState := s.getLatestComputedDemandState(param.GatewayUUID, startTimeIndex, endTimeIndex, param.Query.EndTime)
+		if latestComputedDemandState == nil {
+			break
+		}
 		log.Debug("latestComputedDemandState: ", latestComputedDemandState)
 		demandState.Timestamps = append(demandState.Timestamps, latestComputedDemandState.Timestamps)
 		demandState.GridLifetimeEnergyACDiffToPowers = append(demandState.GridLifetimeEnergyACDiffToPowers, latestComputedDemandState.GridLifetimeEnergyACDiffToPower)
@@ -733,6 +736,9 @@ func (s defaultDevicesService) getRealtimeInfo(param *app.ZoomableParam) (realti
 
 	for startTimeIndex.Before(param.Query.EndTime) {
 		latestRealtimeInfo := s.getLatestRealtimeInfo(param.GatewayUUID, startTimeIndex, endTimeIndex, param.Query.EndTime)
+		if latestRealtimeInfo == nil {
+			break
+		}
 		log.Debug("latestRealtimeInfo.LogDate: ", latestRealtimeInfo.LogDate)
 		realtimeInfo.Timestamps = append(realtimeInfo.Timestamps, int(latestRealtimeInfo.LogDate.Unix()))
 		realtimeInfo.LoadAveragePowerACs = append(realtimeInfo.LoadAveragePowerACs, latestRealtimeInfo.LoadAveragePowerAC.Float32)
@@ -763,6 +769,9 @@ func (s defaultDevicesService) getAccumulatedInfo(param *app.ResolutionWithPerio
 
 	for startTimeIndex.Before(param.Query.EndTime) {
 		latestAccumulatedInfo := s.getLatestAccumulatedInfo(param.GatewayUUID, param.Query.Resolution, startTimeIndex, endTimeIndex, param.Query.EndTime)
+		if latestAccumulatedInfo == nil {
+			break
+		}
 		log.Debug("latestAccumulatedInfo: ", latestAccumulatedInfo)
 		accumulatedInfo.Timestamps = append(accumulatedInfo.Timestamps, latestAccumulatedInfo.Timestamps)
 		accumulatedInfo.LoadConsumedLifetimeEnergyACDiffs = append(accumulatedInfo.LoadConsumedLifetimeEnergyACDiffs, latestAccumulatedInfo.LoadConsumedLifetimeEnergyACDiff)
@@ -794,6 +803,9 @@ func (s defaultDevicesService) getLatestRealtimeInfo(gwUUID string, startTimeInd
 			"startTimeIndex": startTimeIndex,
 			"endTimeIndex":   endTimeIndex,
 		}).Error()
+		if endTimeIndex == endTime {
+			return nil
+		}
 		latestLog = &deremsmodels.CCDataLog{
 			LogDate: endTimeIndex.Add(-1 * time.Second),
 		}
@@ -811,6 +823,9 @@ func (s defaultDevicesService) getLatestAccumulatedInfo(gwUUID, resolution strin
 			"startTimeIndex": startTimeIndex,
 			"endTimeIndex":   endTimeIndex,
 		}).Error()
+		if endTimeIndex == endTime {
+			return nil
+		}
 		latestAccumulatedInfo.Timestamps = int(endTimeIndex.Add(-1 * time.Second).Unix())
 		return
 	}
@@ -848,6 +863,9 @@ func (s defaultDevicesService) getLatestComputedDemandState(gwUUID string, start
 			"startTimeIndex": startTimeIndex,
 			"endTimeIndex":   endTimeIndex,
 		}).Error()
+		if endTimeIndex == endTime {
+			return nil
+		}
 		latestComputedDemandState.Timestamps = int(endTimeIndex.Add(-1 * time.Second).Unix())
 		return
 	}

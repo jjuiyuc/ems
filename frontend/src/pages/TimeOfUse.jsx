@@ -13,7 +13,6 @@ import EnergyCard from "../components/EnergyCard"
 import LineChart from "../components/LineChart"
 
 import { ReactComponent as EditIcon } from "../assets/icons/edit.svg"
-import { common } from "@mui/material/colors"
 
 const { colors } = variables
 

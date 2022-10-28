@@ -115,6 +115,6 @@ export default function Settings(props) {
                 </div>
             </div>
         </div>
-        <TimeOfUseCard />
+        <TimeOfUseCard data={clockDataset} />
     </>
 }

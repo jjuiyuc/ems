@@ -769,9 +769,6 @@ func (s defaultDevicesService) getAccumulatedInfo(param *app.ResolutionWithPerio
 
 	for startTimeIndex.Before(param.Query.EndTime) {
 		latestAccumulatedInfo := s.getLatestAccumulatedInfo(param.GatewayUUID, param.Query.Resolution, startTimeIndex, endTimeIndex, param.Query.EndTime)
-		if latestAccumulatedInfo == nil {
-			break
-		}
 		log.Debug("latestAccumulatedInfo: ", latestAccumulatedInfo)
 		accumulatedInfo.Timestamps = append(accumulatedInfo.Timestamps, latestAccumulatedInfo.Timestamps)
 		accumulatedInfo.LoadConsumedLifetimeEnergyACDiffs = append(accumulatedInfo.LoadConsumedLifetimeEnergyACDiffs, latestAccumulatedInfo.LoadConsumedLifetimeEnergyACDiff)
@@ -823,9 +820,6 @@ func (s defaultDevicesService) getLatestAccumulatedInfo(gwUUID, resolution strin
 			"startTimeIndex": startTimeIndex,
 			"endTimeIndex":   endTimeIndex,
 		}).Error()
-		if endTimeIndex == endTime {
-			return nil
-		}
 		latestAccumulatedInfo.Timestamps = int(endTimeIndex.Add(-1 * time.Second).Unix())
 		return
 	}

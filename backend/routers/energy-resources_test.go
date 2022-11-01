@@ -132,8 +132,8 @@ var _ = Describe("EnergyResources", func() {
 			It("should be ok", func() {
 				prefixURL := fmt.Sprintf("/api/%s/devices/solar/power-state", fixtures.UtGateway.UUID)
 				seedUtURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, "hour", UtStartTime, UtEndTime)
-				expectedTimestamps := []int{1659543000, 1659549599, 1659553199, 1659556799, 1659557100}
-				expectedPvAveragePowerACs := []float32{40, 0, 0, 0, 40}
+				expectedTimestamps := []int{1659543000, 1659557100}
+				expectedPvAveragePowerACs := []float32{40, 40}
 				expectedResponseData := services.SolarPowerStateResponse{
 					Timestamps:        expectedTimestamps,
 					PvAveragePowerACs: expectedPvAveragePowerACs,
@@ -241,8 +241,8 @@ var _ = Describe("EnergyResources", func() {
 			It("should be ok", func() {
 				prefixURL := fmt.Sprintf("/api/%s/devices/battery/power-state", fixtures.UtGateway.UUID)
 				seedUtURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, "hour", UtStartTime, UtEndTime)
-				expectedTimestamps := []int{1659543000, 1659549599, 1659553199, 1659556799, 1659557100}
-				expectedBatteryAveragePowerACs := []float32{-3.5, 0, 0, 0, -7}
+				expectedTimestamps := []int{1659543000, 1659557100}
+				expectedBatteryAveragePowerACs := []float32{-3.5, -7}
 				expectedResponseData := services.BatteryPowerStateResponse{
 					Timestamps:             expectedTimestamps,
 					BatteryAveragePowerACs: expectedBatteryAveragePowerACs,
@@ -360,9 +360,9 @@ var _ = Describe("EnergyResources", func() {
 			It("should be ok", func() {
 				prefixURL := fmt.Sprintf("/api/%s/devices/battery/charge-voltage-state", fixtures.UtGateway.UUID)
 				seedUtURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, "hour", UtStartTime, UtEndTime)
-				expectedTimestamps := []int{1659543000, 1659549599, 1659553199, 1659556799, 1659557100}
-				expectedBatterySoCs := []float32{80, 0, 0, 0, 160}
-				expectedBatteryVoltages := []float32{28, 0, 0, 0, 56}
+				expectedTimestamps := []int{1659543000, 1659557100}
+				expectedBatterySoCs := []float32{80, 160}
+				expectedBatteryVoltages := []float32{28, 56}
 				expectedResponseData := services.BatteryChargeVoltageStateResponse{
 					Timestamps:      expectedTimestamps,
 					BatterySoCs:     expectedBatterySoCs,
@@ -463,8 +463,8 @@ var _ = Describe("EnergyResources", func() {
 			It("should be ok", func() {
 				prefixURL := fmt.Sprintf("/api/%s/devices/grid/power-state", fixtures.UtGateway.UUID)
 				seedUtURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, "hour", UtStartTime, UtEndTime)
-				expectedTimestamps := []int{1659543000, 1659549599, 1659553199, 1659556799, 1659557100}
-				expectedGridAveragePowerACs := []float32{50, 0, 0, 0, 50}
+				expectedTimestamps := []int{1659543000, 1659557100}
+				expectedGridAveragePowerACs := []float32{50, 50}
 				expectedResponseData := services.GridPowerStateResponse{
 					Timestamps:          expectedTimestamps,
 					GridAveragePowerACs: expectedGridAveragePowerACs,

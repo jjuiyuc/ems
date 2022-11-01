@@ -221,7 +221,7 @@ export default connect(mapState)(function Analysis(props) {
         [lineChartPower, setLineChartPower] = useState(null),
         [lineChartPowerError, setLineChartPowerError] = useState(""),
         [lineChartPowerLoading, setLineChartPowerLoading] = useState(false),
-        [lineChartPowertRes] = useState("5minute"),
+        [lineChartPowerRes] = useState("5minute"),
         [barChartData, setBarChartData] = useState(null),
         [barChartDataError, setBarChartDataError] = useState(""),
         [barChartDataLoading, setBarChartDataLoading] = useState(false),
@@ -289,7 +289,7 @@ export default connect(mapState)(function Analysis(props) {
         callLineChartPower = (startTime, endTime) => {
             const lineChartPowerUrl = `${urlPrefix}/power-state?`
                 + new URLSearchParams({
-                    startTime, endTime, resolution: lineChartPowertRes
+                    startTime, endTime, resolution: lineChartPowerRes
                 }).toString()
 
             apiCall({
@@ -389,11 +389,15 @@ export default connect(mapState)(function Analysis(props) {
         } else if (tab === "month") {
             startTime = moment().startOf("month").toISOString()
             endTime = moment().startOf("day").toISOString()
-
+            if (moment().get("date") == 1) {
+                startTime = moment().subtract(1, "month").startOf("month").toISOString()
+            }
         } else if (tab === "year") {
             startTime = moment().startOf("year").toISOString()
             endTime = moment().startOf("month").toISOString()
-
+            if (moment().get("date") == 1 && moment().get("month") == 0) {
+                startTime = moment().subtract(1, "year").startOf("year").toISOString()
+            }
         } else if (tab === "custom") {
             startTime = startDate ? moment(startDate).toISOString() : ""
             endTime = endDate ? moment(endDate).add(1, "day").startOf("day").toISOString() : ""

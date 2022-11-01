@@ -3,11 +3,11 @@ import { useState } from "react"
 import { useTranslation } from "react-multi-lang"
 
 import SettingCard from "../components/SettingCard"
+import TimeOfUseCard from "../components/TimeOfUseCard"
 
 import { ReactComponent as BatteryIcon } from "../assets/icons/battery.svg"
 import { ReactComponent as DemandCharge }
     from "../assets/icons/demand_charge_line.svg"
-import { ReactComponent as TimerIcon } from "../assets/icons/timer.svg"
 
 export default function Settings(props) {
     const
@@ -17,11 +17,46 @@ export default function Settings(props) {
     const
         [reservedForGridOutage, setReservedForGridOutage] = useState(85),
         [availableRegularUsage, setAvailableRegularUsage] = useState(15),
-        [backupReserve, setBackupReserve] = useState(100)
+        [backupReserve, setBackupReserve] = useState(100),
+        [clockDataset, setClockDataset] = useState({
+            data: [], backgroundColor: []
+        })
+    // [midPeak, setMidPeak] = useState({
+    //     types: [
+    //         { kwh: 7.5, percentage: 15, type: "grid" },
+    //         { kwh: 30, percentage: 60, type: "solar" },
+    //         { kwh: 12.5, percentage: 25, type: "battery" },
+    //     ],
+    //     kwh: 50
+    // }),
+    // [onPeak, setOnPeak] = useState({
+    //     types: [
+    //         { kwh: 5, percentage: 10, type: "grid" },
+    //         { kwh: 52, percentage: 50, type: "solar" },
+    //         { kwh: 20, percentage: 40, type: "battery" },
+    //     ],
+    //     kwh: 50
+    // }),
+    // [offPeak, setOffPeak] = useState({
+    //     types: [
+    //         { kwh: 10, percentage: 18, type: "grid" },
+    //         { kwh: 25, percentage: 41, type: "solar" },
+    //         { kwh: 25, percentage: 41, type: "battery" },
+    //     ],
+    //     kwh: 60
+    // }),
+    // [superOffPeak, setSuperOffPeak] = useState({
+    //     types: [
+    //         { kwh: 21, percentage: 35, type: "grid" },
+    //         { kwh: 24, percentage: 40, type: "solar" },
+    //         { kwh: 15, percentage: 25, type: "battery" },
+    //     ],
+    //     kwh: 60
+    // }),
 
     return <>
         <h1 className="mb-8">{pageT("settings")}</h1>
-        <div className="card ">
+        <div className="card mb-8">
             <div className="flex justify-between sm:col-span-2 items-center">
                 <div className="flex items-center">
                     <div
@@ -80,5 +115,6 @@ export default function Settings(props) {
                 </div>
             </div>
         </div>
+        <TimeOfUseCard data={clockDataset} />
     </>
 }

@@ -401,9 +401,6 @@ export default connect(mapState)(function Analysis(props) {
             startTime = startDate ? moment(startDate).toISOString() : ""
             endTime = endDate ? moment(endDate).add(1, "day").startOf("day").toISOString() : ""
         }
-        if (moment().get("day") == 0) {
-            startTime = moment().subtract(1, "week").startOf("week").toISOString()
-        }
         if (startTime && endTime) {
             callCards(startTime, endTime)
 

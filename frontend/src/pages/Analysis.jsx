@@ -221,7 +221,7 @@ export default connect(mapState)(function Analysis(props) {
         [lineChartPower, setLineChartPower] = useState(null),
         [lineChartPowerError, setLineChartPowerError] = useState(""),
         [lineChartPowerLoading, setLineChartPowerLoading] = useState(false),
-        [lineChartPowertRes] = useState("5minute"),
+        [lineChartPowerRes] = useState("5minute"),
         [barChartData, setBarChartData] = useState(null),
         [barChartDataError, setBarChartDataError] = useState(""),
         [barChartDataLoading, setBarChartDataLoading] = useState(false),
@@ -289,7 +289,7 @@ export default connect(mapState)(function Analysis(props) {
         callLineChartPower = (startTime, endTime) => {
             const lineChartPowerUrl = `${urlPrefix}/power-state?`
                 + new URLSearchParams({
-                    startTime, endTime, resolution: lineChartPowertRes
+                    startTime, endTime, resolution: lineChartPowerRes
                 }).toString()
 
             apiCall({

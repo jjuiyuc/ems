@@ -592,6 +592,22 @@ func (s defaultDevicesService) GetDemandState(param *app.PeriodParam) (demandSta
 			endTimeIndex = param.Query.EndTime
 		}
 	}
+
+	// avoid frontend error to send default line data for chart display
+	if demandState.Timestamps == nil {
+		startTimeIndex = param.Query.StartTime
+		endTimeIndex = param.Query.StartTime.Add(15 * time.Minute)
+		for startTimeIndex.Before(param.Query.EndTime) {
+			demandState.Timestamps = append(demandState.Timestamps, int(endTimeIndex.Add(-1*time.Second).Unix()))
+			demandState.GridLifetimeEnergyACDiffToPowers = append(demandState.GridLifetimeEnergyACDiffToPowers, 0)
+
+			startTimeIndex = endTimeIndex
+			endTimeIndex = startTimeIndex.Add(15 * time.Minute)
+			if endTimeIndex.After(param.Query.EndTime) {
+				endTimeIndex = param.Query.EndTime
+			}
+		}
+	}
 	return
 }
 
@@ -755,6 +771,32 @@ func (s defaultDevicesService) getRealtimeInfo(param *app.ZoomableParam) (realti
 		}
 		if endTimeIndex.After(param.Query.EndTime) {
 			endTimeIndex = param.Query.EndTime
+		}
+	}
+
+	// avoid frontend error to send default line data for chart display
+	if realtimeInfo.Timestamps == nil {
+		startTimeIndex = param.Query.StartTime
+		endTimeIndex = param.GetEndTimeIndex()
+		for startTimeIndex.Before(param.Query.EndTime) {
+			realtimeInfo.Timestamps = append(realtimeInfo.Timestamps, int(endTimeIndex.Add(-1*time.Second).Unix()))
+			realtimeInfo.LoadAveragePowerACs = append(realtimeInfo.LoadAveragePowerACs, 0)
+			realtimeInfo.BatteryAveragePowerACs = append(realtimeInfo.BatteryAveragePowerACs, 0)
+			realtimeInfo.PvAveragePowerACs = append(realtimeInfo.PvAveragePowerACs, 0)
+			realtimeInfo.GridAveragePowerACs = append(realtimeInfo.GridAveragePowerACs, 0)
+			realtimeInfo.BatterySoCs = append(realtimeInfo.BatterySoCs, 0)
+			realtimeInfo.BatteryVoltages = append(realtimeInfo.BatteryVoltages, 0)
+
+			startTimeIndex = endTimeIndex
+			switch param.Query.Resolution {
+			case "hour":
+				endTimeIndex = startTimeIndex.Add(1 * time.Hour)
+			case "5minute":
+				endTimeIndex = startTimeIndex.Add(5 * time.Minute)
+			}
+			if endTimeIndex.After(param.Query.EndTime) {
+				endTimeIndex = param.Query.EndTime
+			}
 		}
 	}
 	return

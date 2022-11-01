@@ -389,11 +389,15 @@ export default connect(mapState)(function Analysis(props) {
         } else if (tab === "month") {
             startTime = moment().startOf("month").toISOString()
             endTime = moment().startOf("day").toISOString()
-
+            if (moment().get("date") == 1) {
+                startTime = moment().subtract(1, "month").startOf("month").toISOString()
+            }
         } else if (tab === "year") {
             startTime = moment().startOf("year").toISOString()
             endTime = moment().startOf("month").toISOString()
-
+            if (moment().get("date") == 1 && moment().get("month") == 0) {
+                startTime = moment().subtract(1, "year").startOf("year").toISOString()
+            }
         } else if (tab === "custom") {
             startTime = startDate ? moment(startDate).toISOString() : ""
             endTime = endDate ? moment(endDate).add(1, "day").startOf("day").toISOString() : ""

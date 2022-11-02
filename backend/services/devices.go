@@ -2,7 +2,9 @@ package services
 
 import (
 	"encoding/json"
+	"fmt"
 	"math"
+	"strconv"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -52,29 +54,65 @@ type AccumulatedInfo struct {
 	LoadSelfConsumedEnergyPercentACs  []float32
 }
 
+// AbsFloat32Format godoc
+type AbsFloat32Format float32
+
+// MarshalJSON godoc
+func (f AbsFloat32Format) MarshalJSON() ([]byte, error) {
+	v := math.Abs(float64(f))
+	v, _ = strconv.ParseFloat(fmt.Sprintf("%.3f", v), 32)
+	return json.Marshal(float32(v))
+}
+
+// Float32Format godoc
+type Float32Format float32
+
+// MarshalJSON godoc
+func (f Float32Format) MarshalJSON() ([]byte, error) {
+	v, _ := strconv.ParseFloat(fmt.Sprintf("%.3f", f), 32)
+	return json.Marshal(float32(v))
+}
+
+// Float32ArrayFormat godoc
+type Float32ArrayFormat []float32
+
+// MarshalJSON godoc godoc
+func (f Float32ArrayFormat) MarshalJSON() ([]byte, error) {
+	var formatedArray []float32
+	for _, value := range f {
+		v, err := strconv.ParseFloat(fmt.Sprintf("%.3f", value), 32)
+		if err == nil {
+			formatedArray = append(formatedArray, float32(v))
+		} else {
+			formatedArray = append(formatedArray, 0)
+		}
+	}
+	return json.Marshal(formatedArray)
+}
+
 // DevicesEnergyInfoResponse godoc
 type DevicesEnergyInfoResponse struct {
 	GridIsPeakShaving             int                    `json:"gridIsPeakShaving"`
-	LoadGridAveragePowerAC        float32                `json:"loadGridAveragePowerAC"`
-	BatteryGridAveragePowerAC     float32                `json:"batteryGridAveragePowerAC"`
-	GridContractPowerAC           float32                `json:"gridContractPowerAC"`
-	LoadPvAveragePowerAC          float32                `json:"loadPvAveragePowerAC"`
-	LoadBatteryAveragePowerAC     float32                `json:"loadBatteryAveragePowerAC"`
-	BatterySoC                    float32                `json:"batterySoC"`
-	BatteryProducedAveragePowerAC float32                `json:"batteryProducedAveragePowerAC"`
-	BatteryConsumedAveragePowerAC float32                `json:"batteryConsumedAveragePowerAC"`
+	LoadGridAveragePowerAC        AbsFloat32Format       `json:"loadGridAveragePowerAC"`
+	BatteryGridAveragePowerAC     AbsFloat32Format       `json:"batteryGridAveragePowerAC"`
+	GridContractPowerAC           Float32Format          `json:"gridContractPowerAC"`
+	LoadPvAveragePowerAC          AbsFloat32Format       `json:"loadPvAveragePowerAC"`
+	LoadBatteryAveragePowerAC     AbsFloat32Format       `json:"loadBatteryAveragePowerAC"`
+	BatterySoC                    Float32Format          `json:"batterySoC"`
+	BatteryProducedAveragePowerAC Float32Format          `json:"batteryProducedAveragePowerAC"`
+	BatteryConsumedAveragePowerAC Float32Format          `json:"batteryConsumedAveragePowerAC"`
 	BatteryChargingFrom           string                 `json:"batteryChargingFrom"`
 	BatteryDischargingTo          string                 `json:"batteryDischargingTo"`
-	PvAveragePowerAC              float32                `json:"pvAveragePowerAC"`
-	LoadAveragePowerAC            float32                `json:"loadAveragePowerAC"`
+	PvAveragePowerAC              Float32Format          `json:"pvAveragePowerAC"`
+	LoadAveragePowerAC            AbsFloat32Format       `json:"loadAveragePowerAC"`
 	LoadLinks                     map[string]interface{} `json:"loadLinks"`
 	GridLinks                     map[string]interface{} `json:"gridLinks"`
 	PVLinks                       map[string]interface{} `json:"pvLinks"`
 	BatteryLinks                  map[string]interface{} `json:"batteryLinks"`
-	BatteryPvAveragePowerAC       float32                `json:"batteryPvAveragePowerAC"`
-	GridPvAveragePowerAC          float32                `json:"gridPvAveragePowerAC"`
-	GridProducedAveragePowerAC    float32                `json:"gridProducedAveragePowerAC"`
-	GridConsumedAveragePowerAC    float32                `json:"gridConsumedAveragePowerAC"`
+	BatteryPvAveragePowerAC       AbsFloat32Format       `json:"batteryPvAveragePowerAC"`
+	GridPvAveragePowerAC          AbsFloat32Format       `json:"gridPvAveragePowerAC"`
+	GridProducedAveragePowerAC    Float32Format          `json:"gridProducedAveragePowerAC"`
+	GridConsumedAveragePowerAC    Float32Format          `json:"gridConsumedAveragePowerAC"`
 }
 
 // EnergyDistributionInfoResponse godoc
@@ -97,45 +135,45 @@ type EnergyDistributionInfoResponse struct {
 
 // PowerStateResponse godoc
 type PowerStateResponse struct {
-	Timestamps             []int     `json:"timestamps"`
-	LoadAveragePowerACs    []float32 `json:"loadAveragePowerACs"`
-	PvAveragePowerACs      []float32 `json:"pvAveragePowerACs"`
-	BatteryAveragePowerACs []float32 `json:"batteryAveragePowerACs"`
-	GridAveragePowerACs    []float32 `json:"gridAveragePowerACs"`
+	Timestamps             []int              `json:"timestamps"`
+	LoadAveragePowerACs    Float32ArrayFormat `json:"loadAveragePowerACs"`
+	PvAveragePowerACs      Float32ArrayFormat `json:"pvAveragePowerACs"`
+	BatteryAveragePowerACs Float32ArrayFormat `json:"batteryAveragePowerACs"`
+	GridAveragePowerACs    Float32ArrayFormat `json:"gridAveragePowerACs"`
 }
 
 // AccumulatedPowerStateResponse godoc
 type AccumulatedPowerStateResponse struct {
-	Timestamps                        []int     `json:"timestamps"`
-	LoadConsumedLifetimeEnergyACDiffs []float32 `json:"loadConsumedLifetimeEnergyACDiffs"`
-	PvProducedLifetimeEnergyACDiffs   []float32 `json:"pvProducedLifetimeEnergyACDiffs"`
-	BatteryLifetimeEnergyACDiffs      []float32 `json:"batteryLifetimeEnergyACDiffs"`
-	GridLifetimeEnergyACDiffs         []float32 `json:"gridLifetimeEnergyACDiffs"`
+	Timestamps                        []int              `json:"timestamps"`
+	LoadConsumedLifetimeEnergyACDiffs Float32ArrayFormat `json:"loadConsumedLifetimeEnergyACDiffs"`
+	PvProducedLifetimeEnergyACDiffs   Float32ArrayFormat `json:"pvProducedLifetimeEnergyACDiffs"`
+	BatteryLifetimeEnergyACDiffs      Float32ArrayFormat `json:"batteryLifetimeEnergyACDiffs"`
+	GridLifetimeEnergyACDiffs         Float32ArrayFormat `json:"gridLifetimeEnergyACDiffs"`
 }
 
 // PowerSelfSupplyRateResponse godoc
 type PowerSelfSupplyRateResponse struct {
-	Timestamps                       []int     `json:"timestamps"`
-	LoadSelfConsumedEnergyPercentACs []float32 `json:"loadSelfConsumedEnergyPercentACs"`
+	Timestamps                       []int              `json:"timestamps"`
+	LoadSelfConsumedEnergyPercentACs Float32ArrayFormat `json:"loadSelfConsumedEnergyPercentACs"`
 }
 
 // BatteryUsageInfoResponse godoc
 type BatteryUsageInfoResponse struct {
-	BatterySoC                    float32 `json:"batterySoC"`
-	BatteryProducedAveragePowerAC float32 `json:"batteryProducedAveragePowerAC"`
-	BatteryConsumedAveragePowerAC float32 `json:"batteryConsumedAveragePowerAC"`
-	BatteryChargingFrom           string  `json:"batteryChargingFrom"`
-	BatteryDischargingTo          string  `json:"batteryDischargingTo"`
+	BatterySoC                    Float32Format `json:"batterySoC"`
+	BatteryProducedAveragePowerAC Float32Format `json:"batteryProducedAveragePowerAC"`
+	BatteryConsumedAveragePowerAC Float32Format `json:"batteryConsumedAveragePowerAC"`
+	BatteryChargingFrom           string        `json:"batteryChargingFrom"`
+	BatteryDischargingTo          string        `json:"batteryDischargingTo"`
 }
 
 // ChargeInfoResponse godoc
 type ChargeInfoResponse struct {
-	GridPowerCost              float32 `json:"gridPowerCost"`
-	GridPowerCostSavings       float32 `json:"gridPowerCostSavings"`
-	GridPowerCostLastMonth     float32 `json:"gridPowerCostLastMonth"`
-	GridProducedAveragePowerAC float32 `json:"gridProducedAveragePowerAC"`
-	GridContractPowerAC        float32 `json:"gridContractPowerAC"`
-	GridIsPeakShaving          int     `json:"gridIsPeakShaving"`
+	GridPowerCost              float32       `json:"gridPowerCost"`
+	GridPowerCostSavings       float32       `json:"gridPowerCostSavings"`
+	GridPowerCostLastMonth     float32       `json:"gridPowerCostLastMonth"`
+	GridProducedAveragePowerAC Float32Format `json:"gridProducedAveragePowerAC"`
+	GridContractPowerAC        Float32Format `json:"gridContractPowerAC"`
+	GridIsPeakShaving          int           `json:"gridIsPeakShaving"`
 }
 
 // DemandStateResponse godoc
@@ -160,40 +198,40 @@ type SolarEnergyInfoResponse struct {
 
 // SolarPowerStateResponse godoc
 type SolarPowerStateResponse struct {
-	Timestamps        []int             `json:"timestamps"`
-	PvAveragePowerACs []float32         `json:"pvAveragePowerACs"`
-	OnPeakTime        map[string]string `json:"onPeakTime"`
+	Timestamps        []int              `json:"timestamps"`
+	PvAveragePowerACs Float32ArrayFormat `json:"pvAveragePowerACs"`
+	OnPeakTime        map[string]string  `json:"onPeakTime"`
 }
 
 // BatteryEnergyInfoResponse godoc
 type BatteryEnergyInfoResponse struct {
-	BatteryLifetimeOperationCyclesDiff  float32 `json:"batteryLifetimeOperationCyclesDiff"`
-	BatteryLifetimeOperationCycles      float32 `json:"batteryLifetimeOperationCycles"`
-	BatterySoC                          float32 `json:"batterySoC"`
-	BatteryProducedLifetimeEnergyACDiff float32 `json:"batteryProducedLifetimeEnergyACDiff"`
-	BatteryProducedLifetimeEnergyAC     float32 `json:"batteryProducedLifetimeEnergyAC"`
-	BatteryConsumedLifetimeEnergyACDiff float32 `json:"batteryConsumedLifetimeEnergyACDiff"`
-	BatteryConsumedLifetimeEnergyAC     float32 `json:"batteryConsumedLifetimeEnergyAC"`
-	Model                               string  `json:"model"`
-	Capcity                             float32 `json:"capcity"`
-	PowerSources                        string  `json:"powerSources"`
-	BatteryPower                        float32 `json:"batteryPower"`
-	Voltage                             float32 `json:"voltage"`
+	BatteryLifetimeOperationCyclesDiff  float32       `json:"batteryLifetimeOperationCyclesDiff"`
+	BatteryLifetimeOperationCycles      Float32Format `json:"batteryLifetimeOperationCycles"`
+	BatterySoC                          Float32Format `json:"batterySoC"`
+	BatteryProducedLifetimeEnergyACDiff float32       `json:"batteryProducedLifetimeEnergyACDiff"`
+	BatteryProducedLifetimeEnergyAC     Float32Format `json:"batteryProducedLifetimeEnergyAC"`
+	BatteryConsumedLifetimeEnergyACDiff float32       `json:"batteryConsumedLifetimeEnergyACDiff"`
+	BatteryConsumedLifetimeEnergyAC     Float32Format `json:"batteryConsumedLifetimeEnergyAC"`
+	Model                               string        `json:"model"`
+	Capcity                             float32       `json:"capcity"`
+	PowerSources                        string        `json:"powerSources"`
+	BatteryPower                        float32       `json:"batteryPower"`
+	Voltage                             float32       `json:"voltage"`
 }
 
 // BatteryPowerStateResponse godoc
 type BatteryPowerStateResponse struct {
-	Timestamps             []int             `json:"timestamps"`
-	BatteryAveragePowerACs []float32         `json:"batteryAveragePowerACs"`
-	OnPeakTime             map[string]string `json:"onPeakTime"`
+	Timestamps             []int              `json:"timestamps"`
+	BatteryAveragePowerACs Float32ArrayFormat `json:"batteryAveragePowerACs"`
+	OnPeakTime             map[string]string  `json:"onPeakTime"`
 }
 
 // BatteryChargeVoltageStateResponse godoc
 type BatteryChargeVoltageStateResponse struct {
-	Timestamps      []int             `json:"timestamps"`
-	BatterySoCs     []float32         `json:"batterySoCs"`
-	BatteryVoltages []float32         `json:"batteryVoltages"`
-	OnPeakTime      map[string]string `json:"onPeakTime"`
+	Timestamps      []int              `json:"timestamps"`
+	BatterySoCs     Float32ArrayFormat `json:"batterySoCs"`
+	BatteryVoltages Float32ArrayFormat `json:"batteryVoltages"`
+	OnPeakTime      map[string]string  `json:"onPeakTime"`
 }
 
 // GridEnergyInfoResponse godoc
@@ -206,9 +244,9 @@ type GridEnergyInfoResponse struct {
 
 // GridPowerStateResponse godoc
 type GridPowerStateResponse struct {
-	Timestamps          []int             `json:"timestamps"`
-	GridAveragePowerACs []float32         `json:"gridAveragePowerACs"`
-	OnPeakTime          map[string]string `json:"onPeakTime"`
+	Timestamps          []int              `json:"timestamps"`
+	GridAveragePowerACs Float32ArrayFormat `json:"gridAveragePowerACs"`
+	OnPeakTime          map[string]string  `json:"onPeakTime"`
 }
 
 // DevicesService godoc
@@ -252,31 +290,24 @@ func (s defaultDevicesService) GetLatestDevicesEnergyInfo(gwUUID string) (logTim
 	}
 
 	logTime = latestLog.LogDate
-	positiveLoadGridAveragePowerAC := float32(math.Abs(float64(latestLog.LoadGridAveragePowerAC.Float32)))
-	positiveBatteryGridAveragePowerAC := float32(math.Abs(float64(latestLog.BatteryGridAveragePowerAC.Float32)))
-	positiveLoadPvAveragePowerAC := float32(math.Abs(float64(latestLog.LoadPvAveragePowerAC.Float32)))
-	positiveLoadBatteryAveragePowerAC := float32(math.Abs(float64(latestLog.LoadBatteryAveragePowerAC.Float32)))
-	positiveLoadAveragePowerAC := float32(math.Abs(float64(latestLog.LoadAveragePowerAC.Float32)))
-	positiveBatteryPvAveragePowerAC := float32(math.Abs(float64(latestLog.BatteryPvAveragePowerAC.Float32)))
-	positiveGridPvAveragePowerAC := float32(math.Abs(float64(latestLog.GridPvAveragePowerAC.Float32)))
 	devicesEnergyInfo = &DevicesEnergyInfoResponse{
 		GridIsPeakShaving:             latestLog.GridIsPeakShaving.Int,
-		LoadGridAveragePowerAC:        utils.ThreeDecimalPlaces(positiveLoadGridAveragePowerAC),
-		BatteryGridAveragePowerAC:     utils.ThreeDecimalPlaces(positiveBatteryGridAveragePowerAC),
-		GridContractPowerAC:           utils.ThreeDecimalPlaces(latestLog.GridContractPowerAC.Float32),
-		LoadPvAveragePowerAC:          utils.ThreeDecimalPlaces(positiveLoadPvAveragePowerAC),
-		LoadBatteryAveragePowerAC:     utils.ThreeDecimalPlaces(positiveLoadBatteryAveragePowerAC),
-		BatterySoC:                    utils.ThreeDecimalPlaces(latestLog.BatterySoC.Float32),
-		BatteryProducedAveragePowerAC: utils.ThreeDecimalPlaces(latestLog.BatteryProducedAveragePowerAC.Float32),
-		BatteryConsumedAveragePowerAC: utils.ThreeDecimalPlaces(latestLog.BatteryConsumedAveragePowerAC.Float32),
+		LoadGridAveragePowerAC:        AbsFloat32Format(latestLog.LoadGridAveragePowerAC.Float32),
+		BatteryGridAveragePowerAC:     AbsFloat32Format(latestLog.BatteryGridAveragePowerAC.Float32),
+		GridContractPowerAC:           Float32Format(latestLog.GridContractPowerAC.Float32),
+		LoadPvAveragePowerAC:          AbsFloat32Format(latestLog.LoadPvAveragePowerAC.Float32),
+		LoadBatteryAveragePowerAC:     AbsFloat32Format(latestLog.LoadBatteryAveragePowerAC.Float32),
+		BatterySoC:                    Float32Format(latestLog.BatterySoC.Float32),
+		BatteryProducedAveragePowerAC: Float32Format(latestLog.BatteryProducedAveragePowerAC.Float32),
+		BatteryConsumedAveragePowerAC: Float32Format(latestLog.BatteryConsumedAveragePowerAC.Float32),
 		BatteryChargingFrom:           latestLog.BatteryChargingFrom.String,
 		BatteryDischargingTo:          latestLog.BatteryDischargingTo.String,
-		PvAveragePowerAC:              utils.ThreeDecimalPlaces(latestLog.PvAveragePowerAC.Float32),
-		LoadAveragePowerAC:            utils.ThreeDecimalPlaces(positiveLoadAveragePowerAC),
-		BatteryPvAveragePowerAC:       utils.ThreeDecimalPlaces(positiveBatteryPvAveragePowerAC),
-		GridPvAveragePowerAC:          utils.ThreeDecimalPlaces(positiveGridPvAveragePowerAC),
-		GridProducedAveragePowerAC:    utils.ThreeDecimalPlaces(latestLog.GridProducedAveragePowerAC.Float32),
-		GridConsumedAveragePowerAC:    utils.ThreeDecimalPlaces(latestLog.GridConsumedAveragePowerAC.Float32),
+		PvAveragePowerAC:              Float32Format(latestLog.PvAveragePowerAC.Float32),
+		LoadAveragePowerAC:            AbsFloat32Format(latestLog.LoadAveragePowerAC.Float32),
+		BatteryPvAveragePowerAC:       AbsFloat32Format(latestLog.BatteryPvAveragePowerAC.Float32),
+		GridPvAveragePowerAC:          AbsFloat32Format(latestLog.GridPvAveragePowerAC.Float32),
+		GridProducedAveragePowerAC:    Float32Format(latestLog.GridProducedAveragePowerAC.Float32),
+		GridConsumedAveragePowerAC:    Float32Format(latestLog.GridConsumedAveragePowerAC.Float32),
 	}
 	if err = json.Unmarshal(latestLog.LoadLinks.JSON, &devicesEnergyInfo.LoadLinks); err != nil {
 		log.WithFields(log.Fields{
@@ -394,8 +425,8 @@ func (s defaultDevicesService) GetChargeInfo(param *app.StartTimeParam) (chargeI
 	chargeInfo.GridPowerCost = 0
 	chargeInfo.GridPowerCostSavings = 0
 	chargeInfo.GridPowerCostLastMonth = 0
-	chargeInfo.GridProducedAveragePowerAC = utils.ThreeDecimalPlaces(latestLog.GridProducedAveragePowerAC.Float32)
-	chargeInfo.GridContractPowerAC = utils.ThreeDecimalPlaces(latestLog.GridContractPowerAC.Float32)
+	chargeInfo.GridProducedAveragePowerAC = Float32Format(latestLog.GridProducedAveragePowerAC.Float32)
+	chargeInfo.GridContractPowerAC = Float32Format(latestLog.GridContractPowerAC.Float32)
 	chargeInfo.GridIsPeakShaving = latestLog.GridIsPeakShaving.Int
 	return
 }
@@ -421,9 +452,9 @@ func (s defaultDevicesService) GetBatteryUsageInfo(param *app.StartTimeParam) (b
 	}
 
 	log.Debug("latestLog.LogDate: ", latestLog.LogDate)
-	batteryUsageInfo.BatterySoC = utils.ThreeDecimalPlaces(latestLog.BatterySoC.Float32)
-	batteryUsageInfo.BatteryProducedAveragePowerAC = utils.ThreeDecimalPlaces(latestLog.BatteryProducedAveragePowerAC.Float32)
-	batteryUsageInfo.BatteryConsumedAveragePowerAC = utils.ThreeDecimalPlaces(latestLog.BatteryConsumedAveragePowerAC.Float32)
+	batteryUsageInfo.BatterySoC = Float32Format(latestLog.BatterySoC.Float32)
+	batteryUsageInfo.BatteryProducedAveragePowerAC = Float32Format(latestLog.BatteryProducedAveragePowerAC.Float32)
+	batteryUsageInfo.BatteryConsumedAveragePowerAC = Float32Format(latestLog.BatteryConsumedAveragePowerAC.Float32)
 	batteryUsageInfo.BatteryChargingFrom = latestLog.BatteryChargingFrom.String
 	batteryUsageInfo.BatteryDischargingTo = latestLog.BatteryDischargingTo.String
 	return
@@ -532,12 +563,12 @@ func (s defaultDevicesService) GetBatteryEnergyInfo(param *app.StartTimeParam) (
 		"latestLog.LogDate": latestLog.LogDate,
 	}).Debug()
 	batteryEnergyInfo.BatteryLifetimeOperationCyclesDiff = utils.Diff(latestLog.BatteryLifetimeOperationCycles.Float32, firstLog.BatteryLifetimeOperationCycles.Float32)
-	batteryEnergyInfo.BatteryLifetimeOperationCycles = utils.ThreeDecimalPlaces(latestLog.BatteryLifetimeOperationCycles.Float32)
-	batteryEnergyInfo.BatterySoC = utils.ThreeDecimalPlaces(latestLog.BatterySoC.Float32)
+	batteryEnergyInfo.BatteryLifetimeOperationCycles = Float32Format(latestLog.BatteryLifetimeOperationCycles.Float32)
+	batteryEnergyInfo.BatterySoC = Float32Format(latestLog.BatterySoC.Float32)
 	batteryEnergyInfo.BatteryProducedLifetimeEnergyACDiff = utils.Diff(latestLog.BatteryProducedLifetimeEnergyAC.Float32, firstLog.BatteryProducedLifetimeEnergyAC.Float32)
-	batteryEnergyInfo.BatteryProducedLifetimeEnergyAC = utils.ThreeDecimalPlaces(latestLog.BatteryProducedLifetimeEnergyAC.Float32)
+	batteryEnergyInfo.BatteryProducedLifetimeEnergyAC = Float32Format(latestLog.BatteryProducedLifetimeEnergyAC.Float32)
 	batteryEnergyInfo.BatteryConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.BatteryConsumedLifetimeEnergyAC.Float32, firstLog.BatteryConsumedLifetimeEnergyAC.Float32)
-	batteryEnergyInfo.BatteryConsumedLifetimeEnergyAC = utils.ThreeDecimalPlaces(latestLog.BatteryConsumedLifetimeEnergyAC.Float32)
+	batteryEnergyInfo.BatteryConsumedLifetimeEnergyAC = Float32Format(latestLog.BatteryConsumedLifetimeEnergyAC.Float32)
 	return
 }
 
@@ -622,12 +653,12 @@ func (s defaultDevicesService) getRealtimeInfo(param *app.ZoomableParam) (realti
 		latestRealtimeInfo := s.getLatestRealtimeInfo(param.GatewayUUID, startTimeIndex, endTimeIndex, param.Query.EndTime)
 		log.Debug("latestRealtimeInfo.LogDate: ", latestRealtimeInfo.LogDate)
 		realtimeInfo.Timestamps = append(realtimeInfo.Timestamps, int(latestRealtimeInfo.LogDate.Unix()))
-		realtimeInfo.LoadAveragePowerACs = append(realtimeInfo.LoadAveragePowerACs, utils.ThreeDecimalPlaces(latestRealtimeInfo.LoadAveragePowerAC.Float32))
-		realtimeInfo.BatteryAveragePowerACs = append(realtimeInfo.BatteryAveragePowerACs, utils.ThreeDecimalPlaces(latestRealtimeInfo.BatteryAveragePowerAC.Float32))
-		realtimeInfo.PvAveragePowerACs = append(realtimeInfo.PvAveragePowerACs, utils.ThreeDecimalPlaces(latestRealtimeInfo.PvAveragePowerAC.Float32))
-		realtimeInfo.GridAveragePowerACs = append(realtimeInfo.GridAveragePowerACs, utils.ThreeDecimalPlaces(latestRealtimeInfo.GridAveragePowerAC.Float32))
-		realtimeInfo.BatterySoCs = append(realtimeInfo.BatterySoCs, utils.ThreeDecimalPlaces(latestRealtimeInfo.BatterySoC.Float32))
-		realtimeInfo.BatteryVoltages = append(realtimeInfo.BatteryVoltages, utils.ThreeDecimalPlaces(latestRealtimeInfo.BatteryVoltage.Float32))
+		realtimeInfo.LoadAveragePowerACs = append(realtimeInfo.LoadAveragePowerACs, latestRealtimeInfo.LoadAveragePowerAC.Float32)
+		realtimeInfo.BatteryAveragePowerACs = append(realtimeInfo.BatteryAveragePowerACs, latestRealtimeInfo.BatteryAveragePowerAC.Float32)
+		realtimeInfo.PvAveragePowerACs = append(realtimeInfo.PvAveragePowerACs, latestRealtimeInfo.PvAveragePowerAC.Float32)
+		realtimeInfo.GridAveragePowerACs = append(realtimeInfo.GridAveragePowerACs, latestRealtimeInfo.GridAveragePowerAC.Float32)
+		realtimeInfo.BatterySoCs = append(realtimeInfo.BatterySoCs, latestRealtimeInfo.BatterySoC.Float32)
+		realtimeInfo.BatteryVoltages = append(realtimeInfo.BatteryVoltages, latestRealtimeInfo.BatteryVoltage.Float32)
 
 		startTimeIndex = endTimeIndex
 		switch param.Query.Resolution {
@@ -706,19 +737,19 @@ func (s defaultDevicesService) getLatestAccumulatedInfo(gwUUID, resolution strin
 	case "day":
 		latestLogDaily, _ := (latestLog).(*deremsmodels.CCDataLogCalculatedDaily)
 		latestAccumulatedInfo.Timestamps = int(latestLogDaily.LatestLogDate.Unix())
-		latestAccumulatedInfo.LoadConsumedLifetimeEnergyACDiff = utils.ThreeDecimalPlaces(latestLogDaily.LoadConsumedLifetimeEnergyACDiff.Float32)
-		latestAccumulatedInfo.PvProducedLifetimeEnergyACDiff = utils.ThreeDecimalPlaces(latestLogDaily.PvProducedLifetimeEnergyACDiff.Float32)
-		latestAccumulatedInfo.BatteryLifetimeEnergyACDiff = utils.ThreeDecimalPlaces(latestLogDaily.BatteryLifetimeEnergyACDiff.Float32)
-		latestAccumulatedInfo.GridLifetimeEnergyACDiff = utils.ThreeDecimalPlaces(latestLogDaily.GridLifetimeEnergyACDiff.Float32)
-		latestAccumulatedInfo.LoadSelfConsumedEnergyPercentAC = utils.ThreeDecimalPlaces(latestLogDaily.LoadSelfConsumedEnergyPercentAC.Float32)
+		latestAccumulatedInfo.LoadConsumedLifetimeEnergyACDiff = latestLogDaily.LoadConsumedLifetimeEnergyACDiff.Float32
+		latestAccumulatedInfo.PvProducedLifetimeEnergyACDiff = latestLogDaily.PvProducedLifetimeEnergyACDiff.Float32
+		latestAccumulatedInfo.BatteryLifetimeEnergyACDiff = latestLogDaily.BatteryLifetimeEnergyACDiff.Float32
+		latestAccumulatedInfo.GridLifetimeEnergyACDiff = latestLogDaily.GridLifetimeEnergyACDiff.Float32
+		latestAccumulatedInfo.LoadSelfConsumedEnergyPercentAC = latestLogDaily.LoadSelfConsumedEnergyPercentAC.Float32
 	case "month":
 		latestLogMonthly, _ := (latestLog).(*deremsmodels.CCDataLogCalculatedMonthly)
 		latestAccumulatedInfo.Timestamps = int(latestLogMonthly.LatestLogDate.Unix())
-		latestAccumulatedInfo.LoadConsumedLifetimeEnergyACDiff = utils.ThreeDecimalPlaces(latestLogMonthly.LoadConsumedLifetimeEnergyACDiff.Float32)
-		latestAccumulatedInfo.PvProducedLifetimeEnergyACDiff = utils.ThreeDecimalPlaces(latestLogMonthly.PvProducedLifetimeEnergyACDiff.Float32)
-		latestAccumulatedInfo.BatteryLifetimeEnergyACDiff = utils.ThreeDecimalPlaces(latestLogMonthly.BatteryLifetimeEnergyACDiff.Float32)
-		latestAccumulatedInfo.GridLifetimeEnergyACDiff = utils.ThreeDecimalPlaces(latestLogMonthly.GridLifetimeEnergyACDiff.Float32)
-		latestAccumulatedInfo.LoadSelfConsumedEnergyPercentAC = utils.ThreeDecimalPlaces(latestLogMonthly.LoadSelfConsumedEnergyPercentAC.Float32)
+		latestAccumulatedInfo.LoadConsumedLifetimeEnergyACDiff = latestLogMonthly.LoadConsumedLifetimeEnergyACDiff.Float32
+		latestAccumulatedInfo.PvProducedLifetimeEnergyACDiff = latestLogMonthly.PvProducedLifetimeEnergyACDiff.Float32
+		latestAccumulatedInfo.BatteryLifetimeEnergyACDiff = latestLogMonthly.BatteryLifetimeEnergyACDiff.Float32
+		latestAccumulatedInfo.GridLifetimeEnergyACDiff = latestLogMonthly.GridLifetimeEnergyACDiff.Float32
+		latestAccumulatedInfo.LoadSelfConsumedEnergyPercentAC = latestLogMonthly.LoadSelfConsumedEnergyPercentAC.Float32
 	}
 	return
 }

@@ -334,7 +334,7 @@ definitions:
       pvCo2SavingsSum:
         type: number
       pvEnergyCostSavingsSum:
-        type: number
+        type: integer
       pvProducedLifetimeEnergyACDiff:
         type: number
     type: object

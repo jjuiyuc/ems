@@ -227,7 +227,7 @@ type SolarEnergyInfoResponse struct {
 	BatteryPvConsumedLifetimeEnergyACDiff float32       `json:"batteryPvConsumedLifetimeEnergyACDiff"`
 	GridPvConsumedEnergyPercentAC         float32       `json:"gridPvConsumedEnergyPercentAC"`
 	GridPvConsumedLifetimeEnergyACDiff    float32       `json:"gridPvConsumedLifetimeEnergyACDiff"`
-	PvEnergyCostSavingsSum                Float32Format `json:"pvEnergyCostSavingsSum"`
+	PvEnergyCostSavingsSum                int           `json:"pvEnergyCostSavingsSum"`
 	PvCo2SavingsSum                       Float32Format `json:"pvCo2SavingsSum"`
 }
 
@@ -261,7 +261,7 @@ func (r *SolarEnergyInfoResponse) ComputedValues(firstLogOfDay, firstLogOfMonth,
 		sumOfPvEnergyCostSavings = sumOfPvEnergyCostSavings + logOfMonth.PvEnergyCostSavings.Float32
 		sumOfPvCo2Savings = sumOfPvCo2Savings + logOfMonth.PvCo2Savings.Float32
 	}
-	r.PvEnergyCostSavingsSum = Float32Format(sumOfPvEnergyCostSavings)
+	r.PvEnergyCostSavingsSum = int(sumOfPvEnergyCostSavings)
 	r.PvCo2SavingsSum = Float32Format(sumOfPvCo2Savings)
 }
 

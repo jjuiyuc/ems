@@ -75,21 +75,17 @@ definitions:
   services.AccumulatedPowerStateResponse:
     properties:
       batteryLifetimeEnergyACDiffs:
-        items:
-          type: number
-        type: array
+        $ref: '#/definitions/services.Float32ArrayFormat'
+        type: object
       gridLifetimeEnergyACDiffs:
-        items:
-          type: number
-        type: array
+        $ref: '#/definitions/services.Float32ArrayFormat'
+        type: object
       loadConsumedLifetimeEnergyACDiffs:
-        items:
-          type: number
-        type: array
+        $ref: '#/definitions/services.Float32ArrayFormat'
+        type: object
       pvProducedLifetimeEnergyACDiffs:
-        items:
-          type: number
-        type: array
+        $ref: '#/definitions/services.Float32ArrayFormat'
+        type: object
       timestamps:
         items:
           type: integer
@@ -98,13 +94,11 @@ definitions:
   services.BatteryChargeVoltageStateResponse:
     properties:
       batterySoCs:
-        items:
-          type: number
-        type: array
+        $ref: '#/definitions/services.Float32ArrayFormat'
+        type: object
       batteryVoltages:
-        items:
-          type: number
-        type: array
+        $ref: '#/definitions/services.Float32ArrayFormat'
+        type: object
       onPeakTime:
         additionalProperties:
           type: string
@@ -144,9 +138,8 @@ definitions:
   services.BatteryPowerStateResponse:
     properties:
       batteryAveragePowerACs:
-        items:
-          type: number
-        type: array
+        $ref: '#/definitions/services.Float32ArrayFormat'
+        type: object
       onPeakTime:
         additionalProperties:
           type: string
@@ -228,6 +221,10 @@ definitions:
       pvProducedLifetimeEnergyACDiff:
         type: number
     type: object
+  services.Float32ArrayFormat:
+    items:
+      type: number
+    type: array
   services.GatewayInfo:
     properties:
       address:
@@ -249,9 +246,8 @@ definitions:
   services.GridPowerStateResponse:
     properties:
       gridAveragePowerACs:
-        items:
-          type: number
-        type: array
+        $ref: '#/definitions/services.Float32ArrayFormat'
+        type: object
       onPeakTime:
         additionalProperties:
           type: string
@@ -264,9 +260,8 @@ definitions:
   services.PowerSelfSupplyRateResponse:
     properties:
       loadSelfConsumedEnergyPercentACs:
-        items:
-          type: number
-        type: array
+        $ref: '#/definitions/services.Float32ArrayFormat'
+        type: object
       timestamps:
         items:
           type: integer
@@ -275,21 +270,17 @@ definitions:
   services.PowerStateResponse:
     properties:
       batteryAveragePowerACs:
-        items:
-          type: number
-        type: array
+        $ref: '#/definitions/services.Float32ArrayFormat'
+        type: object
       gridAveragePowerACs:
-        items:
-          type: number
-        type: array
+        $ref: '#/definitions/services.Float32ArrayFormat'
+        type: object
       loadAveragePowerACs:
-        items:
-          type: number
-        type: array
+        $ref: '#/definitions/services.Float32ArrayFormat'
+        type: object
       pvAveragePowerACs:
-        items:
-          type: number
-        type: array
+        $ref: '#/definitions/services.Float32ArrayFormat'
+        type: object
       timestamps:
         items:
           type: integer
@@ -354,9 +345,8 @@ definitions:
           type: string
         type: object
       pvAveragePowerACs:
-        items:
-          type: number
-        type: array
+        $ref: '#/definitions/services.Float32ArrayFormat'
+        type: object
       timestamps:
         items:
           type: integer

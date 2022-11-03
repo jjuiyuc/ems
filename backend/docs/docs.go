@@ -1554,28 +1554,20 @@ var doc = `{
             "type": "object",
             "properties": {
                 "batteryLifetimeEnergyACDiffs": {
-                    "type": "array",
-                    "items": {
-                        "type": "number"
-                    }
+                    "type": "object",
+                    "$ref": "#/definitions/services.Float32ArrayFormat"
                 },
                 "gridLifetimeEnergyACDiffs": {
-                    "type": "array",
-                    "items": {
-                        "type": "number"
-                    }
+                    "type": "object",
+                    "$ref": "#/definitions/services.Float32ArrayFormat"
                 },
                 "loadConsumedLifetimeEnergyACDiffs": {
-                    "type": "array",
-                    "items": {
-                        "type": "number"
-                    }
+                    "type": "object",
+                    "$ref": "#/definitions/services.Float32ArrayFormat"
                 },
                 "pvProducedLifetimeEnergyACDiffs": {
-                    "type": "array",
-                    "items": {
-                        "type": "number"
-                    }
+                    "type": "object",
+                    "$ref": "#/definitions/services.Float32ArrayFormat"
                 },
                 "timestamps": {
                     "type": "array",
@@ -1589,16 +1581,12 @@ var doc = `{
             "type": "object",
             "properties": {
                 "batterySoCs": {
-                    "type": "array",
-                    "items": {
-                        "type": "number"
-                    }
+                    "type": "object",
+                    "$ref": "#/definitions/services.Float32ArrayFormat"
                 },
                 "batteryVoltages": {
-                    "type": "array",
-                    "items": {
-                        "type": "number"
-                    }
+                    "type": "object",
+                    "$ref": "#/definitions/services.Float32ArrayFormat"
                 },
                 "onPeakTime": {
                     "type": "object",
@@ -1659,10 +1647,8 @@ var doc = `{
             "type": "object",
             "properties": {
                 "batteryAveragePowerACs": {
-                    "type": "array",
-                    "items": {
-                        "type": "number"
-                    }
+                    "type": "object",
+                    "$ref": "#/definitions/services.Float32ArrayFormat"
                 },
                 "onPeakTime": {
                     "type": "object",
@@ -1788,6 +1774,12 @@ var doc = `{
                 }
             }
         },
+        "services.Float32ArrayFormat": {
+            "type": "array",
+            "items": {
+                "type": "number"
+            }
+        },
         "services.GatewayInfo": {
             "type": "object",
             "properties": {
@@ -1820,10 +1812,8 @@ var doc = `{
             "type": "object",
             "properties": {
                 "gridAveragePowerACs": {
-                    "type": "array",
-                    "items": {
-                        "type": "number"
-                    }
+                    "type": "object",
+                    "$ref": "#/definitions/services.Float32ArrayFormat"
                 },
                 "onPeakTime": {
                     "type": "object",
@@ -1843,10 +1833,8 @@ var doc = `{
             "type": "object",
             "properties": {
                 "loadSelfConsumedEnergyPercentACs": {
-                    "type": "array",
-                    "items": {
-                        "type": "number"
-                    }
+                    "type": "object",
+                    "$ref": "#/definitions/services.Float32ArrayFormat"
                 },
                 "timestamps": {
                     "type": "array",
@@ -1860,28 +1848,20 @@ var doc = `{
             "type": "object",
             "properties": {
                 "batteryAveragePowerACs": {
-                    "type": "array",
-                    "items": {
-                        "type": "number"
-                    }
+                    "type": "object",
+                    "$ref": "#/definitions/services.Float32ArrayFormat"
                 },
                 "gridAveragePowerACs": {
-                    "type": "array",
-                    "items": {
-                        "type": "number"
-                    }
+                    "type": "object",
+                    "$ref": "#/definitions/services.Float32ArrayFormat"
                 },
                 "loadAveragePowerACs": {
-                    "type": "array",
-                    "items": {
-                        "type": "number"
-                    }
+                    "type": "object",
+                    "$ref": "#/definitions/services.Float32ArrayFormat"
                 },
                 "pvAveragePowerACs": {
-                    "type": "array",
-                    "items": {
-                        "type": "number"
-                    }
+                    "type": "object",
+                    "$ref": "#/definitions/services.Float32ArrayFormat"
                 },
                 "timestamps": {
                     "type": "array",
@@ -1980,10 +1960,8 @@ var doc = `{
                     }
                 },
                 "pvAveragePowerACs": {
-                    "type": "array",
-                    "items": {
-                        "type": "number"
-                    }
+                    "type": "object",
+                    "$ref": "#/definitions/services.Float32ArrayFormat"
                 },
                 "timestamps": {
                     "type": "array",

@@ -63,6 +63,7 @@ type ResolutionWithPeriodParam struct {
 	Query       ResolutionWithPeriodQuery
 }
 
+// Validate godoc
 func (p *StartTimeParam) Validate(c *gin.Context) (err error) {
 	p.GatewayUUID = c.Param("gwid")
 	log.Debug("gatewayUUID: ", p.GatewayUUID)
@@ -73,6 +74,7 @@ func (p *StartTimeParam) Validate(c *gin.Context) (err error) {
 	return
 }
 
+// Validate godoc
 func (p *PeriodParam) Validate(c *gin.Context) (err error) {
 	p.GatewayUUID = c.Param("gwid")
 	log.Debug("gatewayUUID: ", p.GatewayUUID)
@@ -83,6 +85,7 @@ func (p *PeriodParam) Validate(c *gin.Context) (err error) {
 	return
 }
 
+// Validate godoc
 func (p *ZoomableParam) Validate(c *gin.Context) (err error) {
 	p.GatewayUUID = c.Param("gwid")
 	log.Debug("gatewayUUID: ", p.GatewayUUID)
@@ -98,6 +101,7 @@ func (p *ZoomableParam) Validate(c *gin.Context) (err error) {
 	return
 }
 
+// GetEndTimeIndex godoc
 func (p *ZoomableParam) GetEndTimeIndex() (endTimeIndex time.Time) {
 	switch p.Query.Resolution {
 	case "hour":
@@ -108,6 +112,7 @@ func (p *ZoomableParam) GetEndTimeIndex() (endTimeIndex time.Time) {
 	return
 }
 
+// Validate godoc
 func (p *ResolutionWithPeriodParam) Validate(c *gin.Context) (err error) {
 	p.GatewayUUID = c.Param("gwid")
 	log.Debug("gatewayUUID: ", p.GatewayUUID)
@@ -123,6 +128,7 @@ func (p *ResolutionWithPeriodParam) Validate(c *gin.Context) (err error) {
 	return
 }
 
+// GetEndTimeIndex godoc
 func (p *ResolutionWithPeriodParam) GetEndTimeIndex() (endTimeIndex time.Time) {
 	switch p.Query.Resolution {
 	case "day":

@@ -6,22 +6,16 @@ import Clock from "./Clock"
 import TimeRangePicker from "./TimeRangePicker"
 import variables from "../configs/variables"
 
+import { ReactComponent as AddIcon } from "../assets/icons/add.svg"
 import { ReactComponent as TimerIcon } from "../assets/icons/timer.svg"
-import { clamp } from "date-fns"
 
 const { colors } = variables
-const categories = [
-    { label: 1, value: 1 },
-    { label: 2, value: 2 },
-    { label: 3, value: 3 },
-    { label: 4, value: 4 },
-    { label: 5, value: 5 }
-]
+
 
 const defaultPolicyConfig = {
     onPeak: {
         name: "onPeak",
-        extensible: false,
+        extensible: true,
     },
     midPeak: {
         name: "midPeak",
@@ -35,7 +29,7 @@ const defaultPolicyConfig = {
     },
     superOffPeak: {
         name: "superOffPeak",
-        extensible: false,
+        extensible: true,
     },
 }
 const defaultPolicyPrice = {
@@ -61,6 +55,11 @@ export default function TimeOfUseCard(props) {
         pageT = (string, params) => t("settings." + string, params),
         dayTabs = ["weekdays", "saturday", "sundayHoliday"]
 
+    const categories = [
+        { label: pageT("summerTariff"), value: pageT("") },
+        { label: pageT("nonSummerTariff"), value: pageT("nonSummerTariff") }
+    ]
+
     const
         [dayTab, setDayTab] = useState(dayTabs[0]),
         [prices, setPrices]
@@ -68,7 +67,7 @@ export default function TimeOfUseCard(props) {
         [policyConfig, setPolicyConfig] = useState(defaultPolicyConfig),
         [policyPrice, setPolicyPrice] = useState(defaultPolicyPrice)
 
-    const [age, setAge] = useState('')
+    const [age, setAge] = useState("")
 
     const handleChange = (event) => {
         setAge(event.target.value)
@@ -96,11 +95,11 @@ export default function TimeOfUseCard(props) {
                 {pageT("save")}
             </Button>
         </div>
-        <div className="flex items-center">
+        <div className="flex items-center mt-12">
             <div className="pr-6">
-                <Box sx={{ minWidth: 120 }}>
+                <Box sx={{ minWidth: 200 }}>
                     <FormControl fullWidth>
-                        <InputLabel id="demo-simple-select-label">Age</InputLabel>
+                        <InputLabel id="demo-simple-select-label">{pageT("tariff")}</InputLabel>
                         <Select
                             labelId="demo-simple-select-label"
                             id="demo-simple-select"
@@ -130,15 +129,15 @@ export default function TimeOfUseCard(props) {
                 </Stack>
             </div>
         </div>
-        <div className="flex items-start">
+        <div className="flex items-start mt-12">
             <Clock size={{ height: "auto", width: "clamp(12rem,24vw,27.5rem)", "aspect-ratio": "1 / 1" }} dataset={data} id="touClock" />
 
             <div className="mb-12 mt-4">
                 {Object.keys(policyConfig).map((policy) => {
                     const priceGroup = policyPrice[policy]
                     return (
-                        <div key={policy}>
-                            <div className="flex items-center mx-2.5 text-white">
+                        <div className="mb-12 ml-12" key={policy}>
+                            <div className="flex items-center text-white mb-4">
                                 <div
                                     className="bg-blue-main h-2 rounded-full mr-3 w-2" />
                                 <h5 className="font-bold">{pageT(policyConfig[policy].name)}</h5>
@@ -195,21 +194,24 @@ export default function TimeOfUseCard(props) {
                                     />
                                 )
                             })}
-                            <button
-                                onClick={() => {
-                                    const newPolicyPrice = {
-                                        ...policyPrice,
-                                        [policy]: [
-                                            ...priceGroup,
-                                            { startTime: null, endTime: null, basicPrice: null, rate: null }
-                                        ]
-                                    }
-                                    setPolicyPrice(newPolicyPrice)
-                                }}
-                                disabled={!policyConfig[policy].extensible}
-                            >
-                                Add Time Range
-                            </button>
+                            <div className="flex ml-4 mt-4">
+                                <AddIcon className="w-4 h-4 mt-0.5" />
+                                <button
+                                    className="ml-1"
+                                    onClick={() => {
+                                        const newPolicyPrice = {
+                                            ...policyPrice,
+                                            [policy]: [
+                                                ...priceGroup,
+                                                { startTime: null, endTime: null, basicPrice: null, rate: null }
+                                            ]
+                                        }
+                                        setPolicyPrice(newPolicyPrice)
+                                    }}
+                                    disabled={!policyConfig[policy].extensible}>
+                                    {pageT("addTimeRange")}
+                                </button>
+                            </div>
                         </div>)
                 })}
             </div>

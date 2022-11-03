@@ -15,11 +15,10 @@ export default function TimeRangePicker(props) {
 
 
     return (
-        <div className="time-range-picker flex items-center">
+        <div className="time-range-picker flex items-center mt-4">
             <div>
                 <h6 className="mb-1 ml-1">{pageT("startTime")}</h6>
                 <DatePicker
-
                     dateFormat="h:mm aa"
                     showTimeSelect
                     showTimeSelectOnly
@@ -33,7 +32,6 @@ export default function TimeRangePicker(props) {
             <div>
                 <h6 className="mb-1 ml-1">{pageT("endTime")}</h6>
                 <DatePicker
-                    style={{ paddingBottom: "16.5px", paddingTop: "16.5px" }}
                     dateFormat="h:mm aa"
                     showTimeSelect
                     showTimeSelectOnly
@@ -47,7 +45,9 @@ export default function TimeRangePicker(props) {
                 />
             </div>
             <div className="ml-6 mr-4">
+                <h6 className="mb-1 ml-1">基本電價</h6>
                 <TextField
+                    className="react-datepicker__input-container"
                     id="outlined-basic"
                     variant="outlined"
                     value={basicPrice}
@@ -55,9 +55,11 @@ export default function TimeRangePicker(props) {
                 />
             </div>
             <div>
+                <h6 className="mb-1 ml-1">流動電價</h6>
                 <TextField
+                    className="react-datepicker-wrapper"
                     id="outlined-basic"
-                    label="rate"
+                    variant="outlined"
                     value={rate}
                     onChange={(e) => { setRate(e.target.value) }}
                 />

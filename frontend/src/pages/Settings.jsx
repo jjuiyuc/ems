@@ -2,6 +2,7 @@ import { Button, Slider, Switch } from "@mui/material"
 import { useState } from "react"
 import { useTranslation } from "react-multi-lang"
 
+import DialogBox from "../components/DialogBox"
 import SettingCard from "../components/SettingCard"
 import TimeOfUseCard from "../components/TimeOfUseCard"
 
@@ -115,6 +116,7 @@ export default function Settings(props) {
                 </div>
             </div>
         </div>
+        <DialogBox />
         <TimeOfUseCard data={clockDataset} />
     </>
 }

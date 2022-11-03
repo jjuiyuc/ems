@@ -1,15 +1,6 @@
 basePath: /api
 definitions:
-  app.Response:
-    properties:
-      code:
-        type: integer
-      data:
-        type: object
-      msg:
-        type: string
-    type: object
-  routers.PeriodQuery:
+  app.PeriodQuery:
     properties:
       endTime:
         example: UTC time in ISO-8601
@@ -23,7 +14,7 @@ definitions:
     - endTime
     - startTime
     type: object
-  routers.ResolutionWithPeriodQuery:
+  app.ResolutionWithPeriodQuery:
     properties:
       endTime:
         example: UTC time in ISO-8601
@@ -43,7 +34,16 @@ definitions:
     - resolution
     - startTime
     type: object
-  routers.StartTimeQuery:
+  app.Response:
+    properties:
+      code:
+        type: integer
+      data:
+        type: object
+      msg:
+        type: string
+    type: object
+  app.StartTimeQuery:
     properties:
       startTime:
         example: UTC time in ISO-8601
@@ -52,7 +52,7 @@ definitions:
     required:
     - startTime
     type: object
-  routers.ZoomableQuery:
+  app.ZoomableQuery:
     properties:
       endTime:
         example: UTC time in ISO-8601
@@ -61,6 +61,7 @@ definitions:
       resolution:
         enum:
         - hour
+        - 5minute
         type: string
       startTime:
         example: UTC time in ISO-8601
@@ -74,21 +75,17 @@ definitions:
   services.AccumulatedPowerStateResponse:
     properties:
       batteryLifetimeEnergyACDiffs:
-        items:
-          type: number
-        type: array
+        $ref: '#/definitions/services.Float32ArrayFormat'
+        type: object
       gridLifetimeEnergyACDiffs:
-        items:
-          type: number
-        type: array
+        $ref: '#/definitions/services.Float32ArrayFormat'
+        type: object
       loadConsumedLifetimeEnergyACDiffs:
-        items:
-          type: number
-        type: array
+        $ref: '#/definitions/services.Float32ArrayFormat'
+        type: object
       pvProducedLifetimeEnergyACDiffs:
-        items:
-          type: number
-        type: array
+        $ref: '#/definitions/services.Float32ArrayFormat'
+        type: object
       timestamps:
         items:
           type: integer
@@ -97,13 +94,11 @@ definitions:
   services.BatteryChargeVoltageStateResponse:
     properties:
       batterySoCs:
-        items:
-          type: number
-        type: array
+        $ref: '#/definitions/services.Float32ArrayFormat'
+        type: object
       batteryVoltages:
-        items:
-          type: number
-        type: array
+        $ref: '#/definitions/services.Float32ArrayFormat'
+        type: object
       onPeakTime:
         additionalProperties:
           type: string
@@ -143,9 +138,8 @@ definitions:
   services.BatteryPowerStateResponse:
     properties:
       batteryAveragePowerACs:
-        items:
-          type: number
-        type: array
+        $ref: '#/definitions/services.Float32ArrayFormat'
+        type: object
       onPeakTime:
         additionalProperties:
           type: string
@@ -154,6 +148,19 @@ definitions:
         items:
           type: integer
         type: array
+    type: object
+  services.BatteryUsageInfoResponse:
+    properties:
+      batteryChargingFrom:
+        type: string
+      batteryConsumedAveragePowerAC:
+        type: number
+      batteryDischargingTo:
+        type: string
+      batteryProducedAveragePowerAC:
+        type: number
+      batterySoC:
+        type: number
     type: object
   services.ChargeInfoResponse:
     properties:
@@ -214,6 +221,10 @@ definitions:
       pvProducedLifetimeEnergyACDiff:
         type: number
     type: object
+  services.Float32ArrayFormat:
+    items:
+      type: number
+    type: array
   services.GatewayInfo:
     properties:
       address:
@@ -235,9 +246,8 @@ definitions:
   services.GridPowerStateResponse:
     properties:
       gridAveragePowerACs:
-        items:
-          type: number
-        type: array
+        $ref: '#/definitions/services.Float32ArrayFormat'
+        type: object
       onPeakTime:
         additionalProperties:
           type: string
@@ -250,9 +260,8 @@ definitions:
   services.PowerSelfSupplyRateResponse:
     properties:
       loadSelfConsumedEnergyPercentACs:
-        items:
-          type: number
-        type: array
+        $ref: '#/definitions/services.Float32ArrayFormat'
+        type: object
       timestamps:
         items:
           type: integer
@@ -261,21 +270,17 @@ definitions:
   services.PowerStateResponse:
     properties:
       batteryAveragePowerACs:
-        items:
-          type: number
-        type: array
+        $ref: '#/definitions/services.Float32ArrayFormat'
+        type: object
       gridAveragePowerACs:
-        items:
-          type: number
-        type: array
+        $ref: '#/definitions/services.Float32ArrayFormat'
+        type: object
       loadAveragePowerACs:
-        items:
-          type: number
-        type: array
+        $ref: '#/definitions/services.Float32ArrayFormat'
+        type: object
       pvAveragePowerACs:
-        items:
-          type: number
-        type: array
+        $ref: '#/definitions/services.Float32ArrayFormat'
+        type: object
       timestamps:
         items:
           type: integer
@@ -314,8 +319,6 @@ definitions:
     type: object
   services.SolarEnergyInfoResponse:
     properties:
-      allConsumedLifetimeEnergyACDiff:
-        type: number
       batteryPvConsumedEnergyPercentAC:
         type: number
       batteryPvConsumedLifetimeEnergyACDiff:
@@ -328,9 +331,11 @@ definitions:
         type: number
       loadPvConsumedLifetimeEnergyACDiff:
         type: number
-      pvCo2SavingsDiff:
+      pvCo2SavingsSum:
         type: number
-      pvEnergyCostSavingsDiff:
+      pvEnergyCostSavingsSum:
+        type: number
+      pvProducedLifetimeEnergyACDiff:
         type: number
     type: object
   services.SolarPowerStateResponse:
@@ -340,9 +345,8 @@ definitions:
           type: string
         type: object
       pvAveragePowerACs:
-        items:
-          type: number
-        type: array
+        $ref: '#/definitions/services.Float32ArrayFormat'
+        type: object
       timestamps:
         items:
           type: integer
@@ -436,6 +440,7 @@ paths:
         type: string
       - enum:
         - hour
+        - 5minute
         in: query
         name: resolution
         required: true
@@ -544,6 +549,7 @@ paths:
         type: string
       - enum:
         - hour
+        - 5minute
         in: query
         name: resolution
         required: true
@@ -583,6 +589,52 @@ paths:
       summary: Show today's hourly power state of battery
       tags:
       - energy resources
+  /{gwid}/devices/battery/usage-info:
+    get:
+      description: get battery by token, gateway UUID and startTime
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Input user's access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Gateway UUID
+        in: path
+        name: gwid
+        required: true
+        type: string
+      - example: UTC time in ISO-8601
+        format: date-time
+        in: query
+        name: startTime
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/app.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/services.BatteryUsageInfoResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Show current usage state about battery
+      tags:
+      - time of use
   /{gwid}/devices/charge-info:
     get:
       description: get demand charge information by token, gateway UUID and startTime
@@ -802,6 +854,7 @@ paths:
         type: string
       - enum:
         - hour
+        - 5minute
         in: query
         name: resolution
         required: true
@@ -925,6 +978,7 @@ paths:
         type: string
       - enum:
         - hour
+        - 5minute
         in: query
         name: resolution
         required: true
@@ -1029,6 +1083,7 @@ paths:
         type: string
       - enum:
         - hour
+        - 5minute
         in: query
         name: resolution
         required: true

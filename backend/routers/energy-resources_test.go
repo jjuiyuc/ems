@@ -78,15 +78,15 @@ var _ = Describe("EnergyResources", func() {
 				prefixURL := fmt.Sprintf("/api/%s/devices/solar/energy-info", fixtures.UtGateway.UUID)
 				seedUtURL := fmt.Sprintf("%s?startTime=%s", prefixURL, UtStartTime)
 				expectedResponseData := services.SolarEnergyInfoResponse{
-					AllConsumedLifetimeEnergyACDiff:       25,
+					PvProducedLifetimeEnergyACDiff:        10,
 					LoadPvConsumedEnergyPercentAC:         100,
 					LoadPvConsumedLifetimeEnergyACDiff:    10,
 					BatteryPvConsumedEnergyPercentAC:      0,
 					BatteryPvConsumedLifetimeEnergyACDiff: 0,
-					GridPvConsumedEnergyPercentAC:         100,
+					GridPvConsumedEnergyPercentAC:         150,
 					GridPvConsumedLifetimeEnergyACDiff:    15,
-					PvEnergyCostSavingsDiff:               85,
-					PvCo2SavingsDiff:                      19,
+					PvEnergyCostSavingsSum:                170,
+					PvCo2SavingsSum:                       38,
 				}
 				tt := testutils.TestInfo{
 					Token:      token,

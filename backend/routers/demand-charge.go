@@ -16,7 +16,7 @@ import (
 // @Security    ApiKeyAuth
 // @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
 // @Param       gwid           path      string true "Gateway UUID"
-// @Param       query          query     StartTimeQuery true "Query"
+// @Param       query          query     app.StartTimeQuery true "Query"
 // @Produce     json
 // @Success     200            {object}  app.Response{data=services.ChargeInfoResponse}
 // @Failure     400            {object}  app.Response
@@ -24,12 +24,12 @@ import (
 // @Router      /{gwid}/devices/charge-info [get]
 func (w *APIWorker) GetChargeInfo(c *gin.Context) {
 	appG := app.Gin{c}
-	param := &StartTimeParam{}
-	if err := param.validate(c); err != nil {
+	param := &app.StartTimeParam{}
+	if err := param.Validate(c); err != nil {
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
-	responseData := w.Services.Devices.GetChargeInfo(param.GatewayUUID, param.Query.StartTime)
+	responseData := w.Services.Devices.GetChargeInfo(param)
 	appG.Response(http.StatusOK, e.Success, responseData)
 }
 
@@ -40,7 +40,7 @@ func (w *APIWorker) GetChargeInfo(c *gin.Context) {
 // @Security    ApiKeyAuth
 // @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
 // @Param       gwid           path      string true "Gateway UUID"
-// @Param       query          query     PeriodQuery true "Query"
+// @Param       query          query     app.PeriodQuery true "Query"
 // @Produce     json
 // @Success     200            {object}  app.Response{data=services.DemandStateResponse}
 // @Failure     400            {object}  app.Response
@@ -48,11 +48,11 @@ func (w *APIWorker) GetChargeInfo(c *gin.Context) {
 // @Router      /{gwid}/devices/demand-state [get]
 func (w *APIWorker) GetDemandState(c *gin.Context) {
 	appG := app.Gin{c}
-	param := &PeriodParam{}
-	if err := param.validate(c); err != nil {
+	param := &app.PeriodParam{}
+	if err := param.Validate(c); err != nil {
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
-	responseData := w.Services.Devices.GetDemandState(param.GatewayUUID, param.Query.StartTime, param.Query.EndTime)
+	responseData := w.Services.Devices.GetDemandState(param)
 	appG.Response(http.StatusOK, e.Success, responseData)
 }

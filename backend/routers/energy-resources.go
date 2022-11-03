@@ -16,7 +16,7 @@ import (
 // @Security    ApiKeyAuth
 // @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
 // @Param       gwid           path      string true "Gateway UUID"
-// @Param       query          query     StartTimeQuery true "Query"
+// @Param       query          query     app.StartTimeQuery true "Query"
 // @Produce     json
 // @Success     200            {object}  app.Response{data=services.SolarEnergyInfoResponse}
 // @Failure     400            {object}  app.Response
@@ -24,12 +24,12 @@ import (
 // @Router      /{gwid}/devices/solar/energy-info [get]
 func (w *APIWorker) GetSolarEnergyInfo(c *gin.Context) {
 	appG := app.Gin{c}
-	param := &StartTimeParam{}
-	if err := param.validate(c); err != nil {
+	param := &app.StartTimeParam{}
+	if err := param.Validate(c); err != nil {
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
-	responseData := w.Services.Devices.GetSolarEnergyInfo(param.GatewayUUID, param.Query.StartTime)
+	responseData := w.Services.Devices.GetSolarEnergyInfo(param)
 	appG.Response(http.StatusOK, e.Success, responseData)
 }
 
@@ -40,7 +40,7 @@ func (w *APIWorker) GetSolarEnergyInfo(c *gin.Context) {
 // @Security    ApiKeyAuth
 // @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
 // @Param       gwid           path      string true "Gateway UUID"
-// @Param       query          query     ZoomableQuery true "Query"
+// @Param       query          query     app.ZoomableQuery true "Query"
 // @Produce     json
 // @Success     200            {object}  app.Response{data=services.SolarPowerStateResponse}
 // @Failure     400            {object}  app.Response
@@ -49,12 +49,12 @@ func (w *APIWorker) GetSolarEnergyInfo(c *gin.Context) {
 // @Router      /{gwid}/devices/solar/power-state [get]
 func (w *APIWorker) GetSolarPowerState(c *gin.Context) {
 	appG := app.Gin{c}
-	param := &ZoomableParam{}
-	if err := param.validate(c); err != nil {
+	param := &app.ZoomableParam{}
+	if err := param.Validate(c); err != nil {
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
-	responseData, err := w.Services.Devices.GetSolarPowerState(param.GatewayUUID, param.Query.StartTime, param.Query.EndTime)
+	responseData, err := w.Services.Devices.GetSolarPowerState(param)
 	if err != nil {
 		appG.Response(http.StatusInternalServerError, e.ErrSolarPowerStateGen, err.Error())
 		return
@@ -69,7 +69,7 @@ func (w *APIWorker) GetSolarPowerState(c *gin.Context) {
 // @Security    ApiKeyAuth
 // @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
 // @Param       gwid           path      string true "Gateway UUID"
-// @Param       query          query     StartTimeQuery true "Query"
+// @Param       query          query     app.StartTimeQuery true "Query"
 // @Produce     json
 // @Success     200            {object}  app.Response{data=services.BatteryEnergyInfoResponse}
 // @Failure     400            {object}  app.Response
@@ -77,12 +77,12 @@ func (w *APIWorker) GetSolarPowerState(c *gin.Context) {
 // @Router      /{gwid}/devices/battery/energy-info [get]
 func (w *APIWorker) GetBatteryEnergyInfo(c *gin.Context) {
 	appG := app.Gin{c}
-	param := &StartTimeParam{}
-	if err := param.validate(c); err != nil {
+	param := &app.StartTimeParam{}
+	if err := param.Validate(c); err != nil {
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
-	responseData := w.Services.Devices.GetBatteryEnergyInfo(param.GatewayUUID, param.Query.StartTime)
+	responseData := w.Services.Devices.GetBatteryEnergyInfo(param)
 	appG.Response(http.StatusOK, e.Success, responseData)
 }
 
@@ -93,7 +93,7 @@ func (w *APIWorker) GetBatteryEnergyInfo(c *gin.Context) {
 // @Security    ApiKeyAuth
 // @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
 // @Param       gwid           path      string true "Gateway UUID"
-// @Param       query          query     ZoomableQuery true "Query"
+// @Param       query          query     app.ZoomableQuery true "Query"
 // @Produce     json
 // @Success     200            {object}  app.Response{data=services.BatteryPowerStateResponse}
 // @Failure     400            {object}  app.Response
@@ -102,12 +102,12 @@ func (w *APIWorker) GetBatteryEnergyInfo(c *gin.Context) {
 // @Router      /{gwid}/devices/battery/power-state [get]
 func (w *APIWorker) GetBatteryPowerState(c *gin.Context) {
 	appG := app.Gin{c}
-	param := &ZoomableParam{}
-	if err := param.validate(c); err != nil {
+	param := &app.ZoomableParam{}
+	if err := param.Validate(c); err != nil {
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
-	responseData, err := w.Services.Devices.GetBatteryPowerState(param.GatewayUUID, param.Query.StartTime, param.Query.EndTime)
+	responseData, err := w.Services.Devices.GetBatteryPowerState(param)
 	if err != nil {
 		appG.Response(http.StatusInternalServerError, e.ErrBatteryPowerStateGen, err.Error())
 		return
@@ -122,7 +122,7 @@ func (w *APIWorker) GetBatteryPowerState(c *gin.Context) {
 // @Security    ApiKeyAuth
 // @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
 // @Param       gwid           path      string true "Gateway UUID"
-// @Param       query          query     ZoomableQuery true "Query"
+// @Param       query          query     app.ZoomableQuery true "Query"
 // @Produce     json
 // @Success     200            {object}  app.Response{data=services.BatteryChargeVoltageStateResponse}
 // @Failure     400            {object}  app.Response
@@ -131,12 +131,12 @@ func (w *APIWorker) GetBatteryPowerState(c *gin.Context) {
 // @Router /{gwid}/devices/battery/charge-voltage-state [get]
 func (w *APIWorker) GetBatteryChargeVoltageState(c *gin.Context) {
 	appG := app.Gin{c}
-	param := &ZoomableParam{}
-	if err := param.validate(c); err != nil {
+	param := &app.ZoomableParam{}
+	if err := param.Validate(c); err != nil {
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
-	responseData, err := w.Services.Devices.GetBatteryChargeVoltageState(param.GatewayUUID, param.Query.StartTime, param.Query.EndTime)
+	responseData, err := w.Services.Devices.GetBatteryChargeVoltageState(param)
 	if err != nil {
 		appG.Response(http.StatusInternalServerError, e.ErrBatteryChargeVoltageStateGen, err.Error())
 		return
@@ -151,7 +151,7 @@ func (w *APIWorker) GetBatteryChargeVoltageState(c *gin.Context) {
 // @Security    ApiKeyAuth
 // @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
 // @Param       gwid           path      string true "Gateway UUID"
-// @Param       query          query     StartTimeQuery true "Query"
+// @Param       query          query     app.StartTimeQuery true "Query"
 // @Produce     json
 // @Success     200            {object}  app.Response{data=services.GridEnergyInfoResponse}
 // @Failure     400            {object}  app.Response
@@ -159,12 +159,12 @@ func (w *APIWorker) GetBatteryChargeVoltageState(c *gin.Context) {
 // @Router      /{gwid}/devices/grid/energy-info [get]
 func (w *APIWorker) GetGridEnergyInfo(c *gin.Context) {
 	appG := app.Gin{c}
-	param := &StartTimeParam{}
-	if err := param.validate(c); err != nil {
+	param := &app.StartTimeParam{}
+	if err := param.Validate(c); err != nil {
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
-	responseData := w.Services.Devices.GetGridEnergyInfo(param.GatewayUUID, param.Query.StartTime)
+	responseData := w.Services.Devices.GetGridEnergyInfo(param)
 	appG.Response(http.StatusOK, e.Success, responseData)
 }
 
@@ -175,7 +175,7 @@ func (w *APIWorker) GetGridEnergyInfo(c *gin.Context) {
 // @Security    ApiKeyAuth
 // @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
 // @Param       gwid           path      string true "Gateway UUID"
-// @Param       query          query     ZoomableQuery true "Query"
+// @Param       query          query     app.ZoomableQuery true "Query"
 // @Produce     json
 // @Success     200            {object}  app.Response{data=services.GridPowerStateResponse}
 // @Failure     400            {object}  app.Response
@@ -184,12 +184,12 @@ func (w *APIWorker) GetGridEnergyInfo(c *gin.Context) {
 // @Router      /{gwid}/devices/grid/power-state [get]
 func (w *APIWorker) GetGridPowerState(c *gin.Context) {
 	appG := app.Gin{c}
-	param := &ZoomableParam{}
-	if err := param.validate(c); err != nil {
+	param := &app.ZoomableParam{}
+	if err := param.Validate(c); err != nil {
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
-	responseData, err := w.Services.Devices.GetGridPowerState(param.GatewayUUID, param.Query.StartTime, param.Query.EndTime)
+	responseData, err := w.Services.Devices.GetGridPowerState(param)
 	if err != nil {
 		appG.Response(http.StatusInternalServerError, e.ErrGridPowerStateGen, err.Error())
 		return

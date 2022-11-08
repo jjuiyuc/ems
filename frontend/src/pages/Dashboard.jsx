@@ -294,6 +294,7 @@ export default connect(mapState)(function Dashboard(props) {
                     <ElectricalGridDiagram
                         className="h-auto w-full
                                     md:py-8 lg:py-0 xl:py-8"
+                        battery={battery?.state || 0}
                         data={lines} />
                     <div className="grid-cols-2 mt-4
                                     grid md:hidden lg:grid xl:hidden">

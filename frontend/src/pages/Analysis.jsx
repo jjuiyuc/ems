@@ -1,7 +1,7 @@
 import { connect } from "react-redux"
-import { Button, Stack } from "@mui/material"
+import { Button } from "@mui/material"
 import { useTranslation } from "react-multi-lang"
-import moment from "moment"
+import moment, { RFC_2822 } from "moment"
 import { useEffect, useState } from "react"
 
 import { apiCall } from "../utils/api"
@@ -415,11 +415,12 @@ export default connect(mapState)(function Analysis(props) {
     const tabs = ["days", "weeks", "month", "year", "custom"]
 
     return <>
-        <div className="page-header">
+        <div className="page-header flex flex-wrap justify-between">
             <h1>{pageT("analysis")}</h1>
-            <Stack direction="row" justifyContent="flex-end" spacing={1.5}>
+            <div className="flex flex-wrap">
                 {tabs.map((t, i) =>
                     <Button
+                        sx={{ margin: "0.5rem 0 0 0.5rem" }}
                         onClick={() => setTab(t)}
                         filter={tab === t ? "selected" : ""}
                         key={"a-t-" + i}
@@ -427,7 +428,7 @@ export default connect(mapState)(function Analysis(props) {
                         variant="contained">
                         {pageT(t)}
                     </Button>)}
-            </Stack>
+            </div>
         </div>
         {tab === "custom"
             ? <div className="flex justify-end mb-10 relative w-auto">

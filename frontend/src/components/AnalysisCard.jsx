@@ -29,10 +29,10 @@ export default function AnalysisCard(props) {
                     key={"bar-" + i}
                     style={{ width: t.percentage + "%" }} />)}
         </div>
-        <div className="flex justify-center mb-12 mt-4">
+        <div className="flex justify-center mb-8 mt-4">
             {types.map((t, i) =>
                 <div
-                    className="flex items-center mx-2.5 text-white text-xs"
+                    className="flex items-center mx-2.5 text-white text-xs h-8"
                     key={"legend-" + i}>
                     <div className={colors[t.type] + " h-3 mr-2 rounded-full w-3"} />
                     {pageT(t.type)}
@@ -41,7 +41,7 @@ export default function AnalysisCard(props) {
         <div className="grid grid-cols-3 column-separator gap-x-5 sm:gap-x-10">
             {types.map((t, i) =>
                 <div key={"detail-" + i}>
-                    <h6 className="font-bold text-white">{pageT(t.type)}</h6>
+                    <h6 className="h-10 mb-2 font-bold text-white flex items-center">{pageT(t.type)}</h6>
                     <h3 className="my-1">{t.percentage}%</h3>
                     <p className="lg:test text-13px text-white">
                         {t.kwh} {commonT("kwh")}

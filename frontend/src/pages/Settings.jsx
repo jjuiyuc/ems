@@ -2,13 +2,17 @@ import { Button, Slider, Switch } from "@mui/material"
 import { useState } from "react"
 import { useTranslation } from "react-multi-lang"
 
+import { ValidateNum } from "../utils/utils"
+
+import DemandChargeCard from "../components/DemandChargeCard"
 import DialogBox from "../components/DialogBox"
 import SettingCard from "../components/SettingCard"
 import TimeOfUseCard from "../components/TimeOfUseCard"
+import variables from "../configs/variables"
 
 import { ReactComponent as BatteryIcon } from "../assets/icons/battery.svg"
-import { ReactComponent as DemandCharge }
-    from "../assets/icons/demand_charge_line.svg"
+
+const { colors } = variables
 
 export default function Settings(props) {
     const
@@ -21,7 +25,8 @@ export default function Settings(props) {
         [backupReserve, setBackupReserve] = useState(100),
         [clockDataset, setClockDataset] = useState({
             data: [], backgroundColor: []
-        })
+        }),
+        [maxDemandCapacity, setMaxDemandCapacity] = useState("")
     // [midPeak, setMidPeak] = useState({
     //     types: [
     //         { kwh: 7.5, percentage: 15, type: "grid" },
@@ -54,6 +59,7 @@ export default function Settings(props) {
     //     ],
     //     kwh: 60
     // }),
+
 
     return <>
         <h1 className="mb-8">{pageT("settings")}</h1>
@@ -118,5 +124,9 @@ export default function Settings(props) {
         </div>
         <DialogBox />
         <TimeOfUseCard data={clockDataset} />
+        <DemandChargeCard
+            data={maxDemandCapacity}
+            title={pageT("maximumDemandCapacity")}
+        />
     </>
 }

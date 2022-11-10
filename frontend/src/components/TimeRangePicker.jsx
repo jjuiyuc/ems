@@ -8,7 +8,9 @@ import "../assets/css/timeRangePicker.css"
 export default function TimeRangePicker(props) {
     const
         t = useTranslation(),
-        pageT = (string, params) => t("settings." + string, params)
+        pageT = (string, params) => t("settings." + string, params),
+        errorT = (string) => t("error." + string)
+
 
     const { startTime, setStartTime, endTime, setEndTime, basicPrice, rate,
         setBasicPrice, setRate } = props
@@ -57,7 +59,6 @@ export default function TimeRangePicker(props) {
             <div>
                 <h6 className="mb-1 ml-1">流動電價</h6>
                 <TextField
-                    className="react-datepicker-wrapper"
                     id="outlined-basic"
                     variant="outlined"
                     value={rate}

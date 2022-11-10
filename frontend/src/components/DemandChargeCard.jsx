@@ -1,16 +1,26 @@
-import { Button, TextField } from "@mui/material"
+import { Button, TextField, InputAdornment } from "@mui/material"
 import { useState } from "react"
 import { useTranslation } from "react-multi-lang"
+
+import { ValidateNum } from "../utils/utils"
 
 import { ReactComponent as DemandChargeIcon } from
     "../assets/icons/demand_charge_line.svg"
 
 export default function DemandChargeCard(props) {
-    const { data } = props
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
         pageT = (string, params) => t("settings." + string, params)
+    const
+        [inputValue, setInputValue] = useState("")
+    const
+        inputNum = (e) => {
+            const num = e.target.value
+            const isNum = ValidateNum(num)
+            if (!isNum) return
+            setInputValue(num)
+        }
 
     return <div className="card mt-8">
         <div className="flex justify-between sm:col-span-2 items-center">
@@ -34,10 +44,15 @@ export default function DemandChargeCard(props) {
             <h5 className="mr-8">{props.title}</h5>
             <div className="mt-6">
                 <TextField
-                    id="outlined-basic"
-                    variant="outlined"
-                // value={}
-                // onChange={(e) => { setBasicPrice(e.target.value) }}
+                    label="Maximum Demand"
+                    id="outlined-start-adornment"
+                    value={inputValue}
+                    onChange={inputNum}
+                    InputProps={{
+                        endAdornment: <InputAdornment position="end">
+                            {commonT("kwh")}
+                        </InputAdornment>
+                    }}
                 />
             </div>
         </div>

@@ -15,12 +15,14 @@
         "importFromGrid": "Import from Grid",
         "load": "Load",
         "month": "Month",
-        "realTimePowerkW": "Real-time Power (kW)",
+        "todayPowerkW": "Today Power (kW)",
         "selfSupplyRate": "Self-supply Rate (%)",
         "startDate": "Start Date",
         "to": "to",
         "weeks": "Weeks",
-        "year": "Year"
+        "year": "Year",
+        "yesterday": "Yesterday",
+        "YesterdayPowerkW":"Yesterday Power (kW)"
     },
     "common": {
         "active": "Active",

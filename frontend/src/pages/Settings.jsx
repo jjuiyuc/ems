@@ -91,6 +91,7 @@ export default function Settings(props) {
                 </div>
             </div>
         </div>
+        <DialogBox />
         <TimeOfUseCard data={clockDataset} />
         <DemandChargeCard
             data={maxDemandCapacity}

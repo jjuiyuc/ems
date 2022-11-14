@@ -2,6 +2,7 @@ import { connect } from "react-redux"
 import { Button } from "@mui/material"
 import { useTranslation } from "react-multi-lang"
 import moment from "moment"
+import ReportProblemIcon from "@mui/icons-material/ReportProblem"
 import { useEffect, useState } from "react"
 
 import { apiCall } from "../utils/api"
@@ -202,6 +203,8 @@ export default connect(mapState)(function Analysis(props) {
         [tab, setTab] = useState("days"),
         [infoError, setInfoError] = useState(""),
         [infoLoading, setInfoLoading] = useState(false),
+        [preInfoError, setPreInfoError] = useState(""),
+        [preInfoLoading, setPreInfoLoading] = useState(false),
         [energySourcesTotal, setEnergySourcesTotal] = useState({
             types: [
                 { kwh: 0, percentage: 0, type: "importFromGrid" },
@@ -218,10 +221,30 @@ export default connect(mapState)(function Analysis(props) {
             ],
             kwh: 0
         }),
+        [preEnergySourcesTotal, setPreEnergySourcesTotal] = useState({
+            types: [
+                { kwh: 0, percentage: 0, type: "importFromGrid" },
+                { kwh: 0, percentage: 0, type: "directSolarSupply" },
+                { kwh: 0, percentage: 0, type: "batteryDischarge" },
+            ],
+            kwh: 0
+        }),
+        [preEnergyDestinations, setPreEnergyDestinations] = useState({
+            types: [
+                { kwh: 0, percentage: 0, type: "load" },
+                { kwh: 0, percentage: 0, type: "exportToGrid" },
+                { kwh: 0, percentage: 0, type: "chargeToBattery" },
+            ],
+            kwh: 0
+        }),
         [lineChartPower, setLineChartPower] = useState(null),
         [lineChartPowerError, setLineChartPowerError] = useState(""),
         [lineChartPowerLoading, setLineChartPowerLoading] = useState(false),
         [lineChartPowerRes] = useState("5minute"),
+        [preLineChartPower, setPreLineChartPower] = useState(null),
+        [preLineChartPowerError, setPreLineChartPowerError] = useState(""),
+        [preLineChartPowerLoading, setPreLineChartPowerLoading] = useState(false),
+        [preLineChartPowerRes] = useState("5minute"),
         [barChartData, setBarChartData] = useState(null),
         [barChartDataError, setBarChartDataError] = useState(""),
         [barChartDataLoading, setBarChartDataLoading] = useState(false),
@@ -233,7 +256,7 @@ export default connect(mapState)(function Analysis(props) {
 
     const urlPrefix = `/api/${props.gatewayID}/devices`
     const
-        callCards = (startTime, endTime) => {
+        callTodayCards = (startTime, endTime) => {
             apiCall({
                 onComplete: () => setInfoLoading(false),
                 onError: error => setInfoError(error),
@@ -286,6 +309,59 @@ export default connect(mapState)(function Analysis(props) {
                 url: `${urlPrefix}/energy-distribution-info?startTime=${startTime}&endTime=${endTime}`
             })
         },
+        callYesterdayCards = (preStartTime, preEndTime) => {
+            apiCall({
+                onComplete: () => setPreInfoLoading(false),
+                onError: error => setPreInfoError(error),
+                onStart: () => setPreInfoLoading(true),
+                onSuccess: rawData => {
+                    if (!rawData?.data) return
+
+                    const { data } = rawData
+                    setPreEnergySourcesTotal({
+                        types: [
+                            {
+                                kwh: data.gridProducedLifetimeEnergyACDiff,
+                                percentage: data.gridProducedEnergyPercentAC,
+                                type: "importFromGrid"
+                            },
+                            {
+                                kwh: data.pvProducedLifetimeEnergyACDiff,
+                                percentage: data.pvProducedEnergyPercentAC,
+                                type: "directSolarSupply"
+                            },
+                            {
+                                kwh: data.batteryProducedLifetimeEnergyACDiff,
+                                percentage: data.batteryProducedEnergyPercentAC,
+                                type: "batteryDischarge"
+                            },
+                        ],
+                        kwh: data.allProducedLifetimeEnergyACDiff
+                    })
+                    setPreEnergyDestinations({
+                        types: [
+                            {
+                                kwh: data.loadConsumedLifetimeEnergyACDiff,
+                                percentage: data.loadConsumedEnergyPercentAC,
+                                type: "load"
+                            },
+                            {
+                                kwh: data.gridConsumedLifetimeEnergyACDiff,
+                                percentage: data.gridConsumedEnergyPercentAC,
+                                type: "exportToGrid"
+                            },
+                            {
+                                kwh: data.batteryConsumedLifetimeEnergyACDiff,
+                                percentage: data.batteryConsumedEnergyPercentAC,
+                                type: "chargeToBattery"
+                            },
+                        ],
+                        kwh: data.allConsumedLifetimeEnergyACDiff
+                    })
+                },
+                url: `${urlPrefix}/energy-distribution-info?startTime=${preStartTime}&endTime=${preEndTime}`
+            })
+        },
         callLineChartPower = (startTime, endTime) => {
             const lineChartPowerUrl = `${urlPrefix}/power-state?`
                 + new URLSearchParams({
@@ -314,6 +390,37 @@ export default connect(mapState)(function Analysis(props) {
                     })
                 },
                 url: lineChartPowerUrl
+            })
+        },
+        callPreLineChartPower = (preStartTime, preEndTime) => {
+            const preLineChartPowerUrl = `${urlPrefix}/power-state?`
+                + new URLSearchParams({
+                    startTime: preStartTime, endTime: preEndTime,
+                    resolution: preLineChartPowerRes
+                }).toString()
+
+            apiCall({
+                onComplete: () => setPreLineChartPowerLoading(false),
+                onError: error => setPreLineChartPowerError(error),
+                onStart: () => setPreLineChartPowerLoading(true),
+                onSuccess: rawData => {
+                    if (!rawData || !rawData.data) return
+
+                    const
+                        { data } = rawData,
+                        { timestamps } = data,
+                        labels = timestamps.map(t => t * 1000)
+                    setPreLineChartPower({
+                        data: {
+                            load: data.loadAveragePowerACs,
+                            solar: data.pvAveragePowerACs,
+                            battery: data.batteryAveragePowerACs,
+                            grid: data.gridAveragePowerACs
+                        },
+                        labels
+                    })
+                },
+                url: preLineChartPowerUrl
             })
         },
         callBarChartData = (startTime, endTime) => {
@@ -374,10 +481,12 @@ export default connect(mapState)(function Analysis(props) {
         if (!props.gatewayID) return
 
         let startTime = "", endTime = ""
-
+        let preStartTime = "", preEndTime = ""
         if (tab === "days") {
             startTime = moment().startOf("day").toISOString()
             endTime = moment().toISOString()
+            preStartTime = moment().subtract(1, "day").startOf("day").toISOString()
+            preEndTime = moment().subtract(1, "day").endOf("day").toISOString()
 
         } else if (tab === "weeks") {
             startTime = moment().startOf("week").toISOString()
@@ -403,15 +512,20 @@ export default connect(mapState)(function Analysis(props) {
             endTime = endDate ? moment(endDate).add(1, "day").startOf("day").toISOString() : ""
         }
         if (startTime && endTime) {
-            callCards(startTime, endTime)
+            callTodayCards(startTime, endTime)
 
+            if (preStartTime && preEndTime) {
+                callYesterdayCards(preStartTime, preEndTime)
+            }
             if (tab === "days") {
                 callLineChartPower(startTime, endTime)
+                callPreLineChartPower(preStartTime, preEndTime)
             } else {
                 callBarChartData(startTime, endTime)
                 callLineChartSupply(startTime, endTime)
             }
         }
+
     }, [props.gatewayID, tab, startDate, endDate])
 
     const tabs = ["days", "weeks", "month", "year", "custom"]
@@ -456,20 +570,51 @@ export default connect(mapState)(function Analysis(props) {
                 : null}
         </div>
         {tab == "days"
-            ? <div className="card mt-8">
-                <h4>{pageT("realTimePowerkW")}</h4>
-                <div className="max-h-80vh h-160 mt-10 relative w-full">
-                    <LineChart
-                        data={chartRealTimePowerSet({
-                            ...lineChartPower
-                        })} id="analysisLineChart" />
-                    <ErrorBox
-                        error={lineChartPowerError}
-                        message={pageT("chartError")} />
-                    <LoadingBox loading={lineChartPowerLoading} />
+            ? <>
+                <div className="card mt-8">
+                    <h4>{pageT("todayPowerkW")}</h4>
+                    <div className="max-h-80vh h-160 mt-10 relative w-full">
+                        <LineChart
+                            data={chartRealTimePowerSet({
+                                ...lineChartPower
+                            })} id="analysisLineChart" />
+                        <ErrorBox
+                            error={lineChartPowerError}
+                            message={pageT("chartError")} />
+                        <LoadingBox loading={lineChartPowerLoading} />
+                    </div>
                 </div>
-            </div>
+                <h2 className="mt-10">{pageT("yesterday")}</h2>
+                <div className="gap-8 grid md:grid-cols-2 items-start mt-8">
+                    <AnalysisCard
+                        data={preEnergySourcesTotal}
+                        title={pageT("energySourcesTotal")} />
+                    <AnalysisCard
+                        data={preEnergyDestinations}
+                        title={pageT("energyDestinationsTotal")} />
+                    {infoLoading
+                        ? <div className="absolute bg-black-main-opacity-95 grid inset-0
+                                place-items-center rounded-3xl">
+                            <Spinner />
+                        </div>
+                        : null}
+                </div>
+                <div className="card mt-8">
+                    <h4>{pageT("YesterdayPowerkW")}</h4>
+                    <div className="max-h-80vh h-160 mt-10 relative w-full">
+                        <LineChart
+                            data={chartRealTimePowerSet({
+                                ...preLineChartPower
+                            })} id="analysisLineChartYesterday" />
+                        <ErrorBox
+                            error={preLineChartPowerError}
+                            message={pageT("chartError")} />
+                        <LoadingBox loading={preLineChartPowerLoading} />
+                    </div>
+                </div>
+            </>
             : null}
+
         {tab !== "days"
             ? <>
                 <div className="card mt-8">

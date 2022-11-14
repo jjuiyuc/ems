@@ -514,18 +514,20 @@ export default connect(mapState)(function Analysis(props) {
         if (startTime && endTime) {
             callTodayCards(startTime, endTime)
 
-            if (preStartTime && preEndTime) {
-                callYesterdayCards(preStartTime, preEndTime)
-            }
             if (tab === "days") {
                 callLineChartPower(startTime, endTime)
-                callPreLineChartPower(preStartTime, preEndTime)
             } else {
                 callBarChartData(startTime, endTime)
                 callLineChartSupply(startTime, endTime)
             }
         }
+        if (preStartTime && preEndTime) {
+            callYesterdayCards(preStartTime, preEndTime)
 
+            if (tab === "days") {
+                callPreLineChartPower(preStartTime, preEndTime)
+            }
+        }
     }, [props.gatewayID, tab, startDate, endDate])
 
     const tabs = ["days", "weeks", "month", "year", "custom"]

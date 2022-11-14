@@ -15,38 +15,46 @@ const maxPolicyCount = 5
 const defaultPolicyConfig = {
     onPeak: {
         name: "onPeak",
+        tempName: "onPeak",
         extensible: true,
         nameEditable: false,
+        deletable: false
     },
     midPeak: {
         name: "midPeak",
+        tempName: "midPeak",
         extensible: true,
         nameEditable: false,
+        deletable: false
     },
     offPeak: {
         name: "offPeak",
+        tempName: "offPeak",
         extensible: true,
         nameEditable: false,
+        deletable: false
     },
     superOffPeak: {
         name: "superOffPeak",
+        tempName: "superOffPeak",
         extensible: true,
         nameEditable: false,
+        deletable: false
     },
 }
 
 const defaultPolicyPrice = {
     onPeak: [
-        { startTime: null, endTime: null, basicPrice: "", rate: "" }
+        { startTime: "", endTime: "", basicPrice: "88", rate: "9" },
     ],
     midPeak: [
-        { startTime: null, endTime: null, basicPrice: "47", rate: "" }
+        { startTime: "", endTime: "", basicPrice: "", rate: "" }
     ],
     offPeak: [
-        { startTime: null, endTime: null, basicPrice: "47", rate: "3" }
+        { startTime: "", endTime: "", basicPrice: "", rate: "" }
     ],
     superOffPeak: [
-        { startTime: null, endTime: null, basicPrice: "47", rate: "4" }
+        { startTime: "", endTime: "", basicPrice: "", rate: "" }
     ],
 }
 export default function TimeOfUseCard(props) {
@@ -82,7 +90,6 @@ export default function TimeOfUseCard(props) {
             }
             setPolicyConfig(newPolicyConfig)
         }
-
 
     console.log(Object.keys(policyConfig))
 
@@ -159,7 +166,15 @@ export default function TimeOfUseCard(props) {
                                         value={policyConfig[policy].tempName}
                                         onChange={changePolicyConfig}
                                     /> :
-                                    <h5 className="font-bold">{policyConfig[policy].name}</h5>}
+                                    <h5 className="font-bold">{policyConfig[policy].name}</h5>
+                                }
+                                {policyConfig[policy].deletable ?
+                                    <DeleteIcon
+                                        onClick={() => {
+                                            const { [policy]: deleted, ...newPolicyConfig } = policyConfig
+                                            setPolicyConfig(newPolicyConfig)
+                                        }}
+                                    /> : null}
                             </div>
                             {priceGroup.map(({ startTime, endTime, basicPrice, rate }, index) => {
                                 return (
@@ -211,6 +226,15 @@ export default function TimeOfUseCard(props) {
                                                 setPolicyPrice(newPolicyPrice)
                                             }}
                                         />
+                                        {index ? <DeleteIcon
+                                            onClick={() => {
+                                                const newPolicyPrice = {
+                                                    ...policyPrice,
+                                                    [policy]: priceGroup.filter((_, i) => i !== index)
+                                                }
+                                                setPolicyPrice(newPolicyPrice)
+                                            }}
+                                        /> : null}
                                     </>
                                 )
                             })}
@@ -224,7 +248,7 @@ export default function TimeOfUseCard(props) {
                                                 ...policyPrice,
                                                 [policy]: [
                                                     ...priceGroup,
-                                                    { startTime: null, endTime: null, basicPrice: null, rate: null }
+                                                    { startTime: "", endTime: "", basicPrice: "", rate: "" }
                                                 ]
                                             }
                                             setPolicyPrice(newPolicyPrice)
@@ -245,16 +269,17 @@ export default function TimeOfUseCard(props) {
                                     ...policyConfig,
                                     [newKey]: {
                                         name: newName,
+                                        tempName: newName,
                                         extensible: true,
                                         nameEditable: true,
-                                        tempName: newName
+                                        deletable: true
                                     }
                                 }
                                 setPolicyConfig(newPolicyConfig)
 
                                 const newPolicyPrice = {
                                     ...policyPrice,
-                                    [newKey]: [{ startTime: null, endTime: null, basicPrice: "", rate: "" }]
+                                    [newKey]: [{ startTime: "", endTime: "", basicPrice: "", rate: "" }]
                                 }
                                 setPolicyPrice(newPolicyPrice)
                             }}

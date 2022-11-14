@@ -1,7 +1,12 @@
 import { Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material"
 import { useEffect, useState } from "react"
 
-export default function DialogBox() {
+export default function DialogBox({
+    triggerName = "",
+    leftButtonName = "",
+    rightButtonName = "",
+    closeOutside = false
+}) {
     const [open, setOpen] = useState(false);
 
     const handleClickOpen = () => {
@@ -15,12 +20,16 @@ export default function DialogBox() {
     return (
         <>
             <div>
-                <Button variant="outlined" onClick={handleClickOpen}>
-                    Open alert dialog
+                <Button
+                    key={"s-b-"}
+                    radius="pill"
+                    variant="contained"
+                    onClick={handleClickOpen}>
+                    {triggerName}
                 </Button>
                 <Dialog
                     open={open}
-                    onClose={handleClose}
+                    onClose={closeOutside ? handleClose : () => { }}
                     aria-labelledby="alert-dialog-title"
                     aria-describedby="alert-dialog-description"
                 >
@@ -34,9 +43,11 @@ export default function DialogBox() {
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={handleClose}>Disagree</Button>
+                        <Button onClick={handleClose}>
+                            {leftButtonName}
+                        </Button>
                         <Button onClick={handleClose} autoFocus>
-                            Agree
+                            {rightButtonName}
                         </Button>
                     </DialogActions>
                 </Dialog>

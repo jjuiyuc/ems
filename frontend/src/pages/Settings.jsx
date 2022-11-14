@@ -20,46 +20,13 @@ export default function Settings(props) {
         commonT = string => t("common." + string),
         pageT = (string, params) => t("settings." + string, params)
     const
-        [reservedForGridOutage, setReservedForGridOutage] = useState(85),
-        [availableRegularUsage, setAvailableRegularUsage] = useState(15),
+        [reservedForGridOutage, setReservedForGridOutage] = useState(0),
+        [availableRegularUsage, setAvailableRegularUsage] = useState(100),
         [backupReserve, setBackupReserve] = useState(100),
         [clockDataset, setClockDataset] = useState({
             data: [], backgroundColor: []
         }),
         [maxDemandCapacity, setMaxDemandCapacity] = useState("")
-    // [midPeak, setMidPeak] = useState({
-    //     types: [
-    //         { kwh: 7.5, percentage: 15, type: "grid" },
-    //         { kwh: 30, percentage: 60, type: "solar" },
-    //         { kwh: 12.5, percentage: 25, type: "battery" },
-    //     ],
-    //     kwh: 50
-    // }),
-    // [onPeak, setOnPeak] = useState({
-    //     types: [
-    //         { kwh: 5, percentage: 10, type: "grid" },
-    //         { kwh: 52, percentage: 50, type: "solar" },
-    //         { kwh: 20, percentage: 40, type: "battery" },
-    //     ],
-    //     kwh: 50
-    // }),
-    // [offPeak, setOffPeak] = useState({
-    //     types: [
-    //         { kwh: 10, percentage: 18, type: "grid" },
-    //         { kwh: 25, percentage: 41, type: "solar" },
-    //         { kwh: 25, percentage: 41, type: "battery" },
-    //     ],
-    //     kwh: 60
-    // }),
-    // [superOffPeak, setSuperOffPeak] = useState({
-    //     types: [
-    //         { kwh: 21, percentage: 35, type: "grid" },
-    //         { kwh: 24, percentage: 40, type: "solar" },
-    //         { kwh: 15, percentage: 25, type: "battery" },
-    //     ],
-    //     kwh: 60
-    // }),
-
 
     return <>
         <h1 className="mb-8">{pageT("settings")}</h1>
@@ -73,13 +40,11 @@ export default function Settings(props) {
                     </div>
                     <h2 className="font-bold ml-4">{commonT("battery")}</h2>
                 </div>
-                <Button
-                    // onClick={() => setTab(t)}
-                    key={"s-b-"}
-                    radius="pill"
-                    variant="contained">
-                    {pageT("save")}
-                </Button>
+                <DialogBox
+                    triggerName={pageT("save")}
+                    leftButtonName={pageT("cancel")}
+                    rightButtonName={pageT("turnOff")}
+                />
             </div>
             <div className="lg:grid grid-cols-3 mt-12">
                 <div className="col-span-2">
@@ -99,7 +64,11 @@ export default function Settings(props) {
                                 title={pageT("backupReserve")} />
                         </div>
                         <div>
-                            <Slider defaultValue={50} aria-label="Default" valueLabelDisplay="auto" />
+                            <Slider defaultValue={0} aria-label="Default" valueLabelDisplay="auto"
+                                onChange={(e) => {
+                                    setReservedForGridOutage(Number(e.target.value))
+                                    setAvailableRegularUsage(100 - Number(e.target.value))
+                                }} />
                             <div className="flex justify-between">
                                 <p className="text-11px">{pageT("reservedForGrid")}</p>
                                 <p className="text-11px">{pageT("regularUsage")}</p>
@@ -122,7 +91,6 @@ export default function Settings(props) {
                 </div>
             </div>
         </div>
-        <DialogBox />
         <TimeOfUseCard data={clockDataset} />
         <DemandChargeCard
             data={maxDemandCapacity}

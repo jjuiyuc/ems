@@ -15,12 +15,14 @@
         "importFromGrid": "Import from Grid",
         "load": "Load",
         "month": "Month",
-        "realTimePowerkW": "Real-time Power (kW)",
+        "todayPowerkW": "Today Power (kW)",
         "selfSupplyRate": "Self-supply Rate (%)",
         "startDate": "Start Date",
         "to": "to",
         "weeks": "Weeks",
-        "year": "Year"
+        "year": "Year",
+        "yesterday": "Yesterday",
+        "YesterdayPowerkW":"Yesterday Power (kW)"
     },
     "common": {
         "active": "Active",
@@ -102,6 +104,7 @@
     },
     "energyResources": {
         "battery": {
+            "accumulated": "Accumulated",
             "batteryInformation": "Battery Information",
             "batteryOperationCycles": "Battery Operation Cycles",
             "batteryPower": "Battery Power (kW)",
@@ -111,7 +114,6 @@
             "chartError": "Can't get chart data",
             "discharged": "Discharged",
             "infoError": "Can't get battery info",
-            "accumulated": "Accumulated",
             "modal": "Modal",
             "percentage": "Percentage",
             "powerSources": "Power Sources",
@@ -152,6 +154,9 @@
         "passwordIncorrect": "Password is incorrect, please try again.",
         "passwordNotMatch": "Password does not match, please try again.",
         "passwordTokenError": "The reset password link is invalid.",
+        "pricingError":"Pricing must be greater than 0.",
+        "sumError":"The sum of the time range must be equal to 24 hours.",
+        "timeOverlapError":"The time range cannot overlap.",
         "userLocked": "User is locked."
     },
     "forgotPassword": {
@@ -186,22 +191,36 @@
         "resetPassword": "Reset Password"
     },
     "settings":{
+        "addRatePeriod":"Add Rate Period",
+        "addTimeRange":"Add Time Range",
         "availableRegularUsage":"Available Regular Usage",
         "backupReserve":"Backup Reserve",
         "chargingSources":"Charging Sources",
+        "endTime":"End Time",
+        "maximumDemandCapacity":"Maximum Demand Capacity",
+        "midPeak": "Mid-peak",
+        "nonSummerTariff":"Non-summer Tariff",
+        "offPeak": "Off-peak",
+        "onPeak": "On-peak",
         "regularUsage":"Regular Usage",
         "reservedForGrid":"Reserved for Grid",
         "reservedForGridOutage":"Reserved for Grid Outage",
+        "saturday":"Saturday",
+        "startTime":"Start Time",
         "save":"Save",
         "settings":"Settings",
-        "timeOfUse": "Time of Use"
-
+        "summerTariff":"Summer Tariff",
+        "sundayHoliday":"Sunday & Holiday",
+        "superOffPeak": "Super off-Peak",
+        "tariff":"Tariff",
+        "timeOfUse": "Time of Use",
+        "to": "to",
+        "weekdays":"Weekdays"
     },
     "timeOfUse": {
         "batteryStatus": "Battery Status",
         "chargingFrom": "Charging From",
         "current": "Current",
-        "dischargingTo": "Discharging To",
         "directSolarUsage": "Direct Solar Usage(%)",
         "dischargingTo":"Discharging To",
         "editTimeOfUse": "Edit Time of Use",

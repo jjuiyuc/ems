@@ -5,7 +5,9 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
+	"der-ems/internal/e"
 	"der-ems/internal/utils"
+	deremsmodels "der-ems/models/der-ems"
 	"der-ems/repository"
 )
 
@@ -22,6 +24,7 @@ type BillingService interface {
 	GetLocalTime(touLocationID int64, t time.Time) (localTime time.Time, err error)
 	GetPeriodTypeOfDay(touLocationID int64, t time.Time) (periodType string)
 	IsSummer(t time.Time) bool
+	GetBillingsOfLocalTime(gwUUID string, t time.Time) (localTime time.Time, billings []*deremsmodels.Tou, err error)
 }
 
 type defaultBillingService struct {
@@ -98,4 +101,52 @@ func (s defaultBillingService) IsSummer(t time.Time) bool {
 	}
 	return false
 
+}
+
+// GetBillingsOfLocalTime godoc
+func (s defaultBillingService) GetBillingsOfLocalTime(gwUUID string, t time.Time) (localTime time.Time, billings []*deremsmodels.Tou, err error) {
+	gateway, err := s.repo.Gateway.GetGatewayByGatewayUUID(gwUUID)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "s.repo.Gateway.GetGatewayByGatewayUUID",
+			"err":       err,
+		}).Error()
+		return
+	}
+	billingType, err := s.GetBillingTypeByCustomerID(gateway.CustomerID)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "s.GetBillingTypeByCustomerID",
+			"err":       err,
+		}).Error()
+		return
+	}
+	localTime, err = s.GetLocalTime(billingType.TOULocationID, t)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "s.GetLocalTime",
+			"err":       err,
+		}).Error()
+		return
+	}
+	periodType := s.GetPeriodTypeOfDay(billingType.TOULocationID, localTime)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "s.GetPeriodTypeOfDay",
+			"err":       err,
+		}).Error()
+		return
+	}
+	isSummer := s.IsSummer(localTime)
+	billings, err = s.repo.TOU.GetBillingsByTOUInfo(billingType.TOULocationID, billingType.VoltageType, billingType.TOUType, periodType, isSummer, localTime.Format(utils.YYYYMMDD))
+	if err == nil && len(billings) == 0 {
+		err = e.ErrNewBillingsNotExist
+	}
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "s.repo.TOU.GetBillingsByTOUInfo",
+			"err":       err,
+		}).Error()
+	}
+	return
 }

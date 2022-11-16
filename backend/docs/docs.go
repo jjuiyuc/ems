@@ -1943,7 +1943,7 @@ var doc = `{
                     "type": "number"
                 },
                 "pvEnergyCostSavingsSum": {
-                    "type": "number"
+                    "type": "integer"
                 },
                 "pvProducedLifetimeEnergyACDiff": {
                     "type": "number"

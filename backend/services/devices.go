@@ -227,7 +227,7 @@ type SolarEnergyInfoResponse struct {
 	BatteryPvConsumedLifetimeEnergyACDiff float32       `json:"batteryPvConsumedLifetimeEnergyACDiff"`
 	GridPvConsumedEnergyPercentAC         float32       `json:"gridPvConsumedEnergyPercentAC"`
 	GridPvConsumedLifetimeEnergyACDiff    float32       `json:"gridPvConsumedLifetimeEnergyACDiff"`
-	PvEnergyCostSavingsSum                Float32Format `json:"pvEnergyCostSavingsSum"`
+	PvEnergyCostSavingsSum                int           `json:"pvEnergyCostSavingsSum"`
 	PvCo2SavingsSum                       Float32Format `json:"pvCo2SavingsSum"`
 }
 
@@ -261,7 +261,7 @@ func (r *SolarEnergyInfoResponse) ComputedValues(firstLogOfDay, firstLogOfMonth,
 		sumOfPvEnergyCostSavings = sumOfPvEnergyCostSavings + logOfMonth.PvEnergyCostSavings.Float32
 		sumOfPvCo2Savings = sumOfPvCo2Savings + logOfMonth.PvCo2Savings.Float32
 	}
-	r.PvEnergyCostSavingsSum = Float32Format(sumOfPvEnergyCostSavings)
+	r.PvEnergyCostSavingsSum = int(sumOfPvEnergyCostSavings)
 	r.PvCo2SavingsSum = Float32Format(sumOfPvCo2Savings)
 }
 
@@ -577,20 +577,35 @@ func (s defaultDevicesService) GetDemandState(param *app.PeriodParam) (demandSta
 
 	for startTimeIndex.Before(param.Query.EndTime) {
 		latestComputedDemandState := s.getLatestComputedDemandState(param.GatewayUUID, startTimeIndex, endTimeIndex, param.Query.EndTime)
-		if latestComputedDemandState == nil {
-			break
-		}
-		log.Debug("latestComputedDemandState: ", latestComputedDemandState)
-		demandState.Timestamps = append(demandState.Timestamps, latestComputedDemandState.Timestamps)
-		demandState.GridLifetimeEnergyACDiffToPowers = append(demandState.GridLifetimeEnergyACDiffToPowers, latestComputedDemandState.GridLifetimeEnergyACDiffToPower)
-		if latestComputedDemandState.GridContractPowerAC != 0 {
-			demandState.GridContractPowerAC = latestComputedDemandState.GridContractPowerAC
+		if latestComputedDemandState != nil {
+			log.Debug("latestComputedDemandState: ", latestComputedDemandState)
+			demandState.Timestamps = append(demandState.Timestamps, latestComputedDemandState.Timestamps)
+			demandState.GridLifetimeEnergyACDiffToPowers = append(demandState.GridLifetimeEnergyACDiffToPowers, latestComputedDemandState.GridLifetimeEnergyACDiffToPower)
+			if latestComputedDemandState.GridContractPowerAC != 0 {
+				demandState.GridContractPowerAC = latestComputedDemandState.GridContractPowerAC
+			}
 		}
 
 		startTimeIndex = endTimeIndex
 		endTimeIndex = startTimeIndex.Add(15 * time.Minute)
 		if endTimeIndex.After(param.Query.EndTime) {
 			endTimeIndex = param.Query.EndTime
+		}
+	}
+
+	// avoid frontend error to send default line data for chart display
+	if demandState.Timestamps == nil {
+		startTimeIndex = param.Query.StartTime
+		endTimeIndex = param.Query.StartTime.Add(15 * time.Minute)
+		for startTimeIndex.Before(param.Query.EndTime) {
+			demandState.Timestamps = append(demandState.Timestamps, int(endTimeIndex.Add(-1*time.Second).Unix()))
+			demandState.GridLifetimeEnergyACDiffToPowers = append(demandState.GridLifetimeEnergyACDiffToPowers, 0)
+
+			startTimeIndex = endTimeIndex
+			endTimeIndex = startTimeIndex.Add(15 * time.Minute)
+			if endTimeIndex.After(param.Query.EndTime) {
+				endTimeIndex = param.Query.EndTime
+			}
 		}
 	}
 	return
@@ -736,17 +751,16 @@ func (s defaultDevicesService) getRealtimeInfo(param *app.ZoomableParam) (realti
 
 	for startTimeIndex.Before(param.Query.EndTime) {
 		latestRealtimeInfo := s.getLatestRealtimeInfo(param.GatewayUUID, startTimeIndex, endTimeIndex, param.Query.EndTime)
-		if latestRealtimeInfo == nil {
-			break
+		if latestRealtimeInfo != nil {
+			log.Debug("latestRealtimeInfo.LogDate: ", latestRealtimeInfo.LogDate)
+			realtimeInfo.Timestamps = append(realtimeInfo.Timestamps, int(latestRealtimeInfo.LogDate.Unix()))
+			realtimeInfo.LoadAveragePowerACs = append(realtimeInfo.LoadAveragePowerACs, utils.ThreeDecimalPlaces(latestRealtimeInfo.LoadAveragePowerAC.Float32))
+			realtimeInfo.BatteryAveragePowerACs = append(realtimeInfo.BatteryAveragePowerACs, utils.ThreeDecimalPlaces(latestRealtimeInfo.BatteryAveragePowerAC.Float32))
+			realtimeInfo.PvAveragePowerACs = append(realtimeInfo.PvAveragePowerACs, utils.ThreeDecimalPlaces(latestRealtimeInfo.PvAveragePowerAC.Float32))
+			realtimeInfo.GridAveragePowerACs = append(realtimeInfo.GridAveragePowerACs, utils.ThreeDecimalPlaces(latestRealtimeInfo.GridAveragePowerAC.Float32))
+			realtimeInfo.BatterySoCs = append(realtimeInfo.BatterySoCs, utils.ThreeDecimalPlaces(latestRealtimeInfo.BatterySoC.Float32))
+			realtimeInfo.BatteryVoltages = append(realtimeInfo.BatteryVoltages, utils.ThreeDecimalPlaces(latestRealtimeInfo.BatteryVoltage.Float32))
 		}
-		log.Debug("latestRealtimeInfo.LogDate: ", latestRealtimeInfo.LogDate)
-		realtimeInfo.Timestamps = append(realtimeInfo.Timestamps, int(latestRealtimeInfo.LogDate.Unix()))
-		realtimeInfo.LoadAveragePowerACs = append(realtimeInfo.LoadAveragePowerACs, latestRealtimeInfo.LoadAveragePowerAC.Float32)
-		realtimeInfo.BatteryAveragePowerACs = append(realtimeInfo.BatteryAveragePowerACs, latestRealtimeInfo.BatteryAveragePowerAC.Float32)
-		realtimeInfo.PvAveragePowerACs = append(realtimeInfo.PvAveragePowerACs, latestRealtimeInfo.PvAveragePowerAC.Float32)
-		realtimeInfo.GridAveragePowerACs = append(realtimeInfo.GridAveragePowerACs, latestRealtimeInfo.GridAveragePowerAC.Float32)
-		realtimeInfo.BatterySoCs = append(realtimeInfo.BatterySoCs, latestRealtimeInfo.BatterySoC.Float32)
-		realtimeInfo.BatteryVoltages = append(realtimeInfo.BatteryVoltages, latestRealtimeInfo.BatteryVoltage.Float32)
 
 		startTimeIndex = endTimeIndex
 		switch param.Query.Resolution {
@@ -757,6 +771,32 @@ func (s defaultDevicesService) getRealtimeInfo(param *app.ZoomableParam) (realti
 		}
 		if endTimeIndex.After(param.Query.EndTime) {
 			endTimeIndex = param.Query.EndTime
+		}
+	}
+
+	// avoid frontend error to send default line data for chart display
+	if realtimeInfo.Timestamps == nil {
+		startTimeIndex = param.Query.StartTime
+		endTimeIndex = param.GetEndTimeIndex()
+		for startTimeIndex.Before(param.Query.EndTime) {
+			realtimeInfo.Timestamps = append(realtimeInfo.Timestamps, int(endTimeIndex.Add(-1*time.Second).Unix()))
+			realtimeInfo.LoadAveragePowerACs = append(realtimeInfo.LoadAveragePowerACs, 0)
+			realtimeInfo.BatteryAveragePowerACs = append(realtimeInfo.BatteryAveragePowerACs, 0)
+			realtimeInfo.PvAveragePowerACs = append(realtimeInfo.PvAveragePowerACs, 0)
+			realtimeInfo.GridAveragePowerACs = append(realtimeInfo.GridAveragePowerACs, 0)
+			realtimeInfo.BatterySoCs = append(realtimeInfo.BatterySoCs, 0)
+			realtimeInfo.BatteryVoltages = append(realtimeInfo.BatteryVoltages, 0)
+
+			startTimeIndex = endTimeIndex
+			switch param.Query.Resolution {
+			case "hour":
+				endTimeIndex = startTimeIndex.Add(1 * time.Hour)
+			case "5minute":
+				endTimeIndex = startTimeIndex.Add(5 * time.Minute)
+			}
+			if endTimeIndex.After(param.Query.EndTime) {
+				endTimeIndex = param.Query.EndTime
+			}
 		}
 	}
 	return
@@ -800,12 +840,7 @@ func (s defaultDevicesService) getLatestRealtimeInfo(gwUUID string, startTimeInd
 			"startTimeIndex": startTimeIndex,
 			"endTimeIndex":   endTimeIndex,
 		}).Error()
-		if endTimeIndex == endTime {
-			return nil
-		}
-		latestLog = &deremsmodels.CCDataLog{
-			LogDate: endTimeIndex.Add(-1 * time.Second),
-		}
+		return nil
 	}
 	return
 }
@@ -860,11 +895,7 @@ func (s defaultDevicesService) getLatestComputedDemandState(gwUUID string, start
 			"startTimeIndex": startTimeIndex,
 			"endTimeIndex":   endTimeIndex,
 		}).Error()
-		if endTimeIndex == endTime {
-			return nil
-		}
-		latestComputedDemandState.Timestamps = int(endTimeIndex.Add(-1 * time.Second).Unix())
-		return
+		return nil
 	}
 
 	latestComputedDemandState.Timestamps = int(latestLog.LogDate.Unix())

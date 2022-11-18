@@ -200,6 +200,12 @@ type BatteryUsageInfoResponse struct {
 	BatteryDischargingTo          string        `json:"batteryDischargingTo"`
 }
 
+// TimeOfUseInfoResponse godoc
+type TimeOfUseInfoResponse struct {
+	EnergySources map[string]interface{} `json:"energySources"`
+	TimeOfUse     map[string]interface{} `json:"timeOfUse"`
+}
+
 // ChargeInfoResponse godoc
 type ChargeInfoResponse struct {
 	GridPowerCost              float32       `json:"gridPowerCost"`
@@ -366,6 +372,7 @@ type DevicesService interface {
 	GetAccumulatedPowerState(param *app.ResolutionWithPeriodParam) (accumulatedPowerState *AccumulatedPowerStateResponse)
 	GetPowerSelfSupplyRate(param *app.ResolutionWithPeriodParam) (powerSelfSupplyRate *PowerSelfSupplyRateResponse)
 	GetBatteryUsageInfo(param *app.StartTimeParam) (batteryUsageInfo *BatteryUsageInfoResponse)
+	GetTimeOfUseInfo(param *app.StartTimeParam) (timeOfUseInfo *TimeOfUseInfoResponse, err error)
 	GetChargeInfo(param *app.StartTimeParam) (chargeInfo *ChargeInfoResponse)
 	GetDemandState(param *app.PeriodParam) (demandState *DemandStateResponse)
 	GetSolarEnergyInfo(param *app.StartTimeParam) (solarEnergyInfo *SolarEnergyInfoResponse)
@@ -566,6 +573,182 @@ func (s defaultDevicesService) GetBatteryUsageInfo(param *app.StartTimeParam) (b
 	batteryUsageInfo.BatteryConsumedAveragePowerAC = Float32Format(latestLog.BatteryConsumedAveragePowerAC.Float32)
 	batteryUsageInfo.BatteryChargingFrom = latestLog.BatteryChargingFrom.String
 	batteryUsageInfo.BatteryDischargingTo = latestLog.BatteryDischargingTo.String
+	return
+}
+
+func (s defaultDevicesService) GetTimeOfUseInfo(param *app.StartTimeParam) (timeOfUseInfo *TimeOfUseInfoResponse, err error) {
+	timeOfUseInfo = &TimeOfUseInfoResponse{}
+	localStartTime, billings, err := s.billing.GetBillingsOfLocalTime(param.GatewayUUID, param.Query.StartTime)
+	if err != nil {
+		return
+	}
+
+	// 1. energySources
+	energySources, err := s.getEnergySourcesInfo(param.GatewayUUID, localStartTime, billings)
+	if err != nil {
+		return
+	}
+	timeOfUseInfo.EnergySources = energySources
+
+	// 2. timeOfUse
+	timeOfUse, err := s.getTimeOfUse(localStartTime, billings)
+	if err != nil {
+		return
+	}
+	timeOfUseInfo.TimeOfUse = timeOfUse
+
+	log.WithFields(log.Fields{
+		"energySources": energySources,
+		"timeOfUse":     timeOfUse,
+	}).Debug()
+	return
+}
+
+func (s defaultDevicesService) getEnergySourcesInfo(gwUUID string, localStartTime time.Time, billings []*deremsmodels.Tou) (energySources map[string]interface{}, err error) {
+	energySources = make(map[string]interface{})
+
+	onPeak, err := s.getEnergySourceDistributionByPeakType("On-peak", gwUUID, localStartTime, billings)
+	if err != nil {
+		return
+	}
+	midPeak, err := s.getEnergySourceDistributionByPeakType("Mid-peak", gwUUID, localStartTime, billings)
+	if err != nil {
+		return
+	}
+	offPeak, err := s.getEnergySourceDistributionByPeakType("Off-peak", gwUUID, localStartTime, billings)
+	if err != nil {
+		return
+	}
+	if len(onPeak) > 0 {
+		energySources["onPeak"] = onPeak
+	}
+	if len(midPeak) > 0 {
+		energySources["midPeak"] = midPeak
+	}
+	if len(offPeak) > 0 {
+		energySources["offPeak"] = offPeak
+	}
+	return
+}
+
+func (s defaultDevicesService) getEnergySourceDistributionByPeakType(peakType string, gwUUID string, localStartTime time.Time, billings []*deremsmodels.Tou) (energySourceDistribution map[string]float32, err error) {
+	energySourceDistribution = make(map[string]float32)
+
+	loc := time.FixedZone(localStartTime.Zone())
+	for _, billing := range billings {
+		if billing.PeakType.String != peakType {
+			continue
+		}
+
+		startTime, err := time.ParseInLocation(utils.HHMMSS24h, billing.PeriodStime.String, loc)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"caused-by": "time.ParseInLocation",
+				"err":       err,
+			}).Error()
+			break
+		}
+		startTimeInUTC := time.Date(localStartTime.Year(), localStartTime.Month(), localStartTime.Day(), startTime.Hour(), startTime.Minute(), startTime.Second(), 0, loc).In(time.UTC)
+		endTime, err := time.ParseInLocation(utils.HHMMSS24h, billing.PeriodEtime.String, loc)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"caused-by": "time.ParseInLocation",
+				"err":       err,
+			}).Error()
+			break
+		}
+		endTimeInUTC := time.Date(localStartTime.Year(), localStartTime.Month(), localStartTime.Day(), endTime.Hour(), endTime.Minute(), endTime.Second(), 0, loc).In(time.UTC)
+		if billing.PeriodEtime.String == "00:00:00" {
+			endTimeInUTC = endTimeInUTC.AddDate(0, 0, 1)
+		}
+		firstLog, err1 := s.repo.CCData.GetFirstLog(gwUUID, startTimeInUTC, endTimeInUTC)
+		latestLog, err2 := s.repo.CCData.GetLatestLog(gwUUID, startTimeInUTC, endTimeInUTC)
+		if err1 != nil || err2 != nil {
+			log.WithFields(log.Fields{
+				"caused-by":      "s.repo.CCData.GetFirstLog and GetLatestLog",
+				"err1":           err1,
+				"err2":           err2,
+				"startTimeInUTC": startTimeInUTC,
+				"endTimeInUTC":   endTimeInUTC,
+			}).Error()
+			continue
+		}
+
+		pvProducedLifetimeEnergyACDiff := utils.Diff(latestLog.PvProducedLifetimeEnergyAC.Float32, firstLog.PvProducedLifetimeEnergyAC.Float32)
+		gridProducedLifetimeEnergyACDiff := utils.Diff(latestLog.GridProducedLifetimeEnergyAC.Float32, firstLog.GridProducedLifetimeEnergyAC.Float32)
+		batteryProducedLifetimeEnergyACDiff := utils.Diff(latestLog.BatteryProducedLifetimeEnergyAC.Float32, firstLog.BatteryProducedLifetimeEnergyAC.Float32)
+		energySourceDistribution["pvProducedLifetimeEnergyACDiff"] += pvProducedLifetimeEnergyACDiff
+		energySourceDistribution["gridProducedLifetimeEnergyACDiff"] += gridProducedLifetimeEnergyACDiff
+		energySourceDistribution["batteryProducedLifetimeEnergyACDiff"] += batteryProducedLifetimeEnergyACDiff
+	}
+
+	if len(energySourceDistribution) > 0 {
+		energySourceDistribution["pvProducedLifetimeEnergyACDiff"] = utils.ThreeDecimalPlaces(energySourceDistribution["pvProducedLifetimeEnergyACDiff"])
+		energySourceDistribution["gridProducedLifetimeEnergyACDiff"] = utils.ThreeDecimalPlaces(energySourceDistribution["gridProducedLifetimeEnergyACDiff"])
+		energySourceDistribution["batteryProducedLifetimeEnergyACDiff"] = utils.ThreeDecimalPlaces(energySourceDistribution["batteryProducedLifetimeEnergyACDiff"])
+		energySourceDistribution["allProducedLifetimeEnergyACDiff"] = utils.ThreeDecimalPlaces(
+			energySourceDistribution["pvProducedLifetimeEnergyACDiff"] +
+				energySourceDistribution["gridProducedLifetimeEnergyACDiff"] +
+				energySourceDistribution["batteryProducedLifetimeEnergyACDiff"])
+		energySourceDistribution["pvProducedEnergyPercentAC"] = utils.Percent(
+			energySourceDistribution["pvProducedLifetimeEnergyACDiff"],
+			energySourceDistribution["allProducedLifetimeEnergyACDiff"])
+		energySourceDistribution["gridProducedEnergyPercentAC"] = utils.Percent(
+			energySourceDistribution["gridProducedLifetimeEnergyACDiff"],
+			energySourceDistribution["allProducedLifetimeEnergyACDiff"])
+		energySourceDistribution["batteryProducedEnergyPercentAC"] = utils.Percent(
+			energySourceDistribution["batteryProducedLifetimeEnergyACDiff"],
+			energySourceDistribution["allProducedLifetimeEnergyACDiff"])
+	}
+	return
+}
+
+func (s defaultDevicesService) getTimeOfUse(localStartTime time.Time, billings []*deremsmodels.Tou) (timeOfUse map[string]interface{}, err error) {
+	timeOfUse = make(map[string]interface{})
+
+	// 1. timezone
+	timeOfUse["timezone"] = localStartTime.Format(utils.ZHHMM)
+
+	// 2. onPeak, midPeak, offPeak
+	onPeak := s.getPeriodsByPeakType("On-peak", billings)
+	midPeak := s.getPeriodsByPeakType("Mid-peak", billings)
+	offPeak := s.getPeriodsByPeakType("Off-peak", billings)
+	if onPeak != nil {
+		timeOfUse["onPeak"] = onPeak
+	}
+	if midPeak != nil {
+		timeOfUse["midPeak"] = midPeak
+	}
+	if offPeak != nil {
+		timeOfUse["offPeak"] = offPeak
+	}
+
+	// 3. currentPeakType
+	loc := time.FixedZone(localStartTime.Zone())
+	peakType, err := s.billing.GetPeakType(time.Now().In(loc), billings)
+	if err != nil {
+		return
+	}
+	timeOfUse["currentPeakType"] = peakType
+	return
+}
+
+func (s defaultDevicesService) getPeriodsByPeakType(peakType string, billings []*deremsmodels.Tou) (periods []map[string]interface{}) {
+	for _, billing := range billings {
+		if billing.PeakType.String != peakType {
+			continue
+		}
+
+		period := map[string]interface{}{
+			"start":   billing.PeriodStime.String,
+			"end":     billing.PeriodEtime.String,
+			"touRate": billing.FlowRate.Float32,
+		}
+		if period["end"] == "00:00:00" {
+			period["end"] = "24:00:00"
+		}
+		periods = append(periods, period)
+	}
 	return
 }
 

@@ -25,6 +25,7 @@ type BillingService interface {
 	GetPeriodTypeOfDay(touLocationID int64, t time.Time) (periodType string)
 	IsSummer(t time.Time) bool
 	GetBillingsOfLocalTime(gwUUID string, t time.Time) (localTime time.Time, billings []*deremsmodels.Tou, err error)
+	GetPeakType(localTime time.Time, billings []*deremsmodels.Tou) (peakType string, err error)
 }
 
 type defaultBillingService struct {
@@ -147,6 +148,46 @@ func (s defaultBillingService) GetBillingsOfLocalTime(gwUUID string, t time.Time
 			"caused-by": "s.repo.TOU.GetBillingsByTOUInfo",
 			"err":       err,
 		}).Error()
+	}
+	return
+}
+
+// GetPeakType godoc
+func (s defaultBillingService) GetPeakType(localTime time.Time, billings []*deremsmodels.Tou) (peakType string, err error) {
+	loc := time.FixedZone(localTime.Zone())
+	localTime, err = time.ParseInLocation(utils.HHMMSS24h, localTime.Format(utils.HHMMSS24h), loc)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "time.ParseInLocation",
+			"err":       err,
+		}).Error()
+		return
+	}
+
+	for _, billing := range billings {
+		startTime, err := time.ParseInLocation(utils.HHMMSS24h, billing.PeriodStime.String, loc)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"caused-by": "time.ParseInLocation",
+				"err":       err,
+			}).Error()
+			break
+		}
+		endTime, err := time.ParseInLocation(utils.HHMMSS24h, billing.PeriodEtime.String, loc)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"caused-by": "time.ParseInLocation",
+				"err":       err,
+			}).Error()
+			break
+		}
+		if billing.PeriodEtime.String == "00:00:00" {
+			endTime = endTime.AddDate(0, 0, 1)
+		}
+		if localTime.After(startTime) && localTime.Before(endTime) {
+			peakType = billing.PeakType.String
+			break
+		}
 	}
 	return
 }

@@ -32,3 +32,19 @@ func (w *APIWorker) GetBatteryUsageInfo(c *gin.Context) {
 	responseData := w.Services.Devices.GetBatteryUsageInfo(param)
 	appG.Response(http.StatusOK, e.Success, responseData)
 }
+
+// GetTimeOfUseInfo godoc
+func (w *APIWorker) GetTimeOfUseInfo(c *gin.Context) {
+	appG := app.Gin{c}
+	param := &app.StartTimeParam{}
+	if err := param.Validate(c); err != nil {
+		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
+		return
+	}
+	responseData, err := w.Services.Devices.GetTimeOfUseInfo(param)
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ErrTimeOfUseInfoGen, err.Error())
+		return
+	}
+	appG.Response(http.StatusOK, e.Success, responseData)
+}

@@ -48,3 +48,15 @@ func (w *APIWorker) GetTimeOfUseInfo(c *gin.Context) {
 	}
 	appG.Response(http.StatusOK, e.Success, responseData)
 }
+
+// GetSolarEnergyUsage godoc
+func (w *APIWorker) GetSolarEnergyUsage(c *gin.Context) {
+	appG := app.Gin{c}
+	param := &app.ZoomableParam{}
+	if err := param.Validate(c); err != nil {
+		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
+		return
+	}
+	responseData := w.Services.Devices.GetSolarEnergyUsage(param)
+	appG.Response(http.StatusOK, e.Success, responseData)
+}

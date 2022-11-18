@@ -34,13 +34,14 @@ type LatestComputedDemandState struct {
 
 // RealtimeInfo godoc
 type RealtimeInfo struct {
-	Timestamps             []int
-	LoadAveragePowerACs    []float32
-	BatteryAveragePowerACs []float32
-	PvAveragePowerACs      []float32
-	GridAveragePowerACs    []float32
-	BatterySoCs            []float32
-	BatteryVoltages        []float32
+	Timestamps                     []int
+	LoadAveragePowerACs            []float32
+	BatteryAveragePowerACs         []float32
+	PvAveragePowerACs              []float32
+	GridAveragePowerACs            []float32
+	BatterySoCs                    []float32
+	BatteryVoltages                []float32
+	LoadPvConsumedEnergyPercentACs []float32
 }
 
 // AccumulatedInfo godoc
@@ -204,6 +205,12 @@ type BatteryUsageInfoResponse struct {
 type TimeOfUseInfoResponse struct {
 	EnergySources map[string]interface{} `json:"energySources"`
 	TimeOfUse     map[string]interface{} `json:"timeOfUse"`
+}
+
+// SolarEnergyUsageResponse godoc
+type SolarEnergyUsageResponse struct {
+	Timestamps                     []int              `json:"timestamps"`
+	LoadPvConsumedEnergyPercentACs Float32ArrayFormat `json:"loadPvConsumedEnergyPercentACs"`
 }
 
 // ChargeInfoResponse godoc
@@ -373,6 +380,7 @@ type DevicesService interface {
 	GetPowerSelfSupplyRate(param *app.ResolutionWithPeriodParam) (powerSelfSupplyRate *PowerSelfSupplyRateResponse)
 	GetBatteryUsageInfo(param *app.StartTimeParam) (batteryUsageInfo *BatteryUsageInfoResponse)
 	GetTimeOfUseInfo(param *app.StartTimeParam) (timeOfUseInfo *TimeOfUseInfoResponse, err error)
+	GetSolarEnergyUsage(param *app.ZoomableParam) (solarEnergyUsage *SolarEnergyUsageResponse)
 	GetChargeInfo(param *app.StartTimeParam) (chargeInfo *ChargeInfoResponse)
 	GetDemandState(param *app.PeriodParam) (demandState *DemandStateResponse)
 	GetSolarEnergyInfo(param *app.StartTimeParam) (solarEnergyInfo *SolarEnergyInfoResponse)
@@ -502,7 +510,7 @@ func (s defaultDevicesService) GetEnergyDistributionInfo(param *app.PeriodParam)
 }
 
 func (s defaultDevicesService) GetPowerState(param *app.ZoomableParam) (powerState *PowerStateResponse) {
-	realtimeInfo := s.getRealtimeInfo(param)
+	realtimeInfo := s.getRealtimeInfo(param, false)
 	powerState = &PowerStateResponse{
 		Timestamps:             realtimeInfo.Timestamps,
 		LoadAveragePowerACs:    realtimeInfo.LoadAveragePowerACs,
@@ -752,6 +760,15 @@ func (s defaultDevicesService) getPeriodsByPeakType(peakType string, billings []
 	return
 }
 
+func (s defaultDevicesService) GetSolarEnergyUsage(param *app.ZoomableParam) (solarEnergyUsage *SolarEnergyUsageResponse) {
+	realtimeInfo := s.getRealtimeInfo(param, true)
+	solarEnergyUsage = &SolarEnergyUsageResponse{
+		Timestamps:                     realtimeInfo.Timestamps,
+		LoadPvConsumedEnergyPercentACs: realtimeInfo.LoadPvConsumedEnergyPercentACs,
+	}
+	return
+}
+
 func (s defaultDevicesService) GetDemandState(param *app.PeriodParam) (demandState *DemandStateResponse) {
 	demandState = &DemandStateResponse{}
 	startTimeIndex := param.Query.StartTime
@@ -829,7 +846,7 @@ func (s defaultDevicesService) GetSolarPowerState(param *app.ZoomableParam) (sol
 	}
 
 	solarPowerState.OnPeakTime = onPeakTime
-	realtimeInfo := s.getRealtimeInfo(param)
+	realtimeInfo := s.getRealtimeInfo(param, false)
 	solarPowerState.Timestamps = realtimeInfo.Timestamps
 	solarPowerState.PvAveragePowerACs = realtimeInfo.PvAveragePowerACs
 	return
@@ -865,7 +882,7 @@ func (s defaultDevicesService) GetBatteryPowerState(param *app.ZoomableParam) (b
 	}
 
 	batteryPowerState.OnPeakTime = onPeakTime
-	realtimeInfo := s.getRealtimeInfo(param)
+	realtimeInfo := s.getRealtimeInfo(param, false)
 	batteryPowerState.Timestamps = realtimeInfo.Timestamps
 	batteryPowerState.BatteryAveragePowerACs = realtimeInfo.BatteryAveragePowerACs
 	return
@@ -879,7 +896,7 @@ func (s defaultDevicesService) GetBatteryChargeVoltageState(param *app.ZoomableP
 	}
 
 	batteryChargeVoltageState.OnPeakTime = onPeakTime
-	realtimeInfo := s.getRealtimeInfo(param)
+	realtimeInfo := s.getRealtimeInfo(param, false)
 	batteryChargeVoltageState.Timestamps = realtimeInfo.Timestamps
 	batteryChargeVoltageState.BatterySoCs = realtimeInfo.BatterySoCs
 	batteryChargeVoltageState.BatteryVoltages = realtimeInfo.BatteryVoltages
@@ -920,13 +937,13 @@ func (s defaultDevicesService) GetGridPowerState(param *app.ZoomableParam) (grid
 	}
 
 	gridPowerState.OnPeakTime = onPeakTime
-	realtimeInfo := s.getRealtimeInfo(param)
+	realtimeInfo := s.getRealtimeInfo(param, false)
 	gridPowerState.Timestamps = realtimeInfo.Timestamps
 	gridPowerState.GridAveragePowerACs = realtimeInfo.GridAveragePowerACs
 	return
 }
 
-func (s defaultDevicesService) getRealtimeInfo(param *app.ZoomableParam) (realtimeInfo *RealtimeInfo) {
+func (s defaultDevicesService) getRealtimeInfo(param *app.ZoomableParam, includedComputedData bool) (realtimeInfo *RealtimeInfo) {
 	realtimeInfo = &RealtimeInfo{}
 	startTimeIndex := param.Query.StartTime
 	endTimeIndex := param.GetEndTimeIndex()
@@ -942,6 +959,14 @@ func (s defaultDevicesService) getRealtimeInfo(param *app.ZoomableParam) (realti
 			realtimeInfo.GridAveragePowerACs = append(realtimeInfo.GridAveragePowerACs, utils.ThreeDecimalPlaces(latestRealtimeInfo.GridAveragePowerAC.Float32))
 			realtimeInfo.BatterySoCs = append(realtimeInfo.BatterySoCs, utils.ThreeDecimalPlaces(latestRealtimeInfo.BatterySoC.Float32))
 			realtimeInfo.BatteryVoltages = append(realtimeInfo.BatteryVoltages, utils.ThreeDecimalPlaces(latestRealtimeInfo.BatteryVoltage.Float32))
+
+			if includedComputedData {
+				firstRealtimeInfo := s.getFirstLogRealtimeInfo(param.GatewayUUID, startTimeIndex, endTimeIndex, param.Query.EndTime)
+				if firstRealtimeInfo != nil {
+					loadPvConsumedEnergyPercentAC := s.computeLoadPvConsumedEnergyPercentACValue(firstRealtimeInfo, latestRealtimeInfo)
+					realtimeInfo.LoadPvConsumedEnergyPercentACs = append(realtimeInfo.LoadPvConsumedEnergyPercentACs, loadPvConsumedEnergyPercentAC)
+				}
+			}
 		}
 
 		startTimeIndex = endTimeIndex
@@ -968,6 +993,7 @@ func (s defaultDevicesService) getRealtimeInfo(param *app.ZoomableParam) (realti
 			realtimeInfo.GridAveragePowerACs = append(realtimeInfo.GridAveragePowerACs, 0)
 			realtimeInfo.BatterySoCs = append(realtimeInfo.BatterySoCs, 0)
 			realtimeInfo.BatteryVoltages = append(realtimeInfo.BatteryVoltages, 0)
+			realtimeInfo.LoadPvConsumedEnergyPercentACs = append(realtimeInfo.LoadPvConsumedEnergyPercentACs, 0)
 
 			startTimeIndex = endTimeIndex
 			switch param.Query.Resolution {
@@ -981,6 +1007,22 @@ func (s defaultDevicesService) getRealtimeInfo(param *app.ZoomableParam) (realti
 			}
 		}
 	}
+	return
+}
+
+func (s defaultDevicesService) computeLoadPvConsumedEnergyPercentACValue(firstRealtimeInfo, latestRealtimeInfo *deremsmodels.CCDataLog) (loadPvConsumedEnergyPercentAC float32) {
+	pvProducedLifetimeEnergyACDiff := utils.Diff(latestRealtimeInfo.PvProducedLifetimeEnergyAC.Float32, firstRealtimeInfo.PvProducedLifetimeEnergyAC.Float32)
+	loadPvConsumedLifetimeEnergyACDiff := utils.Diff(latestRealtimeInfo.LoadPvConsumedLifetimeEnergyAC.Float32, firstRealtimeInfo.LoadPvConsumedLifetimeEnergyAC.Float32)
+	batteryPvConsumedLifetimeEnergyACDiff := utils.Diff(latestRealtimeInfo.BatteryPvConsumedLifetimeEnergyAC.Float32, firstRealtimeInfo.BatteryPvConsumedLifetimeEnergyAC.Float32)
+	gridPvConsumedLifetimeEnergyACDiff := utils.Diff(latestRealtimeInfo.GridPvConsumedLifetimeEnergyAC.Float32, firstRealtimeInfo.GridPvConsumedLifetimeEnergyAC.Float32)
+	// loadPvConsumedLifetimeEnergyACDiff is recomputed by PvProducedLifetimeEnergyACDiff
+	sumOfPvConsumedLifetimeEnergyAC := loadPvConsumedLifetimeEnergyACDiff + batteryPvConsumedLifetimeEnergyACDiff + gridPvConsumedLifetimeEnergyACDiff
+	if sumOfPvConsumedLifetimeEnergyAC != 0 {
+		loadPvConsumedLifetimeEnergyACDiff = utils.ThreeDecimalPlaces(pvProducedLifetimeEnergyACDiff * utils.Division(loadPvConsumedLifetimeEnergyACDiff, sumOfPvConsumedLifetimeEnergyAC))
+	}
+	loadPvConsumedEnergyPercentAC = utils.Percent(
+		float32(loadPvConsumedLifetimeEnergyACDiff),
+		utils.Diff(latestRealtimeInfo.PvProducedLifetimeEnergyAC.Float32, firstRealtimeInfo.PvProducedLifetimeEnergyAC.Float32))
 	return
 }
 
@@ -1018,6 +1060,20 @@ func (s defaultDevicesService) getLatestRealtimeInfo(gwUUID string, startTimeInd
 	if err != nil {
 		log.WithFields(log.Fields{
 			"caused-by":      "s.repo.CCData.GetLatestLog",
+			"err":            err,
+			"startTimeIndex": startTimeIndex,
+			"endTimeIndex":   endTimeIndex,
+		}).Error()
+		return nil
+	}
+	return
+}
+
+func (s defaultDevicesService) getFirstLogRealtimeInfo(gwUUID string, startTimeIndex, endTimeIndex, endTime time.Time) (firstLog *deremsmodels.CCDataLog) {
+	firstLog, err := s.repo.CCData.GetFirstLog(gwUUID, startTimeIndex, endTimeIndex)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by":      "s.repo.CCData.GetFirstLog",
 			"err":            err,
 			"startTimeIndex": startTimeIndex,
 			"endTimeIndex":   endTimeIndex,

@@ -71,6 +71,10 @@
         "lastMonthBillingCycle": "前一計費週期",
         "realizedSavings": "已避免超約費用"
     },
+    "dialog": {
+        "confirmedMsg":"Are you sure you want to turn off all the charging resources?",
+        "promptMsg":"If all charging resources are turned off, the battery will be in standby mode."
+    },
     "economics": {
         "ancillaryServices": "輔助服務",
         "april": "四月",
@@ -195,6 +199,7 @@
         "addTimeRange":"新增時間區間",
         "availableRegularUsage":"Available Regular Usage",
         "backupReserve":"Backup Reserve",
+        "cancel":"關閉",
         "chargingSources":"Charging Sources",
         "endTime":"結束時間",
         "maximumDemandCapacity":"Maximum Demand Capacity",
@@ -215,6 +220,7 @@
         "tariff":"電價",
         "timeOfUse": "時間電價",
         "to": "至",
+        "turnOff":"關閉",
         "weekdays":"平日"
     },
     "timeOfUse": {

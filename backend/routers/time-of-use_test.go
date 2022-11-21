@@ -113,4 +113,86 @@ var _ = Describe("TimeOfUse", func() {
 			})
 		})
 	})
+
+	Describe("GetTimeOfUseInfo", func() {
+		Context("success", func() {
+			It("should be ok", func() {
+				prefixURL := fmt.Sprintf("/api/%s/devices/time-of-use-info", fixtures.UtGateway.UUID)
+				seedUtURL := fmt.Sprintf("%s?startTime=%s", prefixURL, UtStartTime)
+				expectedEnergySources := map[string]interface{}{
+					"offPeak": map[string]interface{}{
+						"allProducedLifetimeEnergyACDiff":     50.0,
+						"gridProducedEnergyPercentAC":         50.0,
+						"gridProducedLifetimeEnergyACDiff":    25.0,
+						"pvProducedEnergyPercentAC":           20.0,
+						"pvProducedLifetimeEnergyACDiff":      10.0,
+						"batteryProducedEnergyPercentAC":      30.0,
+						"batteryProducedLifetimeEnergyACDiff": 15.0,
+					},
+				}
+				expectedTimeOfUse := map[string]interface{}{
+					"timezone":        "+0800",
+					"currentPeakType": "On-peak",
+					"offPeak": []interface{}{
+						map[string]interface{}{
+							"end":     "07:30:00",
+							"start":   "00:00:00",
+							"touRate": 1.46,
+						},
+						map[string]interface{}{
+							"end":     "24:00:00",
+							"start":   "22:30:00",
+							"touRate": 1.46,
+						},
+					},
+					"onPeak": []interface{}{
+						map[string]interface{}{
+							"end":     "22:30:00",
+							"start":   "07:30:00",
+							"touRate": 3.42,
+						},
+					},
+				}
+				expectedResponseData := services.TimeOfUseInfoResponse{
+					EnergySources: expectedEnergySources,
+					TimeOfUse:     expectedTimeOfUse,
+				}
+				tt := testutils.TestInfo{
+					Token:      token,
+					URL:        seedUtURL,
+					WantStatus: http.StatusOK,
+					WantRv: app.Response{
+						Code: e.Success,
+						Msg:  "ok",
+						Data: expectedResponseData,
+					},
+				}
+				rvData := testutils.GinkgoAssertRequest(tt, router, "GET", nil)
+				dataMap := rvData.(map[string]interface{})
+				dataJSON, err := json.Marshal(dataMap)
+				Expect(err).Should(BeNil())
+				var data services.TimeOfUseInfoResponse
+				err = json.Unmarshal(dataJSON, &data)
+				Expect(err).Should(BeNil())
+				Expect(data).To(Equal(expectedResponseData))
+			})
+		})
+
+		Context("fail", func() {
+			It("should return invalid parameters", func() {
+				prefixURL := fmt.Sprintf("/api/%s/devices/time-of-use-info", fixtures.UtGateway.UUID)
+				seedUtInvalidParamsURL := fmt.Sprintf("%s?startTime=%s", prefixURL, "xxx")
+				tt := testutils.TestInfo{
+					Token:      token,
+					URL:        seedUtInvalidParamsURL,
+					WantStatus: http.StatusBadRequest,
+					WantRv: app.Response{
+						Code: e.InvalidParams,
+						Msg:  "invalid parameters",
+					},
+				}
+				testutils.GinkgoAssertRequest(tt, router, "GET", nil)
+			})
+		})
+	})
 })

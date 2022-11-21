@@ -34,6 +34,19 @@ func (w *APIWorker) GetBatteryUsageInfo(c *gin.Context) {
 }
 
 // GetTimeOfUseInfo godoc
+// @Summary     Show the distribution of energy sources for peak types of the day
+// @Description get energy source distribution by token, gateway UUID, startTime
+// @Tags        time of use
+// @Security    ApiKeyAuth
+// @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
+// @Param       gwid           path      string true "Gateway UUID"
+// @Param       query          query     app.StartTimeQuery true "Query"
+// @Produce     json
+// @Success     200            {object}  app.Response{data=services.TimeOfUseInfoResponse}
+// @Failure     400            {object}  app.Response
+// @Failure     401            {object}  app.Response
+// @Failure     500            {object}  app.Response
+// @Router      /{gwid}/devices/time-of-use-info [get]
 func (w *APIWorker) GetTimeOfUseInfo(c *gin.Context) {
 	appG := app.Gin{c}
 	param := &app.StartTimeParam{}
@@ -50,6 +63,18 @@ func (w *APIWorker) GetTimeOfUseInfo(c *gin.Context) {
 }
 
 // GetSolarEnergyUsage godoc
+// @Summary     Show the day's hourly energy usage of solar
+// @Description get solar by token, gateway UUID, resolution, startTime and endTime
+// @Tags        time of use
+// @Security    ApiKeyAuth
+// @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
+// @Param       gwid           path      string true "Gateway UUID"
+// @Param       query          query     app.ZoomableQuery true "Query"
+// @Produce     json
+// @Success     200            {object}  app.Response{data=services.SolarEnergyUsageResponse}
+// @Failure     400            {object}  app.Response
+// @Failure     401            {object}  app.Response
+// @Router      /{gwid}/devices/solar/energy-usage [get]
 func (w *APIWorker) GetSolarEnergyUsage(c *gin.Context) {
 	appG := app.Gin{c}
 	param := &app.ZoomableParam{}

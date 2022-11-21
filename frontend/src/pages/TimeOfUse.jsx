@@ -45,6 +45,11 @@ export default connect(mapState)(function TimeOfUse(props) {
             Math.floor(Math.random() * (60 - 40 + 1) + 40))
 
     const
+        [tab, setTab] = useState("today"),
+        [infoError, setInfoError] = useState(""),
+        [infoLoading, setInfoLoading] = useState(false),
+        [preInfoError, setPreInfoError] = useState(""),
+        [preInfoLoading, setPreInfoLoading] = useState(false),
         [clockDataset, setClockDataset] = useState({
             data: [], backgroundColor: []
         }),
@@ -78,6 +83,24 @@ export default connect(mapState)(function TimeOfUse(props) {
             x: { grid: { lineWidth: 0 } },
             y: { max: 80, min: 0 }
         }),
+        [onPeak, setOnPeak] = useState({
+            types: [
+                { kwh: 0, percentage: 0, type: "grid" },
+                { kwh: 0, percentage: 0, type: "solar" },
+                { kwh: 0, percentage: 0, type: "battery" },
+            ],
+            kwh: 0,
+            color: "text-negative-main"
+        }),
+        [offPeak, setOffPeak] = useState({
+            types: [
+                { kwh: 0, percentage: 0, type: "grid" },
+                { kwh: 0, percentage: 0, type: "solar" },
+                { kwh: 0, percentage: 0, type: "battery" },
+            ],
+            kwh: 0,
+            color: "text-green-main"
+        }),
         [midPeak, setMidPeak] = useState({
             types: [
                 { kwh: 7.5, percentage: 15, type: "grid" },
@@ -86,37 +109,52 @@ export default connect(mapState)(function TimeOfUse(props) {
             ],
             kwh: 50
         }),
-        [onPeak, setOnPeak] = useState({
+        [superOffPeak, setSuperOffPeak] = useState({
             types: [
-                { kwh: 5, percentage: 10, type: "grid" },
-                { kwh: 52, percentage: 50, type: "solar" },
-                { kwh: 20, percentage: 40, type: "battery" },
+                { kwh: 0, percentage: 0, type: "grid" },
+                { kwh: 0, percentage: 0, type: "solar" },
+                { kwh: 0, percentage: 0, type: "battery" },
             ],
-            kwh: 50,
+            kwh: 0
+        }),
+        [preOnPeak, setPreOnPeak] = useState({
+            types: [
+                { kwh: 0, percentage: 0, type: "grid" },
+                { kwh: 0, percentage: 0, type: "solar" },
+                { kwh: 0, percentage: 0, type: "battery" },
+            ],
+            kwh: 0,
             color: "text-negative-main"
         }),
-        [offPeak, setOffPeak] = useState({
+        [preOffPeak, setPreOffPeak] = useState({
             types: [
-                { kwh: 10, percentage: 18, type: "grid" },
-                { kwh: 25, percentage: 41, type: "solar" },
-                { kwh: 25, percentage: 41, type: "battery" },
+                { kwh: 0, percentage: 0, type: "grid" },
+                { kwh: 0, percentage: 0, type: "solar" },
+                { kwh: 0, percentage: 0, type: "battery" },
             ],
-            kwh: 60,
+            kwh: 0,
             color: "text-green-main"
+        }),
+        [preMidPeak, setPreMidPeak] = useState({
+            types: [
+                { kwh: 0, percentage: 0, type: "grid" },
+                { kwh: 0, percentage: 0, type: "solar" },
+                { kwh: 0, percentage: 25, type: "battery" },
+            ],
+            kwh: 50
+        }),
+        [preSuperOffPeak, setPreSuperOffPeak] = useState({
+            types: [
+                { kwh: 0, percentage: 0, type: "grid" },
+                { kwh: 0, percentage: 0, type: "solar" },
+                { kwh: 0, percentage: 0, type: "battery" },
+            ],
+            kwh: 0
         }),
         // [prices, setPrices]
         //     = useState({ onPeak: 0, midPeak: 0, offPeak: 0, superOffPeak: 0 }),
         [prices, setPrices]
             = useState({ onPeak: 0, offPeak: 0 }),
-        [superOffPeak, setSuperOffPeak] = useState({
-            types: [
-                { kwh: 21, percentage: 35, type: "grid" },
-                { kwh: 24, percentage: 40, type: "solar" },
-                { kwh: 15, percentage: 25, type: "battery" },
-            ],
-            kwh: 60
-        }),
-        [tab, setTab] = useState("today"),
         // [timeOfUse, setTimeOfUse] = useState([
         //     {
         //         end: "05:00",
@@ -180,8 +218,7 @@ export default connect(mapState)(function TimeOfUse(props) {
         const
             currentTime = moment(),
             dataset = { data: [], backgroundColor: [] },
-            // prices = { onPeak: 0, midPeak: 0, offPeak: 0, superOffPeak: 0 }
-            prices = { onPeak: 0, offPeak: 0 }
+            prices = { onPeak: 0, midPeak: 0, offPeak: 0, superOffPeak: 0 }
 
         let currentPeriod = ""
 
@@ -208,7 +245,142 @@ export default connect(mapState)(function TimeOfUse(props) {
         setPrices(prices)
     }, [timeOfUse])
 
+    const urlPrefix = `/api/${props.gatewayID}/devices`
+    const
+        callTodayCards = (startTime) => {
+            apiCall({
+                onComplete: () => setInfoLoading(false),
+                onError: error => setInfoError(error),
+                onStart: () => setInfoLoading(true),
+                onSuccess: rawData => {
+                    if (!rawData?.data) return
+                    const { data } = rawData
+                    console.log(data)
+                    setOnPeak({
+                        types: [
+                            {
+                                kwh: data.energySources.onPeak.gridProducedLifetimeEnergyACDiff,
+                                percentage: data.onPeak.gridProducedEnergyPercentAC,
+                                type: "grid"
+                            },
+                            {
+                                kwh: data.energySources.onPeak.pvProducedLifetimeEnergyACDiff,
+                                percentage: data.energySources.onPeak.pvProducedEnergyPercentAC,
+                                type: "solar"
+                            },
+                            {
+                                kwh: data.energySources.onPeak.batteryProducedLifetimeEnergyACDiff,
+                                percentage: data.energySources.onPeak.batteryProducedEnergyPercentAC,
+                                type: "battery"
+                            },
+                        ],
+                        kwh: data.energySources.onPeak.allProducedLifetimeEnergyACDiff
+                    })
+                    console.log(onPeak)
 
+                    setOffPeak({
+                        types: [
+                            {
+                                kwh: data.gridProducedLifetimeEnergyACDiff,
+                                percentage: data.gridProducedEnergyPercentAC,
+                                type: "grid"
+                            },
+                            {
+                                kwh: data.pvProducedLifetimeEnergyACDiff,
+                                percentage: data.pvProducedEnergyPercentAC,
+                                type: "solar"
+                            },
+                            {
+                                kwh: data.batteryProducedLifetimeEnergyACDiff,
+                                percentage: data.batteryProducedEnergyPercentAC,
+                                type: "battery"
+                            },
+                        ],
+                        kwh: data.allProducedLifetimeEnergyACDiff
+                    })
+                },
+                url: `${urlPrefix}/time-of-use-info?startTime=${startTime}`
+            })
+        },
+        callYesterdayCards = (preStartTime) => {
+            apiCall({
+                onComplete: () => setPreInfoLoading(false),
+                onError: error => setPreInfoError(error),
+                onStart: () => setPreInfoLoading(true),
+                onSuccess: rawData => {
+                    if (!rawData?.data) return
+
+                    const { data } = rawData
+                    setPreOnPeak({
+                        types: [
+                            {
+                                kwh: data.gridProducedLifetimeEnergyACDiff,
+                                percentage: data.gridProducedEnergyPercentAC,
+                                type: "grid"
+                            },
+                            {
+                                kwh: data.pvProducedLifetimeEnergyACDiff,
+                                percentage: data.pvProducedEnergyPercentAC,
+                                type: "solar"
+                            },
+                            {
+                                kwh: data.batteryProducedLifetimeEnergyACDiff,
+                                percentage: data.batteryProducedEnergyPercentAC,
+                                type: "battery"
+                            },
+                        ],
+                        kwh: data.allProducedLifetimeEnergyACDiff
+                    })
+
+                    setPreOffPeak({
+                        types: [
+                            {
+                                kwh: data.energySources.offPeak.gridProducedLifetimeEnergyACDiff,
+                                percentage: data.energySources.offPeak.gridProducedEnergyPercentAC,
+                                type: "grid"
+                            },
+                            {
+                                kwh: data.energySources.offPeak.pvProducedLifetimeEnergyACDiff,
+                                percentage: data.energySources.offPeak.pvProducedEnergyPercentAC,
+                                type: "solar"
+                            },
+                            {
+                                kwh: data.energySources.offPeak.batteryProducedLifetimeEnergyACDiff,
+                                percentage: data.energySources.offPeak.batteryProducedEnergyPercentAC,
+                                type: "battery"
+                            },
+                        ],
+                        kwh: data.energySources.offPeak.allProducedLifetimeEnergyACDiff
+                    })
+                },
+                url: `${urlPrefix}/time-of-use-info?startTime=${preStartTime}`
+            })
+        }
+    useEffect(() => {
+        if (!props.gatewayID) return
+
+        let startTime = "", endTime = ""
+        let preStartTime = "", preEndTime = ""
+        if (tab === "today") {
+            startTime = moment().startOf("day").toISOString()
+            endTime = moment().toISOString()
+            preStartTime = moment().subtract(1, "day").startOf("day").toISOString()
+            preEndTime = moment().subtract(1, "day").endOf("day").toISOString()
+
+        } else if (tab === "yesterday") {
+            startTime = moment().startOf("week").toISOString()
+            endTime = moment().startOf("day").toISOString()
+
+            // if (moment().get("day") == 0) {
+            //     startTime = moment().subtract(1, "week").startOf("week").toISOString()
+            // }
+        }
+
+        callTodayCards(startTime)
+
+
+
+    }, [props.gatewayID, tab])
 
     useEffect(() => {
         if (!props.gatewayID) return
@@ -238,6 +410,7 @@ export default connect(mapState)(function TimeOfUse(props) {
         })
     }, [props.gatewayID])
 
+    console.log(onPeak)
     return <>
         <div className="page-header">
             <h1>{pageT("timeOfUse")}</h1>

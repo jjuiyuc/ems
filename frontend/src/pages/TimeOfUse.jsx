@@ -107,7 +107,7 @@ export default connect(mapState)(function TimeOfUse(props) {
                 { kwh: 30, percentage: 60, type: "solar" },
                 { kwh: 12.5, percentage: 25, type: "battery" },
             ],
-            kwh: 50
+            kwh: 0
         }),
         [superOffPeak, setSuperOffPeak] = useState({
             types: [
@@ -254,50 +254,53 @@ export default connect(mapState)(function TimeOfUse(props) {
                 onStart: () => setInfoLoading(true),
                 onSuccess: rawData => {
                     if (!rawData?.data) return
-                    const { data } = rawData
-                    console.log(data)
-                    setOnPeak({
-                        types: [
-                            {
-                                kwh: data.energySources.onPeak.gridProducedLifetimeEnergyACDiff,
-                                percentage: data.onPeak.gridProducedEnergyPercentAC,
-                                type: "grid"
-                            },
-                            {
-                                kwh: data.energySources.onPeak.pvProducedLifetimeEnergyACDiff,
-                                percentage: data.energySources.onPeak.pvProducedEnergyPercentAC,
-                                type: "solar"
-                            },
-                            {
-                                kwh: data.energySources.onPeak.batteryProducedLifetimeEnergyACDiff,
-                                percentage: data.energySources.onPeak.batteryProducedEnergyPercentAC,
-                                type: "battery"
-                            },
-                        ],
-                        kwh: data.energySources.onPeak.allProducedLifetimeEnergyACDiff
-                    })
-                    console.log(onPeak)
+                    const { data } = rawData,
+                        { onPeak } = data.energySources
 
-                    setOffPeak({
+                    setOnPeak(r => ({
+                        ...r,
                         types: [
                             {
-                                kwh: data.gridProducedLifetimeEnergyACDiff,
-                                percentage: data.gridProducedEnergyPercentAC,
+                                kwh: onPeak?.gridProducedLifetimeEnergyACDiff,
+                                percentage: onPeak?.gridProducedEnergyPercentAC,
                                 type: "grid"
                             },
                             {
-                                kwh: data.pvProducedLifetimeEnergyACDiff,
-                                percentage: data.pvProducedEnergyPercentAC,
+                                kwh: onPeak?.pvProducedLifetimeEnergyACDiff,
+                                percentage: onPeak?.pvProducedEnergyPercentAC,
                                 type: "solar"
                             },
                             {
-                                kwh: data.batteryProducedLifetimeEnergyACDiff,
-                                percentage: data.batteryProducedEnergyPercentAC,
+                                kwh: onPeak?.batteryProducedLifetimeEnergyACDiff,
+                                percentage: onPeak?.batteryProducedEnergyPercentAC,
                                 type: "battery"
                             },
                         ],
-                        kwh: data.allProducedLifetimeEnergyACDiff
-                    })
+                        kwh: onPeak?.allProducedLifetimeEnergyACDiff
+                    }))
+
+                    const { offPeak } = data.energySources
+                    setOffPeak(r => ({
+                        ...r,
+                        types: [
+                            {
+                                kwh: offPeak?.gridProducedLifetimeEnergyACDiff,
+                                percentage: offPeak?.gridProducedEnergyPercentAC,
+                                type: "grid"
+                            },
+                            {
+                                kwh: offPeak?.pvProducedLifetimeEnergyACDiff,
+                                percentage: offPeak?.pvProducedEnergyPercentAC,
+                                type: "solar"
+                            },
+                            {
+                                kwh: offPeak?.batteryProducedLifetimeEnergyACDiff,
+                                percentage: offPeak?.batteryProducedEnergyPercentAC,
+                                type: "battery"
+                            },
+                        ],
+                        kwh: offPeak?.allProducedLifetimeEnergyACDiff
+                    }))
                 },
                 url: `${urlPrefix}/time-of-use-info?startTime=${startTime}`
             })
@@ -310,52 +313,58 @@ export default connect(mapState)(function TimeOfUse(props) {
                 onSuccess: rawData => {
                     if (!rawData?.data) return
 
-                    const { data } = rawData
-                    setPreOnPeak({
-                        types: [
-                            {
-                                kwh: data.gridProducedLifetimeEnergyACDiff,
-                                percentage: data.gridProducedEnergyPercentAC,
-                                type: "grid"
-                            },
-                            {
-                                kwh: data.pvProducedLifetimeEnergyACDiff,
-                                percentage: data.pvProducedEnergyPercentAC,
-                                type: "solar"
-                            },
-                            {
-                                kwh: data.batteryProducedLifetimeEnergyACDiff,
-                                percentage: data.batteryProducedEnergyPercentAC,
-                                type: "battery"
-                            },
-                        ],
-                        kwh: data.allProducedLifetimeEnergyACDiff
-                    })
+                    const { data } = rawData,
+                        { onPeak } = data.energySources
 
-                    setPreOffPeak({
+                    setPreOnPeak(r => ({
+                        ...r,
                         types: [
                             {
-                                kwh: data.energySources.offPeak.gridProducedLifetimeEnergyACDiff,
-                                percentage: data.energySources.offPeak.gridProducedEnergyPercentAC,
+                                kwh: onPeak?.gridProducedLifetimeEnergyACDiff,
+                                percentage: onPeak?.gridProducedEnergyPercentAC,
                                 type: "grid"
                             },
                             {
-                                kwh: data.energySources.offPeak.pvProducedLifetimeEnergyACDiff,
-                                percentage: data.energySources.offPeak.pvProducedEnergyPercentAC,
+                                kwh: onPeak?.pvProducedLifetimeEnergyACDiff,
+                                percentage: onPeak?.pvProducedEnergyPercentAC,
                                 type: "solar"
                             },
                             {
-                                kwh: data.energySources.offPeak.batteryProducedLifetimeEnergyACDiff,
-                                percentage: data.energySources.offPeak.batteryProducedEnergyPercentAC,
+                                kwh: onPeak?.batteryProducedLifetimeEnergyACDiff,
+                                percentage: onPeak?.batteryProducedEnergyPercentAC,
                                 type: "battery"
                             },
                         ],
-                        kwh: data.energySources.offPeak.allProducedLifetimeEnergyACDiff
-                    })
+                        kwh: onPeak?.allProducedLifetimeEnergyACDiff
+                    }))
+
+                    const { offPeak } = data.energySources
+                    setPreOffPeak(r => ({
+                        ...r,
+                        types: [
+                            {
+                                kwh: offPeak?.gridProducedLifetimeEnergyACDiff,
+                                percentage: offPeak?.gridProducedEnergyPercentAC,
+                                type: "grid"
+                            },
+                            {
+                                kwh: offPeak?.pvProducedLifetimeEnergyACDiff,
+                                percentage: offPeak?.pvProducedEnergyPercentAC,
+                                type: "solar"
+                            },
+                            {
+                                kwh: offPeak?.batteryProducedLifetimeEnergyACDiff,
+                                percentage: offPeak?.batteryProducedEnergyPercentAC,
+                                type: "battery"
+                            },
+                        ],
+                        kwh: offPeak?.allProducedLifetimeEnergyACDiff
+                    }))
                 },
                 url: `${urlPrefix}/time-of-use-info?startTime=${preStartTime}`
             })
         }
+
     useEffect(() => {
         if (!props.gatewayID) return
 
@@ -363,22 +372,16 @@ export default connect(mapState)(function TimeOfUse(props) {
         let preStartTime = "", preEndTime = ""
         if (tab === "today") {
             startTime = moment().startOf("day").toISOString()
-            endTime = moment().toISOString()
+            // endTime = moment().toISOString()
+
+            callTodayCards(startTime)
+
+        } else if (tab === "yesterday") {
             preStartTime = moment().subtract(1, "day").startOf("day").toISOString()
             preEndTime = moment().subtract(1, "day").endOf("day").toISOString()
 
-        } else if (tab === "yesterday") {
-            startTime = moment().startOf("week").toISOString()
-            endTime = moment().startOf("day").toISOString()
-
-            // if (moment().get("day") == 0) {
-            //     startTime = moment().subtract(1, "week").startOf("week").toISOString()
-            // }
+            callYesterdayCards(preStartTime)
         }
-
-        callTodayCards(startTime)
-
-
 
     }, [props.gatewayID, tab])
 
@@ -403,14 +406,12 @@ export default connect(mapState)(function TimeOfUse(props) {
                         + data.batteryConsumedAveragePowerAC || 0),
                     state: (data.batterySoC || 0)
                 })
-
-
             },
             url: `/api/${props.gatewayID}/devices/battery/usage-info?startTime=${startTime}`
         })
     }, [props.gatewayID])
 
-    console.log(onPeak)
+
     return <>
         <div className="page-header">
             <h1>{pageT("timeOfUse")}</h1>
@@ -431,45 +432,47 @@ export default connect(mapState)(function TimeOfUse(props) {
                 </Button>
             </Stack>
         </div>
-        <div className="gap-8 grid md:grid-cols-2 items-start">
-            <EnergyCard data={onPeak} title={energyCardTitle("onPeak")} />
-            <EnergyCard data={offPeak} title={energyCardTitle("offPeak")} />
-            {showFullSections
-                ? <>
-                    <EnergyCard data={midPeak} title={energyCardTitle("midPeak")} />
-                    <div className="card energyCard">
-                        <div className="flex flex-wrap items-baseline mb-8">
-                            <h2 className="mr-2 whitespace-nowrap">{superOffPeak.kwh} {commonT("kwh")}</h2>
-                            <h5 className="font-bold">
-                                <span className="inline-block mr-1">
-                                    {pageT("superOffPeak")}{commonT("sources")}
-                                </span>
-                                <span className="inline-block">
-                                    ({pageT("totalUntilNow")})
+        {tab === "today"
+            ? <>
+                <div className="gap-8 grid md:grid-cols-2 items-start">
+                    <EnergyCard data={onPeak} title={energyCardTitle("onPeak")} />
+                    <EnergyCard data={offPeak} title={energyCardTitle("offPeak")} />
+                    {showFullSections
+                        ? <>
+                            <EnergyCard data={midPeak} title={energyCardTitle("midPeak")} />
+                            <div className="card energyCard">
+                                <div className="flex flex-wrap items-baseline mb-8">
+                                    <h2 className="mr-2 whitespace-nowrap">{superOffPeak.kwh} {commonT("kwh")}</h2>
+                                    <h5 className="font-bold">
+                                        <span className="inline-block mr-1">
+                                            {pageT("superOffPeak")}{commonT("sources")}
+                                        </span>
+                                        <span className="inline-block">
+                                            ({pageT("totalUntilNow")})
                         </span>
-                            </h5>
-                        </div>
-                        <div className="h-2 bg-gray-500 w-full rounded-full" />
-                        <div className="mx-2.5 mb-12 mt-4 lg:h-5 w-3 mr-2 sm:h-4" />
-                        <div className="grid grid-cols-3 column-separator gap-x-5 sm:gap-x-10">
-                            {superOffPeak.types.map((t, i) =>
-                                <div key={"detail-" + i}
-                                    className="">
-                                    <h6 className="font-bold text-white">{commonT(t.type)}</h6>
-                                    <h3 className="my-1">-</h3>
-                                    {/* <p className="lg:test text-13px text-white">
+                                    </h5>
+                                </div>
+                                <div className="h-2 bg-gray-500 w-full rounded-full" />
+                                <div className="mx-2.5 mb-12 mt-4 lg:h-5 w-3 mr-2 sm:h-4" />
+                                <div className="grid grid-cols-3 column-separator gap-x-5 sm:gap-x-10">
+                                    {superOffPeak.types.map((t, i) =>
+                                        <div key={"detail-" + i}
+                                            className="">
+                                            <h6 className="font-bold text-white">{commonT(t.type)}</h6>
+                                            <h3 className="my-1">-</h3>
+                                            {/* <p className="lg:test text-13px text-white">
                                 {t.kwh} {commonT("kwh")}
                             </p> */}
-                                    <div className="md:h-6 lg:h-4 w-4"></div>
-                                </div>)}
-                        </div>
-                    </div>
-                </> : null
-            }
-            <div className="card">
-                <div className="header -mr-4">
-                    <h4>{pageT("timeOfUse")}</h4>
-                    {/* <Button
+                                            <div className="md:h-6 lg:h-4 w-4"></div>
+                                        </div>)}
+                                </div>
+                            </div>
+                        </> : null
+                    }
+                    <div className="card">
+                        <div className="header -mr-4">
+                            <h4>{pageT("timeOfUse")}</h4>
+                            {/* <Button
                         color="brand"
                         radius="pill"
                         size="small"
@@ -477,56 +480,126 @@ export default connect(mapState)(function TimeOfUse(props) {
                         <EditIcon className="h-4 mr-1 w-4" />
                         {pageT("editTimeOfUse")}
                     </Button> */}
-                </div>
-                <div className="flex flex-wrap items-center justify-around">
-                    <div className="flex flex-wrap items-center justify-center">
-                        <Clock dataset={clockDataset} id="touClock" />
-                        <div className="grid grid-cols-3-auto gap-y-2
+                        </div>
+                        <div className="flex flex-wrap items-center justify-around">
+                            <div className="flex flex-wrap items-center justify-center">
+                                <Clock dataset={clockDataset} id="touClock" />
+                                <div className="grid grid-cols-3-auto gap-y-2
                                         items-center mx-8 my-4 text-white">
-                            {Object.keys(prices).map((key, i) =>
-                                <Frag key={"t-p-" + i}>
+                                    {Object.keys(prices).map((key, i) =>
+                                        <Frag key={"t-p-" + i}>
+                                            <div
+                                                className="h-2 rounded-full mr-3 w-2"
+                                                style={{ background: colors[key] }} />
+                                            <div className="text-11px">
+                                                {pageT(key)}
+                                            </div>
+                                            <div className="font-bold ml-2 text-base">
+                                                ${prices[key]}
+                                            </div>
+                                        </Frag>)}
+                                </div>
+                            </div>
+                            <div className="my-6 subCard w-56">
+                                <h6 className="font-bold text-11px text-gray-300">
+                                    {pageT("current")}
+                                </h6>
+                                <div className="flex flex-col items-center justify-center">
                                     <div
-                                        className="h-2 rounded-full mr-3 w-2"
-                                        style={{ background: colors[key] }} />
-                                    <div className="text-11px">
-                                        {pageT(key)}
+                                        className="font-bold mb-3 mt-2 px-5 py-2 rounded-full text-gray-900 text-sm"
+                                        style={{ background: colors[currentPeriod] }}>
+                                        {pageT(currentPeriod)}
                                     </div>
-                                    <div className="font-bold ml-2 text-base">
-                                        ${prices[key]}
+                                    <div className="font-bold text-2xl">
+                                        {currentTime}
                                     </div>
-                                </Frag>)}
-                        </div>
-                    </div>
-                    <div className="my-6 subCard w-56">
-                        <h6 className="font-bold text-11px text-gray-300">
-                            {pageT("current")}
-                        </h6>
-                        <div className="flex flex-col items-center justify-center">
-                            <div
-                                className="font-bold mb-3 mt-2 px-5 py-2 rounded-full text-gray-900 text-sm"
-                                style={{ background: colors[currentPeriod] }}>
-                                {pageT(currentPeriod)}
-                            </div>
-                            <div className="font-bold text-2xl">
-                                {currentTime}
+                                </div>
                             </div>
                         </div>
                     </div>
+                    <BatteryStatusCard
+                        data={batteryStatus}
+                    />
                 </div>
-            </div>
-            {tab === "today"
-                ? <BatteryStatusCard
-                    data={batteryStatus}
-                />
-                : null}
-        </div>
-        {tab === "today"
-            ? <>
                 <div className="mt-20 page-header">
                     <h1>{pageT("directSolarUsage")}</h1>
                 </div>
                 <div className="card chart max-h-80vh h-160 relative w-full">
                     <LineChart data={lineChartData} id="touLineChart" />
+                </div>
+            </>
+            : null}
+
+        {tab == "yesterday"
+            ? <>
+                <div className="gap-8 grid md:grid-cols-2 items-start">
+                    <EnergyCard data={preOnPeak} title={energyCardTitle("onPeak")} />
+                    <EnergyCard data={preOffPeak} title={energyCardTitle("offPeak")} />
+                    {showFullSections
+                        ? <>
+                            <EnergyCard data={midPeak} title={energyCardTitle("midPeak")} />
+                            <div className="card energyCard">
+                                <div className="flex flex-wrap items-baseline mb-8">
+                                    <h2 className="mr-2 whitespace-nowrap">{superOffPeak.kwh} {commonT("kwh")}</h2>
+                                    <h5 className="font-bold">
+                                        <span className="inline-block mr-1">
+                                            {pageT("superOffPeak")}{commonT("sources")}
+                                        </span>
+                                        <span className="inline-block">
+                                            ({pageT("totalUntilNow")})
+                                        </span>
+                                    </h5>
+                                </div>
+                                <div className="h-2 bg-gray-500 w-full rounded-full" />
+                                <div className="mx-2.5 mb-12 mt-4 lg:h-5 w-3 mr-2 sm:h-4" />
+                                <div className="grid grid-cols-3 column-separator gap-x-5 sm:gap-x-10">
+                                    {superOffPeak.types.map((t, i) =>
+                                        <div key={"detail-" + i}
+                                            className="">
+                                            <h6 className="font-bold text-white">{commonT(t.type)}</h6>
+                                            <h3 className="my-1">-</h3>
+                                            {/* <p className="lg:test text-13px text-white">
+                                {t.kwh} {commonT("kwh")}
+                            </p> */}
+                                            <div className="md:h-6 lg:h-4 w-4"></div>
+                                        </div>)}
+                                </div>
+                            </div>
+                        </>
+                        : null}
+                    {/* <div className="card">
+                        <div className="header -mr-4">
+                            <h4>{pageT("timeOfUse")}</h4>
+                            <Button
+                        color="brand"
+                        radius="pill"
+                        size="small"
+                        variant="text">
+                        <EditIcon className="h-4 mr-1 w-4" />
+                        {pageT("editTimeOfUse")}
+                    </Button>
+                        </div>
+                        <div className="flex flex-wrap items-center justify-around">
+                            <div className="flex flex-wrap items-center justify-center">
+                                <Clock dataset={clockDataset} id="touClock" />
+                                <div className="grid grid-cols-3-auto gap-y-2
+                                        items-center mx-8 my-4 text-white">
+                                    {Object.keys(prices).map((key, i) =>
+                                        <Frag key={"t-p-" + i}>
+                                            <div
+                                                className="h-2 rounded-full mr-3 w-2"
+                                                style={{ background: colors[key] }} />
+                                            <div className="text-11px">
+                                                {pageT(key)}
+                                            </div>
+                                            <div className="font-bold ml-2 text-base">
+                                                ${prices[key]}
+                                            </div>
+                                        </Frag>)}
+                                </div>
+                            </div>
+                        </div>
+                    </div> */}
                 </div>
             </>
             : null}

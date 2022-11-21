@@ -259,14 +259,14 @@ func (r *SolarEnergyInfoResponse) ComputedValues(firstLogOfDay, firstLogOfMonth,
 		r.GridPvConsumedLifetimeEnergyACDiff = utils.ThreeDecimalPlaces(r.PvProducedLifetimeEnergyACDiff * utils.Division(r.GridPvConsumedLifetimeEnergyACDiff, sumOfPvConsumedLifetimeEnergyAC))
 	}
 	r.LoadPvConsumedEnergyPercentAC = utils.Percent(
-		float32(r.LoadPvConsumedLifetimeEnergyACDiff),
-		utils.Diff(latestLog.PvProducedLifetimeEnergyAC.Float32, firstLogOfDay.PvProducedLifetimeEnergyAC.Float32))
+		r.LoadPvConsumedLifetimeEnergyACDiff,
+		r.PvProducedLifetimeEnergyACDiff)
 	r.BatteryPvConsumedEnergyPercentAC = utils.Percent(
 		r.BatteryPvConsumedLifetimeEnergyACDiff,
-		utils.Diff(latestLog.PvProducedLifetimeEnergyAC.Float32, firstLogOfDay.PvProducedLifetimeEnergyAC.Float32))
+		r.PvProducedLifetimeEnergyACDiff)
 	r.GridPvConsumedEnergyPercentAC = utils.Percent(
 		r.GridPvConsumedLifetimeEnergyACDiff,
-		utils.Diff(latestLog.PvProducedLifetimeEnergyAC.Float32, firstLogOfDay.PvProducedLifetimeEnergyAC.Float32))
+		r.PvProducedLifetimeEnergyACDiff)
 
 	var sumOfPvEnergyCostSavings, sumOfPvCo2Savings float32
 	for _, logOfMonth := range logsOfMonth {
@@ -1021,8 +1021,8 @@ func (s defaultDevicesService) computeLoadPvConsumedEnergyPercentACValue(firstRe
 		loadPvConsumedLifetimeEnergyACDiff = utils.ThreeDecimalPlaces(pvProducedLifetimeEnergyACDiff * utils.Division(loadPvConsumedLifetimeEnergyACDiff, sumOfPvConsumedLifetimeEnergyAC))
 	}
 	loadPvConsumedEnergyPercentAC = utils.Percent(
-		float32(loadPvConsumedLifetimeEnergyACDiff),
-		utils.Diff(latestRealtimeInfo.PvProducedLifetimeEnergyAC.Float32, firstRealtimeInfo.PvProducedLifetimeEnergyAC.Float32))
+		loadPvConsumedLifetimeEnergyACDiff,
+		pvProducedLifetimeEnergyACDiff)
 	return
 }
 

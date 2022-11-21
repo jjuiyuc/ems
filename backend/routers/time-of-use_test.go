@@ -21,7 +21,10 @@ import (
 )
 
 var _ = Describe("TimeOfUse", func() {
-	const UtStartTime = "2022-08-03T16:00:00.000Z"
+	const (
+		UtStartTime = "2022-08-03T16:00:00.000Z"
+		UtEndTime   = "2022-08-03T20:15:00.000Z"
+	)
 
 	var (
 		router *gin.Engine
@@ -182,6 +185,56 @@ var _ = Describe("TimeOfUse", func() {
 			It("should return invalid parameters", func() {
 				prefixURL := fmt.Sprintf("/api/%s/devices/time-of-use-info", fixtures.UtGateway.UUID)
 				seedUtInvalidParamsURL := fmt.Sprintf("%s?startTime=%s", prefixURL, "xxx")
+				tt := testutils.TestInfo{
+					Token:      token,
+					URL:        seedUtInvalidParamsURL,
+					WantStatus: http.StatusBadRequest,
+					WantRv: app.Response{
+						Code: e.InvalidParams,
+						Msg:  "invalid parameters",
+					},
+				}
+				testutils.GinkgoAssertRequest(tt, router, "GET", nil)
+			})
+		})
+	})
+
+	Describe("GetSolarEnergyUsage", func() {
+		Context("success", func() {
+			It("should be ok", func() {
+				prefixURL := fmt.Sprintf("/api/%s/devices/solar/energy-usage", fixtures.UtGateway.UUID)
+				seedUtURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, "hour", UtStartTime, UtEndTime)
+				expectedTimestamps := []int{1659543000, 1659557100}
+				expectedLoadPvConsumedEnergyPercentACs := []float32{0, 0}
+				expectedResponseData := services.SolarEnergyUsageResponse{
+					Timestamps:                     expectedTimestamps,
+					LoadPvConsumedEnergyPercentACs: expectedLoadPvConsumedEnergyPercentACs,
+				}
+				tt := testutils.TestInfo{
+					Token:      token,
+					URL:        seedUtURL,
+					WantStatus: http.StatusOK,
+					WantRv: app.Response{
+						Code: e.Success,
+						Msg:  "ok",
+						Data: expectedResponseData,
+					},
+				}
+				rvData := testutils.GinkgoAssertRequest(tt, router, "GET", nil)
+				dataMap := rvData.(map[string]interface{})
+				dataJSON, err := json.Marshal(dataMap)
+				Expect(err).Should(BeNil())
+				var data services.SolarEnergyUsageResponse
+				err = json.Unmarshal(dataJSON, &data)
+				Expect(err).Should(BeNil())
+				Expect(data).To(Equal(expectedResponseData))
+			})
+		})
+
+		Context("fail", func() {
+			It("should return invalid parameters", func() {
+				prefixURL := fmt.Sprintf("/api/%s/devices/solar/energy-usage", fixtures.UtGateway.UUID)
+				seedUtInvalidParamsURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, "xxx", UtStartTime, UtEndTime)
 				tt := testutils.TestInfo{
 					Token:      token,
 					URL:        seedUtInvalidParamsURL,

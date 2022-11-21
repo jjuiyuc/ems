@@ -1,5 +1,6 @@
 import { Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material"
-import { useEffect, useState } from "react"
+import { useState } from "react"
+import { useTranslation } from "react-multi-lang"
 
 export default function DialogBox({
     triggerName = "",
@@ -7,16 +8,17 @@ export default function DialogBox({
     rightButtonName = "",
     closeOutside = false
 }) {
-    const [open, setOpen] = useState(false);
+    const t = useTranslation(),
+        dialogT = (string) => t("dialog." + string)
+
+    const [open, setOpen] = useState(false)
 
     const handleClickOpen = () => {
         setOpen(true)
     }
-
     const handleClose = () => {
         setOpen(false)
     }
-
     return (
         <>
             <div>
@@ -34,19 +36,24 @@ export default function DialogBox({
                     aria-describedby="alert-dialog-description"
                 >
                     <DialogTitle id="alert-dialog-title">
-                        {"Use Google's location service?"}
+                        {dialogT("confirmedMsg")}
                     </DialogTitle>
                     <DialogContent>
                         <DialogContentText id="alert-dialog-description">
-                            Let Google help apps determine location. This means sending anonymous
-                            location data to Google, even when no apps are running.
+                            {dialogT("promptMsg")}
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={handleClose}>
+                        <Button onClick={handleClose}
+                            radius="pill"
+                            variant="outlined"
+                            color="gray">
                             {leftButtonName}
                         </Button>
-                        <Button onClick={handleClose} autoFocus>
+                        <Button onClick={handleClose} autoFocus
+                            radius="pill"
+                            variant="outlined"
+                            color="negative">
                             {rightButtonName}
                         </Button>
                     </DialogActions>

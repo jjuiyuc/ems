@@ -27,23 +27,37 @@ export default connect(mapState)(function TimeOfUse(props) {
         formT = string => t("form." + string),
         pageT = (string, params) => t("timeOfUse." + string, params)
 
-    const energyCardTitle = source => <>
-        <span className="inline-block mr-1">
-            {pageT("source", { type: pageT(source) })}
-        </span>
-        {/* <span className="inline-block">
+    const energyCardTitle = source =>
+        <>
+            <span className="inline-block mr-1">
+                {pageT("source", { type: pageT(source) })}
+            </span>
+            {/* <span className="inline-block">
             ({pageT("totalUntilNow")})
         </span> */}
-    </>
+        </>
 
-    const
-        hours24 = Array.from(new Array(24).keys()),
-        lineChartDateLabels = hours24.map(n =>
-            moment().hour(n).startOf("h").toISOString()),
-        currentHour = moment().hour(),
-        lineChartDataArray = hours24.filter(v => v <= currentHour).map(() =>
-            Math.floor(Math.random() * (60 - 40 + 1) + 40))
+    const chartSolarUsageSet = ({ data, labels }) => ({
+        datasets: [{
+            backgroundColor: colors.primary.main,
+            borderColor: colors.primary.main,
+            data: data || [],
+            fill: {
+                above: colors.primary["main-opacity-10"],
+                target: "origin"
+            },
+            pointBorderColor: colors.primary["main-opacity-20"],
+            hoverRadius: 0,
+            pointHoverBorderWidth: 0,
+            radius: 0
+        }],
+        labels,
+        tickCallback: (val, index) => val + "%",
+        tooltipLabel: item => `${item.parsed.y}%`,
+        x: { grid: { lineWidth: 0 } },
+        y: { min: 0 }
 
+    })
     const
         [tab, setTab] = useState("today"),
         [infoError, setInfoError] = useState(""),
@@ -63,26 +77,10 @@ export default connect(mapState)(function TimeOfUse(props) {
             power: 0,
             state: 0
         }),
-        [lineChartData, setLineChartData] = useState({
-            datasets: [{
-                backgroundColor: colors.primary.main,
-                borderColor: colors.primary.main,
-                data: lineChartDataArray,
-                fill: {
-                    above: colors.primary["main-opacity-10"],
-                    target: "origin"
-                },
-                pointBorderColor: colors.primary["main-opacity-20"],
-                hoverRadius: 0,
-                pointHoverBorderWidth: 0,
-                radius: 0
-            }],
-            labels: lineChartDateLabels,
-            tickCallback: (val, index) => val + "%",
-            tooltipLabel: item => `${item.parsed.y}%`,
-            x: { grid: { lineWidth: 0 } },
-            y: { max: 80, min: 0 }
-        }),
+        [lineChartUsage, setLineChartUsage] = useState(null),
+        [lineChartUsageError, setLineChartUsageError] = useState(""),
+        [lineChartUsageLoading, setLineChartUsageLoading] = useState(false),
+        [lineChartUsageRes] = useState("hour"),
         [onPeak, setOnPeak] = useState({
             types: [
                 { kwh: 0, percentage: 0, type: "grid" },
@@ -151,10 +149,9 @@ export default connect(mapState)(function TimeOfUse(props) {
             ],
             kwh: 0
         }),
+        [prices, setPrices] = useState({}),
         // [prices, setPrices]
         //     = useState({ onPeak: 0, midPeak: 0, offPeak: 0, superOffPeak: 0 }),
-        [prices, setPrices]
-            = useState({ onPeak: 0, offPeak: 0 }),
         // [timeOfUse, setTimeOfUse] = useState([
         //     {
         //         end: "05:00",
@@ -187,62 +184,41 @@ export default connect(mapState)(function TimeOfUse(props) {
         //         start: "23:00"
         //     }
         // ]),
-        [timeOfUse, setTimeOfUse] = useState([
-            {
-                end: "07:30",
-                name: "offPeak",
-                price: 1.46,
-                start: "00:00"
-            },
-            {
-                end: "22:30",
-                name: "onPeak",
-                price: 3.42,
-                start: "07:30"
-            },
-            {
-                end: "24:00",
-                name: "offPeak",
-                price: 1.46,
-                start: "22:30"
-            },
-        ])
+        [timeOfUse, setTimeOfUse] = useState([])
 
     const getMoment = string => {
         const [hour, minute] = string.split(":")
-
         return moment().hour(parseInt(hour)).minute(parseInt(minute)).second(0)
     }
 
     useEffect(() => {
         const
-            currentTime = moment(),
             dataset = { data: [], backgroundColor: [] },
-            prices = { onPeak: 0, midPeak: 0, offPeak: 0, superOffPeak: 0 }
+            prices = {}
 
         let currentPeriod = ""
 
         if (timeOfUse.length === 0) return
-
         timeOfUse.forEach(item => {
             const
                 { end, start } = item,
                 endTime = getMoment(end),
                 startTime = getMoment(start),
                 duration = moment.duration(endTime.diff(startTime)).as("hours")
-
+            console.log(item.name)
             dataset.data.push(duration)
             dataset.backgroundColor.push(colors[item.name])
-            prices[item.name] = item.price
+            prices[item.name] = item.touRate
 
             if (currentTime >= startTime) {
                 currentPeriod = item.name
             }
         })
         setClockDataset(dataset)
-        setCurrentPeriod(currentPeriod)
-        setCurrentTime(currentTime.format("hh:mm A"))
+        // setCurrentPeriod(currentPeriod)
+        // setCurrentTime(timeOfUse.currentPeakType || "")
         setPrices(prices)
+
     }, [timeOfUse])
 
     const urlPrefix = `/api/${props.gatewayID}/devices`
@@ -301,6 +277,18 @@ export default connect(mapState)(function TimeOfUse(props) {
                         ],
                         kwh: offPeak?.allProducedLifetimeEnergyACDiff
                     }))
+
+                    const { timeOfUse } = data
+                    let periods = []
+                    Object.keys(timeOfUse).forEach(key => {
+                        if (typeof timeOfUse[key] != "object" || !timeOfUse[key]?.length) return
+                        timeOfUse[key].forEach(item => {
+                            periods.push({ name: key, ...item })
+                        })
+                    })
+                    setCurrentTime(moment().format("hh:mm A"))
+                    setCurrentPeriod(timeOfUse.currentPeakType || "")
+                    setTimeOfUse(periods)
                 },
                 url: `${urlPrefix}/time-of-use-info?startTime=${startTime}`
             })
@@ -360,8 +348,41 @@ export default connect(mapState)(function TimeOfUse(props) {
                         ],
                         kwh: offPeak?.allProducedLifetimeEnergyACDiff
                     }))
+                    const { timeOfUse } = data
+                    let periods = []
+                    Object.keys(timeOfUse).forEach(key => {
+                        if (typeof timeOfUse[key] != "object" || !timeOfUse[key]?.length) return
+                        timeOfUse[key].forEach(item => {
+                            periods.push({ name: key, ...item })
+                        })
+                    })
+                    setTimeOfUse(periods)
                 },
                 url: `${urlPrefix}/time-of-use-info?startTime=${preStartTime}`
+            })
+        },
+        callLineChartUsage = (startTime, endTime) => {
+            const lineChartUsageUrl = `${urlPrefix}/solar/energy-usage?`
+                + new URLSearchParams({
+                    startTime, endTime, resolution: lineChartUsageRes
+                }).toString()
+
+            apiCall({
+                onComplete: () => setLineChartUsageLoading(false),
+                onError: error => setLineChartUsageError(error),
+                onStart: () => setLineChartUsageLoading(true),
+                onSuccess: rawData => {
+                    if (!rawData || !rawData.data) return
+                    const
+                        { data } = rawData,
+                        { timestamps } = data,
+                        labels = timestamps.map(t => t * 1000)
+                    setLineChartUsage({
+                        data: data.loadPvConsumedEnergyPercentACs,
+                        labels
+                    })
+                },
+                url: lineChartUsageUrl
             })
         }
 
@@ -372,9 +393,10 @@ export default connect(mapState)(function TimeOfUse(props) {
         let preStartTime = "", preEndTime = ""
         if (tab === "today") {
             startTime = moment().startOf("day").toISOString()
-            // endTime = moment().toISOString()
+            endTime = moment().toISOString()
 
             callTodayCards(startTime)
+            callLineChartUsage(startTime, endTime)
 
         } else if (tab === "yesterday") {
             preStartTime = moment().subtract(1, "day").startOf("day").toISOString()
@@ -382,7 +404,13 @@ export default connect(mapState)(function TimeOfUse(props) {
 
             callYesterdayCards(preStartTime)
         }
+        // if (startTime && endTime) {
+        //     callTodayCards(startTime, endTime)
 
+        //     if (tab === "today") {
+        //     } else {
+        //     }
+        // }
     }, [props.gatewayID, tab])
 
     useEffect(() => {
@@ -410,7 +438,6 @@ export default connect(mapState)(function TimeOfUse(props) {
             url: `/api/${props.gatewayID}/devices/battery/usage-info?startTime=${startTime}`
         })
     }, [props.gatewayID])
-
 
     return <>
         <div className="page-header">
@@ -449,7 +476,7 @@ export default connect(mapState)(function TimeOfUse(props) {
                                         </span>
                                         <span className="inline-block">
                                             ({pageT("totalUntilNow")})
-                        </span>
+                                         </span>
                                     </h5>
                                 </div>
                                 <div className="h-2 bg-gray-500 w-full rounded-full" />
@@ -525,7 +552,9 @@ export default connect(mapState)(function TimeOfUse(props) {
                     <h1>{pageT("directSolarUsage")}</h1>
                 </div>
                 <div className="card chart max-h-80vh h-160 relative w-full">
-                    <LineChart data={lineChartData} id="touLineChart" />
+                    <LineChart data={chartSolarUsageSet({
+                        ...lineChartUsage
+                    })} id="touLineChart" />
                 </div>
             </>
             : null}
@@ -567,21 +596,21 @@ export default connect(mapState)(function TimeOfUse(props) {
                             </div>
                         </>
                         : null}
-                    {/* <div className="card">
+                    <div className="card">
                         <div className="header -mr-4">
                             <h4>{pageT("timeOfUse")}</h4>
-                            <Button
-                        color="brand"
-                        radius="pill"
-                        size="small"
-                        variant="text">
-                        <EditIcon className="h-4 mr-1 w-4" />
-                        {pageT("editTimeOfUse")}
-                    </Button>
+                            {/* <Button
+                                color="brand"
+                                radius="pill"
+                                size="small"
+                                variant="text">
+                                <EditIcon className="h-4 mr-1 w-4" />
+                                {pageT("editTimeOfUse")}
+                            </Button> */}
                         </div>
                         <div className="flex flex-wrap items-center justify-around">
                             <div className="flex flex-wrap items-center justify-center">
-                                <Clock dataset={clockDataset} id="touClock" />
+                                <Clock dataset={clockDataset} id="touClockYesterday" />
                                 <div className="grid grid-cols-3-auto gap-y-2
                                         items-center mx-8 my-4 text-white">
                                     {Object.keys(prices).map((key, i) =>
@@ -599,7 +628,7 @@ export default connect(mapState)(function TimeOfUse(props) {
                                 </div>
                             </div>
                         </div>
-                    </div> */}
+                    </div>
                 </div>
             </>
             : null}

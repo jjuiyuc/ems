@@ -135,7 +135,7 @@ var _ = Describe("TimeOfUse", func() {
 				}
 				expectedTimeOfUse := map[string]interface{}{
 					"timezone":        "+0800",
-					"currentPeakType": "On-peak",
+					"currentPeakType": "onPeak",
 					"offPeak": []interface{}{
 						map[string]interface{}{
 							"end":     "07:30:00",

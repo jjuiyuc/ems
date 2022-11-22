@@ -737,6 +737,14 @@ func (s defaultDevicesService) getTimeOfUse(localStartTime time.Time, billings [
 	if err != nil {
 		return
 	}
+	switch peakType {
+	case "Off-peak":
+		peakType = "offPeak"
+	case "On-peak":
+		peakType = "onPeak"
+	case "Mid-peak":
+		peakType = "midPeak"
+	}
 	timeOfUse["currentPeakType"] = peakType
 	return
 }

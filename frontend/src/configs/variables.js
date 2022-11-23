@@ -11,17 +11,18 @@ const variables = {
         green,
         grid: palette.indigo.main,
         indigo,
-        midPeak: palette.green.main,
+        midPeak: palette.yellow.main,
         primary,
         onPeak: palette.negative.main,
         offPeak: palette.green.main,
         solar: palette.yellow.main,
-        superOffPeak: palette.yellow.main,
+        superOffPeak: palette.purple.main,
         peakShave: palette.green.main,
         yellow,
         purple,
         negative,
         red
+
     },
     languages: {
         en: "English",

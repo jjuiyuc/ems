@@ -1,5 +1,6 @@
 import { connect } from "react-redux"
 import { Button, Stack } from "@mui/material"
+import ReportProblemIcon from "@mui/icons-material/ReportProblem"
 import { Fragment as Frag, useEffect, useState } from "react"
 import moment from "moment"
 import { useTranslation } from "react-multi-lang"
@@ -11,10 +12,24 @@ import BatteryStatusCard from "../components/BatteryStatusCard"
 import Clock from "../components/Clock"
 import EnergyCard from "../components/EnergyCard"
 import LineChart from "../components/LineChart"
+import Spinner from "../components/Spinner"
 
 import { ReactComponent as EditIcon } from "../assets/icons/edit.svg"
 
 const { colors } = variables
+const ErrorBox = ({ error, margin = "", message }) => error
+    ? <AlertBox
+        boxClass={`${margin} negative`}
+        content={<>
+            <span className="font-mono ml-2">{error}</span>
+            <span className="ml-2">{message}</span>
+        </>}
+        icon={ReportProblemIcon}
+        iconColor="negative-main" />
+    : null
+const LoadingBox = ({ loading }) => loading
+    ? <div className="grid h-24 place-items-center"><Spinner /></div>
+    : null
 
 const mapState = state => ({ gatewayID: state.gateways.active.gatewayID })
 
@@ -101,9 +116,9 @@ export default connect(mapState)(function TimeOfUse(props) {
         }),
         [midPeak, setMidPeak] = useState({
             types: [
-                { kwh: 7.5, percentage: 15, type: "grid" },
-                { kwh: 30, percentage: 60, type: "solar" },
-                { kwh: 12.5, percentage: 25, type: "battery" },
+                { kwh: 0, percentage: 0, type: "grid" },
+                { kwh: 0, percentage: 0, type: "solar" },
+                { kwh: 0, percentage: 0, type: "battery" },
             ],
             kwh: 0
         }),
@@ -150,40 +165,6 @@ export default connect(mapState)(function TimeOfUse(props) {
             kwh: 0
         }),
         [prices, setPrices] = useState({}),
-        // [prices, setPrices]
-        //     = useState({ onPeak: 0, midPeak: 0, offPeak: 0, superOffPeak: 0 }),
-        // [timeOfUse, setTimeOfUse] = useState([
-        //     {
-        //         end: "05:00",
-        //         name: "superOffPeak",
-        //         price: 1.2,
-        //         start: "00:00"
-        //     },
-        //     {
-        //         end: "11:00",
-        //         name: "offPeak",
-        //         price: 1.8,
-        //         start: "05:00"
-        //     },
-        //     {
-        //         end: "17:00",
-        //         name: "midPeak",
-        //         price: 2.2,
-        //         start: "11:00"
-        //     },
-        //     {
-        //         end: "23:00",
-        //         name: "onPeak",
-        //         price: 3.5,
-        //         start: "17:00"
-        //     },
-        //     {
-        //         end: "24:00",
-        //         name: "superOffPeak",
-        //         price: 1.2,
-        //         start: "23:00"
-        //     }
-        // ]),
         [timeOfUse, setTimeOfUse] = useState([])
 
     const getMoment = string => {
@@ -215,8 +196,6 @@ export default connect(mapState)(function TimeOfUse(props) {
             }
         })
         setClockDataset(dataset)
-        // setCurrentPeriod(currentPeriod)
-        // setCurrentTime(timeOfUse.currentPeakType || "")
         setPrices(prices)
 
     }, [timeOfUse])
@@ -237,22 +216,22 @@ export default connect(mapState)(function TimeOfUse(props) {
                         ...r,
                         types: [
                             {
-                                kwh: onPeak?.gridProducedLifetimeEnergyACDiff,
-                                percentage: onPeak?.gridProducedEnergyPercentAC,
+                                kwh: onPeak?.gridProducedLifetimeEnergyACDiff || 0,
+                                percentage: onPeak?.gridProducedEnergyPercentAC || 0,
                                 type: "grid"
                             },
                             {
-                                kwh: onPeak?.pvProducedLifetimeEnergyACDiff,
-                                percentage: onPeak?.pvProducedEnergyPercentAC,
+                                kwh: onPeak?.pvProducedLifetimeEnergyACDiff || 0,
+                                percentage: onPeak?.pvProducedEnergyPercentAC || 0,
                                 type: "solar"
                             },
                             {
-                                kwh: onPeak?.batteryProducedLifetimeEnergyACDiff,
-                                percentage: onPeak?.batteryProducedEnergyPercentAC,
+                                kwh: onPeak?.batteryProducedLifetimeEnergyACDiff || 0,
+                                percentage: onPeak?.batteryProducedEnergyPercentAC || 0,
                                 type: "battery"
                             },
                         ],
-                        kwh: onPeak?.allProducedLifetimeEnergyACDiff
+                        kwh: onPeak?.allProducedLifetimeEnergyACDiff || 0
                     }))
 
                     const { offPeak } = data.energySources
@@ -260,22 +239,45 @@ export default connect(mapState)(function TimeOfUse(props) {
                         ...r,
                         types: [
                             {
-                                kwh: offPeak?.gridProducedLifetimeEnergyACDiff,
-                                percentage: offPeak?.gridProducedEnergyPercentAC,
+                                kwh: offPeak?.gridProducedLifetimeEnergyACDiff || 0,
+                                percentage: offPeak?.gridProducedEnergyPercentAC || 0,
                                 type: "grid"
                             },
                             {
-                                kwh: offPeak?.pvProducedLifetimeEnergyACDiff,
-                                percentage: offPeak?.pvProducedEnergyPercentAC,
+                                kwh: offPeak?.pvProducedLifetimeEnergyACDiff || 0,
+                                percentage: offPeak?.pvProducedEnergyPercentAC || 0,
                                 type: "solar"
                             },
                             {
-                                kwh: offPeak?.batteryProducedLifetimeEnergyACDiff,
-                                percentage: offPeak?.batteryProducedEnergyPercentAC,
+                                kwh: offPeak?.batteryProducedLifetimeEnergyACDiff || 0,
+                                percentage: offPeak?.batteryProducedEnergyPercentAC || 0,
                                 type: "battery"
                             },
                         ],
-                        kwh: offPeak?.allProducedLifetimeEnergyACDiff
+                        kwh: offPeak?.allProducedLifetimeEnergyACDiff || 0
+                    }))
+
+                    const { midPeak } = data.energySources
+                    setMidPeak(r => ({
+                        ...r,
+                        types: [
+                            {
+                                kwh: midPeak?.gridProducedLifetimeEnergyACDiff || 0,
+                                percentage: midPeak?.gridProducedEnergyPercentAC || 0,
+                                type: "grid"
+                            },
+                            {
+                                kwh: midPeak?.pvProducedLifetimeEnergyACDiff || 0,
+                                percentage: midPeak?.pvProducedEnergyPercentAC || 0,
+                                type: "solar"
+                            },
+                            {
+                                kwh: midPeak?.batteryProducedLifetimeEnergyACDiff || 0,
+                                percentage: midPeak?.batteryProducedEnergyPercentAC || 0,
+                                type: "battery"
+                            },
+                        ],
+                        kwh: midPeak?.allProducedLifetimeEnergyACDiff || 0
                     }))
 
                     const { timeOfUse } = data
@@ -308,22 +310,22 @@ export default connect(mapState)(function TimeOfUse(props) {
                         ...r,
                         types: [
                             {
-                                kwh: onPeak?.gridProducedLifetimeEnergyACDiff,
-                                percentage: onPeak?.gridProducedEnergyPercentAC,
+                                kwh: onPeak?.gridProducedLifetimeEnergyACDiff || 0,
+                                percentage: onPeak?.gridProducedEnergyPercentAC || 0,
                                 type: "grid"
                             },
                             {
-                                kwh: onPeak?.pvProducedLifetimeEnergyACDiff,
-                                percentage: onPeak?.pvProducedEnergyPercentAC,
+                                kwh: onPeak?.pvProducedLifetimeEnergyACDiff || 0,
+                                percentage: onPeak?.pvProducedEnergyPercentAC || 0,
                                 type: "solar"
                             },
                             {
-                                kwh: onPeak?.batteryProducedLifetimeEnergyACDiff,
-                                percentage: onPeak?.batteryProducedEnergyPercentAC,
+                                kwh: onPeak?.batteryProducedLifetimeEnergyACDiff || 0,
+                                percentage: onPeak?.batteryProducedEnergyPercentAC || 0,
                                 type: "battery"
                             },
                         ],
-                        kwh: onPeak?.allProducedLifetimeEnergyACDiff
+                        kwh: onPeak?.allProducedLifetimeEnergyACDiff || 0
                     }))
 
                     const { offPeak } = data.energySources
@@ -331,23 +333,46 @@ export default connect(mapState)(function TimeOfUse(props) {
                         ...r,
                         types: [
                             {
-                                kwh: offPeak?.gridProducedLifetimeEnergyACDiff,
-                                percentage: offPeak?.gridProducedEnergyPercentAC,
+                                kwh: offPeak?.gridProducedLifetimeEnergyACDiff || 0,
+                                percentage: offPeak?.gridProducedEnergyPercentAC || 0,
                                 type: "grid"
                             },
                             {
-                                kwh: offPeak?.pvProducedLifetimeEnergyACDiff,
-                                percentage: offPeak?.pvProducedEnergyPercentAC,
+                                kwh: offPeak?.pvProducedLifetimeEnergyACDiff || 0,
+                                percentage: offPeak?.pvProducedEnergyPercentAC || 0,
                                 type: "solar"
                             },
                             {
-                                kwh: offPeak?.batteryProducedLifetimeEnergyACDiff,
-                                percentage: offPeak?.batteryProducedEnergyPercentAC,
+                                kwh: offPeak?.batteryProducedLifetimeEnergyACDiff || 0,
+                                percentage: offPeak?.batteryProducedEnergyPercentAC || 0,
                                 type: "battery"
                             },
                         ],
-                        kwh: offPeak?.allProducedLifetimeEnergyACDiff
+                        kwh: offPeak?.allProducedLifetimeEnergyACDiff || 0
                     }))
+                    const { midPeak } = data.energySources
+                    setPreMidPeak(r => ({
+                        ...r,
+                        types: [
+                            {
+                                kwh: midPeak?.gridProducedLifetimeEnergyACDiff || 0,
+                                percentage: midPeak?.gridProducedEnergyPercentAC || 0,
+                                type: "grid"
+                            },
+                            {
+                                kwh: midPeak?.pvProducedLifetimeEnergyACDiff || 0,
+                                percentage: midPeak?.pvProducedEnergyPercentAC || 0,
+                                type: "solar"
+                            },
+                            {
+                                kwh: midPeak?.batteryProducedLifetimeEnergyACDiff || 0,
+                                percentage: midPeak?.batteryProducedEnergyPercentAC || 0,
+                                type: "battery"
+                            },
+                        ],
+                        kwh: midPeak?.allProducedLifetimeEnergyACDiff || 0
+                    }))
+
                     const { timeOfUse } = data
                     let periods = []
                     Object.keys(timeOfUse).forEach(key => {
@@ -385,7 +410,6 @@ export default connect(mapState)(function TimeOfUse(props) {
                 url: lineChartUsageUrl
             })
         }
-
     useEffect(() => {
         if (!props.gatewayID) return
 
@@ -404,13 +428,6 @@ export default connect(mapState)(function TimeOfUse(props) {
 
             callYesterdayCards(preStartTime)
         }
-        // if (startTime && endTime) {
-        //     callTodayCards(startTime, endTime)
-
-        //     if (tab === "today") {
-        //     } else {
-        //     }
-        // }
     }, [props.gatewayID, tab])
 
     useEffect(() => {
@@ -472,14 +489,11 @@ export default connect(mapState)(function TimeOfUse(props) {
                                     <h2 className="mr-2 whitespace-nowrap">{superOffPeak.kwh} {commonT("kwh")}</h2>
                                     <h5 className="font-bold">
                                         <span className="inline-block mr-1">
-                                            {pageT("superOffPeak")}{commonT("sources")}
+                                            {pageT("superOffPeak")} {commonT("sources")}
                                         </span>
-                                        <span className="inline-block">
-                                            ({pageT("totalUntilNow")})
-                                         </span>
                                     </h5>
                                 </div>
-                                <div className="h-2 bg-gray-500 w-full rounded-full" />
+                                <div className="h-2 bg-gray-600 w-full rounded-full" />
                                 <div className="mx-2.5 mb-12 mt-4 lg:h-5 w-3 mr-2 sm:h-4" />
                                 <div className="grid grid-cols-3 column-separator gap-x-5 sm:gap-x-10">
                                     {superOffPeak.types.map((t, i) =>
@@ -488,14 +502,19 @@ export default connect(mapState)(function TimeOfUse(props) {
                                             <h6 className="font-bold text-white">{commonT(t.type)}</h6>
                                             <h3 className="my-1">-</h3>
                                             {/* <p className="lg:test text-13px text-white">
-                                {t.kwh} {commonT("kwh")}
-                            </p> */}
+                                                {t.kwh} {commonT("kwh")}
+                                            </p> */}
                                             <div className="md:h-6 lg:h-4 w-4"></div>
                                         </div>)}
                                 </div>
                             </div>
-                        </> : null
-                    }
+                        </> : null}
+                    {infoLoading
+                        ? <div className="absolute bg-black-main-opacity-95 grid inset-0
+                                place-items-center rounded-3xl">
+                            <Spinner />
+                        </div>
+                        : null}
                     <div className="card">
                         <div className="header -mr-4">
                             <h4>{pageT("timeOfUse")}</h4>
@@ -543,6 +562,12 @@ export default connect(mapState)(function TimeOfUse(props) {
                                 </div>
                             </div>
                         </div>
+                        {infoLoading
+                            ? <div className="absolute bg-black-main-opacity-95 grid inset-0
+                                place-items-center rounded-3xl">
+                                <Spinner />
+                            </div>
+                            : null}
                     </div>
                     <BatteryStatusCard
                         data={batteryStatus}
@@ -555,6 +580,10 @@ export default connect(mapState)(function TimeOfUse(props) {
                     <LineChart data={chartSolarUsageSet({
                         ...lineChartUsage
                     })} id="touLineChart" />
+                    <ErrorBox
+                        error={lineChartUsageError}
+                        message={pageT("chartError")} />
+                    <LoadingBox loading={lineChartUsageLoading} />
                 </div>
             </>
             : null}
@@ -566,20 +595,19 @@ export default connect(mapState)(function TimeOfUse(props) {
                     <EnergyCard data={preOffPeak} title={energyCardTitle("offPeak")} />
                     {showFullSections
                         ? <>
-                            <EnergyCard data={midPeak} title={energyCardTitle("midPeak")} />
+                            <EnergyCard data={preMidPeak} title={energyCardTitle("midPeak")} />
+                            {/* <EnergyCard data={superOffPeak} title={energyCardTitle("superOffPeak")} /> */}
+
                             <div className="card energyCard">
                                 <div className="flex flex-wrap items-baseline mb-8">
                                     <h2 className="mr-2 whitespace-nowrap">{superOffPeak.kwh} {commonT("kwh")}</h2>
                                     <h5 className="font-bold">
                                         <span className="inline-block mr-1">
-                                            {pageT("superOffPeak")}{commonT("sources")}
-                                        </span>
-                                        <span className="inline-block">
-                                            ({pageT("totalUntilNow")})
+                                            {pageT("superOffPeak")} {commonT("sources")}
                                         </span>
                                     </h5>
                                 </div>
-                                <div className="h-2 bg-gray-500 w-full rounded-full" />
+                                <div className="h-2 bg-gray-600 w-full rounded-full" />
                                 <div className="mx-2.5 mb-12 mt-4 lg:h-5 w-3 mr-2 sm:h-4" />
                                 <div className="grid grid-cols-3 column-separator gap-x-5 sm:gap-x-10">
                                     {superOffPeak.types.map((t, i) =>
@@ -588,13 +616,19 @@ export default connect(mapState)(function TimeOfUse(props) {
                                             <h6 className="font-bold text-white">{commonT(t.type)}</h6>
                                             <h3 className="my-1">-</h3>
                                             {/* <p className="lg:test text-13px text-white">
-                                {t.kwh} {commonT("kwh")}
-                            </p> */}
+                                                {t.kwh} {commonT("kwh")}
+                                            </p> */}
                                             <div className="md:h-6 lg:h-4 w-4"></div>
                                         </div>)}
                                 </div>
                             </div>
                         </>
+                        : null}
+                    {infoLoading
+                        ? <div className="absolute bg-black-main-opacity-95 grid inset-0
+                                place-items-center rounded-3xl">
+                            <Spinner />
+                        </div>
                         : null}
                     <div className="card">
                         <div className="header -mr-4">
@@ -628,9 +662,16 @@ export default connect(mapState)(function TimeOfUse(props) {
                                 </div>
                             </div>
                         </div>
+                        {infoLoading
+                            ? <div className="absolute bg-black-main-opacity-95 grid inset-0
+                                place-items-center rounded-3xl">
+                                <Spinner />
+                            </div>
+                            : null}
                     </div>
                 </div>
             </>
-            : null}
+            : null
+        }
     </>
 })

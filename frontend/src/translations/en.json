@@ -220,6 +220,7 @@
     "timeOfUse": {
         "batteryStatus": "Battery Status",
         "chargingFrom": "Charging From",
+        "chartError": "Can't get chart data",
         "current": "Current",
         "directSolarUsage": "Direct Solar Usage(%)",
         "dischargingTo":"Discharging To",

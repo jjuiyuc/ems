@@ -220,6 +220,7 @@
     "timeOfUse": {
         "batteryStatus": "電池狀態",
         "chargingFrom": "充電自/放電至",
+        "chartError": "無法取得圖表資料",
         "current": "目前",
         "directSolarUsage": "太陽能直接消耗比率(%)",
         "dischargingTo": "電池放電至",

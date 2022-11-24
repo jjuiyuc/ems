@@ -120,7 +120,8 @@ export default connect(mapState)(function TimeOfUse(props) {
                 { kwh: 0, percentage: 0, type: "solar" },
                 { kwh: 0, percentage: 0, type: "battery" },
             ],
-            kwh: 0
+            kwh: 0,
+            color: "text-yellow-main"
         }),
         [superOffPeak, setSuperOffPeak] = useState({
             types: [
@@ -154,7 +155,8 @@ export default connect(mapState)(function TimeOfUse(props) {
                 { kwh: 0, percentage: 0, type: "solar" },
                 { kwh: 0, percentage: 25, type: "battery" },
             ],
-            kwh: 50
+            kwh: 50,
+            color: "text-yellow-main"
         }),
         [preSuperOffPeak, setPreSuperOffPeak] = useState({
             types: [
@@ -288,6 +290,7 @@ export default connect(mapState)(function TimeOfUse(props) {
                             periods.push({ name: key, ...item })
                         })
                     })
+                    periods.sort((a, b) => getMoment(a.start) - getMoment(b.start))
                     setCurrentTime(moment().format("hh:mm A"))
                     setCurrentPeriod(timeOfUse.currentPeakType || "")
                     setTimeOfUse(periods)

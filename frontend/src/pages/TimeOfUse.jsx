@@ -384,6 +384,7 @@ export default connect(mapState)(function TimeOfUse(props) {
                             periods.push({ name: key, ...item })
                         })
                     })
+                    periods.sort((a, b) => getMoment(a.start) - getMoment(b.start))
                     setTimeOfUse(periods)
                 },
                 url: `${urlPrefix}/time-of-use-info?startTime=${preStartTime}`

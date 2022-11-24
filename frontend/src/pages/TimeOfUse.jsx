@@ -8,6 +8,7 @@ import { useTranslation } from "react-multi-lang"
 import { apiCall } from "../utils/api"
 import variables from "../configs/variables"
 
+import AlertBox from "../components/AlertBox"
 import BatteryStatusCard from "../components/BatteryStatusCard"
 import Clock from "../components/Clock"
 import EnergyCard from "../components/EnergyCard"

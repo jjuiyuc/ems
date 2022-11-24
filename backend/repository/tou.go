@@ -42,7 +42,7 @@ func (repo defaultTOURepository) GetBillingsByTOUInfo(touLocationID int64, volta
 
 // CountHolidayByDay godoc
 func (repo defaultTOURepository) CountHolidayByDay(touLocationID int64, year, day string) (int64, error) {
-	return deremsmodels.Tous(
+	return deremsmodels.TouHolidays(
 		qm.Where("day = ?", day),
 		qm.Where("year = ?", year),
 		qm.Where("tou_location_id = ?", touLocationID)).Count(repo.db)

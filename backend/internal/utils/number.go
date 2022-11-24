@@ -30,6 +30,15 @@ func Diff(x, y float32) float32 {
 		}).Error()
 		return 0
 	}
+	if value < 0 {
+		// Lifetime is accumulated value. Negative value is illegal.
+		log.WithFields(log.Fields{
+			"caused-by": "diff < 0",
+			"x":         x,
+			"y":         y,
+		}).Error()
+		return 0
+	}
 	return float32(value)
 }
 

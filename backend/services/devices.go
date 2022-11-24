@@ -685,16 +685,6 @@ func (s defaultDevicesService) getEnergySourceDistributionByPeakType(peakType st
 		pvProducedLifetimeEnergyACDiff := utils.Diff(latestLog.PvProducedLifetimeEnergyAC.Float32, firstLog.PvProducedLifetimeEnergyAC.Float32)
 		gridProducedLifetimeEnergyACDiff := utils.Diff(latestLog.GridProducedLifetimeEnergyAC.Float32, firstLog.GridProducedLifetimeEnergyAC.Float32)
 		batteryProducedLifetimeEnergyACDiff := utils.Diff(latestLog.BatteryProducedLifetimeEnergyAC.Float32, firstLog.BatteryProducedLifetimeEnergyAC.Float32)
-		// avoid cc illegal value
-		if pvProducedLifetimeEnergyACDiff < 0 {
-			pvProducedLifetimeEnergyACDiff = 0
-		}
-		if gridProducedLifetimeEnergyACDiff < 0 {
-			gridProducedLifetimeEnergyACDiff = 0
-		}
-		if batteryProducedLifetimeEnergyACDiff < 0 {
-			batteryProducedLifetimeEnergyACDiff = 0
-		}
 		energySourceDistribution["pvProducedLifetimeEnergyACDiff"] += pvProducedLifetimeEnergyACDiff
 		energySourceDistribution["gridProducedLifetimeEnergyACDiff"] += gridProducedLifetimeEnergyACDiff
 		energySourceDistribution["batteryProducedLifetimeEnergyACDiff"] += batteryProducedLifetimeEnergyACDiff

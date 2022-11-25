@@ -659,7 +659,7 @@ export default connect(mapState)(function TimeOfUse(props) {
                                                 {pageT(key)}
                                             </div>
                                             <div className="font-bold ml-2 text-base">
-                                                ${prices[key]}
+                                                ${prices[key]} /{commonT("kwh")}
                                             </div>
                                         </Frag>)}
                                 </div>

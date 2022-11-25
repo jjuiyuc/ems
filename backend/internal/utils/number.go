@@ -20,6 +20,18 @@ func ThreeDecimalPlaces(x float32) float32 {
 	return float32(value)
 }
 
+// GetZeroForNegativeValue godoc
+func GetZeroForNegativeValue(x float32) float32 {
+	if x < 0 {
+		log.WithFields(log.Fields{
+			"caused-by": "value is negative",
+			"x":         x,
+		}).Error()
+		return 0
+	}
+	return x
+}
+
 // Diff godoc
 func Diff(x, y float32) float32 {
 	value, err := strconv.ParseFloat(fmt.Sprintf("%.3f", x-y), 32)

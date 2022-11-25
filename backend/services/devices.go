@@ -138,6 +138,10 @@ func (r *EnergyDistributionInfoResponse) ComputedValues(firstLog, latestLog *der
 	r.PvProducedLifetimeEnergyACDiff = utils.Diff(latestLog.PvProducedLifetimeEnergyAC.Float32, firstLog.PvProducedLifetimeEnergyAC.Float32)
 	r.GridProducedLifetimeEnergyACDiff = utils.Diff(latestLog.GridProducedLifetimeEnergyAC.Float32, firstLog.GridProducedLifetimeEnergyAC.Float32)
 	r.BatteryProducedLifetimeEnergyACDiff = utils.Diff(latestLog.BatteryProducedLifetimeEnergyAC.Float32, firstLog.BatteryProducedLifetimeEnergyAC.Float32)
+	// Avoid cc illegal value
+	r.PvProducedLifetimeEnergyACDiff = utils.GetZeroForNegativeValue(r.PvProducedLifetimeEnergyACDiff)
+	r.GridProducedLifetimeEnergyACDiff = utils.GetZeroForNegativeValue(r.GridProducedLifetimeEnergyACDiff)
+	r.BatteryProducedLifetimeEnergyACDiff = utils.GetZeroForNegativeValue(r.BatteryProducedLifetimeEnergyACDiff)
 	r.AllProducedLifetimeEnergyACDiff = utils.ThreeDecimalPlaces(
 		r.PvProducedLifetimeEnergyACDiff +
 			r.GridProducedLifetimeEnergyACDiff +
@@ -249,6 +253,11 @@ func (r *SolarEnergyInfoResponse) ComputedValues(firstLogOfDay, firstLogOfMonth,
 	r.LoadPvConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.LoadPvConsumedLifetimeEnergyAC.Float32, firstLogOfDay.LoadPvConsumedLifetimeEnergyAC.Float32)
 	r.BatteryPvConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.BatteryPvConsumedLifetimeEnergyAC.Float32, firstLogOfDay.BatteryPvConsumedLifetimeEnergyAC.Float32)
 	r.GridPvConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.GridPvConsumedLifetimeEnergyAC.Float32, firstLogOfDay.GridPvConsumedLifetimeEnergyAC.Float32)
+	// Avoid cc illegal value
+	r.PvProducedLifetimeEnergyACDiff = utils.GetZeroForNegativeValue(r.PvProducedLifetimeEnergyACDiff)
+	r.LoadPvConsumedLifetimeEnergyACDiff = utils.GetZeroForNegativeValue(r.LoadPvConsumedLifetimeEnergyACDiff)
+	r.BatteryPvConsumedLifetimeEnergyACDiff = utils.GetZeroForNegativeValue(r.BatteryPvConsumedLifetimeEnergyACDiff)
+	r.GridPvConsumedLifetimeEnergyACDiff = utils.GetZeroForNegativeValue(r.GridPvConsumedLifetimeEnergyACDiff)
 	// Percent and value are recomputed by PvProducedLifetimeEnergyACDiff
 	sumOfPvConsumedLifetimeEnergyAC := r.LoadPvConsumedLifetimeEnergyACDiff + r.BatteryPvConsumedLifetimeEnergyACDiff + r.GridPvConsumedLifetimeEnergyACDiff
 	if sumOfPvConsumedLifetimeEnergyAC == 0 {
@@ -685,16 +694,10 @@ func (s defaultDevicesService) getEnergySourceDistributionByPeakType(peakType st
 		pvProducedLifetimeEnergyACDiff := utils.Diff(latestLog.PvProducedLifetimeEnergyAC.Float32, firstLog.PvProducedLifetimeEnergyAC.Float32)
 		gridProducedLifetimeEnergyACDiff := utils.Diff(latestLog.GridProducedLifetimeEnergyAC.Float32, firstLog.GridProducedLifetimeEnergyAC.Float32)
 		batteryProducedLifetimeEnergyACDiff := utils.Diff(latestLog.BatteryProducedLifetimeEnergyAC.Float32, firstLog.BatteryProducedLifetimeEnergyAC.Float32)
-		// avoid cc illegal value
-		if pvProducedLifetimeEnergyACDiff < 0 {
-			pvProducedLifetimeEnergyACDiff = 0
-		}
-		if gridProducedLifetimeEnergyACDiff < 0 {
-			gridProducedLifetimeEnergyACDiff = 0
-		}
-		if batteryProducedLifetimeEnergyACDiff < 0 {
-			batteryProducedLifetimeEnergyACDiff = 0
-		}
+		// Avoid cc illegal value
+		pvProducedLifetimeEnergyACDiff = utils.GetZeroForNegativeValue(pvProducedLifetimeEnergyACDiff)
+		gridProducedLifetimeEnergyACDiff = utils.GetZeroForNegativeValue(gridProducedLifetimeEnergyACDiff)
+		batteryProducedLifetimeEnergyACDiff = utils.GetZeroForNegativeValue(batteryProducedLifetimeEnergyACDiff)
 		energySourceDistribution["pvProducedLifetimeEnergyACDiff"] += pvProducedLifetimeEnergyACDiff
 		energySourceDistribution["gridProducedLifetimeEnergyACDiff"] += gridProducedLifetimeEnergyACDiff
 		energySourceDistribution["batteryProducedLifetimeEnergyACDiff"] += batteryProducedLifetimeEnergyACDiff
@@ -1033,6 +1036,11 @@ func (s defaultDevicesService) computeLoadPvConsumedEnergyPercentACValue(firstRe
 	loadPvConsumedLifetimeEnergyACDiff := utils.Diff(latestRealtimeInfo.LoadPvConsumedLifetimeEnergyAC.Float32, firstRealtimeInfo.LoadPvConsumedLifetimeEnergyAC.Float32)
 	batteryPvConsumedLifetimeEnergyACDiff := utils.Diff(latestRealtimeInfo.BatteryPvConsumedLifetimeEnergyAC.Float32, firstRealtimeInfo.BatteryPvConsumedLifetimeEnergyAC.Float32)
 	gridPvConsumedLifetimeEnergyACDiff := utils.Diff(latestRealtimeInfo.GridPvConsumedLifetimeEnergyAC.Float32, firstRealtimeInfo.GridPvConsumedLifetimeEnergyAC.Float32)
+	// Avoid cc illegal value
+	pvProducedLifetimeEnergyACDiff = utils.GetZeroForNegativeValue(pvProducedLifetimeEnergyACDiff)
+	loadPvConsumedLifetimeEnergyACDiff = utils.GetZeroForNegativeValue(loadPvConsumedLifetimeEnergyACDiff)
+	batteryPvConsumedLifetimeEnergyACDiff = utils.GetZeroForNegativeValue(batteryPvConsumedLifetimeEnergyACDiff)
+	gridPvConsumedLifetimeEnergyACDiff = utils.GetZeroForNegativeValue(gridPvConsumedLifetimeEnergyACDiff)
 	// loadPvConsumedLifetimeEnergyACDiff is recomputed by PvProducedLifetimeEnergyACDiff
 	sumOfPvConsumedLifetimeEnergyAC := loadPvConsumedLifetimeEnergyACDiff + batteryPvConsumedLifetimeEnergyACDiff + gridPvConsumedLifetimeEnergyACDiff
 	if sumOfPvConsumedLifetimeEnergyAC != 0 {

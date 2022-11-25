@@ -380,7 +380,7 @@ export default connect(mapState)(function TimeOfUse(props) {
                     const { timeOfUse } = data
                     let periods = []
                     Object.keys(timeOfUse).forEach(key => {
-                        if (typeof timeOfUse[key] != "object" || !timeOfUse[key]?.length) return
+                        if (!Array.isArray(timeOfUse[key])) return
                         timeOfUse[key].forEach(item => {
                             periods.push({ name: key, ...item })
                         })
@@ -546,7 +546,7 @@ export default connect(mapState)(function TimeOfUse(props) {
                                                 {pageT(key)}
                                             </div>
                                             <div className="font-bold ml-2 text-base">
-                                                ${prices[key]}
+                                                ${prices[key]} /{commonT("kwh")}
                                             </div>
                                         </Frag>)}
                                 </div>
@@ -661,7 +661,7 @@ export default connect(mapState)(function TimeOfUse(props) {
                                                 {pageT(key)}
                                             </div>
                                             <div className="font-bold ml-2 text-base">
-                                                ${prices[key]}
+                                                ${prices[key]} /{commonT("kwh")}
                                             </div>
                                         </Frag>)}
                                 </div>

@@ -37,7 +37,7 @@
         "inactive":"未啟動",
         "importFromGrid": "市電充電功率",
         "kw": "kW",
-        "kwh": "kWh",
+        "kwh": "度",
         "load": "用電負載",
         "logIn": "登入",
         "logOut": "登出",

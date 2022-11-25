@@ -546,7 +546,7 @@ export default connect(mapState)(function TimeOfUse(props) {
                                                 {pageT(key)}
                                             </div>
                                             <div className="font-bold ml-2 text-base">
-                                                ${prices[key]}
+                                                ${prices[key]} /{commonT("kwh")}
                                             </div>
                                         </Frag>)}
                                 </div>
@@ -574,9 +574,7 @@ export default connect(mapState)(function TimeOfUse(props) {
                             </div>
                             : null}
                     </div>
-                    <BatteryStatusCard
-                        data={batteryStatus}
-                    />
+                    <BatteryStatusCard data={batteryStatus} />
                 </div>
                 <div className="mt-20 page-header">
                     <h1>{pageT("directSolarUsage")}</h1>
@@ -661,7 +659,7 @@ export default connect(mapState)(function TimeOfUse(props) {
                                                 {pageT(key)}
                                             </div>
                                             <div className="font-bold ml-2 text-base">
-                                                ${prices[key]}
+                                                ${prices[key]} /{commonT("kwh")}
                                             </div>
                                         </Frag>)}
                                 </div>

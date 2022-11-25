@@ -154,9 +154,9 @@ export default connect(mapState)(function TimeOfUse(props) {
             types: [
                 { kwh: 0, percentage: 0, type: "grid" },
                 { kwh: 0, percentage: 0, type: "solar" },
-                { kwh: 0, percentage: 25, type: "battery" },
+                { kwh: 0, percentage: 0, type: "battery" },
             ],
-            kwh: 50,
+            kwh: 0,
             color: "text-yellow-main"
         }),
         [preSuperOffPeak, setPreSuperOffPeak] = useState({
@@ -380,7 +380,7 @@ export default connect(mapState)(function TimeOfUse(props) {
                     const { timeOfUse } = data
                     let periods = []
                     Object.keys(timeOfUse).forEach(key => {
-                        if (typeof timeOfUse[key] != "object" || !timeOfUse[key]?.length) return
+                        if (!Array.isArray(timeOfUse[key])) return
                         timeOfUse[key].forEach(item => {
                             periods.push({ name: key, ...item })
                         })

@@ -286,7 +286,7 @@ export default connect(mapState)(function TimeOfUse(props) {
                     const { timeOfUse } = data
                     let periods = []
                     Object.keys(timeOfUse).forEach(key => {
-                        if (typeof timeOfUse[key] != "object" || !timeOfUse[key]?.length) return
+                        if (!Array.isArray(timeOfUse[key])) return
                         timeOfUse[key].forEach(item => {
                             periods.push({ name: key, ...item })
                         })

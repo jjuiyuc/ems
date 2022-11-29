@@ -155,6 +155,7 @@ var _ = Describe("TimeOfUse", func() {
 							"touRate": 3.42,
 						},
 					},
+					"midPeak": nil,
 				}
 				expectedResponseData := services.TimeOfUseInfoResponse{
 					EnergySources: expectedEnergySources,

@@ -731,18 +731,9 @@ func (s defaultDevicesService) getTimeOfUse(localStartTime time.Time, billings [
 	timeOfUse["timezone"] = localStartTime.Format(utils.ZHHMM)
 
 	// 2. onPeak, midPeak, offPeak
-	onPeak := s.getPeriodsByPeakType("On-peak", billings)
-	midPeak := s.getPeriodsByPeakType("Mid-peak", billings)
-	offPeak := s.getPeriodsByPeakType("Off-peak", billings)
-	if onPeak != nil {
-		timeOfUse["onPeak"] = onPeak
-	}
-	if midPeak != nil {
-		timeOfUse["midPeak"] = midPeak
-	}
-	if offPeak != nil {
-		timeOfUse["offPeak"] = offPeak
-	}
+	timeOfUse["onPeak"] = s.getPeriodsByPeakType("On-peak", billings)
+	timeOfUse["midPeak"] = s.getPeriodsByPeakType("Mid-peak", billings)
+	timeOfUse["offPeak"] = s.getPeriodsByPeakType("Off-peak", billings)
 
 	// 3. currentPeakType
 	loc := time.FixedZone(localStartTime.Zone())

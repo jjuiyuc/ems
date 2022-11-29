@@ -26,7 +26,7 @@ func GetZeroForNegativeValue(x float32) float32 {
 		log.WithFields(log.Fields{
 			"caused-by": "value is negative",
 			"x":         x,
-		}).Error()
+		}).Warn()
 		return 0
 	}
 	return x

@@ -648,7 +648,7 @@ func (s defaultDevicesService) getEnergySourcesInfo(gwUUID string, localStartTim
 	return
 }
 
-func (s defaultDevicesService) getEnergySourceDistributionByPeakType(peakType string, gwUUID string, localStartTime time.Time, billings []*deremsmodels.Tou) (energySourceDistribution map[string]float32, err error) {
+func (s defaultDevicesService) getEnergySourceDistributionByPeakType(peakType, gwUUID string, localStartTime time.Time, billings []*deremsmodels.Tou) (energySourceDistribution map[string]float32, err error) {
 	energySourceDistribution = make(map[string]float32)
 
 	loc := time.FixedZone(localStartTime.Zone())
@@ -752,13 +752,12 @@ func (s defaultDevicesService) getTimeOfUse(localStartTime time.Time, billings [
 	}
 	switch peakType {
 	case "Off-peak":
-		peakType = "offPeak"
+		timeOfUse["currentPeakType"] = "offPeak"
 	case "On-peak":
-		peakType = "onPeak"
+		timeOfUse["currentPeakType"] = "onPeak"
 	case "Mid-peak":
-		peakType = "midPeak"
+		timeOfUse["currentPeakType"] = "midPeak"
 	}
-	timeOfUse["currentPeakType"] = peakType
 	return
 }
 

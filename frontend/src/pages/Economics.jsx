@@ -4,9 +4,11 @@ import { useTranslation } from "react-multi-lang"
 import moment from "moment"
 
 import { API_HOST } from "../constant/env"
-import PriceCard from "../components/PriceCard"
-import LineChart from "../components/LineChart"
 import BarChart from "../components/BarChart"
+import EnergySolarSubCard from "../components/EnergySolarSubCard"
+import LineChart from "../components/LineChart"
+import Spinner from "../components/Spinner"
+
 import variables from "../configs/variables"
 
 import { ReactComponent as EconomicsIcon } from "../assets/icons/economics.svg"
@@ -35,13 +37,11 @@ export default function Economics(props) {
         weeklyTabs = ["thisWeek", "perviouWeek"]
 
     const
+        [infoError, setInfoError] = useState(""),
+        [infoLoading, setInfoLoading] = useState(false),
         [total, setTotal] = useState(630),
-        [ancillaryServices, setAncillaryServices] = useState(15),
-        [demandCharge, setDemandCharge] = useState(150),
-        [timeOfUseArbitrage, setTimeOfUseArbitrage] = useState(130),
-        [renewableEnergyCertificate, setRenewableEnergyCertificate] = useState(150),
-        [solarLocalUsage, setSolarLocalUsage] = useState(160),
-        [exportToGrid, setExportToGrid] = useState(130),
+        [preUbiik, setPreUbiik] = useState(0),
+        [postUbiik, setPostUbiik] = useState(0),
         [monthtlyTab, setMonthtlyTab] = useState(monthtlyTabs[0]),
         [weeklyTab, setWeeklyTab] = useState(weeklyTabs[0])
 
@@ -141,39 +141,29 @@ export default function Economics(props) {
 
     return <>
         <h1 className="mb-9">{pageT("economics")}</h1>
-        <div className=" gap-x-5 lg:grid-cols-4 grid">
-            <div className="card mb-8 row-span-2 col-span-1">
-                <div>
-                    <h5 className="font-bold">{pageT("total")}</h5>
-                    <h2 className="font-bold mb-1 pt-4">{pageT("february")} 2022</h2>
-                    <h2 className="font-bold mb-1 pt-4">${total}</h2>
+        <div className="font-bold gap-5 grid md:grid-cols-2 mt-4 mb-8">
+            <EnergySolarSubCard
+                icon={EconomicsIcon}
+                subTitle={pageT("thisCalendarMonth")}
+                title={pageT("preUbiik")}
+                value={"$" + preUbiik}
+
+            />
+            <EnergySolarSubCard
+                icon={EconomicsIcon}
+                title={pageT("postUbiik")}
+                subTitle={pageT("thisCalendarMonth")}
+                value={"$" + postUbiik}
+
+            />
+            {infoLoading
+                ? <div className="absolute bg-black-main-opacity-95 grid inset-0
+                                place-items-center rounded-3xl">
+                    <Spinner />
                 </div>
-                <div className="flex justify-end items-end">
-                    <div className="items-center place-items-center grid
-                        bg-primary-main-opacity-20 w-20 h-20 rounded-full">
-                        <EconomicsIcon className="text-brand-main w-12 h-12" />
-                    </div>
-                </div>
-            </div>
-            <PriceCard
-                price={ancillaryServices}
-                title={pageT("ancillaryServices")} />
-            <PriceCard
-                price={demandCharge}
-                title={commonT("demandCharge")} />
-            <PriceCard
-                price={timeOfUseArbitrage}
-                title={pageT("timeOfUseArbitrage")} />
-            <PriceCard
-                price={renewableEnergyCertificate}
-                title={pageT("renewableEnergyCertificate")} />
-            <PriceCard
-                price={solarLocalUsage}
-                title={pageT("solarLocalUsage")} />
-            <PriceCard
-                price={exportToGrid}
-                title={commonT("exportToGrid")} />
+                : null}
         </div>
+
         <div className="card chart">
             <div className="items-center grid-cols-1fr-auto-1fr mb-8 lg:grid">
                 <h4 className="mb-4 lg:mb-0">{pageT("monthlyStackedRevenue")}</h4>

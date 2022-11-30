@@ -595,20 +595,20 @@ func (s defaultDevicesService) GetBatteryUsageInfo(param *app.StartTimeParam) (b
 
 func (s defaultDevicesService) GetTimeOfUseInfo(param *app.StartTimeParam) (timeOfUseInfo *TimeOfUseInfoResponse, err error) {
 	timeOfUseInfo = &TimeOfUseInfoResponse{}
-	localStartTime, billings, err := s.billing.GetBillingsOfLocalTime(param.GatewayUUID, param.Query.StartTime)
+	localStartTime, tous, err := s.billing.GetTOUsOfLocalTime(param.GatewayUUID, param.Query.StartTime)
 	if err != nil {
 		return
 	}
 
 	// 1. energySources
-	energySources, err := s.getEnergySourcesInfo(param.GatewayUUID, localStartTime, billings)
+	energySources, err := s.getEnergySourcesInfo(param.GatewayUUID, localStartTime, tous)
 	if err != nil {
 		return
 	}
 	timeOfUseInfo.EnergySources = energySources
 
 	// 2. timeOfUse
-	timeOfUse, err := s.getTimeOfUse(localStartTime, billings)
+	timeOfUse, err := s.getTimeOfUseOfDay(localStartTime, tous)
 	if err != nil {
 		return
 	}
@@ -621,18 +621,18 @@ func (s defaultDevicesService) GetTimeOfUseInfo(param *app.StartTimeParam) (time
 	return
 }
 
-func (s defaultDevicesService) getEnergySourcesInfo(gwUUID string, localStartTime time.Time, billings []*deremsmodels.Tou) (energySources map[string]interface{}, err error) {
+func (s defaultDevicesService) getEnergySourcesInfo(gwUUID string, localStartTime time.Time, tous []*deremsmodels.Tou) (energySources map[string]interface{}, err error) {
 	energySources = make(map[string]interface{})
 
-	onPeak, err := s.getEnergySourceDistributionByPeakType("On-peak", gwUUID, localStartTime, billings)
+	onPeak, err := s.getEnergySourceDistributionByPeakType("On-peak", gwUUID, localStartTime, tous)
 	if err != nil {
 		return
 	}
-	midPeak, err := s.getEnergySourceDistributionByPeakType("Mid-peak", gwUUID, localStartTime, billings)
+	midPeak, err := s.getEnergySourceDistributionByPeakType("Mid-peak", gwUUID, localStartTime, tous)
 	if err != nil {
 		return
 	}
-	offPeak, err := s.getEnergySourceDistributionByPeakType("Off-peak", gwUUID, localStartTime, billings)
+	offPeak, err := s.getEnergySourceDistributionByPeakType("Off-peak", gwUUID, localStartTime, tous)
 	if err != nil {
 		return
 	}
@@ -648,16 +648,16 @@ func (s defaultDevicesService) getEnergySourcesInfo(gwUUID string, localStartTim
 	return
 }
 
-func (s defaultDevicesService) getEnergySourceDistributionByPeakType(peakType, gwUUID string, localStartTime time.Time, billings []*deremsmodels.Tou) (energySourceDistribution map[string]float32, err error) {
+func (s defaultDevicesService) getEnergySourceDistributionByPeakType(peakType, gwUUID string, localStartTime time.Time, tous []*deremsmodels.Tou) (energySourceDistribution map[string]float32, err error) {
 	energySourceDistribution = make(map[string]float32)
 
 	loc := time.FixedZone(localStartTime.Zone())
-	for _, billing := range billings {
-		if billing.PeakType.String != peakType {
+	for _, tou := range tous {
+		if tou.PeakType.String != peakType {
 			continue
 		}
 
-		startTime, err := time.ParseInLocation(utils.HHMMSS24h, billing.PeriodStime.String, loc)
+		startTime, err := time.ParseInLocation(utils.HHMMSS24h, tou.PeriodStime.String, loc)
 		if err != nil {
 			log.WithFields(log.Fields{
 				"caused-by": "time.ParseInLocation",
@@ -666,7 +666,7 @@ func (s defaultDevicesService) getEnergySourceDistributionByPeakType(peakType, g
 			break
 		}
 		startTimeInUTC := time.Date(localStartTime.Year(), localStartTime.Month(), localStartTime.Day(), startTime.Hour(), startTime.Minute(), startTime.Second(), 0, loc).In(time.UTC)
-		endTime, err := time.ParseInLocation(utils.HHMMSS24h, billing.PeriodEtime.String, loc)
+		endTime, err := time.ParseInLocation(utils.HHMMSS24h, tou.PeriodEtime.String, loc)
 		if err != nil {
 			log.WithFields(log.Fields{
 				"caused-by": "time.ParseInLocation",
@@ -675,7 +675,7 @@ func (s defaultDevicesService) getEnergySourceDistributionByPeakType(peakType, g
 			break
 		}
 		endTimeInUTC := time.Date(localStartTime.Year(), localStartTime.Month(), localStartTime.Day(), endTime.Hour(), endTime.Minute(), endTime.Second(), 0, loc).In(time.UTC)
-		if billing.PeriodEtime.String == "00:00:00" {
+		if tou.PeriodEtime.String == "00:00:00" {
 			endTimeInUTC = endTimeInUTC.AddDate(0, 0, 1)
 		}
 		firstLog, err1 := s.repo.CCData.GetFirstLog(gwUUID, startTimeInUTC, endTimeInUTC)
@@ -724,20 +724,20 @@ func (s defaultDevicesService) getEnergySourceDistributionByPeakType(peakType, g
 	return
 }
 
-func (s defaultDevicesService) getTimeOfUse(localStartTime time.Time, billings []*deremsmodels.Tou) (timeOfUse map[string]interface{}, err error) {
+func (s defaultDevicesService) getTimeOfUseOfDay(localStartTime time.Time, tous []*deremsmodels.Tou) (timeOfUse map[string]interface{}, err error) {
 	timeOfUse = make(map[string]interface{})
 
 	// 1. timezone
 	timeOfUse["timezone"] = localStartTime.Format(utils.ZHHMM)
 
 	// 2. onPeak, midPeak, offPeak
-	timeOfUse["onPeak"] = s.getPeriodsByPeakType("On-peak", billings)
-	timeOfUse["midPeak"] = s.getPeriodsByPeakType("Mid-peak", billings)
-	timeOfUse["offPeak"] = s.getPeriodsByPeakType("Off-peak", billings)
+	timeOfUse["onPeak"] = s.getPeriodsByPeakType("On-peak", tous)
+	timeOfUse["midPeak"] = s.getPeriodsByPeakType("Mid-peak", tous)
+	timeOfUse["offPeak"] = s.getPeriodsByPeakType("Off-peak", tous)
 
 	// 3. currentPeakType
 	loc := time.FixedZone(localStartTime.Zone())
-	peakType, err := s.billing.GetPeakType(time.Now().In(loc), billings)
+	peakType, err := s.billing.GetPeakType(time.Now().In(loc), tous)
 	if err != nil {
 		return
 	}
@@ -752,16 +752,16 @@ func (s defaultDevicesService) getTimeOfUse(localStartTime time.Time, billings [
 	return
 }
 
-func (s defaultDevicesService) getPeriodsByPeakType(peakType string, billings []*deremsmodels.Tou) (periods []map[string]interface{}) {
-	for _, billing := range billings {
-		if billing.PeakType.String != peakType {
+func (s defaultDevicesService) getPeriodsByPeakType(peakType string, tous []*deremsmodels.Tou) (periods []map[string]interface{}) {
+	for _, tou := range tous {
+		if tou.PeakType.String != peakType {
 			continue
 		}
 
 		period := map[string]interface{}{
-			"start":   billing.PeriodStime.String,
-			"end":     billing.PeriodEtime.String,
-			"touRate": billing.FlowRate.Float32,
+			"start":   tou.PeriodStime.String,
+			"end":     tou.PeriodEtime.String,
+			"touRate": tou.FlowRate.Float32,
 		}
 		if period["end"] == "00:00:00" {
 			period["end"] = "24:00:00"
@@ -1161,24 +1161,24 @@ func (s defaultDevicesService) getLatestComputedDemandState(gwUUID string, start
 }
 
 func (s defaultDevicesService) getOnPeakTime(gwUUID string, t time.Time) (onPeakTime map[string]string, err error) {
-	localTime, billings, err := s.billing.GetBillingsOfLocalTime(gwUUID, t)
+	localTime, tous, err := s.billing.GetTOUsOfLocalTime(gwUUID, t)
 	if err != nil {
 		return
 	}
 
 	onPeakTime = map[string]string{}
-	for _, billing := range billings {
-		if billing.PeakType.String == "On-peak" {
+	for _, tou := range tous {
+		if tou.PeakType.String == "On-peak" {
 			log.WithFields(log.Fields{
-				"localTime":           localTime,
-				"timezone":            localTime.Format(utils.ZHHMM),
-				"billing.PeakType":    billing.PeakType,
-				"billing.PeriodStime": billing.PeriodStime,
-				"billing.PeriodEtime": billing.PeriodEtime,
+				"localTime":       localTime,
+				"timezone":        localTime.Format(utils.ZHHMM),
+				"tou.PeakType":    tou.PeakType,
+				"tou.PeriodStime": tou.PeriodStime,
+				"tou.PeriodEtime": tou.PeriodEtime,
 			}).Debug()
 			onPeakTime["timezone"] = localTime.Format(utils.ZHHMM)
-			onPeakTime["start"] = billing.PeriodStime.String
-			onPeakTime["end"] = billing.PeriodEtime.String
+			onPeakTime["start"] = tou.PeriodStime.String
+			onPeakTime["end"] = tou.PeriodEtime.String
 			break
 		}
 	}

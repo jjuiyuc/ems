@@ -120,7 +120,7 @@ var _ = Describe("TimeOfUse", func() {
 	Describe("GetTimeOfUseInfo", func() {
 		Context("success", func() {
 			It("should be ok", func() {
-				prefixURL := fmt.Sprintf("/api/%s/devices/time-of-use-info", fixtures.UtGateway.UUID)
+				prefixURL := fmt.Sprintf("/api/%s/devices/tou/info", fixtures.UtGateway.UUID)
 				seedUtURL := fmt.Sprintf("%s?startTime=%s", prefixURL, UtStartTime)
 				expectedEnergySources := map[string]interface{}{
 					"offPeak": map[string]interface{}{
@@ -184,7 +184,7 @@ var _ = Describe("TimeOfUse", func() {
 
 		Context("fail", func() {
 			It("should return invalid parameters", func() {
-				prefixURL := fmt.Sprintf("/api/%s/devices/time-of-use-info", fixtures.UtGateway.UUID)
+				prefixURL := fmt.Sprintf("/api/%s/devices/tou/info", fixtures.UtGateway.UUID)
 				seedUtInvalidParamsURL := fmt.Sprintf("%s?startTime=%s", prefixURL, "xxx")
 				tt := testutils.TestInfo{
 					Token:      token,

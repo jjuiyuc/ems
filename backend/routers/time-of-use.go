@@ -46,7 +46,7 @@ func (w *APIWorker) GetBatteryUsageInfo(c *gin.Context) {
 // @Failure     400            {object}  app.Response
 // @Failure     401            {object}  app.Response
 // @Failure     500            {object}  app.Response
-// @Router      /{gwid}/devices/time-of-use-info [get]
+// @Router      /{gwid}/devices/tou/info [get]
 func (w *APIWorker) GetTimeOfUseInfo(c *gin.Context) {
 	appG := app.Gin{c}
 	param := &app.StartTimeParam{}

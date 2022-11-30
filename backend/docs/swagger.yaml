@@ -1201,7 +1201,7 @@ paths:
       summary: Show today's hourly power state of solar
       tags:
       - energy resources
-  /{gwid}/devices/time-of-use-info:
+  /{gwid}/devices/tou/info:
     get:
       description: get energy source distribution by token, gateway UUID, startTime
       parameters:

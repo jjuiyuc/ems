@@ -1540,7 +1540,7 @@ var doc = `{
                 }
             }
         },
-        "/{gwid}/devices/time-of-use-info": {
+        "/{gwid}/devices/tou/info": {
             "get": {
                 "security": [
                     {

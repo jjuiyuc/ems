@@ -6,7 +6,7 @@ checkbox.src = "data:image/svg+xml,%3Csvg "
     + "%3Crect x='1' y='1' width='16' height='16' rx='2' stroke='%23606060'"
     + " stroke-width='1.8' /%3E%3C/svg%3E"
 
-const checkboxChecked = color => {
+const checkedBox = color => {
     const img = new Image(18, 18)
 
     img.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'"
@@ -16,6 +16,34 @@ const checkboxChecked = color => {
         + " fill='" + color + "' /%3E%3C/svg%3E"
 
     return img
+}
+
+const square = color => {
+    const img = new Image(18, 18)
+
+    img.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' "
+        + `height='18' width='18' fill='${color}'%3E`
+        + "%3Crect x='1' y='1' width='16' height='16' rx='2' /%3E"
+        + "%3C/svg%3E"
+
+    return img
+}
+
+import { Chart } from "chart.js"
+
+const legendLabels = legendStyle => chart => {
+    const labels = Chart.defaults.plugins.legend.labels.generateLabels(chart)
+
+    for (var key in labels) {
+        const label = labels[key], color = label.fillStyle.replace("#", "%23")
+
+        label.pointStyle = legendStyle === "square"
+            ? square(color)
+            : (label.pointStyle = label.hidden ? checkbox : checkedBox(color))
+        label.hidden = false
+    }
+
+    return labels
 }
 
 const tooltipLabelPoint = color => {
@@ -29,4 +57,4 @@ const tooltipLabelPoint = color => {
     return img
 }
 
-export {checkbox, checkboxChecked, tooltipLabelPoint}
+export { legendLabels, tooltipLabelPoint }

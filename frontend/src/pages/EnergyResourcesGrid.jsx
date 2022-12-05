@@ -2,11 +2,13 @@ import { connect } from "react-redux"
 import moment from "moment"
 import { useState, useEffect } from "react"
 import { useTranslation } from "react-multi-lang"
+import ReportProblemIcon from "@mui/icons-material/ReportProblem"
 
 import { apiCall } from "../utils/api"
 import { ConvertTimeToNumber } from "../utils/utils"
 import variables from "../configs/variables"
 
+import AlertBox from "../components/AlertBox"
 import EnergyResourcesTabs from "../components/EnergyResourcesTabs"
 import EnergyGridCard from "../components/EnergyGridCard"
 import LineChart from "../components/LineChart"

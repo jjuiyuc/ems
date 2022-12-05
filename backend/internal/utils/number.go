@@ -78,3 +78,25 @@ func Percent(x, y float32) float32 {
 	}
 	return float32(value)
 }
+
+// SumOfArray godoc
+func SumOfArray(array []int) int {
+	result := 0
+	for _, value := range array {
+		result += value
+	}
+	return result
+}
+
+// DiffTwoArrays godoc
+func DiffTwoArrays(array1, array2 []int) (diff []int) {
+	for i := range array1 {
+		if i < len(array2) {
+			diff = append(diff, array1[i]-array2[i])
+		} else {
+			log.WithFields(log.Fields{"caused-by": "the lengths of two arrays are different"}).Warn()
+			diff = append(diff, 0)
+		}
+	}
+	return
+}

@@ -112,16 +112,16 @@ func getWeeklyBillingParamsByType(repo *repository.Repository, billing services.
 		isSummer := billing.IsSummer(timeOfEachDay)
 		log.Debug("isSummer: ", isSummer)
 		// 3-3. Get billings
-		billings, err := repo.TOU.GetBillingsByTOUInfo(billingType.TOULocationID, billingType.VoltageType, billingType.TOUType, periodType, isSummer, timeOfEachDay.Format(utils.YYYYMMDD))
+		tous, err := repo.TOU.GetTOUsByTOUInfo(billingType.TOULocationID, billingType.VoltageType, billingType.TOUType, periodType, isSummer, timeOfEachDay.Format(utils.YYYYMMDD))
 		if err != nil {
 			log.WithFields(log.Fields{
-				"caused-by": "repo.TOU.GetBillingsByTOUInfo",
+				"caused-by": "repo.TOU.GetTOUsByTOUInfo",
 				"err":       err,
 			}).Error()
 			break
 		}
-		for _, billing := range billings {
-			rate, err := billingToRate(billing, timeOfEachDay)
+		for _, tou := range tous {
+			rate, err := touToRate(tou, timeOfEachDay)
 			if err != nil {
 				break
 			}
@@ -157,30 +157,30 @@ func getSundayOfBillingWeek(t time.Time, sendNow bool) (timeOnSunday time.Time) 
 	return
 }
 
-func billingToRate(billing *deremsmodels.Tou, timeOfEachDay time.Time) (rate RateInfo, err error) {
+func touToRate(tou *deremsmodels.Tou, timeOfEachDay time.Time) (rate RateInfo, err error) {
 	log.WithFields(log.Fields{
-		"peak type":    billing.PeakType,
-		"period stime": billing.PeriodStime,
-		"period etime": billing.PeriodEtime,
-		"basic rate":   billing.BasicRate.Float32,
-		"flow rate":    billing.FlowRate.Float32,
-		"enable at":    billing.EnableAt,
-		"disable at":   billing.DisableAt,
+		"peak type":    tou.PeakType,
+		"period stime": tou.PeriodStime,
+		"period etime": tou.PeriodEtime,
+		"basic rate":   tou.BasicRate.Float32,
+		"flow rate":    tou.FlowRate.Float32,
+		"enable at":    tou.EnableAt,
+		"disable at":   tou.DisableAt,
 	}).Debug()
 
-	interval, err := getBillingInterval(billing.PeriodStime.String, billing.PeriodEtime.String)
+	interval, err := getTOUInterval(tou.PeriodStime.String, tou.PeriodEtime.String)
 	if err != nil {
 		return
 	}
 
 	rate.Date = timeOfEachDay.Format(utils.YYYYMMDD)
 	rate.Interval = interval
-	rate.DemandChargeRate = billing.BasicRate.Float32
-	rate.TOURate = billing.FlowRate.Float32
+	rate.DemandChargeRate = tou.BasicRate.Float32
+	rate.TOURate = tou.FlowRate.Float32
 	return
 }
 
-func getBillingInterval(periodStime, periodEtime string) (interval string, err error) {
+func getTOUInterval(periodStime, periodEtime string) (interval string, err error) {
 	startTime, err := time.Parse(utils.HHMMSS24h, periodStime)
 	if err != nil {
 		log.WithFields(log.Fields{

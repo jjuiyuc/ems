@@ -338,6 +338,16 @@ definitions:
       pvProducedLifetimeEnergyACDiff:
         type: number
     type: object
+  services.SolarEnergyUsageResponse:
+    properties:
+      loadPvConsumedEnergyPercentACs:
+        $ref: '#/definitions/services.Float32ArrayFormat'
+        type: object
+      timestamps:
+        items:
+          type: integer
+        type: array
+    type: object
   services.SolarPowerStateResponse:
     properties:
       onPeakTime:
@@ -351,6 +361,15 @@ definitions:
         items:
           type: integer
         type: array
+    type: object
+  services.TimeOfUseInfoResponse:
+    properties:
+      energySources:
+        additionalProperties: true
+        type: object
+      timeOfUse:
+        additionalProperties: true
+        type: object
     type: object
 info:
   contact: {}
@@ -1060,6 +1079,65 @@ paths:
       summary: Show the detailed information and current state about solar
       tags:
       - energy resources
+  /{gwid}/devices/solar/energy-usage:
+    get:
+      description: get solar by token, gateway UUID, resolution, startTime and endTime
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Input user's access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Gateway UUID
+        in: path
+        name: gwid
+        required: true
+        type: string
+      - example: UTC time in ISO-8601
+        format: date-time
+        in: query
+        name: endTime
+        required: true
+        type: string
+      - enum:
+        - hour
+        - 5minute
+        in: query
+        name: resolution
+        required: true
+        type: string
+      - example: UTC time in ISO-8601
+        format: date-time
+        in: query
+        name: startTime
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/app.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/services.SolarEnergyUsageResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Show the day's hourly energy usage of solar
+      tags:
+      - time of use
   /{gwid}/devices/solar/power-state:
     get:
       description: get solar by token, gateway UUID, resolution, startTime and endTime
@@ -1123,6 +1201,56 @@ paths:
       summary: Show today's hourly power state of solar
       tags:
       - energy resources
+  /{gwid}/devices/tou/info:
+    get:
+      description: get energy source distribution by token, gateway UUID, startTime
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Input user's access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Gateway UUID
+        in: path
+        name: gwid
+        required: true
+        type: string
+      - example: UTC time in ISO-8601
+        format: date-time
+        in: query
+        name: startTime
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/app.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/services.TimeOfUseInfoResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Show the distribution of energy sources for peak types of the day
+      tags:
+      - time of use
   /auth:
     post:
       consumes:

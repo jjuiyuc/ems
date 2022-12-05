@@ -1350,6 +1350,98 @@ var doc = `{
                 }
             }
         },
+        "/{gwid}/devices/solar/energy-usage": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get solar by token, gateway UUID, resolution, startTime and endTime",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "time of use"
+                ],
+                "summary": "Show the day's hourly energy usage of solar",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Input user's access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Gateway UUID",
+                        "name": "gwid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "UTC time in ISO-8601",
+                        "name": "endTime",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "hour",
+                            "5minute"
+                        ],
+                        "type": "string",
+                        "name": "resolution",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "UTC time in ISO-8601",
+                        "name": "startTime",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/app.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/services.SolarEnergyUsageResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/{gwid}/devices/solar/power-state": {
             "get": {
                 "security": [
@@ -1421,6 +1513,86 @@ var doc = `{
                                     "properties": {
                                         "data": {
                                             "$ref": "#/definitions/services.SolarPowerStateResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/{gwid}/devices/tou/info": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get energy source distribution by token, gateway UUID, startTime",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "time of use"
+                ],
+                "summary": "Show the distribution of energy sources for peak types of the day",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Input user's access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Gateway UUID",
+                        "name": "gwid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "UTC time in ISO-8601",
+                        "name": "startTime",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/app.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/services.TimeOfUseInfoResponse"
                                         }
                                     }
                                 }
@@ -1950,6 +2122,21 @@ var doc = `{
                 }
             }
         },
+        "services.SolarEnergyUsageResponse": {
+            "type": "object",
+            "properties": {
+                "loadPvConsumedEnergyPercentACs": {
+                    "type": "object",
+                    "$ref": "#/definitions/services.Float32ArrayFormat"
+                },
+                "timestamps": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
         "services.SolarPowerStateResponse": {
             "type": "object",
             "properties": {
@@ -1968,6 +2155,19 @@ var doc = `{
                     "items": {
                         "type": "integer"
                     }
+                }
+            }
+        },
+        "services.TimeOfUseInfoResponse": {
+            "type": "object",
+            "properties": {
+                "energySources": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "timeOfUse": {
+                    "type": "object",
+                    "additionalProperties": true
                 }
             }
         }

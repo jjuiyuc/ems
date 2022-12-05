@@ -79,12 +79,12 @@ var _ = Describe("EnergyResources", func() {
 				seedUtURL := fmt.Sprintf("%s?startTime=%s", prefixURL, UtStartTime)
 				expectedResponseData := services.SolarEnergyInfoResponse{
 					PvProducedLifetimeEnergyACDiff:        10,
-					LoadPvConsumedEnergyPercentAC:         40,
-					LoadPvConsumedLifetimeEnergyACDiff:    4,
-					BatteryPvConsumedEnergyPercentAC:      0,
-					BatteryPvConsumedLifetimeEnergyACDiff: 0,
-					GridPvConsumedEnergyPercentAC:         60,
-					GridPvConsumedLifetimeEnergyACDiff:    6,
+					LoadPvConsumedEnergyPercentAC:         20,
+					LoadPvConsumedLifetimeEnergyACDiff:    2,
+					BatteryPvConsumedEnergyPercentAC:      50,
+					BatteryPvConsumedLifetimeEnergyACDiff: 5,
+					GridPvConsumedEnergyPercentAC:         30,
+					GridPvConsumedLifetimeEnergyACDiff:    3,
 					PvEnergyCostSavingsSum:                170,
 					PvCo2SavingsSum:                       38,
 				}

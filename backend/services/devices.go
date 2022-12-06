@@ -2,11 +2,14 @@ package services
 
 import (
 	"encoding/json"
+	"fmt"
+	"math"
+	"strconv"
 	"time"
 
 	log "github.com/sirupsen/logrus"
 
-	"der-ems/internal/e"
+	"der-ems/internal/app"
 	"der-ems/internal/utils"
 	deremsmodels "der-ems/models/der-ems"
 	"der-ems/repository"
@@ -31,13 +34,14 @@ type LatestComputedDemandState struct {
 
 // RealtimeInfo godoc
 type RealtimeInfo struct {
-	Timestamps             []int
-	LoadAveragePowerACs    []float32
-	BatteryAveragePowerACs []float32
-	PvAveragePowerACs      []float32
-	GridAveragePowerACs    []float32
-	BatterySoCs            []float32
-	BatteryVoltages        []float32
+	Timestamps                     []int
+	LoadAveragePowerACs            []float32
+	BatteryAveragePowerACs         []float32
+	PvAveragePowerACs              []float32
+	GridAveragePowerACs            []float32
+	BatterySoCs                    []float32
+	BatteryVoltages                []float32
+	LoadPvConsumedEnergyPercentACs []float32
 }
 
 // AccumulatedInfo godoc
@@ -50,29 +54,65 @@ type AccumulatedInfo struct {
 	LoadSelfConsumedEnergyPercentACs  []float32
 }
 
+// AbsFloat32Format godoc
+type AbsFloat32Format float32
+
+// MarshalJSON godoc
+func (f AbsFloat32Format) MarshalJSON() ([]byte, error) {
+	v := math.Abs(float64(f))
+	v, _ = strconv.ParseFloat(fmt.Sprintf("%.3f", v), 32)
+	return json.Marshal(float32(v))
+}
+
+// Float32Format godoc
+type Float32Format float32
+
+// MarshalJSON godoc
+func (f Float32Format) MarshalJSON() ([]byte, error) {
+	v, _ := strconv.ParseFloat(fmt.Sprintf("%.3f", f), 32)
+	return json.Marshal(float32(v))
+}
+
+// Float32ArrayFormat godoc
+type Float32ArrayFormat []float32
+
+// MarshalJSON godoc godoc
+func (f Float32ArrayFormat) MarshalJSON() ([]byte, error) {
+	var formatedArray []float32
+	for _, value := range f {
+		v, err := strconv.ParseFloat(fmt.Sprintf("%.3f", value), 32)
+		if err == nil {
+			formatedArray = append(formatedArray, float32(v))
+		} else {
+			formatedArray = append(formatedArray, 0)
+		}
+	}
+	return json.Marshal(formatedArray)
+}
+
 // DevicesEnergyInfoResponse godoc
 type DevicesEnergyInfoResponse struct {
 	GridIsPeakShaving             int                    `json:"gridIsPeakShaving"`
-	LoadGridAveragePowerAC        float32                `json:"loadGridAveragePowerAC"`
-	BatteryGridAveragePowerAC     float32                `json:"batteryGridAveragePowerAC"`
-	GridContractPowerAC           float32                `json:"gridContractPowerAC"`
-	LoadPvAveragePowerAC          float32                `json:"loadPvAveragePowerAC"`
-	LoadBatteryAveragePowerAC     float32                `json:"loadBatteryAveragePowerAC"`
-	BatterySoC                    float32                `json:"batterySoC"`
-	BatteryProducedAveragePowerAC float32                `json:"batteryProducedAveragePowerAC"`
-	BatteryConsumedAveragePowerAC float32                `json:"batteryConsumedAveragePowerAC"`
+	LoadGridAveragePowerAC        AbsFloat32Format       `json:"loadGridAveragePowerAC"`
+	BatteryGridAveragePowerAC     AbsFloat32Format       `json:"batteryGridAveragePowerAC"`
+	GridContractPowerAC           Float32Format          `json:"gridContractPowerAC"`
+	LoadPvAveragePowerAC          AbsFloat32Format       `json:"loadPvAveragePowerAC"`
+	LoadBatteryAveragePowerAC     AbsFloat32Format       `json:"loadBatteryAveragePowerAC"`
+	BatterySoC                    Float32Format          `json:"batterySoC"`
+	BatteryProducedAveragePowerAC Float32Format          `json:"batteryProducedAveragePowerAC"`
+	BatteryConsumedAveragePowerAC Float32Format          `json:"batteryConsumedAveragePowerAC"`
 	BatteryChargingFrom           string                 `json:"batteryChargingFrom"`
 	BatteryDischargingTo          string                 `json:"batteryDischargingTo"`
-	PvAveragePowerAC              float32                `json:"pvAveragePowerAC"`
-	LoadAveragePowerAC            float32                `json:"loadAveragePowerAC"`
+	PvAveragePowerAC              Float32Format          `json:"pvAveragePowerAC"`
+	LoadAveragePowerAC            AbsFloat32Format       `json:"loadAveragePowerAC"`
 	LoadLinks                     map[string]interface{} `json:"loadLinks"`
 	GridLinks                     map[string]interface{} `json:"gridLinks"`
 	PVLinks                       map[string]interface{} `json:"pvLinks"`
 	BatteryLinks                  map[string]interface{} `json:"batteryLinks"`
-	BatteryPvAveragePowerAC       float32                `json:"batteryPvAveragePowerAC"`
-	GridPvAveragePowerAC          float32                `json:"gridPvAveragePowerAC"`
-	GridProducedAveragePowerAC    float32                `json:"gridProducedAveragePowerAC"`
-	GridConsumedAveragePowerAC    float32                `json:"gridConsumedAveragePowerAC"`
+	BatteryPvAveragePowerAC       AbsFloat32Format       `json:"batteryPvAveragePowerAC"`
+	GridPvAveragePowerAC          AbsFloat32Format       `json:"gridPvAveragePowerAC"`
+	GridProducedAveragePowerAC    Float32Format          `json:"gridProducedAveragePowerAC"`
+	GridConsumedAveragePowerAC    Float32Format          `json:"gridConsumedAveragePowerAC"`
 }
 
 // EnergyDistributionInfoResponse godoc
@@ -93,38 +133,98 @@ type EnergyDistributionInfoResponse struct {
 	BatteryConsumedLifetimeEnergyACDiff float32 `json:"batteryConsumedLifetimeEnergyACDiff"`
 }
 
+// ComputedValues godoc
+func (r *EnergyDistributionInfoResponse) ComputedValues(firstLog, latestLog *deremsmodels.CCDataLog) {
+	r.PvProducedLifetimeEnergyACDiff = utils.Diff(latestLog.PvProducedLifetimeEnergyAC.Float32, firstLog.PvProducedLifetimeEnergyAC.Float32)
+	r.GridProducedLifetimeEnergyACDiff = utils.Diff(latestLog.GridProducedLifetimeEnergyAC.Float32, firstLog.GridProducedLifetimeEnergyAC.Float32)
+	r.BatteryProducedLifetimeEnergyACDiff = utils.Diff(latestLog.BatteryProducedLifetimeEnergyAC.Float32, firstLog.BatteryProducedLifetimeEnergyAC.Float32)
+	// Avoid cc illegal value
+	r.PvProducedLifetimeEnergyACDiff = utils.GetZeroForNegativeValue(r.PvProducedLifetimeEnergyACDiff)
+	r.GridProducedLifetimeEnergyACDiff = utils.GetZeroForNegativeValue(r.GridProducedLifetimeEnergyACDiff)
+	r.BatteryProducedLifetimeEnergyACDiff = utils.GetZeroForNegativeValue(r.BatteryProducedLifetimeEnergyACDiff)
+	r.AllProducedLifetimeEnergyACDiff = utils.ThreeDecimalPlaces(
+		r.PvProducedLifetimeEnergyACDiff +
+			r.GridProducedLifetimeEnergyACDiff +
+			r.BatteryProducedLifetimeEnergyACDiff)
+	r.PvProducedEnergyPercentAC = utils.Percent(
+		r.PvProducedLifetimeEnergyACDiff,
+		r.AllProducedLifetimeEnergyACDiff)
+	r.GridProducedEnergyPercentAC = utils.Percent(
+		r.GridProducedLifetimeEnergyACDiff,
+		r.AllProducedLifetimeEnergyACDiff)
+	r.BatteryProducedEnergyPercentAC = utils.Percent(
+		r.BatteryProducedLifetimeEnergyACDiff,
+		r.AllProducedLifetimeEnergyACDiff)
+	r.AllConsumedLifetimeEnergyACDiff = r.AllProducedLifetimeEnergyACDiff
+	r.GridConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.GridConsumedLifetimeEnergyAC.Float32, firstLog.GridConsumedLifetimeEnergyAC.Float32)
+	r.BatteryConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.BatteryConsumedLifetimeEnergyAC.Float32, firstLog.BatteryConsumedLifetimeEnergyAC.Float32)
+	r.LoadConsumedLifetimeEnergyACDiff = utils.ThreeDecimalPlaces(
+		r.AllConsumedLifetimeEnergyACDiff -
+			(r.GridConsumedLifetimeEnergyACDiff + r.BatteryConsumedLifetimeEnergyACDiff))
+	r.LoadConsumedEnergyPercentAC = utils.Percent(
+		r.LoadConsumedLifetimeEnergyACDiff,
+		r.AllConsumedLifetimeEnergyACDiff)
+	r.GridConsumedEnergyPercentAC = utils.Percent(
+		r.GridConsumedLifetimeEnergyACDiff,
+		r.AllConsumedLifetimeEnergyACDiff)
+	r.BatteryConsumedEnergyPercentAC = utils.Percent(
+		r.BatteryConsumedLifetimeEnergyACDiff,
+		r.AllConsumedLifetimeEnergyACDiff)
+}
+
 // PowerStateResponse godoc
 type PowerStateResponse struct {
-	Timestamps             []int     `json:"timestamps"`
-	LoadAveragePowerACs    []float32 `json:"loadAveragePowerACs"`
-	PvAveragePowerACs      []float32 `json:"pvAveragePowerACs"`
-	BatteryAveragePowerACs []float32 `json:"batteryAveragePowerACs"`
-	GridAveragePowerACs    []float32 `json:"gridAveragePowerACs"`
+	Timestamps             []int              `json:"timestamps"`
+	LoadAveragePowerACs    Float32ArrayFormat `json:"loadAveragePowerACs"`
+	PvAveragePowerACs      Float32ArrayFormat `json:"pvAveragePowerACs"`
+	BatteryAveragePowerACs Float32ArrayFormat `json:"batteryAveragePowerACs"`
+	GridAveragePowerACs    Float32ArrayFormat `json:"gridAveragePowerACs"`
 }
 
 // AccumulatedPowerStateResponse godoc
 type AccumulatedPowerStateResponse struct {
-	Timestamps                        []int     `json:"timestamps"`
-	LoadConsumedLifetimeEnergyACDiffs []float32 `json:"loadConsumedLifetimeEnergyACDiffs"`
-	PvProducedLifetimeEnergyACDiffs   []float32 `json:"pvProducedLifetimeEnergyACDiffs"`
-	BatteryLifetimeEnergyACDiffs      []float32 `json:"batteryLifetimeEnergyACDiffs"`
-	GridLifetimeEnergyACDiffs         []float32 `json:"gridLifetimeEnergyACDiffs"`
+	Timestamps                        []int              `json:"timestamps"`
+	LoadConsumedLifetimeEnergyACDiffs Float32ArrayFormat `json:"loadConsumedLifetimeEnergyACDiffs"`
+	PvProducedLifetimeEnergyACDiffs   Float32ArrayFormat `json:"pvProducedLifetimeEnergyACDiffs"`
+	BatteryLifetimeEnergyACDiffs      Float32ArrayFormat `json:"batteryLifetimeEnergyACDiffs"`
+	GridLifetimeEnergyACDiffs         Float32ArrayFormat `json:"gridLifetimeEnergyACDiffs"`
 }
 
 // PowerSelfSupplyRateResponse godoc
 type PowerSelfSupplyRateResponse struct {
-	Timestamps                       []int     `json:"timestamps"`
-	LoadSelfConsumedEnergyPercentACs []float32 `json:"loadSelfConsumedEnergyPercentACs"`
+	Timestamps                       []int              `json:"timestamps"`
+	LoadSelfConsumedEnergyPercentACs Float32ArrayFormat `json:"loadSelfConsumedEnergyPercentACs"`
+}
+
+// BatteryUsageInfoResponse godoc
+type BatteryUsageInfoResponse struct {
+	BatterySoC                    Float32Format `json:"batterySoC"`
+	BatteryProducedAveragePowerAC Float32Format `json:"batteryProducedAveragePowerAC"`
+	BatteryConsumedAveragePowerAC Float32Format `json:"batteryConsumedAveragePowerAC"`
+	BatteryChargingFrom           string        `json:"batteryChargingFrom"`
+	BatteryDischargingTo          string        `json:"batteryDischargingTo"`
+}
+
+// TimeOfUseInfoResponse godoc
+type TimeOfUseInfoResponse struct {
+	EnergySources map[string]interface{} `json:"energySources"`
+	TimeOfUse     map[string]interface{} `json:"timeOfUse"`
+}
+
+// SolarEnergyUsageResponse godoc
+type SolarEnergyUsageResponse struct {
+	Timestamps                     []int              `json:"timestamps"`
+	LoadPvConsumedEnergyPercentACs Float32ArrayFormat `json:"loadPvConsumedEnergyPercentACs"`
 }
 
 // ChargeInfoResponse godoc
 type ChargeInfoResponse struct {
-	GridPowerCost              float32 `json:"gridPowerCost"`
-	GridPowerCostSavings       float32 `json:"gridPowerCostSavings"`
-	GridPowerCostLastMonth     float32 `json:"gridPowerCostLastMonth"`
-	GridProducedAveragePowerAC float32 `json:"gridProducedAveragePowerAC"`
-	GridContractPowerAC        float32 `json:"gridContractPowerAC"`
-	GridIsPeakShaving          int     `json:"gridIsPeakShaving"`
+	GridPowerCost              float32       `json:"gridPowerCost"`
+	GridPowerCostSavings       float32       `json:"gridPowerCostSavings"`
+	GridPowerCostLastMonth     float32       `json:"gridPowerCostLastMonth"`
+	GridProducedAveragePowerAC Float32Format `json:"gridProducedAveragePowerAC"`
+	GridContractPowerAC        Float32Format `json:"gridContractPowerAC"`
+	GridIsPeakShaving          int           `json:"gridIsPeakShaving"`
 }
 
 // DemandStateResponse godoc
@@ -136,53 +236,125 @@ type DemandStateResponse struct {
 
 // SolarEnergyInfoResponse godoc
 type SolarEnergyInfoResponse struct {
-	AllConsumedLifetimeEnergyACDiff       float32 `json:"allConsumedLifetimeEnergyACDiff"`
-	LoadPvConsumedEnergyPercentAC         float32 `json:"loadPvConsumedEnergyPercentAC"`
-	LoadPvConsumedLifetimeEnergyACDiff    float32 `json:"loadPvConsumedLifetimeEnergyACDiff"`
-	BatteryPvConsumedEnergyPercentAC      float32 `json:"batteryPvConsumedEnergyPercentAC"`
-	BatteryPvConsumedLifetimeEnergyACDiff float32 `json:"batteryPvConsumedLifetimeEnergyACDiff"`
-	GridPvConsumedEnergyPercentAC         float32 `json:"gridPvConsumedEnergyPercentAC"`
-	GridPvConsumedLifetimeEnergyACDiff    float32 `json:"gridPvConsumedLifetimeEnergyACDiff"`
-	PvEnergyCostSavingsDiff               float32 `json:"pvEnergyCostSavingsDiff"`
-	PvCo2SavingsDiff                      float32 `json:"pvCo2SavingsDiff"`
+	PvProducedLifetimeEnergyACDiff        float32       `json:"pvProducedLifetimeEnergyACDiff"`
+	LoadPvConsumedEnergyPercentAC         float32       `json:"loadPvConsumedEnergyPercentAC"`
+	LoadPvConsumedLifetimeEnergyACDiff    float32       `json:"loadPvConsumedLifetimeEnergyACDiff"`
+	BatteryPvConsumedEnergyPercentAC      float32       `json:"batteryPvConsumedEnergyPercentAC"`
+	BatteryPvConsumedLifetimeEnergyACDiff float32       `json:"batteryPvConsumedLifetimeEnergyACDiff"`
+	GridPvConsumedEnergyPercentAC         float32       `json:"gridPvConsumedEnergyPercentAC"`
+	GridPvConsumedLifetimeEnergyACDiff    float32       `json:"gridPvConsumedLifetimeEnergyACDiff"`
+	PvEnergyCostSavingsSum                int           `json:"pvEnergyCostSavingsSum"`
+	PvCo2SavingsSum                       Float32Format `json:"pvCo2SavingsSum"`
+}
+
+// ComputedValues godoc
+func (r *SolarEnergyInfoResponse) ComputedValues(firstLogOfDay, firstLogOfMonth, latestLog *deremsmodels.CCDataLog, logsOfMonth []*deremsmodels.CCDataLog) {
+	r.PvProducedLifetimeEnergyACDiff = utils.Diff(latestLog.PvProducedLifetimeEnergyAC.Float32, firstLogOfDay.PvProducedLifetimeEnergyAC.Float32)
+	r.LoadPvConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.LoadPvConsumedLifetimeEnergyAC.Float32, firstLogOfDay.LoadPvConsumedLifetimeEnergyAC.Float32)
+	r.BatteryPvConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.BatteryPvConsumedLifetimeEnergyAC.Float32, firstLogOfDay.BatteryPvConsumedLifetimeEnergyAC.Float32)
+	r.GridPvConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.GridPvConsumedLifetimeEnergyAC.Float32, firstLogOfDay.GridPvConsumedLifetimeEnergyAC.Float32)
+	// Avoid cc illegal value
+	r.PvProducedLifetimeEnergyACDiff = utils.GetZeroForNegativeValue(r.PvProducedLifetimeEnergyACDiff)
+	r.LoadPvConsumedLifetimeEnergyACDiff = utils.GetZeroForNegativeValue(r.LoadPvConsumedLifetimeEnergyACDiff)
+	r.BatteryPvConsumedLifetimeEnergyACDiff = utils.GetZeroForNegativeValue(r.BatteryPvConsumedLifetimeEnergyACDiff)
+	r.GridPvConsumedLifetimeEnergyACDiff = utils.GetZeroForNegativeValue(r.GridPvConsumedLifetimeEnergyACDiff)
+	// Percent and value are recomputed by PvProducedLifetimeEnergyACDiff
+	sumOfPvConsumedLifetimeEnergyAC := r.LoadPvConsumedLifetimeEnergyACDiff + r.BatteryPvConsumedLifetimeEnergyACDiff + r.GridPvConsumedLifetimeEnergyACDiff
+	if sumOfPvConsumedLifetimeEnergyAC == 0 {
+		r.PvProducedLifetimeEnergyACDiff = 0
+	} else {
+		r.LoadPvConsumedLifetimeEnergyACDiff = utils.ThreeDecimalPlaces(r.PvProducedLifetimeEnergyACDiff * utils.Division(r.LoadPvConsumedLifetimeEnergyACDiff, sumOfPvConsumedLifetimeEnergyAC))
+		r.BatteryPvConsumedLifetimeEnergyACDiff = utils.ThreeDecimalPlaces(r.PvProducedLifetimeEnergyACDiff * utils.Division(r.BatteryPvConsumedLifetimeEnergyACDiff, sumOfPvConsumedLifetimeEnergyAC))
+		r.GridPvConsumedLifetimeEnergyACDiff = utils.ThreeDecimalPlaces(r.PvProducedLifetimeEnergyACDiff * utils.Division(r.GridPvConsumedLifetimeEnergyACDiff, sumOfPvConsumedLifetimeEnergyAC))
+	}
+	r.LoadPvConsumedEnergyPercentAC = utils.Percent(
+		r.LoadPvConsumedLifetimeEnergyACDiff,
+		r.PvProducedLifetimeEnergyACDiff)
+	r.BatteryPvConsumedEnergyPercentAC = utils.Percent(
+		r.BatteryPvConsumedLifetimeEnergyACDiff,
+		r.PvProducedLifetimeEnergyACDiff)
+	r.GridPvConsumedEnergyPercentAC = utils.Percent(
+		r.GridPvConsumedLifetimeEnergyACDiff,
+		r.PvProducedLifetimeEnergyACDiff)
+
+	var sumOfPvEnergyCostSavings, sumOfPvCo2Savings float32
+	for _, logOfMonth := range logsOfMonth {
+		sumOfPvEnergyCostSavings = sumOfPvEnergyCostSavings + logOfMonth.PvEnergyCostSavings.Float32
+		sumOfPvCo2Savings = sumOfPvCo2Savings + logOfMonth.PvCo2Savings.Float32
+	}
+	r.PvEnergyCostSavingsSum = int(sumOfPvEnergyCostSavings)
+	r.PvCo2SavingsSum = Float32Format(sumOfPvCo2Savings)
 }
 
 // SolarPowerStateResponse godoc
 type SolarPowerStateResponse struct {
-	Timestamps        []int             `json:"timestamps"`
-	PvAveragePowerACs []float32         `json:"pvAveragePowerACs"`
-	OnPeakTime        map[string]string `json:"onPeakTime"`
+	Timestamps        []int              `json:"timestamps"`
+	PvAveragePowerACs Float32ArrayFormat `json:"pvAveragePowerACs"`
+	OnPeakTime        map[string]string  `json:"onPeakTime"`
 }
 
 // BatteryEnergyInfoResponse godoc
 type BatteryEnergyInfoResponse struct {
-	BatteryLifetimeOperationCyclesDiff  float32 `json:"batteryLifetimeOperationCyclesDiff"`
-	BatteryLifetimeOperationCycles      float32 `json:"batteryLifetimeOperationCycles"`
-	BatterySoC                          float32 `json:"batterySoC"`
-	BatteryProducedLifetimeEnergyACDiff float32 `json:"batteryProducedLifetimeEnergyACDiff"`
-	BatteryProducedLifetimeEnergyAC     float32 `json:"batteryProducedLifetimeEnergyAC"`
-	BatteryConsumedLifetimeEnergyACDiff float32 `json:"batteryConsumedLifetimeEnergyACDiff"`
-	BatteryConsumedLifetimeEnergyAC     float32 `json:"batteryConsumedLifetimeEnergyAC"`
-	Model                               string  `json:"model"`
-	Capcity                             float32 `json:"capcity"`
-	PowerSources                        string  `json:"powerSources"`
-	BatteryPower                        float32 `json:"batteryPower"`
-	Voltage                             float32 `json:"voltage"`
+	BatteryLifetimeOperationCyclesDiff  float32       `json:"batteryLifetimeOperationCyclesDiff"`
+	BatteryLifetimeOperationCycles      Float32Format `json:"batteryLifetimeOperationCycles"`
+	BatterySoC                          Float32Format `json:"batterySoC"`
+	BatteryProducedLifetimeEnergyACDiff float32       `json:"batteryProducedLifetimeEnergyACDiff"`
+	BatteryProducedLifetimeEnergyAC     Float32Format `json:"batteryProducedLifetimeEnergyAC"`
+	BatteryConsumedLifetimeEnergyACDiff float32       `json:"batteryConsumedLifetimeEnergyACDiff"`
+	BatteryConsumedLifetimeEnergyAC     Float32Format `json:"batteryConsumedLifetimeEnergyAC"`
+	Model                               string        `json:"model"`
+	Capcity                             float32       `json:"capcity"`
+	PowerSources                        string        `json:"powerSources"`
+	BatteryPower                        float32       `json:"batteryPower"`
+	Voltage                             float32       `json:"voltage"`
+}
+
+// GetBatteryInfo godoc
+func (r *BatteryEnergyInfoResponse) GetBatteryInfo(gwUUID string) {
+	// XXX: Hardcode battery information by gateway UUID
+	const (
+		Huayu      = "0324DE7B51B262F3B11A643CBA8E12CE"
+		Serenegray = "0E0BA27A8175AF978C49396BDE9D7A1E"
+	)
+	switch gwUUID {
+	case Huayu:
+		r.Model = "PR2116 Poweroad Battery"
+		r.Capcity = 48
+		r.BatteryPower = 30
+		r.Voltage = 480
+	case Serenegray:
+		r.Model = "L051100-A UZ-Energy Battery"
+		r.Capcity = 30
+		r.BatteryPower = 24
+		r.Voltage = 51.2
+	}
+	r.PowerSources = "Solar + Grid"
+}
+
+// ComputedValues godoc
+func (r *BatteryEnergyInfoResponse) ComputedValues(firstLog, latestLog *deremsmodels.CCDataLog) {
+	r.BatteryLifetimeOperationCyclesDiff = utils.Diff(latestLog.BatteryLifetimeOperationCycles.Float32, firstLog.BatteryLifetimeOperationCycles.Float32)
+	r.BatteryLifetimeOperationCycles = Float32Format(latestLog.BatteryLifetimeOperationCycles.Float32)
+	r.BatterySoC = Float32Format(latestLog.BatterySoC.Float32)
+	r.BatteryProducedLifetimeEnergyACDiff = utils.Diff(latestLog.BatteryProducedLifetimeEnergyAC.Float32, firstLog.BatteryProducedLifetimeEnergyAC.Float32)
+	r.BatteryProducedLifetimeEnergyAC = Float32Format(latestLog.BatteryProducedLifetimeEnergyAC.Float32)
+	r.BatteryConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.BatteryConsumedLifetimeEnergyAC.Float32, firstLog.BatteryConsumedLifetimeEnergyAC.Float32)
+	r.BatteryConsumedLifetimeEnergyAC = Float32Format(latestLog.BatteryConsumedLifetimeEnergyAC.Float32)
 }
 
 // BatteryPowerStateResponse godoc
 type BatteryPowerStateResponse struct {
-	Timestamps             []int             `json:"timestamps"`
-	BatteryAveragePowerACs []float32         `json:"batteryAveragePowerACs"`
-	OnPeakTime             map[string]string `json:"onPeakTime"`
+	Timestamps             []int              `json:"timestamps"`
+	BatteryAveragePowerACs Float32ArrayFormat `json:"batteryAveragePowerACs"`
+	OnPeakTime             map[string]string  `json:"onPeakTime"`
 }
 
 // BatteryChargeVoltageStateResponse godoc
 type BatteryChargeVoltageStateResponse struct {
-	Timestamps      []int             `json:"timestamps"`
-	BatterySoCs     []float32         `json:"batterySoCs"`
-	BatteryVoltages []float32         `json:"batteryVoltages"`
-	OnPeakTime      map[string]string `json:"onPeakTime"`
+	Timestamps      []int              `json:"timestamps"`
+	BatterySoCs     Float32ArrayFormat `json:"batterySoCs"`
+	BatteryVoltages Float32ArrayFormat `json:"batteryVoltages"`
+	OnPeakTime      map[string]string  `json:"onPeakTime"`
 }
 
 // GridEnergyInfoResponse godoc
@@ -193,29 +365,40 @@ type GridEnergyInfoResponse struct {
 	GridLifetimeEnergyACDiffOfMonth  float32 `json:"gridLifetimeEnergyACDiffOfMonth"`
 }
 
+// ComputedValues godoc
+func (r *GridEnergyInfoResponse) ComputedValues(firstLogOfDay, firstLogOfMonth, latestLog *deremsmodels.CCDataLog) {
+	r.GridConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.GridConsumedLifetimeEnergyAC.Float32, firstLogOfDay.GridConsumedLifetimeEnergyAC.Float32)
+	r.GridProducedLifetimeEnergyACDiff = utils.Diff(latestLog.GridProducedLifetimeEnergyAC.Float32, firstLogOfDay.GridProducedLifetimeEnergyAC.Float32)
+	r.GridLifetimeEnergyACDiff = utils.Diff(latestLog.GridLifetimeEnergyAC.Float32, firstLogOfDay.GridLifetimeEnergyAC.Float32)
+	r.GridLifetimeEnergyACDiffOfMonth = utils.Diff(latestLog.GridLifetimeEnergyAC.Float32, firstLogOfMonth.GridLifetimeEnergyAC.Float32)
+}
+
 // GridPowerStateResponse godoc
 type GridPowerStateResponse struct {
-	Timestamps          []int             `json:"timestamps"`
-	GridAveragePowerACs []float32         `json:"gridAveragePowerACs"`
-	OnPeakTime          map[string]string `json:"onPeakTime"`
+	Timestamps          []int              `json:"timestamps"`
+	GridAveragePowerACs Float32ArrayFormat `json:"gridAveragePowerACs"`
+	OnPeakTime          map[string]string  `json:"onPeakTime"`
 }
 
 // DevicesService godoc
 type DevicesService interface {
 	GetLatestDevicesEnergyInfo(gwUUID string) (updatedTime time.Time, devicesEnergyInfo *DevicesEnergyInfoResponse, err error)
-	GetEnergyDistributionInfo(gwUUID string, startTime, endTime time.Time) (energyDistributionInfo *EnergyDistributionInfoResponse)
-	GetPowerState(gwUUID string, startTime, endTime time.Time) (powerState *PowerStateResponse)
-	GetAccumulatedPowerState(gwUUID, resolution string, startTime, endTime time.Time) (accumulatedPowerState *AccumulatedPowerStateResponse)
-	GetPowerSelfSupplyRate(gwUUID, resolution string, startTime, endTime time.Time) (powerSelfSupplyRate *PowerSelfSupplyRateResponse)
-	GetChargeInfo(gwUUID string, startTime time.Time) (chargeInfo *ChargeInfoResponse)
-	GetDemandState(gwUUID string, startTime, endTime time.Time) (demandState *DemandStateResponse)
-	GetSolarEnergyInfo(gwUUID string, startTime time.Time) (solarEnergyInfo *SolarEnergyInfoResponse)
-	GetSolarPowerState(gwUUID string, startTime, endTime time.Time) (solarPowerState *SolarPowerStateResponse, err error)
-	GetBatteryEnergyInfo(gwUUID string, startTime time.Time) (batteryEnergyInfo *BatteryEnergyInfoResponse)
-	GetBatteryPowerState(gwUUID string, startTime, endTime time.Time) (batteryPowerState *BatteryPowerStateResponse, err error)
-	GetBatteryChargeVoltageState(gwUUID string, startTime, endTime time.Time) (batteryChargeVoltageState *BatteryChargeVoltageStateResponse, err error)
-	GetGridEnergyInfo(gwUUID string, startTime time.Time) (gridEnergyInfo *GridEnergyInfoResponse)
-	GetGridPowerState(gwUUID string, startTime, endTime time.Time) (gridPowerState *GridPowerStateResponse, err error)
+	GetEnergyDistributionInfo(param *app.PeriodParam) (energyDistributionInfo *EnergyDistributionInfoResponse)
+	GetPowerState(param *app.ZoomableParam) (powerState *PowerStateResponse)
+	GetAccumulatedPowerState(param *app.ResolutionWithPeriodParam) (accumulatedPowerState *AccumulatedPowerStateResponse)
+	GetPowerSelfSupplyRate(param *app.ResolutionWithPeriodParam) (powerSelfSupplyRate *PowerSelfSupplyRateResponse)
+	GetBatteryUsageInfo(param *app.StartTimeParam) (batteryUsageInfo *BatteryUsageInfoResponse)
+	GetTimeOfUseInfo(param *app.StartTimeParam) (timeOfUseInfo *TimeOfUseInfoResponse, err error)
+	GetSolarEnergyUsage(param *app.ZoomableParam) (solarEnergyUsage *SolarEnergyUsageResponse)
+	GetChargeInfo(param *app.StartTimeParam) (chargeInfo *ChargeInfoResponse)
+	GetDemandState(param *app.PeriodParam) (demandState *DemandStateResponse)
+	GetSolarEnergyInfo(param *app.StartTimeParam) (solarEnergyInfo *SolarEnergyInfoResponse)
+	GetSolarPowerState(param *app.ZoomableParam) (solarPowerState *SolarPowerStateResponse, err error)
+	GetBatteryEnergyInfo(param *app.StartTimeParam) (batteryEnergyInfo *BatteryEnergyInfoResponse)
+	GetBatteryPowerState(param *app.ZoomableParam) (batteryPowerState *BatteryPowerStateResponse, err error)
+	GetBatteryChargeVoltageState(param *app.ZoomableParam) (batteryChargeVoltageState *BatteryChargeVoltageStateResponse, err error)
+	GetGridEnergyInfo(param *app.StartTimeParam) (gridEnergyInfo *GridEnergyInfoResponse)
+	GetGridPowerState(param *app.ZoomableParam) (gridPowerState *GridPowerStateResponse, err error)
 }
 
 type defaultDevicesService struct {
@@ -242,57 +425,82 @@ func (s defaultDevicesService) GetLatestDevicesEnergyInfo(gwUUID string) (logTim
 	logTime = latestLog.LogDate
 	devicesEnergyInfo = &DevicesEnergyInfoResponse{
 		GridIsPeakShaving:             latestLog.GridIsPeakShaving.Int,
-		LoadGridAveragePowerAC:        latestLog.LoadGridAveragePowerAC.Float32,
-		BatteryGridAveragePowerAC:     latestLog.BatteryGridAveragePowerAC.Float32,
-		GridContractPowerAC:           latestLog.GridContractPowerAC.Float32,
-		LoadPvAveragePowerAC:          latestLog.LoadPvAveragePowerAC.Float32,
-		LoadBatteryAveragePowerAC:     latestLog.LoadBatteryAveragePowerAC.Float32,
-		BatterySoC:                    latestLog.BatterySoC.Float32,
-		BatteryProducedAveragePowerAC: latestLog.BatteryProducedAveragePowerAC.Float32,
-		BatteryConsumedAveragePowerAC: latestLog.BatteryConsumedAveragePowerAC.Float32,
+		LoadGridAveragePowerAC:        AbsFloat32Format(latestLog.LoadGridAveragePowerAC.Float32),
+		BatteryGridAveragePowerAC:     AbsFloat32Format(latestLog.BatteryGridAveragePowerAC.Float32),
+		GridContractPowerAC:           Float32Format(latestLog.GridContractPowerAC.Float32),
+		LoadPvAveragePowerAC:          AbsFloat32Format(latestLog.LoadPvAveragePowerAC.Float32),
+		LoadBatteryAveragePowerAC:     AbsFloat32Format(latestLog.LoadBatteryAveragePowerAC.Float32),
+		BatterySoC:                    Float32Format(latestLog.BatterySoC.Float32),
+		BatteryProducedAveragePowerAC: Float32Format(latestLog.BatteryProducedAveragePowerAC.Float32),
+		BatteryConsumedAveragePowerAC: Float32Format(latestLog.BatteryConsumedAveragePowerAC.Float32),
 		BatteryChargingFrom:           latestLog.BatteryChargingFrom.String,
 		BatteryDischargingTo:          latestLog.BatteryDischargingTo.String,
-		PvAveragePowerAC:              latestLog.PvAveragePowerAC.Float32,
-		LoadAveragePowerAC:            latestLog.LoadAveragePowerAC.Float32,
-		BatteryPvAveragePowerAC:       latestLog.BatteryPvAveragePowerAC.Float32,
-		GridPvAveragePowerAC:          latestLog.GridPvAveragePowerAC.Float32,
-		GridProducedAveragePowerAC:    latestLog.GridProducedAveragePowerAC.Float32,
-		GridConsumedAveragePowerAC:    latestLog.GridConsumedAveragePowerAC.Float32,
+		PvAveragePowerAC:              Float32Format(latestLog.PvAveragePowerAC.Float32),
+		LoadAveragePowerAC:            AbsFloat32Format(latestLog.LoadAveragePowerAC.Float32),
+		BatteryPvAveragePowerAC:       AbsFloat32Format(latestLog.BatteryPvAveragePowerAC.Float32),
+		GridPvAveragePowerAC:          AbsFloat32Format(latestLog.GridPvAveragePowerAC.Float32),
+		GridProducedAveragePowerAC:    Float32Format(latestLog.GridProducedAveragePowerAC.Float32),
+		GridConsumedAveragePowerAC:    Float32Format(latestLog.GridConsumedAveragePowerAC.Float32),
 	}
-	if err = json.Unmarshal(latestLog.LoadLinks.JSON, &devicesEnergyInfo.LoadLinks); err != nil {
+	if err1 := json.Unmarshal(latestLog.LoadLinks.JSON, &devicesEnergyInfo.LoadLinks); err1 != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "json.Unmarshal: loadLinksValue",
-			"err":       err,
+			"err1":      err1,
 		}).Error()
-		return
 	}
-	if err = json.Unmarshal(latestLog.GridLinks.JSON, &devicesEnergyInfo.GridLinks); err != nil {
+	if devicesEnergyInfo.LoadLinks == nil {
+		devicesEnergyInfo.LoadLinks = map[string]interface{}{
+			"pv":      0,
+			"grid":    0,
+			"battery": 0,
+		}
+	}
+	if err1 := json.Unmarshal(latestLog.GridLinks.JSON, &devicesEnergyInfo.GridLinks); err1 != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "json.Unmarshal: gridLinksValue",
-			"err":       err,
+			"err1":      err1,
 		}).Error()
-		return
 	}
-	if err = json.Unmarshal(latestLog.PvLinks.JSON, &devicesEnergyInfo.PVLinks); err != nil {
+	if devicesEnergyInfo.GridLinks == nil {
+		devicesEnergyInfo.GridLinks = map[string]interface{}{
+			"pv":      0,
+			"load":    0,
+			"battery": 0,
+		}
+	}
+	if err1 := json.Unmarshal(latestLog.PvLinks.JSON, &devicesEnergyInfo.PVLinks); err1 != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "json.Unmarshal: pvLinksValue",
-			"err":       err,
+			"err1":      err1,
 		}).Error()
-		return
 	}
-	if err = json.Unmarshal(latestLog.BatteryLinks.JSON, &devicesEnergyInfo.BatteryLinks); err != nil {
+	if devicesEnergyInfo.PVLinks == nil {
+		devicesEnergyInfo.PVLinks = map[string]interface{}{
+			"grid":    0,
+			"load":    0,
+			"battery": 0,
+		}
+	}
+	if err1 := json.Unmarshal(latestLog.BatteryLinks.JSON, &devicesEnergyInfo.BatteryLinks); err1 != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "json.Unmarshal: batteryLinksValue",
-			"err":       err,
+			"err1":      err1,
 		}).Error()
+	}
+	if devicesEnergyInfo.BatteryLinks == nil {
+		devicesEnergyInfo.BatteryLinks = map[string]interface{}{
+			"pv":   0,
+			"grid": 0,
+			"load": 0,
+		}
 	}
 	return
 }
 
-func (s defaultDevicesService) GetEnergyDistributionInfo(gwUUID string, startTime, endTime time.Time) (energyDistributionInfo *EnergyDistributionInfoResponse) {
+func (s defaultDevicesService) GetEnergyDistributionInfo(param *app.PeriodParam) (energyDistributionInfo *EnergyDistributionInfoResponse) {
 	energyDistributionInfo = &EnergyDistributionInfoResponse{}
-	firstLog, err1 := s.repo.CCData.GetFirstLog(gwUUID, startTime, endTime)
-	latestLog, err2 := s.repo.CCData.GetLatestLog(gwUUID, startTime, endTime)
+	firstLog, err1 := s.repo.CCData.GetFirstLog(param.GatewayUUID, param.Query.StartTime, param.Query.EndTime)
+	latestLog, err2 := s.repo.CCData.GetLatestLog(param.GatewayUUID, param.Query.StartTime, param.Query.EndTime)
 	if err1 != nil || err2 != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "s.repo.CCData.GetFirstLog and GetLatestLog",
@@ -306,37 +514,12 @@ func (s defaultDevicesService) GetEnergyDistributionInfo(gwUUID string, startTim
 		"firstLog.LogDate":  firstLog.LogDate,
 		"latestLog.LogDate": latestLog.LogDate,
 	}).Debug()
-	energyDistributionInfo.AllProducedLifetimeEnergyACDiff = utils.Diff(latestLog.AllProducedLifetimeEnergyAC.Float32, firstLog.AllProducedLifetimeEnergyAC.Float32)
-	energyDistributionInfo.PvProducedLifetimeEnergyACDiff = utils.Diff(latestLog.PvProducedLifetimeEnergyAC.Float32, firstLog.PvProducedLifetimeEnergyAC.Float32)
-	energyDistributionInfo.GridProducedLifetimeEnergyACDiff = utils.Diff(latestLog.GridProducedLifetimeEnergyAC.Float32, firstLog.GridProducedLifetimeEnergyAC.Float32)
-	energyDistributionInfo.BatteryProducedLifetimeEnergyACDiff = utils.Diff(latestLog.BatteryProducedLifetimeEnergyAC.Float32, firstLog.BatteryProducedLifetimeEnergyAC.Float32)
-	energyDistributionInfo.PvProducedEnergyPercentAC = utils.Percent(
-		energyDistributionInfo.PvProducedLifetimeEnergyACDiff,
-		energyDistributionInfo.AllProducedLifetimeEnergyACDiff)
-	energyDistributionInfo.GridProducedEnergyPercentAC = utils.Percent(
-		energyDistributionInfo.GridProducedLifetimeEnergyACDiff,
-		energyDistributionInfo.AllProducedLifetimeEnergyACDiff)
-	energyDistributionInfo.BatteryProducedEnergyPercentAC = utils.Percent(
-		energyDistributionInfo.BatteryProducedLifetimeEnergyACDiff,
-		energyDistributionInfo.AllProducedLifetimeEnergyACDiff)
-	energyDistributionInfo.AllConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.AllConsumedLifetimeEnergyAC.Float32, firstLog.AllConsumedLifetimeEnergyAC.Float32)
-	energyDistributionInfo.LoadConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.LoadConsumedLifetimeEnergyAC.Float32, firstLog.LoadConsumedLifetimeEnergyAC.Float32)
-	energyDistributionInfo.GridConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.GridConsumedLifetimeEnergyAC.Float32, firstLog.GridConsumedLifetimeEnergyAC.Float32)
-	energyDistributionInfo.BatteryConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.BatteryConsumedLifetimeEnergyAC.Float32, firstLog.BatteryConsumedLifetimeEnergyAC.Float32)
-	energyDistributionInfo.LoadConsumedEnergyPercentAC = utils.Percent(
-		energyDistributionInfo.LoadConsumedLifetimeEnergyACDiff,
-		energyDistributionInfo.AllConsumedLifetimeEnergyACDiff)
-	energyDistributionInfo.GridConsumedEnergyPercentAC = utils.Percent(
-		energyDistributionInfo.GridConsumedLifetimeEnergyACDiff,
-		energyDistributionInfo.AllConsumedLifetimeEnergyACDiff)
-	energyDistributionInfo.BatteryConsumedEnergyPercentAC = utils.Percent(
-		energyDistributionInfo.BatteryConsumedLifetimeEnergyACDiff,
-		energyDistributionInfo.AllConsumedLifetimeEnergyACDiff)
+	energyDistributionInfo.ComputedValues(firstLog, latestLog)
 	return
 }
 
-func (s defaultDevicesService) GetPowerState(gwUUID string, startTime, endTime time.Time) (powerState *PowerStateResponse) {
-	realtimeInfo := s.getRealtimeInfo(gwUUID, startTime, endTime)
+func (s defaultDevicesService) GetPowerState(param *app.ZoomableParam) (powerState *PowerStateResponse) {
+	realtimeInfo := s.getRealtimeInfo(param, false)
 	powerState = &PowerStateResponse{
 		Timestamps:             realtimeInfo.Timestamps,
 		LoadAveragePowerACs:    realtimeInfo.LoadAveragePowerACs,
@@ -347,8 +530,8 @@ func (s defaultDevicesService) GetPowerState(gwUUID string, startTime, endTime t
 	return
 }
 
-func (s defaultDevicesService) GetAccumulatedPowerState(gwUUID, resolution string, startTime, endTime time.Time) (accumulatedPowerState *AccumulatedPowerStateResponse) {
-	accumulatedInfo := s.getAccumulatedInfo(gwUUID, resolution, startTime, endTime)
+func (s defaultDevicesService) GetAccumulatedPowerState(param *app.ResolutionWithPeriodParam) (accumulatedPowerState *AccumulatedPowerStateResponse) {
+	accumulatedInfo := s.getAccumulatedInfo(param)
 	accumulatedPowerState = &AccumulatedPowerStateResponse{
 		Timestamps:                        accumulatedInfo.Timestamps,
 		LoadConsumedLifetimeEnergyACDiffs: accumulatedInfo.LoadConsumedLifetimeEnergyACDiffs,
@@ -359,9 +542,9 @@ func (s defaultDevicesService) GetAccumulatedPowerState(gwUUID, resolution strin
 	return
 }
 
-func (s defaultDevicesService) GetChargeInfo(gwUUID string, startTime time.Time) (chargeInfo *ChargeInfoResponse) {
+func (s defaultDevicesService) GetChargeInfo(param *app.StartTimeParam) (chargeInfo *ChargeInfoResponse) {
 	chargeInfo = &ChargeInfoResponse{}
-	latestLog, err := s.repo.CCData.GetLatestLog(gwUUID, startTime, time.Now().UTC())
+	latestLog, err := s.repo.CCData.GetLatestLog(param.GatewayUUID, param.Query.StartTime, time.Now().UTC())
 	if err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "s.repo.CCData.GetLatestLog",
@@ -375,14 +558,14 @@ func (s defaultDevicesService) GetChargeInfo(gwUUID string, startTime time.Time)
 	chargeInfo.GridPowerCost = 0
 	chargeInfo.GridPowerCostSavings = 0
 	chargeInfo.GridPowerCostLastMonth = 0
-	chargeInfo.GridProducedAveragePowerAC = latestLog.GridProducedAveragePowerAC.Float32
-	chargeInfo.GridContractPowerAC = latestLog.GridContractPowerAC.Float32
+	chargeInfo.GridProducedAveragePowerAC = Float32Format(latestLog.GridProducedAveragePowerAC.Float32)
+	chargeInfo.GridContractPowerAC = Float32Format(latestLog.GridContractPowerAC.Float32)
 	chargeInfo.GridIsPeakShaving = latestLog.GridIsPeakShaving.Int
 	return
 }
 
-func (s defaultDevicesService) GetPowerSelfSupplyRate(gwUUID, resolution string, startTime, endTime time.Time) (powerSelfSupplyRate *PowerSelfSupplyRateResponse) {
-	accumulatedInfo := s.getAccumulatedInfo(gwUUID, resolution, startTime, endTime)
+func (s defaultDevicesService) GetPowerSelfSupplyRate(param *app.ResolutionWithPeriodParam) (powerSelfSupplyRate *PowerSelfSupplyRateResponse) {
+	accumulatedInfo := s.getAccumulatedInfo(param)
 	powerSelfSupplyRate = &PowerSelfSupplyRateResponse{
 		Timestamps:                       accumulatedInfo.Timestamps,
 		LoadSelfConsumedEnergyPercentACs: accumulatedInfo.LoadSelfConsumedEnergyPercentACs,
@@ -390,42 +573,269 @@ func (s defaultDevicesService) GetPowerSelfSupplyRate(gwUUID, resolution string,
 	return
 }
 
-func (s defaultDevicesService) GetDemandState(gwUUID string, startTime, endTime time.Time) (demandState *DemandStateResponse) {
-	demandState = &DemandStateResponse{}
-	startTimeIndex := startTime
-	endTimeIndex := startTime.Add(15 * time.Minute)
+func (s defaultDevicesService) GetBatteryUsageInfo(param *app.StartTimeParam) (batteryUsageInfo *BatteryUsageInfoResponse) {
+	batteryUsageInfo = &BatteryUsageInfoResponse{}
+	latestLog, err := s.repo.CCData.GetLatestLog(param.GatewayUUID, param.Query.StartTime, time.Now().UTC())
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "s.repo.CCData.GetLatestLog",
+			"err":       err,
+		}).Error()
+		return
+	}
 
-	for startTimeIndex.Before(endTime) {
-		latestComputedDemandState := s.getLatestComputedDemandState(gwUUID, startTimeIndex, endTimeIndex, endTime)
-		log.Debug("latestComputedDemandState: ", latestComputedDemandState)
-		demandState.Timestamps = append(demandState.Timestamps, latestComputedDemandState.Timestamps)
-		demandState.GridLifetimeEnergyACDiffToPowers = append(demandState.GridLifetimeEnergyACDiffToPowers, latestComputedDemandState.GridLifetimeEnergyACDiffToPower)
-		if latestComputedDemandState.GridContractPowerAC != 0 {
-			demandState.GridContractPowerAC = latestComputedDemandState.GridContractPowerAC
+	log.Debug("latestLog.LogDate: ", latestLog.LogDate)
+	batteryUsageInfo.BatterySoC = Float32Format(latestLog.BatterySoC.Float32)
+	batteryUsageInfo.BatteryProducedAveragePowerAC = Float32Format(latestLog.BatteryProducedAveragePowerAC.Float32)
+	batteryUsageInfo.BatteryConsumedAveragePowerAC = Float32Format(latestLog.BatteryConsumedAveragePowerAC.Float32)
+	batteryUsageInfo.BatteryChargingFrom = latestLog.BatteryChargingFrom.String
+	batteryUsageInfo.BatteryDischargingTo = latestLog.BatteryDischargingTo.String
+	return
+}
+
+func (s defaultDevicesService) GetTimeOfUseInfo(param *app.StartTimeParam) (timeOfUseInfo *TimeOfUseInfoResponse, err error) {
+	timeOfUseInfo = &TimeOfUseInfoResponse{}
+	localStartTime, tous, err := s.billing.GetTOUsOfLocalTime(param.GatewayUUID, param.Query.StartTime)
+	if err != nil {
+		return
+	}
+
+	// 1. energySources
+	energySources, err := s.getEnergySourcesInfo(param.GatewayUUID, localStartTime, tous)
+	if err != nil {
+		return
+	}
+	timeOfUseInfo.EnergySources = energySources
+
+	// 2. timeOfUse
+	timeOfUse, err := s.getTimeOfUseOfDay(localStartTime, tous)
+	if err != nil {
+		return
+	}
+	timeOfUseInfo.TimeOfUse = timeOfUse
+
+	log.WithFields(log.Fields{
+		"energySources": energySources,
+		"timeOfUse":     timeOfUse,
+	}).Debug()
+	return
+}
+
+func (s defaultDevicesService) getEnergySourcesInfo(gwUUID string, localStartTime time.Time, tous []*deremsmodels.Tou) (energySources map[string]interface{}, err error) {
+	energySources = make(map[string]interface{})
+
+	onPeak, err := s.getEnergySourceDistributionByPeakType("On-peak", gwUUID, localStartTime, tous)
+	if err != nil {
+		return
+	}
+	midPeak, err := s.getEnergySourceDistributionByPeakType("Mid-peak", gwUUID, localStartTime, tous)
+	if err != nil {
+		return
+	}
+	offPeak, err := s.getEnergySourceDistributionByPeakType("Off-peak", gwUUID, localStartTime, tous)
+	if err != nil {
+		return
+	}
+	if len(onPeak) > 0 {
+		energySources["onPeak"] = onPeak
+	}
+	if len(midPeak) > 0 {
+		energySources["midPeak"] = midPeak
+	}
+	if len(offPeak) > 0 {
+		energySources["offPeak"] = offPeak
+	}
+	return
+}
+
+func (s defaultDevicesService) getEnergySourceDistributionByPeakType(peakType, gwUUID string, localStartTime time.Time, tous []*deremsmodels.Tou) (energySourceDistribution map[string]float32, err error) {
+	energySourceDistribution = make(map[string]float32)
+
+	loc := time.FixedZone(localStartTime.Zone())
+	for _, tou := range tous {
+		if tou.PeakType.String != peakType {
+			continue
+		}
+
+		startTime, err := time.ParseInLocation(utils.HHMMSS24h, tou.PeriodStime.String, loc)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"caused-by": "time.ParseInLocation",
+				"err":       err,
+			}).Error()
+			break
+		}
+		startTimeInUTC := time.Date(localStartTime.Year(), localStartTime.Month(), localStartTime.Day(), startTime.Hour(), startTime.Minute(), startTime.Second(), 0, loc).In(time.UTC)
+		endTime, err := time.ParseInLocation(utils.HHMMSS24h, tou.PeriodEtime.String, loc)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"caused-by": "time.ParseInLocation",
+				"err":       err,
+			}).Error()
+			break
+		}
+		endTimeInUTC := time.Date(localStartTime.Year(), localStartTime.Month(), localStartTime.Day(), endTime.Hour(), endTime.Minute(), endTime.Second(), 0, loc).In(time.UTC)
+		if tou.PeriodEtime.String == "00:00:00" {
+			endTimeInUTC = endTimeInUTC.AddDate(0, 0, 1)
+		}
+		firstLog, err1 := s.repo.CCData.GetFirstLog(gwUUID, startTimeInUTC, endTimeInUTC)
+		latestLog, err2 := s.repo.CCData.GetLatestLog(gwUUID, startTimeInUTC, endTimeInUTC)
+		if err1 != nil || err2 != nil {
+			log.WithFields(log.Fields{
+				"caused-by":      "s.repo.CCData.GetFirstLog and GetLatestLog",
+				"err1":           err1,
+				"err2":           err2,
+				"startTimeInUTC": startTimeInUTC,
+				"endTimeInUTC":   endTimeInUTC,
+			}).Error()
+			continue
+		}
+
+		pvProducedLifetimeEnergyACDiff := utils.Diff(latestLog.PvProducedLifetimeEnergyAC.Float32, firstLog.PvProducedLifetimeEnergyAC.Float32)
+		gridProducedLifetimeEnergyACDiff := utils.Diff(latestLog.GridProducedLifetimeEnergyAC.Float32, firstLog.GridProducedLifetimeEnergyAC.Float32)
+		batteryProducedLifetimeEnergyACDiff := utils.Diff(latestLog.BatteryProducedLifetimeEnergyAC.Float32, firstLog.BatteryProducedLifetimeEnergyAC.Float32)
+		// Avoid cc illegal value
+		pvProducedLifetimeEnergyACDiff = utils.GetZeroForNegativeValue(pvProducedLifetimeEnergyACDiff)
+		gridProducedLifetimeEnergyACDiff = utils.GetZeroForNegativeValue(gridProducedLifetimeEnergyACDiff)
+		batteryProducedLifetimeEnergyACDiff = utils.GetZeroForNegativeValue(batteryProducedLifetimeEnergyACDiff)
+		energySourceDistribution["pvProducedLifetimeEnergyACDiff"] += pvProducedLifetimeEnergyACDiff
+		energySourceDistribution["gridProducedLifetimeEnergyACDiff"] += gridProducedLifetimeEnergyACDiff
+		energySourceDistribution["batteryProducedLifetimeEnergyACDiff"] += batteryProducedLifetimeEnergyACDiff
+	}
+
+	if len(energySourceDistribution) > 0 {
+		energySourceDistribution["pvProducedLifetimeEnergyACDiff"] = utils.ThreeDecimalPlaces(energySourceDistribution["pvProducedLifetimeEnergyACDiff"])
+		energySourceDistribution["gridProducedLifetimeEnergyACDiff"] = utils.ThreeDecimalPlaces(energySourceDistribution["gridProducedLifetimeEnergyACDiff"])
+		energySourceDistribution["batteryProducedLifetimeEnergyACDiff"] = utils.ThreeDecimalPlaces(energySourceDistribution["batteryProducedLifetimeEnergyACDiff"])
+		energySourceDistribution["allProducedLifetimeEnergyACDiff"] = utils.ThreeDecimalPlaces(
+			energySourceDistribution["pvProducedLifetimeEnergyACDiff"] +
+				energySourceDistribution["gridProducedLifetimeEnergyACDiff"] +
+				energySourceDistribution["batteryProducedLifetimeEnergyACDiff"])
+		energySourceDistribution["pvProducedEnergyPercentAC"] = utils.Percent(
+			energySourceDistribution["pvProducedLifetimeEnergyACDiff"],
+			energySourceDistribution["allProducedLifetimeEnergyACDiff"])
+		energySourceDistribution["gridProducedEnergyPercentAC"] = utils.Percent(
+			energySourceDistribution["gridProducedLifetimeEnergyACDiff"],
+			energySourceDistribution["allProducedLifetimeEnergyACDiff"])
+		energySourceDistribution["batteryProducedEnergyPercentAC"] = utils.Percent(
+			energySourceDistribution["batteryProducedLifetimeEnergyACDiff"],
+			energySourceDistribution["allProducedLifetimeEnergyACDiff"])
+	}
+	return
+}
+
+func (s defaultDevicesService) getTimeOfUseOfDay(localStartTime time.Time, tous []*deremsmodels.Tou) (timeOfUse map[string]interface{}, err error) {
+	timeOfUse = make(map[string]interface{})
+
+	// 1. timezone
+	timeOfUse["timezone"] = localStartTime.Format(utils.ZHHMM)
+
+	// 2. onPeak, midPeak, offPeak
+	timeOfUse["onPeak"] = s.getPeriodsByPeakType("On-peak", tous)
+	timeOfUse["midPeak"] = s.getPeriodsByPeakType("Mid-peak", tous)
+	timeOfUse["offPeak"] = s.getPeriodsByPeakType("Off-peak", tous)
+
+	// 3. currentPeakType
+	loc := time.FixedZone(localStartTime.Zone())
+	peakType, err := s.billing.GetPeakType(time.Now().In(loc), tous)
+	if err != nil {
+		return
+	}
+	switch peakType {
+	case "Off-peak":
+		timeOfUse["currentPeakType"] = "offPeak"
+	case "On-peak":
+		timeOfUse["currentPeakType"] = "onPeak"
+	case "Mid-peak":
+		timeOfUse["currentPeakType"] = "midPeak"
+	}
+	return
+}
+
+func (s defaultDevicesService) getPeriodsByPeakType(peakType string, tous []*deremsmodels.Tou) (periods []map[string]interface{}) {
+	for _, tou := range tous {
+		if tou.PeakType.String != peakType {
+			continue
+		}
+
+		period := map[string]interface{}{
+			"start":   tou.PeriodStime.String,
+			"end":     tou.PeriodEtime.String,
+			"touRate": tou.FlowRate.Float32,
+		}
+		if period["end"] == "00:00:00" {
+			period["end"] = "24:00:00"
+		}
+		periods = append(periods, period)
+	}
+	return
+}
+
+func (s defaultDevicesService) GetSolarEnergyUsage(param *app.ZoomableParam) (solarEnergyUsage *SolarEnergyUsageResponse) {
+	realtimeInfo := s.getRealtimeInfo(param, true)
+	solarEnergyUsage = &SolarEnergyUsageResponse{
+		Timestamps:                     realtimeInfo.Timestamps,
+		LoadPvConsumedEnergyPercentACs: realtimeInfo.LoadPvConsumedEnergyPercentACs,
+	}
+	return
+}
+
+func (s defaultDevicesService) GetDemandState(param *app.PeriodParam) (demandState *DemandStateResponse) {
+	demandState = &DemandStateResponse{}
+	startTimeIndex := param.Query.StartTime
+	endTimeIndex := param.Query.StartTime.Add(15 * time.Minute)
+
+	for startTimeIndex.Before(param.Query.EndTime) {
+		latestComputedDemandState := s.getLatestComputedDemandState(param.GatewayUUID, startTimeIndex, endTimeIndex, param.Query.EndTime)
+		if latestComputedDemandState != nil {
+			log.Debug("latestComputedDemandState: ", latestComputedDemandState)
+			demandState.Timestamps = append(demandState.Timestamps, latestComputedDemandState.Timestamps)
+			demandState.GridLifetimeEnergyACDiffToPowers = append(demandState.GridLifetimeEnergyACDiffToPowers, latestComputedDemandState.GridLifetimeEnergyACDiffToPower)
+			if latestComputedDemandState.GridContractPowerAC != 0 {
+				demandState.GridContractPowerAC = latestComputedDemandState.GridContractPowerAC
+			}
 		}
 
 		startTimeIndex = endTimeIndex
 		endTimeIndex = startTimeIndex.Add(15 * time.Minute)
-		if endTimeIndex.After(endTime) {
-			endTimeIndex = endTime
+		if endTimeIndex.After(param.Query.EndTime) {
+			endTimeIndex = param.Query.EndTime
+		}
+	}
+
+	// avoid frontend error to send default line data for chart display
+	if demandState.Timestamps == nil {
+		startTimeIndex = param.Query.StartTime
+		endTimeIndex = param.Query.StartTime.Add(15 * time.Minute)
+		for startTimeIndex.Before(param.Query.EndTime) {
+			demandState.Timestamps = append(demandState.Timestamps, int(endTimeIndex.Add(-1*time.Second).Unix()))
+			demandState.GridLifetimeEnergyACDiffToPowers = append(demandState.GridLifetimeEnergyACDiffToPowers, 0)
+
+			startTimeIndex = endTimeIndex
+			endTimeIndex = startTimeIndex.Add(15 * time.Minute)
+			if endTimeIndex.After(param.Query.EndTime) {
+				endTimeIndex = param.Query.EndTime
+			}
 		}
 	}
 	return
 }
 
-func (s defaultDevicesService) GetSolarEnergyInfo(gwUUID string, startTime time.Time) (solarEnergyInfo *SolarEnergyInfoResponse) {
+func (s defaultDevicesService) GetSolarEnergyInfo(param *app.StartTimeParam) (solarEnergyInfo *SolarEnergyInfoResponse) {
 	solarEnergyInfo = &SolarEnergyInfoResponse{}
 	now := time.Now().UTC()
-	startTimeThisMonth := startTime.AddDate(0, 0, -startTime.Day())
-	firstLogOfDay, err1 := s.repo.CCData.GetFirstLog(gwUUID, startTime, now)
-	firstLogOfMonth, err2 := s.repo.CCData.GetFirstLog(gwUUID, startTimeThisMonth, now)
-	latestLog, err3 := s.repo.CCData.GetLatestLog(gwUUID, startTime, now)
-	if err1 != nil || err2 != nil || err3 != nil {
+	startTimeThisMonth := param.Query.StartTime.AddDate(0, 0, -param.Query.StartTime.Day())
+	firstLogOfDay, err1 := s.repo.CCData.GetFirstLog(param.GatewayUUID, param.Query.StartTime, now)
+	firstLogOfMonth, err2 := s.repo.CCData.GetFirstLog(param.GatewayUUID, startTimeThisMonth, now)
+	latestLog, err3 := s.repo.CCData.GetLatestLog(param.GatewayUUID, param.Query.StartTime, now)
+	logsOfMonth, err4 := s.repo.CCData.GetLogs(param.GatewayUUID, startTimeThisMonth, now)
+	if err1 != nil || err2 != nil || err3 != nil || err4 != nil {
 		log.WithFields(log.Fields{
-			"caused-by": "s.repo.CCData.GetFirstLog:Day&Month and GetLatestLog",
+			"caused-by": "s.repo.CCData.GetFirstLog:Day&Month or GetLatestLog or GetLogs",
 			"err1":      err1,
 			"err2":      err2,
 			"err3":      err3,
+			"err4":      err4,
 		}).Error()
 		return
 	}
@@ -435,43 +845,29 @@ func (s defaultDevicesService) GetSolarEnergyInfo(gwUUID string, startTime time.
 		"firstLogOfMonth.LogDate": firstLogOfMonth.LogDate,
 		"latestLog.LogDate":       latestLog.LogDate,
 	}).Debug()
-	solarEnergyInfo.AllConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.AllConsumedLifetimeEnergyAC.Float32, firstLogOfDay.AllConsumedLifetimeEnergyAC.Float32)
-	solarEnergyInfo.LoadPvConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.LoadPvConsumedLifetimeEnergyAC.Float32, firstLogOfDay.LoadPvConsumedLifetimeEnergyAC.Float32)
-	solarEnergyInfo.LoadPvConsumedEnergyPercentAC = utils.Percent(
-		solarEnergyInfo.LoadPvConsumedLifetimeEnergyACDiff,
-		utils.Diff(latestLog.LoadConsumedLifetimeEnergyAC.Float32, firstLogOfDay.LoadConsumedLifetimeEnergyAC.Float32))
-	solarEnergyInfo.BatteryPvConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.BatteryPvConsumedLifetimeEnergyAC.Float32, firstLogOfDay.BatteryPvConsumedLifetimeEnergyAC.Float32)
-	solarEnergyInfo.BatteryPvConsumedEnergyPercentAC = utils.Percent(
-		solarEnergyInfo.BatteryPvConsumedLifetimeEnergyACDiff,
-		utils.Diff(latestLog.BatteryConsumedLifetimeEnergyAC.Float32, firstLogOfDay.BatteryConsumedLifetimeEnergyAC.Float32))
-	solarEnergyInfo.GridPvConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.GridPvConsumedLifetimeEnergyAC.Float32, firstLogOfDay.GridPvConsumedLifetimeEnergyAC.Float32)
-	solarEnergyInfo.GridPvConsumedEnergyPercentAC = utils.Percent(
-		solarEnergyInfo.GridPvConsumedLifetimeEnergyACDiff,
-		utils.Diff(latestLog.GridConsumedLifetimeEnergyAC.Float32, firstLogOfDay.GridConsumedLifetimeEnergyAC.Float32))
-	solarEnergyInfo.PvEnergyCostSavingsDiff = utils.Diff(latestLog.PvEnergyCostSavings.Float32, firstLogOfMonth.PvEnergyCostSavings.Float32)
-	solarEnergyInfo.PvCo2SavingsDiff = utils.Diff(latestLog.PvCo2Savings.Float32, firstLogOfMonth.PvCo2Savings.Float32)
+	solarEnergyInfo.ComputedValues(firstLogOfDay, firstLogOfMonth, latestLog, logsOfMonth)
 	return
 }
 
-func (s defaultDevicesService) GetSolarPowerState(gwUUID string, startTime, endTime time.Time) (solarPowerState *SolarPowerStateResponse, err error) {
+func (s defaultDevicesService) GetSolarPowerState(param *app.ZoomableParam) (solarPowerState *SolarPowerStateResponse, err error) {
 	solarPowerState = &SolarPowerStateResponse{}
-	onPeakTime, err := s.getOnPeakTime(gwUUID, startTime)
+	onPeakTime, err := s.getOnPeakTime(param.GatewayUUID, param.Query.StartTime)
 	if err != nil {
 		return
 	}
 
 	solarPowerState.OnPeakTime = onPeakTime
-	realtimeInfo := s.getRealtimeInfo(gwUUID, startTime, endTime)
+	realtimeInfo := s.getRealtimeInfo(param, false)
 	solarPowerState.Timestamps = realtimeInfo.Timestamps
 	solarPowerState.PvAveragePowerACs = realtimeInfo.PvAveragePowerACs
 	return
 }
 
-func (s defaultDevicesService) GetBatteryEnergyInfo(gwUUID string, startTime time.Time) (batteryEnergyInfo *BatteryEnergyInfoResponse) {
+func (s defaultDevicesService) GetBatteryEnergyInfo(param *app.StartTimeParam) (batteryEnergyInfo *BatteryEnergyInfoResponse) {
 	batteryEnergyInfo = &BatteryEnergyInfoResponse{}
-	s.getBatteryInfo(gwUUID, batteryEnergyInfo)
-	firstLog, err1 := s.repo.CCData.GetFirstLog(gwUUID, startTime, time.Time{})
-	latestLog, err2 := s.repo.CCData.GetLatestLog(gwUUID, time.Time{}, time.Time{})
+	batteryEnergyInfo.GetBatteryInfo(param.GatewayUUID)
+	firstLog, err1 := s.repo.CCData.GetFirstLog(param.GatewayUUID, param.Query.StartTime, time.Time{})
+	latestLog, err2 := s.repo.CCData.GetLatestLog(param.GatewayUUID, time.Time{}, time.Time{})
 	if err1 != nil || err2 != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "s.repo.CCData.GetFirstLog and GetLatestLog",
@@ -485,52 +881,46 @@ func (s defaultDevicesService) GetBatteryEnergyInfo(gwUUID string, startTime tim
 		"firstLog.LogDate":  firstLog.LogDate,
 		"latestLog.LogDate": latestLog.LogDate,
 	}).Debug()
-	batteryEnergyInfo.BatteryLifetimeOperationCyclesDiff = utils.Diff(latestLog.BatteryLifetimeOperationCycles.Float32, firstLog.BatteryLifetimeOperationCycles.Float32)
-	batteryEnergyInfo.BatteryLifetimeOperationCycles = latestLog.BatteryLifetimeOperationCycles.Float32
-	batteryEnergyInfo.BatterySoC = latestLog.BatterySoC.Float32
-	batteryEnergyInfo.BatteryProducedLifetimeEnergyACDiff = utils.Diff(latestLog.BatteryProducedLifetimeEnergyAC.Float32, firstLog.BatteryProducedLifetimeEnergyAC.Float32)
-	batteryEnergyInfo.BatteryProducedLifetimeEnergyAC = latestLog.BatteryProducedLifetimeEnergyAC.Float32
-	batteryEnergyInfo.BatteryConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.BatteryConsumedLifetimeEnergyAC.Float32, firstLog.BatteryConsumedLifetimeEnergyAC.Float32)
-	batteryEnergyInfo.BatteryConsumedLifetimeEnergyAC = latestLog.BatteryConsumedLifetimeEnergyAC.Float32
+	batteryEnergyInfo.ComputedValues(firstLog, latestLog)
 	return
 }
 
-func (s defaultDevicesService) GetBatteryPowerState(gwUUID string, startTime, endTime time.Time) (batteryPowerState *BatteryPowerStateResponse, err error) {
+func (s defaultDevicesService) GetBatteryPowerState(param *app.ZoomableParam) (batteryPowerState *BatteryPowerStateResponse, err error) {
 	batteryPowerState = &BatteryPowerStateResponse{}
-	onPeakTime, err := s.getOnPeakTime(gwUUID, startTime)
+	onPeakTime, err := s.getOnPeakTime(param.GatewayUUID, param.Query.StartTime)
 	if err != nil {
 		return
 	}
 
 	batteryPowerState.OnPeakTime = onPeakTime
-	realtimeInfo := s.getRealtimeInfo(gwUUID, startTime, endTime)
+	realtimeInfo := s.getRealtimeInfo(param, false)
 	batteryPowerState.Timestamps = realtimeInfo.Timestamps
 	batteryPowerState.BatteryAveragePowerACs = realtimeInfo.BatteryAveragePowerACs
 	return
 }
 
-func (s defaultDevicesService) GetBatteryChargeVoltageState(gwUUID string, startTime, endTime time.Time) (batteryChargeVoltageState *BatteryChargeVoltageStateResponse, err error) {
+func (s defaultDevicesService) GetBatteryChargeVoltageState(param *app.ZoomableParam) (batteryChargeVoltageState *BatteryChargeVoltageStateResponse, err error) {
 	batteryChargeVoltageState = &BatteryChargeVoltageStateResponse{}
-	onPeakTime, err := s.getOnPeakTime(gwUUID, startTime)
+	onPeakTime, err := s.getOnPeakTime(param.GatewayUUID, param.Query.StartTime)
 	if err != nil {
 		return
 	}
 
 	batteryChargeVoltageState.OnPeakTime = onPeakTime
-	realtimeInfo := s.getRealtimeInfo(gwUUID, startTime, endTime)
+	realtimeInfo := s.getRealtimeInfo(param, false)
 	batteryChargeVoltageState.Timestamps = realtimeInfo.Timestamps
 	batteryChargeVoltageState.BatterySoCs = realtimeInfo.BatterySoCs
 	batteryChargeVoltageState.BatteryVoltages = realtimeInfo.BatteryVoltages
 	return
 }
 
-func (s defaultDevicesService) GetGridEnergyInfo(gwUUID string, startTime time.Time) (gridEnergyInfo *GridEnergyInfoResponse) {
+func (s defaultDevicesService) GetGridEnergyInfo(param *app.StartTimeParam) (gridEnergyInfo *GridEnergyInfoResponse) {
 	gridEnergyInfo = &GridEnergyInfoResponse{}
 	now := time.Now().UTC()
-	startTimeThisMonth := startTime.AddDate(0, 0, -startTime.Day())
-	firstLogOfDay, err1 := s.repo.CCData.GetFirstLog(gwUUID, startTime, now)
-	firstLogOfMonth, err2 := s.repo.CCData.GetFirstLog(gwUUID, startTimeThisMonth, now)
-	latestLog, err3 := s.repo.CCData.GetLatestLog(gwUUID, startTime, now)
+	startTimeThisMonth := param.Query.StartTime.AddDate(0, 0, -param.Query.StartTime.Day())
+	firstLogOfDay, err1 := s.repo.CCData.GetFirstLog(param.GatewayUUID, param.Query.StartTime, now)
+	firstLogOfMonth, err2 := s.repo.CCData.GetFirstLog(param.GatewayUUID, startTimeThisMonth, now)
+	latestLog, err3 := s.repo.CCData.GetLatestLog(param.GatewayUUID, param.Query.StartTime, now)
 	if err1 != nil || err2 != nil || err3 != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "s.repo.CCData.GetFirstLog:Day&Month and GetLatestLog",
@@ -546,65 +936,119 @@ func (s defaultDevicesService) GetGridEnergyInfo(gwUUID string, startTime time.T
 		"firstLogOfMonth.LogDate": firstLogOfMonth.LogDate,
 		"latestLog.LogDate":       latestLog.LogDate,
 	}).Debug()
-	gridEnergyInfo.GridConsumedLifetimeEnergyACDiff = utils.Diff(latestLog.GridConsumedLifetimeEnergyAC.Float32, firstLogOfDay.GridConsumedLifetimeEnergyAC.Float32)
-	gridEnergyInfo.GridProducedLifetimeEnergyACDiff = utils.Diff(latestLog.GridProducedLifetimeEnergyAC.Float32, firstLogOfDay.GridProducedLifetimeEnergyAC.Float32)
-	gridEnergyInfo.GridLifetimeEnergyACDiff = utils.Diff(latestLog.GridLifetimeEnergyAC.Float32, firstLogOfDay.GridLifetimeEnergyAC.Float32)
-	gridEnergyInfo.GridLifetimeEnergyACDiffOfMonth = utils.Diff(latestLog.GridLifetimeEnergyAC.Float32, firstLogOfMonth.GridLifetimeEnergyAC.Float32)
+	gridEnergyInfo.ComputedValues(firstLogOfDay, firstLogOfMonth, latestLog)
 	return
 }
 
-func (s defaultDevicesService) GetGridPowerState(gwUUID string, startTime, endTime time.Time) (gridPowerState *GridPowerStateResponse, err error) {
+func (s defaultDevicesService) GetGridPowerState(param *app.ZoomableParam) (gridPowerState *GridPowerStateResponse, err error) {
 	gridPowerState = &GridPowerStateResponse{}
-	onPeakTime, err := s.getOnPeakTime(gwUUID, startTime)
+	onPeakTime, err := s.getOnPeakTime(param.GatewayUUID, param.Query.StartTime)
 	if err != nil {
 		return
 	}
 
 	gridPowerState.OnPeakTime = onPeakTime
-	realtimeInfo := s.getRealtimeInfo(gwUUID, startTime, endTime)
+	realtimeInfo := s.getRealtimeInfo(param, false)
 	gridPowerState.Timestamps = realtimeInfo.Timestamps
 	gridPowerState.GridAveragePowerACs = realtimeInfo.GridAveragePowerACs
 	return
 }
 
-func (s defaultDevicesService) getRealtimeInfo(gwUUID string, startTime, endTime time.Time) (realtimeInfo *RealtimeInfo) {
+func (s defaultDevicesService) getRealtimeInfo(param *app.ZoomableParam, includedComputedData bool) (realtimeInfo *RealtimeInfo) {
 	realtimeInfo = &RealtimeInfo{}
-	startTimeIndex := startTime
-	endTimeIndex := startTime.Add(1 * time.Hour)
+	startTimeIndex := param.Query.StartTime
+	endTimeIndex := param.GetEndTimeIndex()
 
-	for startTimeIndex.Before(endTime) {
-		latestRealtimeInfo := s.getLatestRealtimeInfo(gwUUID, startTimeIndex, endTimeIndex, endTime)
-		log.Debug("latestRealtimeInfo.LogDate: ", latestRealtimeInfo.LogDate)
-		realtimeInfo.Timestamps = append(realtimeInfo.Timestamps, int(latestRealtimeInfo.LogDate.Unix()))
-		realtimeInfo.LoadAveragePowerACs = append(realtimeInfo.LoadAveragePowerACs, latestRealtimeInfo.LoadAveragePowerAC.Float32)
-		realtimeInfo.BatteryAveragePowerACs = append(realtimeInfo.BatteryAveragePowerACs, latestRealtimeInfo.BatteryAveragePowerAC.Float32)
-		realtimeInfo.PvAveragePowerACs = append(realtimeInfo.PvAveragePowerACs, latestRealtimeInfo.PvAveragePowerAC.Float32)
-		realtimeInfo.GridAveragePowerACs = append(realtimeInfo.GridAveragePowerACs, latestRealtimeInfo.GridAveragePowerAC.Float32)
-		realtimeInfo.BatterySoCs = append(realtimeInfo.BatterySoCs, latestRealtimeInfo.BatterySoC.Float32)
-		realtimeInfo.BatteryVoltages = append(realtimeInfo.BatteryVoltages, latestRealtimeInfo.BatteryVoltage.Float32)
+	for startTimeIndex.Before(param.Query.EndTime) {
+		latestRealtimeInfo := s.getLatestRealtimeInfo(param.GatewayUUID, startTimeIndex, endTimeIndex, param.Query.EndTime)
+		if latestRealtimeInfo != nil {
+			log.Debug("latestRealtimeInfo.LogDate: ", latestRealtimeInfo.LogDate)
+			realtimeInfo.Timestamps = append(realtimeInfo.Timestamps, int(latestRealtimeInfo.LogDate.Unix()))
+			realtimeInfo.LoadAveragePowerACs = append(realtimeInfo.LoadAveragePowerACs, utils.ThreeDecimalPlaces(latestRealtimeInfo.LoadAveragePowerAC.Float32))
+			realtimeInfo.BatteryAveragePowerACs = append(realtimeInfo.BatteryAveragePowerACs, utils.ThreeDecimalPlaces(latestRealtimeInfo.BatteryAveragePowerAC.Float32))
+			realtimeInfo.PvAveragePowerACs = append(realtimeInfo.PvAveragePowerACs, utils.ThreeDecimalPlaces(latestRealtimeInfo.PvAveragePowerAC.Float32))
+			realtimeInfo.GridAveragePowerACs = append(realtimeInfo.GridAveragePowerACs, utils.ThreeDecimalPlaces(latestRealtimeInfo.GridAveragePowerAC.Float32))
+			realtimeInfo.BatterySoCs = append(realtimeInfo.BatterySoCs, utils.ThreeDecimalPlaces(latestRealtimeInfo.BatterySoC.Float32))
+			realtimeInfo.BatteryVoltages = append(realtimeInfo.BatteryVoltages, utils.ThreeDecimalPlaces(latestRealtimeInfo.BatteryVoltage.Float32))
+
+			if includedComputedData {
+				firstRealtimeInfo := s.getFirstLogRealtimeInfo(param.GatewayUUID, startTimeIndex, endTimeIndex, param.Query.EndTime)
+				if firstRealtimeInfo != nil {
+					loadPvConsumedEnergyPercentAC := s.computeLoadPvConsumedEnergyPercentACValue(firstRealtimeInfo, latestRealtimeInfo)
+					realtimeInfo.LoadPvConsumedEnergyPercentACs = append(realtimeInfo.LoadPvConsumedEnergyPercentACs, loadPvConsumedEnergyPercentAC)
+				}
+			}
+		}
 
 		startTimeIndex = endTimeIndex
-		endTimeIndex = startTimeIndex.Add(1 * time.Hour)
-		if endTimeIndex.After(endTime) {
-			endTimeIndex = endTime
+		switch param.Query.Resolution {
+		case "hour":
+			endTimeIndex = startTimeIndex.Add(1 * time.Hour)
+		case "5minute":
+			endTimeIndex = startTimeIndex.Add(5 * time.Minute)
+		}
+		if endTimeIndex.After(param.Query.EndTime) {
+			endTimeIndex = param.Query.EndTime
+		}
+	}
+
+	// avoid frontend error to send default line data for chart display
+	if realtimeInfo.Timestamps == nil {
+		startTimeIndex = param.Query.StartTime
+		endTimeIndex = param.GetEndTimeIndex()
+		for startTimeIndex.Before(param.Query.EndTime) {
+			realtimeInfo.Timestamps = append(realtimeInfo.Timestamps, int(endTimeIndex.Add(-1*time.Second).Unix()))
+			realtimeInfo.LoadAveragePowerACs = append(realtimeInfo.LoadAveragePowerACs, 0)
+			realtimeInfo.BatteryAveragePowerACs = append(realtimeInfo.BatteryAveragePowerACs, 0)
+			realtimeInfo.PvAveragePowerACs = append(realtimeInfo.PvAveragePowerACs, 0)
+			realtimeInfo.GridAveragePowerACs = append(realtimeInfo.GridAveragePowerACs, 0)
+			realtimeInfo.BatterySoCs = append(realtimeInfo.BatterySoCs, 0)
+			realtimeInfo.BatteryVoltages = append(realtimeInfo.BatteryVoltages, 0)
+			realtimeInfo.LoadPvConsumedEnergyPercentACs = append(realtimeInfo.LoadPvConsumedEnergyPercentACs, 0)
+
+			startTimeIndex = endTimeIndex
+			switch param.Query.Resolution {
+			case "hour":
+				endTimeIndex = startTimeIndex.Add(1 * time.Hour)
+			case "5minute":
+				endTimeIndex = startTimeIndex.Add(5 * time.Minute)
+			}
+			if endTimeIndex.After(param.Query.EndTime) {
+				endTimeIndex = param.Query.EndTime
+			}
 		}
 	}
 	return
 }
 
-func (s defaultDevicesService) getAccumulatedInfo(gwUUID, resolution string, startTime, endTime time.Time) (accumulatedInfo *AccumulatedInfo) {
-	accumulatedInfo = &AccumulatedInfo{}
-	startTimeIndex := startTime
-	var endTimeIndex time.Time
-	switch resolution {
-	case "day":
-		endTimeIndex = startTime.AddDate(0, 0, 1)
-	case "month":
-		endTimeIndex = startTime.AddDate(0, 0, 1).AddDate(0, 1, 0).AddDate(0, 0, -1)
+func (s defaultDevicesService) computeLoadPvConsumedEnergyPercentACValue(firstRealtimeInfo, latestRealtimeInfo *deremsmodels.CCDataLog) (loadPvConsumedEnergyPercentAC float32) {
+	pvProducedLifetimeEnergyACDiff := utils.Diff(latestRealtimeInfo.PvProducedLifetimeEnergyAC.Float32, firstRealtimeInfo.PvProducedLifetimeEnergyAC.Float32)
+	loadPvConsumedLifetimeEnergyACDiff := utils.Diff(latestRealtimeInfo.LoadPvConsumedLifetimeEnergyAC.Float32, firstRealtimeInfo.LoadPvConsumedLifetimeEnergyAC.Float32)
+	batteryPvConsumedLifetimeEnergyACDiff := utils.Diff(latestRealtimeInfo.BatteryPvConsumedLifetimeEnergyAC.Float32, firstRealtimeInfo.BatteryPvConsumedLifetimeEnergyAC.Float32)
+	gridPvConsumedLifetimeEnergyACDiff := utils.Diff(latestRealtimeInfo.GridPvConsumedLifetimeEnergyAC.Float32, firstRealtimeInfo.GridPvConsumedLifetimeEnergyAC.Float32)
+	// Avoid cc illegal value
+	pvProducedLifetimeEnergyACDiff = utils.GetZeroForNegativeValue(pvProducedLifetimeEnergyACDiff)
+	loadPvConsumedLifetimeEnergyACDiff = utils.GetZeroForNegativeValue(loadPvConsumedLifetimeEnergyACDiff)
+	batteryPvConsumedLifetimeEnergyACDiff = utils.GetZeroForNegativeValue(batteryPvConsumedLifetimeEnergyACDiff)
+	gridPvConsumedLifetimeEnergyACDiff = utils.GetZeroForNegativeValue(gridPvConsumedLifetimeEnergyACDiff)
+	// loadPvConsumedLifetimeEnergyACDiff is recomputed by PvProducedLifetimeEnergyACDiff
+	sumOfPvConsumedLifetimeEnergyAC := loadPvConsumedLifetimeEnergyACDiff + batteryPvConsumedLifetimeEnergyACDiff + gridPvConsumedLifetimeEnergyACDiff
+	if sumOfPvConsumedLifetimeEnergyAC != 0 {
+		loadPvConsumedLifetimeEnergyACDiff = utils.ThreeDecimalPlaces(pvProducedLifetimeEnergyACDiff * utils.Division(loadPvConsumedLifetimeEnergyACDiff, sumOfPvConsumedLifetimeEnergyAC))
 	}
+	loadPvConsumedEnergyPercentAC = utils.Percent(
+		loadPvConsumedLifetimeEnergyACDiff,
+		pvProducedLifetimeEnergyACDiff)
+	return
+}
 
-	for startTimeIndex.Before(endTime) {
-		latestAccumulatedInfo := s.getLatestAccumulatedInfo(gwUUID, resolution, startTimeIndex, endTimeIndex, endTime)
+func (s defaultDevicesService) getAccumulatedInfo(param *app.ResolutionWithPeriodParam) (accumulatedInfo *AccumulatedInfo) {
+	accumulatedInfo = &AccumulatedInfo{}
+	startTimeIndex := param.Query.StartTime
+	endTimeIndex := param.GetEndTimeIndex()
+
+	for startTimeIndex.Before(param.Query.EndTime) {
+		latestAccumulatedInfo := s.getLatestAccumulatedInfo(param.GatewayUUID, param.Query.Resolution, startTimeIndex, endTimeIndex, param.Query.EndTime)
 		log.Debug("latestAccumulatedInfo: ", latestAccumulatedInfo)
 		accumulatedInfo.Timestamps = append(accumulatedInfo.Timestamps, latestAccumulatedInfo.Timestamps)
 		accumulatedInfo.LoadConsumedLifetimeEnergyACDiffs = append(accumulatedInfo.LoadConsumedLifetimeEnergyACDiffs, latestAccumulatedInfo.LoadConsumedLifetimeEnergyACDiff)
@@ -614,14 +1058,14 @@ func (s defaultDevicesService) getAccumulatedInfo(gwUUID, resolution string, sta
 		accumulatedInfo.LoadSelfConsumedEnergyPercentACs = append(accumulatedInfo.LoadSelfConsumedEnergyPercentACs, latestAccumulatedInfo.LoadSelfConsumedEnergyPercentAC)
 
 		startTimeIndex = endTimeIndex
-		switch resolution {
+		switch param.Query.Resolution {
 		case "day":
 			endTimeIndex = startTimeIndex.AddDate(0, 0, 1)
 		case "month":
 			endTimeIndex = startTimeIndex.AddDate(0, 0, 1).AddDate(0, 1, 0).AddDate(0, 0, -1)
 		}
-		if endTimeIndex.After(endTime) {
-			endTimeIndex = endTime
+		if endTimeIndex.After(param.Query.EndTime) {
+			endTimeIndex = param.Query.EndTime
 		}
 	}
 	return
@@ -636,9 +1080,21 @@ func (s defaultDevicesService) getLatestRealtimeInfo(gwUUID string, startTimeInd
 			"startTimeIndex": startTimeIndex,
 			"endTimeIndex":   endTimeIndex,
 		}).Error()
-		latestLog = &deremsmodels.CCDataLog{
-			LogDate: endTimeIndex.Add(-1 * time.Second),
-		}
+		return nil
+	}
+	return
+}
+
+func (s defaultDevicesService) getFirstLogRealtimeInfo(gwUUID string, startTimeIndex, endTimeIndex, endTime time.Time) (firstLog *deremsmodels.CCDataLog) {
+	firstLog, err := s.repo.CCData.GetFirstLog(gwUUID, startTimeIndex, endTimeIndex)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by":      "s.repo.CCData.GetFirstLog",
+			"err":            err,
+			"startTimeIndex": startTimeIndex,
+			"endTimeIndex":   endTimeIndex,
+		}).Error()
+		return nil
 	}
 	return
 }
@@ -679,6 +1135,9 @@ func (s defaultDevicesService) getLatestAccumulatedInfo(gwUUID, resolution strin
 }
 
 func (s defaultDevicesService) getLatestComputedDemandState(gwUUID string, startTimeIndex, endTimeIndex, endTime time.Time) (latestComputedDemandState *LatestComputedDemandState) {
+	if endTimeIndex == endTime && startTimeIndex.Add(15*time.Minute).Unix() > endTimeIndex.Unix() {
+		return nil
+	}
 	latestComputedDemandState = &LatestComputedDemandState{}
 	firstLog, err1 := s.repo.CCData.GetFirstLog(gwUUID, startTimeIndex, endTimeIndex)
 	latestLog, err2 := s.repo.CCData.GetLatestLog(gwUUID, startTimeIndex, endTimeIndex)
@@ -690,99 +1149,36 @@ func (s defaultDevicesService) getLatestComputedDemandState(gwUUID string, start
 			"startTimeIndex": startTimeIndex,
 			"endTimeIndex":   endTimeIndex,
 		}).Error()
-		latestComputedDemandState.Timestamps = int(endTimeIndex.Add(-1 * time.Second).Unix())
-		return
+		return nil
 	}
 
 	latestComputedDemandState.Timestamps = int(latestLog.LogDate.Unix())
 	latestComputedDemandState.GridLifetimeEnergyACDiffToPower = utils.Division(
 		utils.Diff(latestLog.GridLifetimeEnergyAC.Float32,
 			firstLog.GridLifetimeEnergyAC.Float32), (15.0 / 60.0))
-	latestComputedDemandState.GridContractPowerAC = latestLog.GridContractPowerAC.Float32
-	return
-}
-
-func (s defaultDevicesService) getBatteryInfo(gwUUID string, batteryEnergyInfo *BatteryEnergyInfoResponse) {
-	// XXX: Hardcode battery information by gateway UUID
-	const (
-		Huayu      = "0324DE7B51B262F3B11A643CBA8E12CE"
-		Serenegray = "0E0BA27A8175AF978C49396BDE9D7A1E"
-	)
-	switch gwUUID {
-	case Huayu:
-		batteryEnergyInfo.Model = "PR2116 Poweroad Battery"
-		batteryEnergyInfo.Capcity = 48
-		batteryEnergyInfo.BatteryPower = 30
-		batteryEnergyInfo.Voltage = 480
-	case Serenegray:
-		batteryEnergyInfo.Model = "L051100-A UZ-Energy Battery"
-		batteryEnergyInfo.Capcity = 30
-		batteryEnergyInfo.BatteryPower = 24
-		batteryEnergyInfo.Voltage = 51.2
-	}
-	batteryEnergyInfo.PowerSources = "Solar + Grid"
+	latestComputedDemandState.GridContractPowerAC = utils.ThreeDecimalPlaces(latestLog.GridContractPowerAC.Float32)
 	return
 }
 
 func (s defaultDevicesService) getOnPeakTime(gwUUID string, t time.Time) (onPeakTime map[string]string, err error) {
-	gateway, err := s.repo.Gateway.GetGatewayByGatewayUUID(gwUUID)
+	localTime, tous, err := s.billing.GetTOUsOfLocalTime(gwUUID, t)
 	if err != nil {
-		log.WithFields(log.Fields{
-			"caused-by": "s.repo.Gateway.GetGatewayByGatewayUUID",
-			"err":       err,
-		}).Error()
-		return
-	}
-	billingType, err := s.billing.GetBillingTypeByCustomerID(gateway.CustomerID)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"caused-by": "s.billing.GetBillingTypeByCustomerID",
-			"err":       err,
-		}).Error()
-		return
-	}
-	localTime, err := s.billing.GetLocalTime(billingType.TOULocationID, t)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"caused-by": "s.billing.GetLocalTime",
-			"err":       err,
-		}).Error()
-		return
-	}
-	periodType := s.billing.GetPeriodTypeOfDay(billingType.TOULocationID, localTime)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"caused-by": "s.billing.GetPeriodTypeOfDay",
-			"err":       err,
-		}).Error()
-		return
-	}
-	isSummer := s.billing.IsSummer(localTime)
-	billings, err := s.repo.TOU.GetBillingsByTOUInfo(billingType.TOULocationID, billingType.VoltageType, billingType.TOUType, periodType, isSummer, localTime.Format(utils.YYYYMMDD))
-	if err == nil && len(billings) == 0 {
-		err = e.ErrNewBillingsNotExist
-	}
-	if err != nil {
-		log.WithFields(log.Fields{
-			"caused-by": "s.repo.TOU.GetBillingsByTOUInfo",
-			"err":       err,
-		}).Error()
 		return
 	}
 
 	onPeakTime = map[string]string{}
-	for _, billing := range billings {
-		if billing.PeakType.String == "On-peak" {
+	for _, tou := range tous {
+		if tou.PeakType.String == "On-peak" {
 			log.WithFields(log.Fields{
-				"localTime":           localTime,
-				"timezone":            localTime.Format(utils.ZHHMM),
-				"billing.PeakType":    billing.PeakType,
-				"billing.PeriodStime": billing.PeriodStime,
-				"billing.PeriodEtime": billing.PeriodEtime,
+				"localTime":       localTime,
+				"timezone":        localTime.Format(utils.ZHHMM),
+				"tou.PeakType":    tou.PeakType,
+				"tou.PeriodStime": tou.PeriodStime,
+				"tou.PeriodEtime": tou.PeriodEtime,
 			}).Debug()
 			onPeakTime["timezone"] = localTime.Format(utils.ZHHMM)
-			onPeakTime["start"] = billing.PeriodStime.String
-			onPeakTime["end"] = billing.PeriodEtime.String
+			onPeakTime["start"] = tou.PeriodStime.String
+			onPeakTime["end"] = tou.PeriodEtime.String
 			break
 		}
 	}

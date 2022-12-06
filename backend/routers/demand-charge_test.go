@@ -123,11 +123,8 @@ var _ = Describe("DemandCharge", func() {
 			It("should be ok", func() {
 				prefixURL := fmt.Sprintf("/api/%s/devices/demand-state", fixtures.UtGateway.UUID)
 				seedUtURL := fmt.Sprintf("%s?startTime=%s&endTime=%s", prefixURL, UtStartTime, UtEndTime)
-				expectedTimestamps := []int{1659543000, 1659544199, 1659545099, 1659545999, 1659546899,
-					1659547799, 1659548699, 1659549599, 1659550499, 1659551399, 1659552299, 1659553199,
-					1659554099, 1659554999, 1659555899, 1659556799, 1659557100}
-				expectedGridLifetimeEnergyACDiffToPowers := []float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-					0, 0, 0, 0, 0, 40}
+				expectedTimestamps := []int{1659543000, 1659557100}
+				expectedGridLifetimeEnergyACDiffToPowers := []float32{0, 40}
 				expectedResponseData := services.DemandStateResponse{
 					Timestamps:                       expectedTimestamps,
 					GridLifetimeEnergyACDiffToPowers: expectedGridLifetimeEnergyACDiffToPowers,

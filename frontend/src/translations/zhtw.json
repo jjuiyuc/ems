@@ -111,6 +111,7 @@
     },
     "energyResources": {
         "battery": {
+            "accumulated": "累計",
             "batteryInformation": "電池基本資訊",
             "batteryOperationCycles": "累積充放電循環次數",
             "batteryPower": "額定功率 (kW)",
@@ -160,8 +161,11 @@
         "passwordFormat": "您輸入的密碼不符合密碼原則的要求，請重新輸入。",
         "passwordIncorrect": "密碼錯誤，請重新輸入。",
         "passwordNotMatch": "密碼不一致，請重新輸入。",
-        "userLocked": "使用者帳號已被鎖定。",
-        "passwordTokenError": "該重設密碼連結已失效"
+        "passwordTokenError": "該重設密碼連結已失效",
+        "pricingError":"價格須大於0",
+        "sumError":"時間區間加總須為二十四小時。",
+        "timeOverlapError":"時間區間不能重疊。",
+        "userLocked": "使用者帳號已被鎖定。"
     },
     "forgotPassword": {
         "backToLogin": "回登入頁",
@@ -198,16 +202,31 @@
         "resetPassword": "重設密碼"
     },
     "settings":{
+        "addRatePeriod":"新增費率區間",
+        "addTimeRange":"新增時間區間",
         "availableRegularUsage":"Available Regular Usage",
         "backupReserve":"Backup Reserve",
         "chargingSources":"Charging Sources",
+        "endTime":"結束時間",
+        "maximumDemandCapacity":"Maximum Demand Capacity",
+        "midPeak": "半尖峰時段電力",
+        "nonSummerTariff":"非夏季電價",
+        "offPeak": "離峰時段電力",
+        "onPeak": "尖峰時段電力",
         "regularUsage":"Regular Usage",
         "reservedForGrid":"Reserved for Grid",
         "reservedForGridOutage":"Reserved for Grid Outage",
+        "saturday":"週六",
+        "startTime":"開始時間",
         "save":"儲存",
         "settings":"設定",
-        "timeOfUse": "時間電價"
-
+        "summerTariff":"夏季電價",
+        "sundayHoliday":"週日 & 假日",
+        "superOffPeak": "超級離峰時段電力",
+        "tariff":"電價",
+        "timeOfUse": "時間電價",
+        "to": "至",
+        "weekdays":"平日"
     },
     "timeOfUse": {
         "batteryStatus": "電池狀態",

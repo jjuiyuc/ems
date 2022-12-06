@@ -1,40 +1,33 @@
+import { TextField } from "@mui/material"
 import DatePicker from "react-datepicker"
 import { useTranslation } from "react-multi-lang"
 import moment from "moment"
 import { useState } from "react"
+import "../assets/css/timeRangePicker.css"
 
 export default function TimeRangePicker(props) {
     const
         t = useTranslation(),
-        pageT = (string, params) => t("settings." + string, params)
+        pageT = (string, params) => t("settings." + string, params),
+        errorT = (string) => t("error." + string)
 
-    const { startTime, setStartTime, endTime, setEndTime } = props
 
-    const onChange = (dates) => {
-        const [start, end] = dates
-        setStartTime(start)
-        setEndTime(end)
-    }
+    const { startTime, setStartTime, endTime, setEndTime, basicPrice, rate,
+        setBasicPrice, setRate } = props
+
+
     return (
-        <>
+        <div className="time-range-picker flex items-center mt-4">
             <div>
                 <h6 className="mb-1 ml-1">{pageT("startTime")}</h6>
                 <DatePicker
                     dateFormat="h:mm aa"
                     showTimeSelect
                     showTimeSelectOnly
-                    timeIntervals={1}
+                    timeIntervals={30}
                     timeCaption="Start Time"
                     selected={startTime}
-                    onChange={onChange}
-                    value={startTime ? moment(startTime).format("h:mm aa") : ""}
-                    selectsStart
-                    startDate={startTime}
-                    endDate={endTime}
-                    // minDate={moment().subtract(2, "week")._d}
-                    // maxDate={moment(new Date()).add(-1, 'days')._d}
-                    showDisabledMonthNavigation
-                    selectsRange
+                    onChange={(time) => setStartTime(time)}
                 />
             </div>
             <span className="mt-6 mx-4">{pageT("to")}</span>
@@ -44,18 +37,34 @@ export default function TimeRangePicker(props) {
                     dateFormat="h:mm aa"
                     showTimeSelect
                     showTimeSelectOnly
-                    timeIntervals={1}
+                    timeIntervals={30}
                     timeCaption="End Time"
                     selected={endTime}
-                    onChange={(date) => setEndTime(date)}
-                    selectsEnd
-                    startDate={startTime}
-                    endDate={endTime}
-                    minDate={startTime}
-                    // maxDate={moment(new Date()).add(-1, 'days')._d}
-                    disabled={true}
+                    onChange={(time) => setEndTime(time)}
+                    minTime={moment(startTime).add(1, "minute")._d}
+                    maxTime={moment().endOf("day")._d}
+                    disabled={!startTime}
                 />
             </div>
-        </>
+            <div className="ml-6 mr-4">
+                <h6 className="mb-1 ml-1">基本電價</h6>
+                <TextField
+                    className="react-datepicker__input-container"
+                    id="outlined-basic"
+                    variant="outlined"
+                    value={basicPrice}
+                    onChange={(e) => { setBasicPrice(e.target.value) }}
+                />
+            </div>
+            <div>
+                <h6 className="mb-1 ml-1">流動電價</h6>
+                <TextField
+                    id="outlined-basic"
+                    variant="outlined"
+                    value={rate}
+                    onChange={(e) => { setRate(e.target.value) }}
+                />
+            </div>
+        </div>
     )
 }

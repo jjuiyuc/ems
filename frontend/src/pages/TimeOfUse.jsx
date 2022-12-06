@@ -286,7 +286,7 @@ export default connect(mapState)(function TimeOfUse(props) {
                     const { timeOfUse } = data
                     let periods = []
                     Object.keys(timeOfUse).forEach(key => {
-                        if (typeof timeOfUse[key] != "object" || !timeOfUse[key]?.length) return
+                        if (!Array.isArray(timeOfUse[key])) return
                         timeOfUse[key].forEach(item => {
                             periods.push({ name: key, ...item })
                         })
@@ -296,7 +296,7 @@ export default connect(mapState)(function TimeOfUse(props) {
                     setCurrentPeriod(timeOfUse.currentPeakType || "")
                     setTimeOfUse(periods)
                 },
-                url: `${urlPrefix}/time-of-use-info?startTime=${startTime}`
+                url: `${urlPrefix}/tou/info?startTime=${startTime}`
             })
         },
         callYesterdayCards = (preStartTime) => {
@@ -388,7 +388,7 @@ export default connect(mapState)(function TimeOfUse(props) {
                     periods.sort((a, b) => getMoment(a.start) - getMoment(b.start))
                     setTimeOfUse(periods)
                 },
-                url: `${urlPrefix}/time-of-use-info?startTime=${preStartTime}`
+                url: `${urlPrefix}/tou/info?startTime=${preStartTime}`
             })
         },
         callLineChartUsage = (startTime, endTime) => {

@@ -78,11 +78,13 @@
         "december": "十二月",
         "demandCharge":"契約容量超約",
         "economics": "Economics",
+        "energyCostComparison":"優必闊微電網前後電費對比 ($)",
         "exportToGrid": "回送市電",
         "february": "二月",
         "january": "一月",
         "july": "七月",
         "june": "六月",
+        "lastMonth":"上個月",
         "march": "三月",
         "may": "五月",
         "monthlyStackedRevenue": "每月累積收入",
@@ -94,6 +96,8 @@
         "postUbiik":"優必闊微電網",
         "rec": "REC",
         "renewableEnergyCertificate": "可再生能源書",
+        "sameMonthLastYear":"去年當月",
+        "savedEnergyCost":"優必闊微電網節省之電費 ($)",
         "september": "九月",
         "solarLocalUsage": "Solar Local Usage",
         "thisCalendarMonth": "當月",
@@ -171,6 +175,9 @@
         "language": "語言",
         "newPassword": "新密碼",
         "password": "密碼"
+    },
+    "info":{
+        "pleaseNote":"溫馨提示："
     },
     "logIn": {
         "forgotPassword": "忘記密碼？"

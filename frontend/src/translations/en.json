@@ -78,11 +78,13 @@
         "december": "December",
         "demandCharge": "Demand Charge",
         "economics": "Economics",
+        "energyCostComparison":"Energy Cost Comparison, Pre- and Post-Ubiik ($)",
         "exportToGrid": "Export to Grid",
         "february": "February",
         "january": "January",
         "july": "July",
         "june": "June",
+        "lastMonth":"Last Month",
         "march": "March",
         "may": "May",
         "monthlyStackedRevenue": "Monthly Stacked Revenue",
@@ -94,6 +96,8 @@
         "postUbiik":"Post-Ubiik",
         "rec": "REC",
         "renewableEnergyCertificate": "Renewable Energy Certificate (REC)",
+        "sameMonthLastYear":"Same Month Last Year",
+        "savedEnergyCost":"Saved Energy Cost by Ubiik ($)",
         "september": "September",
         "solarLocalUsage": "Solar Local Usage",
         "thisCalendarMonth": "This Calendar Month",
@@ -174,6 +178,9 @@
         "language": "Language",
         "newPassword": "New Password",
         "password": "Password"
+    },
+    "info": {
+        "pleaseNote":"Please Note:"
     },
     "logIn": {
         "forgotPassword": "Forgot Password?"

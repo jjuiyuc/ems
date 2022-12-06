@@ -60,6 +60,7 @@ export default function BarChart(props) {
                     legend: {
                         align: "end",
                         hidden: false,
+                        display: props.data.legend || false,
                         labels: {
                             boxHeight: 18,
                             boxWidth: 18,

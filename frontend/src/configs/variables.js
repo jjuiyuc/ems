@@ -13,7 +13,7 @@ const variables = {
         indigo,
         midPeak: palette.yellow.main,
         primary,
-        onPeak: palette.negative.main,
+        onPeak: negative.main,
         offPeak: palette.green.main,
         solar: palette.yellow.main,
         superOffPeak: palette.purple.main,

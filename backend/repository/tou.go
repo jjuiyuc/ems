@@ -10,7 +10,7 @@ import (
 // TOURepository godoc
 type TOURepository interface {
 	GetTOULocationByTOULocationID(touLocationID int64) (*deremsmodels.TouLocation, error)
-	GetBillingsByTOUInfo(touLocationID int64, voltageType, touType, periodType string, isSummer bool, day string) ([]*deremsmodels.Tou, error)
+	GetTOUsByTOUInfo(touLocationID int64, voltageType, touType, periodType string, isSummer bool, day string) ([]*deremsmodels.Tou, error)
 	CountHolidayByDay(touLocationID int64, year, day string) (int64, error)
 }
 
@@ -28,8 +28,8 @@ func (repo defaultTOURepository) GetTOULocationByTOULocationID(touLocationID int
 	return deremsmodels.FindTouLocation(repo.db, touLocationID)
 }
 
-// GetBillingsByTOUInfo godoc
-func (repo defaultTOURepository) GetBillingsByTOUInfo(touLocationID int64, voltageType, touType, periodType string, isSummer bool, day string) ([]*deremsmodels.Tou, error) {
+// GetTOUsByTOUInfo godoc
+func (repo defaultTOURepository) GetTOUsByTOUInfo(touLocationID int64, voltageType, touType, periodType string, isSummer bool, day string) ([]*deremsmodels.Tou, error) {
 	return deremsmodels.Tous(
 		qm.Where("enable_at <= ?", day),
 		qm.Where("disable_at >= ?", day),
@@ -42,7 +42,7 @@ func (repo defaultTOURepository) GetBillingsByTOUInfo(touLocationID int64, volta
 
 // CountHolidayByDay godoc
 func (repo defaultTOURepository) CountHolidayByDay(touLocationID int64, year, day string) (int64, error) {
-	return deremsmodels.Tous(
+	return deremsmodels.TouHolidays(
 		qm.Where("day = ?", day),
 		qm.Where("year = ?", year),
 		qm.Where("tou_location_id = ?", touLocationID)).Count(repo.db)

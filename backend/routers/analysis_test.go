@@ -81,11 +81,11 @@ var _ = Describe("Analysis", func() {
 					PvProducedLifetimeEnergyACDiff:      10,
 					GridProducedLifetimeEnergyACDiff:    25,
 					BatteryProducedLifetimeEnergyACDiff: 15,
-					AllConsumedLifetimeEnergyACDiff:     25,
-					LoadConsumedEnergyPercentAC:         40,
-					GridConsumedEnergyPercentAC:         60,
+					AllConsumedLifetimeEnergyACDiff:     50,
+					LoadConsumedEnergyPercentAC:         70,
+					GridConsumedEnergyPercentAC:         30,
 					BatteryConsumedEnergyPercentAC:      0,
-					LoadConsumedLifetimeEnergyACDiff:    10,
+					LoadConsumedLifetimeEnergyACDiff:    35,
 					GridConsumedLifetimeEnergyACDiff:    15,
 					BatteryConsumedLifetimeEnergyACDiff: 0,
 				}
@@ -133,11 +133,11 @@ var _ = Describe("Analysis", func() {
 			It("should be ok", func() {
 				prefixURL := fmt.Sprintf("/api/%s/devices/power-state", fixtures.UtGateway.UUID)
 				seedUtURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, "hour", UtStartTime, UtEndTime)
-				expectedTimestamps := []int{1659543000, 1659549599, 1659553199, 1659556799, 1659557100}
-				expectedLoadAveragePowerACs := []float32{30, 0, 0, 0, 30}
-				expectedPvAveragePowerACs := []float32{40, 0, 0, 0, 40}
-				expectedBatteryAveragePowerACs := []float32{-3.5, 0, 0, 0, -7}
-				expectedGridAveragePowerACs := []float32{50, 0, 0, 0, 50}
+				expectedTimestamps := []int{1659543000, 1659557100}
+				expectedLoadAveragePowerACs := []float32{30, 30}
+				expectedPvAveragePowerACs := []float32{40, 40}
+				expectedBatteryAveragePowerACs := []float32{-3.5, -7}
+				expectedGridAveragePowerACs := []float32{50, 50}
 				expectedResponseData := services.PowerStateResponse{
 					Timestamps:             expectedTimestamps,
 					LoadAveragePowerACs:    expectedLoadAveragePowerACs,

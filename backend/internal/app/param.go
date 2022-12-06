@@ -1,4 +1,4 @@
-package routers
+package app
 
 import (
 	"time"
@@ -22,7 +22,7 @@ type PeriodQuery struct {
 
 // ZoomableQuery godoc
 type ZoomableQuery struct {
-	Resolution string    `form:"resolution" binding:"required" enums:"hour"`
+	Resolution string    `form:"resolution" binding:"required" enums:"hour,5minute"`
 	StartTime  time.Time `form:"startTime" binding:"required" example:"UTC time in ISO-8601" format:"date-time"`
 	EndTime    time.Time `form:"endTime" binding:"required,gtfield=StartTime" example:"UTC time in ISO-8601" format:"date-time"`
 }
@@ -63,7 +63,8 @@ type ResolutionWithPeriodParam struct {
 	Query       ResolutionWithPeriodQuery
 }
 
-func (p *StartTimeParam) validate(c *gin.Context) (err error) {
+// Validate godoc
+func (p *StartTimeParam) Validate(c *gin.Context) (err error) {
 	p.GatewayUUID = c.Param("gwid")
 	log.Debug("gatewayUUID: ", p.GatewayUUID)
 
@@ -73,7 +74,8 @@ func (p *StartTimeParam) validate(c *gin.Context) (err error) {
 	return
 }
 
-func (p *PeriodParam) validate(c *gin.Context) (err error) {
+// Validate godoc
+func (p *PeriodParam) Validate(c *gin.Context) (err error) {
 	p.GatewayUUID = c.Param("gwid")
 	log.Debug("gatewayUUID: ", p.GatewayUUID)
 
@@ -83,7 +85,8 @@ func (p *PeriodParam) validate(c *gin.Context) (err error) {
 	return
 }
 
-func (p *ZoomableParam) validate(c *gin.Context) (err error) {
+// Validate godoc
+func (p *ZoomableParam) Validate(c *gin.Context) (err error) {
 	p.GatewayUUID = c.Param("gwid")
 	log.Debug("gatewayUUID: ", p.GatewayUUID)
 
@@ -91,15 +94,26 @@ func (p *ZoomableParam) validate(c *gin.Context) (err error) {
 		log.WithFields(log.Fields{"caused-by": err}).Error()
 		return
 	}
-	// TODO: Only supports hour now
-	if p.Query.Resolution != "hour" {
+	if p.Query.Resolution != "hour" && p.Query.Resolution != "5minute" {
 		err = e.ErrNewUnexpectedResolution
 		log.WithFields(log.Fields{"caused-by": err}).Error()
 	}
 	return
 }
 
-func (p *ResolutionWithPeriodParam) validate(c *gin.Context) (err error) {
+// GetEndTimeIndex godoc
+func (p *ZoomableParam) GetEndTimeIndex() (endTimeIndex time.Time) {
+	switch p.Query.Resolution {
+	case "hour":
+		endTimeIndex = p.Query.StartTime.Add(1 * time.Hour)
+	case "5minute":
+		endTimeIndex = p.Query.StartTime.Add(5 * time.Minute)
+	}
+	return
+}
+
+// Validate godoc
+func (p *ResolutionWithPeriodParam) Validate(c *gin.Context) (err error) {
 	p.GatewayUUID = c.Param("gwid")
 	log.Debug("gatewayUUID: ", p.GatewayUUID)
 
@@ -110,6 +124,17 @@ func (p *ResolutionWithPeriodParam) validate(c *gin.Context) (err error) {
 	if p.Query.Resolution != "day" && p.Query.Resolution != "month" {
 		err = e.ErrNewUnexpectedResolution
 		log.WithFields(log.Fields{"caused-by": err}).Error()
+	}
+	return
+}
+
+// GetEndTimeIndex godoc
+func (p *ResolutionWithPeriodParam) GetEndTimeIndex() (endTimeIndex time.Time) {
+	switch p.Query.Resolution {
+	case "day":
+		endTimeIndex = p.Query.StartTime.AddDate(0, 0, 1)
+	case "month":
+		endTimeIndex = p.Query.StartTime.AddDate(0, 0, 1).AddDate(0, 1, 0).AddDate(0, 0, -1)
 	}
 	return
 }

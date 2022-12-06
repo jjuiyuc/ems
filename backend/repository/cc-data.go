@@ -20,6 +20,7 @@ type CCDataRepository interface {
 	UpsertCCDataLog(ccDataLog *deremsmodels.CCDataLog) (err error)
 	GetLatestLog(gwUUID string, startTime, endTime time.Time) (*deremsmodels.CCDataLog, error)
 	GetFirstLog(gwUUID string, startTime, endTime time.Time) (*deremsmodels.CCDataLog, error)
+	GetLogs(gwUUID string, startTime, endTime time.Time) ([]*deremsmodels.CCDataLog, error)
 	GetCCDataLogCount() (int64, error)
 	// CC data calculated log
 	GetLatestCalculatedLog(gwUUID, resolution string, startTime, endTime time.Time) (interface{}, error)
@@ -99,6 +100,13 @@ func (repo defaultCCDataRepository) GetFirstLog(gwUUID string, startTime, endTim
 	return deremsmodels.CCDataLogs(
 		qm.Where("(gw_uuid = ? and log_date >= ? and log_date < ?)", gwUUID, startTime, endTime),
 		qm.OrderBy("log_date ASC")).One(repo.db)
+}
+
+// GetLogs
+func (repo defaultCCDataRepository) GetLogs(gwUUID string, startTime, endTime time.Time) ([]*deremsmodels.CCDataLog, error) {
+	return deremsmodels.CCDataLogs(
+		qm.Where("(gw_uuid = ? and log_date >= ? and log_date < ?)", gwUUID, startTime, endTime),
+		qm.OrderBy("log_date ASC")).All(repo.db)
 }
 
 // GetCCDataLogCount godoc

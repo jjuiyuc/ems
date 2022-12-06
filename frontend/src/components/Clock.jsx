@@ -1,28 +1,28 @@
-import {ArcElement, Chart, DoughnutController} from "chart.js"
-import {useEffect, useState} from "react"
+import { ArcElement, Chart, DoughnutController } from "chart.js"
+import { useEffect, useState } from "react"
 
 import "../assets/css/clock.scss"
 
 Chart.register(ArcElement, DoughnutController)
 
-export default function Clock (props) {
+export default function Clock(props) {
     const [chart, setChart] = useState(null)
 
     useEffect(() => {
         const
             ctx = document.getElementById(props.id),
             chart = new Chart(ctx, {
-                data: {datasets: [props.dataset]},
+                data: { datasets: [props.dataset] },
                 options: {
                     borderWidth: 0,
                     cutout: 90,
                     plugins: {
-                        legend: {display: false},
-                        tooltip: {enabled: false}
+                        legend: { display: false },
+                        tooltip: { enabled: false }
                     }
                 },
                 type: "doughnut"
-        })
+            })
 
         setChart(chart)
 
@@ -36,11 +36,12 @@ export default function Clock (props) {
         }
     }, [props.dataset])
 
-    return <div className="clock">
+    return <div className={"clock " + (props.size ? "" : "h-48 w-48")}
+        style={props.size}>
         <div className="bg">
             <div className="ticks">
-            {Array.from(new Array(12).keys()).map((v, i) =>
-                <div key={"tick-" + i} />)}
+                {Array.from(new Array(12).keys()).map((v, i) =>
+                    <div key={"tick-" + i} />)}
             </div>
             <div className="text text-11px">
                 <div>12 am</div>
@@ -49,6 +50,6 @@ export default function Clock (props) {
                 <div>12 pm</div>
             </div>
         </div>
-        <canvas id={props.id} height="192" width="192" />
+        <canvas id={props.id} style={{ height: "100%", width: "100%" }} />
     </div>
 }

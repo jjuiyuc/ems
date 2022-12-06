@@ -6,7 +6,9 @@
     "blue": {
         "main": "#43B0FF",
         "main-opacity-10":"#43B0FF10",
-        "main-opacity-20":"#43B0FF20"
+        "main-opacity-20":"#43B0FF20",
+        "400":"#0FA9BA",
+        "400-opacity-10":"#0FA9BA20"
     },
     "brand": {"main": "#12c9c9"},
     "calendar": {"white": "#EEECF1"},
@@ -50,7 +52,11 @@
         "800": "#0b7979",
         "900": "#096262"
     },
-    "purple": {"main": "#EF7BE3"},
+    "purple": {
+        "main": "#EF7BE3",
+        "main-opacity-10": "#EF7BE310",
+        "main-opacity-20": "#EF7BE320"
+    },
     "red": {
         "main":"#FD0060",
         "600-opacity-50": "#DC262650"

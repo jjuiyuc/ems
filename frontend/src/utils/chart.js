@@ -17,6 +17,7 @@ const checkedBox = color => {
 
     return img
 }
+
 const square = color => {
     const img = new Image(18, 18)
 

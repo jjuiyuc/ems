@@ -190,6 +190,64 @@ definitions:
           type: integer
         type: array
     type: object
+  services.EnergyCostsDailyInfo:
+    properties:
+      postUbiikLastMonth:
+        items:
+          type: integer
+        type: array
+      postUbiikTheSameMonthLastYear:
+        items:
+          type: integer
+        type: array
+      postUbiikThisMonth:
+        items:
+          type: integer
+        type: array
+      preUbiikLastMonth:
+        items:
+          type: integer
+        type: array
+      preUbiikTheSameMonthLastYear:
+        items:
+          type: integer
+        type: array
+      preUbiikThisMonth:
+        items:
+          type: integer
+        type: array
+      savedLastMonth:
+        items:
+          type: integer
+        type: array
+      savedTheSameMonthLastYear:
+        items:
+          type: integer
+        type: array
+      savedThisMonth:
+        items:
+          type: integer
+        type: array
+      timestamps:
+        items:
+          type: integer
+        type: array
+    type: object
+  services.EnergyCostsInfo:
+    properties:
+      postUbiikLastMonth:
+        type: integer
+      postUbiikTheSameMonthLastYear:
+        type: integer
+      postUbiikThisMonth:
+        type: integer
+      preUbiikLastMonth:
+        type: integer
+      preUbiikTheSameMonthLastYear:
+        type: integer
+      preUbiikThisMonth:
+        type: integer
+    type: object
   services.EnergyDistributionInfoResponse:
     properties:
       allConsumedLifetimeEnergyACDiff:
@@ -361,6 +419,15 @@ definitions:
         items:
           type: integer
         type: array
+    type: object
+  services.TimeOfUseEnergyCostResponse:
+    properties:
+      energyCosts:
+        $ref: '#/definitions/services.EnergyCostsInfo'
+        type: object
+      energyDailyCosts:
+        $ref: '#/definitions/services.EnergyCostsDailyInfo'
+        type: object
     type: object
   services.TimeOfUseInfoResponse:
     properties:
@@ -1201,6 +1268,58 @@ paths:
       summary: Show today's hourly power state of solar
       tags:
       - energy resources
+  /{gwid}/devices/tou/energy-cost:
+    get:
+      description: get energy cost by token, gateway UUID, startTime and endTime
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Input user's access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Gateway UUID
+        in: path
+        name: gwid
+        required: true
+        type: string
+      - example: UTC time in ISO-8601
+        format: date-time
+        in: query
+        name: endTime
+        required: true
+        type: string
+      - example: UTC time in ISO-8601
+        format: date-time
+        in: query
+        name: startTime
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/app.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/services.TimeOfUseEnergyCostResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Show energy cost of Pre-Ubiik and Post-Ubiik
+      tags:
+      - economics
   /{gwid}/devices/tou/info:
     get:
       description: get energy source distribution by token, gateway UUID, startTime

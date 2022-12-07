@@ -1,7 +1,7 @@
 import { connect } from "react-redux"
-import { Button, Stack, ToggleButtonGroup, ToggleButton, Alert } from "@mui/material"
+import { Button, ToggleButtonGroup, ToggleButton } from "@mui/material"
 import ReportProblemIcon from "@mui/icons-material/ReportProblem"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useTranslation } from "react-multi-lang"
 import moment from "moment"
 
@@ -50,7 +50,9 @@ const
     fakeData5 = fakeDataArray(days),
     fakeData6 = fakeDataArray(days)
 
-export default function Economics(props) {
+const mapState = state => ({ gatewayID: state.gateways.active.gatewayID })
+
+export default connect(mapState)(function Economics(props) {
 
     const
         t = useTranslation(),
@@ -61,28 +63,61 @@ export default function Economics(props) {
         [formats, setFormats] = useState([]),
         [infoError, setInfoError] = useState(""),
         [infoLoading, setInfoLoading] = useState(false),
-        [total, setTotal] = useState(630),
-        [preUbiik, setPreUbiik] = useState(0),
-        [postUbiik, setPostUbiik] = useState(0),
-        [lastMonth, setLastMonth] = useState(0),
-        [sameMonthLastYear, setSameMonthLastYear] = useState(0)
+        [preUbiikThisMonth, setPreUbiikThisMonth] = useState(0),
+        [postUbiikThisMonth, setPostUbiikThisMonth] = useState(0),
+        [preUbiikLastMonth, setPreUbiikLastMonth] = useState(0),
+        [postUbiikLastMonth, setPostUbiikLastMonth] = useState(0),
+        [preUbiikSameMonthLastYear, setPreUbiikSameMonthLastYear] = useState(0),
+        [postUbiikSameMonthLastYear, setPostUbiikSameMonthLastYear] = useState(0),
+        [lineChartCosts, setLineChartCosts] = useState(null),
+        [lineChartCostsError, setLineChartCostsError] = useState(""),
+        [lineChartCostsLoading, setLineChartCostsLoading] = useState(false)
 
     const handleFormat = (event, newFormats) => {
         setFormats(newFormats)
     }
-
-    const chartCostComparisonSet = (formats) => {
+    const cardsData = {
+        preUbiik: [
+            {
+                title: pageT("preUbiik"),
+                value: "$" + `${preUbiikThisMonth}`
+            },
+            {
+                title: pageT("lastMonth"),
+                value: "$" + `${preUbiikLastMonth}`
+            },
+            {
+                title: pageT("sameMonthLastYear"),
+                value: "$" + `${preUbiikSameMonthLastYear}`
+            }
+        ],
+        postUbiik: [
+            {
+                title: pageT("postUbiik"),
+                value: "$" + `${postUbiikThisMonth}`
+            },
+            {
+                title: pageT("lastMonth"),
+                value: "$" + `${postUbiikLastMonth}`
+            },
+            {
+                title: pageT("sameMonthLastYear"),
+                value: "$" + `${postUbiikSameMonthLastYear}`
+            }
+        ]
+    }
+    const chartCostComparisonSet = ({ formats, data, labels }) => {
         const lastMonth = formats?.includes("lastMonth")
             ? ([{
                 backgroundColor: colors.purple["main"],
                 borderColor: colors.purple["main"],
                 borderDash: [5, 5],
-                data: fakeData5,
+                data: data?.preUbiikLastMonth || [],
                 fill: {
                     above: colors.purple["main-opacity-10"],
                     target: "origin"
                 },
-                id: "preUbiik",
+                id: "preUbiikLastMonth",
                 hoverRadius: 0,
                 pointHoverBorderWidth: 0,
                 radius: 0,
@@ -92,12 +127,12 @@ export default function Economics(props) {
             {
                 backgroundColor: colors.purple.main,
                 borderColor: colors.purple.main,
-                data: fakeData6,
+                data: data?.postUbiikLastMonth || [],
                 fill: {
                     above: colors.purple["main-opacity-20"],
                     target: "origin"
                 },
-                id: "postUbiik",
+                id: "postUbiikLastMonth",
                 hoverRadius: 0,
                 borderWidth: 2,
                 pointHoverBorderWidth: 0,
@@ -111,12 +146,12 @@ export default function Economics(props) {
                 backgroundColor: colors.yellow["main"],
                 borderColor: colors.yellow["main"],
                 borderDash: [5, 5],
-                data: fakeData3,
+                data: data?.preUbiikSameMonthLastYear || [],
                 fill: {
                     above: colors.yellow["main-opacity-10"],
                     target: "origin"
                 },
-                id: "preUbiik",
+                id: "preUbiikSameMonthLastYear",
                 hoverRadius: 0,
                 pointHoverBorderWidth: 0,
                 radius: 0,
@@ -126,12 +161,12 @@ export default function Economics(props) {
             {
                 backgroundColor: colors.yellow.main,
                 borderColor: colors.yellow.main,
-                data: fakeData4,
+                data: data?.postUbiikSameMonthLastYear || [],
                 fill: {
                     above: colors.yellow["main-opacity-20"],
                     target: "origin"
                 },
-                id: "postUbiik",
+                id: "postUbiikSameMonthLastYear",
                 hoverRadius: 0,
                 borderWidth: 2,
                 pointHoverBorderWidth: 0,
@@ -145,12 +180,12 @@ export default function Economics(props) {
                     backgroundColor: colors.blue["main"],
                     borderColor: colors.blue["main"],
                     borderDash: [5, 5],
-                    data: fakeData2,
+                    data: data?.preUbiikThisMonth || [],
                     fill: {
                         above: colors.blue["main-opacity-10"],
                         target: "origin"
                     },
-                    id: "preUbiik",
+                    id: "preUbiikThisMonth",
                     hoverRadius: 0,
                     pointHoverBorderWidth: 0,
                     radius: 0,
@@ -160,12 +195,12 @@ export default function Economics(props) {
                 {
                     backgroundColor: colors.blue.main,
                     borderColor: colors.blue.main,
-                    data: fakeData1,
+                    data: data?.postUbiikThisMonth || [],
                     fill: {
                         above: colors.blue["main-opacity-20"],
                         target: "origin"
                     },
-                    id: "postUbiik",
+                    id: "postUbiikThisMonth",
                     hoverRadius: 0,
                     borderWidth: 2,
                     pointHoverBorderWidth: 0,
@@ -175,7 +210,7 @@ export default function Economics(props) {
                 ...lastMonth,
                 ...sameMonthLastYear
             ],
-            labels: sevenDays,
+            labels,
             tickCallback: val => "$" + val,
             tooltipLabel: item =>
                 item.dataset.label + " $" + item.parsed.y,
@@ -186,7 +221,8 @@ export default function Economics(props) {
                     },
                     "tooltipFormat": "MMM D",
                     "unit": "day"
-                }
+                },
+                type: "timeseries"
             }
         })
     }
@@ -261,6 +297,72 @@ export default function Economics(props) {
             }
         })
     }
+    const urlPrefix = `/api/${props.gatewayID}/devices`
+    const
+        callCards = (startTime, endTime) => {
+            apiCall({
+                onComplete: () => setInfoLoading(false),
+                onError: error => setInfoError(error),
+                onStart: () => setInfoLoading(true),
+                onSuccess: rawData => {
+                    if (!rawData?.data) return
+                    const { data } = rawData,
+                        preAndPost = data.energyCosts
+                    // console.log(data)
+                    setPreUbiikThisMonth(preAndPost?.preUbiikThisMonth || 0)
+                    setPostUbiikThisMonth(preAndPost?.postUbiikThisMonth || 0)
+                    setPreUbiikLastMonth(preAndPost?.preUbiikLastMonth || 0)
+                    setPostUbiikLastMonth(preAndPost?.postUbiikLastMonth || 0)
+                    setPreUbiikSameMonthLastYear(preAndPost?.preUbiikTheSameMonthLastYear || 0)
+                    setPostUbiikSameMonthLastYear(preAndPost?.postUbiikTheSameMonthLastYear || 0)
+                },
+                url: `${urlPrefix}/tou/energy-cost?startTime=${startTime}&endTime=${endTime}`
+            })
+        },
+        callLineChartCosts = (startTime, endTime) => {
+            apiCall({
+                onComplete: () => setLineChartCostsLoading(false),
+                onError: error => setLineChartCostsError(error),
+                onStart: () => setLineChartCostsLoading(true),
+                onSuccess: rawData => {
+                    if (!rawData || !rawData.data) return
+
+                    const
+                        { data } = rawData,
+                        costs = data.energyDailyCosts,
+                        { timestamps } = data,
+                        labels = timestamps.map(t => t * 1000)
+
+                    console.log(data)
+
+                    setLineChartCosts({
+                        data: {
+                            preUbiikLastMonth: costs?.preUbiikLastMonth,
+                            postUbiikLastMonth: costs?.postUbiikLastMonth
+
+                        },
+                        labels
+                    })
+                },
+                url: `${urlPrefix}/tou/energy-cost?startTime=${startTime}&endTime=${endTime}`
+            })
+        }
+    useEffect(() => {
+        if (!props.gatewayID) return
+
+        let startTime = moment().startOf("month").toISOString(),
+            endTime = moment().startOf("day").toISOString()
+
+        if (moment().get("date") == 1) {
+            startTime = moment().subtract(1, "month").startOf("month").toISOString()
+            endTime = moment().startOf("day").toISOString()
+        }
+        if (startTime && endTime) {
+            callCards(startTime, endTime)
+            callLineChartCosts(startTime, endTime)
+        }
+    }, [props.gatewayID])
+
     return <>
         <div className="page-header flex flex-wrap justify-between">
             <h1 className="mb-9">{pageT("economics")}</h1>
@@ -283,24 +385,14 @@ export default function Economics(props) {
             <div className="lg:grid-cols-2 grid gap-5">
                 <EconomicsCard
                     icon={EconomicsIcon}
-                    title={pageT("preUbiik")}
                     subTitle={pageT("thisCalendarMonth")}
-                    leftTitle={pageT("lastMonth")}
-                    rightTitle={pageT("sameMonthLastYear")}
-                    value={"$" + preUbiik}
-                    leftValue={"$" + lastMonth}
-                    rightValue={"$" + sameMonthLastYear}
+                    data={cardsData.preUbiik}
                     tabs={formats}
                 />
                 <EconomicsCard
                     icon={EconomicsIcon}
-                    title={pageT("postUbiik")}
                     subTitle={pageT("thisCalendarMonth")}
-                    leftTitle={pageT("lastMonth")}
-                    rightTitle={pageT("sameMonthLastYear")}
-                    value={"$" + postUbiik}
-                    leftValue={"$" + lastMonth}
-                    rightValue={"$" + sameMonthLastYear}
+                    data={cardsData.postUbiik}
                     tabs={formats}
                 />
             </div>
@@ -317,14 +409,11 @@ export default function Economics(props) {
                 error={chargeVoltageError}
                 message={pageT("chartError")} /> */}
             <div className="max-h-80vh h-160 relative w-full">
-                <LineChart data={chartCostComparisonSet(formats)}
+                <LineChart data={chartCostComparisonSet({
+                    formats,
+                    ...lineChartCosts
+                })}
                     id="ecoCost" />
-
-                {/* // data={chartChargeVoltageSet({
-                    //     ...chargeVoltage,
-                    //     unit: { charge: "%", voltage: " " + commonT("v") },
-                    // })}
-                    // id="erbChargeVoltage" /> */}
             </div>
             {/* <LoadingBox loading={chargeVoltageLoading} /> */}
         </div>
@@ -341,4 +430,4 @@ export default function Economics(props) {
             <InfoReminder />
         </div>
     </>
-}
+})

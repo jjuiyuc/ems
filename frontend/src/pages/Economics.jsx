@@ -69,8 +69,8 @@ export default connect(mapState)(function Economics(props) {
         [postUbiikLastMonth, setPostUbiikLastMonth] = useState(0),
         [preUbiikSameMonthLastYear, setPreUbiikSameMonthLastYear] = useState(0),
         [postUbiikSameMonthLastYear, setPostUbiikSameMonthLastYear] = useState(0),
-        [lineChartCosts, setLineChartCosts] = useState(null)
-
+        [lineChartCosts, setLineChartCosts] = useState(null),
+        [barChartSaved, setBarChartSaved] = useState(null)
     const handleFormat = (event, newFormats) => {
         setFormats(newFormats)
     }
@@ -223,63 +223,41 @@ export default connect(mapState)(function Economics(props) {
             }
         })
     }
-    const chartSavedCostSet = (formats) => {
+    const chartSavedCostSet = ({ formats, data, labels }) => {
         const lastMonth = formats?.includes("lastMonth")
             ? ([{
-                backgroundColor: colors.purple["main-opacity-20"],
-                borderColor: colors.purple.main,
-                data: fakeData1,
-                id: "preUbiik",
+                backgroundColor: colors.purple["main"],
+                borderColor: colors.purple["main"],
+                data: data?.savedLastMonth || [],
+                id: "savedLastMonth",
                 borderWidth: 1,
-                label: pageT("preUbiik") + " - " + pageT("lastMonth")
-            },
-            {
-                backgroundColor: colors.purple.main,
-                data: fakeData2,
-                id: "postUbiik",
-                borderWidth: 1,
-                label: pageT("postUbiik") + " - " + pageT("lastMonth")
+                label: pageT("lastMonth")
             }])
             : []
-
         const sameMonthLastYear = formats?.includes("sameMonthLastYear")
             ? ([{
-                backgroundColor: colors.yellow["main-opacity-20"],
+                backgroundColor: colors.yellow["main"],
                 borderColor: colors.yellow.main,
-                data: fakeData3,
-                id: "preUbiik",
+                data: data?.savedTheSameMonthLastYear || [],
+                id: "savedTheSameMonthLastYear",
                 borderWidth: 1,
-                label: pageT("preUbiik") + " - " + pageT("sameMonthLastYear")
-            },
-            {
-                backgroundColor: colors.yellow.main,
-                data: fakeData4,
-                id: "postUbiik",
-                borderWidth: 1,
-                label: pageT("postUbiik") + " - " + pageT("sameMonthLastYear")
+                label: pageT("sameMonthLastYear")
             }])
             : []
         return ({
             datasets: [
                 {
-                    backgroundColor: colors.blue["main-opacity-20"],
-                    borderColor: colors.blue["main"],
-                    data: fakeData5,
-                    id: "preUbiik",
-                    borderWidth: 1,
-                    label: pageT("preUbiik") + " - " + pageT("thisCalendarMonth")
-                },
-                {
                     backgroundColor: colors.blue.main,
-                    data: fakeData6,
-                    id: "postUbiik",
+                    borderColor: colors.blue["main"],
+                    data: data?.savedThisMonth || [],
+                    id: "savedThisMonth",
                     borderWidth: 1,
-                    label: pageT("postUbiik") + " - " + pageT("thisCalendarMonth")
+                    label: pageT("thisCalendarMonth")
                 },
                 ...lastMonth,
                 ...sameMonthLastYear
             ],
-            labels: sevenDays,
+            labels,
             tickCallback: val => "$" + val,
             tooltipLabel: item =>
                 item.dataset.label + " $" + item.parsed.y,
@@ -319,7 +297,6 @@ export default connect(mapState)(function Economics(props) {
                         labels = timestamps.map(t => {
                             return moment(t * 1000).startOf("day")._d.getTime()
                         })
-
                     setLineChartCosts({
                         data: {
                             preUbiikThisMonth: costs?.preUbiikThisMonth,
@@ -328,6 +305,14 @@ export default connect(mapState)(function Economics(props) {
                             postUbiikLastMonth: costs?.postUbiikLastMonth,
                             preUbiikSameMonthLastYear: costs?.preUbiikTheSameMonthLastYear,
                             postUbiikSameMonthLastYear: costs?.postUbiikTheSameMonthLastYear
+                        },
+                        labels
+                    })
+                    setBarChartSaved({
+                        data: {
+                            savedThisMonth: costs?.savedThisMonth,
+                            savedLastMonth: costs?.savedLastMonth,
+                            savedTheSameMonthLastYear: costs?.savedTheSameMonthLastYear
                         },
                         labels
                     })
@@ -404,7 +389,10 @@ export default connect(mapState)(function Economics(props) {
             <h4 className="mb-4 lg:mb-0">{pageT("savedEnergyCost")}</h4>
             <div className="max-h-80vh h-160 mt-8 relative w-full">
                 <BarChart
-                    data={chartSavedCostSet(formats)}
+                    data={chartSavedCostSet({
+                        formats,
+                        ...barChartSaved
+                    })}
                     id="ecoSavedCosts" />
             </div>
         </div>

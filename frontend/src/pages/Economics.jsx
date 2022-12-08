@@ -274,7 +274,7 @@ export default connect(mapState)(function Economics(props) {
     }
     const urlPrefix = `/api/${props.gatewayID}/devices`
     const
-        callCards = (startTime, endTime) => {
+        callData = (startTime, endTime) => {
             apiCall({
                 onComplete: () => setInfoLoading(false),
                 onError: error => setInfoError(error),
@@ -331,7 +331,7 @@ export default connect(mapState)(function Economics(props) {
             endTime = moment().startOf("day").toISOString()
         }
         if (startTime && endTime) {
-            callCards(startTime, endTime)
+            callData(startTime, endTime)
         }
     }, [props.gatewayID])
 

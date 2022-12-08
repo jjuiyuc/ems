@@ -330,9 +330,7 @@ export default connect(mapState)(function Economics(props) {
                 </ToggleButtonGroup>
             </div>
         </div>
-        <ErrorBox
-            error={infoError}
-            message={pageT("infoError")} />
+        <ErrorBox error={infoError} message={pageT("infoError")} />
         <div className="font-bold mt-4 mb-8 relative">
             <div className="lg:grid-cols-2 grid gap-5">
                 <EconomicsCard

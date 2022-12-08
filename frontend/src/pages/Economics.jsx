@@ -28,32 +28,9 @@ const ErrorBox = ({ error, margin = "", message }) => error
         icon={ReportProblemIcon}
         iconColor="negative-main" />
     : null
-const LoadingBox = ({ loading }) => loading
-    ? <div className="grid h-24 place-items-center"><Spinner /></div>
-    : null
-
-const fakeDataArray = amount => Array.from(new Array(amount).keys())
-    .map(() => Math.floor(Math.random() * (40 - 10 + 1) + 10))
-
-const
-    currentHour = moment().hour(),
-    hours24 = Array.from(new Array(24).keys()),
-    lineChartDataArray = hours24.filter(v => v <= currentHour).map(() =>
-        Math.floor(Math.random() * (60 - 40 + 1) + 40)),
-    days = 7,
-    sevenDays = Array.from(new Array(days).keys()).map(n =>
-        moment().subtract(days - n, "d").startOf("day").toISOString()),
-    fakeData1 = fakeDataArray(days),
-    fakeData2 = fakeDataArray(days),
-    fakeData3 = fakeDataArray(days),
-    fakeData4 = fakeDataArray(days),
-    fakeData5 = fakeDataArray(days),
-    fakeData6 = fakeDataArray(days)
-
 const mapState = state => ({ gatewayID: state.gateways.active.gatewayID })
 
 export default connect(mapState)(function Economics(props) {
-
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
@@ -353,6 +330,9 @@ export default connect(mapState)(function Economics(props) {
                 </ToggleButtonGroup>
             </div>
         </div>
+        <ErrorBox
+            error={infoError}
+            message={pageT("infoError")} />
         <div className="font-bold mt-4 mb-8 relative">
             <div className="lg:grid-cols-2 grid gap-5">
                 <EconomicsCard

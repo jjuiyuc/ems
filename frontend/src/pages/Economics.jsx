@@ -69,9 +69,7 @@ export default connect(mapState)(function Economics(props) {
         [postUbiikLastMonth, setPostUbiikLastMonth] = useState(0),
         [preUbiikSameMonthLastYear, setPreUbiikSameMonthLastYear] = useState(0),
         [postUbiikSameMonthLastYear, setPostUbiikSameMonthLastYear] = useState(0),
-        [lineChartCosts, setLineChartCosts] = useState(null),
-        [lineChartCostsError, setLineChartCostsError] = useState(""),
-        [lineChartCostsLoading, setLineChartCostsLoading] = useState(false)
+        [lineChartCosts, setLineChartCosts] = useState(null)
 
     const handleFormat = (event, newFormats) => {
         setFormats(newFormats)
@@ -221,8 +219,7 @@ export default connect(mapState)(function Economics(props) {
                     },
                     "tooltipFormat": "MMM D",
                     "unit": "day"
-                },
-                type: "timeseries"
+                }
             }
         })
     }
@@ -308,38 +305,29 @@ export default connect(mapState)(function Economics(props) {
                     if (!rawData?.data) return
                     const { data } = rawData,
                         preAndPost = data.energyCosts
-                    // console.log(data)
+
                     setPreUbiikThisMonth(preAndPost?.preUbiikThisMonth || 0)
                     setPostUbiikThisMonth(preAndPost?.postUbiikThisMonth || 0)
                     setPreUbiikLastMonth(preAndPost?.preUbiikLastMonth || 0)
                     setPostUbiikLastMonth(preAndPost?.postUbiikLastMonth || 0)
                     setPreUbiikSameMonthLastYear(preAndPost?.preUbiikTheSameMonthLastYear || 0)
                     setPostUbiikSameMonthLastYear(preAndPost?.postUbiikTheSameMonthLastYear || 0)
-                },
-                url: `${urlPrefix}/tou/energy-cost?startTime=${startTime}&endTime=${endTime}`
-            })
-        },
-        callLineChartCosts = (startTime, endTime) => {
-            apiCall({
-                onComplete: () => setLineChartCostsLoading(false),
-                onError: error => setLineChartCostsError(error),
-                onStart: () => setLineChartCostsLoading(true),
-                onSuccess: rawData => {
-                    if (!rawData || !rawData.data) return
 
                     const
-                        { data } = rawData,
                         costs = data.energyDailyCosts,
-                        { timestamps } = data,
-                        labels = timestamps.map(t => t * 1000)
-
-                    console.log(data)
+                        { timestamps } = costs,
+                        labels = timestamps.map(t => {
+                            return moment(t * 1000).startOf("day")._d.getTime()
+                        })
 
                     setLineChartCosts({
                         data: {
+                            preUbiikThisMonth: costs?.preUbiikThisMonth,
+                            postUbiikThisMonth: costs?.postUbiikThisMonth,
                             preUbiikLastMonth: costs?.preUbiikLastMonth,
-                            postUbiikLastMonth: costs?.postUbiikLastMonth
-
+                            postUbiikLastMonth: costs?.postUbiikLastMonth,
+                            preUbiikSameMonthLastYear: costs?.preUbiikTheSameMonthLastYear,
+                            postUbiikSameMonthLastYear: costs?.postUbiikTheSameMonthLastYear
                         },
                         labels
                     })
@@ -359,7 +347,6 @@ export default connect(mapState)(function Economics(props) {
         }
         if (startTime && endTime) {
             callCards(startTime, endTime)
-            callLineChartCosts(startTime, endTime)
         }
     }, [props.gatewayID])
 
@@ -405,25 +392,20 @@ export default connect(mapState)(function Economics(props) {
         </div>
         <div className="card chart mt-8 mb-8">
             <h4 className="mb-9">{pageT("energyCostComparison")}</h4>
-            {/* <ErrorBox
-                error={chargeVoltageError}
-                message={pageT("chartError")} /> */}
             <div className="max-h-80vh h-160 relative w-full">
                 <LineChart data={chartCostComparisonSet({
                     formats,
                     ...lineChartCosts
                 })}
-                    id="ecoCost" />
+                    id="ecoCosts" />
             </div>
-            {/* <LoadingBox loading={chargeVoltageLoading} /> */}
         </div>
-
         <div className="card mt-8">
             <h4 className="mb-4 lg:mb-0">{pageT("savedEnergyCost")}</h4>
             <div className="max-h-80vh h-160 mt-8 relative w-full">
                 <BarChart
                     data={chartSavedCostSet(formats)}
-                    id="economicsBarChart" />
+                    id="ecoSavedCosts" />
             </div>
         </div>
         <div className="mt-8">

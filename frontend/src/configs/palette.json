@@ -6,9 +6,7 @@
     "blue": {
         "main": "#43B0FF",
         "main-opacity-10":"#43B0FF10",
-        "main-opacity-20":"#43B0FF20",
-        "400":"#0FA9BA",
-        "400-opacity-10":"#0FA9BA20"
+        "main-opacity-20":"#43B0FF20"
     },
     "brand": {"main": "#12c9c9"},
     "calendar": {"white": "#EEECF1"},

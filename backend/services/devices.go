@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
+	"reflect"
 	"strconv"
 	"time"
 
@@ -1138,11 +1139,23 @@ func (s defaultDevicesService) computeLoadPvConsumedEnergyPercentACValue(firstRe
 
 func (s defaultDevicesService) getAccumulatedInfo(param *app.ResolutionWithPeriodParam) (accumulatedInfo *AccumulatedInfo) {
 	accumulatedInfo = &AccumulatedInfo{}
+	latestAccumulatedInfoArray := s.getLatestAccumulatedInfoArray(param.GatewayUUID, param.Query.Resolution, param.Query.StartTime, param.Query.EndTime)
+
 	startTimeIndex := param.Query.StartTime
 	endTimeIndex := param.GetEndTimeIndex()
-
 	for startTimeIndex.Before(param.Query.EndTime) {
-		latestAccumulatedInfo := s.getLatestAccumulatedInfo(param.GatewayUUID, param.Query.Resolution, startTimeIndex, endTimeIndex, param.Query.EndTime)
+		latestAccumulatedInfo := &LatestAccumulatedInfo{}
+		dataExists := false
+		for _, info := range latestAccumulatedInfoArray {
+			if info.Timestamps >= int(startTimeIndex.Unix()) && info.Timestamps < int(endTimeIndex.Unix()) {
+				*latestAccumulatedInfo = *info
+				dataExists = true
+				break
+			}
+		}
+		if !dataExists {
+			latestAccumulatedInfo.Timestamps = int(endTimeIndex.Add(-1 * time.Second).Unix())
+		}
 		log.Debug("latestAccumulatedInfo: ", latestAccumulatedInfo)
 		accumulatedInfo.Timestamps = append(accumulatedInfo.Timestamps, latestAccumulatedInfo.Timestamps)
 		accumulatedInfo.LoadConsumedLifetimeEnergyACDiffs = append(accumulatedInfo.LoadConsumedLifetimeEnergyACDiffs, latestAccumulatedInfo.LoadConsumedLifetimeEnergyACDiff)
@@ -1195,43 +1208,50 @@ func (s defaultDevicesService) getFirstLogRealtimeInfo(gwUUID string, startTimeI
 	return
 }
 
-func (s defaultDevicesService) getLatestAccumulatedInfo(gwUUID, resolution string, startTimeIndex, endTimeIndex, endTime time.Time) (latestAccumulatedInfo *LatestAccumulatedInfo) {
-	latestAccumulatedInfo = &LatestAccumulatedInfo{}
-	latestLog, err := s.repo.CCData.GetLatestCalculatedLog(gwUUID, resolution, startTimeIndex, endTimeIndex)
+func (s defaultDevicesService) getLatestAccumulatedInfoArray(gwUUID, resolution string, startTime, endTime time.Time) (latestAccumulatedInfoArray []*LatestAccumulatedInfo) {
+	logs, err := s.repo.CCData.GetCalculatedLogs(gwUUID, resolution, startTime, endTime)
 	if err != nil {
 		log.WithFields(log.Fields{
-			"caused-by":      "s.repo.CCData.GetLatestCalculatedLog",
-			"err":            err,
-			"startTimeIndex": startTimeIndex,
-			"endTimeIndex":   endTimeIndex,
+			"caused-by": "s.repo.CCData.GetCalculatedLogs",
+			"err":       err,
+			"startTime": startTime,
+			"endTime":   endTime,
 		}).Error()
-		latestAccumulatedInfo.Timestamps = int(endTimeIndex.Add(-1 * time.Second).Unix())
 		return
 	}
 
-	switch resolution {
-	case "day":
-		latestLogDaily, _ := (latestLog).(*deremsmodels.CCDataLogCalculatedDaily)
-		latestAccumulatedInfo.Timestamps = int(latestLogDaily.LatestLogDate.Unix())
-		latestAccumulatedInfo.LoadConsumedLifetimeEnergyACDiff = latestLogDaily.LoadConsumedLifetimeEnergyACDiff.Float32
-		latestAccumulatedInfo.PvProducedLifetimeEnergyACDiff = latestLogDaily.PvProducedLifetimeEnergyACDiff.Float32
-		latestAccumulatedInfo.BatteryLifetimeEnergyACDiff = latestLogDaily.BatteryLifetimeEnergyACDiff.Float32
-		latestAccumulatedInfo.GridLifetimeEnergyACDiff = latestLogDaily.GridLifetimeEnergyACDiff.Float32
-		latestAccumulatedInfo.LoadSelfConsumedEnergyPercentAC = latestLogDaily.LoadSelfConsumedEnergyPercentAC.Float32
-		latestAccumulatedInfo.PreUbiikCost = int(latestLogDaily.OffPeakPeriodPreUbiikCost.Float32 +
-			latestLogDaily.OnPeakPeriodPreUbiikCost.Float32 +
-			latestLogDaily.MidPeakPeriodPreUbiikCost.Float32)
-		latestAccumulatedInfo.PostUbiikCost = int(latestLogDaily.OffPeakPeriodPostUbiikCost.Float32 +
-			latestLogDaily.OnPeakPeriodPostUbiikCost.Float32 +
-			latestLogDaily.MidPeakPeriodPostUbiikCost.Float32)
-	case "month":
-		latestLogMonthly, _ := (latestLog).(*deremsmodels.CCDataLogCalculatedMonthly)
-		latestAccumulatedInfo.Timestamps = int(latestLogMonthly.LatestLogDate.Unix())
-		latestAccumulatedInfo.LoadConsumedLifetimeEnergyACDiff = latestLogMonthly.LoadConsumedLifetimeEnergyACDiff.Float32
-		latestAccumulatedInfo.PvProducedLifetimeEnergyACDiff = latestLogMonthly.PvProducedLifetimeEnergyACDiff.Float32
-		latestAccumulatedInfo.BatteryLifetimeEnergyACDiff = latestLogMonthly.BatteryLifetimeEnergyACDiff.Float32
-		latestAccumulatedInfo.GridLifetimeEnergyACDiff = latestLogMonthly.GridLifetimeEnergyACDiff.Float32
-		latestAccumulatedInfo.LoadSelfConsumedEnergyPercentAC = latestLogMonthly.LoadSelfConsumedEnergyPercentAC.Float32
+	if reflect.TypeOf(logs).Kind() == reflect.Slice {
+		s := reflect.ValueOf(logs)
+		for i := 0; i < s.Len(); i++ {
+			switch resolution {
+			case "day":
+				latestLogDaily := (s.Index(i).Interface()).(*deremsmodels.CCDataLogCalculatedDaily)
+				latestAccumulatedInfo := &LatestAccumulatedInfo{}
+				latestAccumulatedInfo.Timestamps = int(latestLogDaily.LatestLogDate.Unix())
+				latestAccumulatedInfo.LoadConsumedLifetimeEnergyACDiff = latestLogDaily.LoadConsumedLifetimeEnergyACDiff.Float32
+				latestAccumulatedInfo.PvProducedLifetimeEnergyACDiff = latestLogDaily.PvProducedLifetimeEnergyACDiff.Float32
+				latestAccumulatedInfo.BatteryLifetimeEnergyACDiff = latestLogDaily.BatteryLifetimeEnergyACDiff.Float32
+				latestAccumulatedInfo.GridLifetimeEnergyACDiff = latestLogDaily.GridLifetimeEnergyACDiff.Float32
+				latestAccumulatedInfo.LoadSelfConsumedEnergyPercentAC = latestLogDaily.LoadSelfConsumedEnergyPercentAC.Float32
+				latestAccumulatedInfo.PreUbiikCost = int(latestLogDaily.OffPeakPeriodPreUbiikCost.Float32 +
+					latestLogDaily.OnPeakPeriodPreUbiikCost.Float32 +
+					latestLogDaily.MidPeakPeriodPreUbiikCost.Float32)
+				latestAccumulatedInfo.PostUbiikCost = int(latestLogDaily.OffPeakPeriodPostUbiikCost.Float32 +
+					latestLogDaily.OnPeakPeriodPostUbiikCost.Float32 +
+					latestLogDaily.MidPeakPeriodPostUbiikCost.Float32)
+				latestAccumulatedInfoArray = append(latestAccumulatedInfoArray, latestAccumulatedInfo)
+			case "month":
+				latestLogMonthly := (s.Index(i).Interface()).(*deremsmodels.CCDataLogCalculatedMonthly)
+				latestAccumulatedInfo := &LatestAccumulatedInfo{}
+				latestAccumulatedInfo.Timestamps = int(latestLogMonthly.LatestLogDate.Unix())
+				latestAccumulatedInfo.LoadConsumedLifetimeEnergyACDiff = latestLogMonthly.LoadConsumedLifetimeEnergyACDiff.Float32
+				latestAccumulatedInfo.PvProducedLifetimeEnergyACDiff = latestLogMonthly.PvProducedLifetimeEnergyACDiff.Float32
+				latestAccumulatedInfo.BatteryLifetimeEnergyACDiff = latestLogMonthly.BatteryLifetimeEnergyACDiff.Float32
+				latestAccumulatedInfo.GridLifetimeEnergyACDiff = latestLogMonthly.GridLifetimeEnergyACDiff.Float32
+				latestAccumulatedInfo.LoadSelfConsumedEnergyPercentAC = latestLogMonthly.LoadSelfConsumedEnergyPercentAC.Float32
+				latestAccumulatedInfoArray = append(latestAccumulatedInfoArray, latestAccumulatedInfo)
+			}
+		}
 	}
 	return
 }

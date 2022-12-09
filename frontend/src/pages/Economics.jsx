@@ -1,5 +1,5 @@
 import { connect } from "react-redux"
-import { Button, ToggleButtonGroup, ToggleButton } from "@mui/material"
+import { ToggleButtonGroup, ToggleButton } from "@mui/material"
 import ReportProblemIcon from "@mui/icons-material/ReportProblem"
 import { useState, useEffect } from "react"
 import { useTranslation } from "react-multi-lang"
@@ -33,9 +33,7 @@ const mapState = state => ({ gatewayID: state.gateways.active.gatewayID })
 export default connect(mapState)(function Economics(props) {
     const
         t = useTranslation(),
-        commonT = string => t("common." + string),
         pageT = (string, params) => t("economics." + string, params)
-
     const
         [formats, setFormats] = useState([]),
         [infoError, setInfoError] = useState(""),
@@ -48,6 +46,7 @@ export default connect(mapState)(function Economics(props) {
         [postUbiikSameMonthLastYear, setPostUbiikSameMonthLastYear] = useState(0),
         [lineChartCosts, setLineChartCosts] = useState(null),
         [barChartSaved, setBarChartSaved] = useState(null)
+
     const handleFormat = (event, newFormats) => {
         setFormats(newFormats)
     }
@@ -115,7 +114,6 @@ export default connect(mapState)(function Economics(props) {
                 label: pageT("postUbiik") + " - " + pageT("lastMonth")
             }])
             : []
-
         const sameMonthLastYear = formats?.includes("sameMonthLastYear")
             ? ([{
                 backgroundColor: colors.yellow["main"],
@@ -324,7 +322,10 @@ export default connect(mapState)(function Economics(props) {
                     <ToggleButton value="lastMonth" aria-label="lastMonth" color="primary">
                         {pageT("lastMonth")}
                     </ToggleButton>
-                    <ToggleButton value="sameMonthLastYear" aria-label="sameMonthLastYear" color="primary">
+                    <ToggleButton
+                        value="sameMonthLastYear"
+                        aria-label="sameMonthLastYear"
+                        color="primary">
                         {pageT("sameMonthLastYear")}
                     </ToggleButton>
                 </ToggleButtonGroup>

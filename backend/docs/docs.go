@@ -379,7 +379,8 @@ var doc = `{
                     },
                     {
                         "enum": [
-                            "hour"
+                            "hour",
+                            "5minute"
                         ],
                         "type": "string",
                         "name": "resolution",
@@ -550,7 +551,8 @@ var doc = `{
                     },
                     {
                         "enum": [
-                            "hour"
+                            "hour",
+                            "5minute"
                         ],
                         "type": "string",
                         "name": "resolution",
@@ -599,6 +601,80 @@ var doc = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/{gwid}/devices/battery/usage-info": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get battery by token, gateway UUID and startTime",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "time of use"
+                ],
+                "summary": "Show current usage state about battery",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Input user's access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Gateway UUID",
+                        "name": "gwid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "UTC time in ISO-8601",
+                        "name": "startTime",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/app.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/services.BatteryUsageInfoResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/app.Response"
                         }
@@ -959,7 +1035,8 @@ var doc = `{
                     },
                     {
                         "enum": [
-                            "hour"
+                            "hour",
+                            "5minute"
                         ],
                         "type": "string",
                         "name": "resolution",
@@ -1148,7 +1225,8 @@ var doc = `{
                     },
                     {
                         "enum": [
-                            "hour"
+                            "hour",
+                            "5minute"
                         ],
                         "type": "string",
                         "name": "resolution",
@@ -1272,6 +1350,98 @@ var doc = `{
                 }
             }
         },
+        "/{gwid}/devices/solar/energy-usage": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get solar by token, gateway UUID, resolution, startTime and endTime",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "time of use"
+                ],
+                "summary": "Show the day's hourly energy usage of solar",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Input user's access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Gateway UUID",
+                        "name": "gwid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "UTC time in ISO-8601",
+                        "name": "endTime",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "hour",
+                            "5minute"
+                        ],
+                        "type": "string",
+                        "name": "resolution",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "UTC time in ISO-8601",
+                        "name": "startTime",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/app.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/services.SolarEnergyUsageResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/{gwid}/devices/solar/power-state": {
             "get": {
                 "security": [
@@ -1313,7 +1483,8 @@ var doc = `{
                     },
                     {
                         "enum": [
-                            "hour"
+                            "hour",
+                            "5minute"
                         ],
                         "type": "string",
                         "name": "resolution",
@@ -1368,24 +1539,90 @@ var doc = `{
                     }
                 }
             }
+        },
+        "/{gwid}/devices/tou/info": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get energy source distribution by token, gateway UUID, startTime",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "time of use"
+                ],
+                "summary": "Show the distribution of energy sources for peak types of the day",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Input user's access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Gateway UUID",
+                        "name": "gwid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "UTC time in ISO-8601",
+                        "name": "startTime",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/app.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/services.TimeOfUseInfoResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
-        "app.Response": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "type": "integer"
-                },
-                "data": {
-                    "type": "object"
-                },
-                "msg": {
-                    "type": "string"
-                }
-            }
-        },
-        "routers.PeriodQuery": {
+        "app.PeriodQuery": {
             "type": "object",
             "required": [
                 "endTime",
@@ -1404,7 +1641,7 @@ var doc = `{
                 }
             }
         },
-        "routers.ResolutionWithPeriodQuery": {
+        "app.ResolutionWithPeriodQuery": {
             "type": "object",
             "required": [
                 "endTime",
@@ -1431,7 +1668,21 @@ var doc = `{
                 }
             }
         },
-        "routers.StartTimeQuery": {
+        "app.Response": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {
+                    "type": "object"
+                },
+                "msg": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.StartTimeQuery": {
             "type": "object",
             "required": [
                 "startTime"
@@ -1444,7 +1695,7 @@ var doc = `{
                 }
             }
         },
-        "routers.ZoomableQuery": {
+        "app.ZoomableQuery": {
             "type": "object",
             "required": [
                 "endTime",
@@ -1460,7 +1711,8 @@ var doc = `{
                 "resolution": {
                     "type": "string",
                     "enum": [
-                        "hour"
+                        "hour",
+                        "5minute"
                     ]
                 },
                 "startTime": {
@@ -1474,28 +1726,20 @@ var doc = `{
             "type": "object",
             "properties": {
                 "batteryLifetimeEnergyACDiffs": {
-                    "type": "array",
-                    "items": {
-                        "type": "number"
-                    }
+                    "type": "object",
+                    "$ref": "#/definitions/services.Float32ArrayFormat"
                 },
                 "gridLifetimeEnergyACDiffs": {
-                    "type": "array",
-                    "items": {
-                        "type": "number"
-                    }
+                    "type": "object",
+                    "$ref": "#/definitions/services.Float32ArrayFormat"
                 },
                 "loadConsumedLifetimeEnergyACDiffs": {
-                    "type": "array",
-                    "items": {
-                        "type": "number"
-                    }
+                    "type": "object",
+                    "$ref": "#/definitions/services.Float32ArrayFormat"
                 },
                 "pvProducedLifetimeEnergyACDiffs": {
-                    "type": "array",
-                    "items": {
-                        "type": "number"
-                    }
+                    "type": "object",
+                    "$ref": "#/definitions/services.Float32ArrayFormat"
                 },
                 "timestamps": {
                     "type": "array",
@@ -1509,16 +1753,12 @@ var doc = `{
             "type": "object",
             "properties": {
                 "batterySoCs": {
-                    "type": "array",
-                    "items": {
-                        "type": "number"
-                    }
+                    "type": "object",
+                    "$ref": "#/definitions/services.Float32ArrayFormat"
                 },
                 "batteryVoltages": {
-                    "type": "array",
-                    "items": {
-                        "type": "number"
-                    }
+                    "type": "object",
+                    "$ref": "#/definitions/services.Float32ArrayFormat"
                 },
                 "onPeakTime": {
                     "type": "object",
@@ -1579,10 +1819,8 @@ var doc = `{
             "type": "object",
             "properties": {
                 "batteryAveragePowerACs": {
-                    "type": "array",
-                    "items": {
-                        "type": "number"
-                    }
+                    "type": "object",
+                    "$ref": "#/definitions/services.Float32ArrayFormat"
                 },
                 "onPeakTime": {
                     "type": "object",
@@ -1595,6 +1833,26 @@ var doc = `{
                     "items": {
                         "type": "integer"
                     }
+                }
+            }
+        },
+        "services.BatteryUsageInfoResponse": {
+            "type": "object",
+            "properties": {
+                "batteryChargingFrom": {
+                    "type": "string"
+                },
+                "batteryConsumedAveragePowerAC": {
+                    "type": "number"
+                },
+                "batteryDischargingTo": {
+                    "type": "string"
+                },
+                "batteryProducedAveragePowerAC": {
+                    "type": "number"
+                },
+                "batterySoC": {
+                    "type": "number"
                 }
             }
         },
@@ -1688,6 +1946,12 @@ var doc = `{
                 }
             }
         },
+        "services.Float32ArrayFormat": {
+            "type": "array",
+            "items": {
+                "type": "number"
+            }
+        },
         "services.GatewayInfo": {
             "type": "object",
             "properties": {
@@ -1720,10 +1984,8 @@ var doc = `{
             "type": "object",
             "properties": {
                 "gridAveragePowerACs": {
-                    "type": "array",
-                    "items": {
-                        "type": "number"
-                    }
+                    "type": "object",
+                    "$ref": "#/definitions/services.Float32ArrayFormat"
                 },
                 "onPeakTime": {
                     "type": "object",
@@ -1743,10 +2005,8 @@ var doc = `{
             "type": "object",
             "properties": {
                 "loadSelfConsumedEnergyPercentACs": {
-                    "type": "array",
-                    "items": {
-                        "type": "number"
-                    }
+                    "type": "object",
+                    "$ref": "#/definitions/services.Float32ArrayFormat"
                 },
                 "timestamps": {
                     "type": "array",
@@ -1760,28 +2020,20 @@ var doc = `{
             "type": "object",
             "properties": {
                 "batteryAveragePowerACs": {
-                    "type": "array",
-                    "items": {
-                        "type": "number"
-                    }
+                    "type": "object",
+                    "$ref": "#/definitions/services.Float32ArrayFormat"
                 },
                 "gridAveragePowerACs": {
-                    "type": "array",
-                    "items": {
-                        "type": "number"
-                    }
+                    "type": "object",
+                    "$ref": "#/definitions/services.Float32ArrayFormat"
                 },
                 "loadAveragePowerACs": {
-                    "type": "array",
-                    "items": {
-                        "type": "number"
-                    }
+                    "type": "object",
+                    "$ref": "#/definitions/services.Float32ArrayFormat"
                 },
                 "pvAveragePowerACs": {
-                    "type": "array",
-                    "items": {
-                        "type": "number"
-                    }
+                    "type": "object",
+                    "$ref": "#/definitions/services.Float32ArrayFormat"
                 },
                 "timestamps": {
                     "type": "array",
@@ -1841,9 +2093,6 @@ var doc = `{
         "services.SolarEnergyInfoResponse": {
             "type": "object",
             "properties": {
-                "allConsumedLifetimeEnergyACDiff": {
-                    "type": "number"
-                },
                 "batteryPvConsumedEnergyPercentAC": {
                     "type": "number"
                 },
@@ -1862,11 +2111,29 @@ var doc = `{
                 "loadPvConsumedLifetimeEnergyACDiff": {
                     "type": "number"
                 },
-                "pvCo2SavingsDiff": {
+                "pvCo2SavingsSum": {
                     "type": "number"
                 },
-                "pvEnergyCostSavingsDiff": {
+                "pvEnergyCostSavingsSum": {
+                    "type": "integer"
+                },
+                "pvProducedLifetimeEnergyACDiff": {
                     "type": "number"
+                }
+            }
+        },
+        "services.SolarEnergyUsageResponse": {
+            "type": "object",
+            "properties": {
+                "loadPvConsumedEnergyPercentACs": {
+                    "type": "object",
+                    "$ref": "#/definitions/services.Float32ArrayFormat"
+                },
+                "timestamps": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 }
             }
         },
@@ -1880,16 +2147,27 @@ var doc = `{
                     }
                 },
                 "pvAveragePowerACs": {
-                    "type": "array",
-                    "items": {
-                        "type": "number"
-                    }
+                    "type": "object",
+                    "$ref": "#/definitions/services.Float32ArrayFormat"
                 },
                 "timestamps": {
                     "type": "array",
                     "items": {
                         "type": "integer"
                     }
+                }
+            }
+        },
+        "services.TimeOfUseInfoResponse": {
+            "type": "object",
+            "properties": {
+                "energySources": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "timeOfUse": {
+                    "type": "object",
+                    "additionalProperties": true
                 }
             }
         }

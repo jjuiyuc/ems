@@ -16,7 +16,7 @@ import (
 // @Security    ApiKeyAuth
 // @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
 // @Param       gwid           path      string true "Gateway UUID"
-// @Param       query          query     PeriodQuery true "Query"
+// @Param       query          query     app.PeriodQuery true "Query"
 // @Produce     json
 // @Success     200            {object}  app.Response{data=services.EnergyDistributionInfoResponse}
 // @Failure     400            {object}  app.Response
@@ -24,12 +24,12 @@ import (
 // @Router      /{gwid}/devices/energy-distribution-info [get]
 func (w *APIWorker) GetEnergyDistributionInfo(c *gin.Context) {
 	appG := app.Gin{c}
-	param := &PeriodParam{}
-	if err := param.validate(c); err != nil {
+	param := &app.PeriodParam{}
+	if err := param.Validate(c); err != nil {
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
-	responseData := w.Services.Devices.GetEnergyDistributionInfo(param.GatewayUUID, param.Query.StartTime, param.Query.EndTime)
+	responseData := w.Services.Devices.GetEnergyDistributionInfo(param)
 	appG.Response(http.StatusOK, e.Success, responseData)
 }
 
@@ -40,7 +40,7 @@ func (w *APIWorker) GetEnergyDistributionInfo(c *gin.Context) {
 // @Security    ApiKeyAuth
 // @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
 // @Param       gwid           path      string true "Gateway UUID"
-// @Param       query          query     ZoomableQuery true "Query"
+// @Param       query          query     app.ZoomableQuery true "Query"
 // @Produce     json
 // @Success     200            {object}  app.Response{data=services.PowerStateResponse}
 // @Failure     400            {object}  app.Response
@@ -48,12 +48,12 @@ func (w *APIWorker) GetEnergyDistributionInfo(c *gin.Context) {
 // @Router      /{gwid}/devices/power-state [get]
 func (w *APIWorker) GetPowerState(c *gin.Context) {
 	appG := app.Gin{c}
-	param := &ZoomableParam{}
-	if err := param.validate(c); err != nil {
+	param := &app.ZoomableParam{}
+	if err := param.Validate(c); err != nil {
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
-	responseData := w.Services.Devices.GetPowerState(param.GatewayUUID, param.Query.StartTime, param.Query.EndTime)
+	responseData := w.Services.Devices.GetPowerState(param)
 	appG.Response(http.StatusOK, e.Success, responseData)
 }
 
@@ -64,7 +64,7 @@ func (w *APIWorker) GetPowerState(c *gin.Context) {
 // @Security    ApiKeyAuth
 // @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
 // @Param       gwid           path      string true "Gateway UUID"
-// @Param       query          query     ResolutionWithPeriodQuery true "Query"
+// @Param       query          query     app.ResolutionWithPeriodQuery true "Query"
 // @Produce     json
 // @Success     200            {object}  app.Response{data=services.AccumulatedPowerStateResponse}
 // @Failure     400            {object}  app.Response
@@ -72,12 +72,12 @@ func (w *APIWorker) GetPowerState(c *gin.Context) {
 // @Router      /{gwid}/devices/accumulated-power-state [get]
 func (w *APIWorker) GetAccumulatedPowerState(c *gin.Context) {
 	appG := app.Gin{c}
-	param := &ResolutionWithPeriodParam{}
-	if err := param.validate(c); err != nil {
+	param := &app.ResolutionWithPeriodParam{}
+	if err := param.Validate(c); err != nil {
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
-	responseData := w.Services.Devices.GetAccumulatedPowerState(param.GatewayUUID, param.Query.Resolution, param.Query.StartTime, param.Query.EndTime)
+	responseData := w.Services.Devices.GetAccumulatedPowerState(param)
 	appG.Response(http.StatusOK, e.Success, responseData)
 }
 
@@ -88,7 +88,7 @@ func (w *APIWorker) GetAccumulatedPowerState(c *gin.Context) {
 // @Security    ApiKeyAuth
 // @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
 // @Param       gwid           path      string true "Gateway UUID"
-// @Param       query          query     ResolutionWithPeriodQuery true "Query"
+// @Param       query          query     app.ResolutionWithPeriodQuery true "Query"
 // @Produce     json
 // @Success     200            {object}  app.Response{data=services.PowerSelfSupplyRateResponse}
 // @Failure     400            {object}  app.Response
@@ -96,11 +96,11 @@ func (w *APIWorker) GetAccumulatedPowerState(c *gin.Context) {
 // @Router      /{gwid}/devices/power-self-supply-rate [get]
 func (w *APIWorker) GetPowerSelfSupplyRate(c *gin.Context) {
 	appG := app.Gin{c}
-	param := &ResolutionWithPeriodParam{}
-	if err := param.validate(c); err != nil {
+	param := &app.ResolutionWithPeriodParam{}
+	if err := param.Validate(c); err != nil {
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
-	responseData := w.Services.Devices.GetPowerSelfSupplyRate(param.GatewayUUID, param.Query.Resolution, param.Query.StartTime, param.Query.EndTime)
+	responseData := w.Services.Devices.GetPowerSelfSupplyRate(param)
 	appG.Response(http.StatusOK, e.Success, responseData)
 }

@@ -50,8 +50,15 @@
         "800": "#0b7979",
         "900": "#096262"
     },
-    "purple": {"main": "#EF7BE3"},
-    "red": {"600-opacity-50": "#DC262650"},
+    "purple": {
+        "main": "#EF7BE3",
+        "main-opacity-10": "#EF7BE310",
+        "main-opacity-20": "#EF7BE320"
+    },
+    "red": {
+        "main":"#FD0060",
+        "600-opacity-50": "#DC262650"
+    },
     "success": {"main": "#0FD76B"},
     "yellow": {
         "main": "#FBE947",

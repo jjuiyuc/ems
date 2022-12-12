@@ -2,10 +2,12 @@ import { connect } from "react-redux"
 import moment from "moment"
 import { useMemo, useState, useEffect } from "react"
 import { useTranslation } from "react-multi-lang"
+import ReportProblemIcon from "@mui/icons-material/ReportProblem"
 
 import { apiCall } from "../utils/api"
 import variables from "../configs/variables"
 
+import AlertBox from "../components/AlertBox"
 import LineChart from "../components/LineChart"
 import PriceCard from "../components/PriceCard"
 import Spinner from "../components/Spinner"

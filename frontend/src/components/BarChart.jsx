@@ -23,7 +23,7 @@ Chart.register(
     Tooltip
 )
 
-import { checkbox, checkboxChecked, tooltipLabelPoint } from "../utils/chart"
+import { legendLabels, tooltipLabelPoint } from "../utils/chart"
 import variables from "../configs/variables"
 
 const
@@ -60,34 +60,20 @@ export default function BarChart(props) {
                     legend: {
                         align: "end",
                         hidden: false,
+                        display: props.data.legend || false,
                         labels: {
                             boxHeight: 18,
                             boxWidth: 18,
                             color: "white",
-                            font: {
-                                size: 16
-                            },
-                            generateLabels: function (chart) {
-                                const labels = Chart.defaults.plugins.legend
-                                    .labels.generateLabels(chart)
-
-                                for (var key in labels) {
-                                    const
-                                        label = labels[key],
-                                        color = label.fillStyle
-                                            .replace("#", "%23")
-
-                                    label.pointStyle = label.hidden
-                                        ? checkbox
-                                        : checkboxChecked(color)
-                                    label.hidden = false
-                                }
-
-                                return labels
-                            },
+                            font: { size: 16 },
+                            generateLabels:
+                                legendLabels(props.data.legendStyle),
                             padding: 20,
                             usePointStyle: true
                         },
+                        onClick: props.data.disableToggle
+                            ? null
+                            : Chart.defaults.plugins.legend.onClick,
                         position: "top"
                     },
                     tooltip: {

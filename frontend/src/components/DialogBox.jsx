@@ -1,42 +1,60 @@
 import { Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material"
-import { useEffect, useState } from "react"
+import { useState } from "react"
+import { useTranslation } from "react-multi-lang"
 
-export default function DialogBox() {
-    const [open, setOpen] = useState(false);
+export default function DialogBox({
+    triggerName = "",
+    leftButtonName = "",
+    rightButtonName = "",
+    closeOutside = false
+}) {
+    const t = useTranslation(),
+        dialogT = (string) => t("dialog." + string)
+
+    const [open, setOpen] = useState(false)
 
     const handleClickOpen = () => {
         setOpen(true)
     }
-
     const handleClose = () => {
         setOpen(false)
     }
-
     return (
         <>
             <div>
-                <Button variant="outlined" onClick={handleClickOpen}>
-                    Open alert dialog
+                <Button
+                    key={"s-b-"}
+                    radius="pill"
+                    variant="contained"
+                    onClick={handleClickOpen}>
+                    {triggerName}
                 </Button>
                 <Dialog
                     open={open}
-                    onClose={handleClose}
+                    onClose={closeOutside ? handleClose : () => { }}
                     aria-labelledby="alert-dialog-title"
                     aria-describedby="alert-dialog-description"
                 >
                     <DialogTitle id="alert-dialog-title">
-                        {"Use Google's location service?"}
+                        {dialogT("confirmedMsg")}
                     </DialogTitle>
                     <DialogContent>
                         <DialogContentText id="alert-dialog-description">
-                            Let Google help apps determine location. This means sending anonymous
-                            location data to Google, even when no apps are running.
+                            {dialogT("promptMsg")}
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={handleClose}>Disagree</Button>
-                        <Button onClick={handleClose} autoFocus>
-                            Agree
+                        <Button onClick={handleClose}
+                            radius="pill"
+                            variant="outlined"
+                            color="gray">
+                            {leftButtonName}
+                        </Button>
+                        <Button onClick={handleClose} autoFocus
+                            radius="pill"
+                            variant="outlined"
+                            color="negative">
+                            {rightButtonName}
                         </Button>
                     </DialogActions>
                 </Dialog>
@@ -44,4 +62,3 @@ export default function DialogBox() {
         </>
     )
 }
-

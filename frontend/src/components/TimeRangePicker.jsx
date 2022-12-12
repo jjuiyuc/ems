@@ -2,7 +2,6 @@ import { TextField } from "@mui/material"
 import DatePicker from "react-datepicker"
 import { useTranslation } from "react-multi-lang"
 import moment from "moment"
-import { useState } from "react"
 import "../assets/css/timeRangePicker.css"
 
 export default function TimeRangePicker(props) {
@@ -11,13 +10,11 @@ export default function TimeRangePicker(props) {
         pageT = (string, params) => t("settings." + string, params),
         errorT = (string) => t("error." + string)
 
-
     const { startTime, setStartTime, endTime, setEndTime, basicPrice, rate,
         setBasicPrice, setRate } = props
 
-
     return (
-        <div className="time-range-picker flex items-center mt-4">
+        <>
             <div>
                 <h6 className="mb-1 ml-1">{pageT("startTime")}</h6>
                 <DatePicker
@@ -30,7 +27,7 @@ export default function TimeRangePicker(props) {
                     onChange={(time) => setStartTime(time)}
                 />
             </div>
-            <span className="mt-6 mx-4">{pageT("to")}</span>
+            <span className="mt-6">{pageT("to")}</span>
             <div>
                 <h6 className="mb-1 ml-1">{pageT("endTime")}</h6>
                 <DatePicker
@@ -46,7 +43,7 @@ export default function TimeRangePicker(props) {
                     disabled={!startTime}
                 />
             </div>
-            <div className="ml-6 mr-4">
+            <div>
                 <h6 className="mb-1 ml-1">基本電價</h6>
                 <TextField
                     className="react-datepicker__input-container"
@@ -65,6 +62,6 @@ export default function TimeRangePicker(props) {
                     onChange={(e) => { setRate(e.target.value) }}
                 />
             </div>
-        </div>
+        </>
     )
 }

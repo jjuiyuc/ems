@@ -319,10 +319,15 @@ export default connect(mapState)(function Economics(props) {
                     onChange={handleFormat}
                     size="large"
                     aria-label="text formatting">
-                    <ToggleButton value="lastMonth" aria-label="lastMonth" color="primary">
+                    <ToggleButton
+                        sx={{ textTransform: "none", fontWeight: "700" }}
+                        value="lastMonth"
+                        aria-label="lastMonth"
+                        color="primary">
                         {pageT("lastMonth")}
                     </ToggleButton>
                     <ToggleButton
+                        sx={{ textTransform: "none", fontWeight: "700" }}
                         value="sameMonthLastYear"
                         aria-label="sameMonthLastYear"
                         color="primary">

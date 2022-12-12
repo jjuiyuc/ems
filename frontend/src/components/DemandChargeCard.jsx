@@ -45,14 +45,16 @@ export default function DemandChargeCard(props) {
             <div className="mt-6">
                 <TextField
                     label="Maximum Demand"
-                    id="outlined-start-adornment"
+                    id="outlined-end-adornment"
                     value={inputValue}
                     onChange={inputNum}
                     InputProps={{
-                        endAdornment: <InputAdornment position="end">
-                            {commonT("kwh")}
-                        </InputAdornment>
+                        endAdornment:
+                            <InputAdornment position="end">
+                                {commonT("kwh")}
+                            </InputAdornment>
                     }}
+                // focused
                 />
             </div>
         </div>

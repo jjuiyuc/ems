@@ -617,6 +617,7 @@ export default connect(mapState)(function Analysis(props) {
                 </div>
             </>
             : null}
+
         {tab !== "days"
             ? <>
                 <div className="card mt-8">

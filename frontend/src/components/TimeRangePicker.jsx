@@ -2,7 +2,6 @@ import { TextField } from "@mui/material"
 import DatePicker from "react-datepicker"
 import { useTranslation } from "react-multi-lang"
 import moment from "moment"
-import { useState } from "react"
 import "../assets/css/timeRangePicker.css"
 
 export default function TimeRangePicker(props) {
@@ -11,10 +10,8 @@ export default function TimeRangePicker(props) {
         pageT = (string, params) => t("settings." + string, params),
         errorT = (string) => t("error." + string)
 
-
     const { startTime, setStartTime, endTime, setEndTime, basicPrice, rate,
         setBasicPrice, setRate } = props
-
 
     return (
         <>

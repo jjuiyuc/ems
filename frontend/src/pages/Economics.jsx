@@ -15,8 +15,6 @@ import LineChart from "../components/LineChart"
 import InfoReminder from "../components/InfoReminder"
 import Spinner from "../components/Spinner"
 
-import { ReactComponent as EconomicsIcon } from "../assets/icons/economics.svg"
-
 const { colors } = variables
 const ErrorBox = ({ error, margin = "", message }) => error
     ? <AlertBox
@@ -49,36 +47,6 @@ export default connect(mapState)(function Economics(props) {
 
     const handleFormat = (event, newFormats) => {
         setFormats(newFormats)
-    }
-    const cardsData = {
-        preUbiik: [
-            {
-                title: pageT("preUbiik"),
-                value: "$" + `${preUbiikThisMonth}`
-            },
-            {
-                title: pageT("lastMonth"),
-                value: "$" + `${preUbiikLastMonth}`
-            },
-            {
-                title: pageT("sameMonthLastYear"),
-                value: "$" + `${preUbiikSameMonthLastYear}`
-            }
-        ],
-        postUbiik: [
-            {
-                title: pageT("postUbiik"),
-                value: "$" + `${postUbiikThisMonth}`
-            },
-            {
-                title: pageT("lastMonth"),
-                value: "$" + `${postUbiikLastMonth}`
-            },
-            {
-                title: pageT("sameMonthLastYear"),
-                value: "$" + `${postUbiikSameMonthLastYear}`
-            }
-        ]
     }
     const chartCostComparisonSet = ({ formats, data, labels }) => {
         const lastMonth = formats?.includes("lastMonth")
@@ -340,15 +308,21 @@ export default connect(mapState)(function Economics(props) {
         <div className="font-bold mt-4 mb-8 relative">
             <div className="lg:grid-cols-2 grid gap-5">
                 <EconomicsCard
-                    icon={EconomicsIcon}
-                    subTitle={pageT("thisCalendarMonth")}
-                    data={cardsData.preUbiik}
+                    data={{
+                        lastMonth: preUbiikLastMonth,
+                        sameMonthLastYear: preUbiikSameMonthLastYear,
+                        thisMonth: preUbiikThisMonth,
+                        type: "pre"
+                    }}
                     tabs={formats}
                 />
                 <EconomicsCard
-                    icon={EconomicsIcon}
-                    subTitle={pageT("thisCalendarMonth")}
-                    data={cardsData.postUbiik}
+                    data={{
+                        lastMonth: postUbiikLastMonth,
+                        sameMonthLastYear: postUbiikSameMonthLastYear,
+                        thisMonth: postUbiikThisMonth,
+                        type: "post"
+                    }}
                     tabs={formats}
                 />
             </div>

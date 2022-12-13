@@ -1,7 +1,7 @@
 import { connect } from "react-redux"
-import { Button, Stack, ToggleButtonGroup, ToggleButton, Alert } from "@mui/material"
+import { ToggleButtonGroup, ToggleButton } from "@mui/material"
 import ReportProblemIcon from "@mui/icons-material/ReportProblem"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useTranslation } from "react-multi-lang"
 import moment from "moment"
 
@@ -15,8 +15,6 @@ import LineChart from "../components/LineChart"
 import InfoReminder from "../components/InfoReminder"
 import Spinner from "../components/Spinner"
 
-import { ReactComponent as EconomicsIcon } from "../assets/icons/economics.svg"
-
 const { colors } = variables
 const ErrorBox = ({ error, margin = "", message }) => error
     ? <AlertBox
@@ -28,61 +26,40 @@ const ErrorBox = ({ error, margin = "", message }) => error
         icon={ReportProblemIcon}
         iconColor="negative-main" />
     : null
-const LoadingBox = ({ loading }) => loading
-    ? <div className="grid h-24 place-items-center"><Spinner /></div>
-    : null
+const mapState = state => ({ gatewayID: state.gateways.active.gatewayID })
 
-const fakeDataArray = amount => Array.from(new Array(amount).keys())
-    .map(() => Math.floor(Math.random() * (40 - 10 + 1) + 10))
-
-const
-    currentHour = moment().hour(),
-    hours24 = Array.from(new Array(24).keys()),
-    lineChartDataArray = hours24.filter(v => v <= currentHour).map(() =>
-        Math.floor(Math.random() * (60 - 40 + 1) + 40)),
-    days = 7,
-    sevenDays = Array.from(new Array(days).keys()).map(n =>
-        moment().subtract(days - n, "d").startOf("day").toISOString()),
-    fakeData1 = fakeDataArray(days),
-    fakeData2 = fakeDataArray(days),
-    fakeData3 = fakeDataArray(days),
-    fakeData4 = fakeDataArray(days),
-    fakeData5 = fakeDataArray(days),
-    fakeData6 = fakeDataArray(days)
-
-export default function Economics(props) {
-
+export default connect(mapState)(function Economics(props) {
     const
         t = useTranslation(),
-        commonT = string => t("common." + string),
         pageT = (string, params) => t("economics." + string, params)
-
     const
         [formats, setFormats] = useState([]),
         [infoError, setInfoError] = useState(""),
         [infoLoading, setInfoLoading] = useState(false),
-        [total, setTotal] = useState(630),
-        [preUbiik, setPreUbiik] = useState(0),
-        [postUbiik, setPostUbiik] = useState(0),
-        [lastMonth, setLastMonth] = useState(0),
-        [sameMonthLastYear, setSameMonthLastYear] = useState(0)
+        [preUbiikThisMonth, setPreUbiikThisMonth] = useState(0),
+        [postUbiikThisMonth, setPostUbiikThisMonth] = useState(0),
+        [preUbiikLastMonth, setPreUbiikLastMonth] = useState(0),
+        [postUbiikLastMonth, setPostUbiikLastMonth] = useState(0),
+        [preUbiikSameMonthLastYear, setPreUbiikSameMonthLastYear] = useState(0),
+        [postUbiikSameMonthLastYear, setPostUbiikSameMonthLastYear] = useState(0),
+        [lineChartCosts, setLineChartCosts] = useState(null),
+        [barChartSaved, setBarChartSaved] = useState(null)
 
     const handleFormat = (event, newFormats) => {
         setFormats(newFormats)
     }
-
-    const chartCostComparisonSet = (formats) => {
+    const chartCostComparisonSet = ({ formats, data, labels }) => {
         const lastMonth = formats?.includes("lastMonth")
             ? ([{
                 backgroundColor: colors.purple["main"],
                 borderColor: colors.purple["main"],
                 borderDash: [5, 5],
-                data: fakeData5,
+                data: data?.preUbiikLastMonth || [],
                 fill: {
                     above: colors.purple["main-opacity-10"],
                     target: "origin"
                 },
-                id: "preUbiik",
+                id: "preUbiikLastMonth",
                 hoverRadius: 0,
                 pointHoverBorderWidth: 0,
                 radius: 0,
@@ -92,12 +69,12 @@ export default function Economics(props) {
             {
                 backgroundColor: colors.purple.main,
                 borderColor: colors.purple.main,
-                data: fakeData6,
+                data: data?.postUbiikLastMonth || [],
                 fill: {
                     above: colors.purple["main-opacity-20"],
                     target: "origin"
                 },
-                id: "postUbiik",
+                id: "postUbiikLastMonth",
                 hoverRadius: 0,
                 borderWidth: 2,
                 pointHoverBorderWidth: 0,
@@ -105,18 +82,17 @@ export default function Economics(props) {
                 label: pageT("postUbiik") + " - " + pageT("lastMonth")
             }])
             : []
-
         const sameMonthLastYear = formats?.includes("sameMonthLastYear")
             ? ([{
                 backgroundColor: colors.yellow["main"],
                 borderColor: colors.yellow["main"],
                 borderDash: [5, 5],
-                data: fakeData3,
+                data: data?.preUbiikSameMonthLastYear || [],
                 fill: {
                     above: colors.yellow["main-opacity-10"],
                     target: "origin"
                 },
-                id: "preUbiik",
+                id: "preUbiikSameMonthLastYear",
                 hoverRadius: 0,
                 pointHoverBorderWidth: 0,
                 radius: 0,
@@ -126,12 +102,12 @@ export default function Economics(props) {
             {
                 backgroundColor: colors.yellow.main,
                 borderColor: colors.yellow.main,
-                data: fakeData4,
+                data: data?.postUbiikSameMonthLastYear || [],
                 fill: {
                     above: colors.yellow["main-opacity-20"],
                     target: "origin"
                 },
-                id: "postUbiik",
+                id: "postUbiikSameMonthLastYear",
                 hoverRadius: 0,
                 borderWidth: 2,
                 pointHoverBorderWidth: 0,
@@ -145,12 +121,12 @@ export default function Economics(props) {
                     backgroundColor: colors.blue["main"],
                     borderColor: colors.blue["main"],
                     borderDash: [5, 5],
-                    data: fakeData2,
+                    data: data?.preUbiikThisMonth || [],
                     fill: {
                         above: colors.blue["main-opacity-10"],
                         target: "origin"
                     },
-                    id: "preUbiik",
+                    id: "preUbiikThisMonth",
                     hoverRadius: 0,
                     pointHoverBorderWidth: 0,
                     radius: 0,
@@ -160,12 +136,12 @@ export default function Economics(props) {
                 {
                     backgroundColor: colors.blue.main,
                     borderColor: colors.blue.main,
-                    data: fakeData1,
+                    data: data?.postUbiikThisMonth || [],
                     fill: {
                         above: colors.blue["main-opacity-20"],
                         target: "origin"
                     },
-                    id: "postUbiik",
+                    id: "postUbiikThisMonth",
                     hoverRadius: 0,
                     borderWidth: 2,
                     pointHoverBorderWidth: 0,
@@ -175,7 +151,7 @@ export default function Economics(props) {
                 ...lastMonth,
                 ...sameMonthLastYear
             ],
-            labels: sevenDays,
+            labels,
             tickCallback: val => "$" + val,
             tooltipLabel: item =>
                 item.dataset.label + " $" + item.parsed.y,
@@ -190,63 +166,41 @@ export default function Economics(props) {
             }
         })
     }
-    const chartSavedCostSet = (formats) => {
+    const chartSavedCostSet = ({ formats, data, labels }) => {
         const lastMonth = formats?.includes("lastMonth")
             ? ([{
-                backgroundColor: colors.purple["main-opacity-20"],
-                borderColor: colors.purple.main,
-                data: fakeData1,
-                id: "preUbiik",
+                backgroundColor: colors.purple["main"],
+                borderColor: colors.purple["main"],
+                data: data?.savedLastMonth || [],
+                id: "savedLastMonth",
                 borderWidth: 1,
-                label: pageT("preUbiik") + " - " + pageT("lastMonth")
-            },
-            {
-                backgroundColor: colors.purple.main,
-                data: fakeData2,
-                id: "postUbiik",
-                borderWidth: 1,
-                label: pageT("postUbiik") + " - " + pageT("lastMonth")
+                label: pageT("lastMonth")
             }])
             : []
-
         const sameMonthLastYear = formats?.includes("sameMonthLastYear")
             ? ([{
-                backgroundColor: colors.yellow["main-opacity-20"],
+                backgroundColor: colors.yellow["main"],
                 borderColor: colors.yellow.main,
-                data: fakeData3,
-                id: "preUbiik",
+                data: data?.savedTheSameMonthLastYear || [],
+                id: "savedTheSameMonthLastYear",
                 borderWidth: 1,
-                label: pageT("preUbiik") + " - " + pageT("sameMonthLastYear")
-            },
-            {
-                backgroundColor: colors.yellow.main,
-                data: fakeData4,
-                id: "postUbiik",
-                borderWidth: 1,
-                label: pageT("postUbiik") + " - " + pageT("sameMonthLastYear")
+                label: pageT("sameMonthLastYear")
             }])
             : []
         return ({
             datasets: [
                 {
-                    backgroundColor: colors.blue["main-opacity-20"],
-                    borderColor: colors.blue["main"],
-                    data: fakeData5,
-                    id: "preUbiik",
-                    borderWidth: 1,
-                    label: pageT("preUbiik") + " - " + pageT("thisCalendarMonth")
-                },
-                {
                     backgroundColor: colors.blue.main,
-                    data: fakeData6,
-                    id: "postUbiik",
+                    borderColor: colors.blue["main"],
+                    data: data?.savedThisMonth || [],
+                    id: "savedThisMonth",
                     borderWidth: 1,
-                    label: pageT("postUbiik") + " - " + pageT("thisCalendarMonth")
+                    label: pageT("thisCalendarMonth")
                 },
                 ...lastMonth,
                 ...sameMonthLastYear
             ],
-            labels: sevenDays,
+            labels,
             tickCallback: val => "$" + val,
             tooltipLabel: item =>
                 item.dataset.label + " $" + item.parsed.y,
@@ -261,6 +215,69 @@ export default function Economics(props) {
             }
         })
     }
+    const urlPrefix = `/api/${props.gatewayID}/devices`
+    const
+        callData = (startTime, endTime) => {
+            apiCall({
+                onComplete: () => setInfoLoading(false),
+                onError: error => setInfoError(error),
+                onStart: () => setInfoLoading(true),
+                onSuccess: rawData => {
+                    if (!rawData?.data) return
+                    const { data } = rawData,
+                        preAndPost = data.energyCosts
+
+                    setPreUbiikThisMonth(preAndPost?.preUbiikThisMonth || 0)
+                    setPostUbiikThisMonth(preAndPost?.postUbiikThisMonth || 0)
+                    setPreUbiikLastMonth(preAndPost?.preUbiikLastMonth || 0)
+                    setPostUbiikLastMonth(preAndPost?.postUbiikLastMonth || 0)
+                    setPreUbiikSameMonthLastYear(preAndPost?.preUbiikTheSameMonthLastYear || 0)
+                    setPostUbiikSameMonthLastYear(preAndPost?.postUbiikTheSameMonthLastYear || 0)
+
+                    const
+                        costs = data.energyDailyCosts,
+                        { timestamps } = costs,
+                        labels = timestamps.map(t => {
+                            return moment(t * 1000).startOf("day")._d.getTime()
+                        })
+                    setLineChartCosts({
+                        data: {
+                            preUbiikThisMonth: costs?.preUbiikThisMonth,
+                            postUbiikThisMonth: costs?.postUbiikThisMonth,
+                            preUbiikLastMonth: costs?.preUbiikLastMonth,
+                            postUbiikLastMonth: costs?.postUbiikLastMonth,
+                            preUbiikSameMonthLastYear: costs?.preUbiikTheSameMonthLastYear,
+                            postUbiikSameMonthLastYear: costs?.postUbiikTheSameMonthLastYear
+                        },
+                        labels
+                    })
+                    setBarChartSaved({
+                        data: {
+                            savedThisMonth: costs?.savedThisMonth,
+                            savedLastMonth: costs?.savedLastMonth,
+                            savedTheSameMonthLastYear: costs?.savedTheSameMonthLastYear
+                        },
+                        labels
+                    })
+                },
+                url: `${urlPrefix}/tou/energy-cost?startTime=${startTime}&endTime=${endTime}`
+            })
+        }
+    useEffect(() => {
+        if (!props.gatewayID) return
+
+        let startTime = moment().startOf("month").toISOString(),
+            endTime = moment().startOf("day").toISOString()
+
+        if (moment().get("date") == 1) {
+            startTime = moment().subtract(1, "month").startOf("month").toISOString()
+            endTime = moment().startOf("day").toISOString()
+        }
+        if (startTime && endTime) {
+            callData(startTime, endTime)
+        }
+    }, [props.gatewayID])
+
     return <>
         <div className="page-header flex flex-wrap justify-between">
             <h1 className="mb-9">{pageT("economics")}</h1>
@@ -270,37 +287,42 @@ export default function Economics(props) {
                     onChange={handleFormat}
                     size="large"
                     aria-label="text formatting">
-                    <ToggleButton value="lastMonth" aria-label="lastMonth" color="primary">
+                    <ToggleButton
+                        sx={{ textTransform: "none", fontWeight: "700" }}
+                        value="lastMonth"
+                        aria-label="lastMonth"
+                        color="primary">
                         {pageT("lastMonth")}
                     </ToggleButton>
-                    <ToggleButton value="sameMonthLastYear" aria-label="sameMonthLastYear" color="primary">
+                    <ToggleButton
+                        sx={{ textTransform: "none", fontWeight: "700" }}
+                        value="sameMonthLastYear"
+                        aria-label="sameMonthLastYear"
+                        color="primary">
                         {pageT("sameMonthLastYear")}
                     </ToggleButton>
                 </ToggleButtonGroup>
             </div>
         </div>
+        <ErrorBox error={infoError} message={pageT("infoError")} />
         <div className="font-bold mt-4 mb-8 relative">
             <div className="lg:grid-cols-2 grid gap-5">
                 <EconomicsCard
-                    icon={EconomicsIcon}
-                    title={pageT("preUbiik")}
-                    subTitle={pageT("thisCalendarMonth")}
-                    leftTitle={pageT("lastMonth")}
-                    rightTitle={pageT("sameMonthLastYear")}
-                    value={"$" + preUbiik}
-                    leftValue={"$" + lastMonth}
-                    rightValue={"$" + sameMonthLastYear}
+                    data={{
+                        lastMonth: preUbiikLastMonth,
+                        sameMonthLastYear: preUbiikSameMonthLastYear,
+                        thisMonth: preUbiikThisMonth,
+                        type: "pre"
+                    }}
                     tabs={formats}
                 />
                 <EconomicsCard
-                    icon={EconomicsIcon}
-                    title={pageT("postUbiik")}
-                    subTitle={pageT("thisCalendarMonth")}
-                    leftTitle={pageT("lastMonth")}
-                    rightTitle={pageT("sameMonthLastYear")}
-                    value={"$" + postUbiik}
-                    leftValue={"$" + lastMonth}
-                    rightValue={"$" + sameMonthLastYear}
+                    data={{
+                        lastMonth: postUbiikLastMonth,
+                        sameMonthLastYear: postUbiikSameMonthLastYear,
+                        thisMonth: postUbiikThisMonth,
+                        type: "post"
+                    }}
                     tabs={formats}
                 />
             </div>
@@ -313,32 +335,27 @@ export default function Economics(props) {
         </div>
         <div className="card chart mt-8 mb-8">
             <h4 className="mb-9">{pageT("energyCostComparison")}</h4>
-            {/* <ErrorBox
-                error={chargeVoltageError}
-                message={pageT("chartError")} /> */}
             <div className="max-h-80vh h-160 relative w-full">
-                <LineChart data={chartCostComparisonSet(formats)}
-                    id="ecoCost" />
-
-                {/* // data={chartChargeVoltageSet({
-                    //     ...chargeVoltage,
-                    //     unit: { charge: "%", voltage: " " + commonT("v") },
-                    // })}
-                    // id="erbChargeVoltage" /> */}
+                <LineChart data={chartCostComparisonSet({
+                    formats,
+                    ...lineChartCosts
+                })}
+                    id="ecoCosts" />
             </div>
-            {/* <LoadingBox loading={chargeVoltageLoading} /> */}
         </div>
-
         <div className="card mt-8">
             <h4 className="mb-4 lg:mb-0">{pageT("savedEnergyCost")}</h4>
             <div className="max-h-80vh h-160 mt-8 relative w-full">
                 <BarChart
-                    data={chartSavedCostSet(formats)}
-                    id="economicsBarChart" />
+                    data={chartSavedCostSet({
+                        formats,
+                        ...barChartSaved
+                    })}
+                    id="ecoSavedCosts" />
             </div>
         </div>
         <div className="mt-8">
             <InfoReminder />
         </div>
     </>
-}
+})

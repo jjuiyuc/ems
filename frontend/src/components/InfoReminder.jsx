@@ -2,7 +2,6 @@ import { connect } from "react-redux"
 import { Alert } from "@mui/material"
 import { useTranslation } from "react-multi-lang"
 
-
 const mapState = state => ({ lang: state.lang.value })
 
 export default connect(mapState)(function InfoReminder(props) {

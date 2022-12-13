@@ -334,7 +334,14 @@ export default connect(mapState)(function Economics(props) {
                 : null}
         </div>
         <div className="card chart mt-8 mb-8">
-            <h4 className="mb-9">{pageT("energyCostComparison")}</h4>
+            <div className="flex justify-between">
+
+                <h4 className="mb-9">{pageT("energyCostComparison")}</h4>
+                <div className="bg-gray-700 p-4 mr-6 rounded-xl">
+                    <p>{pageT("dottedLine") + pageT("preUbiik")}</p>
+                    <p>{pageT("solidLine") + pageT("postUbiik")}</p>
+                </div>
+            </div>
             <div className="max-h-80vh h-160 relative w-full">
                 <LineChart data={chartCostComparisonSet({
                     formats,

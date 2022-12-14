@@ -427,14 +427,12 @@
   cursor: pointer;
 }
 .react-datepicker__day:hover,
-.react-datepicker__month-text:hover,
 .react-datepicker__quarter-text:hover,
 .react-datepicker__year-text:hover {
   border-radius: 50%;
   background-color: rgba(18, 201, 201,0.3);
 }
 .react-datepicker__day--today,
-.react-datepicker__month-text--today,
 .react-datepicker__quarter-text--today,
 .react-datepicker__year-text--today {
   font-weight: bold;

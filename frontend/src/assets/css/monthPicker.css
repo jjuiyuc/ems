@@ -522,14 +522,12 @@ background-color: #1C1C1E;
 .react-datepicker__year-text--in-selecting-range) {
   color: E0E0E0;
 }
-.react-datepicker__day--disabled,
 .react-datepicker__month-text--disabled,
 .react-datepicker__quarter-text--disabled,
 .react-datepicker__year-text--disabled {
   cursor: default;
   color: rgba(189, 189, 189,0.3);
 }
-.react-datepicker__day--disabled:hover,
 .react-datepicker__month-text--disabled:hover,
 .react-datepicker__quarter-text--disabled:hover,
 .react-datepicker__year-text--disabled:hover {

@@ -15,7 +15,7 @@ import DateRangePicker from "../components/DateRangePicker"
 import LineChart from "../components/LineChart"
 import MonthPicker from "../components/MonthPicker"
 import Spinner from "../components/Spinner"
-import "../assets/css/dateRangePicker.css"
+// import "../assets/css/dateRangePicker.css"
 
 const { colors } = variables
 const ErrorBox = ({ error, margin = "", message }) => error
@@ -552,7 +552,7 @@ export default connect(mapState)(function Analysis(props) {
             </div>
         </div>
         {tab === "month"
-            ? <div className="flex justify-end mb-10 mr-56 relative w-auto">
+            ? <div className="flex justify-end mb-10 mr-36 relative w-auto">
                 <div className="flex items-center">
                     <MonthPicker
                         {...{ startMonth, setStartMonth }}
@@ -628,7 +628,6 @@ export default connect(mapState)(function Analysis(props) {
                 </div>
             </>
             : null}
-
         {tab !== "days"
             ? <>
                 <div className="card mt-8">

@@ -13,6 +13,7 @@ import AnalysisCard from "../components/AnalysisCard"
 import BarChart from "../components/BarChart"
 import DateRangePicker from "../components/DateRangePicker"
 import LineChart from "../components/LineChart"
+import MonthPicker from "../components/MonthPicker"
 import Spinner from "../components/Spinner"
 import "../assets/css/dateRangePicker.css"
 
@@ -253,7 +254,8 @@ export default connect(mapState)(function Analysis(props) {
         [lineChartSupplyError, setLineChartSupplyError] = useState(""),
         [lineChartSupplyLoading, setLineChartSupplyLoading] = useState(false),
         [startDate, setStartDate] = useState(null),
-        [endDate, setEndDate] = useState(null)
+        [endDate, setEndDate] = useState(null),
+        [startMonth, setStartMonth] = useState(new Date())
 
     const urlPrefix = `/api/${props.gatewayID}/devices`
     const
@@ -549,6 +551,15 @@ export default connect(mapState)(function Analysis(props) {
                     </Button>)}
             </div>
         </div>
+        {tab === "month"
+            ? <div className="flex justify-end mb-10 mr-56 relative w-auto">
+                <div className="flex items-center">
+                    <MonthPicker
+                        {...{ startMonth, setStartMonth }}
+                    />
+                </div>
+            </div>
+            : null}
         {tab === "custom"
             ? <div className="flex justify-end mb-10 relative w-auto">
                 <div className="flex items-center">

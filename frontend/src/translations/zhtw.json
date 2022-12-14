@@ -16,6 +16,7 @@
         "load": "用電負載",
         "month": "月",
         "todayPowerkW": "今日功率 (kW)",
+        "selectMonth":"選擇月份",
         "selfSupplyRate": "自給用電比率(%)",
         "startDate": "開始日期",
         "to": "至",

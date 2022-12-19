@@ -364,24 +364,11 @@ background-color: #1C1C1E;
   border-radius: 0.3rem;
 }
 
-.react-datepicker__day-names,
-.react-datepicker__week {
-  white-space: nowrap;
-}
-
-.react-datepicker__day-names {
-  margin-bottom: -8px;
-}
-
-.react-datepicker__day-name,
-.react-datepicker__day,
-.react-datepicker__time-name {
-  color: #EEECF1;
-  display: inline-block;
-  width: 1.7rem;
-  line-height: 1.7rem;
-  text-align: center;
-  margin: 0.166rem;
+.react-datepicker__month-text,
+.react-datepicker__quarter-text,
+.react-datepicker__year-text {
+    color: #EEECF1;
+  cursor: pointer;
 }
 
 .react-datepicker__month--selected, .react-datepicker__month--in-selecting-range, .react-datepicker__month--in-range,
@@ -400,7 +387,7 @@ background-color: #1C1C1E;
 }
 .react-datepicker__month--disabled,
 .react-datepicker__quarter--disabled {
-  color: #ccc;
+  color: rgba(189, 189, 189,0.3);
   pointer-events: none;
 }
 .react-datepicker__month--disabled:hover,
@@ -408,20 +395,11 @@ background-color: #1C1C1E;
   cursor: default;
   background-color: transparent;
 }
-
-.react-datepicker__month-text,
-.react-datepicker__quarter-text,
-.react-datepicker__year-text {
-    color: #EEECF1;
-  cursor: pointer;
-}
-
 .react-datepicker__month-text:hover,
 .react-datepicker__quarter-text:hover,
 .react-datepicker__year-text:hover {
   background-color: rgba(18, 201, 201,0.3);
   border-radius: 1.5rem;
-  /* padding: 4px; */
 }
 .react-datepicker__month-text--today,
 .react-datepicker__quarter-text--today,
@@ -487,10 +465,9 @@ background-color: #1C1C1E;
 .react-datepicker__year-text--keyboard-selected:hover {
   background-color: rgba(18, 201, 201,0.3);
 }
-.react-datepicker__day--in-selecting-range:not(.react-datepicker__day--in-range,
 .react-datepicker__month-text--in-range,
 .react-datepicker__quarter-text--in-range,
-.react-datepicker__year-text--in-range),
+.react-datepicker__year-text--in-range,
 .react-datepicker__month-text--in-selecting-range:not(.react-datepicker__day--in-range,
 .react-datepicker__month-text--in-range,
 .react-datepicker__quarter-text--in-range,
@@ -708,12 +685,6 @@ input{
   align-items: center;
   display: flex;
   z-index: 2147483647;
-}
-.react-datepicker__portal .react-datepicker__day-name,
-.react-datepicker__portal .react-datepicker__day,
-.react-datepicker__portal .react-datepicker__time-name {
-  width: 3rem;
-  line-height: 3rem;
 }
 @media (max-width: 400px), (max-height: 550px) {
   .react-datepicker__portal .react-datepicker__day-name,

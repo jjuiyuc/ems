@@ -387,7 +387,7 @@
 .react-datepicker__day-name,
 .react-datepicker__day,
 .react-datepicker__time-name {
-  color: #EEECF1;
+  color: rgb(179, 175, 185);
   display: inline-block;
   width: 1.7rem;
   line-height: 1.7rem;

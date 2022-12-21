@@ -107,7 +107,7 @@ export default connect(mapState)(function Dashboard(props) {
 
         setBattery({
             direction:
-                data.batteryChargingFrom ? "chargingFrom" : "dischargingTo",
+                data.batteryChargingFrom ? "chargingFrom" : "dischargeTo",
             target: (data.batteryChargingFrom || data.batteryDischargingTo),
             import: data.batteryGridAveragePowerAC,
             power: batteryPower,
@@ -183,7 +183,7 @@ export default connect(mapState)(function Dashboard(props) {
                 value: `${battery?.power} ${commonT("kw")}`
             },
             {
-                name: commonT("importFromGrid"),
+                name: commonT("chargeFromGrid"),
                 value: `${battery?.import} ${commonT("kw")}`
             },
             { name: pageT(battery?.direction), value: battery?.target || "-" }

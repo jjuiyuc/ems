@@ -205,7 +205,7 @@ export default connect(mapState)(function Analysis(props) {
         xTickSource: "labels"
     })
     const
-        [tab, setTab] = useState("days"),
+        [tab, setTab] = useState("day"),
         [infoError, setInfoError] = useState(""),
         [infoLoading, setInfoLoading] = useState(false),
         [preInfoError, setPreInfoError] = useState(""),
@@ -488,13 +488,13 @@ export default connect(mapState)(function Analysis(props) {
 
         let startTime = "", endTime = ""
         let preStartTime = "", preEndTime = ""
-        if (tab === "days") {
+        if (tab === "day") {
             startTime = moment().startOf("day").toISOString()
             endTime = moment().toISOString()
             preStartTime = moment().subtract(1, "day").startOf("day").toISOString()
             preEndTime = moment().subtract(1, "day").endOf("day").toISOString()
 
-        } else if (tab === "weeks") {
+        } else if (tab === "week") {
             startTime = moment().startOf("week").toISOString()
             endTime = moment().startOf("day").toISOString()
 
@@ -517,7 +517,7 @@ export default connect(mapState)(function Analysis(props) {
         if (startTime && endTime) {
             callTodayCards(startTime, endTime)
 
-            if (tab === "days") {
+            if (tab === "day") {
                 callLineChartPower(startTime, endTime)
             } else {
                 callBarChartData(startTime, endTime)
@@ -527,13 +527,13 @@ export default connect(mapState)(function Analysis(props) {
         if (preStartTime && preEndTime) {
             callYesterdayCards(preStartTime, preEndTime)
 
-            if (tab === "days") {
+            if (tab === "day") {
                 callPreLineChartPower(preStartTime, preEndTime)
             }
         }
     }, [props.gatewayID, tab, startDate, endDate, startMonth])
 
-    const tabs = ["days", "weeks", "month", "year", "custom"]
+    const tabs = ["day", "week", "month", "year", "custom"]
 
     return <>
         <div className="page-header flex flex-wrap justify-between">
@@ -583,7 +583,7 @@ export default connect(mapState)(function Analysis(props) {
                 </div>
                 : null}
         </div>
-        {tab == "days"
+        {tab == "day"
             ? <>
                 <div className="card mt-8">
                     <h4>{pageT("todayPowerkW")}</h4>
@@ -628,7 +628,7 @@ export default connect(mapState)(function Analysis(props) {
                 </div>
             </>
             : null}
-        {tab !== "days"
+        {tab !== "day"
             ? <>
                 <div className="card mt-8">
                     <h4>{pageT("accumulatedKwh")}</h4>

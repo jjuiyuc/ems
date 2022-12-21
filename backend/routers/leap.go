@@ -4,12 +4,15 @@ import (
 	"encoding/json"
 	"net/http"
 	"reflect"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 
 	"der-ems/internal/app"
 	"der-ems/internal/e"
+	"der-ems/kafka"
 )
 
 // LeapNotification godoc
@@ -21,7 +24,10 @@ type LeapNotification struct {
 // GetLeapBiddingDispatch godoc
 func (w *APIWorker) GetLeapBiddingDispatch(c *gin.Context) {
 	// XXX: Hardcode for demo
-	const MeterID = "436ca983-d52e-4d8e-8c82-2d5021d495bf"
+	const (
+		MeterID     = "436ca983-d52e-4d8e-8c82-2d5021d495bf"
+		GatewayUUID = "0E0BA27A8175AF978C49396BDE9D7A1E"
+	)
 	appG := app.Gin{c}
 	appG.Response(http.StatusOK, e.Success, nil)
 
@@ -60,7 +66,12 @@ func (w *APIWorker) GetLeapBiddingDispatch(c *gin.Context) {
 	if meterExists {
 		bodyJSON, _ := json.Marshal(body)
 		log.Debug("bodyJSON : ", string(bodyJSON))
-		// TODO: Send notification content to gateway local AI
-		log.Debug("Send notification content to gateway")
+		sendLeapBiddingDispatchToGateway(w.Cfg, bodyJSON, GatewayUUID)
 	}
+}
+
+func sendLeapBiddingDispatchToGateway(cfg *viper.Viper, biddingDispatchJSON []byte, uuid string) {
+	biddingDispatchTopic := strings.Replace(kafka.SendLeapBiddingDispatchToLocalGW, "{gw-id}", uuid, 1)
+	log.Debug("biddingDispatchTopic: ", biddingDispatchTopic)
+	kafka.Produce(cfg, biddingDispatchTopic, string(biddingDispatchJSON))
 }

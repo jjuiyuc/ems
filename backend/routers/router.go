@@ -30,12 +30,16 @@ const (
 
 // APIWorker godoc
 type APIWorker struct {
+	Cfg      *viper.Viper
 	Services *services.Services
 }
 
 // NewAPIWorker godoc
 func NewAPIWorker(cfg *viper.Viper, services *services.Services) {
-	w := &APIWorker{Services: services}
+	w := &APIWorker{
+		Cfg:      cfg,
+		Services: services,
+	}
 
 	r := InitRouter(cfg.GetBool("server.cors"), cfg.GetString("server.ginMode"), w)
 	r.Run(cfg.GetString("server.port"))

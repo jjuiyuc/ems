@@ -16,6 +16,7 @@
         "load": "Load",
         "month": "Month",
         "todayPowerkW": "Today Power (kW)",
+        "selectMonth":"Select Month",
         "selfSupplyRate": "Self-supply Rate (%)",
         "startDate": "Start Date",
         "to": "to",
@@ -70,6 +71,10 @@
         "infoError": "Can't get info",
         "lastMonthBillingCycle": "Last Month Billing Cycle",
         "realizedSavings": "Realized Savings"
+    },
+    "dialog": {
+        "confirmedMsg":"Are you sure you want to turn off all the charging resources?",
+        "promptMsg":"If all charging resources are turned off, the battery will be in standby mode."
     },
     "economics": {
         "ancillaryServices": "Ancillary Services",
@@ -208,6 +213,7 @@
         "addTimeRange":"Add Time Range",
         "availableRegularUsage":"Available Regular Usage",
         "backupReserve":"Backup Reserve",
+        "cancel":"Cancel",
         "chargingSources":"Charging Sources",
         "endTime":"End Time",
         "maximumDemandCapacity":"Maximum Demand Capacity",
@@ -228,6 +234,7 @@
         "tariff":"Tariff",
         "timeOfUse": "Time of Use",
         "to": "to",
+        "turnOff":"Turn Off",
         "weekdays":"Weekdays"
     },
     "timeOfUse": {

@@ -16,6 +16,7 @@
         "load": "用電負載",
         "month": "月",
         "todayPowerkW": "今日功率 (kW)",
+        "selectMonth":"選擇月份",
         "selfSupplyRate": "自給用電比率(%)",
         "startDate": "開始日期",
         "to": "至",
@@ -70,6 +71,10 @@
         "infoError": "無法取得資料",
         "lastMonthBillingCycle": "前一計費週期",
         "realizedSavings": "已避免超約費用"
+    },
+    "dialog": {
+        "confirmedMsg":"Are you sure you want to turn off all the charging resources?",
+        "promptMsg":"If all charging resources are turned off, the battery will be in standby mode."
     },
     "economics": {
         "ancillaryServices": "輔助服務",
@@ -209,6 +214,7 @@
         "addTimeRange":"新增時間區間",
         "availableRegularUsage":"Available Regular Usage",
         "backupReserve":"Backup Reserve",
+        "cancel":"關閉",
         "chargingSources":"Charging Sources",
         "endTime":"結束時間",
         "maximumDemandCapacity":"Maximum Demand Capacity",
@@ -229,6 +235,7 @@
         "tariff":"電價",
         "timeOfUse": "時間電價",
         "to": "至",
+        "turnOff":"關閉",
         "weekdays":"平日"
     },
     "timeOfUse": {

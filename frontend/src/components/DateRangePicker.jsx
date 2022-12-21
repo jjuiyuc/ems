@@ -1,7 +1,7 @@
 import DatePicker from "react-datepicker"
 import { useTranslation } from "react-multi-lang"
 import moment from "moment"
-import { useState } from "react"
+import "../assets/css/dateRangePicker.css"
 
 export default function DateRangePicker(props) {
     const

@@ -33,6 +33,7 @@ module.exports = {
                 "5rem-1fr": "5rem 1fr",
                 "15rem-1fr": "15rem 1fr",
                 "1fr-auto-1fr": "1fr auto 1fr",
+                "settings-input": "auto 1fr auto auto auto 30px"
             },
             gridTemplateRows: {
                 "1fr-auto": "1fr auto",

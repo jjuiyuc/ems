@@ -13,8 +13,8 @@ import AnalysisCard from "../components/AnalysisCard"
 import BarChart from "../components/BarChart"
 import DateRangePicker from "../components/DateRangePicker"
 import LineChart from "../components/LineChart"
+import MonthPicker from "../components/MonthPicker"
 import Spinner from "../components/Spinner"
-import "../assets/css/dateRangePicker.css"
 
 const { colors } = variables
 const ErrorBox = ({ error, margin = "", message }) => error
@@ -38,6 +38,10 @@ export default connect(mapState)(function Analysis(props) {
         t = useTranslation(),
         commonT = string => t("common." + string),
         pageT = (string, params) => t("analysis." + string, params)
+
+    const defaultMonth = moment().get("date") == 1
+        ? moment().subtract(1, "month").startOf("month")._d
+        : new Date()
 
     const chartRealTimePowerSet = ({ data, labels }) => ({
         datasets: [
@@ -253,7 +257,8 @@ export default connect(mapState)(function Analysis(props) {
         [lineChartSupplyError, setLineChartSupplyError] = useState(""),
         [lineChartSupplyLoading, setLineChartSupplyLoading] = useState(false),
         [startDate, setStartDate] = useState(null),
-        [endDate, setEndDate] = useState(null)
+        [endDate, setEndDate] = useState(null),
+        [startMonth, setStartMonth] = useState(defaultMonth)
 
     const urlPrefix = `/api/${props.gatewayID}/devices`
     const
@@ -497,11 +502,8 @@ export default connect(mapState)(function Analysis(props) {
                 startTime = moment().subtract(1, "week").startOf("week").toISOString()
             }
         } else if (tab === "month") {
-            startTime = moment().startOf("month").toISOString()
-            endTime = moment().startOf("day").toISOString()
-            if (moment().get("date") == 1) {
-                startTime = moment().subtract(1, "month").startOf("month").toISOString()
-            }
+            startTime = startMonth ? moment(startMonth).startOf("month").toISOString() : ""
+            endTime = startMonth ? moment(startMonth).endOf("month").toISOString() : ""
         } else if (tab === "year") {
             startTime = moment().startOf("year").toISOString()
             endTime = moment().startOf("month").toISOString()
@@ -529,7 +531,7 @@ export default connect(mapState)(function Analysis(props) {
                 callPreLineChartPower(preStartTime, preEndTime)
             }
         }
-    }, [props.gatewayID, tab, startDate, endDate])
+    }, [props.gatewayID, tab, startDate, endDate, startMonth])
 
     const tabs = ["days", "weeks", "month", "year", "custom"]
 
@@ -549,6 +551,15 @@ export default connect(mapState)(function Analysis(props) {
                     </Button>)}
             </div>
         </div>
+        {tab === "month"
+            ? <div className="flex justify-end mb-10 mr-36 relative w-auto">
+                <div className="flex items-center">
+                    <MonthPicker
+                        {...{ startMonth, setStartMonth }}
+                    />
+                </div>
+            </div>
+            : null}
         {tab === "custom"
             ? <div className="flex justify-end mb-10 relative w-auto">
                 <div className="flex items-center">

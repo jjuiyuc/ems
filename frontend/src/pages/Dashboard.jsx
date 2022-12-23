@@ -141,8 +141,10 @@ export default connect(mapState)(function Dashboard(props) {
             export: data.gridPvAveragePowerAC
         })
     }
+    const { gatewayID } = props
     useEffect(() => {
-        if (!props.gatewayID) return
+        console.log("123")
+        if (!gatewayID) return
 
         const
             windowProtocol = window.location.protocol,
@@ -165,7 +167,7 @@ export default connect(mapState)(function Dashboard(props) {
         return () => {
             if (wsConnection) wsConnection.close()
         }
-    }, [props.gatewayID])
+    }, [gatewayID])
 
     const peakShaveRate = useMemo(() => {
         if (!peak.current || !peak.threshhold) return 0

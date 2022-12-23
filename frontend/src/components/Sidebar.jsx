@@ -10,6 +10,7 @@ import { ReactComponent as Demand } from "../assets/icons/demand_charge.svg"
 import { ReactComponent as Economics } from "../assets/icons/economics.svg"
 import { ReactComponent as Menu } from "../assets/icons/menu.svg"
 import { ReactComponent as Logo } from "../assets/images/logo.svg"
+import { ReactComponent as LogoWithName } from "../assets/images/logoWithName.svg"
 import { ReactComponent as Resource } from "../assets/icons/resource.svg"
 import { ReactComponent as Settings } from "../assets/icons/settings.svg"
 import { ReactComponent as Timer } from "../assets/icons/timer.svg"
@@ -24,6 +25,7 @@ function Sidebar(props) {
         transitionClasses = "duration-300 transition "
             + (isExpanded ? "opacity-100" : "opacity-0")
 
+    const MenuIcon = isExpanded ? Menu : Logo
     const
         navs = [
             { icon: <Dashboard />, path: "dashboard" },
@@ -62,18 +64,17 @@ function Sidebar(props) {
         <div className="w-60">
             <div className="border-b border-black-main flex h-20 items-center
                             justify-start px-7">
-                <Menu
+                <MenuIcon
                     className="cursor-pointer h-6 text-gray-200 w-6"
                     onClick={toggle} />
                 <Link className={"ml-2 " + transitionClasses} to="/">
-                    <Logo className="logo" />
+                    <LogoWithName className="logo" />
                 </Link>
             </div>
             <ul className="mt-6 sidebar-menu">{navList}</ul>
         </div>
     </aside>
 }
-
 const
     mapState = state => ({ status: state.sidebarStatus.value }),
     mapDispatch = dispatch => ({

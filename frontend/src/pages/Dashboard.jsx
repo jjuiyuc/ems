@@ -143,7 +143,6 @@ export default connect(mapState)(function Dashboard(props) {
     }
     const { gatewayID } = props
     useEffect(() => {
-        console.log("123")
         if (!gatewayID) return
 
         const

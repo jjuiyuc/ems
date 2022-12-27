@@ -590,7 +590,6 @@ export default connect(mapState)(function TimeOfUse(props) {
                 </div>
             </>
             : null}
-
         {tab == "yesterday"
             ? <>
                 <div className="gap-8 grid md:grid-cols-2 items-start">

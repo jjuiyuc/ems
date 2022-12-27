@@ -2,6 +2,7 @@ import { useTranslation } from "react-multi-lang"
 import { useEffect, useRef } from "react"
 import variables from "../configs/variables"
 import WaterChart from "water-chart"
+import BatteryDiagram from "../components/BatteryDiagram"
 
 const { colors } = variables
 
@@ -38,6 +39,7 @@ export default function BatteryStatusCard({ data }) {
             waveColor2: colors.primary.main
         })
     }, [data.state])
+
     return <div className="card">
         <div className="header">
             <h4>{pageT("batteryStatus")}</h4>

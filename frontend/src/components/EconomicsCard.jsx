@@ -27,7 +27,7 @@ export default function EconomicsCard(props) {
                         <EconomicsIcon className="h-9 text-gray-400 w-9" />
                     </div>
                 </div>
-                {["lastMonth", "sameMonthLastYear"].map(t =>
+                {["lastMonth", "sameDayLastYear"].map(t =>
                     props.tabs.includes(t)
                         ? <div className="light-card font-bold mt-6">
                             <p className="mb-4">{pageT(t)}</p>

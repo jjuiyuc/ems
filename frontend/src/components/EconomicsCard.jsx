@@ -17,7 +17,7 @@ export default function EconomicsCard(props) {
                             <h5 className="mr-1">{pageT(type + "Ubiik")}</h5>
                             <label className="bg-gray-600 font-normal px-2 py-1
                                 rounded-3xl text-11px">
-                                {pageT("thisCalendarMonth")}
+                                {pageT("today")}
                             </label>
                         </div>
                         <h2 className="flex">${thisMonth}</h2>
@@ -27,7 +27,7 @@ export default function EconomicsCard(props) {
                         <EconomicsIcon className="h-9 text-gray-400 w-9" />
                     </div>
                 </div>
-                {["lastMonth", "sameMonthLastYear"].map(t =>
+                {["lastMonth", "sameDayLastYear"].map(t =>
                     props.tabs.includes(t)
                         ? <div className="light-card font-bold mt-6">
                             <p className="mb-4">{pageT(t)}</p>

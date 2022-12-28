@@ -82,7 +82,7 @@ export default connect(mapState)(function Economics(props) {
                 label: pageT("postUbiik") + " - " + pageT("lastMonth")
             }])
             : []
-        const sameMonthLastYear = formats?.includes("sameMonthLastYear")
+        const sameDayLastYear = formats?.includes("sameDayLastYear")
             ? ([{
                 backgroundColor: colors.yellow["main"],
                 borderColor: colors.yellow["main"],
@@ -97,7 +97,7 @@ export default connect(mapState)(function Economics(props) {
                 pointHoverBorderWidth: 0,
                 radius: 0,
                 borderWidth: 1,
-                label: pageT("preUbiik") + " - " + pageT("sameMonthLastYear")
+                label: pageT("preUbiik") + " - " + pageT("sameDayLastYear")
             },
             {
                 backgroundColor: colors.yellow.main,
@@ -112,7 +112,7 @@ export default connect(mapState)(function Economics(props) {
                 borderWidth: 2,
                 pointHoverBorderWidth: 0,
                 radius: 0,
-                label: pageT("postUbiik") + " - " + pageT("sameMonthLastYear")
+                label: pageT("postUbiik") + " - " + pageT("sameDayLastYear")
             }])
             : []
         return ({
@@ -131,7 +131,7 @@ export default connect(mapState)(function Economics(props) {
                     pointHoverBorderWidth: 0,
                     radius: 0,
                     borderWidth: 1,
-                    label: pageT("preUbiik") + " - " + pageT("thisCalendarMonth")
+                    label: pageT("preUbiik") + " - " + pageT("today")
                 },
                 {
                     backgroundColor: colors.blue.main,
@@ -146,10 +146,10 @@ export default connect(mapState)(function Economics(props) {
                     borderWidth: 2,
                     pointHoverBorderWidth: 0,
                     radius: 0,
-                    label: pageT("postUbiik") + " - " + pageT("thisCalendarMonth")
+                    label: pageT("postUbiik") + " - " + pageT("today")
                 },
                 ...lastMonth,
-                ...sameMonthLastYear
+                ...sameDayLastYear
             ],
             labels,
             tickCallback: val => "$" + val,
@@ -177,14 +177,14 @@ export default connect(mapState)(function Economics(props) {
                 label: pageT("lastMonth")
             }])
             : []
-        const sameMonthLastYear = formats?.includes("sameMonthLastYear")
+        const sameDayLastYear = formats?.includes("sameDayLastYear")
             ? ([{
                 backgroundColor: colors.yellow["main"],
                 borderColor: colors.yellow.main,
                 data: data?.savedTheSameMonthLastYear || [],
                 id: "savedTheSameMonthLastYear",
                 borderWidth: 1,
-                label: pageT("sameMonthLastYear")
+                label: pageT("sameDayLastYear")
             }])
             : []
         return ({
@@ -195,10 +195,10 @@ export default connect(mapState)(function Economics(props) {
                     data: data?.savedThisMonth || [],
                     id: "savedThisMonth",
                     borderWidth: 1,
-                    label: pageT("thisCalendarMonth")
+                    label: pageT("today")
                 },
                 ...lastMonth,
-                ...sameMonthLastYear
+                ...sameDayLastYear
             ],
             labels,
             tickCallback: val => "$" + val,
@@ -296,10 +296,10 @@ export default connect(mapState)(function Economics(props) {
                     </ToggleButton>
                     <ToggleButton
                         sx={{ textTransform: "none", fontWeight: "700" }}
-                        value="sameMonthLastYear"
-                        aria-label="sameMonthLastYear"
+                        value="sameDayLastYear"
+                        aria-label="sameDayLastYear"
                         color="primary">
-                        {pageT("sameMonthLastYear")}
+                        {pageT("sameDayLastYear")}
                     </ToggleButton>
                 </ToggleButtonGroup>
             </div>
@@ -310,7 +310,7 @@ export default connect(mapState)(function Economics(props) {
                 <EconomicsCard
                     data={{
                         lastMonth: preUbiikLastMonth,
-                        sameMonthLastYear: preUbiikSameMonthLastYear,
+                        sameDayLastYear: preUbiikSameMonthLastYear,
                         thisMonth: preUbiikThisMonth,
                         type: "pre"
                     }}
@@ -319,7 +319,7 @@ export default connect(mapState)(function Economics(props) {
                 <EconomicsCard
                     data={{
                         lastMonth: postUbiikLastMonth,
-                        sameMonthLastYear: postUbiikSameMonthLastYear,
+                        sameDayLastYear: postUbiikSameMonthLastYear,
                         thisMonth: postUbiikThisMonth,
                         type: "post"
                     }}

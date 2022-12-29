@@ -9,8 +9,8 @@ const (
 	// SendAIBillingParamsToLocalGW godoc
 	SendAIBillingParamsToLocalGW = "core.ai.cmd.billing-params.{gw-id}.0"
 
-	// SendLeapBiddingDispatchToLocalGW godoc
-	SendLeapBiddingDispatchToLocalGW = "core.ai.fct.leap-bidding-dispatch.{gw-id}.0"
+	// SendLeapNotificationToLocalGW godoc
+	SendLeapNotificationToLocalGW = "core.leap.cdc.notification.{gw-id}.0"
 
 	// ReceiveLocalCCData godoc
 	ReceiveLocalCCData = "iot.cc.fct.record.0"

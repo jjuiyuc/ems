@@ -15,10 +15,16 @@ import (
 	"der-ems/kafka"
 )
 
-// LeapNotification godoc
-type LeapNotification struct {
+// LeapBiddingDispatch godoc
+type LeapBiddingDispatch struct {
 	TestNotification bool                     `json:"test_notification"`
 	MeterDispatches  []map[string]interface{} `json:"meter_dispatches"`
+}
+
+// LeapNotification godoc
+type LeapNotification struct {
+	Type  string      `json:"type"`
+	Value interface{} `json:"value"`
 }
 
 // GetLeapBiddingDispatch godoc
@@ -31,7 +37,7 @@ func (w *APIWorker) GetLeapBiddingDispatch(c *gin.Context) {
 	appG := app.Gin{c}
 	appG.Response(http.StatusOK, e.Success, nil)
 
-	body := new(LeapNotification)
+	body := new(LeapBiddingDispatch)
 	if err := c.BindJSON(&body); err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "c.BindJSON",
@@ -66,12 +72,24 @@ func (w *APIWorker) GetLeapBiddingDispatch(c *gin.Context) {
 	if meterExists {
 		bodyJSON, _ := json.Marshal(body)
 		log.Debug("bodyJSON : ", string(bodyJSON))
-		sendLeapBiddingDispatchToGateway(w.Cfg, bodyJSON, GatewayUUID)
+
+		leapNotification := &LeapNotification{
+			Type:  "leapBiddingDispatch",
+			Value: body,
+		}
+		leapNotificationJSON, err := json.Marshal(leapNotification)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"caused-by": "json.Marshal",
+				"err":       err,
+			}).Error()
+		}
+		sendLeapNotificationToGateway(w.Cfg, leapNotificationJSON, GatewayUUID)
 	}
 }
 
-func sendLeapBiddingDispatchToGateway(cfg *viper.Viper, biddingDispatchJSON []byte, uuid string) {
-	biddingDispatchTopic := strings.Replace(kafka.SendLeapBiddingDispatchToLocalGW, "{gw-id}", uuid, 1)
-	log.Debug("biddingDispatchTopic: ", biddingDispatchTopic)
-	kafka.Produce(cfg, biddingDispatchTopic, string(biddingDispatchJSON))
+func sendLeapNotificationToGateway(cfg *viper.Viper, leapNotificationJSON []byte, uuid string) {
+	leapNotificationTopic := strings.Replace(kafka.SendLeapNotificationToLocalGW, "{gw-id}", uuid, 1)
+	log.Debug("leapNotificationTopic: ", leapNotificationTopic)
+	kafka.Produce(cfg, leapNotificationTopic, string(leapNotificationJSON))
 }

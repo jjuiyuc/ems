@@ -52,6 +52,7 @@ export default function BatteryStatusCard({ data }) {
                     className="h-48 relative w-48"
                     id="batteryChart"
                     ref={batteryChart} />
+                {/* <BatteryDiagram /> */}
             </div>
             <div className="column-separator grid grid-cols-3 my-6
     mw-88 gap-x-5 sm:gap-x-10">

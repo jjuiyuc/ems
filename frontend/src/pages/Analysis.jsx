@@ -504,10 +504,12 @@ export default connect(mapState)(function Analysis(props) {
         } else if (tab === "month") {
             startTime = startMonth ? moment(startMonth).startOf("month").toISOString() : ""
             endTime = startMonth ? moment(startMonth).endOf("month").toISOString() : ""
+
         } else if (tab === "year") {
             startTime = moment().startOf("year").toISOString()
             endTime = moment().startOf("month").toISOString()
-            if (moment().get("date") == 1 && moment().get("month") == 0) {
+
+            if (moment().get("month") == 0) {
                 startTime = moment().subtract(1, "year").startOf("year").toISOString()
             }
         } else if (tab === "custom") {

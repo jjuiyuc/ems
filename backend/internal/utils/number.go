@@ -48,7 +48,7 @@ func Diff(x, y float32) float32 {
 // Division godoc
 func Division(x, y float32) float32 {
 	if x == 0 || y == 0 {
-		log.WithFields(log.Fields{"caused-by": "numerator/denominator is zero"}).Error()
+		log.WithField("caused-by", "numerator/denominator is zero").Warn()
 		return 0
 	}
 	value, err := strconv.ParseFloat(fmt.Sprintf("%.3f", x/y), 32)
@@ -65,7 +65,7 @@ func Division(x, y float32) float32 {
 // Percent godoc
 func Percent(x, y float32) float32 {
 	if x == 0 || y == 0 {
-		log.WithFields(log.Fields{"caused-by": "numerator/denominator is zero"}).Error()
+		log.WithField("caused-by", "numerator/denominator is zero").Warn()
 		return 0
 	}
 	value, err := strconv.ParseFloat(fmt.Sprintf("%.2f", (x/y)*100), 32)
@@ -94,7 +94,7 @@ func DiffTwoArrays(array1, array2 []int) (diff []int) {
 		if i < len(array2) {
 			diff = append(diff, array1[i]-array2[i])
 		} else {
-			log.WithFields(log.Fields{"caused-by": "the lengths of two arrays are different"}).Warn()
+			log.WithField("caused-by", "the lengths of two arrays are different").Warn()
 			diff = append(diff, 0)
 		}
 	}

@@ -69,7 +69,7 @@ func (p *StartTimeParam) Validate(c *gin.Context) (err error) {
 	log.Debug("gatewayUUID: ", p.GatewayUUID)
 
 	if err = c.BindQuery(&p.Query); err != nil {
-		log.WithFields(log.Fields{"caused-by": err}).Error()
+		log.WithField("caused-by", err).Error()
 	}
 	return
 }
@@ -80,7 +80,7 @@ func (p *PeriodParam) Validate(c *gin.Context) (err error) {
 	log.Debug("gatewayUUID: ", p.GatewayUUID)
 
 	if err = c.BindQuery(&p.Query); err != nil {
-		log.WithFields(log.Fields{"caused-by": err}).Error()
+		log.WithField("caused-by", err).Error()
 	}
 	return
 }
@@ -91,12 +91,12 @@ func (p *ZoomableParam) Validate(c *gin.Context) (err error) {
 	log.Debug("gatewayUUID: ", p.GatewayUUID)
 
 	if err = c.BindQuery(&p.Query); err != nil {
-		log.WithFields(log.Fields{"caused-by": err}).Error()
+		log.WithField("caused-by", err).Error()
 		return
 	}
 	if p.Query.Resolution != "hour" && p.Query.Resolution != "5minute" {
 		err = e.ErrNewUnexpectedResolution
-		log.WithFields(log.Fields{"caused-by": err}).Error()
+		log.WithField("caused-by", err).Error()
 	}
 	return
 }
@@ -118,12 +118,12 @@ func (p *ResolutionWithPeriodParam) Validate(c *gin.Context) (err error) {
 	log.Debug("gatewayUUID: ", p.GatewayUUID)
 
 	if err = c.BindQuery(&p.Query); err != nil {
-		log.WithFields(log.Fields{"caused-by": err}).Error()
+		log.WithField("caused-by", err).Error()
 		return
 	}
 	if p.Query.Resolution != "day" && p.Query.Resolution != "month" {
 		err = e.ErrNewUnexpectedResolution
-		log.WithFields(log.Fields{"caused-by": err}).Error()
+		log.WithField("caused-by", err).Error()
 	}
 	return
 }

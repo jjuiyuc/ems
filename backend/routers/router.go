@@ -125,7 +125,7 @@ func authorize(apiType APIType) gin.HandlerFunc {
 			authHeader = c.GetHeader("Sec-WebSocket-Protocol")
 		}
 		if authHeader == "" {
-			log.WithFields(log.Fields{"caused-by": "no header"}).Error()
+			log.WithField("caused-by", "no header").Error()
 			appG.Response(http.StatusUnauthorized, e.ErrAuthNoHeader, nil)
 			c.Abort()
 			return
@@ -144,7 +144,7 @@ func authorize(apiType APIType) gin.HandlerFunc {
 			}
 		}
 		if token == "" {
-			log.WithFields(log.Fields{"caused-by": "invalid header"}).Error()
+			log.WithField("caused-by", "invalid header").Error()
 			appG.Response(http.StatusUnauthorized, e.ErrAuthInvalidHeader, nil)
 			c.Abort()
 			return
@@ -152,7 +152,7 @@ func authorize(apiType APIType) gin.HandlerFunc {
 		claims, err := utils.ParseToken(token)
 		if err != nil {
 			// Token timeout included
-			log.WithFields(log.Fields{"caused-by": "token parse"}).Error()
+			log.WithField("caused-by", "token parse").Error()
 			appG.Response(http.StatusUnauthorized, e.ErrAuthTokenParse, nil)
 			c.Abort()
 			return

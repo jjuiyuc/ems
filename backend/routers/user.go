@@ -108,14 +108,14 @@ func (w *APIWorker) GetProfile(c *gin.Context) {
 	appG := app.Gin{c}
 	userID, _ := c.Get("userID")
 	if userID == nil {
-		log.WithFields(log.Fields{"caused-by": "error token"}).Error()
+		log.WithField("caused-by", "error token").Error()
 		appG.Response(http.StatusUnauthorized, e.ErrToken, nil)
 		return
 	}
 
 	profile, err := w.Services.User.GetProfile(userID.(int64))
 	if err != nil {
-		log.WithFields(log.Fields{"caused-by": "get profile"}).Error()
+		log.WithField("caused-by", "get profile").Error()
 		appG.Response(http.StatusInternalServerError, e.ErrUserProfileGen, err.Error())
 		return
 	}

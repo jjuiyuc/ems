@@ -7,12 +7,15 @@ const stopKeyframe = (level, direction) => {
       height: ${level}%;
     }`
 }
+
 const Animation = styled.div`
   @keyframes animation {
     from {
       height: 0%;
     }
-    ${(props) => stopKeyframe(props.level, props.direction)}
+    80% {
+      height: ${(props) => (props.level) + "%"};
+    }
     to {
       height: ${(props) => (props.level) + "%"};
     }
@@ -24,6 +27,7 @@ const Animation = styled.div`
   animation-timing-function: linear;`
 
 export default function BatteryDiagram(props) {
+
     const { direction } = props
     const state = props.state > 100
         ? 100

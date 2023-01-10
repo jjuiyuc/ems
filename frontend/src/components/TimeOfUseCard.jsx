@@ -90,8 +90,7 @@ export default function TimeOfUseCard(props) {
             }
             setPolicyConfig(newPolicyConfig)
         }
-
-    console.log(Object.keys(policyConfig))
+    // console.log(Object.keys(policyConfig))
 
     return <div className="card">
         <div className="flex justify-between sm:col-span-2 items-center">

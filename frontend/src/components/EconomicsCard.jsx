@@ -17,7 +17,7 @@ export default function EconomicsCard(props) {
                             <h5 className="mr-1">{pageT(type + "Ubiik")}</h5>
                             <label className="bg-gray-600 font-normal px-2 py-1
                                 rounded-3xl text-11px">
-                                {pageT("today")}
+                                {pageT("thisMonth")}
                             </label>
                         </div>
                         <h2 className="flex">${thisMonth}</h2>

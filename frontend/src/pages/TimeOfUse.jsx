@@ -189,7 +189,7 @@ export default connect(mapState)(function TimeOfUse(props) {
                 endTime = getMoment(end),
                 startTime = getMoment(start),
                 duration = moment.duration(endTime.diff(startTime)).as("hours")
-            console.log(item.name)
+
             dataset.data.push(duration)
             dataset.backgroundColor.push(colors[item.name])
             prices[item.name] = item.touRate

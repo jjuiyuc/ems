@@ -44,9 +44,13 @@ export default function BatteryDiagram(props) {
             <div className="bg-gray-400 h-48 p-2 rounded-lg w-full">
                 <div className="bg-white h-full p-1 rounded-md">
                     <div className="h-full overflow-hidden relative rounded">
-                        <div className={"absolute bg-primary-200 w-full " +
+                        <div className={"absolute  w-full " +
                             (direction === "chargingFrom" ? "bottom-0" : "")}
                             style={{
+                                backgroundColor:
+                                    direction === "dischargingTo"
+                                        ? "#12c9c9"
+                                        : "#c4f2f2",
                                 height: (state || 0) + "%",
                                 top:
                                     direction === "dischargingTo"
@@ -61,6 +65,10 @@ export default function BatteryDiagram(props) {
                             direction={direction}
                             level={(state || 0)}
                             style={{
+                                backgroundColor:
+                                    direction === "dischargingTo"
+                                        ? "#c4f2f2"
+                                        : "#12c9c9",
                                 height: (state || 0) + "%",
                                 top:
                                     direction === "dischargingTo"

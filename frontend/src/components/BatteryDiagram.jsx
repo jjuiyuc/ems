@@ -59,12 +59,8 @@ export default function BatteryDiagram(props) {
                             </>
                             : <>
                                 <div className={"absolute w-full " +
-                                    (direction === "chargingFrom" ? "bottom-0" : "")}
+                                    (direction === "chargingFrom" ? "bottom-0 bg-primary-200" : "bg-primary-500")}
                                     style={{
-                                        backgroundColor:
-                                            direction === "dischargingTo"
-                                                ? "#12c9c9"
-                                                : "#c4f2f2",
                                         height: (state || 0) + "%",
                                         top:
                                             direction === "dischargingTo"
@@ -73,16 +69,12 @@ export default function BatteryDiagram(props) {
                                     }}></div>
                                 <Animation
                                     className={
-                                        "absolute bg-primary-500 w-full " +
-                                        (direction === "chargingFrom" ? "bottom-0" : "")
+                                        "absolute w-full " +
+                                        (direction === "chargingFrom" ? "bottom-0 bg-primary-500" : "bg-primary-200")
                                     }
                                     direction={direction}
                                     level={(state || 0)}
                                     style={{
-                                        backgroundColor:
-                                            direction === "dischargingTo"
-                                                ? "#c4f2f2"
-                                                : "#12c9c9",
                                         height: (state || 0) + "%",
                                         top:
                                             direction === "dischargingTo"

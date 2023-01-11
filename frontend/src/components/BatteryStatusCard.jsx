@@ -13,7 +13,9 @@ export default function BatteryStatusCard({ data }) {
             <h4>{pageT("batteryStatus")}</h4>
         </div>
         <div className="flex flex-wrap items-center justify-evenly">
-            <BatteryDiagram state={data?.state} direction={data?.direction} />
+            <BatteryDiagram state={data?.state} direction={data?.direction}
+                target={data?.target}
+            />
             <div className="column-separator grid grid-cols-3 my-6
                 mw-88 gap-x-5 sm:gap-x-10">
                 <div>

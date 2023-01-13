@@ -24,6 +24,7 @@ type CCDataRepository interface {
 	GetCCDataLogCount() (int64, error)
 	// CC data calculated log
 	GetLatestCalculatedLog(gwUUID, resolution string, startTime, endTime time.Time) (interface{}, error)
+	GetCalculatedLogs(gwUUID, resolution string, startTime, endTime time.Time) (interface{}, error)
 }
 
 type defaultCCDataRepository struct {
@@ -124,6 +125,21 @@ func (repo defaultCCDataRepository) GetLatestCalculatedLog(gwUUID, resolution st
 		return deremsmodels.CCDataLogCalculatedMonthlies(
 			qm.Where("(gw_uuid = ? and latest_log_date >= ? and latest_log_date < ?)", gwUUID, startTime, endTime),
 			qm.OrderBy("latest_log_date DESC")).One(repo.db)
+	default:
+		return nil, e.ErrNewUnexpectedResolution
+	}
+}
+
+func (repo defaultCCDataRepository) GetCalculatedLogs(gwUUID, resolution string, startTime, endTime time.Time) (interface{}, error) {
+	switch resolution {
+	case "day":
+		return deremsmodels.CCDataLogCalculatedDailies(
+			qm.Where("(gw_uuid = ? and latest_log_date >= ? and latest_log_date < ?)", gwUUID, startTime, endTime),
+			qm.OrderBy("latest_log_date ASC")).All(repo.db)
+	case "month":
+		return deremsmodels.CCDataLogCalculatedMonthlies(
+			qm.Where("(gw_uuid = ? and latest_log_date >= ? and latest_log_date < ?)", gwUUID, startTime, endTime),
+			qm.OrderBy("latest_log_date ASC")).All(repo.db)
 	default:
 		return nil, e.ErrNewUnexpectedResolution
 	}

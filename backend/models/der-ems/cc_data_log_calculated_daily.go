@@ -33,6 +33,12 @@ type CCDataLogCalculatedDaily struct {
 	BatteryLifetimeEnergyACDiff      null.Float32 `boil:"battery_lifetime_energy_ac_diff" json:"batteryLifetimeEnergyAcDiff,omitempty" toml:"batteryLifetimeEnergyAcDiff" yaml:"batteryLifetimeEnergyAcDiff,omitempty"`
 	GridLifetimeEnergyACDiff         null.Float32 `boil:"grid_lifetime_energy_ac_diff" json:"gridLifetimeEnergyAcDiff,omitempty" toml:"gridLifetimeEnergyAcDiff" yaml:"gridLifetimeEnergyAcDiff,omitempty"`
 	LoadSelfConsumedEnergyPercentAC  null.Float32 `boil:"load_self_consumed_energy_percent_ac" json:"loadSelfConsumedEnergyPercentAc,omitempty" toml:"loadSelfConsumedEnergyPercentAc" yaml:"loadSelfConsumedEnergyPercentAc,omitempty"`
+	OffPeakPeriodPreUbiikCost        null.Float32 `boil:"off_peak_period_pre_ubiik_cost" json:"offPeakPeriodPreUbiikCost,omitempty" toml:"offPeakPeriodPreUbiikCost" yaml:"offPeakPeriodPreUbiikCost,omitempty"`
+	OffPeakPeriodPostUbiikCost       null.Float32 `boil:"off_peak_period_post_ubiik_cost" json:"offPeakPeriodPostUbiikCost,omitempty" toml:"offPeakPeriodPostUbiikCost" yaml:"offPeakPeriodPostUbiikCost,omitempty"`
+	OnPeakPeriodPreUbiikCost         null.Float32 `boil:"on_peak_period_pre_ubiik_cost" json:"onPeakPeriodPreUbiikCost,omitempty" toml:"onPeakPeriodPreUbiikCost" yaml:"onPeakPeriodPreUbiikCost,omitempty"`
+	OnPeakPeriodPostUbiikCost        null.Float32 `boil:"on_peak_period_post_ubiik_cost" json:"onPeakPeriodPostUbiikCost,omitempty" toml:"onPeakPeriodPostUbiikCost" yaml:"onPeakPeriodPostUbiikCost,omitempty"`
+	MidPeakPeriodPreUbiikCost        null.Float32 `boil:"mid_peak_period_pre_ubiik_cost" json:"midPeakPeriodPreUbiikCost,omitempty" toml:"midPeakPeriodPreUbiikCost" yaml:"midPeakPeriodPreUbiikCost,omitempty"`
+	MidPeakPeriodPostUbiikCost       null.Float32 `boil:"mid_peak_period_post_ubiik_cost" json:"midPeakPeriodPostUbiikCost,omitempty" toml:"midPeakPeriodPostUbiikCost" yaml:"midPeakPeriodPostUbiikCost,omitempty"`
 	CreatedAt                        time.Time    `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
 	UpdatedAt                        time.Time    `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
 
@@ -51,6 +57,12 @@ var CCDataLogCalculatedDailyColumns = struct {
 	BatteryLifetimeEnergyACDiff      string
 	GridLifetimeEnergyACDiff         string
 	LoadSelfConsumedEnergyPercentAC  string
+	OffPeakPeriodPreUbiikCost        string
+	OffPeakPeriodPostUbiikCost       string
+	OnPeakPeriodPreUbiikCost         string
+	OnPeakPeriodPostUbiikCost        string
+	MidPeakPeriodPreUbiikCost        string
+	MidPeakPeriodPostUbiikCost       string
 	CreatedAt                        string
 	UpdatedAt                        string
 }{
@@ -64,6 +76,12 @@ var CCDataLogCalculatedDailyColumns = struct {
 	BatteryLifetimeEnergyACDiff:      "battery_lifetime_energy_ac_diff",
 	GridLifetimeEnergyACDiff:         "grid_lifetime_energy_ac_diff",
 	LoadSelfConsumedEnergyPercentAC:  "load_self_consumed_energy_percent_ac",
+	OffPeakPeriodPreUbiikCost:        "off_peak_period_pre_ubiik_cost",
+	OffPeakPeriodPostUbiikCost:       "off_peak_period_post_ubiik_cost",
+	OnPeakPeriodPreUbiikCost:         "on_peak_period_pre_ubiik_cost",
+	OnPeakPeriodPostUbiikCost:        "on_peak_period_post_ubiik_cost",
+	MidPeakPeriodPreUbiikCost:        "mid_peak_period_pre_ubiik_cost",
+	MidPeakPeriodPostUbiikCost:       "mid_peak_period_post_ubiik_cost",
 	CreatedAt:                        "created_at",
 	UpdatedAt:                        "updated_at",
 }
@@ -79,6 +97,12 @@ var CCDataLogCalculatedDailyTableColumns = struct {
 	BatteryLifetimeEnergyACDiff      string
 	GridLifetimeEnergyACDiff         string
 	LoadSelfConsumedEnergyPercentAC  string
+	OffPeakPeriodPreUbiikCost        string
+	OffPeakPeriodPostUbiikCost       string
+	OnPeakPeriodPreUbiikCost         string
+	OnPeakPeriodPostUbiikCost        string
+	MidPeakPeriodPreUbiikCost        string
+	MidPeakPeriodPostUbiikCost       string
 	CreatedAt                        string
 	UpdatedAt                        string
 }{
@@ -92,6 +116,12 @@ var CCDataLogCalculatedDailyTableColumns = struct {
 	BatteryLifetimeEnergyACDiff:      "cc_data_log_calculated_daily.battery_lifetime_energy_ac_diff",
 	GridLifetimeEnergyACDiff:         "cc_data_log_calculated_daily.grid_lifetime_energy_ac_diff",
 	LoadSelfConsumedEnergyPercentAC:  "cc_data_log_calculated_daily.load_self_consumed_energy_percent_ac",
+	OffPeakPeriodPreUbiikCost:        "cc_data_log_calculated_daily.off_peak_period_pre_ubiik_cost",
+	OffPeakPeriodPostUbiikCost:       "cc_data_log_calculated_daily.off_peak_period_post_ubiik_cost",
+	OnPeakPeriodPreUbiikCost:         "cc_data_log_calculated_daily.on_peak_period_pre_ubiik_cost",
+	OnPeakPeriodPostUbiikCost:        "cc_data_log_calculated_daily.on_peak_period_post_ubiik_cost",
+	MidPeakPeriodPreUbiikCost:        "cc_data_log_calculated_daily.mid_peak_period_pre_ubiik_cost",
+	MidPeakPeriodPostUbiikCost:       "cc_data_log_calculated_daily.mid_peak_period_post_ubiik_cost",
 	CreatedAt:                        "cc_data_log_calculated_daily.created_at",
 	UpdatedAt:                        "cc_data_log_calculated_daily.updated_at",
 }
@@ -109,6 +139,12 @@ var CCDataLogCalculatedDailyWhere = struct {
 	BatteryLifetimeEnergyACDiff      whereHelpernull_Float32
 	GridLifetimeEnergyACDiff         whereHelpernull_Float32
 	LoadSelfConsumedEnergyPercentAC  whereHelpernull_Float32
+	OffPeakPeriodPreUbiikCost        whereHelpernull_Float32
+	OffPeakPeriodPostUbiikCost       whereHelpernull_Float32
+	OnPeakPeriodPreUbiikCost         whereHelpernull_Float32
+	OnPeakPeriodPostUbiikCost        whereHelpernull_Float32
+	MidPeakPeriodPreUbiikCost        whereHelpernull_Float32
+	MidPeakPeriodPostUbiikCost       whereHelpernull_Float32
 	CreatedAt                        whereHelpertime_Time
 	UpdatedAt                        whereHelpertime_Time
 }{
@@ -122,6 +158,12 @@ var CCDataLogCalculatedDailyWhere = struct {
 	BatteryLifetimeEnergyACDiff:      whereHelpernull_Float32{field: "`cc_data_log_calculated_daily`.`battery_lifetime_energy_ac_diff`"},
 	GridLifetimeEnergyACDiff:         whereHelpernull_Float32{field: "`cc_data_log_calculated_daily`.`grid_lifetime_energy_ac_diff`"},
 	LoadSelfConsumedEnergyPercentAC:  whereHelpernull_Float32{field: "`cc_data_log_calculated_daily`.`load_self_consumed_energy_percent_ac`"},
+	OffPeakPeriodPreUbiikCost:        whereHelpernull_Float32{field: "`cc_data_log_calculated_daily`.`off_peak_period_pre_ubiik_cost`"},
+	OffPeakPeriodPostUbiikCost:       whereHelpernull_Float32{field: "`cc_data_log_calculated_daily`.`off_peak_period_post_ubiik_cost`"},
+	OnPeakPeriodPreUbiikCost:         whereHelpernull_Float32{field: "`cc_data_log_calculated_daily`.`on_peak_period_pre_ubiik_cost`"},
+	OnPeakPeriodPostUbiikCost:        whereHelpernull_Float32{field: "`cc_data_log_calculated_daily`.`on_peak_period_post_ubiik_cost`"},
+	MidPeakPeriodPreUbiikCost:        whereHelpernull_Float32{field: "`cc_data_log_calculated_daily`.`mid_peak_period_pre_ubiik_cost`"},
+	MidPeakPeriodPostUbiikCost:       whereHelpernull_Float32{field: "`cc_data_log_calculated_daily`.`mid_peak_period_post_ubiik_cost`"},
 	CreatedAt:                        whereHelpertime_Time{field: "`cc_data_log_calculated_daily`.`created_at`"},
 	UpdatedAt:                        whereHelpertime_Time{field: "`cc_data_log_calculated_daily`.`updated_at`"},
 }
@@ -143,8 +185,8 @@ func (*ccDataLogCalculatedDailyR) NewStruct() *ccDataLogCalculatedDailyR {
 type ccDataLogCalculatedDailyL struct{}
 
 var (
-	ccDataLogCalculatedDailyAllColumns            = []string{"id", "gw_uuid", "latest_log_date", "gw_id", "customer_id", "pv_produced_lifetime_energy_ac_diff", "load_consumed_lifetime_energy_ac_diff", "battery_lifetime_energy_ac_diff", "grid_lifetime_energy_ac_diff", "load_self_consumed_energy_percent_ac", "created_at", "updated_at"}
-	ccDataLogCalculatedDailyColumnsWithoutDefault = []string{"gw_uuid", "latest_log_date", "gw_id", "customer_id", "pv_produced_lifetime_energy_ac_diff", "load_consumed_lifetime_energy_ac_diff", "battery_lifetime_energy_ac_diff", "grid_lifetime_energy_ac_diff", "load_self_consumed_energy_percent_ac"}
+	ccDataLogCalculatedDailyAllColumns            = []string{"id", "gw_uuid", "latest_log_date", "gw_id", "customer_id", "pv_produced_lifetime_energy_ac_diff", "load_consumed_lifetime_energy_ac_diff", "battery_lifetime_energy_ac_diff", "grid_lifetime_energy_ac_diff", "load_self_consumed_energy_percent_ac", "off_peak_period_pre_ubiik_cost", "off_peak_period_post_ubiik_cost", "on_peak_period_pre_ubiik_cost", "on_peak_period_post_ubiik_cost", "mid_peak_period_pre_ubiik_cost", "mid_peak_period_post_ubiik_cost", "created_at", "updated_at"}
+	ccDataLogCalculatedDailyColumnsWithoutDefault = []string{"gw_uuid", "latest_log_date", "gw_id", "customer_id", "pv_produced_lifetime_energy_ac_diff", "load_consumed_lifetime_energy_ac_diff", "battery_lifetime_energy_ac_diff", "grid_lifetime_energy_ac_diff", "load_self_consumed_energy_percent_ac", "off_peak_period_pre_ubiik_cost", "off_peak_period_post_ubiik_cost", "on_peak_period_pre_ubiik_cost", "on_peak_period_post_ubiik_cost", "mid_peak_period_pre_ubiik_cost", "mid_peak_period_post_ubiik_cost"}
 	ccDataLogCalculatedDailyColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	ccDataLogCalculatedDailyPrimaryKeyColumns     = []string{"id"}
 	ccDataLogCalculatedDailyGeneratedColumns      = []string{}

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
+	"reflect"
 	"strconv"
 	"time"
 
@@ -23,6 +24,8 @@ type LatestAccumulatedInfo struct {
 	BatteryLifetimeEnergyACDiff      float32
 	GridLifetimeEnergyACDiff         float32
 	LoadSelfConsumedEnergyPercentAC  float32
+	PreUbiikCost                     int
+	PostUbiikCost                    int
 }
 
 // LatestComputedDemandState godoc
@@ -52,6 +55,8 @@ type AccumulatedInfo struct {
 	BatteryLifetimeEnergyACDiffs      []float32
 	GridLifetimeEnergyACDiffs         []float32
 	LoadSelfConsumedEnergyPercentACs  []float32
+	PreUbiikCosts                     []int
+	PostUbiikCosts                    []int
 }
 
 // AbsFloat32Format godoc
@@ -215,6 +220,36 @@ type TimeOfUseInfoResponse struct {
 type SolarEnergyUsageResponse struct {
 	Timestamps                     []int              `json:"timestamps"`
 	LoadPvConsumedEnergyPercentACs Float32ArrayFormat `json:"loadPvConsumedEnergyPercentACs"`
+}
+
+// EnergyCostsInfo godoc
+type EnergyCostsInfo struct {
+	PreUbiikThisMonth             int `json:"preUbiikThisMonth"`
+	PostUbiikThisMonth            int `json:"postUbiikThisMonth"`
+	PreUbiikLastMonth             int `json:"preUbiikLastMonth"`
+	PostUbiikLastMonth            int `json:"postUbiikLastMonth"`
+	PreUbiikTheSameMonthLastYear  int `json:"preUbiikTheSameMonthLastYear"`
+	PostUbiikTheSameMonthLastYear int `json:"postUbiikTheSameMonthLastYear"`
+}
+
+// EnergyCostsDailyInfo godoc
+type EnergyCostsDailyInfo struct {
+	Timestamps                    []int `json:"timestamps"`
+	PreUbiikThisMonth             []int `json:"preUbiikThisMonth"`
+	PostUbiikThisMonth            []int `json:"postUbiikThisMonth"`
+	PreUbiikLastMonth             []int `json:"preUbiikLastMonth"`
+	PostUbiikLastMonth            []int `json:"postUbiikLastMonth"`
+	PreUbiikTheSameMonthLastYear  []int `json:"preUbiikTheSameMonthLastYear"`
+	PostUbiikTheSameMonthLastYear []int `json:"postUbiikTheSameMonthLastYear"`
+	SavedThisMonth                []int `json:"savedThisMonth"`
+	SavedLastMonth                []int `json:"savedLastMonth"`
+	SavedTheSameMonthLastYear     []int `json:"savedTheSameMonthLastYear"`
+}
+
+// TimeOfUseEnergyCostResponse godoc
+type TimeOfUseEnergyCostResponse struct {
+	EnergyCosts      EnergyCostsInfo      `json:"energyCosts"`
+	EnergyDailyCosts EnergyCostsDailyInfo `json:"energyDailyCosts"`
 }
 
 // ChargeInfoResponse godoc
@@ -390,6 +425,7 @@ type DevicesService interface {
 	GetBatteryUsageInfo(param *app.StartTimeParam) (batteryUsageInfo *BatteryUsageInfoResponse)
 	GetTimeOfUseInfo(param *app.StartTimeParam) (timeOfUseInfo *TimeOfUseInfoResponse, err error)
 	GetSolarEnergyUsage(param *app.ZoomableParam) (solarEnergyUsage *SolarEnergyUsageResponse)
+	GetTimeOfUseEnergyCost(param *app.PeriodParam) (timeOfUseEnergyCost *TimeOfUseEnergyCostResponse)
 	GetChargeInfo(param *app.StartTimeParam) (chargeInfo *ChargeInfoResponse)
 	GetDemandState(param *app.PeriodParam) (demandState *DemandStateResponse)
 	GetSolarEnergyInfo(param *app.StartTimeParam) (solarEnergyInfo *SolarEnergyInfoResponse)
@@ -780,6 +816,65 @@ func (s defaultDevicesService) GetSolarEnergyUsage(param *app.ZoomableParam) (so
 	return
 }
 
+func (s defaultDevicesService) GetTimeOfUseEnergyCost(param *app.PeriodParam) (timeOfUseEnergyCost *TimeOfUseEnergyCostResponse) {
+	timeOfUseEnergyCost = &TimeOfUseEnergyCostResponse{}
+
+	accumulatedParam := &app.ResolutionWithPeriodParam{
+		GatewayUUID: param.GatewayUUID,
+		Query: app.ResolutionWithPeriodQuery{
+			Resolution: "day",
+			StartTime:  param.Query.StartTime,
+			EndTime:    param.Query.EndTime,
+		},
+	}
+	// This month
+	log.WithFields(log.Fields{
+		"This month - StartTime": accumulatedParam.Query.StartTime,
+		"This month - EndTime":   accumulatedParam.Query.EndTime,
+	}).Debug()
+	accumulatedInfoThisMonth := s.getAccumulatedInfo(accumulatedParam)
+	// Last month
+	accumulatedParam.Query.StartTime = utils.AddDate(param.Query.StartTime, 0, -1, 0)
+	accumulatedParam.Query.EndTime = utils.AddDate(param.Query.EndTime, 0, -1, 0)
+	log.WithFields(log.Fields{
+		"Last month - StartTime": accumulatedParam.Query.StartTime,
+		"Last month - EndTime":   accumulatedParam.Query.EndTime,
+	}).Debug()
+	accumulatedInfoLastMonth := s.getAccumulatedInfo(accumulatedParam)
+	// The same month last year
+	accumulatedParam.Query.StartTime = utils.AddDate(param.Query.StartTime, -1, 0, 0)
+	accumulatedParam.Query.EndTime = utils.AddDate(param.Query.EndTime, -1, 0, 0)
+	log.WithFields(log.Fields{
+		"The same month last year - StartTime": accumulatedParam.Query.StartTime,
+		"The same month last year - EndTime":   accumulatedParam.Query.EndTime,
+	}).Debug()
+	accumulatedInfoTheSameMonthLastYear := s.getAccumulatedInfo(accumulatedParam)
+
+	energyCostsInfo := EnergyCostsInfo{
+		PreUbiikThisMonth:             utils.SumOfArray(accumulatedInfoThisMonth.PreUbiikCosts),
+		PostUbiikThisMonth:            utils.SumOfArray(accumulatedInfoThisMonth.PostUbiikCosts),
+		PreUbiikLastMonth:             utils.SumOfArray(accumulatedInfoLastMonth.PreUbiikCosts),
+		PostUbiikLastMonth:            utils.SumOfArray(accumulatedInfoLastMonth.PostUbiikCosts),
+		PreUbiikTheSameMonthLastYear:  utils.SumOfArray(accumulatedInfoTheSameMonthLastYear.PreUbiikCosts),
+		PostUbiikTheSameMonthLastYear: utils.SumOfArray(accumulatedInfoTheSameMonthLastYear.PostUbiikCosts),
+	}
+	timeOfUseEnergyCost.EnergyCosts = energyCostsInfo
+	energyCostsDailyInfo := EnergyCostsDailyInfo{
+		Timestamps:                    accumulatedInfoThisMonth.Timestamps,
+		PreUbiikThisMonth:             accumulatedInfoThisMonth.PreUbiikCosts,
+		PostUbiikThisMonth:            accumulatedInfoThisMonth.PostUbiikCosts,
+		PreUbiikLastMonth:             accumulatedInfoLastMonth.PreUbiikCosts,
+		PostUbiikLastMonth:            accumulatedInfoLastMonth.PostUbiikCosts,
+		PreUbiikTheSameMonthLastYear:  accumulatedInfoTheSameMonthLastYear.PreUbiikCosts,
+		PostUbiikTheSameMonthLastYear: accumulatedInfoTheSameMonthLastYear.PostUbiikCosts,
+		SavedThisMonth:                utils.DiffTwoArrays(accumulatedInfoThisMonth.PreUbiikCosts, accumulatedInfoThisMonth.PostUbiikCosts),
+		SavedLastMonth:                utils.DiffTwoArrays(accumulatedInfoLastMonth.PreUbiikCosts, accumulatedInfoLastMonth.PostUbiikCosts),
+		SavedTheSameMonthLastYear:     utils.DiffTwoArrays(accumulatedInfoTheSameMonthLastYear.PreUbiikCosts, accumulatedInfoTheSameMonthLastYear.PostUbiikCosts),
+	}
+	timeOfUseEnergyCost.EnergyDailyCosts = energyCostsDailyInfo
+	return
+}
+
 func (s defaultDevicesService) GetDemandState(param *app.PeriodParam) (demandState *DemandStateResponse) {
 	demandState = &DemandStateResponse{}
 	startTimeIndex := param.Query.StartTime
@@ -1044,11 +1139,23 @@ func (s defaultDevicesService) computeLoadPvConsumedEnergyPercentACValue(firstRe
 
 func (s defaultDevicesService) getAccumulatedInfo(param *app.ResolutionWithPeriodParam) (accumulatedInfo *AccumulatedInfo) {
 	accumulatedInfo = &AccumulatedInfo{}
+	latestAccumulatedInfoArray := s.getLatestAccumulatedInfoArray(param.GatewayUUID, param.Query.Resolution, param.Query.StartTime, param.Query.EndTime)
+
 	startTimeIndex := param.Query.StartTime
 	endTimeIndex := param.GetEndTimeIndex()
-
 	for startTimeIndex.Before(param.Query.EndTime) {
-		latestAccumulatedInfo := s.getLatestAccumulatedInfo(param.GatewayUUID, param.Query.Resolution, startTimeIndex, endTimeIndex, param.Query.EndTime)
+		latestAccumulatedInfo := &LatestAccumulatedInfo{}
+		dataExists := false
+		for _, info := range latestAccumulatedInfoArray {
+			if info.Timestamps >= int(startTimeIndex.Unix()) && info.Timestamps < int(endTimeIndex.Unix()) {
+				*latestAccumulatedInfo = *info
+				dataExists = true
+				break
+			}
+		}
+		if !dataExists {
+			latestAccumulatedInfo.Timestamps = int(endTimeIndex.Add(-1 * time.Second).Unix())
+		}
 		log.Debug("latestAccumulatedInfo: ", latestAccumulatedInfo)
 		accumulatedInfo.Timestamps = append(accumulatedInfo.Timestamps, latestAccumulatedInfo.Timestamps)
 		accumulatedInfo.LoadConsumedLifetimeEnergyACDiffs = append(accumulatedInfo.LoadConsumedLifetimeEnergyACDiffs, latestAccumulatedInfo.LoadConsumedLifetimeEnergyACDiff)
@@ -1060,6 +1167,8 @@ func (s defaultDevicesService) getAccumulatedInfo(param *app.ResolutionWithPerio
 		startTimeIndex = endTimeIndex
 		switch param.Query.Resolution {
 		case "day":
+			accumulatedInfo.PreUbiikCosts = append(accumulatedInfo.PreUbiikCosts, latestAccumulatedInfo.PreUbiikCost)
+			accumulatedInfo.PostUbiikCosts = append(accumulatedInfo.PostUbiikCosts, latestAccumulatedInfo.PostUbiikCost)
 			endTimeIndex = startTimeIndex.AddDate(0, 0, 1)
 		case "month":
 			endTimeIndex = startTimeIndex.AddDate(0, 0, 1).AddDate(0, 1, 0).AddDate(0, 0, -1)
@@ -1099,37 +1208,50 @@ func (s defaultDevicesService) getFirstLogRealtimeInfo(gwUUID string, startTimeI
 	return
 }
 
-func (s defaultDevicesService) getLatestAccumulatedInfo(gwUUID, resolution string, startTimeIndex, endTimeIndex, endTime time.Time) (latestAccumulatedInfo *LatestAccumulatedInfo) {
-	latestAccumulatedInfo = &LatestAccumulatedInfo{}
-	latestLog, err := s.repo.CCData.GetLatestCalculatedLog(gwUUID, resolution, startTimeIndex, endTimeIndex)
+func (s defaultDevicesService) getLatestAccumulatedInfoArray(gwUUID, resolution string, startTime, endTime time.Time) (latestAccumulatedInfoArray []*LatestAccumulatedInfo) {
+	logs, err := s.repo.CCData.GetCalculatedLogs(gwUUID, resolution, startTime, endTime)
 	if err != nil {
 		log.WithFields(log.Fields{
-			"caused-by":      "s.repo.CCData.GetLatestCalculatedLog",
-			"err":            err,
-			"startTimeIndex": startTimeIndex,
-			"endTimeIndex":   endTimeIndex,
+			"caused-by": "s.repo.CCData.GetCalculatedLogs",
+			"err":       err,
+			"startTime": startTime,
+			"endTime":   endTime,
 		}).Error()
-		latestAccumulatedInfo.Timestamps = int(endTimeIndex.Add(-1 * time.Second).Unix())
 		return
 	}
 
-	switch resolution {
-	case "day":
-		latestLogDaily, _ := (latestLog).(*deremsmodels.CCDataLogCalculatedDaily)
-		latestAccumulatedInfo.Timestamps = int(latestLogDaily.LatestLogDate.Unix())
-		latestAccumulatedInfo.LoadConsumedLifetimeEnergyACDiff = latestLogDaily.LoadConsumedLifetimeEnergyACDiff.Float32
-		latestAccumulatedInfo.PvProducedLifetimeEnergyACDiff = latestLogDaily.PvProducedLifetimeEnergyACDiff.Float32
-		latestAccumulatedInfo.BatteryLifetimeEnergyACDiff = latestLogDaily.BatteryLifetimeEnergyACDiff.Float32
-		latestAccumulatedInfo.GridLifetimeEnergyACDiff = latestLogDaily.GridLifetimeEnergyACDiff.Float32
-		latestAccumulatedInfo.LoadSelfConsumedEnergyPercentAC = latestLogDaily.LoadSelfConsumedEnergyPercentAC.Float32
-	case "month":
-		latestLogMonthly, _ := (latestLog).(*deremsmodels.CCDataLogCalculatedMonthly)
-		latestAccumulatedInfo.Timestamps = int(latestLogMonthly.LatestLogDate.Unix())
-		latestAccumulatedInfo.LoadConsumedLifetimeEnergyACDiff = latestLogMonthly.LoadConsumedLifetimeEnergyACDiff.Float32
-		latestAccumulatedInfo.PvProducedLifetimeEnergyACDiff = latestLogMonthly.PvProducedLifetimeEnergyACDiff.Float32
-		latestAccumulatedInfo.BatteryLifetimeEnergyACDiff = latestLogMonthly.BatteryLifetimeEnergyACDiff.Float32
-		latestAccumulatedInfo.GridLifetimeEnergyACDiff = latestLogMonthly.GridLifetimeEnergyACDiff.Float32
-		latestAccumulatedInfo.LoadSelfConsumedEnergyPercentAC = latestLogMonthly.LoadSelfConsumedEnergyPercentAC.Float32
+	if reflect.TypeOf(logs).Kind() == reflect.Slice {
+		s := reflect.ValueOf(logs)
+		for i := 0; i < s.Len(); i++ {
+			switch resolution {
+			case "day":
+				latestLogDaily := (s.Index(i).Interface()).(*deremsmodels.CCDataLogCalculatedDaily)
+				latestAccumulatedInfo := &LatestAccumulatedInfo{}
+				latestAccumulatedInfo.Timestamps = int(latestLogDaily.LatestLogDate.Unix())
+				latestAccumulatedInfo.LoadConsumedLifetimeEnergyACDiff = latestLogDaily.LoadConsumedLifetimeEnergyACDiff.Float32
+				latestAccumulatedInfo.PvProducedLifetimeEnergyACDiff = latestLogDaily.PvProducedLifetimeEnergyACDiff.Float32
+				latestAccumulatedInfo.BatteryLifetimeEnergyACDiff = latestLogDaily.BatteryLifetimeEnergyACDiff.Float32
+				latestAccumulatedInfo.GridLifetimeEnergyACDiff = latestLogDaily.GridLifetimeEnergyACDiff.Float32
+				latestAccumulatedInfo.LoadSelfConsumedEnergyPercentAC = latestLogDaily.LoadSelfConsumedEnergyPercentAC.Float32
+				latestAccumulatedInfo.PreUbiikCost = int(latestLogDaily.OffPeakPeriodPreUbiikCost.Float32 +
+					latestLogDaily.OnPeakPeriodPreUbiikCost.Float32 +
+					latestLogDaily.MidPeakPeriodPreUbiikCost.Float32)
+				latestAccumulatedInfo.PostUbiikCost = int(latestLogDaily.OffPeakPeriodPostUbiikCost.Float32 +
+					latestLogDaily.OnPeakPeriodPostUbiikCost.Float32 +
+					latestLogDaily.MidPeakPeriodPostUbiikCost.Float32)
+				latestAccumulatedInfoArray = append(latestAccumulatedInfoArray, latestAccumulatedInfo)
+			case "month":
+				latestLogMonthly := (s.Index(i).Interface()).(*deremsmodels.CCDataLogCalculatedMonthly)
+				latestAccumulatedInfo := &LatestAccumulatedInfo{}
+				latestAccumulatedInfo.Timestamps = int(latestLogMonthly.LatestLogDate.Unix())
+				latestAccumulatedInfo.LoadConsumedLifetimeEnergyACDiff = latestLogMonthly.LoadConsumedLifetimeEnergyACDiff.Float32
+				latestAccumulatedInfo.PvProducedLifetimeEnergyACDiff = latestLogMonthly.PvProducedLifetimeEnergyACDiff.Float32
+				latestAccumulatedInfo.BatteryLifetimeEnergyACDiff = latestLogMonthly.BatteryLifetimeEnergyACDiff.Float32
+				latestAccumulatedInfo.GridLifetimeEnergyACDiff = latestLogMonthly.GridLifetimeEnergyACDiff.Float32
+				latestAccumulatedInfo.LoadSelfConsumedEnergyPercentAC = latestLogMonthly.LoadSelfConsumedEnergyPercentAC.Float32
+				latestAccumulatedInfoArray = append(latestAccumulatedInfoArray, latestAccumulatedInfo)
+			}
+		}
 	}
 	return
 }

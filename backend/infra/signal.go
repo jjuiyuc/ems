@@ -69,9 +69,7 @@ func initialiseContext() {
 
 		sig := <-sigChan
 		// Use default log to reduce package dependency
-		log.WithFields(log.Fields{
-			"signal": sig.String(),
-		}).Info("initiating graceful shutdown")
+		log.WithField("signal", sig.String()).Info("initiating graceful shutdown")
 
 		signal.Reset()
 	}()

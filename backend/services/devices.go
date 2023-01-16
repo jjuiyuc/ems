@@ -350,6 +350,7 @@ func (r *BatteryEnergyInfoResponse) GetBatteryInfo(gwUUID string) {
 	const (
 		Huayu      = "0324DE7B51B262F3B11A643CBA8E12CE"
 		Serenegray = "0E0BA27A8175AF978C49396BDE9D7A1E"
+		CHTMiaoli  = "018F1623ADD8E739F7C6CBE62A7DF3C0"
 	)
 	switch gwUUID {
 	case Huayu:
@@ -361,6 +362,11 @@ func (r *BatteryEnergyInfoResponse) GetBatteryInfo(gwUUID string) {
 		r.Model = "L051100-A UZ-Energy Battery"
 		r.Capcity = 30
 		r.BatteryPower = 24
+		r.Voltage = 51.2
+	case CHTMiaoli:
+		r.Model = "L051100-A UZ-Energy Battery"
+		r.Capcity = 10
+		r.BatteryPower = 15
 		r.Voltage = 51.2
 	}
 	r.PowerSources = "Solar + Grid"

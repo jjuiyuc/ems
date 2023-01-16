@@ -461,7 +461,9 @@ func (s defaultDevicesService) GetLatestDevicesEnergyInfo(gwUUID string) (logTim
 			"caused-by": "s.repo.CCData.GetLatestLog",
 			"err":       err,
 		}).Error()
-		return
+		// To avoid frontend crash, return default values if no data in database
+		err = nil
+		latestLog = &deremsmodels.CCDataLog{}
 	}
 
 	logTime = latestLog.LogDate

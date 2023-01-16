@@ -194,7 +194,7 @@ var _ = Describe("EnergyResources", func() {
 					Model:                               "L051100-A UZ-Energy Battery",
 					Capcity:                             30,
 					PowerSources:                        "Solar + Grid",
-					BatteryPower:                        24,
+					BatteryPower:                        20,
 					Voltage:                             51.2,
 				}
 				tt := testutils.TestInfo{

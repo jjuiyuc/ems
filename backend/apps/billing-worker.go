@@ -109,7 +109,7 @@ func getWeeklyBillingParamsByType(repo *repository.Repository, billing services.
 		periodType := billing.GetPeriodTypeOfDay(billingType.TOULocationID, timeOfEachDay)
 		log.Debug("periodType: ", periodType)
 		// 3-2. The day is summmer or not
-		isSummer := billing.IsSummer(timeOfEachDay)
+		isSummer := billing.IsSummer(billingType.VoltageType, timeOfEachDay)
 		log.Debug("isSummer: ", isSummer)
 		// 3-3. Get billings
 		tous, err := repo.TOU.GetTOUsByTOUInfo(billingType.TOULocationID, billingType.VoltageType, billingType.TOUType, periodType, isSummer, timeOfEachDay.Format(utils.YYYYMMDD))

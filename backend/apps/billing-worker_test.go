@@ -199,7 +199,7 @@ func (s *BillingWorkerSuite) Test_getWeeklyBillingParamsByType() {
 		DemandChargeRate: 47.2,
 		TOURate:          1.46,
 	}
-	if s.billing.IsSummer(s.seedUtTime) {
+	if s.billing.IsSummer(seedUtBillingType.VoltageType, s.seedUtTime) {
 		rate.DemandChargeRate = 47.2
 		rate.TOURate = 1.46
 	}

@@ -1,6 +1,7 @@
 package services
 
 import (
+	"strconv"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -23,7 +24,7 @@ type BillingService interface {
 	GetBillingTypeByCustomerID(customerID int64) (billingType BillingType, err error)
 	GetLocalTime(touLocationID int64, t time.Time) (localTime time.Time, err error)
 	GetPeriodTypeOfDay(touLocationID int64, t time.Time) (periodType string)
-	IsSummer(t time.Time) bool
+	IsSummer(voltageType string, t time.Time) bool
 	GetTOUsOfLocalTime(gwUUID string, t time.Time) (localTime time.Time, tous []*deremsmodels.Tou, err error)
 	GetPeakType(localTime time.Time, tous []*deremsmodels.Tou) (peakType string, err error)
 }
@@ -94,14 +95,24 @@ func (s defaultBillingService) GetPeriodTypeOfDay(touLocationID int64, t time.Ti
 }
 
 // IsSummer godoc
-func (s defaultBillingService) IsSummer(t time.Time) bool {
-	// XXX: Hardcode TPC summer is 06/30~09/30
-	switch t.Month() {
-	case time.June, time.July, time.August, time.September:
-		return true
+func (s defaultBillingService) IsSummer(voltageType string, t time.Time) bool {
+	/* XXX: Hardcode TPC ~2022 summer is 06/30~09/30
+	   TPC 2023~ summer low voltage is 06/30~09/30 and the other is 05/16~10/15 */
+	if (t.Year() <= 2022) || (t.Year() > 2022 && voltageType == "Low voltage") {
+		switch t.Month() {
+		case time.June, time.July, time.August, time.September:
+			return true
+		}
+		return false
+	} else {
+		billingDate, _ := time.Parse(utils.YYYYMMDD, t.Format(utils.YYYYMMDD))
+		summerStartDate, _ := time.Parse(utils.YYYYMMDD, strconv.Itoa(t.Year())+"-05-16")
+		summerEndDate, _ := time.Parse(utils.YYYYMMDD, strconv.Itoa(t.Year())+"-10-15")
+		if (summerStartDate.Before(billingDate) && summerEndDate.After(billingDate)) || summerStartDate.Equal(billingDate) || summerEndDate.Equal(billingDate) {
+			return true
+		}
+		return false
 	}
-	return false
-
 }
 
 // GetTOUsOfLocalTime godoc
@@ -138,7 +149,7 @@ func (s defaultBillingService) GetTOUsOfLocalTime(gwUUID string, t time.Time) (l
 		}).Error()
 		return
 	}
-	isSummer := s.IsSummer(localTime)
+	isSummer := s.IsSummer(billingType.VoltageType, localTime)
 	tous, err = s.repo.TOU.GetTOUsByTOUInfo(billingType.TOULocationID, billingType.VoltageType, billingType.TOUType, periodType, isSummer, localTime.Format(utils.YYYYMMDD))
 	if err == nil && len(tous) == 0 {
 		err = e.ErrNewBillingsNotExist

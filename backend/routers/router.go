@@ -30,12 +30,16 @@ const (
 
 // APIWorker godoc
 type APIWorker struct {
+	Cfg      *viper.Viper
 	Services *services.Services
 }
 
 // NewAPIWorker godoc
 func NewAPIWorker(cfg *viper.Viper, services *services.Services) {
-	w := &APIWorker{Services: services}
+	w := &APIWorker{
+		Cfg:      cfg,
+		Services: services,
+	}
 
 	r := InitRouter(cfg.GetBool("server.cors"), cfg.GetString("server.ginMode"), w)
 	r.Run(cfg.GetString("server.port"))
@@ -110,6 +114,9 @@ func InitRouter(isCORS bool, ginMode string, w *APIWorker) *gin.Engine {
 	// Dashboard
 	wsGroup.GET("/:gwid/devices/energy-info", authorize(WebSocket), w.dashboardHandler)
 
+	// Leap - webhook endpoint
+	apiGroup.POST("/leap/bidding/dispatch/webhook", leapAuthorize(), w.GetLeapBiddingDispatch)
+
 	return r
 }
 
@@ -163,6 +170,23 @@ func authorize(apiType APIType) gin.HandlerFunc {
 			c.Set("token", token)
 		}
 
+		c.Next()
+	}
+}
+
+func leapAuthorize() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// XXX: Hardcode for demo
+		const APIKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZXhwIjoxNjcxMTA4NTQzLCJpc3MiOiJkZXJlbXMifQ.NVwtEo5w8xLfxNGtF3bM8jT6OgG-oW-1JZEwj72ILHM"
+		appG := app.Gin{c}
+
+		token := c.GetHeader("x-api-key")
+		if token != APIKey {
+			log.WithFields(log.Fields{"caused-by": "invalid header"}).Error()
+			appG.Response(http.StatusUnauthorized, e.ErrAuthInvalidHeader, nil)
+			c.Abort()
+			return
+		}
 		c.Next()
 	}
 }

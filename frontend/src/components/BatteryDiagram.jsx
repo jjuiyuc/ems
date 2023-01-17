@@ -34,7 +34,7 @@ export default function BatteryDiagram(props) {
         : (props.state < 0 ? 0 : props.state)
     const lines = Array.from(Array(10).keys()).map((key) => (
         <div
-            className={"border-white" + (key < 9 ? " border-b-2" : "")}
+            className={"border-gray-100" + (key < 9 ? " border-b-2" : "")}
             key={"line-" + key}
         />
     ))
@@ -42,7 +42,7 @@ export default function BatteryDiagram(props) {
         <div className="flex flex-col items-center w-24">
             <div className="bg-gray-400 h-3 w-10 rounded-t-md" />
             <div className="bg-gray-400 h-48 p-2 rounded-lg w-full">
-                <div className="bg-white h-full p-1 rounded-md">
+                <div className="bg-gray-100 h-full p-1 rounded-md">
                     <div className="h-full overflow-hidden relative rounded">
                         {target == ""
                             ? <>

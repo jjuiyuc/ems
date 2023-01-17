@@ -12,6 +12,7 @@
     "calendar": {"white": "#EEECF1"},
     "darkGray": {"main": "#303034"},
     "gray": {
+        "100":"#EEEEEE",
         "200": "#E0E0E0",
         "main": "#E0E0E0",
         "300": "#BDBDBD",

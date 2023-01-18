@@ -26,10 +26,14 @@ var _ = Describe("EnergyResources", func() {
 		UtEndTime   = "2022-08-03T20:15:00.000Z"
 	)
 
-	var expectedOnPeakTime = map[string]string{
+	var expectedTimeOfUseOnPeakTime = map[string]interface{}{
 		"timezone": "+0800",
-		"start":    "07:30:00",
-		"end":      "22:30:00",
+		"onPeak": []interface{}{
+			map[string]interface{}{
+				"end":   "22:30:00",
+				"start": "07:30:00",
+			},
+		},
 	}
 
 	var (
@@ -137,7 +141,7 @@ var _ = Describe("EnergyResources", func() {
 				expectedResponseData := services.SolarPowerStateResponse{
 					Timestamps:        expectedTimestamps,
 					PvAveragePowerACs: expectedPvAveragePowerACs,
-					OnPeakTime:        expectedOnPeakTime,
+					TimeOfUse:         expectedTimeOfUseOnPeakTime,
 				}
 				tt := testutils.TestInfo{
 					Token:      token,
@@ -246,7 +250,7 @@ var _ = Describe("EnergyResources", func() {
 				expectedResponseData := services.BatteryPowerStateResponse{
 					Timestamps:             expectedTimestamps,
 					BatteryAveragePowerACs: expectedBatteryAveragePowerACs,
-					OnPeakTime:             expectedOnPeakTime,
+					TimeOfUse:              expectedTimeOfUseOnPeakTime,
 				}
 				tt := testutils.TestInfo{
 					Token:      token,
@@ -367,7 +371,7 @@ var _ = Describe("EnergyResources", func() {
 					Timestamps:      expectedTimestamps,
 					BatterySoCs:     expectedBatterySoCs,
 					BatteryVoltages: expectedBatteryVoltages,
-					OnPeakTime:      expectedOnPeakTime,
+					TimeOfUse:       expectedTimeOfUseOnPeakTime,
 				}
 				tt := testutils.TestInfo{
 					Token:      token,
@@ -468,7 +472,7 @@ var _ = Describe("EnergyResources", func() {
 				expectedResponseData := services.GridPowerStateResponse{
 					Timestamps:          expectedTimestamps,
 					GridAveragePowerACs: expectedGridAveragePowerACs,
-					OnPeakTime:          expectedOnPeakTime,
+					TimeOfUse:           expectedTimeOfUseOnPeakTime,
 				}
 				tt := testutils.TestInfo{
 					Token:      token,

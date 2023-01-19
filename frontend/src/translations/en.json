@@ -221,6 +221,8 @@
         "nonSummerTariff":"Non-summer Tariff",
         "offPeak": "Off-peak",
         "onPeak": "On-peak",
+        "powerOutage":"Power Outage",
+        "preNotifiedOutagePeriod":"Pre-notified Outage Period",
         "regularUsage":"Regular Usage",
         "reservedForGrid":"Reserved for Grid",
         "reservedForGridOutage":"Reserved for Grid Outage",

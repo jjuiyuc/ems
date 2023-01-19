@@ -222,6 +222,8 @@
         "nonSummerTariff":"非夏季電價",
         "offPeak": "離峰時段電力",
         "onPeak": "尖峰時段電力",
+        "powerOutage ":"Power Outage",
+        "preNotifiedOutagePeriod":"Pre-notified Outage Period",
         "regularUsage":"Regular Usage",
         "reservedForGrid":"Reserved for Grid",
         "reservedForGridOutage":"Reserved for Grid Outage",

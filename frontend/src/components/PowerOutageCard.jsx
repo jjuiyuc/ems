@@ -20,7 +20,7 @@ const defaultPolicyConfig = {
 }
 const defaultPolicyTime = {
     preNotifiedOutagePeriod: [
-        { startTime: "", endTime: "" },
+        { startDate: "", endDate: "" },
     ]
 }
 export default function PowerOutageCard(props) {
@@ -35,13 +35,6 @@ export default function PowerOutageCard(props) {
         [policyTime, setPolicyTime] = useState(defaultPolicyTime),
         [startDate, setStartDate] = useState(null),
         [endDate, setEndDate] = useState(null)
-
-    const
-        handleChange = (e) => {
-            setTariff(e.target.value)
-        }
-    // console.log(Object.keys(policyConfig))
-
     return <div className="card mb-8">
         <div className="flex justify-between sm:col-span-2 items-center">
             <div className="flex items-center">
@@ -61,7 +54,7 @@ export default function PowerOutageCard(props) {
             </Button>
         </div>
         <div className="flex items-start mt-12">
-            <div className="mb-12 mt-4">
+            <div className="mb-2">
                 {Object.keys(policyConfig).map((policy) => {
                     const timeGroup = policyTime[policy]
                     return (
@@ -72,68 +65,65 @@ export default function PowerOutageCard(props) {
                             </div>
                             {timeGroup.map(({ startDate, endDate }, index) => {
                                 return (
-                                    <>
-                                        <div className="time-range-picker grid
-                                        grid-cols-settings-input gap-x-4 items-center mt-4">
-                                            <DatePeriodPicker
-                                                key={index}
-                                                startDate={startDate}
-                                                endDate={endDate}
-                                                setStartDate={(date) => {
-                                                    const newPolicyTime = {
-                                                        ...policyTime,
-                                                        [policy]: timeGroup.map((row, i) =>
-                                                            i === index
-                                                                ? { ...row, startDate: date }
-                                                                : row)
-                                                    }
-                                                    setPolicyTime(newPolicyTime)
-                                                }}
-                                                setEndDate={(date) => {
-                                                    const newPolicyTime = {
-                                                        ...policyTime,
-                                                        [policy]: timeGroup.map((row, i) =>
-                                                            i === index
-                                                                ? { ...row, endTime: date }
-                                                                : row)
-                                                    }
-                                                    setPolicyTime(newPolicyTime)
-                                                }}
-                                            />
-                                            {index ?
-                                                <div className="ml-2 mt-4 h-4 w-4 flex cursor-pointer">
-                                                    <DeleteIcon
-                                                        onClick={() => {
-                                                            const newPolicyTime = {
-                                                                ...policyTime,
-                                                                [policy]: timeGroup.filter((_, i) => i !== index)
-                                                            }
-                                                            setPolicyTime(newPolicyTime)
-                                                        }}
-                                                    />
-                                                </div> : <div></div>}
-                                        </div>
-                                    </>
+                                    <div key={`${policy}-${index}`}
+                                        className="time-range-picker grid
+                                        grid-cols-settings-input-col4 gap-x-4 items-center mt-4">
+                                        <DatePeriodPicker
+                                            key={index}
+                                            startDate={startDate}
+                                            endDate={endDate}
+                                            setStartDate={(date) => {
+                                                const newPolicyTime = {
+                                                    ...policyTime,
+                                                    [policy]: timeGroup.map((row, i) =>
+                                                        i === index
+                                                            ? { ...row, startDate: date }
+                                                            : row)
+                                                }
+                                                setPolicyTime(newPolicyTime)
+                                            }}
+                                            setEndDate={(date) => {
+                                                const newPolicyTime = {
+                                                    ...policyTime,
+                                                    [policy]: timeGroup.map((row, i) =>
+                                                        i === index
+                                                            ? { ...row, endDate: date }
+                                                            : row)
+                                                }
+                                                setPolicyTime(newPolicyTime)
+                                            }}
+                                        />
+                                        {index ?
+                                            <div className="ml-2 mt-4 h-4 w-4 flex cursor-pointer">
+                                                <DeleteIcon
+                                                    onClick={() => {
+                                                        const newPolicyTime = {
+                                                            ...policyTime,
+                                                            [policy]: timeGroup.filter((_, i) => i !== index)
+                                                        }
+                                                        setPolicyTime(newPolicyTime)
+                                                    }}
+                                                />
+                                            </div> : <div></div>}
+                                    </div>
                                 )
                             })}
                             {policyConfig[policy].extensible && timeGroup.length < maxLength ?
-                                <div className="flex ml-4 mt-4">
-                                    <AddIcon className="w-4 h-4 mt-0.5" />
-                                    <button
-                                        className="ml-1"
-                                        onClick={() => {
-                                            const newPolicyTime = {
-                                                ...policyTime,
-                                                [policy]: [
-                                                    ...timeGroup,
-                                                    { startDate: "", endDate: "" }
-                                                ]
-                                            }
-                                            setPolicyTime(newPolicyTime)
-                                        }}>
-                                        {pageT("addTimeRange")}
-                                    </button>
-                                </div> : null}
+                                <button
+                                    className="flex ml-4 mt-4"
+                                    onClick={() => {
+                                        const newPolicyTime = {
+                                            ...policyTime,
+                                            [policy]: [
+                                                ...timeGroup,
+                                                { startDate: "", endDate: "" }
+                                            ]
+                                        }
+                                        setPolicyTime(newPolicyTime)
+                                    }}>
+                                    <AddIcon className="w-4 h-4 mt-0.5 mr-1" />
+                                    {pageT("addDateRange")}
+                                </button> : null}
                         </div>)
                 })}
             </div>

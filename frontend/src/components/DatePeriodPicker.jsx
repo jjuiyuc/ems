@@ -12,42 +12,33 @@ export default function DatePeriodPicker(props) {
 
     const { startDate, setStartDate, endDate, setEndDate } = props
 
-    const onChange = (dates) => {
-        const [start, end] = dates
-        setStartDate(start)
-        setEndDate(end)
-    }
-    // const filterPassedTime = (time) => {
-    //     const currentDate = new Date()
-    //     const selectedDate = new Date(time)
-
-    //     return currentDate.getTime() < selectedDate.getTime();
-    // }
     return (
         <>
             <div>
-                <h6 className="mb-1 ml-1">{pageT("startTime")}</h6>
+                <h6 className="mb-1 ml-1">{pageT("startDate")}</h6>
                 <DatePicker
-                    dateFormat="yyyy/MM/dd h:mm"
+                    dateFormat="yyyy/MM/dd h:mm A"
                     showTimeSelect
                     selected={startDate}
-                    // filterTime={filterPassedTime}
                     onChange={(date) => setStartDate(date)}
-                    value={startDate ? moment(startDate).format("yyyy/MM/DD h:mm") : ""}
+                    value={startDate ? moment(startDate).format("yyyy/MM/DD h:mm A") : ""}
+                    selectsStart
                     startDate={startDate}
+                    endDate={endDate}
                 />
             </div>
             <span className="mt-6">{pageT("to")}</span>
             <div>
-                <h6 className="mb-1 ml-1">{pageT("endTime")}</h6>
+                <h6 className="mb-1 ml-1">{pageT("endDate")}</h6>
                 <DatePicker
-                    dateFormat="yyyy/MM/DD h:mm"
+                    dateFormat="yyyy/MM/DD h:mm A"
                     showTimeSelect
                     selected={endDate}
-                    // filterTime={filterPassedTime}
                     onChange={(date) => setEndDate(date)}
+                    selectsEnd
                     endDate={endDate}
-                    value={endDate ? moment(endDate).format("yyyy/MM/DD h:mm") : ""}
+                    startDate={startDate}
+                    value={endDate ? moment(endDate).format("yyyy/MM/DD h:mm A") : ""}
                     minDate={startDate}
                     disabled={!startDate}
                 />

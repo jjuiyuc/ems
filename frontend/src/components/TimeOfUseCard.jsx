@@ -12,51 +12,6 @@ import { ReactComponent as TimerIcon } from "../assets/icons/timer.svg"
 const maxLength = 4
 const maxPolicyCount = 5
 
-const defaultPolicyConfig = {
-    onPeak: {
-        name: "onPeak",
-        tempName: "onPeak",
-        extensible: true,
-        nameEditable: false,
-        deletable: false
-    },
-    midPeak: {
-        name: "midPeak",
-        tempName: "midPeak",
-        extensible: true,
-        nameEditable: false,
-        deletable: false
-    },
-    offPeak: {
-        name: "offPeak",
-        tempName: "offPeak",
-        extensible: true,
-        nameEditable: false,
-        deletable: false
-    },
-    superOffPeak: {
-        name: "superOffPeak",
-        tempName: "superOffPeak",
-        extensible: true,
-        nameEditable: false,
-        deletable: false
-    },
-}
-
-const defaultPolicyPrice = {
-    onPeak: [
-        { startTime: "", endTime: "", basicPrice: "", rate: "" },
-    ],
-    midPeak: [
-        { startTime: "", endTime: "", basicPrice: "", rate: "" }
-    ],
-    offPeak: [
-        { startTime: "", endTime: "", basicPrice: "", rate: "" }
-    ],
-    superOffPeak: [
-        { startTime: "", endTime: "", basicPrice: "", rate: "" }
-    ],
-}
 export default function TimeOfUseCard(props) {
     const { data } = props
     const
@@ -65,6 +20,50 @@ export default function TimeOfUseCard(props) {
         pageT = (string, params) => t("settings." + string, params),
         dayTabs = ["weekdays", "saturday", "sundayHoliday"]
 
+    const defaultPolicyConfig = {
+        onPeak: {
+            name: pageT("onPeak"),
+            tempName: "onPeak",
+            extensible: true,
+            nameEditable: false,
+            deletable: false
+        },
+        midPeak: {
+            name: pageT("midPeak"),
+            tempName: "midPeak",
+            extensible: true,
+            nameEditable: false,
+            deletable: false
+        },
+        offPeak: {
+            name: pageT("offPeak"),
+            tempName: "offPeak",
+            extensible: true,
+            nameEditable: false,
+            deletable: false
+        },
+        superOffPeak: {
+            name: pageT("superOffPeak"),
+            tempName: "superOffPeak",
+            extensible: true,
+            nameEditable: false,
+            deletable: false
+        },
+    }
+    const defaultPolicyPrice = {
+        onPeak: [
+            { startTime: "", endTime: "", basicPrice: "", rate: "" },
+        ],
+        midPeak: [
+            { startTime: "", endTime: "", basicPrice: "", rate: "" }
+        ],
+        offPeak: [
+            { startTime: "", endTime: "", basicPrice: "", rate: "" }
+        ],
+        superOffPeak: [
+            { startTime: "", endTime: "", basicPrice: "", rate: "" }
+        ],
+    }
     const categories = [
         { label: pageT("summerTariff"), value: pageT("summerTariff") },
         { label: pageT("nonSummerTariff"), value: pageT("nonSummerTariff") }
@@ -150,13 +149,13 @@ export default function TimeOfUseCard(props) {
         <div className="flex items-start mt-12">
             <Clock size={{
                 height: "auto", width: "clamp(12rem,24vw,27.5rem)",
-                "aspect-ratio": "1 / 1"
+                aspectRatio: "1 / 1"
             }} dataset={data} id="touClock" />
             <div className="mb-12 mt-4">
-                {Object.keys(policyConfig).map((policy) => {
+                {Object.keys(policyConfig).map((policy, i) => {
                     const priceGroup = policyPrice[policy]
                     return (
-                        <div className="mb-12 ml-12" key={policy}>
+                        <div className="mb-12 ml-12" key={policy + i}>
                             <div className="flex items-center text-white mb-4">
                                 <div
                                     className="bg-blue-main h-2 rounded-full mr-3 w-2" />
@@ -182,91 +181,86 @@ export default function TimeOfUseCard(props) {
                             </div>
                             {priceGroup.map(({ startTime, endTime, basicPrice, rate }, index) => {
                                 return (
-                                    <>
-                                        <div className="time-range-picker grid
+                                    <div key={`${policy}-${i}-${index}`} className="time-range-picker grid
                                         grid-cols-settings-input gap-x-4 items-center mt-4">
-                                            <TimeRangePicker
-                                                key={index}
-                                                startTime={startTime}
-                                                endTime={endTime}
-                                                basicPrice={basicPrice}
-                                                rate={rate}
-                                                setStartTime={(time) => {
-                                                    const newPolicyPrice = {
-                                                        ...policyPrice,
-                                                        [policy]: priceGroup.map((row, i) =>
-                                                            i === index
-                                                                ? { ...row, startTime: time }
-                                                                : row)
-                                                    }
-                                                    setPolicyPrice(newPolicyPrice)
-                                                }}
-                                                setEndTime={(time) => {
-                                                    const newPolicyPrice = {
-                                                        ...policyPrice,
-                                                        [policy]: priceGroup.map((row, i) =>
-                                                            i === index
-                                                                ? { ...row, endTime: time }
-                                                                : row)
-                                                    }
-                                                    setPolicyPrice(newPolicyPrice)
-                                                }}
-                                                setBasicPrice={(price) => {
-                                                    const newPolicyPrice = {
-                                                        ...policyPrice,
-                                                        [policy]: priceGroup.map((row, i) =>
-                                                            i === index
-                                                                ? { ...row, basicPrice: price }
-                                                                : row)
-                                                    }
-                                                    setPolicyPrice(newPolicyPrice)
-                                                }}
-                                                setRate={(price) => {
-                                                    const newPolicyPrice = {
-                                                        ...policyPrice,
-                                                        [policy]: priceGroup.map((row, i) =>
-                                                            i == index
-                                                                ? { ...row, rate: price }
-                                                                : row)
-                                                    }
-                                                    setPolicyPrice(newPolicyPrice)
-                                                }}
-                                            />
-                                            {index ?
-                                                <div className="ml-2 mt-4 h-4 w-4 flex cursor-pointer">
-                                                    <DeleteIcon
-                                                        onClick={() => {
-                                                            const newPolicyPrice = {
-                                                                ...policyPrice,
-                                                                [policy]: priceGroup.filter((_, i) => i !== index)
-                                                            }
-                                                            setPolicyPrice(newPolicyPrice)
-                                                        }}
-                                                    />
-                                                </div> : <div></div>}
-                                        </div>
-
-                                    </>
+                                        <TimeRangePicker
+                                            key={index}
+                                            startTime={startTime}
+                                            endTime={endTime}
+                                            basicPrice={basicPrice}
+                                            rate={rate}
+                                            setStartTime={(time) => {
+                                                const newPolicyPrice = {
+                                                    ...policyPrice,
+                                                    [policy]: priceGroup.map((row, i) =>
+                                                        i === index
+                                                            ? { ...row, startTime: time }
+                                                            : row)
+                                                }
+                                                setPolicyPrice(newPolicyPrice)
+                                            }}
+                                            setEndTime={(time) => {
+                                                const newPolicyPrice = {
+                                                    ...policyPrice,
+                                                    [policy]: priceGroup.map((row, i) =>
+                                                        i === index
+                                                            ? { ...row, endTime: time }
+                                                            : row)
+                                                }
+                                                setPolicyPrice(newPolicyPrice)
+                                            }}
+                                            setBasicPrice={(price) => {
+                                                const newPolicyPrice = {
+                                                    ...policyPrice,
+                                                    [policy]: priceGroup.map((row, i) =>
+                                                        i === index
+                                                            ? { ...row, basicPrice: price }
+                                                            : row)
+                                                }
+                                                setPolicyPrice(newPolicyPrice)
+                                            }}
+                                            setRate={(price) => {
+                                                const newPolicyPrice = {
+                                                    ...policyPrice,
+                                                    [policy]: priceGroup.map((row, i) =>
+                                                        i == index
+                                                            ? { ...row, rate: price }
+                                                            : row)
+                                                }
+                                                setPolicyPrice(newPolicyPrice)
+                                            }}
+                                        />
+                                        {index ?
+                                            <div className="ml-2 mt-4 h-4 w-4 flex cursor-pointer">
+                                                <DeleteIcon
+                                                    onClick={() => {
+                                                        const newPolicyPrice = {
+                                                            ...policyPrice,
+                                                            [policy]: priceGroup.filter((_, i) => i !== index)
+                                                        }
+                                                        setPolicyPrice(newPolicyPrice)
+                                                    }}
+                                                />
+                                            </div> : <div></div>}
+                                    </div>
                                 )
                             })}
                             {policyConfig[policy].extensible && priceGroup.length < maxLength ?
-                                <div className="flex ml-4 mt-4">
-                                    <AddIcon className="w-4 h-4 mt-0.5" />
-                                    <button
-                                        className="ml-1"
-                                        onClick={() => {
-                                            const newPolicyPrice = {
-                                                ...policyPrice,
-                                                [policy]: [
-                                                    ...priceGroup,
-                                                    { startTime: "", endTime: "", basicPrice: "", rate: "" }
-                                                ]
-                                            }
-                                            setPolicyPrice(newPolicyPrice)
-                                        }}>
-                                        {pageT("addTimeRange")}
-                                    </button>
-                                </div> : null}
+                                <button
+                                    className="flex ml-4 mt-4"
+                                    onClick={() => {
+                                        const newPolicyPrice = {
+                                            ...policyPrice,
+                                            [policy]: [
+                                                ...priceGroup,
+                                                { startTime: "", endTime: "", basicPrice: "", rate: "" }
+                                            ]
+                                        }
+                                        setPolicyPrice(newPolicyPrice)
+                                    }}>
+                                    <AddIcon className="w-4 h-4 mt-0.5 mr-1" />
+                                    {pageT("addTimeRange")}
+                                </button> : null}
                         </div>)
                 })}
                 {Object.keys(policyConfig).length < maxPolicyCount &&

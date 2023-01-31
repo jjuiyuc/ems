@@ -258,7 +258,7 @@ export default function TimeOfUseCard(props) {
                                         }
                                         setPolicyPrice(newPolicyPrice)
                                     }}>
-                                    <AddIcon className="w-4 h-4 mt-0.5 mr-1" />
+                                    <AddIcon className="w-4 h-4 mt-0.7 mr-1" />
                                     {pageT("addTimeRange")}
                                 </button> : null}
                         </div>)

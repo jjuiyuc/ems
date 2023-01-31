@@ -51,6 +51,7 @@ module.exports = {
                 "80vh": "80vh"
             },
             margin: {
+                "0.7": "0.188rem",
                 "18": "4.5rem",
             },
             maxWidth: {

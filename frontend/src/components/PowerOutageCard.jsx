@@ -121,7 +121,7 @@ export default function PowerOutageCard(props) {
                                         }
                                         setPolicyTime(newPolicyTime)
                                     }}>
-                                    <AddIcon className="w-4 h-4 mt-0.5 mr-1" />
+                                    <AddIcon className="w-4 h-4 mt-0.7 mr-1" />
                                     {pageT("addDateRange")}
                                 </button> : null}
                         </div>)

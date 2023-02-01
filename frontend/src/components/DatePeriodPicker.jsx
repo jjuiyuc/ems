@@ -25,6 +25,7 @@ export default function DatePeriodPicker(props) {
                     selectsStart
                     startDate={startDate}
                     endDate={endDate}
+                    minDate={moment(new Date())._d}
                 />
             </div>
             <span className="mt-6">{pageT("to")}</span>
@@ -40,6 +41,8 @@ export default function DatePeriodPicker(props) {
                     startDate={startDate}
                     value={endDate ? moment(endDate).format("yyyy/MM/DD h:mm A") : ""}
                     minDate={startDate}
+                    // minTime={moment(startDate).add(30, "minutes")._d}
+                    // maxTime={moment().endOf("day")._d}
                     disabled={!startDate}
                 />
             </div>

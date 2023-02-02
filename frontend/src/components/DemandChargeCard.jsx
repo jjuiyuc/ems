@@ -51,10 +51,10 @@ export default function DemandChargeCard(props) {
                     InputProps={{
                         endAdornment:
                             <InputAdornment position="end">
-                                {commonT("kwh")}
+                                {commonT("kw")}
                             </InputAdornment>
                     }}
-                // focused
+                    focused
                 />
             </div>
         </div>

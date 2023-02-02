@@ -21,7 +21,6 @@ export default function DemandChargeCard(props) {
             if (!isNum) return
             setInputValue(num)
         }
-
     return <div className="card mt-8">
         <div className="flex justify-between sm:col-span-2 items-center">
             <div className="flex items-center">

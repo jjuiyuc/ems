@@ -33,8 +33,8 @@ function Sidebar(props) {
             { icon: <Timer />, path: "time-of-use", text: "timeOfUseEnergy" },
             { icon: <Economics />, path: "economics" },
             { icon: <Demand />, path: "demand-charge", text: "demandCharge" },
-            { icon: <Resource />, path: "energy-resources", text: "energyResources" }
-            // { icon: <Settings />, path: "settings" }
+            { icon: <Resource />, path: "energy-resources", text: "energyResources" },
+            { icon: <Settings />, path: "settings" }
         ],
         t = useTranslation(),
         navT = string => t("navigator." + string),

@@ -2,12 +2,12 @@ import { Button, Slider, Switch } from "@mui/material"
 import { useState } from "react"
 import { useTranslation } from "react-multi-lang"
 
-import { ValidateNum } from "../utils/utils"
-
 import DemandChargeCard from "../components/DemandChargeCard"
 import DialogBox from "../components/DialogBox"
+import PowerOutageCard from "../components/PowerOutageCard"
 import SettingCard from "../components/SettingCard"
 import TimeOfUseCard from "../components/TimeOfUseCard"
+
 import variables from "../configs/variables"
 
 import { ReactComponent as BatteryIcon } from "../assets/icons/battery.svg"
@@ -91,6 +91,7 @@ export default function Settings(props) {
                 </div>
             </div>
         </div>
+        <PowerOutageCard />
         <TimeOfUseCard data={clockDataset} />
         <DemandChargeCard
             data={maxDemandCapacity}

@@ -68,7 +68,7 @@ function LoggedIn(props) {
                         <Route
                             element={<Navigate to="/dashboard" replace />}
                             path="*" />
-                        {/* <Route element={<Settings />} path="/settings" /> */}
+                        <Route element={<Settings />} path="/settings" />
                     </Routes>
                 </div>
             </div>

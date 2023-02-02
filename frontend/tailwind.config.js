@@ -33,7 +33,8 @@ module.exports = {
                 "5rem-1fr": "5rem 1fr",
                 "15rem-1fr": "15rem 1fr",
                 "1fr-auto-1fr": "1fr auto 1fr",
-                "settings-input": "auto 1fr auto auto auto 30px"
+                "settings-input": "auto 1fr auto auto auto 30px",
+                "settings-input-col4": "auto 1fr auto 30px"
             },
             gridTemplateRows: {
                 "1fr-auto": "1fr auto",
@@ -50,6 +51,7 @@ module.exports = {
                 "80vh": "80vh"
             },
             margin: {
+                "0.7": "0.188rem",
                 "18": "4.5rem",
             },
             maxWidth: {

@@ -210,11 +210,13 @@
         "resetPassword": "重設密碼"
     },
     "settings":{
+        "aboveBaseline":"流動電價 ($/度)",
         "addRatePeriod":"新增費率區間",
         "addDateRange":"新增日期區間",
         "addTimeRange":"新增時間區間",
         "availableRegularUsage":"Available Regular Usage",
         "backupReserve":"Backup Reserve",
+        "belowBaseline":"基本電價 ($/度)",
         "cancel":"關閉",
         "chargingSources":"Charging Sources",
         "endDate": "結束日期",

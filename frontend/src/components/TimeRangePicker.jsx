@@ -44,7 +44,7 @@ export default function TimeRangePicker(props) {
                 />
             </div>
             <div>
-                <h6 className="mb-1 ml-1">基本電價</h6>
+                <h6 className="mb-1 ml-1">{pageT("belowBaseline")}</h6>
                 <TextField
                     className="react-datepicker__input-container"
                     id="outlined-basic"
@@ -54,7 +54,7 @@ export default function TimeRangePicker(props) {
                 />
             </div>
             <div>
-                <h6 className="mb-1 ml-1">流動電價</h6>
+                <h6 className="mb-1 ml-1">{pageT("aboveBaseline")}</h6>
                 <TextField
                     id="outlined-basic"
                     variant="outlined"

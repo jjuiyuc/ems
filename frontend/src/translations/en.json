@@ -209,11 +209,13 @@
         "resetPassword": "Reset Password"
     },
     "settings":{
+        "aboveBaseline":"Above Baseline ($/kWh)",
         "addRatePeriod":"Add Rate Period",
         "addDateRange":"Add Date Range",
         "addTimeRange":"Add Time Range",
         "availableRegularUsage":"Available Regular Usage",
         "backupReserve":"Backup Reserve",
+        "belowBaseline":"Below Baseline ($/kWh)",
         "cancel":"Cancel",
         "chargingSources":"Charging Sources",
         "endDate": "End Date",

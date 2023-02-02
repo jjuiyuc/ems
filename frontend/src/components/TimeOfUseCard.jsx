@@ -100,10 +100,10 @@ export default function TimeOfUseCard(props) {
                     <TimerIcon className="h-8 text-gray-400 w-8" />
                 </div>
                 <h2 className="font-bold ml-4">{pageT("timeOfUse")}</h2>
-                <h6 className="border-solid rounded-lg border-gray-500 border
+                {/* <h6 className="border-solid rounded-lg border-gray-500 border
                     px-4 py-2 opacity-60 ml-4 mr-2">低壓-單向</h6>
                 <h6 className="border-solid rounded-lg border-gray-500 border
-                    px-4 py-2 opacity-60">兩段式</h6>
+                    px-4 py-2 opacity-60">兩段式</h6> */}
             </div>
             <Button
                 // onClick={() => setTab(t)}

@@ -60,10 +60,11 @@ export default connect(mapState)(function Economics(props) {
                     target: "origin"
                 },
                 id: "preUbiikLastMonth",
-                hoverRadius: 0,
-                pointHoverBorderWidth: 0,
-                radius: 0,
                 borderWidth: 1,
+                pointBorderColor: colors.purple["main-opacity-10"],
+                hoverRadius: 2,
+                pointHoverBorderWidth: 2,
+                radius: 2,
                 label: pageT("preUbiik") + " - " + pageT("lastMonth")
             },
             {
@@ -75,10 +76,11 @@ export default connect(mapState)(function Economics(props) {
                     target: "origin"
                 },
                 id: "postUbiikLastMonth",
-                hoverRadius: 0,
                 borderWidth: 2,
-                pointHoverBorderWidth: 0,
-                radius: 0,
+                pointBorderColor: colors.purple["main-opacity-20"],
+                hoverRadius: 2,
+                pointHoverBorderWidth: 2,
+                radius: 2,
                 label: pageT("postUbiik") + " - " + pageT("lastMonth")
             }])
             : []
@@ -93,10 +95,11 @@ export default connect(mapState)(function Economics(props) {
                     target: "origin"
                 },
                 id: "preUbiikSameMonthLastYear",
-                hoverRadius: 0,
-                pointHoverBorderWidth: 0,
-                radius: 0,
-                borderWidth: 1,
+                borderWidth: 2,
+                pointBorderColor: colors.yellow["main-opacity-10"],
+                hoverRadius: 2,
+                pointHoverBorderWidth: 2,
+                radius: 2,
                 label: pageT("preUbiik") + " - " + pageT("sameDayLastYear")
             },
             {
@@ -108,10 +111,11 @@ export default connect(mapState)(function Economics(props) {
                     target: "origin"
                 },
                 id: "postUbiikSameMonthLastYear",
-                hoverRadius: 0,
                 borderWidth: 2,
-                pointHoverBorderWidth: 0,
-                radius: 0,
+                pointBorderColor: colors.yellow["main-opacity-20"],
+                hoverRadius: 2,
+                pointHoverBorderWidth: 2,
+                radius: 2,
                 label: pageT("postUbiik") + " - " + pageT("sameDayLastYear")
             }])
             : []
@@ -127,10 +131,11 @@ export default connect(mapState)(function Economics(props) {
                         target: "origin"
                     },
                     id: "preUbiikThisMonth",
-                    hoverRadius: 0,
-                    pointHoverBorderWidth: 0,
-                    radius: 0,
-                    borderWidth: 1,
+                    borderWidth: 2,
+                    pointBorderColor: colors.blue["main-opacity-10"],
+                    hoverRadius: 2,
+                    pointHoverBorderWidth: 2,
+                    radius: 2,
                     label: pageT("preUbiik") + " - " + pageT("today")
                 },
                 {
@@ -142,10 +147,11 @@ export default connect(mapState)(function Economics(props) {
                         target: "origin"
                     },
                     id: "postUbiikThisMonth",
-                    hoverRadius: 0,
                     borderWidth: 2,
-                    pointHoverBorderWidth: 0,
-                    radius: 0,
+                    pointBorderColor: colors.blue["main-opacity-20"],
+                    hoverRadius: 2,
+                    pointHoverBorderWidth: 2,
+                    radius: 2,
                     label: pageT("postUbiik") + " - " + pageT("today")
                 },
                 ...lastMonth,

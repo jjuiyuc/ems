@@ -32,26 +32,30 @@ const LoadingBox = ({ loading }) => loading
     ? <div className="grid h-24 place-items-center"><Spinner /></div>
     : null
 
-const drawHighPeak = (startHour, endHour) => chart => {
-    if (chart.scales.x._gridLineItems && endHour && startHour) {
-        const
-            ctx = chart.ctx,
-            xLines = chart.scales.x._gridLineItems,
-            xLineFirst = xLines[0],
-            yFirstLine = chart.scales.y._gridLineItems[0],
-            xLeft = yFirstLine.x1,
-            xFullWidth = yFirstLine.x2 - xLeft,
-            xWidth = (endHour - startHour) / 24 * xFullWidth,
-            xStart = startHour / 24 * xFullWidth + xLeft,
-            yTop = xLineFirst.y1,
-            yFullHeight = xLineFirst.y2 - yTop
+const drawHighPeak = (onPeak) => chart => {
+    if (chart.scales.x._gridLineItems && Array.isArray(onPeak)) {
+        onPeak.map(item => {
+            const { start, end } = item
+            if (!start || !end) return
+            const
+                ctx = chart.ctx,
+                xLines = chart.scales.x._gridLineItems,
+                xLineFirst = xLines[0],
+                yFirstLine = chart.scales.y._gridLineItems[0],
+                xLeft = yFirstLine.x1,
+                xFullWidth = yFirstLine.x2 - xLeft,
+                xWidth = (end - start) / 24 * xFullWidth,
+                xStart = start / 24 * xFullWidth + xLeft,
+                yTop = xLineFirst.y1,
+                yFullHeight = xLineFirst.y2 - yTop
 
-        ctx.beginPath()
-        ctx.fillStyle = "#ffffff10"
-        ctx.strokeStyle = colors.gray[400]
-        ctx.rect(xStart, yTop, xWidth, yFullHeight)
-        ctx.fill()
-        ctx.stroke()
+            ctx.beginPath()
+            ctx.fillStyle = "#ffffff10"
+            ctx.strokeStyle = colors.gray[400]
+            ctx.rect(xStart, yTop, xWidth, yFullHeight)
+            ctx.fill()
+            ctx.stroke()
+        })
     }
 }
 const mapState = state => ({ gatewayID: state.gateways.active.gatewayID })
@@ -77,7 +81,7 @@ export default connect(mapState)(function EnergyResourcesGrid(props) {
         [lineChartGridPowerRes] = useState("5minute")
 
     const chartGridPowerSet = ({ data, highPeak, labels }) => ({
-        beforeDraw: drawHighPeak(highPeak.start, highPeak.end),
+        beforeDraw: drawHighPeak(highPeak),
         datasets: [{
             backgroundColor: colors.indigo.main,
             borderColor: colors.indigo.main,
@@ -154,18 +158,21 @@ export default connect(mapState)(function EnergyResourcesGrid(props) {
 
                 const
                     { data } = rawData,
-                    { onPeakTime, timestamps } = data,
-                    { end, start, timezone } = onPeakTime,
+                    { timestamps } = data,
+                    { onPeak, timezone } = data.timeOfUse,
                     labels = [
                         ...timestamps.map(t => t * 1000),
                         ...oClocks.slice(timestamps.length)
                     ],
-                    peakStart = ConvertTimeToNumber(start, timezone),
-                    peakEnd = ConvertTimeToNumber(end, timezone)
-
+                    highPeak = onPeak.map(item => {
+                        const { start, end } = item,
+                            peakStart = ConvertTimeToNumber(start, timezone),
+                            peakEnd = ConvertTimeToNumber(end, timezone)
+                        return ({ start: peakStart, end: peakEnd })
+                    })
                 setLineChartGridPower({
                     data: data.gridAveragePowerACs,
-                    highPeak: { start: peakStart, end: peakEnd },
+                    highPeak,
                     labels
                 })
             },

@@ -4,9 +4,12 @@ const ConvertTimeToNumber = (string, timezone) => {
     const
         today = moment().format("YYYY-MM-DD"),
         time = moment(today + " " + string + timezone),
-        hour = time.hour(),
         minute = time.minute()
 
+    let hour = time.hour()
+    if (hour == 0 && time.date() !== moment().date()) {
+        hour = 24
+    }
     return hour + Number((minute / 60).toFixed(1))
 }
 

@@ -5,7 +5,7 @@ import { useTranslation } from "react-multi-lang"
 import ReportProblemIcon from "@mui/icons-material/ReportProblem"
 
 import { apiCall } from "../utils/api"
-import { ConvertTimeToNumber } from "../utils/utils"
+import { ConvertTimeToNumber, drawHighPeak } from "../utils/utils"
 import variables from "../configs/variables"
 
 import AlertBox from "../components/AlertBox"
@@ -36,28 +36,6 @@ const LoadingBox = ({ loading }) => loading
     ? <div className="grid h-24 place-items-center"><Spinner /></div>
     : null
 
-const drawHighPeak = (startHour, endHour) => chart => {
-    if (chart.scales.x._gridLineItems && endHour && startHour) {
-        const
-            ctx = chart.ctx,
-            xLines = chart.scales.x._gridLineItems,
-            xLineFirst = xLines[0],
-            yFirstLine = chart.scales.y._gridLineItems[0],
-            xLeft = yFirstLine.x1,
-            xFullWidth = yFirstLine.x2 - xLeft,
-            xWidth = (endHour - startHour) / 24 * xFullWidth,
-            xStart = startHour / 24 * xFullWidth + xLeft,
-            yTop = xLineFirst.y1,
-            yFullHeight = xLineFirst.y2 - yTop
-
-        ctx.beginPath()
-        ctx.fillStyle = "#ffffff10"
-        ctx.strokeStyle = colors.gray[400]
-        ctx.rect(xStart, yTop, xWidth, yFullHeight)
-        ctx.fill()
-        ctx.stroke()
-    }
-}
 const mapState = state => ({ gatewayID: state.gateways.active.gatewayID })
 export default connect(mapState)(function EnergyResoucesSolar(props) {
     const
@@ -83,7 +61,6 @@ export default connect(mapState)(function EnergyResoucesSolar(props) {
         [lineChartSolarError, setLineChartSolarError] = useState(""),
         [lineChartSolarLoading, setLineChartSolarLoading] = useState(false),
         [lineChartSolarRes] = useState("5minute")
-
     const
         isEcoPositive = economics > 0,
         EcoIcon = isEcoPositive ? UpIcon : DownIcon,
@@ -94,7 +71,7 @@ export default connect(mapState)(function EnergyResoucesSolar(props) {
             </span>
 
     const chartSolarGenerationSet = ({ data, labels, highPeak }) => ({
-        beforeDraw: drawHighPeak(highPeak?.start, highPeak?.end),
+        beforeDraw: drawHighPeak(highPeak),
         datasets: [{
             backgroundColor: colors.yellow.main,
             borderColor: colors.yellow.main,
@@ -178,18 +155,23 @@ export default connect(mapState)(function EnergyResoucesSolar(props) {
 
                 const
                     { data } = rawData,
-                    { onPeakTime, timestamps } = data,
-                    { end, start, timezone } = onPeakTime,
+                    { timestamps } = data,
+                    { onPeak, timezone } = data.timeOfUse,
                     labels = [
                         ...timestamps.map(t => t * 1000),
                         ...oClocks.slice(timestamps.length)
                     ],
-                    peakStart = ConvertTimeToNumber(start, timezone),
-                    peakEnd = ConvertTimeToNumber(end, timezone)
+                    highPeak = onPeak?.map(item => {
+                        const { start, end } = item
+                        const
+                            peakStart = ConvertTimeToNumber(start, timezone),
+                            peakEnd = ConvertTimeToNumber(end, timezone)
+                        return ({ start: peakStart, end: peakEnd })
+                    }) || []
 
                 setLineChartSolar({
                     data: data.pvAveragePowerACs,
-                    highPeak: { start: peakStart, end: peakEnd },
+                    highPeak,
                     labels
                 })
             },
@@ -197,7 +179,7 @@ export default connect(mapState)(function EnergyResoucesSolar(props) {
         })
     }, [props.gatewayID])
 
-    const solarGenerationchart = lineChartSolar
+    const solarGenerationChart = lineChartSolar
         ? <LineChart
             data={chartSolarGenerationSet(lineChartSolar)}
             id="ersLineChart" />
@@ -238,7 +220,7 @@ export default connect(mapState)(function EnergyResoucesSolar(props) {
             <div className="max-h-80vh h-160 relative w-full">
                 <ErrorBox error={lineChartSolarError} message={pageT("chartError")} />
                 <LoadingBox loading={lineChartSolarLoading} />
-                {solarGenerationchart}
+                {solarGenerationChart}
             </div>
         </div>
     </>

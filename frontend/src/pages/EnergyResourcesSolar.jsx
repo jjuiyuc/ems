@@ -5,7 +5,7 @@ import { useTranslation } from "react-multi-lang"
 import ReportProblemIcon from "@mui/icons-material/ReportProblem"
 
 import { apiCall } from "../utils/api"
-import { ConvertTimeToNumber } from "../utils/utils"
+import { ConvertTimeToNumber, drawHighPeak } from "../utils/utils"
 import variables from "../configs/variables"
 
 import AlertBox from "../components/AlertBox"
@@ -36,34 +36,6 @@ const LoadingBox = ({ loading }) => loading
     ? <div className="grid h-24 place-items-center"><Spinner /></div>
     : null
 
-const drawHighPeak = (onPeak) => chart => {
-
-    if (chart.scales.x._gridLineItems && Array.isArray(onPeak)) {
-        onPeak.map(item => {
-            const { start, end } = item
-            if (!start || !end) return
-            const
-                ctx = chart.ctx,
-                xLines = chart.scales.x._gridLineItems,
-                xLineFirst = xLines[0],
-                yFirstLine = chart.scales.y._gridLineItems[0],
-                xLeft = yFirstLine.x1,
-                xFullWidth = yFirstLine.x2 - xLeft,
-                xWidth = (end - start) / 24 * xFullWidth,
-                xStart = start / 24 * xFullWidth + xLeft,
-                yTop = xLineFirst.y1,
-                yFullHeight = xLineFirst.y2 - yTop
-
-            ctx.beginPath()
-            ctx.fillStyle = "#ffffff10"
-            ctx.strokeStyle = colors.gray[400]
-            ctx.rect(xStart, yTop, xWidth, yFullHeight)
-            ctx.fill()
-            ctx.stroke()
-        }
-        )
-    }
-}
 const mapState = state => ({ gatewayID: state.gateways.active.gatewayID })
 export default connect(mapState)(function EnergyResoucesSolar(props) {
     const
@@ -89,7 +61,6 @@ export default connect(mapState)(function EnergyResoucesSolar(props) {
         [lineChartSolarError, setLineChartSolarError] = useState(""),
         [lineChartSolarLoading, setLineChartSolarLoading] = useState(false),
         [lineChartSolarRes] = useState("5minute")
-
     const
         isEcoPositive = economics > 0,
         EcoIcon = isEcoPositive ? UpIcon : DownIcon,
@@ -190,13 +161,13 @@ export default connect(mapState)(function EnergyResoucesSolar(props) {
                         ...timestamps.map(t => t * 1000),
                         ...oClocks.slice(timestamps.length)
                     ],
-                    highPeak = onPeak.map(item => {
+                    highPeak = onPeak?.map(item => {
                         const { start, end } = item
                         const
                             peakStart = ConvertTimeToNumber(start, timezone),
                             peakEnd = ConvertTimeToNumber(end, timezone)
                         return ({ start: peakStart, end: peakEnd })
-                    })
+                    }) || []
 
                 setLineChartSolar({
                     data: data.pvAveragePowerACs,

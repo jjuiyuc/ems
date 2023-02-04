@@ -5,7 +5,7 @@ import { useEffect, useState } from "react"
 import { useTranslation } from "react-multi-lang"
 
 import { apiCall } from "../utils/api"
-import { ConvertTimeToNumber } from "../utils/utils"
+import { ConvertTimeToNumber, drawHighPeak } from "../utils/utils"
 import variables from "../configs/variables"
 
 import AlertBox from "../components/AlertBox"
@@ -24,57 +24,6 @@ import { ReactComponent as DischargeIcon }
 
 const { colors } = variables
 
-const drawHighPeak = (onPeak) => chart => {
-    if (chart.scales.x._gridLineItems && Array.isArray(onPeak)) {
-        onPeak.map(item => {
-            const { start, end } = item
-            if (!start || !end) return
-            const
-                ctx = chart.ctx,
-                xLines = chart.scales.x._gridLineItems,
-                xLineFirst = xLines[0],
-                yFirstLine = chart.scales.y._gridLineItems[0],
-                xLeft = yFirstLine.x1,
-                xFullWidth = yFirstLine.x2 - xLeft,
-                xWidth = (end - start) / 24 * xFullWidth,
-                xStart = start / 24 * xFullWidth + xLeft,
-                yTop = xLineFirst.y1,
-                yFullHeight = xLineFirst.y2 - yTop
-
-            ctx.beginPath()
-            ctx.fillStyle = "#ffffff10"
-            ctx.strokeStyle = colors.gray[400]
-            ctx.rect(xStart, yTop, xWidth, yFullHeight)
-            ctx.fill()
-            ctx.stroke()
-        })
-    }
-}
-const chartPowerSet = ({ data, highPeak, labels, unit }) => ({
-    beforeDraw: drawHighPeak(highPeak),
-    datasets: [{
-        backgroundColor: colors.blue.main,
-        borderColor: colors.blue.main,
-        data,
-        fill: {
-            above: colors.blue["main-opacity-10"],
-            below: colors.blue["main-opacity-10"],
-            target: "origin"
-        },
-        pointBorderColor: colors.blue["main-opacity-20"],
-        hoverRadius: 0,
-        pointHoverBorderWidth: 0,
-        radius: 0
-    }],
-    labels,
-    tickCallback: (val, index) => val + " " + unit,
-    tooltipLabel: item => `${item.parsed.y} ${unit}`,
-    // y: { max: 25, min: -25 },
-    x: {
-        max: moment().add(1, "day").startOf("day"),
-        min: moment().startOf("day")
-    }
-})
 const ErrorBox = ({ error, margin = "", message }) => error
     ? <AlertBox
         boxClass={`${margin} negative`}
@@ -116,6 +65,31 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
         [powerSources, setPowerSources] = useState(""),
         [voltage, setVoltage] = useState(0)
 
+    const chartPowerSet = ({ data, highPeak, labels, unit }) => ({
+        beforeDraw: drawHighPeak(highPeak),
+        datasets: [{
+            backgroundColor: colors.blue.main,
+            borderColor: colors.blue.main,
+            data,
+            fill: {
+                above: colors.blue["main-opacity-10"],
+                below: colors.blue["main-opacity-10"],
+                target: "origin"
+            },
+            pointBorderColor: colors.blue["main-opacity-20"],
+            hoverRadius: 0,
+            pointHoverBorderWidth: 0,
+            radius: 0
+        }],
+        labels,
+        tickCallback: (val, index) => val + " " + unit,
+        tooltipLabel: item => `${item.parsed.y} ${unit}`,
+        // y: { max: 25, min: -25 },
+        x: {
+            max: moment().add(1, "day").startOf("day"),
+            min: moment().startOf("day")
+        }
+    })
     const chartChargeVoltageSet = ({ data, highPeak, labels, unit }) => ({
         beforeDraw: drawHighPeak(highPeak),
         datasets: [
@@ -218,12 +192,12 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
                         ...timestamps.map(t => t * 1000),
                         ...oClocks.slice(timestamps.length)
                     ],
-                    highPeak = onPeak.map(item => {
+                    highPeak = onPeak?.map(item => {
                         const { start, end } = item,
                             peakStart = ConvertTimeToNumber(start, timezone),
                             peakEnd = ConvertTimeToNumber(end, timezone)
                         return ({ start: peakStart, end: peakEnd })
-                    })
+                    }) || []
                 setPower({
                     data: data.batteryAveragePowerACs,
                     highPeak,
@@ -251,12 +225,12 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
                         ...timestamps.map(t => t * 1000),
                         ...oClocks.slice(timestamps.length)
                     ],
-                    highPeak = onPeak.map(item => {
+                    highPeak = onPeak?.map(item => {
                         const { start, end } = item,
                             peakStart = ConvertTimeToNumber(start, timezone),
                             peakEnd = ConvertTimeToNumber(end, timezone)
                         return ({ start: peakStart, end: peakEnd })
-                    })
+                    }) || []
                 setChargeVoltage({
                     data: {
                         charge: data.batterySoCs,

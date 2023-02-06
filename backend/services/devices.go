@@ -323,9 +323,9 @@ func (r *SolarEnergyInfoResponse) ComputedValues(firstLogOfDay, firstLogOfMonth,
 
 // SolarPowerStateResponse godoc
 type SolarPowerStateResponse struct {
-	Timestamps        []int              `json:"timestamps"`
-	PvAveragePowerACs Float32ArrayFormat `json:"pvAveragePowerACs"`
-	OnPeakTime        map[string]string  `json:"onPeakTime"`
+	Timestamps        []int                  `json:"timestamps"`
+	PvAveragePowerACs Float32ArrayFormat     `json:"pvAveragePowerACs"`
+	TimeOfUse         map[string]interface{} `json:"timeOfUse"`
 }
 
 // BatteryEnergyInfoResponse godoc
@@ -350,6 +350,7 @@ func (r *BatteryEnergyInfoResponse) GetBatteryInfo(gwUUID string) {
 	const (
 		Huayu      = "0324DE7B51B262F3B11A643CBA8E12CE"
 		Serenegray = "0E0BA27A8175AF978C49396BDE9D7A1E"
+		CHTMiaoli  = "018F1623ADD8E739F7C6CBE62A7DF3C0"
 	)
 	switch gwUUID {
 	case Huayu:
@@ -360,7 +361,12 @@ func (r *BatteryEnergyInfoResponse) GetBatteryInfo(gwUUID string) {
 	case Serenegray:
 		r.Model = "L051100-A UZ-Energy Battery"
 		r.Capcity = 30
-		r.BatteryPower = 24
+		r.BatteryPower = 20
+		r.Voltage = 51.2
+	case CHTMiaoli:
+		r.Model = "L051100-A UZ-Energy Battery"
+		r.Capcity = 10
+		r.BatteryPower = 15
 		r.Voltage = 51.2
 	}
 	r.PowerSources = "Solar + Grid"
@@ -379,17 +385,17 @@ func (r *BatteryEnergyInfoResponse) ComputedValues(firstLog, latestLog *deremsmo
 
 // BatteryPowerStateResponse godoc
 type BatteryPowerStateResponse struct {
-	Timestamps             []int              `json:"timestamps"`
-	BatteryAveragePowerACs Float32ArrayFormat `json:"batteryAveragePowerACs"`
-	OnPeakTime             map[string]string  `json:"onPeakTime"`
+	Timestamps             []int                  `json:"timestamps"`
+	BatteryAveragePowerACs Float32ArrayFormat     `json:"batteryAveragePowerACs"`
+	TimeOfUse              map[string]interface{} `json:"timeOfUse"`
 }
 
 // BatteryChargeVoltageStateResponse godoc
 type BatteryChargeVoltageStateResponse struct {
-	Timestamps      []int              `json:"timestamps"`
-	BatterySoCs     Float32ArrayFormat `json:"batterySoCs"`
-	BatteryVoltages Float32ArrayFormat `json:"batteryVoltages"`
-	OnPeakTime      map[string]string  `json:"onPeakTime"`
+	Timestamps      []int                  `json:"timestamps"`
+	BatterySoCs     Float32ArrayFormat     `json:"batterySoCs"`
+	BatteryVoltages Float32ArrayFormat     `json:"batteryVoltages"`
+	TimeOfUse       map[string]interface{} `json:"timeOfUse"`
 }
 
 // GridEnergyInfoResponse godoc
@@ -410,9 +416,9 @@ func (r *GridEnergyInfoResponse) ComputedValues(firstLogOfDay, firstLogOfMonth, 
 
 // GridPowerStateResponse godoc
 type GridPowerStateResponse struct {
-	Timestamps          []int              `json:"timestamps"`
-	GridAveragePowerACs Float32ArrayFormat `json:"gridAveragePowerACs"`
-	OnPeakTime          map[string]string  `json:"onPeakTime"`
+	Timestamps          []int                  `json:"timestamps"`
+	GridAveragePowerACs Float32ArrayFormat     `json:"gridAveragePowerACs"`
+	TimeOfUse           map[string]interface{} `json:"timeOfUse"`
 }
 
 // DevicesService godoc
@@ -455,7 +461,9 @@ func (s defaultDevicesService) GetLatestDevicesEnergyInfo(gwUUID string) (logTim
 			"caused-by": "s.repo.CCData.GetLatestLog",
 			"err":       err,
 		}).Error()
-		return
+		// To avoid frontend crash, return default values if no data in database
+		err = nil
+		latestLog = &deremsmodels.CCDataLog{}
 	}
 
 	logTime = latestLog.LogDate
@@ -946,12 +954,12 @@ func (s defaultDevicesService) GetSolarEnergyInfo(param *app.StartTimeParam) (so
 
 func (s defaultDevicesService) GetSolarPowerState(param *app.ZoomableParam) (solarPowerState *SolarPowerStateResponse, err error) {
 	solarPowerState = &SolarPowerStateResponse{}
-	onPeakTime, err := s.getOnPeakTime(param.GatewayUUID, param.Query.StartTime)
+	timeOfUseOnPeakTime, err := s.getTimeOfUseOnPeakTime(param.GatewayUUID, param.Query.StartTime)
 	if err != nil {
 		return
 	}
 
-	solarPowerState.OnPeakTime = onPeakTime
+	solarPowerState.TimeOfUse = timeOfUseOnPeakTime
 	realtimeInfo := s.getRealtimeInfo(param, false)
 	solarPowerState.Timestamps = realtimeInfo.Timestamps
 	solarPowerState.PvAveragePowerACs = realtimeInfo.PvAveragePowerACs
@@ -982,12 +990,12 @@ func (s defaultDevicesService) GetBatteryEnergyInfo(param *app.StartTimeParam) (
 
 func (s defaultDevicesService) GetBatteryPowerState(param *app.ZoomableParam) (batteryPowerState *BatteryPowerStateResponse, err error) {
 	batteryPowerState = &BatteryPowerStateResponse{}
-	onPeakTime, err := s.getOnPeakTime(param.GatewayUUID, param.Query.StartTime)
+	timeOfUseOnPeakTime, err := s.getTimeOfUseOnPeakTime(param.GatewayUUID, param.Query.StartTime)
 	if err != nil {
 		return
 	}
 
-	batteryPowerState.OnPeakTime = onPeakTime
+	batteryPowerState.TimeOfUse = timeOfUseOnPeakTime
 	realtimeInfo := s.getRealtimeInfo(param, false)
 	batteryPowerState.Timestamps = realtimeInfo.Timestamps
 	batteryPowerState.BatteryAveragePowerACs = realtimeInfo.BatteryAveragePowerACs
@@ -996,12 +1004,12 @@ func (s defaultDevicesService) GetBatteryPowerState(param *app.ZoomableParam) (b
 
 func (s defaultDevicesService) GetBatteryChargeVoltageState(param *app.ZoomableParam) (batteryChargeVoltageState *BatteryChargeVoltageStateResponse, err error) {
 	batteryChargeVoltageState = &BatteryChargeVoltageStateResponse{}
-	onPeakTime, err := s.getOnPeakTime(param.GatewayUUID, param.Query.StartTime)
+	timeOfUseOnPeakTime, err := s.getTimeOfUseOnPeakTime(param.GatewayUUID, param.Query.StartTime)
 	if err != nil {
 		return
 	}
 
-	batteryChargeVoltageState.OnPeakTime = onPeakTime
+	batteryChargeVoltageState.TimeOfUse = timeOfUseOnPeakTime
 	realtimeInfo := s.getRealtimeInfo(param, false)
 	batteryChargeVoltageState.Timestamps = realtimeInfo.Timestamps
 	batteryChargeVoltageState.BatterySoCs = realtimeInfo.BatterySoCs
@@ -1037,12 +1045,12 @@ func (s defaultDevicesService) GetGridEnergyInfo(param *app.StartTimeParam) (gri
 
 func (s defaultDevicesService) GetGridPowerState(param *app.ZoomableParam) (gridPowerState *GridPowerStateResponse, err error) {
 	gridPowerState = &GridPowerStateResponse{}
-	onPeakTime, err := s.getOnPeakTime(param.GatewayUUID, param.Query.StartTime)
+	timeOfUseOnPeakTime, err := s.getTimeOfUseOnPeakTime(param.GatewayUUID, param.Query.StartTime)
 	if err != nil {
 		return
 	}
 
-	gridPowerState.OnPeakTime = onPeakTime
+	gridPowerState.TimeOfUse = timeOfUseOnPeakTime
 	realtimeInfo := s.getRealtimeInfo(param, false)
 	gridPowerState.Timestamps = realtimeInfo.Timestamps
 	gridPowerState.GridAveragePowerACs = realtimeInfo.GridAveragePowerACs
@@ -1282,27 +1290,20 @@ func (s defaultDevicesService) getLatestComputedDemandState(gwUUID string, start
 	return
 }
 
-func (s defaultDevicesService) getOnPeakTime(gwUUID string, t time.Time) (onPeakTime map[string]string, err error) {
-	localTime, tous, err := s.billing.GetTOUsOfLocalTime(gwUUID, t)
+func (s defaultDevicesService) getTimeOfUseOnPeakTime(gwUUID string, t time.Time) (timeOfUseOnPeakTime map[string]interface{}, err error) {
+	timeOfUseOnPeakTime = make(map[string]interface{})
+	localStartTime, tous, err := s.billing.GetTOUsOfLocalTime(gwUUID, t)
 	if err != nil {
 		return
 	}
 
-	onPeakTime = map[string]string{}
-	for _, tou := range tous {
-		if tou.PeakType.String == "On-peak" {
-			log.WithFields(log.Fields{
-				"localTime":       localTime,
-				"timezone":        localTime.Format(utils.ZHHMM),
-				"tou.PeakType":    tou.PeakType,
-				"tou.PeriodStime": tou.PeriodStime,
-				"tou.PeriodEtime": tou.PeriodEtime,
-			}).Debug()
-			onPeakTime["timezone"] = localTime.Format(utils.ZHHMM)
-			onPeakTime["start"] = tou.PeriodStime.String
-			onPeakTime["end"] = tou.PeriodEtime.String
-			break
-		}
+	// 1. timezone
+	timeOfUseOnPeakTime["timezone"] = localStartTime.Format(utils.ZHHMM)
+	// 2. onPeak
+	periods := s.getPeriodsByPeakType("On-peak", tous)
+	for _, period := range periods {
+		delete(period, "touRate")
 	}
+	timeOfUseOnPeakTime["onPeak"] = periods
 	return
 }

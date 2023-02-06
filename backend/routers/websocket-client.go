@@ -21,7 +21,8 @@ type Client struct {
 
 func (c *Client) run(w *APIWorker) {
 	isOpen := true
-	var previousLogTime time.Time
+	// Set specific time to avoid log time is default value
+	previousLogTime := time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC)
 
 	defer func() {
 		c.Pool.Unregister <- c

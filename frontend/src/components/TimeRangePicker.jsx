@@ -2,6 +2,8 @@ import { TextField } from "@mui/material"
 import DatePicker from "react-datepicker"
 import { useTranslation } from "react-multi-lang"
 import moment from "moment"
+
+import { ValidateDecimalPlace } from "../utils/utils"
 import "../assets/css/timeRangePicker.css"
 
 export default function TimeRangePicker(props) {
@@ -12,7 +14,19 @@ export default function TimeRangePicker(props) {
 
     const { startTime, setStartTime, endTime, setEndTime, basicPrice, rate,
         setBasicPrice, setRate } = props
-
+    const
+        inputPrice = (e) => {
+            const num = e.target.value
+            const isNum = ValidateDecimalPlace(num)
+            if (!isNum) return
+            setBasicPrice(num)
+        },
+        inputRate = (e) => {
+            const num = e.target.value
+            const isNum = ValidateDecimalPlace(num)
+            if (!isNum) return
+            setRate(num)
+        }
     return (
         <>
             <div>
@@ -50,7 +64,7 @@ export default function TimeRangePicker(props) {
                     id="outlined-basic"
                     variant="outlined"
                     value={basicPrice}
-                    onChange={(e) => { setBasicPrice(e.target.value) }}
+                    onChange={inputPrice}
                 />
             </div>
             <div>
@@ -59,7 +73,7 @@ export default function TimeRangePicker(props) {
                     id="outlined-basic"
                     variant="outlined"
                     value={rate}
-                    onChange={(e) => { setRate(e.target.value) }}
+                    onChange={inputRate}
                 />
             </div>
         </>

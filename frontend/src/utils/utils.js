@@ -51,4 +51,7 @@ const ValidatePassword = password =>
 const ValidateNum = num =>
     /^(0?|[1-9][0-9]*)$/.test(num)
 
-export { ConvertTimeToNumber, drawHighPeak, ValidateEmail, ValidatePassword, ValidateNum }
+const ValidateDecimalPlace = num =>
+    /^((0?|[1-9][0-9]*)|([0-9]*\.)|([0]\.\d{1,2}|[1-9][0-9]*\.\d{1,2}))$/.test(num)
+
+export { ConvertTimeToNumber, drawHighPeak, ValidateEmail, ValidatePassword, ValidateNum, ValidateDecimalPlace }

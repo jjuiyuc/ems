@@ -112,7 +112,7 @@ export default connect(mapState)(function Analysis(props) {
         ],
         labels,
         legend: true,
-        tickCallback: (val, index) => val + commonT("kw"),
+        tickCallback: val => parseFloat(val.toFixed(2)) + commonT("kw"),
         tooltipLabel: item => `${item.dataset.label} ${item.parsed.y} `
             + commonT("kw"),
         x: { grid: { lineWidth: 0 } }
@@ -143,6 +143,7 @@ export default connect(mapState)(function Analysis(props) {
         ],
         labels,
         legend: true,
+        tickCallback: val => parseFloat(val.toFixed(2)) + " " + commonT("kwh"),
         tooltipLabel: item =>
             `${item.dataset.label} ${item.parsed.y} ${commonT("kwh")}`,
         x: {
@@ -180,7 +181,7 @@ export default connect(mapState)(function Analysis(props) {
             radius: 0
         }],
         labels,
-        tickCallback: (val, index) => val + "%",
+        tickCallback: val => parseFloat(val.toFixed(2)) + "%",
         tooltipLabel: item => item.parsed.y + "%",
         x: {
             grid: { lineWidth: 0 },

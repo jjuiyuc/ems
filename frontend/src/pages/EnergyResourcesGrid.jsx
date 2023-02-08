@@ -70,7 +70,7 @@ export default connect(mapState)(function EnergyResourcesGrid(props) {
             radius: 0,
         }],
         labels,
-        tickCallback: val => parseFloat(val.toFixed(2)) + commonT("kw"),
+        tickCallback: val => parseFloat(val.toFixed(3)) + commonT("kw"),
         tooltipLabel: item =>
             `${item.parsed.y} ${commonT("kw")}`,
         x: {

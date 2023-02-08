@@ -20,7 +20,7 @@ export default function Settings(props) {
         commonT = string => t("common." + string),
         pageT = (string, params) => t("settings." + string, params)
     const
-        [reservedForGridOutage, setReservedForGridOutage] = useState(0),
+        [reservedForGridOutage, setReservedForGridOutage] = useState(1),
         [availableRegularUsage, setAvailableRegularUsage] = useState(100),
         [backupReserve, setBackupReserve] = useState(100),
         [clockDataset, setClockDataset] = useState({
@@ -64,7 +64,7 @@ export default function Settings(props) {
                                 title={pageT("backupReserve")} />
                         </div>
                         <div>
-                            <Slider defaultValue={0} aria-label="Default" valueLabelDisplay="auto"
+                            <Slider defaultValue={1} aria-label="Default" valueLabelDisplay="auto"
                                 onChange={(e) => {
                                     setReservedForGridOutage(Number(e.target.value))
                                     setAvailableRegularUsage(100 - Number(e.target.value))

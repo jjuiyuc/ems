@@ -82,9 +82,8 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
             radius: 0
         }],
         labels,
-        tickCallback: (val, index) => val + " " + unit,
+        tickCallback: (val, index) => parseFloat(val.toFixed(2)) + " " + unit,
         tooltipLabel: item => `${item.parsed.y} ${unit}`,
-        // y: { max: 25, min: -25 },
         x: {
             max: moment().add(1, "day").startOf("day"),
             min: moment().startOf("day")
@@ -233,7 +232,7 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
                     }) || []
                 setChargeVoltage({
                     data: {
-                        charge: data.batterySoCs,
+                        charge: data.batterySoCs || 0,
                         voltage: data.batteryVoltages
                     },
                     highPeak,

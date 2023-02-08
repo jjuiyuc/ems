@@ -143,7 +143,7 @@ export default connect(mapState)(function Analysis(props) {
         ],
         labels,
         legend: true,
-        tickCallback: val => parseFloat(val.toFixed(2)) + "" + commonT("kwh"),
+        tickCallback: val => parseFloat(val.toFixed(2)) + " " + commonT("kwh"),
         tooltipLabel: item =>
             `${item.dataset.label} ${item.parsed.y} ${commonT("kwh")}`,
         x: {

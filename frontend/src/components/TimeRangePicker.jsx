@@ -3,7 +3,7 @@ import DatePicker from "react-datepicker"
 import { useTranslation } from "react-multi-lang"
 import moment from "moment"
 
-import { ValidateDecimalPlace } from "../utils/utils"
+import { validateNumTwoDecimalPlaces } from "../utils/utils"
 import "../assets/css/timeRangePicker.css"
 
 export default function TimeRangePicker(props) {
@@ -17,13 +17,13 @@ export default function TimeRangePicker(props) {
     const
         inputPrice = (e) => {
             const num = e.target.value
-            const isNum = ValidateDecimalPlace(num)
+            const isNum = validateNumTwoDecimalPlaces(num)
             if (!isNum) return
             setBasicPrice(num)
         },
         inputRate = (e) => {
             const num = e.target.value
-            const isNum = ValidateDecimalPlace(num)
+            const isNum = validateNumTwoDecimalPlaces(num)
             if (!isNum) return
             setRate(num)
         }

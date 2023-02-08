@@ -82,7 +82,7 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
             radius: 0
         }],
         labels,
-        tickCallback: (val, index) => parseFloat(val.toFixed(2)) + " " + unit,
+        tickCallback: (val, index) => parseFloat(val.toFixed(3)) + " " + unit,
         tooltipLabel: item => `${item.parsed.y} ${unit}`,
         x: {
             max: moment().add(1, "day").startOf("day"),
@@ -125,12 +125,12 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
             },
         ],
         labels,
-        tickCallback: val => parseFloat(val.toFixed(2)) + " " + unit.charge,
+        tickCallback: val => val + " " + unit.charge,
         tooltipLabel: item => `${item.dataset.label} ${item.parsed.y}`
             + unit[item.dataset.id],
         y: { max: 100, min: 0 },
         y1: { max: 100, min: 0 },
-        y1TickCallback: val => parseFloat(val.toFixed(2)) + " " + unit.voltage,
+        y1TickCallback: val => parseFloat(val.toFixed(3)) + " " + unit.voltage,
         x: {
             max: moment().add(1, "day").startOf("day"),
             min: moment().startOf("day")

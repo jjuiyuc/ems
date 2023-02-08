@@ -158,7 +158,7 @@ export default connect(mapState)(function Economics(props) {
                 ...sameDayLastYear
             ],
             labels,
-            tickCallback: val => "$" + parseFloat(val.toFixed(2)),
+            tickCallback: val => "$" + parseFloat(val.toFixed(3)),
             tooltipLabel: item =>
                 item.dataset.label + " $" + item.parsed.y,
             x: {
@@ -207,7 +207,7 @@ export default connect(mapState)(function Economics(props) {
                 ...sameDayLastYear
             ],
             labels,
-            tickCallback: val => "$" + parseFloat(val.toFixed(2)),
+            tickCallback: val => "$" + parseFloat(val.toFixed(3)),
             tooltipLabel: item =>
                 item.dataset.label + " $" + item.parsed.y,
             x: {

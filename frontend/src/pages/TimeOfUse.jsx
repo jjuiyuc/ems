@@ -68,7 +68,7 @@ export default connect(mapState)(function TimeOfUse(props) {
             radius: 0
         }],
         labels,
-        tickCallback: (val, index) => val + "%",
+        tickCallback: val => parseFloat(val.toFixed(2)) + "%",
         tooltipLabel: item => `${item.parsed.y}%`,
         x: { grid: { lineWidth: 0 } },
         y: { min: 0 }

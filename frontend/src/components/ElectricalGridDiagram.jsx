@@ -1,27 +1,5 @@
 export default function ElectricalGridDiagram(props) {
     const
-        // arrows = {
-        //     battery: {
-        //         grid: "M529.677 153.953L530.515 140.899L507.806 141.456L529.677 153.953Z",
-        //         load: "M65.9904 142L84.5 142L84.5 155.995L65.9904 142Z",
-        //         pv: "M536.541 419.529L536.806 406.877L515.787 406.53L536.541 419.529Z"
-        //     },
-        //     grid: {
-        //         battery: "M125.376 361.832L124.538 374.886L147.247 374.329L125.376 361.832Z",
-        //         load: "M131.78 103.255L131.514 115.907L152.533 116.255L131.78 103.255Z",
-        //         pv: "M635.132 330.987L653.404 325.183L630.484 312.388L635.132 330.987Z"
-        //     },
-        //     load: {
-        //         battery: "M27.6147 324.294L9.81039 317.185L33.5949 306.08L27.6147 324.294Z",
-        //         grid: "M528.541 100.255L528.806 112.907L507.787 113.255L528.541 100.255Z",
-        //         pv: "M538.677 363.832L539.515 376.886L516.806 376.329L538.677 363.832Z"
-        //     },
-        //     pv: {
-        //         battery: "M122.78 415.529L122.514 402.877L143.533 402.53L122.78 415.529Z",
-        //         grid: "M601.885 142L583.375 142L583.375 155.995L601.885 142Z",
-        //         load: "M132.376 153.953L131.538 140.899L154.247 141.456L132.376 153.953Z"
-        //     }
-        // },
         arrowDirections = {
             "load-grid": false,
             "load-pv": false,
@@ -41,7 +19,6 @@ export default function ElectricalGridDiagram(props) {
             "pv-load": "30deg",
             "grid-battery": "30deg",
             "battery-grid": "-30deg"
-
         },
         lines = {
             "battery-load": "M107.5 127.779C46.8664 161.664 9.19995 209.054 9.19995 261.5C9.19995 311.3 43.1616 356.541 98.4999 389.99",
@@ -56,7 +33,6 @@ export default function ElectricalGridDiagram(props) {
             "battery-pv": "M98.5 389.99C157.618 425.724 241.133 448 333.7 448C424.764 448 507.067 426.442 566 391.721",
             "pv-load": "M111.183 129.564L561.516 389.564",
             "load-pv": "M111.183 129.564L561.516 389.564"
-
         },
         lineGridBattery = {
             x1: "102.698", y1: "389.132", x2: "553.031", y2: "129.132"
@@ -651,7 +627,6 @@ export default function ElectricalGridDiagram(props) {
                         path={lines[start + "-" + end]} {...motionProps} />
                 </polygon>
                 : null}
-
         </>
     }
     const isPointActive = point =>

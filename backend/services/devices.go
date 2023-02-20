@@ -887,6 +887,9 @@ func (s defaultDevicesService) GetDemandState(param *app.PeriodParam) (demandSta
 	demandState = &DemandStateResponse{}
 	startTimeIndex := param.Query.StartTime
 	endTimeIndex := param.Query.StartTime.Add(15 * time.Minute)
+	if endTimeIndex.After(param.Query.EndTime) {
+		endTimeIndex = param.Query.EndTime
+	}
 
 	for startTimeIndex.Before(param.Query.EndTime) {
 		latestComputedDemandState := s.getLatestComputedDemandState(param.GatewayUUID, startTimeIndex, endTimeIndex, param.Query.EndTime)
@@ -910,6 +913,9 @@ func (s defaultDevicesService) GetDemandState(param *app.PeriodParam) (demandSta
 	if demandState.Timestamps == nil {
 		startTimeIndex = param.Query.StartTime
 		endTimeIndex = param.Query.StartTime.Add(15 * time.Minute)
+		if endTimeIndex.After(param.Query.EndTime) {
+			endTimeIndex = param.Query.EndTime
+		}
 		for startTimeIndex.Before(param.Query.EndTime) {
 			demandState.Timestamps = append(demandState.Timestamps, int(endTimeIndex.Add(-1*time.Second).Unix()))
 			demandState.GridLifetimeEnergyACDiffToPowers = append(demandState.GridLifetimeEnergyACDiffToPowers, 0)
@@ -1061,6 +1067,9 @@ func (s defaultDevicesService) getRealtimeInfo(param *app.ZoomableParam, include
 	realtimeInfo = &RealtimeInfo{}
 	startTimeIndex := param.Query.StartTime
 	endTimeIndex := param.GetEndTimeIndex()
+	if endTimeIndex.After(param.Query.EndTime) {
+		endTimeIndex = param.Query.EndTime
+	}
 
 	for startTimeIndex.Before(param.Query.EndTime) {
 		latestRealtimeInfo := s.getLatestRealtimeInfo(param.GatewayUUID, startTimeIndex, endTimeIndex, param.Query.EndTime)
@@ -1099,6 +1108,9 @@ func (s defaultDevicesService) getRealtimeInfo(param *app.ZoomableParam, include
 	if realtimeInfo.Timestamps == nil {
 		startTimeIndex = param.Query.StartTime
 		endTimeIndex = param.GetEndTimeIndex()
+		if endTimeIndex.After(param.Query.EndTime) {
+			endTimeIndex = param.Query.EndTime
+		}
 		for startTimeIndex.Before(param.Query.EndTime) {
 			realtimeInfo.Timestamps = append(realtimeInfo.Timestamps, int(endTimeIndex.Add(-1*time.Second).Unix()))
 			realtimeInfo.LoadAveragePowerACs = append(realtimeInfo.LoadAveragePowerACs, 0)

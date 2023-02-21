@@ -2,15 +2,15 @@ export default function ElectricalGridDiagram(props) {
     const
         arrowDirections = {
             "load-grid": false,
+            "load-battery": false,
             "load-pv": false,
-            "battery-grid": true,
-            "battery-load": true,
             "pv-grid": false,
             "battery-pv": false,
-            "grid-load": true,
             "grid-battery": false,
+            "battery-grid": true,
+            "battery-load": true,
+            "grid-load": true,
             "pv-load": true,
-            "load-battery": false,
             "grid-pv": true,
             "pv-battery": true,
         },
@@ -608,6 +608,8 @@ export default function ElectricalGridDiagram(props) {
         const
             { end, start } = props,
             isActive = data[start][end],
+            arrowAmount = 2,
+            duration = 5.6,
             reverse = arrowDirections[start + "-" + end],
             motionProps = reverse
                 ? { keyPoints: "1;0", keyTimes: "0;1", calcMode: "linear" }
@@ -615,17 +617,26 @@ export default function ElectricalGridDiagram(props) {
             skew = arrowSkews[start + "-" + end],
             style = reverse
                 ? { transform: "translate(20px, -10px) scaleX(-1)" }
-                : { transform: "translate(0px, -10px)" }
+                : { transform: "translate(-20px, -10px)" }
         if (skew) {
             style.transform += ` skew(${skew})`
         }
         return <>
             {isActive
-                ? <polygon fill="url(#arrowGradient)" points="0,0 20,10 0,20"
-                    style={style}>
-                    <animateMotion dur="10s" repeatCount="indefinite" rotate="auto"
-                        path={lines[start + "-" + end]} {...motionProps} />
-                </polygon>
+                ? Array.from(Array(arrowAmount).keys()).map((n, i) =>
+                    <polygon
+                        key={"egd-a-" + i}
+                        fill="url(#arrowGradient)"
+                        points="0,0 20,10 0,20"
+                        style={style}>
+                        <animateMotion {...motionProps}
+                            begin={`${n * (duration / arrowAmount)}s`}
+                            dur={`${duration}s`}
+                            path={lines[start + "-" + end]}
+                            repeatCount="indefinite"
+                            rotate="auto"
+                        />
+                    </polygon>)
                 : null}
         </>
     }

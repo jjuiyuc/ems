@@ -313,9 +313,15 @@ func (r *SolarEnergyInfoResponse) ComputedValues(firstLogOfDay, firstLogOfMonth,
 		r.PvProducedLifetimeEnergyACDiff)
 
 	var sumOfPvEnergyCostSavings, sumOfPvCo2Savings float32
-	for _, logOfMonth := range logsOfMonth {
-		sumOfPvEnergyCostSavings = sumOfPvEnergyCostSavings + logOfMonth.PvEnergyCostSavings.Float32
-		sumOfPvCo2Savings = sumOfPvCo2Savings + logOfMonth.PvCo2Savings.Float32
+	// XXX: Hardcode for serenegray field old CC version
+	if latestLog.GWUUID == "0E0BA27A8175AF978C49396BDE9D7A1E" {
+		for _, logOfMonth := range logsOfMonth {
+			sumOfPvEnergyCostSavings = sumOfPvEnergyCostSavings + logOfMonth.PvEnergyCostSavings.Float32
+			sumOfPvCo2Savings = sumOfPvCo2Savings + logOfMonth.PvCo2Savings.Float32
+		}
+	} else {
+		sumOfPvEnergyCostSavings = utils.Diff(latestLog.PvEnergyCostSavings.Float32, firstLogOfMonth.PvEnergyCostSavings.Float32)
+		sumOfPvCo2Savings = utils.Diff(latestLog.PvCo2Savings.Float32, firstLogOfMonth.PvCo2Savings.Float32)
 	}
 	r.PvEnergyCostSavingsSum = int(sumOfPvEnergyCostSavings)
 	r.PvCo2SavingsSum = Float32Format(sumOfPvCo2Savings)

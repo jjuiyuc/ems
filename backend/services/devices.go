@@ -372,7 +372,7 @@ func (r *BatteryEnergyInfoResponse) GetBatteryInfo(gwUUID string) {
 	case CHTMiaoli:
 		r.Model = "L051100-A UZ-Energy Battery"
 		r.Capcity = 10
-		r.BatteryPower = 15
+		r.BatteryPower = 5
 		r.Voltage = 51.2
 	}
 	r.PowerSources = "Solar + Grid"

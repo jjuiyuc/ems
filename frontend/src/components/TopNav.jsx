@@ -42,7 +42,7 @@ function TopNav(props) {
         <div className="flex flex-row-reverse h-20 items-center
                         justify-between px-12 z-10 w-full">
             <div className="flex h-20 items-center">
-                <AlertIcon className="h-8 w-8 opacity-30" />
+                {/* <AlertIcon className="h-8 w-8 opacity-30" /> */}
                 <Button onClick={openMenu} sx={{ marginLeft: "1.5rem" }}>
                     <UserIcon className="h-8 mr-2 w-8" />
                     {name}

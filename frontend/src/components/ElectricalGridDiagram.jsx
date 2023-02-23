@@ -630,7 +630,7 @@ export default function ElectricalGridDiagram(props) {
                         points="0,0 20,10 0,20"
                         style={style}>
                         <animateMotion {...motionProps}
-                            begin={`${n * (duration / arrowAmount)}s`}
+                            begin={`${n * (duration / arrowAmount) * -1}s`}
                             dur={`${duration}s`}
                             path={lines[start + "-" + end]}
                             repeatCount="indefinite"
@@ -657,10 +657,10 @@ export default function ElectricalGridDiagram(props) {
         width="682"
         xmlns="http://www.w3.org/2000/svg">
         <linearGradient id="arrowGradient" x1="0" x2="1" y1="0" y2="0">
-            <stop offset="0%" stop-color="#12C9C9" />
-            <stop offset="30%" stop-color="#6AD1D1" />
-            <stop offset="70%" stop-color="#96D3D3" />
-            <stop offset="100%" stop-color="#B8EEEE" />
+            <stop offset="0%" stopColor="#12C9C9" />
+            <stop offset="30%" stopColor="#6AD1D1" />
+            <stop offset="70%" stopColor="#96D3D3" />
+            <stop offset="100%" stopColor="#B8EEEE" />
         </linearGradient>
         <line {...lineGridBattery} stroke="#1C1C1E" strokeWidth="4" />
         <Line start="load" end="grid" />

@@ -185,7 +185,7 @@ func (h weatherConsumerHandler) generateWeatherSendingInfo(lat, lng float32) (la
 func (h weatherConsumerHandler) getWeatherDataByLocation(lat, lng float32) (latestWeatherJSON []byte, err error) {
 	now := time.Now().UTC()
 	startValidDate := now
-	endValidDate := now.Add(30 * time.Hour)
+	endValidDate := now.Add(31 * time.Hour)
 	weatherForecastList, err := h.repo.Weather.GetWeatherForecastByLocation(lat, lng, startValidDate, endValidDate)
 	if err != nil {
 		log.WithFields(log.Fields{

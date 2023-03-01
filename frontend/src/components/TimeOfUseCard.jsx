@@ -1,13 +1,17 @@
 import { Fragment as Frag, useEffect, useState, useRef } from "react"
 import { Button, Box, FormControl, Stack, InputLabel, Select, MenuItem, TextField } from "@mui/material"
 import { useTranslation } from "react-multi-lang"
+import moment from "moment"
 
 import Clock from "./Clock"
 import TimeRangePicker from "./TimeRangePicker"
+import variables from "../configs/variables"
 
 import { ReactComponent as AddIcon } from "../assets/icons/add.svg"
 import { ReactComponent as DeleteIcon } from "../assets/icons/delete.svg"
 import { ReactComponent as TimerIcon } from "../assets/icons/timer.svg"
+
+const { colors } = variables
 
 const maxLength = 4
 const maxPolicyCount = 5
@@ -157,17 +161,22 @@ export default function TimeOfUseCard(props) {
                     return (
                         <div className="mb-12 ml-12" key={policy + i}>
                             <div className="flex items-center text-white mb-4">
-                                <div
-                                    className="bg-blue-main h-2 rounded-full mr-3 w-2" />
-                                {policyConfig[policy].nameEditable ?
-                                    <TextField
-                                        className=""
-                                        id="outlined-basic"
-                                        variant="outlined"
-                                        value={policyConfig[policy].tempName}
-                                        onChange={changePolicyConfig}
-                                    /> :
-                                    <h5 className="font-bold">{policyConfig[policy].name}</h5>
+                                {policyConfig[policy].nameEditable
+                                    ? <>
+                                        <div className="bg-blue-main h-2 rounded-full mr-3 w-2" />
+                                        <TextField
+                                            className=""
+                                            id="outlined-basic"
+                                            variant="outlined"
+                                            value={policyConfig[policy].tempName}
+                                            onChange={changePolicyConfig}
+                                        />
+                                    </>
+                                    : <>
+                                        <div className="h-2 rounded-full mr-3 w-2"
+                                            style={{ background: colors[policy] }} />
+                                        <h5 className="font-bold">{policyConfig[policy].name}</h5>
+                                    </>
                                 }
                                 {policyConfig[policy].deletable ?
                                     <div className="ml-2 mb-9 h-4 w-4 flex cursor-pointer">

@@ -78,20 +78,9 @@ export default function TimeOfUseCard(props) {
         [policyConfig, setPolicyConfig] = useState(defaultPolicyConfig),
         [policyPrice, setPolicyPrice] = useState(defaultPolicyPrice),
         [tariff, setTariff] = useState("")
-
     const
         handleChange = (e) => {
             setTariff(e.target.value)
-        },
-        changePolicyConfig = (e) => {
-            const newPolicyConfig = {
-                ...policyConfig,
-                [policy]: {
-                    ...policyConfig[policy],
-                    tempName: e.target.value
-                }
-            }
-            setPolicyConfig(newPolicyConfig)
         }
     // console.log(Object.keys(policyConfig))
 
@@ -169,7 +158,16 @@ export default function TimeOfUseCard(props) {
                                             id="outlined-basic"
                                             variant="outlined"
                                             value={policyConfig[policy].tempName}
-                                            onChange={changePolicyConfig}
+                                            onChange={(e) => {
+                                                const newPolicyConfig = {
+                                                    ...policyConfig,
+                                                    [policy]: {
+                                                        ...policyConfig[policy],
+                                                        tempName: e.target.value
+                                                    }
+                                                }
+                                                setPolicyConfig(newPolicyConfig)
+                                            }}
                                         />
                                     </>
                                     : <>

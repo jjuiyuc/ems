@@ -1092,7 +1092,7 @@ func (s defaultDevicesService) getRealtimeInfo(param *app.ZoomableParam, include
 			if includedComputedData {
 				firstRealtimeInfo := s.getFirstLogRealtimeInfo(param.GatewayUUID, startTimeIndex, endTimeIndex, param.Query.EndTime)
 				if firstRealtimeInfo != nil {
-					loadPvConsumedEnergyPercentAC := s.computeLoadPvConsumedEnergyPercentACValue(firstRealtimeInfo, latestRealtimeInfo)
+					loadPvConsumedEnergyPercentAC := s.computeLoadPvConsumedEnergyPercentACValue(latestRealtimeInfo)
 					realtimeInfo.LoadPvConsumedEnergyPercentACs = append(realtimeInfo.LoadPvConsumedEnergyPercentACs, loadPvConsumedEnergyPercentAC)
 				}
 			}
@@ -1142,24 +1142,12 @@ func (s defaultDevicesService) getRealtimeInfo(param *app.ZoomableParam, include
 	return
 }
 
-func (s defaultDevicesService) computeLoadPvConsumedEnergyPercentACValue(firstRealtimeInfo, latestRealtimeInfo *deremsmodels.CCDataLog) (loadPvConsumedEnergyPercentAC float32) {
-	pvProducedLifetimeEnergyACDiff := utils.Diff(latestRealtimeInfo.PvProducedLifetimeEnergyAC.Float32, firstRealtimeInfo.PvProducedLifetimeEnergyAC.Float32)
-	loadPvConsumedLifetimeEnergyACDiff := utils.Diff(latestRealtimeInfo.LoadPvConsumedLifetimeEnergyAC.Float32, firstRealtimeInfo.LoadPvConsumedLifetimeEnergyAC.Float32)
-	batteryPvConsumedLifetimeEnergyACDiff := utils.Diff(latestRealtimeInfo.BatteryPvConsumedLifetimeEnergyAC.Float32, firstRealtimeInfo.BatteryPvConsumedLifetimeEnergyAC.Float32)
-	gridPvConsumedLifetimeEnergyACDiff := utils.Diff(latestRealtimeInfo.GridPvConsumedLifetimeEnergyAC.Float32, firstRealtimeInfo.GridPvConsumedLifetimeEnergyAC.Float32)
-	// Avoid cc illegal value
-	pvProducedLifetimeEnergyACDiff = utils.GetZeroForNegativeValue(pvProducedLifetimeEnergyACDiff)
-	loadPvConsumedLifetimeEnergyACDiff = utils.GetZeroForNegativeValue(loadPvConsumedLifetimeEnergyACDiff)
-	batteryPvConsumedLifetimeEnergyACDiff = utils.GetZeroForNegativeValue(batteryPvConsumedLifetimeEnergyACDiff)
-	gridPvConsumedLifetimeEnergyACDiff = utils.GetZeroForNegativeValue(gridPvConsumedLifetimeEnergyACDiff)
-	// loadPvConsumedLifetimeEnergyACDiff is recomputed by PvProducedLifetimeEnergyACDiff
-	sumOfPvConsumedLifetimeEnergyAC := loadPvConsumedLifetimeEnergyACDiff + batteryPvConsumedLifetimeEnergyACDiff + gridPvConsumedLifetimeEnergyACDiff
-	if sumOfPvConsumedLifetimeEnergyAC != 0 {
-		loadPvConsumedLifetimeEnergyACDiff = utils.ThreeDecimalPlaces(pvProducedLifetimeEnergyACDiff * utils.Division(loadPvConsumedLifetimeEnergyACDiff, sumOfPvConsumedLifetimeEnergyAC))
-	}
+func (s defaultDevicesService) computeLoadPvConsumedEnergyPercentACValue(latestRealtimeInfo *deremsmodels.CCDataLog) (loadPvConsumedEnergyPercentAC float32) {
+	// Compute by power values
 	loadPvConsumedEnergyPercentAC = utils.Percent(
-		loadPvConsumedLifetimeEnergyACDiff,
-		pvProducedLifetimeEnergyACDiff)
+		latestRealtimeInfo.LoadPvAveragePowerAC.Float32,
+		latestRealtimeInfo.LoadPvAveragePowerAC.Float32+latestRealtimeInfo.BatteryPvAveragePowerAC.Float32+latestRealtimeInfo.GridPvAveragePowerAC.Float32)
+	loadPvConsumedEnergyPercentAC = float32(math.Abs(float64(loadPvConsumedEnergyPercentAC)))
 	return
 }
 

@@ -206,7 +206,7 @@ var _ = Describe("TimeOfUse", func() {
 				prefixURL := fmt.Sprintf("/api/%s/devices/solar/energy-usage", fixtures.UtGateway.UUID)
 				seedUtURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, "hour", UtStartTime, UtEndTime)
 				expectedTimestamps := []int{1659543000, 1659557100}
-				expectedLoadPvConsumedEnergyPercentACs := []float32{0, 20}
+				expectedLoadPvConsumedEnergyPercentACs := []float32{50, 50}
 				expectedResponseData := services.SolarEnergyUsageResponse{
 					Timestamps:                     expectedTimestamps,
 					LoadPvConsumedEnergyPercentACs: expectedLoadPvConsumedEnergyPercentACs,

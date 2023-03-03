@@ -1,19 +1,23 @@
 import { Fragment as Frag, useEffect, useState, useRef } from "react"
 import { Button, Box, FormControl, Stack, InputLabel, Select, MenuItem, TextField } from "@mui/material"
 import { useTranslation } from "react-multi-lang"
+import moment from "moment"
 
 import Clock from "./Clock"
 import TimeRangePicker from "./TimeRangePicker"
+import variables from "../configs/variables"
 
 import { ReactComponent as AddIcon } from "../assets/icons/add.svg"
 import { ReactComponent as DeleteIcon } from "../assets/icons/delete.svg"
 import { ReactComponent as TimerIcon } from "../assets/icons/timer.svg"
 
+const { colors } = variables
+
 const maxLength = 4
 const maxPolicyCount = 5
 
 export default function TimeOfUseCard(props) {
-    const { data } = props
+    // const { data } = props
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
@@ -71,25 +75,78 @@ export default function TimeOfUseCard(props) {
     const customCount = useRef(1)
     const
         [dayTab, setDayTab] = useState(dayTabs[0]),
+        [clockDataset, setClockDataset] = useState({
+            data: [], backgroundColor: []
+        }),
+        [timeOfUse, setTimeOfUse] = useState([
+            {
+                end: "05:00",
+                name: "superOffPeak",
+                price: 1.2,
+                start: "00:00"
+            },
+            {
+                end: "11:00",
+                name: "offPeak",
+                price: 1.8,
+                start: "05:00"
+            },
+            {
+                end: "17:00",
+                name: "midPeak",
+                price: 2.2,
+                start: "11:00"
+            },
+            {
+                end: "23:00",
+                name: "onPeak",
+                price: 3.5,
+                start: "17:00"
+            },
+            {
+                end: "24:00",
+                name: "superOffPeak",
+                price: 1.2,
+                start: "23:00"
+            }
+        ]),
+        [prices, setPrices]
+            = useState({ onPeak: 0, midPeak: 0, offPeak: 0, superOffPeak: 0 }),
         [policyConfig, setPolicyConfig] = useState(defaultPolicyConfig),
         [policyPrice, setPolicyPrice] = useState(defaultPolicyPrice),
         [tariff, setTariff] = useState("")
-
     const
         handleChange = (e) => {
             setTariff(e.target.value)
-        },
-        changePolicyConfig = (e) => {
-            const newPolicyConfig = {
-                ...policyConfig,
-                [policy]: {
-                    ...policyConfig[policy],
-                    tempName: e.target.value
-                }
-            }
-            setPolicyConfig(newPolicyConfig)
         }
     // console.log(Object.keys(policyConfig))
+    const getMoment = string => {
+        const [hour, minute] = string.split(":")
+
+        return moment().hour(parseInt(hour)).minute(parseInt(minute)).second(0)
+    }
+
+    // useEffect(() => {
+    //     const
+    //         dataset = { data: [], backgroundColor: [] },
+    //         prices = { onPeak: 0, midPeak: 0, offPeak: 0, superOffPeak: 0 }
+
+    //     if (timeOfUse.length === 0) return
+
+    //     timeOfUse.forEach(item => {
+    //         const
+    //             { end, start } = item,
+    //             endTime = getMoment(end),
+    //             startTime = getMoment(start),
+    //             duration = moment.duration(endTime.diff(startTime)).as("hours")
+
+    //         dataset.data.push(duration)
+    //         dataset.backgroundColor.push(colors[item.name])
+    //         prices[item.name] = item.price
+    //     })
+    //     setClockDataset(dataset)
+    //     setPrices(prices)
+    // }, [timeOfUse])
 
     return <div className="card">
         <div className="flex justify-between sm:col-span-2 items-center">
@@ -150,24 +207,38 @@ export default function TimeOfUseCard(props) {
             <Clock size={{
                 height: "auto", width: "clamp(12rem,24vw,27.5rem)",
                 aspectRatio: "1 / 1"
-            }} dataset={data} id="touClock" />
+            }} dataset={clockDataset} id="touClock" />
             <div className="mb-12 mt-4">
                 {Object.keys(policyConfig).map((policy, i) => {
                     const priceGroup = policyPrice[policy]
                     return (
                         <div className="mb-12 ml-12" key={policy + i}>
                             <div className="flex items-center text-white mb-4">
-                                <div
-                                    className="bg-blue-main h-2 rounded-full mr-3 w-2" />
-                                {policyConfig[policy].nameEditable ?
-                                    <TextField
-                                        className=""
-                                        id="outlined-basic"
-                                        variant="outlined"
-                                        value={policyConfig[policy].tempName}
-                                        onChange={changePolicyConfig}
-                                    /> :
-                                    <h5 className="font-bold">{policyConfig[policy].name}</h5>
+                                {policyConfig[policy].nameEditable
+                                    ? <>
+                                        <div className="bg-blue-main h-2 rounded-full mr-3 w-2" />
+                                        <TextField
+                                            className=""
+                                            id="outlined-basic"
+                                            variant="outlined"
+                                            value={policyConfig[policy].tempName}
+                                            onChange={(e) => {
+                                                const newPolicyConfig = {
+                                                    ...policyConfig,
+                                                    [policy]: {
+                                                        ...policyConfig[policy],
+                                                        tempName: e.target.value
+                                                    }
+                                                }
+                                                setPolicyConfig(newPolicyConfig)
+                                            }}
+                                        />
+                                    </>
+                                    : <>
+                                        <div className="h-2 rounded-full mr-3 w-2"
+                                            style={{ background: colors[policy] }} />
+                                        <h5 className="font-bold">{policyConfig[policy].name}</h5>
+                                    </>
                                 }
                                 {policyConfig[policy].deletable ?
                                     <div className="ml-2 mb-9 h-4 w-4 flex cursor-pointer">

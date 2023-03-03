@@ -23,9 +23,6 @@ export default function Settings(props) {
         [reservedForGridOutage, setReservedForGridOutage] = useState(1),
         [availableRegularUsage, setAvailableRegularUsage] = useState(99),
         [backupReserve, setBackupReserve] = useState(100),
-        [clockDataset, setClockDataset] = useState({
-            data: [], backgroundColor: []
-        }),
         [maxDemandCapacity, setMaxDemandCapacity] = useState("")
 
     return <>
@@ -92,7 +89,7 @@ export default function Settings(props) {
             </div>
         </div>
         <PowerOutageCard />
-        <TimeOfUseCard data={clockDataset} />
+        <TimeOfUseCard />
         <DemandChargeCard
             data={maxDemandCapacity}
             title={pageT("maximumDemandCapacity")}

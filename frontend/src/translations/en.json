@@ -1,4 +1,10 @@
 {
+    "accountManagementGroup":{
+
+    },
+    "accountManagementUser":{
+
+    },
     "analysis": {
         "accumulatedKwh": "Accumulated kWh",
         "analysis": "Analysis",
@@ -26,6 +32,8 @@
         "YesterdayPowerkW":"Yesterday Power (kW)"
     },
     "common": {
+        "accountManagementGroup":"Account Management Group",
+        "accountManagementUser":"Account Management User",
         "active": "Active",
         "battery": "Battery",
         "batteryPower": "Battery Power",

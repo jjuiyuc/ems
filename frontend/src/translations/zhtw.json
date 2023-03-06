@@ -1,4 +1,10 @@
 {
+    "accountManagementGroup":{
+
+    },
+    "accountManagementUser":{
+
+    },
     "analysis": {
         "accumulatedKwh": "累積電量 (kWh)",
         "analysis": "電力分析",
@@ -26,6 +32,8 @@
         "YesterdayPowerkW":"昨日功率 (kW)"
     },
     "common": {
+        "accountManagementGroup":"帳號管理——群組",
+        "accountManagementUser":"帳號管理——使用者",
         "active": "已動",
         "battery": "儲能電池",
         "batteryPower": "電池功率",

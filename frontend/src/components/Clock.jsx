@@ -15,7 +15,7 @@ export default function Clock(props) {
                 data: { datasets: [props.dataset] },
                 options: {
                     borderWidth: 0,
-                    cutout: 90,
+                    cutout: "96%",
                     plugins: {
                         legend: { display: false },
                         tooltip: { enabled: false }

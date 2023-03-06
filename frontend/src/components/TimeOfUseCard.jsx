@@ -126,27 +126,27 @@ export default function TimeOfUseCard(props) {
         return moment().hour(parseInt(hour)).minute(parseInt(minute)).second(0)
     }
 
-    // useEffect(() => {
-    //     const
-    //         dataset = { data: [], backgroundColor: [] },
-    //         prices = { onPeak: 0, midPeak: 0, offPeak: 0, superOffPeak: 0 }
+    useEffect(() => {
+        const
+            dataset = { data: [], backgroundColor: [] },
+            prices = { onPeak: 0, midPeak: 0, offPeak: 0, superOffPeak: 0 }
 
-    //     if (timeOfUse.length === 0) return
+        if (timeOfUse.length === 0) return
 
-    //     timeOfUse.forEach(item => {
-    //         const
-    //             { end, start } = item,
-    //             endTime = getMoment(end),
-    //             startTime = getMoment(start),
-    //             duration = moment.duration(endTime.diff(startTime)).as("hours")
+        timeOfUse.forEach(item => {
+            const
+                { end, start } = item,
+                endTime = getMoment(end),
+                startTime = getMoment(start),
+                duration = moment.duration(endTime.diff(startTime)).as("hours")
 
-    //         dataset.data.push(duration)
-    //         dataset.backgroundColor.push(colors[item.name])
-    //         prices[item.name] = item.price
-    //     })
-    //     setClockDataset(dataset)
-    //     setPrices(prices)
-    // }, [timeOfUse])
+            dataset.data.push(duration)
+            dataset.backgroundColor.push(colors[item.name])
+            prices[item.name] = item.price
+        })
+        setClockDataset(dataset)
+        setPrices(prices)
+    }, [timeOfUse])
 
     return <div className="card">
         <div className="flex justify-between sm:col-span-2 items-center">

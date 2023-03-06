@@ -66,9 +66,9 @@ function LoggedIn(props) {
                                 replace
                                 to="/energy-resources/solar" />}
                             path="/energy-resources" />
-                        <Route element={<Sample />}
+                        <Route element={<AccountManagementGroup />}
                             path="/account-management-group" />
-                        <Route element={<Sample />}
+                        <Route element={<AccountManagementUser />}
                             path="/account-management-user" />
                         <Route element={<Settings />} path="/settings" />
                         <Route

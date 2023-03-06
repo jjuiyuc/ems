@@ -194,6 +194,8 @@
         "forgotPassword": "Forgot Password?"
     },
     "navigator": {
+        "accountManagementGroup":"Account Management Group",
+        "accountManagementUser":"Account Management User",
         "analysis": "Analysis",
         "dashboard": "Dashboard",
         "demandCharge": "Demand Charge",

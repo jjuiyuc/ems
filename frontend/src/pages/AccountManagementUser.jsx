@@ -1,3 +1,5 @@
+import { Button } from "@mui/material"
+import AddIcon from "@mui/icons-material/Add"
 import DataTable from "react-data-table-component"
 import moment from "moment"
 import { useTranslation } from "react-multi-lang"
@@ -10,6 +12,17 @@ export default function AccountManagementUser() {
         pageT = (string, params) => t("accountManagementUser." + string, params)
     return <>
         <h1 className="mb-9">{commonT("accountManagementUser")}</h1>
+        <div>
+            <Button
+                // onClick={}
+                key={"ac-b-"}
+                size="large"
+                variant="outlined"
+                color="brand"
+                startIcon={<AddIcon />}>
+                {commonT("add")}
+            </Button>
+        </div>
     </>
 
 }

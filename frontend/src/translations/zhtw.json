@@ -34,7 +34,8 @@
     "common": {
         "accountManagementGroup":"帳號管理——群組",
         "accountManagementUser":"帳號管理——使用者",
-        "active": "已動",
+        "active": "已啟動",
+        "add":"新增",
         "battery": "儲能電池",
         "batteryPower": "電池功率",
         "chargingFrom": "充電來源",

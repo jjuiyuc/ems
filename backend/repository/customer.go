@@ -6,21 +6,21 @@ import (
 	deremsmodels "der-ems/models/der-ems"
 )
 
-// CustomerRepository godoc
-type CustomerRepository interface {
-	GetCustomerByCustomerID(customerID int64) (*deremsmodels.Customer, error)
+// LocationRepository godoc
+type LocationRepository interface {
+	GetLocationByLocationID(locationID int64) (*deremsmodels.Location, error)
 }
 
-type defaultCustomerRepository struct {
+type defaultLocationRepository struct {
 	db *sql.DB
 }
 
-// NewCustomerRepository godoc
-func NewCustomerRepository(db *sql.DB) CustomerRepository {
-	return &defaultCustomerRepository{db}
+// NewLocationRepository godoc
+func NewLocationRepository(db *sql.DB) LocationRepository {
+	return &defaultLocationRepository{db}
 }
 
-// GetCustomerByCustomerID godoc
-func (repo defaultCustomerRepository) GetCustomerByCustomerID(customerID int64) (*deremsmodels.Customer, error) {
-	return deremsmodels.FindCustomer(repo.db, customerID)
+// GetLocationByLocationID godoc
+func (repo defaultLocationRepository) GetLocationByLocationID(locationID int64) (*deremsmodels.Location, error) {
+	return deremsmodels.FindLocation(repo.db, locationID)
 }

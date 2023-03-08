@@ -21,7 +21,7 @@ type BillingType struct {
 
 // BillingService godoc
 type BillingService interface {
-	GetBillingTypeByCustomerID(customerID int64) (billingType BillingType, err error)
+	GetBillingTypeByLocationID(locationID int64) (billingType BillingType, err error)
 	GetLocalTime(touLocationID int64, t time.Time) (localTime time.Time, err error)
 	GetPeriodTypeOfDay(touLocationID int64, t time.Time) (periodType string)
 	IsSummer(voltageType string, t time.Time) bool
@@ -38,20 +38,20 @@ func NewBillingService(repo *repository.Repository) BillingService {
 	return &defaultBillingService{repo}
 }
 
-// GetBillingTypeByCustomerID godoc
-func (s defaultBillingService) GetBillingTypeByCustomerID(customerID int64) (billingType BillingType, err error) {
-	customer, err := s.repo.Customer.GetCustomerByCustomerID(customerID)
+// GetBillingTypeByLocationID godoc
+func (s defaultBillingService) GetBillingTypeByLocationID(locationID int64) (billingType BillingType, err error) {
+	location, err := s.repo.Location.GetLocationByLocationID(locationID)
 	if err != nil {
 		log.WithFields(log.Fields{
-			"caused-by": "s.repo.Customer.GetCustomerByCustomerID",
+			"caused-by": "s.repo.Location.GetLocationByLocationID",
 			"err":       err,
 		}).Error()
 		return
 	}
 	billingType = BillingType{
-		TOULocationID: customer.TOULocationID.Int64,
-		VoltageType:   customer.VoltageType.String,
-		TOUType:       customer.TOUType.String,
+		TOULocationID: location.TOULocationID.Int64,
+		VoltageType:   location.VoltageType.String,
+		TOUType:       location.TOUType.String,
 	}
 	return
 }
@@ -125,10 +125,10 @@ func (s defaultBillingService) GetTOUsOfLocalTime(gwUUID string, t time.Time) (l
 		}).Error()
 		return
 	}
-	billingType, err := s.GetBillingTypeByCustomerID(gateway.CustomerID)
+	billingType, err := s.GetBillingTypeByLocationID(gateway.LocationID)
 	if err != nil {
 		log.WithFields(log.Fields{
-			"caused-by": "s.GetBillingTypeByCustomerID",
+			"caused-by": "s.GetBillingTypeByLocationID",
 			"err":       err,
 		}).Error()
 		return

@@ -123,19 +123,19 @@ func (s defaultUserService) GetProfile(userID int64) (profile *ProfileResponse, 
 	gatewayInfos := []GatewayInfo{}
 	for _, gateway := range gateways {
 		log.Debug("gateway.UUID: ", gateway.UUID)
-		customer, err := s.repo.Customer.GetCustomerByCustomerID(gateway.CustomerID)
+		location, err := s.repo.Location.GetLocationByLocationID(gateway.LocationID)
 		if err != nil {
 			log.WithFields(log.Fields{
-				"caused-by": "s.repo.Customer.GetCustomerByCustomerID",
+				"caused-by": "s.repo.Location.GetLocationByLocationID",
 				"err":       err,
 			}).Error()
 			continue
 		}
-		log.Debug("customer.Address: ", customer.Address)
+		log.Debug("location.Address: ", location.Address)
 
 		gatewayInfo := GatewayInfo{
 			GatewayID: gateway.UUID,
-			Address:   customer.Address.String,
+			Address:   location.Address.String,
 		}
 		gatewayInfos = append(gatewayInfos, gatewayInfo)
 	}

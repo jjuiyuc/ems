@@ -8,7 +8,7 @@ type Repository struct {
 	Weather  WeatherRepository
 	Gateway  GatewayRepository
 	CCData   CCDataRepository
-	Customer CustomerRepository
+	Location LocationRepository
 	TOU      TOURepository
 	AIData   AIDataRepository
 }
@@ -20,7 +20,7 @@ func NewRepository(db *sql.DB) *Repository {
 		Weather:  NewWeatherRepository(db),
 		Gateway:  NewGatewayRepository(db),
 		CCData:   NewCCDataRepository(db),
-		Customer: NewCustomerRepository(db),
+		Location: NewLocationRepository(db),
 		TOU:      NewTOURepository(db),
 		AIData:   NewAIDataRepository(db),
 	}

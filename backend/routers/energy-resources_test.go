@@ -56,7 +56,7 @@ var _ = Describe("EnergyResources", func() {
 		// Truncate & seed data
 		err = testutils.SeedUtUser(db)
 		Expect(err).Should(BeNil())
-		err = testutils.SeedUtCustomerAndGateway(db)
+		err = testutils.SeedUtLocationAndGateway(db)
 		Expect(err).Should(BeNil())
 		token, err = utils.GenerateToken(fixtures.UtUser.ID)
 		Expect(err).Should(BeNil())

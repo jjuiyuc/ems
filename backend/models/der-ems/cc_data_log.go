@@ -27,7 +27,7 @@ type CCDataLog struct {
 	GWUUID                            string       `boil:"gw_uuid" json:"gwUUID" toml:"gwUUID" yaml:"gwUUID"`
 	LogDate                           time.Time    `boil:"log_date" json:"logDate" toml:"logDate" yaml:"logDate"`
 	GWID                              null.Int64   `boil:"gw_id" json:"gwID,omitempty" toml:"gwID" yaml:"gwID,omitempty"`
-	CustomerID                        null.Int64   `boil:"customer_id" json:"customerID,omitempty" toml:"customerID" yaml:"customerID,omitempty"`
+	LocationID                        null.Int64   `boil:"location_id" json:"locationID,omitempty" toml:"locationID" yaml:"locationID,omitempty"`
 	GridIsPeakShaving                 null.Int     `boil:"grid_is_peak_shaving" json:"gridIsPeakShaving,omitempty" toml:"gridIsPeakShaving" yaml:"gridIsPeakShaving,omitempty"`
 	LoadGridAveragePowerAC            null.Float32 `boil:"load_grid_average_power_ac" json:"loadGridAveragePowerAc,omitempty" toml:"loadGridAveragePowerAc" yaml:"loadGridAveragePowerAc,omitempty"`
 	BatteryGridAveragePowerAC         null.Float32 `boil:"battery_grid_average_power_ac" json:"batteryGridAveragePowerAc,omitempty" toml:"batteryGridAveragePowerAc" yaml:"batteryGridAveragePowerAc,omitempty"`
@@ -83,7 +83,7 @@ var CCDataLogColumns = struct {
 	GWUUID                            string
 	LogDate                           string
 	GWID                              string
-	CustomerID                        string
+	LocationID                        string
 	GridIsPeakShaving                 string
 	LoadGridAveragePowerAC            string
 	BatteryGridAveragePowerAC         string
@@ -134,7 +134,7 @@ var CCDataLogColumns = struct {
 	GWUUID:                            "gw_uuid",
 	LogDate:                           "log_date",
 	GWID:                              "gw_id",
-	CustomerID:                        "customer_id",
+	LocationID:                        "location_id",
 	GridIsPeakShaving:                 "grid_is_peak_shaving",
 	LoadGridAveragePowerAC:            "load_grid_average_power_ac",
 	BatteryGridAveragePowerAC:         "battery_grid_average_power_ac",
@@ -187,7 +187,7 @@ var CCDataLogTableColumns = struct {
 	GWUUID                            string
 	LogDate                           string
 	GWID                              string
-	CustomerID                        string
+	LocationID                        string
 	GridIsPeakShaving                 string
 	LoadGridAveragePowerAC            string
 	BatteryGridAveragePowerAC         string
@@ -238,7 +238,7 @@ var CCDataLogTableColumns = struct {
 	GWUUID:                            "cc_data_log.gw_uuid",
 	LogDate:                           "cc_data_log.log_date",
 	GWID:                              "cc_data_log.gw_id",
-	CustomerID:                        "cc_data_log.customer_id",
+	LocationID:                        "cc_data_log.location_id",
 	GridIsPeakShaving:                 "cc_data_log.grid_is_peak_shaving",
 	LoadGridAveragePowerAC:            "cc_data_log.load_grid_average_power_ac",
 	BatteryGridAveragePowerAC:         "cc_data_log.battery_grid_average_power_ac",
@@ -365,7 +365,7 @@ var CCDataLogWhere = struct {
 	GWUUID                            whereHelperstring
 	LogDate                           whereHelpertime_Time
 	GWID                              whereHelpernull_Int64
-	CustomerID                        whereHelpernull_Int64
+	LocationID                        whereHelpernull_Int64
 	GridIsPeakShaving                 whereHelpernull_Int
 	LoadGridAveragePowerAC            whereHelpernull_Float32
 	BatteryGridAveragePowerAC         whereHelpernull_Float32
@@ -416,7 +416,7 @@ var CCDataLogWhere = struct {
 	GWUUID:                            whereHelperstring{field: "`cc_data_log`.`gw_uuid`"},
 	LogDate:                           whereHelpertime_Time{field: "`cc_data_log`.`log_date`"},
 	GWID:                              whereHelpernull_Int64{field: "`cc_data_log`.`gw_id`"},
-	CustomerID:                        whereHelpernull_Int64{field: "`cc_data_log`.`customer_id`"},
+	LocationID:                        whereHelpernull_Int64{field: "`cc_data_log`.`location_id`"},
 	GridIsPeakShaving:                 whereHelpernull_Int{field: "`cc_data_log`.`grid_is_peak_shaving`"},
 	LoadGridAveragePowerAC:            whereHelpernull_Float32{field: "`cc_data_log`.`load_grid_average_power_ac`"},
 	BatteryGridAveragePowerAC:         whereHelpernull_Float32{field: "`cc_data_log`.`battery_grid_average_power_ac`"},
@@ -481,8 +481,8 @@ func (*ccDataLogR) NewStruct() *ccDataLogR {
 type ccDataLogL struct{}
 
 var (
-	ccDataLogAllColumns            = []string{"id", "gw_uuid", "log_date", "gw_id", "customer_id", "grid_is_peak_shaving", "load_grid_average_power_ac", "battery_grid_average_power_ac", "grid_contract_power_ac", "load_pv_average_power_ac", "load_battery_average_power_ac", "battery_soc", "battery_produced_average_power_ac", "battery_consumed_average_power_ac", "battery_charging_from", "battery_discharging_to", "pv_average_power_ac", "load_average_power_ac", "load_links", "grid_links", "pv_links", "battery_links", "battery_pv_average_power_ac", "grid_pv_average_power_ac", "grid_produced_average_power_ac", "grid_consumed_average_power_ac", "battery_lifetime_operation_cycles", "battery_produced_lifetime_energy_ac", "battery_consumed_lifetime_energy_ac", "battery_average_power_ac", "battery_voltage", "all_produced_lifetime_energy_ac", "pv_produced_lifetime_energy_ac", "grid_produced_lifetime_energy_ac", "all_consumed_lifetime_energy_ac", "load_consumed_lifetime_energy_ac", "grid_consumed_lifetime_energy_ac", "grid_average_power_ac", "battery_lifetime_energy_ac", "grid_lifetime_energy_ac", "load_self_consumed_lifetime_energy_ac", "grid_power_cost", "grid_power_cost_savings", "load_pv_consumed_lifetime_energy_ac", "battery_pv_consumed_lifetime_energy_ac", "grid_pv_consumed_lifetime_energy_ac", "pv_energy_cost_savings", "pv_co2_savings", "created_at", "updated_at"}
-	ccDataLogColumnsWithoutDefault = []string{"gw_uuid", "log_date", "gw_id", "customer_id", "grid_is_peak_shaving", "load_grid_average_power_ac", "battery_grid_average_power_ac", "grid_contract_power_ac", "load_pv_average_power_ac", "load_battery_average_power_ac", "battery_soc", "battery_produced_average_power_ac", "battery_consumed_average_power_ac", "battery_charging_from", "battery_discharging_to", "pv_average_power_ac", "load_average_power_ac", "load_links", "grid_links", "pv_links", "battery_links", "battery_pv_average_power_ac", "grid_pv_average_power_ac", "grid_produced_average_power_ac", "grid_consumed_average_power_ac", "battery_lifetime_operation_cycles", "battery_produced_lifetime_energy_ac", "battery_consumed_lifetime_energy_ac", "battery_average_power_ac", "battery_voltage", "all_produced_lifetime_energy_ac", "pv_produced_lifetime_energy_ac", "grid_produced_lifetime_energy_ac", "all_consumed_lifetime_energy_ac", "load_consumed_lifetime_energy_ac", "grid_consumed_lifetime_energy_ac", "grid_average_power_ac", "battery_lifetime_energy_ac", "grid_lifetime_energy_ac", "load_self_consumed_lifetime_energy_ac", "grid_power_cost", "grid_power_cost_savings", "load_pv_consumed_lifetime_energy_ac", "battery_pv_consumed_lifetime_energy_ac", "grid_pv_consumed_lifetime_energy_ac", "pv_energy_cost_savings", "pv_co2_savings"}
+	ccDataLogAllColumns            = []string{"id", "gw_uuid", "log_date", "gw_id", "location_id", "grid_is_peak_shaving", "load_grid_average_power_ac", "battery_grid_average_power_ac", "grid_contract_power_ac", "load_pv_average_power_ac", "load_battery_average_power_ac", "battery_soc", "battery_produced_average_power_ac", "battery_consumed_average_power_ac", "battery_charging_from", "battery_discharging_to", "pv_average_power_ac", "load_average_power_ac", "load_links", "grid_links", "pv_links", "battery_links", "battery_pv_average_power_ac", "grid_pv_average_power_ac", "grid_produced_average_power_ac", "grid_consumed_average_power_ac", "battery_lifetime_operation_cycles", "battery_produced_lifetime_energy_ac", "battery_consumed_lifetime_energy_ac", "battery_average_power_ac", "battery_voltage", "all_produced_lifetime_energy_ac", "pv_produced_lifetime_energy_ac", "grid_produced_lifetime_energy_ac", "all_consumed_lifetime_energy_ac", "load_consumed_lifetime_energy_ac", "grid_consumed_lifetime_energy_ac", "grid_average_power_ac", "battery_lifetime_energy_ac", "grid_lifetime_energy_ac", "load_self_consumed_lifetime_energy_ac", "grid_power_cost", "grid_power_cost_savings", "load_pv_consumed_lifetime_energy_ac", "battery_pv_consumed_lifetime_energy_ac", "grid_pv_consumed_lifetime_energy_ac", "pv_energy_cost_savings", "pv_co2_savings", "created_at", "updated_at"}
+	ccDataLogColumnsWithoutDefault = []string{"gw_uuid", "log_date", "gw_id", "location_id", "grid_is_peak_shaving", "load_grid_average_power_ac", "battery_grid_average_power_ac", "grid_contract_power_ac", "load_pv_average_power_ac", "load_battery_average_power_ac", "battery_soc", "battery_produced_average_power_ac", "battery_consumed_average_power_ac", "battery_charging_from", "battery_discharging_to", "pv_average_power_ac", "load_average_power_ac", "load_links", "grid_links", "pv_links", "battery_links", "battery_pv_average_power_ac", "grid_pv_average_power_ac", "grid_produced_average_power_ac", "grid_consumed_average_power_ac", "battery_lifetime_operation_cycles", "battery_produced_lifetime_energy_ac", "battery_consumed_lifetime_energy_ac", "battery_average_power_ac", "battery_voltage", "all_produced_lifetime_energy_ac", "pv_produced_lifetime_energy_ac", "grid_produced_lifetime_energy_ac", "all_consumed_lifetime_energy_ac", "load_consumed_lifetime_energy_ac", "grid_consumed_lifetime_energy_ac", "grid_average_power_ac", "battery_lifetime_energy_ac", "grid_lifetime_energy_ac", "load_self_consumed_lifetime_energy_ac", "grid_power_cost", "grid_power_cost_savings", "load_pv_consumed_lifetime_energy_ac", "battery_pv_consumed_lifetime_energy_ac", "grid_pv_consumed_lifetime_energy_ac", "pv_energy_cost_savings", "pv_co2_savings"}
 	ccDataLogColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	ccDataLogPrimaryKeyColumns     = []string{"id"}
 	ccDataLogGeneratedColumns      = []string{}

@@ -21,8 +21,8 @@ import (
 	"github.com/volatiletech/strmangle"
 )
 
-// Customer is an object representing the database table.
-type Customer struct {
+// Location is an object representing the database table.
+type Location struct {
 	ID             int64        `boil:"id" json:"id" toml:"id" yaml:"id"`
 	CustomerNumber string       `boil:"customer_number" json:"customerNumber" toml:"customerNumber" yaml:"customerNumber"`
 	FieldNumber    string       `boil:"field_number" json:"fieldNumber" toml:"fieldNumber" yaml:"fieldNumber"`
@@ -38,11 +38,11 @@ type Customer struct {
 	CreatedAt      time.Time    `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
 	UpdatedAt      time.Time    `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
 
-	R *customerR `boil:"-" json:"-" toml:"-" yaml:"-"`
-	L customerL  `boil:"-" json:"-" toml:"-" yaml:"-"`
+	R *locationR `boil:"-" json:"-" toml:"-" yaml:"-"`
+	L locationL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
-var CustomerColumns = struct {
+var LocationColumns = struct {
 	ID             string
 	CustomerNumber string
 	FieldNumber    string
@@ -74,7 +74,7 @@ var CustomerColumns = struct {
 	UpdatedAt:      "updated_at",
 }
 
-var CustomerTableColumns = struct {
+var LocationTableColumns = struct {
 	ID             string
 	CustomerNumber string
 	FieldNumber    string
@@ -90,20 +90,20 @@ var CustomerTableColumns = struct {
 	CreatedAt      string
 	UpdatedAt      string
 }{
-	ID:             "customer.id",
-	CustomerNumber: "customer.customer_number",
-	FieldNumber:    "customer.field_number",
-	Address:        "customer.address",
-	Lat:            "customer.lat",
-	Lng:            "customer.lng",
-	WeatherLat:     "customer.weather_lat",
-	WeatherLng:     "customer.weather_lng",
-	Timezone:       "customer.timezone",
-	TOULocationID:  "customer.tou_location_id",
-	VoltageType:    "customer.voltage_type",
-	TOUType:        "customer.tou_type",
-	CreatedAt:      "customer.created_at",
-	UpdatedAt:      "customer.updated_at",
+	ID:             "location.id",
+	CustomerNumber: "location.customer_number",
+	FieldNumber:    "location.field_number",
+	Address:        "location.address",
+	Lat:            "location.lat",
+	Lng:            "location.lng",
+	WeatherLat:     "location.weather_lat",
+	WeatherLng:     "location.weather_lng",
+	Timezone:       "location.timezone",
+	TOULocationID:  "location.tou_location_id",
+	VoltageType:    "location.voltage_type",
+	TOUType:        "location.tou_type",
+	CreatedAt:      "location.created_at",
+	UpdatedAt:      "location.updated_at",
 }
 
 // Generated where
@@ -132,7 +132,7 @@ func (w whereHelpernull_Float64) GTE(x null.Float64) qm.QueryMod {
 func (w whereHelpernull_Float64) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
 func (w whereHelpernull_Float64) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
 
-var CustomerWhere = struct {
+var LocationWhere = struct {
 	ID             whereHelperint64
 	CustomerNumber whereHelperstring
 	FieldNumber    whereHelperstring
@@ -148,78 +148,78 @@ var CustomerWhere = struct {
 	CreatedAt      whereHelpertime_Time
 	UpdatedAt      whereHelpertime_Time
 }{
-	ID:             whereHelperint64{field: "`customer`.`id`"},
-	CustomerNumber: whereHelperstring{field: "`customer`.`customer_number`"},
-	FieldNumber:    whereHelperstring{field: "`customer`.`field_number`"},
-	Address:        whereHelpernull_String{field: "`customer`.`address`"},
-	Lat:            whereHelpernull_Float64{field: "`customer`.`lat`"},
-	Lng:            whereHelpernull_Float64{field: "`customer`.`lng`"},
-	WeatherLat:     whereHelpernull_Float32{field: "`customer`.`weather_lat`"},
-	WeatherLng:     whereHelpernull_Float32{field: "`customer`.`weather_lng`"},
-	Timezone:       whereHelpernull_String{field: "`customer`.`timezone`"},
-	TOULocationID:  whereHelpernull_Int64{field: "`customer`.`tou_location_id`"},
-	VoltageType:    whereHelpernull_String{field: "`customer`.`voltage_type`"},
-	TOUType:        whereHelpernull_String{field: "`customer`.`tou_type`"},
-	CreatedAt:      whereHelpertime_Time{field: "`customer`.`created_at`"},
-	UpdatedAt:      whereHelpertime_Time{field: "`customer`.`updated_at`"},
+	ID:             whereHelperint64{field: "`location`.`id`"},
+	CustomerNumber: whereHelperstring{field: "`location`.`customer_number`"},
+	FieldNumber:    whereHelperstring{field: "`location`.`field_number`"},
+	Address:        whereHelpernull_String{field: "`location`.`address`"},
+	Lat:            whereHelpernull_Float64{field: "`location`.`lat`"},
+	Lng:            whereHelpernull_Float64{field: "`location`.`lng`"},
+	WeatherLat:     whereHelpernull_Float32{field: "`location`.`weather_lat`"},
+	WeatherLng:     whereHelpernull_Float32{field: "`location`.`weather_lng`"},
+	Timezone:       whereHelpernull_String{field: "`location`.`timezone`"},
+	TOULocationID:  whereHelpernull_Int64{field: "`location`.`tou_location_id`"},
+	VoltageType:    whereHelpernull_String{field: "`location`.`voltage_type`"},
+	TOUType:        whereHelpernull_String{field: "`location`.`tou_type`"},
+	CreatedAt:      whereHelpertime_Time{field: "`location`.`created_at`"},
+	UpdatedAt:      whereHelpertime_Time{field: "`location`.`updated_at`"},
 }
 
-// CustomerRels is where relationship names are stored.
-var CustomerRels = struct {
+// LocationRels is where relationship names are stored.
+var LocationRels = struct {
 	Gateways string
 }{
 	Gateways: "Gateways",
 }
 
-// customerR is where relationships are stored.
-type customerR struct {
+// locationR is where relationships are stored.
+type locationR struct {
 	Gateways GatewaySlice `boil:"Gateways" json:"Gateways" toml:"Gateways" yaml:"Gateways"`
 }
 
 // NewStruct creates a new relationship struct
-func (*customerR) NewStruct() *customerR {
-	return &customerR{}
+func (*locationR) NewStruct() *locationR {
+	return &locationR{}
 }
 
-func (r *customerR) GetGateways() GatewaySlice {
+func (r *locationR) GetGateways() GatewaySlice {
 	if r == nil {
 		return nil
 	}
 	return r.Gateways
 }
 
-// customerL is where Load methods for each relationship are stored.
-type customerL struct{}
+// locationL is where Load methods for each relationship are stored.
+type locationL struct{}
 
 var (
-	customerAllColumns            = []string{"id", "customer_number", "field_number", "address", "lat", "lng", "weather_lat", "weather_lng", "timezone", "tou_location_id", "voltage_type", "tou_type", "created_at", "updated_at"}
-	customerColumnsWithoutDefault = []string{"customer_number", "field_number", "address", "lat", "lng", "weather_lat", "weather_lng", "timezone", "tou_location_id", "voltage_type", "tou_type"}
-	customerColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
-	customerPrimaryKeyColumns     = []string{"id"}
-	customerGeneratedColumns      = []string{}
+	locationAllColumns            = []string{"id", "customer_number", "field_number", "address", "lat", "lng", "weather_lat", "weather_lng", "timezone", "tou_location_id", "voltage_type", "tou_type", "created_at", "updated_at"}
+	locationColumnsWithoutDefault = []string{"customer_number", "field_number", "address", "lat", "lng", "weather_lat", "weather_lng", "timezone", "tou_location_id", "voltage_type", "tou_type"}
+	locationColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
+	locationPrimaryKeyColumns     = []string{"id"}
+	locationGeneratedColumns      = []string{}
 )
 
 type (
-	// CustomerSlice is an alias for a slice of pointers to Customer.
-	// This should almost always be used instead of []Customer.
-	CustomerSlice []*Customer
+	// LocationSlice is an alias for a slice of pointers to Location.
+	// This should almost always be used instead of []Location.
+	LocationSlice []*Location
 
-	customerQuery struct {
+	locationQuery struct {
 		*queries.Query
 	}
 )
 
 // Cache for insert, update and upsert
 var (
-	customerType                 = reflect.TypeOf(&Customer{})
-	customerMapping              = queries.MakeStructMapping(customerType)
-	customerPrimaryKeyMapping, _ = queries.BindMapping(customerType, customerMapping, customerPrimaryKeyColumns)
-	customerInsertCacheMut       sync.RWMutex
-	customerInsertCache          = make(map[string]insertCache)
-	customerUpdateCacheMut       sync.RWMutex
-	customerUpdateCache          = make(map[string]updateCache)
-	customerUpsertCacheMut       sync.RWMutex
-	customerUpsertCache          = make(map[string]insertCache)
+	locationType                 = reflect.TypeOf(&Location{})
+	locationMapping              = queries.MakeStructMapping(locationType)
+	locationPrimaryKeyMapping, _ = queries.BindMapping(locationType, locationMapping, locationPrimaryKeyColumns)
+	locationInsertCacheMut       sync.RWMutex
+	locationInsertCache          = make(map[string]insertCache)
+	locationUpdateCacheMut       sync.RWMutex
+	locationUpdateCache          = make(map[string]updateCache)
+	locationUpsertCacheMut       sync.RWMutex
+	locationUpsertCache          = make(map[string]insertCache)
 )
 
 var (
@@ -230,9 +230,9 @@ var (
 	_ = qmhelper.Where
 )
 
-// One returns a single customer record from the query.
-func (q customerQuery) One(exec boil.Executor) (*Customer, error) {
-	o := &Customer{}
+// One returns a single location record from the query.
+func (q locationQuery) One(exec boil.Executor) (*Location, error) {
+	o := &Location{}
 
 	queries.SetLimit(q.Query, 1)
 
@@ -241,26 +241,26 @@ func (q customerQuery) One(exec boil.Executor) (*Customer, error) {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, sql.ErrNoRows
 		}
-		return nil, errors.Wrap(err, "deremsmodels: failed to execute a one query for customer")
+		return nil, errors.Wrap(err, "deremsmodels: failed to execute a one query for location")
 	}
 
 	return o, nil
 }
 
-// All returns all Customer records from the query.
-func (q customerQuery) All(exec boil.Executor) (CustomerSlice, error) {
-	var o []*Customer
+// All returns all Location records from the query.
+func (q locationQuery) All(exec boil.Executor) (LocationSlice, error) {
+	var o []*Location
 
 	err := q.Bind(nil, exec, &o)
 	if err != nil {
-		return nil, errors.Wrap(err, "deremsmodels: failed to assign all query results to Customer slice")
+		return nil, errors.Wrap(err, "deremsmodels: failed to assign all query results to Location slice")
 	}
 
 	return o, nil
 }
 
-// Count returns the count of all Customer records in the query.
-func (q customerQuery) Count(exec boil.Executor) (int64, error) {
+// Count returns the count of all Location records in the query.
+func (q locationQuery) Count(exec boil.Executor) (int64, error) {
 	var count int64
 
 	queries.SetSelect(q.Query, nil)
@@ -268,14 +268,14 @@ func (q customerQuery) Count(exec boil.Executor) (int64, error) {
 
 	err := q.Query.QueryRow(exec).Scan(&count)
 	if err != nil {
-		return 0, errors.Wrap(err, "deremsmodels: failed to count customer rows")
+		return 0, errors.Wrap(err, "deremsmodels: failed to count location rows")
 	}
 
 	return count, nil
 }
 
 // Exists checks if the row exists in the table.
-func (q customerQuery) Exists(exec boil.Executor) (bool, error) {
+func (q locationQuery) Exists(exec boil.Executor) (bool, error) {
 	var count int64
 
 	queries.SetSelect(q.Query, nil)
@@ -284,21 +284,21 @@ func (q customerQuery) Exists(exec boil.Executor) (bool, error) {
 
 	err := q.Query.QueryRow(exec).Scan(&count)
 	if err != nil {
-		return false, errors.Wrap(err, "deremsmodels: failed to check if customer exists")
+		return false, errors.Wrap(err, "deremsmodels: failed to check if location exists")
 	}
 
 	return count > 0, nil
 }
 
 // Gateways retrieves all the gateway's Gateways with an executor.
-func (o *Customer) Gateways(mods ...qm.QueryMod) gatewayQuery {
+func (o *Location) Gateways(mods ...qm.QueryMod) gatewayQuery {
 	var queryMods []qm.QueryMod
 	if len(mods) != 0 {
 		queryMods = append(queryMods, mods...)
 	}
 
 	queryMods = append(queryMods,
-		qm.Where("`gateway`.`customer_id`=?", o.ID),
+		qm.Where("`gateway`.`location_id`=?", o.ID),
 	)
 
 	return Gateways(queryMods...)
@@ -306,27 +306,27 @@ func (o *Customer) Gateways(mods ...qm.QueryMod) gatewayQuery {
 
 // LoadGateways allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for a 1-M or N-M relationship.
-func (customerL) LoadGateways(e boil.Executor, singular bool, maybeCustomer interface{}, mods queries.Applicator) error {
-	var slice []*Customer
-	var object *Customer
+func (locationL) LoadGateways(e boil.Executor, singular bool, maybeLocation interface{}, mods queries.Applicator) error {
+	var slice []*Location
+	var object *Location
 
 	if singular {
-		object = maybeCustomer.(*Customer)
+		object = maybeLocation.(*Location)
 	} else {
-		slice = *maybeCustomer.(*[]*Customer)
+		slice = *maybeLocation.(*[]*Location)
 	}
 
 	args := make([]interface{}, 0, 1)
 	if singular {
 		if object.R == nil {
-			object.R = &customerR{}
+			object.R = &locationR{}
 		}
 		args = append(args, object.ID)
 	} else {
 	Outer:
 		for _, obj := range slice {
 			if obj.R == nil {
-				obj.R = &customerR{}
+				obj.R = &locationR{}
 			}
 
 			for _, a := range args {
@@ -345,7 +345,7 @@ func (customerL) LoadGateways(e boil.Executor, singular bool, maybeCustomer inte
 
 	query := NewQuery(
 		qm.From(`gateway`),
-		qm.WhereIn(`gateway.customer_id in ?`, args...),
+		qm.WhereIn(`gateway.location_id in ?`, args...),
 	)
 	if mods != nil {
 		mods.Apply(query)
@@ -374,19 +374,19 @@ func (customerL) LoadGateways(e boil.Executor, singular bool, maybeCustomer inte
 			if foreign.R == nil {
 				foreign.R = &gatewayR{}
 			}
-			foreign.R.Customer = object
+			foreign.R.Location = object
 		}
 		return nil
 	}
 
 	for _, foreign := range resultSlice {
 		for _, local := range slice {
-			if local.ID == foreign.CustomerID {
+			if local.ID == foreign.LocationID {
 				local.R.Gateways = append(local.R.Gateways, foreign)
 				if foreign.R == nil {
 					foreign.R = &gatewayR{}
 				}
-				foreign.R.Customer = local
+				foreign.R.Location = local
 				break
 			}
 		}
@@ -396,21 +396,21 @@ func (customerL) LoadGateways(e boil.Executor, singular bool, maybeCustomer inte
 }
 
 // AddGateways adds the given related objects to the existing relationships
-// of the customer, optionally inserting them as new records.
+// of the location, optionally inserting them as new records.
 // Appends related to o.R.Gateways.
-// Sets related.R.Customer appropriately.
-func (o *Customer) AddGateways(exec boil.Executor, insert bool, related ...*Gateway) error {
+// Sets related.R.Location appropriately.
+func (o *Location) AddGateways(exec boil.Executor, insert bool, related ...*Gateway) error {
 	var err error
 	for _, rel := range related {
 		if insert {
-			rel.CustomerID = o.ID
+			rel.LocationID = o.ID
 			if err = rel.Insert(exec, boil.Infer()); err != nil {
 				return errors.Wrap(err, "failed to insert into foreign table")
 			}
 		} else {
 			updateQuery := fmt.Sprintf(
 				"UPDATE `gateway` SET %s WHERE %s",
-				strmangle.SetParamNames("`", "`", 0, []string{"customer_id"}),
+				strmangle.SetParamNames("`", "`", 0, []string{"location_id"}),
 				strmangle.WhereClause("`", "`", 0, gatewayPrimaryKeyColumns),
 			)
 			values := []interface{}{o.ID, rel.ID}
@@ -423,12 +423,12 @@ func (o *Customer) AddGateways(exec boil.Executor, insert bool, related ...*Gate
 				return errors.Wrap(err, "failed to update foreign table")
 			}
 
-			rel.CustomerID = o.ID
+			rel.LocationID = o.ID
 		}
 	}
 
 	if o.R == nil {
-		o.R = &customerR{
+		o.R = &locationR{
 			Gateways: related,
 		}
 	} else {
@@ -438,57 +438,57 @@ func (o *Customer) AddGateways(exec boil.Executor, insert bool, related ...*Gate
 	for _, rel := range related {
 		if rel.R == nil {
 			rel.R = &gatewayR{
-				Customer: o,
+				Location: o,
 			}
 		} else {
-			rel.R.Customer = o
+			rel.R.Location = o
 		}
 	}
 	return nil
 }
 
-// Customers retrieves all the records using an executor.
-func Customers(mods ...qm.QueryMod) customerQuery {
-	mods = append(mods, qm.From("`customer`"))
+// Locations retrieves all the records using an executor.
+func Locations(mods ...qm.QueryMod) locationQuery {
+	mods = append(mods, qm.From("`location`"))
 	q := NewQuery(mods...)
 	if len(queries.GetSelect(q)) == 0 {
-		queries.SetSelect(q, []string{"`customer`.*"})
+		queries.SetSelect(q, []string{"`location`.*"})
 	}
 
-	return customerQuery{q}
+	return locationQuery{q}
 }
 
-// FindCustomer retrieves a single record by ID with an executor.
+// FindLocation retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindCustomer(exec boil.Executor, iD int64, selectCols ...string) (*Customer, error) {
-	customerObj := &Customer{}
+func FindLocation(exec boil.Executor, iD int64, selectCols ...string) (*Location, error) {
+	locationObj := &Location{}
 
 	sel := "*"
 	if len(selectCols) > 0 {
 		sel = strings.Join(strmangle.IdentQuoteSlice(dialect.LQ, dialect.RQ, selectCols), ",")
 	}
 	query := fmt.Sprintf(
-		"select %s from `customer` where `id`=?", sel,
+		"select %s from `location` where `id`=?", sel,
 	)
 
 	q := queries.Raw(query, iD)
 
-	err := q.Bind(nil, exec, customerObj)
+	err := q.Bind(nil, exec, locationObj)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, sql.ErrNoRows
 		}
-		return nil, errors.Wrap(err, "deremsmodels: unable to select from customer")
+		return nil, errors.Wrap(err, "deremsmodels: unable to select from location")
 	}
 
-	return customerObj, nil
+	return locationObj, nil
 }
 
 // Insert a single record using an executor.
 // See boil.Columns.InsertColumnSet documentation to understand column list inference for inserts.
-func (o *Customer) Insert(exec boil.Executor, columns boil.Columns) error {
+func (o *Location) Insert(exec boil.Executor, columns boil.Columns) error {
 	if o == nil {
-		return errors.New("deremsmodels: no customer provided for insertion")
+		return errors.New("deremsmodels: no location provided for insertion")
 	}
 
 	var err error
@@ -501,39 +501,39 @@ func (o *Customer) Insert(exec boil.Executor, columns boil.Columns) error {
 		o.UpdatedAt = currTime
 	}
 
-	nzDefaults := queries.NonZeroDefaultSet(customerColumnsWithDefault, o)
+	nzDefaults := queries.NonZeroDefaultSet(locationColumnsWithDefault, o)
 
 	key := makeCacheKey(columns, nzDefaults)
-	customerInsertCacheMut.RLock()
-	cache, cached := customerInsertCache[key]
-	customerInsertCacheMut.RUnlock()
+	locationInsertCacheMut.RLock()
+	cache, cached := locationInsertCache[key]
+	locationInsertCacheMut.RUnlock()
 
 	if !cached {
 		wl, returnColumns := columns.InsertColumnSet(
-			customerAllColumns,
-			customerColumnsWithDefault,
-			customerColumnsWithoutDefault,
+			locationAllColumns,
+			locationColumnsWithDefault,
+			locationColumnsWithoutDefault,
 			nzDefaults,
 		)
 
-		cache.valueMapping, err = queries.BindMapping(customerType, customerMapping, wl)
+		cache.valueMapping, err = queries.BindMapping(locationType, locationMapping, wl)
 		if err != nil {
 			return err
 		}
-		cache.retMapping, err = queries.BindMapping(customerType, customerMapping, returnColumns)
+		cache.retMapping, err = queries.BindMapping(locationType, locationMapping, returnColumns)
 		if err != nil {
 			return err
 		}
 		if len(wl) != 0 {
-			cache.query = fmt.Sprintf("INSERT INTO `customer` (`%s`) %%sVALUES (%s)%%s", strings.Join(wl, "`,`"), strmangle.Placeholders(dialect.UseIndexPlaceholders, len(wl), 1, 1))
+			cache.query = fmt.Sprintf("INSERT INTO `location` (`%s`) %%sVALUES (%s)%%s", strings.Join(wl, "`,`"), strmangle.Placeholders(dialect.UseIndexPlaceholders, len(wl), 1, 1))
 		} else {
-			cache.query = "INSERT INTO `customer` () VALUES ()%s%s"
+			cache.query = "INSERT INTO `location` () VALUES ()%s%s"
 		}
 
 		var queryOutput, queryReturning string
 
 		if len(cache.retMapping) != 0 {
-			cache.retQuery = fmt.Sprintf("SELECT `%s` FROM `customer` WHERE %s", strings.Join(returnColumns, "`,`"), strmangle.WhereClause("`", "`", 0, customerPrimaryKeyColumns))
+			cache.retQuery = fmt.Sprintf("SELECT `%s` FROM `location` WHERE %s", strings.Join(returnColumns, "`,`"), strmangle.WhereClause("`", "`", 0, locationPrimaryKeyColumns))
 		}
 
 		cache.query = fmt.Sprintf(cache.query, queryOutput, queryReturning)
@@ -549,7 +549,7 @@ func (o *Customer) Insert(exec boil.Executor, columns boil.Columns) error {
 	result, err := exec.Exec(cache.query, vals...)
 
 	if err != nil {
-		return errors.Wrap(err, "deremsmodels: unable to insert into customer")
+		return errors.Wrap(err, "deremsmodels: unable to insert into location")
 	}
 
 	var lastID int64
@@ -565,7 +565,7 @@ func (o *Customer) Insert(exec boil.Executor, columns boil.Columns) error {
 	}
 
 	o.ID = int64(lastID)
-	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == customerMapping["id"] {
+	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == locationMapping["id"] {
 		goto CacheNoHooks
 	}
 
@@ -579,51 +579,51 @@ func (o *Customer) Insert(exec boil.Executor, columns boil.Columns) error {
 	}
 	err = exec.QueryRow(cache.retQuery, identifierCols...).Scan(queries.PtrsFromMapping(value, cache.retMapping)...)
 	if err != nil {
-		return errors.Wrap(err, "deremsmodels: unable to populate default values for customer")
+		return errors.Wrap(err, "deremsmodels: unable to populate default values for location")
 	}
 
 CacheNoHooks:
 	if !cached {
-		customerInsertCacheMut.Lock()
-		customerInsertCache[key] = cache
-		customerInsertCacheMut.Unlock()
+		locationInsertCacheMut.Lock()
+		locationInsertCache[key] = cache
+		locationInsertCacheMut.Unlock()
 	}
 
 	return nil
 }
 
-// Update uses an executor to update the Customer.
+// Update uses an executor to update the Location.
 // See boil.Columns.UpdateColumnSet documentation to understand column list inference for updates.
 // Update does not automatically update the record in case of default values. Use .Reload() to refresh the records.
-func (o *Customer) Update(exec boil.Executor, columns boil.Columns) (int64, error) {
+func (o *Location) Update(exec boil.Executor, columns boil.Columns) (int64, error) {
 	currTime := time.Now().In(boil.GetLocation())
 
 	o.UpdatedAt = currTime
 
 	var err error
 	key := makeCacheKey(columns, nil)
-	customerUpdateCacheMut.RLock()
-	cache, cached := customerUpdateCache[key]
-	customerUpdateCacheMut.RUnlock()
+	locationUpdateCacheMut.RLock()
+	cache, cached := locationUpdateCache[key]
+	locationUpdateCacheMut.RUnlock()
 
 	if !cached {
 		wl := columns.UpdateColumnSet(
-			customerAllColumns,
-			customerPrimaryKeyColumns,
+			locationAllColumns,
+			locationPrimaryKeyColumns,
 		)
 
 		if !columns.IsWhitelist() {
 			wl = strmangle.SetComplement(wl, []string{"created_at"})
 		}
 		if len(wl) == 0 {
-			return 0, errors.New("deremsmodels: unable to update customer, could not build whitelist")
+			return 0, errors.New("deremsmodels: unable to update location, could not build whitelist")
 		}
 
-		cache.query = fmt.Sprintf("UPDATE `customer` SET %s WHERE %s",
+		cache.query = fmt.Sprintf("UPDATE `location` SET %s WHERE %s",
 			strmangle.SetParamNames("`", "`", 0, wl),
-			strmangle.WhereClause("`", "`", 0, customerPrimaryKeyColumns),
+			strmangle.WhereClause("`", "`", 0, locationPrimaryKeyColumns),
 		)
-		cache.valueMapping, err = queries.BindMapping(customerType, customerMapping, append(wl, customerPrimaryKeyColumns...))
+		cache.valueMapping, err = queries.BindMapping(locationType, locationMapping, append(wl, locationPrimaryKeyColumns...))
 		if err != nil {
 			return 0, err
 		}
@@ -638,42 +638,42 @@ func (o *Customer) Update(exec boil.Executor, columns boil.Columns) (int64, erro
 	var result sql.Result
 	result, err = exec.Exec(cache.query, values...)
 	if err != nil {
-		return 0, errors.Wrap(err, "deremsmodels: unable to update customer row")
+		return 0, errors.Wrap(err, "deremsmodels: unable to update location row")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "deremsmodels: failed to get rows affected by update for customer")
+		return 0, errors.Wrap(err, "deremsmodels: failed to get rows affected by update for location")
 	}
 
 	if !cached {
-		customerUpdateCacheMut.Lock()
-		customerUpdateCache[key] = cache
-		customerUpdateCacheMut.Unlock()
+		locationUpdateCacheMut.Lock()
+		locationUpdateCache[key] = cache
+		locationUpdateCacheMut.Unlock()
 	}
 
 	return rowsAff, nil
 }
 
 // UpdateAll updates all rows with the specified column values.
-func (q customerQuery) UpdateAll(exec boil.Executor, cols M) (int64, error) {
+func (q locationQuery) UpdateAll(exec boil.Executor, cols M) (int64, error) {
 	queries.SetUpdate(q.Query, cols)
 
 	result, err := q.Query.Exec(exec)
 	if err != nil {
-		return 0, errors.Wrap(err, "deremsmodels: unable to update all for customer")
+		return 0, errors.Wrap(err, "deremsmodels: unable to update all for location")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "deremsmodels: unable to retrieve rows affected for customer")
+		return 0, errors.Wrap(err, "deremsmodels: unable to retrieve rows affected for location")
 	}
 
 	return rowsAff, nil
 }
 
 // UpdateAll updates all rows with the specified column values, using an executor.
-func (o CustomerSlice) UpdateAll(exec boil.Executor, cols M) (int64, error) {
+func (o LocationSlice) UpdateAll(exec boil.Executor, cols M) (int64, error) {
 	ln := int64(len(o))
 	if ln == 0 {
 		return 0, nil
@@ -695,13 +695,13 @@ func (o CustomerSlice) UpdateAll(exec boil.Executor, cols M) (int64, error) {
 
 	// Append all of the primary key values for each column
 	for _, obj := range o {
-		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), customerPrimaryKeyMapping)
+		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), locationPrimaryKeyMapping)
 		args = append(args, pkeyArgs...)
 	}
 
-	sql := fmt.Sprintf("UPDATE `customer` SET %s WHERE %s",
+	sql := fmt.Sprintf("UPDATE `location` SET %s WHERE %s",
 		strmangle.SetParamNames("`", "`", 0, colNames),
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, customerPrimaryKeyColumns, len(o)))
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, locationPrimaryKeyColumns, len(o)))
 
 	if boil.DebugMode {
 		fmt.Fprintln(boil.DebugWriter, sql)
@@ -709,25 +709,25 @@ func (o CustomerSlice) UpdateAll(exec boil.Executor, cols M) (int64, error) {
 	}
 	result, err := exec.Exec(sql, args...)
 	if err != nil {
-		return 0, errors.Wrap(err, "deremsmodels: unable to update all in customer slice")
+		return 0, errors.Wrap(err, "deremsmodels: unable to update all in location slice")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "deremsmodels: unable to retrieve rows affected all in update all customer")
+		return 0, errors.Wrap(err, "deremsmodels: unable to retrieve rows affected all in update all location")
 	}
 	return rowsAff, nil
 }
 
-var mySQLCustomerUniqueColumns = []string{
+var mySQLLocationUniqueColumns = []string{
 	"id",
 }
 
 // Upsert attempts an insert using an executor, and does an update or ignore on conflict.
 // See boil.Columns documentation for how to properly use updateColumns and insertColumns.
-func (o *Customer) Upsert(exec boil.Executor, updateColumns, insertColumns boil.Columns) error {
+func (o *Location) Upsert(exec boil.Executor, updateColumns, insertColumns boil.Columns) error {
 	if o == nil {
-		return errors.New("deremsmodels: no customer provided for upsert")
+		return errors.New("deremsmodels: no location provided for upsert")
 	}
 	currTime := time.Now().In(boil.GetLocation())
 
@@ -736,8 +736,8 @@ func (o *Customer) Upsert(exec boil.Executor, updateColumns, insertColumns boil.
 	}
 	o.UpdatedAt = currTime
 
-	nzDefaults := queries.NonZeroDefaultSet(customerColumnsWithDefault, o)
-	nzUniques := queries.NonZeroDefaultSet(mySQLCustomerUniqueColumns, o)
+	nzDefaults := queries.NonZeroDefaultSet(locationColumnsWithDefault, o)
+	nzUniques := queries.NonZeroDefaultSet(mySQLLocationUniqueColumns, o)
 
 	if len(nzUniques) == 0 {
 		return errors.New("cannot upsert with a table that cannot conflict on a unique column")
@@ -765,43 +765,43 @@ func (o *Customer) Upsert(exec boil.Executor, updateColumns, insertColumns boil.
 	key := buf.String()
 	strmangle.PutBuffer(buf)
 
-	customerUpsertCacheMut.RLock()
-	cache, cached := customerUpsertCache[key]
-	customerUpsertCacheMut.RUnlock()
+	locationUpsertCacheMut.RLock()
+	cache, cached := locationUpsertCache[key]
+	locationUpsertCacheMut.RUnlock()
 
 	var err error
 
 	if !cached {
 		insert, ret := insertColumns.InsertColumnSet(
-			customerAllColumns,
-			customerColumnsWithDefault,
-			customerColumnsWithoutDefault,
+			locationAllColumns,
+			locationColumnsWithDefault,
+			locationColumnsWithoutDefault,
 			nzDefaults,
 		)
 
 		update := updateColumns.UpdateColumnSet(
-			customerAllColumns,
-			customerPrimaryKeyColumns,
+			locationAllColumns,
+			locationPrimaryKeyColumns,
 		)
 
 		if !updateColumns.IsNone() && len(update) == 0 {
-			return errors.New("deremsmodels: unable to upsert customer, could not build update column list")
+			return errors.New("deremsmodels: unable to upsert location, could not build update column list")
 		}
 
 		ret = strmangle.SetComplement(ret, nzUniques)
-		cache.query = buildUpsertQueryMySQL(dialect, "`customer`", update, insert)
+		cache.query = buildUpsertQueryMySQL(dialect, "`location`", update, insert)
 		cache.retQuery = fmt.Sprintf(
-			"SELECT %s FROM `customer` WHERE %s",
+			"SELECT %s FROM `location` WHERE %s",
 			strings.Join(strmangle.IdentQuoteSlice(dialect.LQ, dialect.RQ, ret), ","),
 			strmangle.WhereClause("`", "`", 0, nzUniques),
 		)
 
-		cache.valueMapping, err = queries.BindMapping(customerType, customerMapping, insert)
+		cache.valueMapping, err = queries.BindMapping(locationType, locationMapping, insert)
 		if err != nil {
 			return err
 		}
 		if len(ret) != 0 {
-			cache.retMapping, err = queries.BindMapping(customerType, customerMapping, ret)
+			cache.retMapping, err = queries.BindMapping(locationType, locationMapping, ret)
 			if err != nil {
 				return err
 			}
@@ -822,7 +822,7 @@ func (o *Customer) Upsert(exec boil.Executor, updateColumns, insertColumns boil.
 	result, err := exec.Exec(cache.query, vals...)
 
 	if err != nil {
-		return errors.Wrap(err, "deremsmodels: unable to upsert for customer")
+		return errors.Wrap(err, "deremsmodels: unable to upsert for location")
 	}
 
 	var lastID int64
@@ -839,13 +839,13 @@ func (o *Customer) Upsert(exec boil.Executor, updateColumns, insertColumns boil.
 	}
 
 	o.ID = int64(lastID)
-	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == customerMapping["id"] {
+	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == locationMapping["id"] {
 		goto CacheNoHooks
 	}
 
-	uniqueMap, err = queries.BindMapping(customerType, customerMapping, nzUniques)
+	uniqueMap, err = queries.BindMapping(locationType, locationMapping, nzUniques)
 	if err != nil {
-		return errors.Wrap(err, "deremsmodels: unable to retrieve unique values for customer")
+		return errors.Wrap(err, "deremsmodels: unable to retrieve unique values for location")
 	}
 	nzUniqueCols = queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), uniqueMap)
 
@@ -855,28 +855,28 @@ func (o *Customer) Upsert(exec boil.Executor, updateColumns, insertColumns boil.
 	}
 	err = exec.QueryRow(cache.retQuery, nzUniqueCols...).Scan(returns...)
 	if err != nil {
-		return errors.Wrap(err, "deremsmodels: unable to populate default values for customer")
+		return errors.Wrap(err, "deremsmodels: unable to populate default values for location")
 	}
 
 CacheNoHooks:
 	if !cached {
-		customerUpsertCacheMut.Lock()
-		customerUpsertCache[key] = cache
-		customerUpsertCacheMut.Unlock()
+		locationUpsertCacheMut.Lock()
+		locationUpsertCache[key] = cache
+		locationUpsertCacheMut.Unlock()
 	}
 
 	return nil
 }
 
-// Delete deletes a single Customer record with an executor.
+// Delete deletes a single Location record with an executor.
 // Delete will match against the primary key column to find the record to delete.
-func (o *Customer) Delete(exec boil.Executor) (int64, error) {
+func (o *Location) Delete(exec boil.Executor) (int64, error) {
 	if o == nil {
-		return 0, errors.New("deremsmodels: no Customer provided for delete")
+		return 0, errors.New("deremsmodels: no Location provided for delete")
 	}
 
-	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), customerPrimaryKeyMapping)
-	sql := "DELETE FROM `customer` WHERE `id`=?"
+	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), locationPrimaryKeyMapping)
+	sql := "DELETE FROM `location` WHERE `id`=?"
 
 	if boil.DebugMode {
 		fmt.Fprintln(boil.DebugWriter, sql)
@@ -884,52 +884,52 @@ func (o *Customer) Delete(exec boil.Executor) (int64, error) {
 	}
 	result, err := exec.Exec(sql, args...)
 	if err != nil {
-		return 0, errors.Wrap(err, "deremsmodels: unable to delete from customer")
+		return 0, errors.Wrap(err, "deremsmodels: unable to delete from location")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "deremsmodels: failed to get rows affected by delete for customer")
+		return 0, errors.Wrap(err, "deremsmodels: failed to get rows affected by delete for location")
 	}
 
 	return rowsAff, nil
 }
 
 // DeleteAll deletes all matching rows.
-func (q customerQuery) DeleteAll(exec boil.Executor) (int64, error) {
+func (q locationQuery) DeleteAll(exec boil.Executor) (int64, error) {
 	if q.Query == nil {
-		return 0, errors.New("deremsmodels: no customerQuery provided for delete all")
+		return 0, errors.New("deremsmodels: no locationQuery provided for delete all")
 	}
 
 	queries.SetDelete(q.Query)
 
 	result, err := q.Query.Exec(exec)
 	if err != nil {
-		return 0, errors.Wrap(err, "deremsmodels: unable to delete all from customer")
+		return 0, errors.Wrap(err, "deremsmodels: unable to delete all from location")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "deremsmodels: failed to get rows affected by deleteall for customer")
+		return 0, errors.Wrap(err, "deremsmodels: failed to get rows affected by deleteall for location")
 	}
 
 	return rowsAff, nil
 }
 
 // DeleteAll deletes all rows in the slice, using an executor.
-func (o CustomerSlice) DeleteAll(exec boil.Executor) (int64, error) {
+func (o LocationSlice) DeleteAll(exec boil.Executor) (int64, error) {
 	if len(o) == 0 {
 		return 0, nil
 	}
 
 	var args []interface{}
 	for _, obj := range o {
-		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), customerPrimaryKeyMapping)
+		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), locationPrimaryKeyMapping)
 		args = append(args, pkeyArgs...)
 	}
 
-	sql := "DELETE FROM `customer` WHERE " +
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, customerPrimaryKeyColumns, len(o))
+	sql := "DELETE FROM `location` WHERE " +
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, locationPrimaryKeyColumns, len(o))
 
 	if boil.DebugMode {
 		fmt.Fprintln(boil.DebugWriter, sql)
@@ -937,12 +937,12 @@ func (o CustomerSlice) DeleteAll(exec boil.Executor) (int64, error) {
 	}
 	result, err := exec.Exec(sql, args...)
 	if err != nil {
-		return 0, errors.Wrap(err, "deremsmodels: unable to delete all from customer slice")
+		return 0, errors.Wrap(err, "deremsmodels: unable to delete all from location slice")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "deremsmodels: failed to get rows affected by deleteall for customer")
+		return 0, errors.Wrap(err, "deremsmodels: failed to get rows affected by deleteall for location")
 	}
 
 	return rowsAff, nil
@@ -950,8 +950,8 @@ func (o CustomerSlice) DeleteAll(exec boil.Executor) (int64, error) {
 
 // Reload refetches the object from the database
 // using the primary keys with an executor.
-func (o *Customer) Reload(exec boil.Executor) error {
-	ret, err := FindCustomer(exec, o.ID)
+func (o *Location) Reload(exec boil.Executor) error {
+	ret, err := FindLocation(exec, o.ID)
 	if err != nil {
 		return err
 	}
@@ -962,26 +962,26 @@ func (o *Customer) Reload(exec boil.Executor) error {
 
 // ReloadAll refetches every row with matching primary key column values
 // and overwrites the original object slice with the newly updated slice.
-func (o *CustomerSlice) ReloadAll(exec boil.Executor) error {
+func (o *LocationSlice) ReloadAll(exec boil.Executor) error {
 	if o == nil || len(*o) == 0 {
 		return nil
 	}
 
-	slice := CustomerSlice{}
+	slice := LocationSlice{}
 	var args []interface{}
 	for _, obj := range *o {
-		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), customerPrimaryKeyMapping)
+		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), locationPrimaryKeyMapping)
 		args = append(args, pkeyArgs...)
 	}
 
-	sql := "SELECT `customer`.* FROM `customer` WHERE " +
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, customerPrimaryKeyColumns, len(*o))
+	sql := "SELECT `location`.* FROM `location` WHERE " +
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, locationPrimaryKeyColumns, len(*o))
 
 	q := queries.Raw(sql, args...)
 
 	err := q.Bind(nil, exec, &slice)
 	if err != nil {
-		return errors.Wrap(err, "deremsmodels: unable to reload all in CustomerSlice")
+		return errors.Wrap(err, "deremsmodels: unable to reload all in LocationSlice")
 	}
 
 	*o = slice
@@ -989,10 +989,10 @@ func (o *CustomerSlice) ReloadAll(exec boil.Executor) error {
 	return nil
 }
 
-// CustomerExists checks if the Customer row exists.
-func CustomerExists(exec boil.Executor, iD int64) (bool, error) {
+// LocationExists checks if the Location row exists.
+func LocationExists(exec boil.Executor, iD int64) (bool, error) {
 	var exists bool
-	sql := "select exists(select 1 from `customer` where `id`=? limit 1)"
+	sql := "select exists(select 1 from `location` where `id`=? limit 1)"
 
 	if boil.DebugMode {
 		fmt.Fprintln(boil.DebugWriter, sql)
@@ -1002,7 +1002,7 @@ func CustomerExists(exec boil.Executor, iD int64) (bool, error) {
 
 	err := row.Scan(&exists)
 	if err != nil {
-		return false, errors.Wrap(err, "deremsmodels: unable to check if customer exists")
+		return false, errors.Wrap(err, "deremsmodels: unable to check if location exists")
 	}
 
 	return exists, nil

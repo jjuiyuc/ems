@@ -27,7 +27,7 @@ type CCDatum struct {
 	GWUUID      string     `boil:"gw_uuid" json:"gwUUID" toml:"gwUUID" yaml:"gwUUID"`
 	LogDate     time.Time  `boil:"log_date" json:"logDate" toml:"logDate" yaml:"logDate"`
 	GWID        null.Int64 `boil:"gw_id" json:"gwID,omitempty" toml:"gwID" yaml:"gwID,omitempty"`
-	CustomerID  null.Int64 `boil:"customer_id" json:"customerID,omitempty" toml:"customerID" yaml:"customerID,omitempty"`
+	LocationID  null.Int64 `boil:"location_id" json:"locationID,omitempty" toml:"locationID" yaml:"locationID,omitempty"`
 	LocalCCData null.JSON  `boil:"local_cc_data" json:"localCCData,omitempty" toml:"localCCData" yaml:"localCCData,omitempty"`
 	CreatedAt   time.Time  `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
 	UpdatedAt   time.Time  `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
@@ -41,7 +41,7 @@ var CCDatumColumns = struct {
 	GWUUID      string
 	LogDate     string
 	GWID        string
-	CustomerID  string
+	LocationID  string
 	LocalCCData string
 	CreatedAt   string
 	UpdatedAt   string
@@ -50,7 +50,7 @@ var CCDatumColumns = struct {
 	GWUUID:      "gw_uuid",
 	LogDate:     "log_date",
 	GWID:        "gw_id",
-	CustomerID:  "customer_id",
+	LocationID:  "location_id",
 	LocalCCData: "local_cc_data",
 	CreatedAt:   "created_at",
 	UpdatedAt:   "updated_at",
@@ -61,7 +61,7 @@ var CCDatumTableColumns = struct {
 	GWUUID      string
 	LogDate     string
 	GWID        string
-	CustomerID  string
+	LocationID  string
 	LocalCCData string
 	CreatedAt   string
 	UpdatedAt   string
@@ -70,7 +70,7 @@ var CCDatumTableColumns = struct {
 	GWUUID:      "cc_data.gw_uuid",
 	LogDate:     "cc_data.log_date",
 	GWID:        "cc_data.gw_id",
-	CustomerID:  "cc_data.customer_id",
+	LocationID:  "cc_data.location_id",
 	LocalCCData: "cc_data.local_cc_data",
 	CreatedAt:   "cc_data.created_at",
 	UpdatedAt:   "cc_data.updated_at",
@@ -83,7 +83,7 @@ var CCDatumWhere = struct {
 	GWUUID      whereHelperstring
 	LogDate     whereHelpertime_Time
 	GWID        whereHelpernull_Int64
-	CustomerID  whereHelpernull_Int64
+	LocationID  whereHelpernull_Int64
 	LocalCCData whereHelpernull_JSON
 	CreatedAt   whereHelpertime_Time
 	UpdatedAt   whereHelpertime_Time
@@ -92,7 +92,7 @@ var CCDatumWhere = struct {
 	GWUUID:      whereHelperstring{field: "`cc_data`.`gw_uuid`"},
 	LogDate:     whereHelpertime_Time{field: "`cc_data`.`log_date`"},
 	GWID:        whereHelpernull_Int64{field: "`cc_data`.`gw_id`"},
-	CustomerID:  whereHelpernull_Int64{field: "`cc_data`.`customer_id`"},
+	LocationID:  whereHelpernull_Int64{field: "`cc_data`.`location_id`"},
 	LocalCCData: whereHelpernull_JSON{field: "`cc_data`.`local_cc_data`"},
 	CreatedAt:   whereHelpertime_Time{field: "`cc_data`.`created_at`"},
 	UpdatedAt:   whereHelpertime_Time{field: "`cc_data`.`updated_at`"},
@@ -115,8 +115,8 @@ func (*ccDatumR) NewStruct() *ccDatumR {
 type ccDatumL struct{}
 
 var (
-	ccDatumAllColumns            = []string{"id", "gw_uuid", "log_date", "gw_id", "customer_id", "local_cc_data", "created_at", "updated_at"}
-	ccDatumColumnsWithoutDefault = []string{"gw_uuid", "log_date", "gw_id", "customer_id", "local_cc_data"}
+	ccDatumAllColumns            = []string{"id", "gw_uuid", "log_date", "gw_id", "location_id", "local_cc_data", "created_at", "updated_at"}
+	ccDatumColumnsWithoutDefault = []string{"gw_uuid", "log_date", "gw_id", "location_id", "local_cc_data"}
 	ccDatumColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	ccDatumPrimaryKeyColumns     = []string{"id"}
 	ccDatumGeneratedColumns      = []string{}

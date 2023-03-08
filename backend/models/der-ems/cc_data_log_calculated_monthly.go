@@ -27,7 +27,7 @@ type CCDataLogCalculatedMonthly struct {
 	GWUUID                           string       `boil:"gw_uuid" json:"gwUUID" toml:"gwUUID" yaml:"gwUUID"`
 	LatestLogDate                    time.Time    `boil:"latest_log_date" json:"latestLogDate" toml:"latestLogDate" yaml:"latestLogDate"`
 	GWID                             null.Int64   `boil:"gw_id" json:"gwID,omitempty" toml:"gwID" yaml:"gwID,omitempty"`
-	CustomerID                       null.Int64   `boil:"customer_id" json:"customerID,omitempty" toml:"customerID" yaml:"customerID,omitempty"`
+	LocationID                       null.Int64   `boil:"location_id" json:"locationID,omitempty" toml:"locationID" yaml:"locationID,omitempty"`
 	PvProducedLifetimeEnergyACDiff   null.Float32 `boil:"pv_produced_lifetime_energy_ac_diff" json:"pvProducedLifetimeEnergyAcDiff,omitempty" toml:"pvProducedLifetimeEnergyAcDiff" yaml:"pvProducedLifetimeEnergyAcDiff,omitempty"`
 	LoadConsumedLifetimeEnergyACDiff null.Float32 `boil:"load_consumed_lifetime_energy_ac_diff" json:"loadConsumedLifetimeEnergyAcDiff,omitempty" toml:"loadConsumedLifetimeEnergyAcDiff" yaml:"loadConsumedLifetimeEnergyAcDiff,omitempty"`
 	BatteryLifetimeEnergyACDiff      null.Float32 `boil:"battery_lifetime_energy_ac_diff" json:"batteryLifetimeEnergyAcDiff,omitempty" toml:"batteryLifetimeEnergyAcDiff" yaml:"batteryLifetimeEnergyAcDiff,omitempty"`
@@ -45,7 +45,7 @@ var CCDataLogCalculatedMonthlyColumns = struct {
 	GWUUID                           string
 	LatestLogDate                    string
 	GWID                             string
-	CustomerID                       string
+	LocationID                       string
 	PvProducedLifetimeEnergyACDiff   string
 	LoadConsumedLifetimeEnergyACDiff string
 	BatteryLifetimeEnergyACDiff      string
@@ -58,7 +58,7 @@ var CCDataLogCalculatedMonthlyColumns = struct {
 	GWUUID:                           "gw_uuid",
 	LatestLogDate:                    "latest_log_date",
 	GWID:                             "gw_id",
-	CustomerID:                       "customer_id",
+	LocationID:                       "location_id",
 	PvProducedLifetimeEnergyACDiff:   "pv_produced_lifetime_energy_ac_diff",
 	LoadConsumedLifetimeEnergyACDiff: "load_consumed_lifetime_energy_ac_diff",
 	BatteryLifetimeEnergyACDiff:      "battery_lifetime_energy_ac_diff",
@@ -73,7 +73,7 @@ var CCDataLogCalculatedMonthlyTableColumns = struct {
 	GWUUID                           string
 	LatestLogDate                    string
 	GWID                             string
-	CustomerID                       string
+	LocationID                       string
 	PvProducedLifetimeEnergyACDiff   string
 	LoadConsumedLifetimeEnergyACDiff string
 	BatteryLifetimeEnergyACDiff      string
@@ -86,7 +86,7 @@ var CCDataLogCalculatedMonthlyTableColumns = struct {
 	GWUUID:                           "cc_data_log_calculated_monthly.gw_uuid",
 	LatestLogDate:                    "cc_data_log_calculated_monthly.latest_log_date",
 	GWID:                             "cc_data_log_calculated_monthly.gw_id",
-	CustomerID:                       "cc_data_log_calculated_monthly.customer_id",
+	LocationID:                       "cc_data_log_calculated_monthly.location_id",
 	PvProducedLifetimeEnergyACDiff:   "cc_data_log_calculated_monthly.pv_produced_lifetime_energy_ac_diff",
 	LoadConsumedLifetimeEnergyACDiff: "cc_data_log_calculated_monthly.load_consumed_lifetime_energy_ac_diff",
 	BatteryLifetimeEnergyACDiff:      "cc_data_log_calculated_monthly.battery_lifetime_energy_ac_diff",
@@ -103,7 +103,7 @@ var CCDataLogCalculatedMonthlyWhere = struct {
 	GWUUID                           whereHelperstring
 	LatestLogDate                    whereHelpertime_Time
 	GWID                             whereHelpernull_Int64
-	CustomerID                       whereHelpernull_Int64
+	LocationID                       whereHelpernull_Int64
 	PvProducedLifetimeEnergyACDiff   whereHelpernull_Float32
 	LoadConsumedLifetimeEnergyACDiff whereHelpernull_Float32
 	BatteryLifetimeEnergyACDiff      whereHelpernull_Float32
@@ -116,7 +116,7 @@ var CCDataLogCalculatedMonthlyWhere = struct {
 	GWUUID:                           whereHelperstring{field: "`cc_data_log_calculated_monthly`.`gw_uuid`"},
 	LatestLogDate:                    whereHelpertime_Time{field: "`cc_data_log_calculated_monthly`.`latest_log_date`"},
 	GWID:                             whereHelpernull_Int64{field: "`cc_data_log_calculated_monthly`.`gw_id`"},
-	CustomerID:                       whereHelpernull_Int64{field: "`cc_data_log_calculated_monthly`.`customer_id`"},
+	LocationID:                       whereHelpernull_Int64{field: "`cc_data_log_calculated_monthly`.`location_id`"},
 	PvProducedLifetimeEnergyACDiff:   whereHelpernull_Float32{field: "`cc_data_log_calculated_monthly`.`pv_produced_lifetime_energy_ac_diff`"},
 	LoadConsumedLifetimeEnergyACDiff: whereHelpernull_Float32{field: "`cc_data_log_calculated_monthly`.`load_consumed_lifetime_energy_ac_diff`"},
 	BatteryLifetimeEnergyACDiff:      whereHelpernull_Float32{field: "`cc_data_log_calculated_monthly`.`battery_lifetime_energy_ac_diff`"},
@@ -143,8 +143,8 @@ func (*ccDataLogCalculatedMonthlyR) NewStruct() *ccDataLogCalculatedMonthlyR {
 type ccDataLogCalculatedMonthlyL struct{}
 
 var (
-	ccDataLogCalculatedMonthlyAllColumns            = []string{"id", "gw_uuid", "latest_log_date", "gw_id", "customer_id", "pv_produced_lifetime_energy_ac_diff", "load_consumed_lifetime_energy_ac_diff", "battery_lifetime_energy_ac_diff", "grid_lifetime_energy_ac_diff", "load_self_consumed_energy_percent_ac", "created_at", "updated_at"}
-	ccDataLogCalculatedMonthlyColumnsWithoutDefault = []string{"gw_uuid", "latest_log_date", "gw_id", "customer_id", "pv_produced_lifetime_energy_ac_diff", "load_consumed_lifetime_energy_ac_diff", "battery_lifetime_energy_ac_diff", "grid_lifetime_energy_ac_diff", "load_self_consumed_energy_percent_ac"}
+	ccDataLogCalculatedMonthlyAllColumns            = []string{"id", "gw_uuid", "latest_log_date", "gw_id", "location_id", "pv_produced_lifetime_energy_ac_diff", "load_consumed_lifetime_energy_ac_diff", "battery_lifetime_energy_ac_diff", "grid_lifetime_energy_ac_diff", "load_self_consumed_energy_percent_ac", "created_at", "updated_at"}
+	ccDataLogCalculatedMonthlyColumnsWithoutDefault = []string{"gw_uuid", "latest_log_date", "gw_id", "location_id", "pv_produced_lifetime_energy_ac_diff", "load_consumed_lifetime_energy_ac_diff", "battery_lifetime_energy_ac_diff", "grid_lifetime_energy_ac_diff", "load_self_consumed_energy_percent_ac"}
 	ccDataLogCalculatedMonthlyColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	ccDataLogCalculatedMonthlyPrimaryKeyColumns     = []string{"id"}
 	ccDataLogCalculatedMonthlyGeneratedColumns      = []string{}

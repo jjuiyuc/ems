@@ -313,9 +313,15 @@ func (r *SolarEnergyInfoResponse) ComputedValues(firstLogOfDay, firstLogOfMonth,
 		r.PvProducedLifetimeEnergyACDiff)
 
 	var sumOfPvEnergyCostSavings, sumOfPvCo2Savings float32
-	for _, logOfMonth := range logsOfMonth {
-		sumOfPvEnergyCostSavings = sumOfPvEnergyCostSavings + logOfMonth.PvEnergyCostSavings.Float32
-		sumOfPvCo2Savings = sumOfPvCo2Savings + logOfMonth.PvCo2Savings.Float32
+	// XXX: Hardcode for serenegray field old CC version
+	if latestLog.GWUUID == "0E0BA27A8175AF978C49396BDE9D7A1E" {
+		for _, logOfMonth := range logsOfMonth {
+			sumOfPvEnergyCostSavings = sumOfPvEnergyCostSavings + logOfMonth.PvEnergyCostSavings.Float32
+			sumOfPvCo2Savings = sumOfPvCo2Savings + logOfMonth.PvCo2Savings.Float32
+		}
+	} else {
+		sumOfPvEnergyCostSavings = utils.Diff(latestLog.PvEnergyCostSavings.Float32, firstLogOfMonth.PvEnergyCostSavings.Float32)
+		sumOfPvCo2Savings = utils.Diff(latestLog.PvCo2Savings.Float32, firstLogOfMonth.PvCo2Savings.Float32)
 	}
 	r.PvEnergyCostSavingsSum = int(sumOfPvEnergyCostSavings)
 	r.PvCo2SavingsSum = Float32Format(sumOfPvCo2Savings)
@@ -366,7 +372,7 @@ func (r *BatteryEnergyInfoResponse) GetBatteryInfo(gwUUID string) {
 	case CHTMiaoli:
 		r.Model = "L051100-A UZ-Energy Battery"
 		r.Capcity = 10
-		r.BatteryPower = 15
+		r.BatteryPower = 5
 		r.Voltage = 51.2
 	}
 	r.PowerSources = "Solar + Grid"
@@ -1086,7 +1092,7 @@ func (s defaultDevicesService) getRealtimeInfo(param *app.ZoomableParam, include
 			if includedComputedData {
 				firstRealtimeInfo := s.getFirstLogRealtimeInfo(param.GatewayUUID, startTimeIndex, endTimeIndex, param.Query.EndTime)
 				if firstRealtimeInfo != nil {
-					loadPvConsumedEnergyPercentAC := s.computeLoadPvConsumedEnergyPercentACValue(firstRealtimeInfo, latestRealtimeInfo)
+					loadPvConsumedEnergyPercentAC := s.computeLoadPvConsumedEnergyPercentACValue(latestRealtimeInfo)
 					realtimeInfo.LoadPvConsumedEnergyPercentACs = append(realtimeInfo.LoadPvConsumedEnergyPercentACs, loadPvConsumedEnergyPercentAC)
 				}
 			}
@@ -1136,24 +1142,12 @@ func (s defaultDevicesService) getRealtimeInfo(param *app.ZoomableParam, include
 	return
 }
 
-func (s defaultDevicesService) computeLoadPvConsumedEnergyPercentACValue(firstRealtimeInfo, latestRealtimeInfo *deremsmodels.CCDataLog) (loadPvConsumedEnergyPercentAC float32) {
-	pvProducedLifetimeEnergyACDiff := utils.Diff(latestRealtimeInfo.PvProducedLifetimeEnergyAC.Float32, firstRealtimeInfo.PvProducedLifetimeEnergyAC.Float32)
-	loadPvConsumedLifetimeEnergyACDiff := utils.Diff(latestRealtimeInfo.LoadPvConsumedLifetimeEnergyAC.Float32, firstRealtimeInfo.LoadPvConsumedLifetimeEnergyAC.Float32)
-	batteryPvConsumedLifetimeEnergyACDiff := utils.Diff(latestRealtimeInfo.BatteryPvConsumedLifetimeEnergyAC.Float32, firstRealtimeInfo.BatteryPvConsumedLifetimeEnergyAC.Float32)
-	gridPvConsumedLifetimeEnergyACDiff := utils.Diff(latestRealtimeInfo.GridPvConsumedLifetimeEnergyAC.Float32, firstRealtimeInfo.GridPvConsumedLifetimeEnergyAC.Float32)
-	// Avoid cc illegal value
-	pvProducedLifetimeEnergyACDiff = utils.GetZeroForNegativeValue(pvProducedLifetimeEnergyACDiff)
-	loadPvConsumedLifetimeEnergyACDiff = utils.GetZeroForNegativeValue(loadPvConsumedLifetimeEnergyACDiff)
-	batteryPvConsumedLifetimeEnergyACDiff = utils.GetZeroForNegativeValue(batteryPvConsumedLifetimeEnergyACDiff)
-	gridPvConsumedLifetimeEnergyACDiff = utils.GetZeroForNegativeValue(gridPvConsumedLifetimeEnergyACDiff)
-	// loadPvConsumedLifetimeEnergyACDiff is recomputed by PvProducedLifetimeEnergyACDiff
-	sumOfPvConsumedLifetimeEnergyAC := loadPvConsumedLifetimeEnergyACDiff + batteryPvConsumedLifetimeEnergyACDiff + gridPvConsumedLifetimeEnergyACDiff
-	if sumOfPvConsumedLifetimeEnergyAC != 0 {
-		loadPvConsumedLifetimeEnergyACDiff = utils.ThreeDecimalPlaces(pvProducedLifetimeEnergyACDiff * utils.Division(loadPvConsumedLifetimeEnergyACDiff, sumOfPvConsumedLifetimeEnergyAC))
-	}
+func (s defaultDevicesService) computeLoadPvConsumedEnergyPercentACValue(latestRealtimeInfo *deremsmodels.CCDataLog) (loadPvConsumedEnergyPercentAC float32) {
+	// Compute by power values
 	loadPvConsumedEnergyPercentAC = utils.Percent(
-		loadPvConsumedLifetimeEnergyACDiff,
-		pvProducedLifetimeEnergyACDiff)
+		latestRealtimeInfo.LoadPvAveragePowerAC.Float32,
+		latestRealtimeInfo.LoadPvAveragePowerAC.Float32+latestRealtimeInfo.BatteryPvAveragePowerAC.Float32+latestRealtimeInfo.GridPvAveragePowerAC.Float32)
+	loadPvConsumedEnergyPercentAC = float32(math.Abs(float64(loadPvConsumedEnergyPercentAC)))
 	return
 }
 

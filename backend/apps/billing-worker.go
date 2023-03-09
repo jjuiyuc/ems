@@ -81,7 +81,7 @@ func getGateways(repo *repository.Repository) (gateways []*deremsmodels.Gateway,
 }
 
 func generateBillingParams(repo *repository.Repository, billing services.BillingService, gateway *deremsmodels.Gateway, sendNow bool) (billingParamsJSON []byte, err error) {
-	billingType, err := billing.GetBillingTypeByLocationID(gateway.LocationID)
+	billingType, err := billing.GetBillingTypeByLocationID(gateway.LocationID.Int64)
 	if err != nil {
 		return
 	}

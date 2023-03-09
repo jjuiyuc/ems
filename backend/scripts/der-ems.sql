@@ -257,7 +257,7 @@ DROP TABLE IF EXISTS `gateway`;
 CREATE TABLE `gateway` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `uuid` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `location_id` bigint NOT NULL,
+  `location_id` bigint DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),

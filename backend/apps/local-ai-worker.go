@@ -108,7 +108,7 @@ func (h localAIConsumerHandler) saveLocalAIData(msg []byte) (err error) {
 	gateway, err := h.repo.Gateway.GetGatewayByGatewayUUID(gwUUID)
 	if err == nil {
 		aiData.GWID = null.NewInt64(gateway.ID, true)
-		aiData.LocationID = null.NewInt64(gateway.LocationID, true)
+		aiData.LocationID = gateway.LocationID
 	} else {
 		log.WithFields(log.Fields{
 			"caused-by": "h.repo.Gateway.GetGatewayByGatewayUUID",

@@ -36,5 +36,5 @@ var UtLocation = &deremsmodels.Location{
 var UtGateway = &deremsmodels.Gateway{
 	ID:         1,
 	UUID:       "0E0BA27A8175AF978C49396BDE9D7A1E",
-	LocationID: 1,
+	LocationID: null.NewInt64(1, true),
 }

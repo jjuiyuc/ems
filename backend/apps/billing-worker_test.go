@@ -60,7 +60,7 @@ func (s *BillingWorkerSuite) Test_GetBillingTypeByLocationID() {
 	testGateway := &deremsmodels.Gateway{
 		ID:         fixtures.UtGateway.ID,
 		UUID:       fixtures.UtGateway.UUID,
-		LocationID: fixtures.UtLocation.ID,
+		LocationID: fixtures.UtGateway.LocationID,
 	}
 	testBillingType := &services.BillingType{
 		TOULocationID: fixtures.UtLocation.TOULocationID.Int64,
@@ -84,7 +84,7 @@ func (s *BillingWorkerSuite) Test_GetBillingTypeByLocationID() {
 	s.Equalf(tt.wantRv.Gateway.ID, gateways[0].ID, e.ErrNewMessageNotEqual.Error())
 	s.Equalf(tt.wantRv.Gateway.UUID, gateways[0].UUID, e.ErrNewMessageNotEqual.Error())
 	s.Equalf(tt.wantRv.Gateway.LocationID, gateways[0].LocationID, e.ErrNewMessageNotEqual.Error())
-	billingType, err := s.billing.GetBillingTypeByLocationID(gateways[0].LocationID)
+	billingType, err := s.billing.GetBillingTypeByLocationID(gateways[0].LocationID.Int64)
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	s.Equalf(tt.wantRv.BillingType.TOULocationID, billingType.TOULocationID, e.ErrNewMessageNotEqual.Error())
 	s.Equalf(tt.wantRv.BillingType.VoltageType, billingType.VoltageType, e.ErrNewMessageNotEqual.Error())

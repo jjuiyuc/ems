@@ -109,7 +109,7 @@ func (h localCCConsumerHandler) saveLocalCCData(msg []byte) (err error) {
 	gateway, err := h.repo.Gateway.GetGatewayByGatewayUUID(gwUUID)
 	if err == nil {
 		ccData.GWID = null.NewInt64(gateway.ID, true)
-		ccData.LocationID = null.NewInt64(gateway.LocationID, true)
+		ccData.LocationID = gateway.LocationID
 	} else {
 		log.WithFields(log.Fields{
 			"caused-by": "h.repo.Gateway.GetGatewayByGatewayUUID",
@@ -156,7 +156,7 @@ func (h localCCConsumerHandler) saveLocalCCDataLog(msg []byte) (err error) {
 	gateway, err := h.repo.Gateway.GetGatewayByGatewayUUID(gwIDValue.(string))
 	if err == nil {
 		ccDataLog.GWID = null.NewInt64(gateway.ID, true)
-		ccDataLog.LocationID = null.NewInt64(gateway.LocationID, true)
+		ccDataLog.LocationID = gateway.LocationID
 	} else {
 		log.WithFields(log.Fields{
 			"caused-by": "h.repo.Gateway.GetGatewayByGatewayUUID",

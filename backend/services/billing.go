@@ -125,7 +125,7 @@ func (s defaultBillingService) GetTOUsOfLocalTime(gwUUID string, t time.Time) (l
 		}).Error()
 		return
 	}
-	billingType, err := s.GetBillingTypeByLocationID(gateway.LocationID)
+	billingType, err := s.GetBillingTypeByLocationID(gateway.LocationID.Int64)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "s.GetBillingTypeByLocationID",

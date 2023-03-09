@@ -330,7 +330,7 @@ func (locationL) LoadGateways(e boil.Executor, singular bool, maybeLocation inte
 			}
 
 			for _, a := range args {
-				if a == obj.ID {
+				if queries.Equal(a, obj.ID) {
 					continue Outer
 				}
 			}
@@ -381,7 +381,7 @@ func (locationL) LoadGateways(e boil.Executor, singular bool, maybeLocation inte
 
 	for _, foreign := range resultSlice {
 		for _, local := range slice {
-			if local.ID == foreign.LocationID {
+			if queries.Equal(local.ID, foreign.LocationID) {
 				local.R.Gateways = append(local.R.Gateways, foreign)
 				if foreign.R == nil {
 					foreign.R = &gatewayR{}
@@ -403,7 +403,7 @@ func (o *Location) AddGateways(exec boil.Executor, insert bool, related ...*Gate
 	var err error
 	for _, rel := range related {
 		if insert {
-			rel.LocationID = o.ID
+			queries.Assign(&rel.LocationID, o.ID)
 			if err = rel.Insert(exec, boil.Infer()); err != nil {
 				return errors.Wrap(err, "failed to insert into foreign table")
 			}
@@ -423,7 +423,7 @@ func (o *Location) AddGateways(exec boil.Executor, insert bool, related ...*Gate
 				return errors.Wrap(err, "failed to update foreign table")
 			}
 
-			rel.LocationID = o.ID
+			queries.Assign(&rel.LocationID, o.ID)
 		}
 	}
 
@@ -444,6 +444,79 @@ func (o *Location) AddGateways(exec boil.Executor, insert bool, related ...*Gate
 			rel.R.Location = o
 		}
 	}
+	return nil
+}
+
+// SetGateways removes all previously related items of the
+// location replacing them completely with the passed
+// in related items, optionally inserting them as new records.
+// Sets o.R.Location's Gateways accordingly.
+// Replaces o.R.Gateways with related.
+// Sets related.R.Location's Gateways accordingly.
+func (o *Location) SetGateways(exec boil.Executor, insert bool, related ...*Gateway) error {
+	query := "update `gateway` set `location_id` = null where `location_id` = ?"
+	values := []interface{}{o.ID}
+	if boil.DebugMode {
+		fmt.Fprintln(boil.DebugWriter, query)
+		fmt.Fprintln(boil.DebugWriter, values)
+	}
+	_, err := exec.Exec(query, values...)
+	if err != nil {
+		return errors.Wrap(err, "failed to remove relationships before set")
+	}
+
+	if o.R != nil {
+		for _, rel := range o.R.Gateways {
+			queries.SetScanner(&rel.LocationID, nil)
+			if rel.R == nil {
+				continue
+			}
+
+			rel.R.Location = nil
+		}
+		o.R.Gateways = nil
+	}
+
+	return o.AddGateways(exec, insert, related...)
+}
+
+// RemoveGateways relationships from objects passed in.
+// Removes related items from R.Gateways (uses pointer comparison, removal does not keep order)
+// Sets related.R.Location.
+func (o *Location) RemoveGateways(exec boil.Executor, related ...*Gateway) error {
+	if len(related) == 0 {
+		return nil
+	}
+
+	var err error
+	for _, rel := range related {
+		queries.SetScanner(&rel.LocationID, nil)
+		if rel.R != nil {
+			rel.R.Location = nil
+		}
+		if _, err = rel.Update(exec, boil.Whitelist("location_id")); err != nil {
+			return err
+		}
+	}
+	if o.R == nil {
+		return nil
+	}
+
+	for _, rel := range related {
+		for i, ri := range o.R.Gateways {
+			if rel != ri {
+				continue
+			}
+
+			ln := len(o.R.Gateways)
+			if ln > 1 && i < ln-1 {
+				o.R.Gateways[i] = o.R.Gateways[ln-1]
+			}
+			o.R.Gateways = o.R.Gateways[:ln-1]
+			break
+		}
+	}
+
 	return nil
 }
 

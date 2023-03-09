@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/friendsofgo/errors"
+	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
@@ -22,11 +23,11 @@ import (
 
 // Gateway is an object representing the database table.
 type Gateway struct {
-	ID         int64     `boil:"id" json:"id" toml:"id" yaml:"id"`
-	UUID       string    `boil:"uuid" json:"uuid" toml:"uuid" yaml:"uuid"`
-	LocationID int64     `boil:"location_id" json:"locationID" toml:"locationID" yaml:"locationID"`
-	CreatedAt  time.Time `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
-	UpdatedAt  time.Time `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
+	ID         int64      `boil:"id" json:"id" toml:"id" yaml:"id"`
+	UUID       string     `boil:"uuid" json:"uuid" toml:"uuid" yaml:"uuid"`
+	LocationID null.Int64 `boil:"location_id" json:"locationID,omitempty" toml:"locationID" yaml:"locationID,omitempty"`
+	CreatedAt  time.Time  `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
+	UpdatedAt  time.Time  `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
 
 	R *gatewayR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L gatewayL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -65,13 +66,13 @@ var GatewayTableColumns = struct {
 var GatewayWhere = struct {
 	ID         whereHelperint64
 	UUID       whereHelperstring
-	LocationID whereHelperint64
+	LocationID whereHelpernull_Int64
 	CreatedAt  whereHelpertime_Time
 	UpdatedAt  whereHelpertime_Time
 }{
 	ID:         whereHelperint64{field: "`gateway`.`id`"},
 	UUID:       whereHelperstring{field: "`gateway`.`uuid`"},
-	LocationID: whereHelperint64{field: "`gateway`.`location_id`"},
+	LocationID: whereHelpernull_Int64{field: "`gateway`.`location_id`"},
 	CreatedAt:  whereHelpertime_Time{field: "`gateway`.`created_at`"},
 	UpdatedAt:  whereHelpertime_Time{field: "`gateway`.`updated_at`"},
 }
@@ -278,7 +279,9 @@ func (gatewayL) LoadLocation(e boil.Executor, singular bool, maybeGateway interf
 		if object.R == nil {
 			object.R = &gatewayR{}
 		}
-		args = append(args, object.LocationID)
+		if !queries.IsNil(object.LocationID) {
+			args = append(args, object.LocationID)
+		}
 
 	} else {
 	Outer:
@@ -288,12 +291,14 @@ func (gatewayL) LoadLocation(e boil.Executor, singular bool, maybeGateway interf
 			}
 
 			for _, a := range args {
-				if a == obj.LocationID {
+				if queries.Equal(a, obj.LocationID) {
 					continue Outer
 				}
 			}
 
-			args = append(args, obj.LocationID)
+			if !queries.IsNil(obj.LocationID) {
+				args = append(args, obj.LocationID)
+			}
 
 		}
 	}
@@ -343,7 +348,7 @@ func (gatewayL) LoadLocation(e boil.Executor, singular bool, maybeGateway interf
 
 	for _, local := range slice {
 		for _, foreign := range resultSlice {
-			if local.LocationID == foreign.ID {
+			if queries.Equal(local.LocationID, foreign.ID) {
 				local.R.Location = foreign
 				if foreign.R == nil {
 					foreign.R = &locationR{}
@@ -565,7 +570,7 @@ func (o *Gateway) SetLocation(exec boil.Executor, insert bool, related *Location
 		return errors.Wrap(err, "failed to update local table")
 	}
 
-	o.LocationID = related.ID
+	queries.Assign(&o.LocationID, related.ID)
 	if o.R == nil {
 		o.R = &gatewayR{
 			Location: related,
@@ -582,6 +587,39 @@ func (o *Gateway) SetLocation(exec boil.Executor, insert bool, related *Location
 		related.R.Gateways = append(related.R.Gateways, o)
 	}
 
+	return nil
+}
+
+// RemoveLocation relationship.
+// Sets o.R.Location to nil.
+// Removes o from all passed in related items' relationships struct.
+func (o *Gateway) RemoveLocation(exec boil.Executor, related *Location) error {
+	var err error
+
+	queries.SetScanner(&o.LocationID, nil)
+	if _, err = o.Update(exec, boil.Whitelist("location_id")); err != nil {
+		return errors.Wrap(err, "failed to update local table")
+	}
+
+	if o.R != nil {
+		o.R.Location = nil
+	}
+	if related == nil || related.R == nil {
+		return nil
+	}
+
+	for i, ri := range related.R.Gateways {
+		if queries.Equal(o.LocationID, ri.LocationID) {
+			continue
+		}
+
+		ln := len(related.R.Gateways)
+		if ln > 1 && i < ln-1 {
+			related.R.Gateways[i] = related.R.Gateways[ln-1]
+		}
+		related.R.Gateways = related.R.Gateways[:ln-1]
+		break
+	}
 	return nil
 }
 

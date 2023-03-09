@@ -123,7 +123,7 @@ func (s defaultUserService) GetProfile(userID int64) (profile *ProfileResponse, 
 	gatewayInfos := []GatewayInfo{}
 	for _, gateway := range gateways {
 		log.Debug("gateway.UUID: ", gateway.UUID)
-		location, err := s.repo.Location.GetLocationByLocationID(gateway.LocationID)
+		location, err := s.repo.Location.GetLocationByLocationID(gateway.LocationID.Int64)
 		if err != nil {
 			log.WithFields(log.Fields{
 				"caused-by": "s.repo.Location.GetLocationByLocationID",

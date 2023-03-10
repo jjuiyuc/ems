@@ -45,6 +45,7 @@
         "main-opacity-10": "#12c9c910",
         "main-opacity-20": "#12c9c920",
         "main-opacity-30": "#12c9c930",
+        "main-opacity-90": "#12c9c990",
         "500": "#12c9c9",
         "600": "#10b5b5",
         "700": "#0e9797",
@@ -57,8 +58,7 @@
         "main-opacity-20": "#EF7BE320"
     },
     "red": {
-        "main":"#FD0060",
-        "600-opacity-50": "#DC262650"
+        "main":"#EC1F41"
     },
     "success": {"main": "#0FD76B"},
     "yellow": {

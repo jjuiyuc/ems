@@ -1,9 +1,12 @@
 {
     "accountManagementGroup":{
+        "groupName":"群組名稱",
+        "groupType":"群組類型"
 
     },
     "accountManagementUser":{
-
+        "account":"帳號",
+        "name":"名稱"
     },
     "analysis": {
         "accumulatedKwh": "累積電量 (kWh)",
@@ -32,8 +35,8 @@
         "YesterdayPowerkW":"昨日功率 (kW)"
     },
     "common": {
-        "accountManagementGroup":"帳號管理——群組",
-        "accountManagementUser":"帳號管理——使用者",
+        "accountManagementGroup":"帳號管理（群組）",
+        "accountManagementUser":"帳號管理（使用者）",
         "active": "已啟動",
         "add":"新增",
         "battery": "儲能電池",
@@ -45,6 +48,7 @@
         "demandCharge": "契約容量超約",
         "exportToGrid": "回送市電",
         "grid": "市電",
+        "group":"群組",
         "inactive":"未啟動",
         "kw": "kW",
         "kwh": "度",
@@ -72,6 +76,9 @@
         "noWebsocketSupport": "您的瀏覽器不支援 WebSocket",
         "solar":"由太陽能提供",
         "unableToConnect": "無法建立連線"
+    },
+    "dataTable":{
+        "noDataMsg":"No Data Message"
     },
     "demandCharge": {
         "chartError": "無法取得圖表資料",
@@ -106,7 +113,7 @@
         "monthlyStackedRevenue": "每月累積收入",
         "november": "十一月",
         "october": "十月",
-        "perviouWeek": "上週",
+        "perviousWeek": "上週",
         "perviousMonth": "上個月",
         "preUbiik":"傳統市電",
         "postUbiik":"優必闊微電網",
@@ -204,8 +211,8 @@
         "forgotPassword": "忘記密碼？"
     },
     "navigator": {
-        "accountManagementGroup":"帳號管理－群組",
-        "accountManagementUser":"帳號管理－使用者",
+        "accountManagementGroup":"帳號管理（群組）",
+        "accountManagementUser":"帳號管理（使用者）",
         "analysis": "電力分析",
         "dashboard": "儀表板",
         "demandCharge": "契約容量超約",

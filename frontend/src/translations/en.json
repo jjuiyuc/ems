@@ -1,9 +1,11 @@
 {
     "accountManagementGroup":{
-
+        "groupName":"Group Name",
+        "groupType":"Group Type"
     },
     "accountManagementUser":{
-
+        "account":"Account",
+        "name":"Name"
     },
     "analysis": {
         "accumulatedKwh": "Accumulated kWh",
@@ -45,6 +47,7 @@
         "dischargingTo": "Discharging To",
         "exportToGrid": "Export to Grid",
         "grid": "Grid",
+        "group":"Group",
         "inactive":"Inactive",
         "load": "Load",
         "logIn": "Log In",
@@ -72,6 +75,9 @@
         "noWebsocketSupport": "Your browser does not support WebSockets.",
         "solar":"Solar",
         "unableToConnect": "Unable to connect"
+    },
+    "dataTable":{
+        "noDataMsg":"No Data Message"
     },
     "demandCharge": {
         "chartError": "Can't get chart data",

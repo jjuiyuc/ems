@@ -24,6 +24,7 @@ const variables = {
         red
 
     },
+
     languages: {
         en: "English",
         zhtw: "中文"

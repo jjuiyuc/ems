@@ -1,15 +1,14 @@
 import { Button } from "@mui/material"
 import AddIcon from "@mui/icons-material/Add"
-import DataTable from "react-data-table-component"
 import moment from "moment"
 import { useTranslation } from "react-multi-lang"
 import { useEffect, useMemo, useState } from "react"
 
+import DialogForm from "../components/DialogForm"
 import Table from "../components/DataTable"
 
 import { ReactComponent as DeleteIcon } from "../assets/icons/trash_solid.svg"
 import { ReactComponent as EditIcon } from "../assets/icons/edit.svg"
-import { ReactComponent as NoticeIcon } from "../assets/icons/notice.svg"
 
 export default function AccountManagementGroup() {
     const
@@ -57,7 +56,15 @@ export default function AccountManagementGroup() {
         },
         {
             cell: row => <div className="flex w-28">
-                <NoticeIcon className="mr-5" />
+                <DialogForm
+                    type={"notice"}
+                    dialogTitle={commonT("group")}
+                    groupName={pageT("groupName")}
+                    groupType={pageT("groupType")}
+                    parentGroup={pageT("parentGroup")}
+                    fieldList={pageT("fieldList")}
+                    okayButton={commonT("okay")}
+                />
                 {row.groupType === "Area Owner"
                     ? null
                     : <>
@@ -71,17 +78,16 @@ export default function AccountManagementGroup() {
     return <>
         <h1 className="mb-9">{commonT("accountManagementGroup")}</h1>
         <div className="mb-9">
-            <Button
-                // onClick={}
-                key={"ac-b-"}
-                size="x-large"
-                variant="outlined"
-                radius="pill"
-                fontSize="large"
-                color="brand"
-                startIcon={<AddIcon />}>
-                {commonT("add")}
-            </Button>
+            <DialogForm
+                type={"addGroup"}
+                triggerName={commonT("add")}
+                dialogTitle={commonT("group")}
+                groupName={pageT("groupName")}
+                groupType={pageT("groupType")}
+                parentGroup={pageT("parentGroup")}
+                leftButtonName={commonT("cancel")}
+                rightButtonName={commonT("add")}
+            />
         </div>
         <Table
             {...{ columns, data }}

@@ -5,6 +5,7 @@ import moment from "moment"
 import { useTranslation } from "react-multi-lang"
 import { useEffect, useMemo, useState } from "react"
 
+import DialogForm from "../components/DialogForm"
 import Table from "../components/DataTable"
 
 import { ReactComponent as DeleteIcon } from "../assets/icons/trash_solid.svg"
@@ -78,16 +79,17 @@ export default function AccountManagementUser() {
     return <>
         <h1 className="mb-9">{commonT("accountManagementUser")}</h1>
         <div className="mb-9">
-            <Button
-                // onClick={}
-                key={"ac-b-"}
-                size="x-large"
-                variant="outlined"
-                radius="pill"
-                color="brand"
-                startIcon={<AddIcon />}>
-                {commonT("add")}
-            </Button>
+            <DialogForm
+                type={"addUser"}
+                triggerName={commonT("add")}
+                dialogTitle={pageT("user")}
+                account={pageT("account")}
+                password={pageT("password")}
+                name={pageT("name")}
+                group={commonT("group")}
+                leftButtonName={commonT("cancel")}
+                rightButtonName={commonT("add")}
+            />
         </div>
         <Table
             {...{ columns, data }}

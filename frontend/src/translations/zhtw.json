@@ -1,12 +1,15 @@
 {
     "accountManagementGroup":{
+        "fieldList":"場域列表",
         "groupName":"群組名稱",
-        "groupType":"群組類型"
-
+        "groupType":"群組類型",
+        "parentGroup":"父層群組"
     },
     "accountManagementUser":{
         "account":"帳號",
-        "name":"名稱"
+        "name":"名稱",
+        "password":"密碼",
+        "user":"使用者"
     },
     "analysis": {
         "accumulatedKwh": "累積電量 (kWh)",
@@ -41,6 +44,7 @@
         "add":"新增",
         "battery": "儲能電池",
         "batteryPower": "電池功率",
+        "cancel":"取消",
         "chargingFrom": "充電來源",
         "chargeFromGrid":"市電充電功率",
         "copyright": "© 2022 Ubiik Inc. All rights reserved",
@@ -55,6 +59,7 @@
         "load": "用電負載",
         "logIn": "登入",
         "logOut": "登出",
+        "okay":"Okay",
         "passwordRule": "密碼長度至少為 8 個字元，且必須包含下列 4 種字元中的 3 種：英文大寫字元、英文小寫字元、數字、特殊符號。",
         "peakShave": "電池削峰",
         "solar": "太陽能",
@@ -78,6 +83,7 @@
         "unableToConnect": "無法建立連線"
     },
     "dataTable":{
+        "group":"Group",
         "noDataMsg":"No Data Message"
     },
     "demandCharge": {
@@ -235,7 +241,6 @@
         "availableRegularUsage":"Available Regular Usage",
         "backupReserve":"Backup Reserve",
         "belowBaseline":"基本電價 ($/度)",
-        "cancel":"關閉",
         "chargingSources":"Charging Sources",
         "endDate": "結束日期",
         "endTime":"結束時間",

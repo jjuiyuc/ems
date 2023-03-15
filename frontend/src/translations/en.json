@@ -1,11 +1,15 @@
 {
     "accountManagementGroup":{
+        "fieldList":"Field List",
         "groupName":"Group Name",
-        "groupType":"Group Type"
+        "groupType":"Group Type",
+        "parentGroup":"Parent Group"
     },
     "accountManagementUser":{
         "account":"Account",
-        "name":"Name"
+        "name":"Name",
+        "password":"Password",
+        "user":"User"
     },
     "analysis": {
         "accumulatedKwh": "Accumulated kWh",
@@ -40,6 +44,7 @@
         "add":"Add",
         "battery": "Battery",
         "batteryPower": "Battery Power",
+        "cancel":"Cancel",
         "chargingFrom": "Charging From",
         "chargeFromGrid":"Charge from Grid",
         "copyright": "© 2022 Ubiik Inc. All rights reserved",
@@ -54,6 +59,7 @@
         "logOut": "Log Out",
         "kw": "kW",
         "kwh": "kWh",
+        "okay":"Okay",
         "passwordRule": "Password must be at least six characters long, and include 3 out of 4 of the following: uppercase letter, lowercase letter, numeric character and special character.",
         "peakShave": "Peak Shave",
         "solar": "Solar",
@@ -77,6 +83,7 @@
         "unableToConnect": "Unable to connect"
     },
     "dataTable":{
+        "group":"Group",
         "noDataMsg":"No Data Message"
     },
     "demandCharge": {

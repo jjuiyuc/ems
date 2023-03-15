@@ -39,7 +39,7 @@ export default function Settings(props) {
                 </div>
                 <DialogBox
                     triggerName={pageT("save")}
-                    leftButtonName={pageT("cancel")}
+                    leftButtonName={commonT("cancel")}
                     rightButtonName={pageT("turnOff")}
                 />
             </div>

@@ -1,6 +1,6 @@
 import {
     Button, Dialog, DialogTitle, DialogActions, FormControl,
-    InputLabel, InputAdornment, IconButton, List, ListItem, MenuItem,
+    InputLabel, InputAdornment, IconButton, ListItem, MenuItem,
     OutlinedInput, TextField
 } from "@mui/material"
 import AddIcon from "@mui/icons-material/Add"
@@ -277,40 +277,42 @@ export default function DialogForm({
                         <DialogTitle id="form-dialog-title">
                             {dialogTitle}
                         </DialogTitle>
-                        <List sx={{
-                            display: "flex",
-                            flexDirection: "column",
-                            margin: "auto",
-                            width: "fit-content",
-                            mt: 2,
-                            minWidth: 120
-                        }}>
-                            <ListItem
-                                id="name"
-                                label={groupName}
-                                required>
-                                Serenegray
-                            </ListItem>
-                            <ListItem
-                                id="group-type"
-                                label={groupType}
-                            >
-                                Field owner
-                            </ListItem>
-                            <ListItem
-                                id="parent-group-type"
-                                label={parentGroup}
-                            >
-                                AreaOwner_TW
-                            </ListItem>
-                            <ListItem
-                                id="field-list"
-                                label={fieldList}
-                            >
-                                Serenegray-0E0BA27A8175AF978C49396BDE9D7A1E
 
-                            </ListItem>
-                        </List>
+                        <div className="flex flex-col m-auto mt-4 min-w-49.5 w-fit">
+                            <div className="grid grid-cols-1fr-auto">
+                                <h5 className="ml-6 mt-2">{groupName} :</h5>
+                                <ListItem
+                                    id="name"
+                                    label={groupName}
+                                    required>
+                                    Serenegray
+                                </ListItem>
+                                <h5 className="ml-6 mt-2">{groupType} :</h5>
+                                <ListItem
+                                    id="group-type"
+                                    label={groupType}
+                                >
+                                    Field owner
+                                </ListItem>
+                                <h5 className="ml-6 mt-2">{parentGroup} :</h5>
+                                <ListItem
+                                    id="parent-group-type"
+                                    label={parentGroup}
+                                >
+                                    AreaOwner
+                                    _TW
+                                </ListItem>
+                                <h5 className="ml-6 mt-2">{fieldList} :</h5>
+                                <ListItem
+                                    id="field-list"
+                                    label={fieldList}
+                                >
+                                    Serenegray-0E0BA27A8175AF978C49396BDE9D7A1E
+                                </ListItem>
+                            </div>
+
+                        </div>
+
                         <DialogActions sx={{ margin: "1rem 0.5rem 1rem 0" }}>
                             <Button onClick={handleClose}
                                 radius="pill"

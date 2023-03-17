@@ -49,6 +49,7 @@
         "chargeFromGrid":"市電充電功率",
         "copyright": "© 2022 Ubiik Inc. All rights reserved",
         "dischargingTo": "電池放電至",
+        "delete":"刪除",
         "demandCharge": "契約容量超約",
         "exportToGrid": "回送市電",
         "grid": "市電",
@@ -62,6 +63,7 @@
         "okay":"Okay",
         "passwordRule": "密碼長度至少為 8 個字元，且必須包含下列 4 種字元中的 3 種：英文大寫字元、英文小寫字元、數字、特殊符號。",
         "peakShave": "電池削峰",
+        "save":"儲存",
         "solar": "太陽能",
         "sources":"供給",
         "stateOfCharge": "電池電量",
@@ -95,8 +97,17 @@
         "realizedSavings": "已避免超約費用"
     },
     "dialog": {
+        "account":"帳號",
         "confirmedMsg":"Are you sure you want to turn off all the charging resources?",
-        "promptMsg":"If all charging resources are turned off, the battery will be in standby mode."
+        "deleteMsg":"請問您是否要刪除這筆資料?",
+        "fieldList":"場域列表",
+        "groupName":"群組名稱",
+        "groupType":"群組類型",
+        "name":"名稱",
+        "parentGroup":"父層群組",
+        "password":"密碼",
+        "promptMsg":"If all charging resources are turned off, the battery will be in standby mode.",
+        "user":"使用者"
     },
     "economics": {
         "ancillaryServices": "輔助服務",
@@ -257,7 +268,6 @@
         "saturday":"週六",
         "startDate": "開始日期",
         "startTime":"開始時間",
-        "save":"儲存",
         "settings":"設定",
         "summerTariff":"夏季電價",
         "sundayHoliday":"週日 & 假日",

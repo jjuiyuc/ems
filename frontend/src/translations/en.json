@@ -48,6 +48,7 @@
         "chargingFrom": "Charging From",
         "chargeFromGrid":"Charge from Grid",
         "copyright": "© 2022 Ubiik Inc. All rights reserved",
+        "delete":"Delete",
         "demandCharge": "Demand Charge",
         "dischargingTo": "Discharging To",
         "exportToGrid": "Export to Grid",
@@ -62,6 +63,7 @@
         "okay":"Okay",
         "passwordRule": "Password must be at least six characters long, and include 3 out of 4 of the following: uppercase letter, lowercase letter, numeric character and special character.",
         "peakShave": "Peak Shave",
+        "save":"Save",
         "solar": "Solar",
         "sources":"Sources",
         "stateOfCharge": "State of Charge",
@@ -95,8 +97,17 @@
         "realizedSavings": "Realized Savings"
     },
     "dialog": {
+        "account":"Account",
         "confirmedMsg":"Are you sure you want to turn off all the charging resources?",
-        "promptMsg":"If all charging resources are turned off, the battery will be in standby mode."
+        "fieldList":"Field List",
+        "groupName":"Group Name",
+        "groupType":"Group Type",
+        "deleteMsg":"Are you sure you want to delete this?",
+        "name":"Name",
+        "parentGroup":"Parent Group",
+        "password":"Password",
+        "promptMsg":"If all charging resources are turned off, the battery will be in standby mode.",
+        "user":"User"
     },
     "economics": {
         "ancillaryServices": "Ancillary Services",

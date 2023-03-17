@@ -23,86 +23,86 @@ import (
 
 // GroupTypeWebpageRight is an object representing the database table.
 type GroupTypeWebpageRight struct {
-	ID        int64     `boil:"id" json:"id" toml:"id" yaml:"id"`
-	TypeID    int64     `boil:"type_id" json:"typeID" toml:"typeID" yaml:"typeID"`
-	WebpageID int64     `boil:"webpage_id" json:"webpageID" toml:"webpageID" yaml:"webpageID"`
-	View      null.Bool `boil:"view" json:"view,omitempty" toml:"view" yaml:"view,omitempty"`
-	Add       null.Bool `boil:"add" json:"add,omitempty" toml:"add" yaml:"add,omitempty"`
-	Edit      null.Bool `boil:"edit" json:"edit,omitempty" toml:"edit" yaml:"edit,omitempty"`
-	Delete    null.Bool `boil:"delete" json:"delete,omitempty" toml:"delete" yaml:"delete,omitempty"`
-	CreatedAt time.Time `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
-	UpdatedAt time.Time `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
+	ID         int64     `boil:"id" json:"id" toml:"id" yaml:"id"`
+	TypeID     int64     `boil:"type_id" json:"typeID" toml:"typeID" yaml:"typeID"`
+	WebpageID  int64     `boil:"webpage_id" json:"webpageID" toml:"webpageID" yaml:"webpageID"`
+	ViewData   null.Bool `boil:"view_data" json:"viewData,omitempty" toml:"viewData" yaml:"viewData,omitempty"`
+	AddData    null.Bool `boil:"add_data" json:"addData,omitempty" toml:"addData" yaml:"addData,omitempty"`
+	EditData   null.Bool `boil:"edit_data" json:"editData,omitempty" toml:"editData" yaml:"editData,omitempty"`
+	DeleteData null.Bool `boil:"delete_data" json:"deleteData,omitempty" toml:"deleteData" yaml:"deleteData,omitempty"`
+	CreatedAt  time.Time `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
+	UpdatedAt  time.Time `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
 
 	R *groupTypeWebpageRightR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L groupTypeWebpageRightL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var GroupTypeWebpageRightColumns = struct {
-	ID        string
-	TypeID    string
-	WebpageID string
-	View      string
-	Add       string
-	Edit      string
-	Delete    string
-	CreatedAt string
-	UpdatedAt string
+	ID         string
+	TypeID     string
+	WebpageID  string
+	ViewData   string
+	AddData    string
+	EditData   string
+	DeleteData string
+	CreatedAt  string
+	UpdatedAt  string
 }{
-	ID:        "id",
-	TypeID:    "type_id",
-	WebpageID: "webpage_id",
-	View:      "view",
-	Add:       "add",
-	Edit:      "edit",
-	Delete:    "delete",
-	CreatedAt: "created_at",
-	UpdatedAt: "updated_at",
+	ID:         "id",
+	TypeID:     "type_id",
+	WebpageID:  "webpage_id",
+	ViewData:   "view_data",
+	AddData:    "add_data",
+	EditData:   "edit_data",
+	DeleteData: "delete_data",
+	CreatedAt:  "created_at",
+	UpdatedAt:  "updated_at",
 }
 
 var GroupTypeWebpageRightTableColumns = struct {
-	ID        string
-	TypeID    string
-	WebpageID string
-	View      string
-	Add       string
-	Edit      string
-	Delete    string
-	CreatedAt string
-	UpdatedAt string
+	ID         string
+	TypeID     string
+	WebpageID  string
+	ViewData   string
+	AddData    string
+	EditData   string
+	DeleteData string
+	CreatedAt  string
+	UpdatedAt  string
 }{
-	ID:        "group_type_webpage_right.id",
-	TypeID:    "group_type_webpage_right.type_id",
-	WebpageID: "group_type_webpage_right.webpage_id",
-	View:      "group_type_webpage_right.view",
-	Add:       "group_type_webpage_right.add",
-	Edit:      "group_type_webpage_right.edit",
-	Delete:    "group_type_webpage_right.delete",
-	CreatedAt: "group_type_webpage_right.created_at",
-	UpdatedAt: "group_type_webpage_right.updated_at",
+	ID:         "group_type_webpage_right.id",
+	TypeID:     "group_type_webpage_right.type_id",
+	WebpageID:  "group_type_webpage_right.webpage_id",
+	ViewData:   "group_type_webpage_right.view_data",
+	AddData:    "group_type_webpage_right.add_data",
+	EditData:   "group_type_webpage_right.edit_data",
+	DeleteData: "group_type_webpage_right.delete_data",
+	CreatedAt:  "group_type_webpage_right.created_at",
+	UpdatedAt:  "group_type_webpage_right.updated_at",
 }
 
 // Generated where
 
 var GroupTypeWebpageRightWhere = struct {
-	ID        whereHelperint64
-	TypeID    whereHelperint64
-	WebpageID whereHelperint64
-	View      whereHelpernull_Bool
-	Add       whereHelpernull_Bool
-	Edit      whereHelpernull_Bool
-	Delete    whereHelpernull_Bool
-	CreatedAt whereHelpertime_Time
-	UpdatedAt whereHelpertime_Time
+	ID         whereHelperint64
+	TypeID     whereHelperint64
+	WebpageID  whereHelperint64
+	ViewData   whereHelpernull_Bool
+	AddData    whereHelpernull_Bool
+	EditData   whereHelpernull_Bool
+	DeleteData whereHelpernull_Bool
+	CreatedAt  whereHelpertime_Time
+	UpdatedAt  whereHelpertime_Time
 }{
-	ID:        whereHelperint64{field: "`group_type_webpage_right`.`id`"},
-	TypeID:    whereHelperint64{field: "`group_type_webpage_right`.`type_id`"},
-	WebpageID: whereHelperint64{field: "`group_type_webpage_right`.`webpage_id`"},
-	View:      whereHelpernull_Bool{field: "`group_type_webpage_right`.`view`"},
-	Add:       whereHelpernull_Bool{field: "`group_type_webpage_right`.`add`"},
-	Edit:      whereHelpernull_Bool{field: "`group_type_webpage_right`.`edit`"},
-	Delete:    whereHelpernull_Bool{field: "`group_type_webpage_right`.`delete`"},
-	CreatedAt: whereHelpertime_Time{field: "`group_type_webpage_right`.`created_at`"},
-	UpdatedAt: whereHelpertime_Time{field: "`group_type_webpage_right`.`updated_at`"},
+	ID:         whereHelperint64{field: "`group_type_webpage_right`.`id`"},
+	TypeID:     whereHelperint64{field: "`group_type_webpage_right`.`type_id`"},
+	WebpageID:  whereHelperint64{field: "`group_type_webpage_right`.`webpage_id`"},
+	ViewData:   whereHelpernull_Bool{field: "`group_type_webpage_right`.`view_data`"},
+	AddData:    whereHelpernull_Bool{field: "`group_type_webpage_right`.`add_data`"},
+	EditData:   whereHelpernull_Bool{field: "`group_type_webpage_right`.`edit_data`"},
+	DeleteData: whereHelpernull_Bool{field: "`group_type_webpage_right`.`delete_data`"},
+	CreatedAt:  whereHelpertime_Time{field: "`group_type_webpage_right`.`created_at`"},
+	UpdatedAt:  whereHelpertime_Time{field: "`group_type_webpage_right`.`updated_at`"},
 }
 
 // GroupTypeWebpageRightRels is where relationship names are stored.
@@ -143,8 +143,8 @@ func (r *groupTypeWebpageRightR) GetWebpage() *Webpage {
 type groupTypeWebpageRightL struct{}
 
 var (
-	groupTypeWebpageRightAllColumns            = []string{"id", "type_id", "webpage_id", "view", "add", "edit", "delete", "created_at", "updated_at"}
-	groupTypeWebpageRightColumnsWithoutDefault = []string{"type_id", "webpage_id", "view", "add", "edit", "delete"}
+	groupTypeWebpageRightAllColumns            = []string{"id", "type_id", "webpage_id", "view_data", "add_data", "edit_data", "delete_data", "created_at", "updated_at"}
+	groupTypeWebpageRightColumnsWithoutDefault = []string{"type_id", "webpage_id", "view_data", "add_data", "edit_data", "delete_data"}
 	groupTypeWebpageRightColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	groupTypeWebpageRightPrimaryKeyColumns     = []string{"id"}
 	groupTypeWebpageRightGeneratedColumns      = []string{}

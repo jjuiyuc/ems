@@ -26,7 +26,8 @@
         "YesterdayPowerkW":"昨日功率 (kW)"
     },
     "common": {
-        "active": "已動",
+        "account":"帳號",
+        "active": "已啟動",
         "battery": "儲能電池",
         "batteryPower": "電池功率",
         "chargingFrom": "充電來源",

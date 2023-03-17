@@ -26,6 +26,7 @@
         "YesterdayPowerkW":"Yesterday Power (kW)"
     },
     "common": {
+        "account":"Account",
         "active": "Active",
         "battery": "Battery",
         "batteryPower": "Battery Power",

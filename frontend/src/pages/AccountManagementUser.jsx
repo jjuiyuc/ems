@@ -1,5 +1,3 @@
-import { Button } from "@mui/material"
-import AddIcon from "@mui/icons-material/Add"
 import DataTable from "react-data-table-component"
 import moment from "moment"
 import { useTranslation } from "react-multi-lang"
@@ -8,8 +6,6 @@ import { useEffect, useMemo, useState } from "react"
 import DialogBox from "../components/DialogBox"
 import DialogForm from "../components/DialogForm"
 import Table from "../components/DataTable"
-
-import { ReactComponent as DeleteIcon } from "../assets/icons/trash_solid.svg"
 
 export default function AccountManagementUser() {
     const

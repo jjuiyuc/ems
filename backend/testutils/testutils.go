@@ -60,6 +60,7 @@ func SeedUtUser(db *sql.DB) (err error) {
 	}
 	user := &deremsmodels.User{
 		Username:       fixtures.UtUser.Username,
+		GroupID:        fixtures.UtUser.GroupID,
 		Password:       string(hashPassword[:]),
 		ExpirationDate: fixtures.UtUser.ExpirationDate,
 	}

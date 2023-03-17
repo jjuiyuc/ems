@@ -2,7 +2,10 @@ import { Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogAc
 import { useState } from "react"
 import { useTranslation } from "react-multi-lang"
 
+import { ReactComponent as DeleteIcon } from "../assets/icons/trash_solid.svg"
+
 export default function DialogBox({
+    type = "",
     triggerName = "",
     leftButtonName = "",
     rightButtonName = "",
@@ -11,16 +14,51 @@ export default function DialogBox({
     const t = useTranslation(),
         dialogT = (string) => t("dialog." + string)
 
-    const [open, setOpen] = useState(false)
+    const [open, setOpen] = useState(false),
+        [fullWidth, setFullWidth] = useState(true),
+        [maxWidth, setMaxWidth] = useState("sm")
 
-    const handleClickOpen = () => {
-        setOpen(true)
-    }
-    const handleClose = () => {
-        setOpen(false)
-    }
-    return (
-        <>
+    const
+        handleClickOpen = () => {
+            setOpen(true)
+        },
+        handleClose = () => {
+            setOpen(false)
+        }
+    return <> {type === "delete"
+        ? <>
+            <div>
+                <DeleteIcon onClick={handleClickOpen} />
+                <Dialog
+                    fullWidth={fullWidth}
+                    maxWidth={maxWidth}
+                    open={open}
+                    onClose={closeOutside ? handleClose : () => { }}
+                >
+                    <div className="flex flex-col w-fit mx-2">
+                        <DialogTitle id="delete-dialog-title">
+                            {dialogT("deleteMsg")}
+                        </DialogTitle>
+                    </div>
+                    <DialogActions sx={{ margin: "0.5rem 0.5rem 0.5rem 0" }}>
+                        <Button onClick={handleClose}
+                            radius="pill"
+                            variant="outlined"
+                            color="gray">
+                            {leftButtonName}
+                        </Button>
+                        <Button onClick={handleClose} autoFocus
+                            radius="pill"
+                            variant="contained"
+                            color="negative"
+                            sx={{ color: "#ffffff" }}>
+                            {rightButtonName}
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            </div>
+        </>
+        : <>
             <div>
                 <Button
                     key={"s-b-"}
@@ -60,5 +98,6 @@ export default function DialogBox({
                 </Dialog>
             </div>
         </>
-    )
+    }
+    </>
 }

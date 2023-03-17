@@ -10,34 +10,48 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff"
 import { useState } from "react"
 import { useTranslation } from "react-multi-lang"
 
+import { ValidateEmail } from "../utils/utils"
+
+import { ReactComponent as EditIcon } from "../assets/icons/edit.svg"
 import { ReactComponent as NoticeIcon } from "../assets/icons/notice.svg"
 
 export default function DialogForm({
-    addType = "",
     type = "",
     triggerName = "",
     dialogTitle = "",
-    groupName = "",
-    groupType = "",
-    parentGroup = "",
-    account = "",
-    password = "",
-    name = "",
-    group = "",
-    fieldList = "",
     leftButtonName = "",
     rightButtonName = "",
     okayButton = "",
     closeOutside = false
 }) {
     const t = useTranslation(),
-        dialog = (string) => t("dialog." + string)
+        commonT = string => t("common." + string),
+        dialogT = (string) => t("dialog." + string),
+        errorT = (string) => t("error." + string)
 
     const
         [open, setOpen] = useState(false),
         [fullWidth, setFullWidth] = useState(true),
         [maxWidth, setMaxWidth] = useState("sm"),
-        [showPassword, setShowPassword] = useState(false)
+        [groupName, setGroupName] = useState(""),
+        [groupNameError, setGroupNameError] = useState(null),
+        [groupType, setGroupType] = useState(""),
+        [groupTypeError, setGroupTypeError] = useState(null),
+        [parentGroup, setParentGroup] = useState(""),
+        [parentGroupError, setParentGroupError] = useState(null),
+        [account, setAccount] = useState(""),
+        [accountError, setAccountError] = useState(null),
+        [password, setPassword] = useState(""),
+        [passwordError, setPasswordError] = useState(false),
+        [showPassword, setShowPassword] = useState(false),
+        [name, setName] = useState(""),
+        [nameError, setNameError] = useState(null),
+        [group, setGroup] = useState(""),
+        [groupError, setGroupError] = useState(null),
+        [fieldList, setFieldList] = useState(""),
+        [fieldListError, setFieldListError] = useState(null),
+        [otherError, setOtherError] = useState(""),
+        [defaultValue, setDefaultValue] = useState("KKK")
 
     const
         handleClickOpen = () => {
@@ -45,11 +59,47 @@ export default function DialogForm({
         },
         handleClose = () => {
             setOpen(false)
-        }
-    const
+        },
         handleClickShowPassword = () => setShowPassword((show) => !show),
         handleMouseDownPassword = (event) => {
-            event.preventDefault();
+            event.preventDefault()
+        },
+        handleChange = (e) => {
+            setDefaultValue(e.target.value)
+        }
+    const
+        changeAccount = (e) => {
+            setAccount(e.target.value)
+            setAccountError(null)
+            setOtherError("")
+        },
+        changePassword = (e) => {
+            setPassword(e.target.value)
+            setPasswordError(false)
+            setOtherError("")
+        },
+        submit = async () => {
+            const isEmail = ValidateEmail(email)
+
+            if (!isEmail) {
+                setEmailError({ type: "emailFormat" })
+                return
+            }
+
+            const onError = (err) => {
+                switch (err) {
+                    case 20004:
+                        setEmailError({ type: "emailNotExist" })
+                        break
+                    case 20006:
+                        setEmailError({ type: "userLocked" })
+                        break
+                    case 20007:
+                        setPasswordError(true)
+                        break
+                    default: setOtherError(err)
+                }
+            }
         }
     const typeGroup = [
         {
@@ -119,15 +169,13 @@ export default function DialogForm({
                         }}>
                             <TextField
                                 id="add-name"
-                                label={groupName}
+                                label={dialogT("groupName")}
                                 focused
-                                required
                             />
                             <TextField
                                 id="add-type"
                                 select
-                                label={groupType}
-                                required
+                                label={dialogT("groupType")}
                             >
                                 {typeGroup.map((option) => (
                                     <MenuItem key={option.value} value={option.value}>
@@ -138,8 +186,7 @@ export default function DialogForm({
                             <TextField
                                 id="add-parent-group-type"
                                 select
-                                label={parentGroup}
-                                required
+                                label={dialogT("parentGroup")}
                             >
                                 {parentGroupType.map((option) => (
                                     <MenuItem key={option.value} value={option.value}>
@@ -199,13 +246,16 @@ export default function DialogForm({
                         }}>
                             <TextField
                                 id="add-account"
-                                label={account}
-                                focused
-                                required />
+                                label={dialogT("account")}
+                                onChange={changeAccount}
+                                error={accountError !== null}
+                                helperText={accountError ? errorT(accountError.type) : ""}
+                                type="email"
+                                focused />
                             <FormControl sx={{ mb: "2rem", minWidth: 120 }} variant="outlined">
-                                <InputLabel htmlFor="outlined-adornment-password">{password}</InputLabel>
+                                <InputLabel htmlFor="outlined-adornment-password">{dialogT("password")}</InputLabel>
                                 <OutlinedInput
-                                    id="outlined-adornment-password"
+                                    id="add-password"
                                     type={showPassword ? "text" : "password"}
                                     endAdornment={
                                         <InputAdornment position="end">
@@ -222,20 +272,20 @@ export default function DialogForm({
                                             </IconButton>
                                         </InputAdornment>
                                     }
-                                    label={password}
+                                    label={dialogT("password")}
                                     autoComplete="current-password"
-                                    required
                                 />
                             </FormControl>
                             <TextField
                                 id="add-name"
-                                label={name}
-                                required
-                            />
+                                label={dialogT("name")}>
+
+                            </TextField>
                             <TextField
                                 id="add-group"
                                 select
-                                label={group}
+                                onChange={handleChange}
+                                label={commonT("group")}
                             >
                                 {groupData.map((option) => (
                                     <MenuItem key={option.value} value={option.value}>
@@ -280,45 +330,179 @@ export default function DialogForm({
 
                         <div className="flex flex-col m-auto mt-4 min-w-49.5 w-fit">
                             <div className="grid grid-cols-1fr-auto">
-                                <h5 className="ml-6 mt-2">{groupName} :</h5>
+                                <h5 className="ml-6 mt-2">{dialogT("groupName")} :</h5>
                                 <ListItem
                                     id="name"
-                                    label={groupName}
-                                    required>
+                                    label={dialogT("groupName")}>
                                     Serenegray
                                 </ListItem>
-                                <h5 className="ml-6 mt-2">{groupType} :</h5>
+                                <h5 className="ml-6 mt-2">{dialogT("groupType")} :</h5>
                                 <ListItem
                                     id="group-type"
-                                    label={groupType}
+                                    label={dialogT("groupType")}
                                 >
                                     Field owner
                                 </ListItem>
-                                <h5 className="ml-6 mt-2">{parentGroup} :</h5>
+                                <h5 className="ml-6 mt-2">{dialogT("parentGroup")} :</h5>
                                 <ListItem
                                     id="parent-group-type"
-                                    label={parentGroup}
+                                    label={dialogT("parentGroup")}
                                 >
-                                    AreaOwner
-                                    _TW
+                                    AreaOwner_TW
                                 </ListItem>
-                                <h5 className="ml-6 mt-2">{fieldList} :</h5>
+                                <h5 className="ml-6 mt-2">{dialogT("fieldList")} :</h5>
                                 <ListItem
                                     id="field-list"
-                                    label={fieldList}
+                                    label={dialogT("fieldList")}
                                 >
                                     Serenegray-0E0BA27A8175AF978C49396BDE9D7A1E
                                 </ListItem>
                             </div>
-
                         </div>
-
                         <DialogActions sx={{ margin: "1rem 0.5rem 1rem 0" }}>
                             <Button onClick={handleClose}
                                 radius="pill"
                                 variant="contained"
                                 color="primary">
                                 {okayButton}
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
+                </div>
+            </>
+            : null}
+        {type === "editGroup"
+            ? <>
+                <div>
+                    <EditIcon className="mr-5" onClick={handleClickOpen} />
+                    <Dialog
+                        fullWidth={fullWidth}
+                        maxWidth={maxWidth}
+                        open={open}
+                        onClose={handleClose}
+                    >
+                        <DialogTitle id="form-dialog-title">
+                            {dialogTitle}
+                        </DialogTitle>
+                        <FormControl sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            margin: "auto",
+                            width: "fit-content",
+                            mt: 2,
+                            minWidth: 120
+                        }}>
+                            <TextField
+                                id="edit-name"
+                                label={dialogT("groupName")}
+                                onChange={handleChange}
+                                focused>
+                                {defaultValue}
+                            </TextField>
+                        </FormControl>
+                        <DialogActions sx={{ margin: "1rem 0.5rem 1rem 0" }}>
+                            <Button onClick={handleClose}
+                                radius="pill"
+                                variant="outlined"
+                                color="gray">
+                                {leftButtonName}
+                            </Button>
+                            <Button onClick={handleClose}
+                                radius="pill"
+                                variant="contained"
+                                color="primary">
+                                {rightButtonName}
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
+                </div>
+            </>
+            : null}
+        {type === "editUser"
+            ? <>
+                <div>
+                    <EditIcon className="mr-5" onClick={handleClickOpen} />
+                    <Dialog
+                        fullWidth={fullWidth}
+                        maxWidth={maxWidth}
+                        open={open}
+                        onClose={handleClose}
+                    >
+                        <DialogTitle id="form-dialog-title">
+                            {dialogTitle}
+                        </DialogTitle>
+                        <FormControl sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            margin: "auto",
+                            width: "fit-content",
+                            mt: "1rem",
+                            minWidth: 120
+                        }}>
+                            <TextField
+                                id="edit-account"
+                                label={dialogT("account")}
+                                onChange={changeAccount}
+                                error={accountError !== null}
+                                helperText={accountError ? errorT(accountError.type) : ""}
+                                type="email"
+                                focused />
+                            <FormControl sx={{ mb: "2rem", minWidth: 120 }} variant="outlined">
+                                <InputLabel htmlFor="outlined-adornment-password">
+                                    {dialogT("password")}
+                                </InputLabel>
+                                <OutlinedInput
+                                    id="edit-password"
+                                    type={showPassword ? "text" : "password"}
+                                    endAdornment={
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                aria-label="toggle password visibility"
+                                                onClick={handleClickShowPassword}
+                                                onMouseDown={handleMouseDownPassword}
+                                                edge="end"
+                                            >
+                                                {showPassword
+                                                    ? <Visibility />
+                                                    : <VisibilityOff />
+                                                }
+                                            </IconButton>
+                                        </InputAdornment>
+                                    }
+                                    label={dialogT("password")}
+                                    onChange={handleChange}
+                                    autoComplete="current-password"
+                                />
+                            </FormControl>
+                            <TextField
+                                id="edit-name"
+                                label={dialogT("name")}
+                            />
+                            <TextField
+                                id="edit-group"
+                                select
+                                label={commonT("group")}
+                                onChange={handleChange}
+                            >
+                                {groupData.map((option) => (
+                                    <MenuItem key={option.value} value={option.value}>
+                                        {option.label}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        </FormControl>
+                        <DialogActions sx={{ margin: "1rem 0.5rem 1rem 0" }}>
+                            <Button onClick={handleClose}
+                                radius="pill"
+                                variant="outlined"
+                                color="gray">
+                                {leftButtonName}
+                            </Button>
+                            <Button onClick={handleClose}
+                                radius="pill"
+                                variant="contained"
+                                color="primary">
+                                {rightButtonName}
                             </Button>
                         </DialogActions>
                     </Dialog>

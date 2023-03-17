@@ -5,11 +5,11 @@ import moment from "moment"
 import { useTranslation } from "react-multi-lang"
 import { useEffect, useMemo, useState } from "react"
 
+import DialogBox from "../components/DialogBox"
 import DialogForm from "../components/DialogForm"
 import Table from "../components/DataTable"
 
 import { ReactComponent as DeleteIcon } from "../assets/icons/trash_solid.svg"
-import { ReactComponent as EditIcon } from "../assets/icons/edit.svg"
 
 export default function AccountManagementUser() {
     const
@@ -67,10 +67,19 @@ export default function AccountManagementUser() {
         },
         {
             cell: row => <div className="flex w-28">
-                <EditIcon className="mr-5" />
+                <DialogForm
+                    type={"editUser"}
+                    dialogTitle={pageT("user")}
+                    leftButtonName={commonT("cancel")}
+                    rightButtonName={commonT("save")}
+                />
                 {row.group === "Area Owner_TW"
                     ? null
-                    : <DeleteIcon />
+                    : <DialogBox
+                        type={"delete"}
+                        leftButtonName={commonT("cancel")}
+                        rightButtonName={commonT("delete")}
+                    />
                 }
             </div>,
             center: true,
@@ -83,10 +92,6 @@ export default function AccountManagementUser() {
                 type={"addUser"}
                 triggerName={commonT("add")}
                 dialogTitle={pageT("user")}
-                account={pageT("account")}
-                password={pageT("password")}
-                name={pageT("name")}
-                group={commonT("group")}
                 leftButtonName={commonT("cancel")}
                 rightButtonName={commonT("add")}
             />

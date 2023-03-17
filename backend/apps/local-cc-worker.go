@@ -109,7 +109,7 @@ func (h localCCConsumerHandler) saveLocalCCData(msg []byte) (err error) {
 	gateway, err := h.repo.Gateway.GetGatewayByGatewayUUID(gwUUID)
 	if err == nil {
 		ccData.GWID = null.NewInt64(gateway.ID, true)
-		ccData.CustomerID = null.NewInt64(gateway.CustomerID, true)
+		ccData.LocationID = gateway.LocationID
 	} else {
 		log.WithFields(log.Fields{
 			"caused-by": "h.repo.Gateway.GetGatewayByGatewayUUID",
@@ -120,7 +120,7 @@ func (h localCCConsumerHandler) saveLocalCCData(msg []byte) (err error) {
 	log.WithFields(log.Fields{
 		deremsmodels.CCDatumColumns.GWUUID:      ccData.GWUUID,
 		deremsmodels.CCDatumColumns.LogDate:     ccData.LogDate,
-		deremsmodels.CCDatumColumns.CustomerID:  ccData.CustomerID,
+		deremsmodels.CCDatumColumns.LocationID:  ccData.LocationID,
 		deremsmodels.CCDatumColumns.LocalCCData: string(ccData.LocalCCData.JSON),
 	}).Debug("upsert local CC data")
 	err = h.repo.CCData.UpsertCCData(ccData)
@@ -156,7 +156,7 @@ func (h localCCConsumerHandler) saveLocalCCDataLog(msg []byte) (err error) {
 	gateway, err := h.repo.Gateway.GetGatewayByGatewayUUID(gwIDValue.(string))
 	if err == nil {
 		ccDataLog.GWID = null.NewInt64(gateway.ID, true)
-		ccDataLog.CustomerID = null.NewInt64(gateway.CustomerID, true)
+		ccDataLog.LocationID = gateway.LocationID
 	} else {
 		log.WithFields(log.Fields{
 			"caused-by": "h.repo.Gateway.GetGatewayByGatewayUUID",

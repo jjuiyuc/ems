@@ -51,7 +51,7 @@ func (s *WeatherWorkerSuite) SetupSuite() {
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	_, err = db.Exec("TRUNCATE TABLE gateway")
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
-	_, err = db.Exec("TRUNCATE TABLE customer")
+	_, err = db.Exec("TRUNCATE TABLE location")
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	_, err = db.Exec("SET FOREIGN_KEY_CHECKS = 1")
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
@@ -98,9 +98,9 @@ func (s *WeatherWorkerSuite) SetupSuite() {
 	seedUtValue2["validDate"] = s.seedUtTime.Add(+15 * time.Minute).Format(time.RFC3339)
 	s.seedUtWeather.Values = append(s.seedUtWeather.Values, seedUtValue2)
 
-	// Mock customer table
+	// Mock location table
 	_, err = db.Exec(`
-		INSERT INTO customer (id,customer_number,field_number,weather_lat,weather_lng) VALUES
+		INSERT INTO location (id,customer_number,field_number,weather_lat,weather_lng) VALUES
 		(1,'00001','001',24.75,121.75),
 		(2,'00001','002',24.75,121.75),
 		(3,'00002','001',24.75,121.75);
@@ -109,7 +109,7 @@ func (s *WeatherWorkerSuite) SetupSuite() {
 
 	// Mock gateway table
 	_, err = db.Exec(`
-		INSERT INTO gateway (id,uuid,customer_id) VALUES
+		INSERT INTO gateway (id,uuid,location_id) VALUES
 		(1,'U00001',1),
 		(2,'U00002',1),
 		(3,'U00003',2),

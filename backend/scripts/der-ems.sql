@@ -27,7 +27,7 @@ CREATE TABLE `ai_data` (
   `gw_uuid` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `log_date` datetime NOT NULL,
   `gw_id` bigint DEFAULT NULL,
-  `customer_id` bigint DEFAULT NULL,
+  `location_id` bigint DEFAULT NULL,
   `local_ai_data` json DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -48,7 +48,7 @@ CREATE TABLE `cc_data` (
   `gw_uuid` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `log_date` datetime NOT NULL,
   `gw_id` bigint DEFAULT NULL,
-  `customer_id` bigint DEFAULT NULL,
+  `location_id` bigint DEFAULT NULL,
   `local_cc_data` json DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -69,7 +69,7 @@ CREATE TABLE `cc_data_log` (
   `gw_uuid` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `log_date` datetime NOT NULL,
   `gw_id` bigint DEFAULT NULL,
-  `customer_id` bigint DEFAULT NULL,
+  `location_id` bigint DEFAULT NULL,
   `grid_is_peak_shaving` int DEFAULT NULL,
   `load_grid_average_power_ac` float DEFAULT NULL,
   `battery_grid_average_power_ac` float DEFAULT NULL,
@@ -132,7 +132,7 @@ CREATE TABLE `cc_data_log_calculated_daily` (
   `gw_uuid` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `latest_log_date` datetime NOT NULL,
   `gw_id` bigint DEFAULT NULL,
-  `customer_id` bigint DEFAULT NULL,
+  `location_id` bigint DEFAULT NULL,
   `pv_produced_lifetime_energy_ac_diff` float DEFAULT NULL,
   `load_consumed_lifetime_energy_ac_diff` float DEFAULT NULL,
   `battery_lifetime_energy_ac_diff` float DEFAULT NULL,
@@ -163,7 +163,7 @@ CREATE TABLE `cc_data_log_calculated_monthly` (
   `gw_uuid` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `latest_log_date` datetime NOT NULL,
   `gw_id` bigint DEFAULT NULL,
-  `customer_id` bigint DEFAULT NULL,
+  `location_id` bigint DEFAULT NULL,
   `pv_produced_lifetime_energy_ac_diff` float DEFAULT NULL,
   `load_consumed_lifetime_energy_ac_diff` float DEFAULT NULL,
   `battery_lifetime_energy_ac_diff` float DEFAULT NULL,
@@ -177,13 +177,13 @@ CREATE TABLE `cc_data_log_calculated_monthly` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `customer`
+-- Table structure for table `location`
 --
 
-DROP TABLE IF EXISTS `customer`;
+DROP TABLE IF EXISTS `location`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `customer` (
+CREATE TABLE `location` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `customer_number` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `field_number` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -257,13 +257,13 @@ DROP TABLE IF EXISTS `gateway`;
 CREATE TABLE `gateway` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `uuid` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `customer_id` bigint NOT NULL,
+  `location_id` bigint DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uuid_UNIQUE` (`uuid`),
-  KEY `gateway_customer_id_customer_id_foreign` (`customer_id`),
-  CONSTRAINT `gateway_customer_id_customer_id_foreign` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+  KEY `gateway_location_id_location_id_foreign` (`location_id`),
+  CONSTRAINT `gateway_location_id_location_id_foreign` FOREIGN KEY (`location_id`) REFERENCES `location` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

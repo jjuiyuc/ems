@@ -16,8 +16,8 @@ var UtUser = &deremsmodels.User{
 	ExpirationDate: null.NewTime(time.Date(2100, 1, 1, 0, 0, 0, 0, time.UTC), true),
 }
 
-// UtCustomer godoc
-var UtCustomer = &deremsmodels.Customer{
+// UtLocation godoc
+var UtLocation = &deremsmodels.Location{
 	ID:             1,
 	CustomerNumber: "00001",
 	FieldNumber:    "001",
@@ -36,5 +36,5 @@ var UtCustomer = &deremsmodels.Customer{
 var UtGateway = &deremsmodels.Gateway{
 	ID:         1,
 	UUID:       "0E0BA27A8175AF978C49396BDE9D7A1E",
-	CustomerID: 1,
+	LocationID: null.NewInt64(1, true),
 }

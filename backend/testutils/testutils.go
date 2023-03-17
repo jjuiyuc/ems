@@ -67,8 +67,8 @@ func SeedUtUser(db *sql.DB) (err error) {
 	return
 }
 
-// SeedUtCustomerAndGateway godoc
-func SeedUtCustomerAndGateway(db *sql.DB) (err error) {
+// SeedUtLocationAndGateway godoc
+func SeedUtLocationAndGateway(db *sql.DB) (err error) {
 	_, err = db.Exec("SET FOREIGN_KEY_CHECKS = 0")
 	if err != nil {
 		return
@@ -77,7 +77,7 @@ func SeedUtCustomerAndGateway(db *sql.DB) (err error) {
 	if err != nil {
 		return
 	}
-	_, err = db.Exec("truncate table customer")
+	_, err = db.Exec("truncate table location")
 	if err != nil {
 		return
 	}
@@ -85,8 +85,8 @@ func SeedUtCustomerAndGateway(db *sql.DB) (err error) {
 	if err != nil {
 		return
 	}
-	customer := fixtures.UtCustomer
-	err = customer.Insert(db, boil.Infer())
+	location := fixtures.UtLocation
+	err = location.Insert(db, boil.Infer())
 	if err != nil {
 		return
 	}

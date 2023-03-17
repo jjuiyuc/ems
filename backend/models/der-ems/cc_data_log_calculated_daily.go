@@ -27,7 +27,7 @@ type CCDataLogCalculatedDaily struct {
 	GWUUID                           string       `boil:"gw_uuid" json:"gwUUID" toml:"gwUUID" yaml:"gwUUID"`
 	LatestLogDate                    time.Time    `boil:"latest_log_date" json:"latestLogDate" toml:"latestLogDate" yaml:"latestLogDate"`
 	GWID                             null.Int64   `boil:"gw_id" json:"gwID,omitempty" toml:"gwID" yaml:"gwID,omitempty"`
-	CustomerID                       null.Int64   `boil:"customer_id" json:"customerID,omitempty" toml:"customerID" yaml:"customerID,omitempty"`
+	LocationID                       null.Int64   `boil:"location_id" json:"locationID,omitempty" toml:"locationID" yaml:"locationID,omitempty"`
 	PvProducedLifetimeEnergyACDiff   null.Float32 `boil:"pv_produced_lifetime_energy_ac_diff" json:"pvProducedLifetimeEnergyAcDiff,omitempty" toml:"pvProducedLifetimeEnergyAcDiff" yaml:"pvProducedLifetimeEnergyAcDiff,omitempty"`
 	LoadConsumedLifetimeEnergyACDiff null.Float32 `boil:"load_consumed_lifetime_energy_ac_diff" json:"loadConsumedLifetimeEnergyAcDiff,omitempty" toml:"loadConsumedLifetimeEnergyAcDiff" yaml:"loadConsumedLifetimeEnergyAcDiff,omitempty"`
 	BatteryLifetimeEnergyACDiff      null.Float32 `boil:"battery_lifetime_energy_ac_diff" json:"batteryLifetimeEnergyAcDiff,omitempty" toml:"batteryLifetimeEnergyAcDiff" yaml:"batteryLifetimeEnergyAcDiff,omitempty"`
@@ -51,7 +51,7 @@ var CCDataLogCalculatedDailyColumns = struct {
 	GWUUID                           string
 	LatestLogDate                    string
 	GWID                             string
-	CustomerID                       string
+	LocationID                       string
 	PvProducedLifetimeEnergyACDiff   string
 	LoadConsumedLifetimeEnergyACDiff string
 	BatteryLifetimeEnergyACDiff      string
@@ -70,7 +70,7 @@ var CCDataLogCalculatedDailyColumns = struct {
 	GWUUID:                           "gw_uuid",
 	LatestLogDate:                    "latest_log_date",
 	GWID:                             "gw_id",
-	CustomerID:                       "customer_id",
+	LocationID:                       "location_id",
 	PvProducedLifetimeEnergyACDiff:   "pv_produced_lifetime_energy_ac_diff",
 	LoadConsumedLifetimeEnergyACDiff: "load_consumed_lifetime_energy_ac_diff",
 	BatteryLifetimeEnergyACDiff:      "battery_lifetime_energy_ac_diff",
@@ -91,7 +91,7 @@ var CCDataLogCalculatedDailyTableColumns = struct {
 	GWUUID                           string
 	LatestLogDate                    string
 	GWID                             string
-	CustomerID                       string
+	LocationID                       string
 	PvProducedLifetimeEnergyACDiff   string
 	LoadConsumedLifetimeEnergyACDiff string
 	BatteryLifetimeEnergyACDiff      string
@@ -110,7 +110,7 @@ var CCDataLogCalculatedDailyTableColumns = struct {
 	GWUUID:                           "cc_data_log_calculated_daily.gw_uuid",
 	LatestLogDate:                    "cc_data_log_calculated_daily.latest_log_date",
 	GWID:                             "cc_data_log_calculated_daily.gw_id",
-	CustomerID:                       "cc_data_log_calculated_daily.customer_id",
+	LocationID:                       "cc_data_log_calculated_daily.location_id",
 	PvProducedLifetimeEnergyACDiff:   "cc_data_log_calculated_daily.pv_produced_lifetime_energy_ac_diff",
 	LoadConsumedLifetimeEnergyACDiff: "cc_data_log_calculated_daily.load_consumed_lifetime_energy_ac_diff",
 	BatteryLifetimeEnergyACDiff:      "cc_data_log_calculated_daily.battery_lifetime_energy_ac_diff",
@@ -133,7 +133,7 @@ var CCDataLogCalculatedDailyWhere = struct {
 	GWUUID                           whereHelperstring
 	LatestLogDate                    whereHelpertime_Time
 	GWID                             whereHelpernull_Int64
-	CustomerID                       whereHelpernull_Int64
+	LocationID                       whereHelpernull_Int64
 	PvProducedLifetimeEnergyACDiff   whereHelpernull_Float32
 	LoadConsumedLifetimeEnergyACDiff whereHelpernull_Float32
 	BatteryLifetimeEnergyACDiff      whereHelpernull_Float32
@@ -152,7 +152,7 @@ var CCDataLogCalculatedDailyWhere = struct {
 	GWUUID:                           whereHelperstring{field: "`cc_data_log_calculated_daily`.`gw_uuid`"},
 	LatestLogDate:                    whereHelpertime_Time{field: "`cc_data_log_calculated_daily`.`latest_log_date`"},
 	GWID:                             whereHelpernull_Int64{field: "`cc_data_log_calculated_daily`.`gw_id`"},
-	CustomerID:                       whereHelpernull_Int64{field: "`cc_data_log_calculated_daily`.`customer_id`"},
+	LocationID:                       whereHelpernull_Int64{field: "`cc_data_log_calculated_daily`.`location_id`"},
 	PvProducedLifetimeEnergyACDiff:   whereHelpernull_Float32{field: "`cc_data_log_calculated_daily`.`pv_produced_lifetime_energy_ac_diff`"},
 	LoadConsumedLifetimeEnergyACDiff: whereHelpernull_Float32{field: "`cc_data_log_calculated_daily`.`load_consumed_lifetime_energy_ac_diff`"},
 	BatteryLifetimeEnergyACDiff:      whereHelpernull_Float32{field: "`cc_data_log_calculated_daily`.`battery_lifetime_energy_ac_diff`"},
@@ -185,8 +185,8 @@ func (*ccDataLogCalculatedDailyR) NewStruct() *ccDataLogCalculatedDailyR {
 type ccDataLogCalculatedDailyL struct{}
 
 var (
-	ccDataLogCalculatedDailyAllColumns            = []string{"id", "gw_uuid", "latest_log_date", "gw_id", "customer_id", "pv_produced_lifetime_energy_ac_diff", "load_consumed_lifetime_energy_ac_diff", "battery_lifetime_energy_ac_diff", "grid_lifetime_energy_ac_diff", "load_self_consumed_energy_percent_ac", "off_peak_period_pre_ubiik_cost", "off_peak_period_post_ubiik_cost", "on_peak_period_pre_ubiik_cost", "on_peak_period_post_ubiik_cost", "mid_peak_period_pre_ubiik_cost", "mid_peak_period_post_ubiik_cost", "created_at", "updated_at"}
-	ccDataLogCalculatedDailyColumnsWithoutDefault = []string{"gw_uuid", "latest_log_date", "gw_id", "customer_id", "pv_produced_lifetime_energy_ac_diff", "load_consumed_lifetime_energy_ac_diff", "battery_lifetime_energy_ac_diff", "grid_lifetime_energy_ac_diff", "load_self_consumed_energy_percent_ac", "off_peak_period_pre_ubiik_cost", "off_peak_period_post_ubiik_cost", "on_peak_period_pre_ubiik_cost", "on_peak_period_post_ubiik_cost", "mid_peak_period_pre_ubiik_cost", "mid_peak_period_post_ubiik_cost"}
+	ccDataLogCalculatedDailyAllColumns            = []string{"id", "gw_uuid", "latest_log_date", "gw_id", "location_id", "pv_produced_lifetime_energy_ac_diff", "load_consumed_lifetime_energy_ac_diff", "battery_lifetime_energy_ac_diff", "grid_lifetime_energy_ac_diff", "load_self_consumed_energy_percent_ac", "off_peak_period_pre_ubiik_cost", "off_peak_period_post_ubiik_cost", "on_peak_period_pre_ubiik_cost", "on_peak_period_post_ubiik_cost", "mid_peak_period_pre_ubiik_cost", "mid_peak_period_post_ubiik_cost", "created_at", "updated_at"}
+	ccDataLogCalculatedDailyColumnsWithoutDefault = []string{"gw_uuid", "latest_log_date", "gw_id", "location_id", "pv_produced_lifetime_energy_ac_diff", "load_consumed_lifetime_energy_ac_diff", "battery_lifetime_energy_ac_diff", "grid_lifetime_energy_ac_diff", "load_self_consumed_energy_percent_ac", "off_peak_period_pre_ubiik_cost", "off_peak_period_post_ubiik_cost", "on_peak_period_pre_ubiik_cost", "on_peak_period_post_ubiik_cost", "mid_peak_period_pre_ubiik_cost", "mid_peak_period_post_ubiik_cost"}
 	ccDataLogCalculatedDailyColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	ccDataLogCalculatedDailyPrimaryKeyColumns     = []string{"id"}
 	ccDataLogCalculatedDailyGeneratedColumns      = []string{}

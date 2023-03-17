@@ -39,7 +39,7 @@ func (s *BillingWorkerSuite) SetupSuite() {
 	s.billing = services.NewBillingService(repo)
 
 	// Truncate & seed data
-	err := testutils.SeedUtCustomerAndGateway(db)
+	err := testutils.SeedUtLocationAndGateway(db)
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 
 	// Mock seedUtTime
@@ -51,7 +51,7 @@ func (s *BillingWorkerSuite) TearDownSuite() {
 	models.Close()
 }
 
-func (s *BillingWorkerSuite) Test_GetBillingTypeByCustomerID() {
+func (s *BillingWorkerSuite) Test_GetBillingTypeByLocationID() {
 	type response struct {
 		Gateway     *deremsmodels.Gateway
 		BillingType *services.BillingType
@@ -60,19 +60,19 @@ func (s *BillingWorkerSuite) Test_GetBillingTypeByCustomerID() {
 	testGateway := &deremsmodels.Gateway{
 		ID:         fixtures.UtGateway.ID,
 		UUID:       fixtures.UtGateway.UUID,
-		CustomerID: fixtures.UtCustomer.ID,
+		LocationID: fixtures.UtGateway.LocationID,
 	}
 	testBillingType := &services.BillingType{
-		TOULocationID: fixtures.UtCustomer.TOULocationID.Int64,
-		VoltageType:   fixtures.UtCustomer.VoltageType.String,
-		TOUType:       fixtures.UtCustomer.TOUType.String,
+		TOULocationID: fixtures.UtLocation.TOULocationID.Int64,
+		VoltageType:   fixtures.UtLocation.VoltageType.String,
+		TOUType:       fixtures.UtLocation.TOUType.String,
 	}
 
 	tt := struct {
 		name   string
 		wantRv response
 	}{
-		name: "GetBillingTypeByCustomerID",
+		name: "GetBillingTypeByLocationID",
 		wantRv: response{
 			Gateway:     testGateway,
 			BillingType: testBillingType,
@@ -83,8 +83,8 @@ func (s *BillingWorkerSuite) Test_GetBillingTypeByCustomerID() {
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	s.Equalf(tt.wantRv.Gateway.ID, gateways[0].ID, e.ErrNewMessageNotEqual.Error())
 	s.Equalf(tt.wantRv.Gateway.UUID, gateways[0].UUID, e.ErrNewMessageNotEqual.Error())
-	s.Equalf(tt.wantRv.Gateway.CustomerID, gateways[0].CustomerID, e.ErrNewMessageNotEqual.Error())
-	billingType, err := s.billing.GetBillingTypeByCustomerID(gateways[0].CustomerID)
+	s.Equalf(tt.wantRv.Gateway.LocationID, gateways[0].LocationID, e.ErrNewMessageNotEqual.Error())
+	billingType, err := s.billing.GetBillingTypeByLocationID(gateways[0].LocationID.Int64)
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	s.Equalf(tt.wantRv.BillingType.TOULocationID, billingType.TOULocationID, e.ErrNewMessageNotEqual.Error())
 	s.Equalf(tt.wantRv.BillingType.VoltageType, billingType.VoltageType, e.ErrNewMessageNotEqual.Error())
@@ -185,9 +185,9 @@ func (s *BillingWorkerSuite) Test_getWeeklyBillingParamsByType() {
 	}
 
 	seedUtBillingType := &services.BillingType{
-		TOULocationID: fixtures.UtCustomer.TOULocationID.Int64,
-		VoltageType:   fixtures.UtCustomer.VoltageType.String,
-		TOUType:       fixtures.UtCustomer.TOUType.String,
+		TOULocationID: fixtures.UtLocation.TOULocationID.Int64,
+		VoltageType:   fixtures.UtLocation.VoltageType.String,
+		TOUType:       fixtures.UtLocation.TOUType.String,
 	}
 
 	var testBillingParams BillingParams

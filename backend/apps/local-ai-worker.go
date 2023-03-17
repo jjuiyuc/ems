@@ -108,7 +108,7 @@ func (h localAIConsumerHandler) saveLocalAIData(msg []byte) (err error) {
 	gateway, err := h.repo.Gateway.GetGatewayByGatewayUUID(gwUUID)
 	if err == nil {
 		aiData.GWID = null.NewInt64(gateway.ID, true)
-		aiData.CustomerID = null.NewInt64(gateway.CustomerID, true)
+		aiData.LocationID = gateway.LocationID
 	} else {
 		log.WithFields(log.Fields{
 			"caused-by": "h.repo.Gateway.GetGatewayByGatewayUUID",
@@ -119,7 +119,7 @@ func (h localAIConsumerHandler) saveLocalAIData(msg []byte) (err error) {
 	log.WithFields(log.Fields{
 		deremsmodels.AiDatumColumns.GWUUID:      aiData.GWUUID,
 		deremsmodels.AiDatumColumns.LogDate:     aiData.LogDate,
-		deremsmodels.AiDatumColumns.CustomerID:  aiData.CustomerID,
+		deremsmodels.AiDatumColumns.LocationID:  aiData.LocationID,
 		deremsmodels.AiDatumColumns.LocalAiData: string(aiData.LocalAiData.JSON),
 	}).Debug("upsert local AI data")
 	err = h.repo.AIData.UpsertAIData(aiData)

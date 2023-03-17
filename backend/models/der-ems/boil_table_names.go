@@ -9,10 +9,10 @@ var TableNames = struct {
 	CCDataLog                  string
 	CCDataLogCalculatedDaily   string
 	CCDataLogCalculatedMonthly string
-	Customer                   string
 	Device                     string
 	DeviceModel                string
 	Gateway                    string
+	Location                   string
 	LoginLog                   string
 	Tou                        string
 	TouHoliday                 string
@@ -26,10 +26,10 @@ var TableNames = struct {
 	CCDataLog:                  "cc_data_log",
 	CCDataLogCalculatedDaily:   "cc_data_log_calculated_daily",
 	CCDataLogCalculatedMonthly: "cc_data_log_calculated_monthly",
-	Customer:                   "customer",
 	Device:                     "device",
 	DeviceModel:                "device_model",
 	Gateway:                    "gateway",
+	Location:                   "location",
 	LoginLog:                   "login_log",
 	Tou:                        "tou",
 	TouHoliday:                 "tou_holiday",

@@ -47,7 +47,7 @@ func (s *LocalAIWorkerSuite) SetupSuite() {
 	s.handler = handler
 
 	// Truncate & seed data
-	err := testutils.SeedUtCustomerAndGateway(db)
+	err := testutils.SeedUtLocationAndGateway(db)
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	// Mock seedUtLocalAIData data
 	s.seedUtLocalAIData = map[string]interface{}{

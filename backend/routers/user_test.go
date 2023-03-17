@@ -50,7 +50,7 @@ func (s *UserSuite) SetupSuite() {
 	// Truncate & seed data
 	err := testutils.SeedUtUser(db)
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
-	err = testutils.SeedUtCustomerAndGateway(db)
+	err = testutils.SeedUtLocationAndGateway(db)
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	token, err := utils.GenerateToken(fixtures.UtUser.ID)
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
@@ -273,5 +273,5 @@ func (s *UserSuite) Test_GetProfile() {
 	s.Equalf(fixtures.UtUser.Username, data.Username, e.ErrNewMessageNotEqual.Error())
 	s.Equalf(fixtures.UtUser.ExpirationDate, data.ExpirationDate, e.ErrNewMessageNotEqual.Error())
 	s.Equalf(fixtures.UtGateway.UUID, data.Gateways[0].GatewayID, e.ErrNewMessageNotEqual.Error())
-	s.Equalf(fixtures.UtCustomer.Address.String, data.Gateways[0].Address, e.ErrNewMessageNotEqual.Error())
+	s.Equalf(fixtures.UtLocation.Address.String, data.Gateways[0].Address, e.ErrNewMessageNotEqual.Error())
 }

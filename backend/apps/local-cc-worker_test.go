@@ -47,7 +47,7 @@ func (s *LocalCCWorkerSuite) SetupSuite() {
 	s.handler = handler
 
 	// Truncate & seed data
-	err := testutils.SeedUtCustomerAndGateway(db)
+	err := testutils.SeedUtLocationAndGateway(db)
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	// Mock seedUtLocalCCData data
 	seedUtLoadLinks := map[string]int{

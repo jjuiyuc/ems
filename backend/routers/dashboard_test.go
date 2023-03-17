@@ -49,7 +49,7 @@ func (s *DashboardSuite) SetupSuite() {
 	// Truncate & seed data
 	err := testutils.SeedUtUser(db)
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
-	err = testutils.SeedUtCustomerAndGateway(db)
+	err = testutils.SeedUtLocationAndGateway(db)
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	token, err := utils.GenerateToken(fixtures.UtUser.ID)
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())

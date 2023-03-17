@@ -1,4 +1,4 @@
-import { Button, Divider, ListItemIcon, Menu, MenuItem } from "@mui/material"
+import { Button, Divider, ListItemIcon, Menu, MenuItem, Select } from "@mui/material"
 import { connect } from "react-redux"
 import { Language as LanguageIcon, Logout as LogoutIcon }
     from "@mui/icons-material"
@@ -10,14 +10,24 @@ import logout from "../utils/logout"
 
 import { ReactComponent as AlertIcon } from "../assets/icons/alert_default.svg"
 import { ReactComponent as LocationIcon } from "../assets/icons/location.svg"
-import { ReactComponent as UserIcon } from "../assets/icons/profile.svg"
+import { ReactComponent as UserCircleIcon } from "../assets/icons/profile.svg"
+import { ReactComponent as UserIcon } from "../assets/icons/user.svg"
 
 function TopNav(props) {
     const
         t = useTranslation(),
         commonT = string => t("common." + string)
 
-    const [menuAnchorEl, setMenuAnchorEl] = useState(null)
+    const
+        [menuAnchorEl, setMenuAnchorEl] = useState(null),
+        [locationName, setLocationName] = useState([
+            {
+                value: "Serenegray",
+                label: "Serenegray",
+            }, {
+                value: "Cht_Miaoli",
+                label: "Cht_Miaoli",
+            }])
 
     const
         closeMenu = () => setMenuAnchorEl(null),
@@ -44,13 +54,33 @@ function TopNav(props) {
             <div className="flex h-20 items-center">
                 {/* <AlertIcon className="h-8 w-8 opacity-30" /> */}
                 <Button onClick={openMenu} sx={{ marginLeft: "1.5rem" }}>
-                    <UserIcon className="h-8 mr-2 w-8" />
+                    <UserCircleIcon className="h-8 mr-2 w-8" />
                     {name}
                 </Button>
             </div>
-            <div className="items-center hidden md:flex">
-                <LocationIcon className="h-8 mr-1 w-8" />
-                {props.address}
+            <div className="items-center  md:flex">
+                {/* <Select
+                    className="h-8 mr-1 w-8"
+                    id="location-name"
+                    label={commonT("locationName")}
+                    // onChange={}
+                    value={locationName}>
+                    {locationName.map((option) => (
+                        <MenuItem key={option.value} value={option.value}>
+                            {option.label}
+                        </MenuItem>
+                    ))}
+                </Select>
+                <Select
+                    className="h-8 mr-1 w-8"
+                    id="location-name"
+                    label={commonT("locationName")}>
+                    {locationName.map((option) => (
+                        <MenuItem key={option.value} value={option.value}>
+                            {option.label}
+                        </MenuItem>
+                    ))}
+                </Select> */}
             </div>
         </div>
         <Menu
@@ -64,6 +94,11 @@ function TopNav(props) {
             <MenuItem>
                 <ListItemIcon><LanguageIcon /></ListItemIcon>
                 <LanguageSelector id="lang" size="small" />
+            </MenuItem>
+            <Divider />
+            <MenuItem onClick={logout}>
+                <ListItemIcon><UserIcon /></ListItemIcon>
+                {commonT("account")}
             </MenuItem>
             <Divider />
             <MenuItem onClick={logout}>

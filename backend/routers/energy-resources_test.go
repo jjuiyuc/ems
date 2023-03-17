@@ -89,8 +89,8 @@ var _ = Describe("EnergyResources", func() {
 					BatteryPvConsumedLifetimeEnergyACDiff: 5,
 					GridPvConsumedEnergyPercentAC:         30,
 					GridPvConsumedLifetimeEnergyACDiff:    3,
-					PvEnergyCostSavingsSum:                170,
-					PvCo2SavingsSum:                       38,
+					PvEnergyCostSavingsSum:                85,
+					PvCo2SavingsSum:                       19,
 				}
 				tt := testutils.TestInfo{
 					Token:      token,

@@ -38,7 +38,7 @@ export default function Settings(props) {
                     <h2 className="font-bold ml-4">{commonT("battery")}</h2>
                 </div>
                 <DialogBox
-                    triggerName={pageT("save")}
+                    triggerName={commonT("save")}
                     leftButtonName={commonT("cancel")}
                     rightButtonName={pageT("turnOff")}
                 />

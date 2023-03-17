@@ -25,6 +25,7 @@ import (
 type User struct {
 	ID                  int64       `boil:"id" json:"id" toml:"id" yaml:"id"`
 	Username            string      `boil:"username" json:"username" toml:"username" yaml:"username"`
+	GroupID             int64       `boil:"group_id" json:"groupID" toml:"groupID" yaml:"groupID"`
 	Password            string      `boil:"password" json:"-" toml:"-" yaml:"-"`
 	PasswordLastChanged null.Time   `boil:"password_last_changed" json:"passwordLastChanged,omitempty" toml:"passwordLastChanged" yaml:"passwordLastChanged,omitempty"`
 	PasswordRetryCount  null.Int    `boil:"password_retry_count" json:"passwordRetryCount,omitempty" toml:"passwordRetryCount" yaml:"passwordRetryCount,omitempty"`
@@ -36,6 +37,7 @@ type User struct {
 	CreatedAt           time.Time   `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
 	UpdatedAt           time.Time   `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
 	DeletedAt           null.Time   `boil:"deleted_at" json:"deletedAt,omitempty" toml:"deletedAt" yaml:"deletedAt,omitempty"`
+	DeletedBy           null.Int64  `boil:"deleted_by" json:"deletedBy,omitempty" toml:"deletedBy" yaml:"deletedBy,omitempty"`
 
 	R *userR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L userL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -44,6 +46,7 @@ type User struct {
 var UserColumns = struct {
 	ID                  string
 	Username            string
+	GroupID             string
 	Password            string
 	PasswordLastChanged string
 	PasswordRetryCount  string
@@ -55,9 +58,11 @@ var UserColumns = struct {
 	CreatedAt           string
 	UpdatedAt           string
 	DeletedAt           string
+	DeletedBy           string
 }{
 	ID:                  "id",
 	Username:            "username",
+	GroupID:             "group_id",
 	Password:            "password",
 	PasswordLastChanged: "password_last_changed",
 	PasswordRetryCount:  "password_retry_count",
@@ -69,11 +74,13 @@ var UserColumns = struct {
 	CreatedAt:           "created_at",
 	UpdatedAt:           "updated_at",
 	DeletedAt:           "deleted_at",
+	DeletedBy:           "deleted_by",
 }
 
 var UserTableColumns = struct {
 	ID                  string
 	Username            string
+	GroupID             string
 	Password            string
 	PasswordLastChanged string
 	PasswordRetryCount  string
@@ -85,9 +92,11 @@ var UserTableColumns = struct {
 	CreatedAt           string
 	UpdatedAt           string
 	DeletedAt           string
+	DeletedBy           string
 }{
 	ID:                  "user.id",
 	Username:            "user.username",
+	GroupID:             "user.group_id",
 	Password:            "user.password",
 	PasswordLastChanged: "user.password_last_changed",
 	PasswordRetryCount:  "user.password_retry_count",
@@ -99,6 +108,7 @@ var UserTableColumns = struct {
 	CreatedAt:           "user.created_at",
 	UpdatedAt:           "user.updated_at",
 	DeletedAt:           "user.deleted_at",
+	DeletedBy:           "user.deleted_by",
 }
 
 // Generated where
@@ -106,6 +116,7 @@ var UserTableColumns = struct {
 var UserWhere = struct {
 	ID                  whereHelperint64
 	Username            whereHelperstring
+	GroupID             whereHelperint64
 	Password            whereHelperstring
 	PasswordLastChanged whereHelpernull_Time
 	PasswordRetryCount  whereHelpernull_Int
@@ -117,9 +128,11 @@ var UserWhere = struct {
 	CreatedAt           whereHelpertime_Time
 	UpdatedAt           whereHelpertime_Time
 	DeletedAt           whereHelpernull_Time
+	DeletedBy           whereHelpernull_Int64
 }{
 	ID:                  whereHelperint64{field: "`user`.`id`"},
 	Username:            whereHelperstring{field: "`user`.`username`"},
+	GroupID:             whereHelperint64{field: "`user`.`group_id`"},
 	Password:            whereHelperstring{field: "`user`.`password`"},
 	PasswordLastChanged: whereHelpernull_Time{field: "`user`.`password_last_changed`"},
 	PasswordRetryCount:  whereHelpernull_Int{field: "`user`.`password_retry_count`"},
@@ -131,23 +144,34 @@ var UserWhere = struct {
 	CreatedAt:           whereHelpertime_Time{field: "`user`.`created_at`"},
 	UpdatedAt:           whereHelpertime_Time{field: "`user`.`updated_at`"},
 	DeletedAt:           whereHelpernull_Time{field: "`user`.`deleted_at`"},
+	DeletedBy:           whereHelpernull_Int64{field: "`user`.`deleted_by`"},
 }
 
 // UserRels is where relationship names are stored.
 var UserRels = struct {
+	Group             string
 	UserGatewayRights string
 }{
+	Group:             "Group",
 	UserGatewayRights: "UserGatewayRights",
 }
 
 // userR is where relationships are stored.
 type userR struct {
+	Group             *Group                `boil:"Group" json:"Group" toml:"Group" yaml:"Group"`
 	UserGatewayRights UserGatewayRightSlice `boil:"UserGatewayRights" json:"UserGatewayRights" toml:"UserGatewayRights" yaml:"UserGatewayRights"`
 }
 
 // NewStruct creates a new relationship struct
 func (*userR) NewStruct() *userR {
 	return &userR{}
+}
+
+func (r *userR) GetGroup() *Group {
+	if r == nil {
+		return nil
+	}
+	return r.Group
 }
 
 func (r *userR) GetUserGatewayRights() UserGatewayRightSlice {
@@ -161,8 +185,8 @@ func (r *userR) GetUserGatewayRights() UserGatewayRightSlice {
 type userL struct{}
 
 var (
-	userAllColumns            = []string{"id", "username", "password", "password_last_changed", "password_retry_count", "reset_pwd_token", "pwd_token_expiry", "name", "locked_at", "expiration_date", "created_at", "updated_at", "deleted_at"}
-	userColumnsWithoutDefault = []string{"username", "password", "password_last_changed", "reset_pwd_token", "pwd_token_expiry", "name", "locked_at", "expiration_date", "deleted_at"}
+	userAllColumns            = []string{"id", "username", "group_id", "password", "password_last_changed", "password_retry_count", "reset_pwd_token", "pwd_token_expiry", "name", "locked_at", "expiration_date", "created_at", "updated_at", "deleted_at", "deleted_by"}
+	userColumnsWithoutDefault = []string{"username", "group_id", "password", "password_last_changed", "reset_pwd_token", "pwd_token_expiry", "name", "locked_at", "expiration_date", "deleted_at", "deleted_by"}
 	userColumnsWithDefault    = []string{"id", "password_retry_count", "created_at", "updated_at"}
 	userPrimaryKeyColumns     = []string{"id"}
 	userGeneratedColumns      = []string{}
@@ -259,6 +283,17 @@ func (q userQuery) Exists(exec boil.Executor) (bool, error) {
 	return count > 0, nil
 }
 
+// Group pointed to by the foreign key.
+func (o *User) Group(mods ...qm.QueryMod) groupQuery {
+	queryMods := []qm.QueryMod{
+		qm.Where("`id` = ?", o.GroupID),
+	}
+
+	queryMods = append(queryMods, mods...)
+
+	return Groups(queryMods...)
+}
+
 // UserGatewayRights retrieves all the user_gateway_right's UserGatewayRights with an executor.
 func (o *User) UserGatewayRights(mods ...qm.QueryMod) userGatewayRightQuery {
 	var queryMods []qm.QueryMod
@@ -271,6 +306,102 @@ func (o *User) UserGatewayRights(mods ...qm.QueryMod) userGatewayRightQuery {
 	)
 
 	return UserGatewayRights(queryMods...)
+}
+
+// LoadGroup allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for an N-1 relationship.
+func (userL) LoadGroup(e boil.Executor, singular bool, maybeUser interface{}, mods queries.Applicator) error {
+	var slice []*User
+	var object *User
+
+	if singular {
+		object = maybeUser.(*User)
+	} else {
+		slice = *maybeUser.(*[]*User)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &userR{}
+		}
+		args = append(args, object.GroupID)
+
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &userR{}
+			}
+
+			for _, a := range args {
+				if a == obj.GroupID {
+					continue Outer
+				}
+			}
+
+			args = append(args, obj.GroupID)
+
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(
+		qm.From(`group`),
+		qm.WhereIn(`group.id in ?`, args...),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.Query(e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load Group")
+	}
+
+	var resultSlice []*Group
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice Group")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results of eager load for group")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for group")
+	}
+
+	if len(resultSlice) == 0 {
+		return nil
+	}
+
+	if singular {
+		foreign := resultSlice[0]
+		object.R.Group = foreign
+		if foreign.R == nil {
+			foreign.R = &groupR{}
+		}
+		foreign.R.Users = append(foreign.R.Users, object)
+		return nil
+	}
+
+	for _, local := range slice {
+		for _, foreign := range resultSlice {
+			if local.GroupID == foreign.ID {
+				local.R.Group = foreign
+				if foreign.R == nil {
+					foreign.R = &groupR{}
+				}
+				foreign.R.Users = append(foreign.R.Users, local)
+				break
+			}
+		}
+	}
+
+	return nil
 }
 
 // LoadUserGatewayRights allows an eager lookup of values, cached into the
@@ -359,6 +490,52 @@ func (userL) LoadUserGatewayRights(e boil.Executor, singular bool, maybeUser int
 				break
 			}
 		}
+	}
+
+	return nil
+}
+
+// SetGroup of the user to the related item.
+// Sets o.R.Group to related.
+// Adds o to related.R.Users.
+func (o *User) SetGroup(exec boil.Executor, insert bool, related *Group) error {
+	var err error
+	if insert {
+		if err = related.Insert(exec, boil.Infer()); err != nil {
+			return errors.Wrap(err, "failed to insert into foreign table")
+		}
+	}
+
+	updateQuery := fmt.Sprintf(
+		"UPDATE `user` SET %s WHERE %s",
+		strmangle.SetParamNames("`", "`", 0, []string{"group_id"}),
+		strmangle.WhereClause("`", "`", 0, userPrimaryKeyColumns),
+	)
+	values := []interface{}{related.ID, o.ID}
+
+	if boil.DebugMode {
+		fmt.Fprintln(boil.DebugWriter, updateQuery)
+		fmt.Fprintln(boil.DebugWriter, values)
+	}
+	if _, err = exec.Exec(updateQuery, values...); err != nil {
+		return errors.Wrap(err, "failed to update local table")
+	}
+
+	o.GroupID = related.ID
+	if o.R == nil {
+		o.R = &userR{
+			Group: related,
+		}
+	} else {
+		o.R.Group = related
+	}
+
+	if related.R == nil {
+		related.R = &groupR{
+			Users: UserSlice{o},
+		}
+	} else {
+		related.R.Users = append(related.R.Users, o)
 	}
 
 	return nil

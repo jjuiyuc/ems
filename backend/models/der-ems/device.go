@@ -23,125 +23,215 @@ import (
 
 // Device is an object representing the database table.
 type Device struct {
-	ID        int64       `boil:"id" json:"id" toml:"id" yaml:"id"`
-	ModbusID  string      `boil:"modbusid" json:"modbusid" toml:"modbusid" yaml:"modbusid"`
-	UUEID     string      `boil:"uueid" json:"uueid" toml:"uueid" yaml:"uueid"`
-	ModelID   int64       `boil:"model_id" json:"modelID" toml:"modelID" yaml:"modelID"`
-	GWUUID    string      `boil:"gw_uuid" json:"gwUUID" toml:"gwUUID" yaml:"gwUUID"`
-	Remark    null.String `boil:"remark" json:"remark,omitempty" toml:"remark" yaml:"remark,omitempty"`
-	Enable    null.Bool   `boil:"enable" json:"enable,omitempty" toml:"enable" yaml:"enable,omitempty"`
-	CreatedAt time.Time   `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
-	UpdatedAt time.Time   `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
+	ID            int64       `boil:"id" json:"id" toml:"id" yaml:"id"`
+	ModbusID      int         `boil:"modbusid" json:"modbusid" toml:"modbusid" yaml:"modbusid"`
+	ModuleID      int64       `boil:"module_id" json:"moduleID" toml:"moduleID" yaml:"moduleID"`
+	ModelID       int64       `boil:"model_id" json:"modelID" toml:"modelID" yaml:"modelID"`
+	GWID          null.Int64  `boil:"gw_id" json:"gwID,omitempty" toml:"gwID" yaml:"gwID,omitempty"`
+	PowerCapacity float32     `boil:"power_capacity" json:"powerCapacity" toml:"powerCapacity" yaml:"powerCapacity"`
+	ExtraInfo     null.JSON   `boil:"extra_info" json:"extraInfo,omitempty" toml:"extraInfo" yaml:"extraInfo,omitempty"`
+	Remark        null.String `boil:"remark" json:"remark,omitempty" toml:"remark" yaml:"remark,omitempty"`
+	CreatedAt     time.Time   `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
+	CreatedBy     null.Int64  `boil:"created_by" json:"createdBy,omitempty" toml:"createdBy" yaml:"createdBy,omitempty"`
+	UpdatedAt     time.Time   `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
+	UpdatedBy     null.Int64  `boil:"updated_by" json:"updatedBy,omitempty" toml:"updatedBy" yaml:"updatedBy,omitempty"`
+	DeletedAt     null.Time   `boil:"deleted_at" json:"deletedAt,omitempty" toml:"deletedAt" yaml:"deletedAt,omitempty"`
+	DeletedBy     null.Int64  `boil:"deleted_by" json:"deletedBy,omitempty" toml:"deletedBy" yaml:"deletedBy,omitempty"`
 
 	R *deviceR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L deviceL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var DeviceColumns = struct {
-	ID        string
-	ModbusID  string
-	UUEID     string
-	ModelID   string
-	GWUUID    string
-	Remark    string
-	Enable    string
-	CreatedAt string
-	UpdatedAt string
+	ID            string
+	ModbusID      string
+	ModuleID      string
+	ModelID       string
+	GWID          string
+	PowerCapacity string
+	ExtraInfo     string
+	Remark        string
+	CreatedAt     string
+	CreatedBy     string
+	UpdatedAt     string
+	UpdatedBy     string
+	DeletedAt     string
+	DeletedBy     string
 }{
-	ID:        "id",
-	ModbusID:  "modbusid",
-	UUEID:     "uueid",
-	ModelID:   "model_id",
-	GWUUID:    "gw_uuid",
-	Remark:    "remark",
-	Enable:    "enable",
-	CreatedAt: "created_at",
-	UpdatedAt: "updated_at",
+	ID:            "id",
+	ModbusID:      "modbusid",
+	ModuleID:      "module_id",
+	ModelID:       "model_id",
+	GWID:          "gw_id",
+	PowerCapacity: "power_capacity",
+	ExtraInfo:     "extra_info",
+	Remark:        "remark",
+	CreatedAt:     "created_at",
+	CreatedBy:     "created_by",
+	UpdatedAt:     "updated_at",
+	UpdatedBy:     "updated_by",
+	DeletedAt:     "deleted_at",
+	DeletedBy:     "deleted_by",
 }
 
 var DeviceTableColumns = struct {
-	ID        string
-	ModbusID  string
-	UUEID     string
-	ModelID   string
-	GWUUID    string
-	Remark    string
-	Enable    string
-	CreatedAt string
-	UpdatedAt string
+	ID            string
+	ModbusID      string
+	ModuleID      string
+	ModelID       string
+	GWID          string
+	PowerCapacity string
+	ExtraInfo     string
+	Remark        string
+	CreatedAt     string
+	CreatedBy     string
+	UpdatedAt     string
+	UpdatedBy     string
+	DeletedAt     string
+	DeletedBy     string
 }{
-	ID:        "device.id",
-	ModbusID:  "device.modbusid",
-	UUEID:     "device.uueid",
-	ModelID:   "device.model_id",
-	GWUUID:    "device.gw_uuid",
-	Remark:    "device.remark",
-	Enable:    "device.enable",
-	CreatedAt: "device.created_at",
-	UpdatedAt: "device.updated_at",
+	ID:            "device.id",
+	ModbusID:      "device.modbusid",
+	ModuleID:      "device.module_id",
+	ModelID:       "device.model_id",
+	GWID:          "device.gw_id",
+	PowerCapacity: "device.power_capacity",
+	ExtraInfo:     "device.extra_info",
+	Remark:        "device.remark",
+	CreatedAt:     "device.created_at",
+	CreatedBy:     "device.created_by",
+	UpdatedAt:     "device.updated_at",
+	UpdatedBy:     "device.updated_by",
+	DeletedAt:     "device.deleted_at",
+	DeletedBy:     "device.deleted_by",
 }
 
 // Generated where
 
-type whereHelpernull_Bool struct{ field string }
+type whereHelperint struct{ field string }
 
-func (w whereHelpernull_Bool) EQ(x null.Bool) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, false, x)
+func (w whereHelperint) EQ(x int) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.EQ, x) }
+func (w whereHelperint) NEQ(x int) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.NEQ, x) }
+func (w whereHelperint) LT(x int) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.LT, x) }
+func (w whereHelperint) LTE(x int) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.LTE, x) }
+func (w whereHelperint) GT(x int) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.GT, x) }
+func (w whereHelperint) GTE(x int) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GTE, x) }
+func (w whereHelperint) IN(slice []int) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
 }
-func (w whereHelpernull_Bool) NEQ(x null.Bool) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, true, x)
+func (w whereHelperint) NIN(slice []int) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
 }
-func (w whereHelpernull_Bool) LT(x null.Bool) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LT, x)
+
+type whereHelperfloat32 struct{ field string }
+
+func (w whereHelperfloat32) EQ(x float32) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.EQ, x) }
+func (w whereHelperfloat32) NEQ(x float32) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.NEQ, x)
 }
-func (w whereHelpernull_Bool) LTE(x null.Bool) qm.QueryMod {
+func (w whereHelperfloat32) LT(x float32) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.LT, x) }
+func (w whereHelperfloat32) LTE(x float32) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.LTE, x)
 }
-func (w whereHelpernull_Bool) GT(x null.Bool) qm.QueryMod {
+func (w whereHelperfloat32) GT(x float32) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GT, x) }
+func (w whereHelperfloat32) GTE(x float32) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GTE, x)
+}
+func (w whereHelperfloat32) IN(slice []float32) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
+}
+func (w whereHelperfloat32) NIN(slice []float32) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
+}
+
+type whereHelpernull_Time struct{ field string }
+
+func (w whereHelpernull_Time) EQ(x null.Time) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, false, x)
+}
+func (w whereHelpernull_Time) NEQ(x null.Time) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, true, x)
+}
+func (w whereHelpernull_Time) LT(x null.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LT, x)
+}
+func (w whereHelpernull_Time) LTE(x null.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LTE, x)
+}
+func (w whereHelpernull_Time) GT(x null.Time) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.GT, x)
 }
-func (w whereHelpernull_Bool) GTE(x null.Bool) qm.QueryMod {
+func (w whereHelpernull_Time) GTE(x null.Time) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.GTE, x)
 }
 
-func (w whereHelpernull_Bool) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
-func (w whereHelpernull_Bool) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
+func (w whereHelpernull_Time) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
+func (w whereHelpernull_Time) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
 
 var DeviceWhere = struct {
-	ID        whereHelperint64
-	ModbusID  whereHelperstring
-	UUEID     whereHelperstring
-	ModelID   whereHelperint64
-	GWUUID    whereHelperstring
-	Remark    whereHelpernull_String
-	Enable    whereHelpernull_Bool
-	CreatedAt whereHelpertime_Time
-	UpdatedAt whereHelpertime_Time
+	ID            whereHelperint64
+	ModbusID      whereHelperint
+	ModuleID      whereHelperint64
+	ModelID       whereHelperint64
+	GWID          whereHelpernull_Int64
+	PowerCapacity whereHelperfloat32
+	ExtraInfo     whereHelpernull_JSON
+	Remark        whereHelpernull_String
+	CreatedAt     whereHelpertime_Time
+	CreatedBy     whereHelpernull_Int64
+	UpdatedAt     whereHelpertime_Time
+	UpdatedBy     whereHelpernull_Int64
+	DeletedAt     whereHelpernull_Time
+	DeletedBy     whereHelpernull_Int64
 }{
-	ID:        whereHelperint64{field: "`device`.`id`"},
-	ModbusID:  whereHelperstring{field: "`device`.`modbusid`"},
-	UUEID:     whereHelperstring{field: "`device`.`uueid`"},
-	ModelID:   whereHelperint64{field: "`device`.`model_id`"},
-	GWUUID:    whereHelperstring{field: "`device`.`gw_uuid`"},
-	Remark:    whereHelpernull_String{field: "`device`.`remark`"},
-	Enable:    whereHelpernull_Bool{field: "`device`.`enable`"},
-	CreatedAt: whereHelpertime_Time{field: "`device`.`created_at`"},
-	UpdatedAt: whereHelpertime_Time{field: "`device`.`updated_at`"},
+	ID:            whereHelperint64{field: "`device`.`id`"},
+	ModbusID:      whereHelperint{field: "`device`.`modbusid`"},
+	ModuleID:      whereHelperint64{field: "`device`.`module_id`"},
+	ModelID:       whereHelperint64{field: "`device`.`model_id`"},
+	GWID:          whereHelpernull_Int64{field: "`device`.`gw_id`"},
+	PowerCapacity: whereHelperfloat32{field: "`device`.`power_capacity`"},
+	ExtraInfo:     whereHelpernull_JSON{field: "`device`.`extra_info`"},
+	Remark:        whereHelpernull_String{field: "`device`.`remark`"},
+	CreatedAt:     whereHelpertime_Time{field: "`device`.`created_at`"},
+	CreatedBy:     whereHelpernull_Int64{field: "`device`.`created_by`"},
+	UpdatedAt:     whereHelpertime_Time{field: "`device`.`updated_at`"},
+	UpdatedBy:     whereHelpernull_Int64{field: "`device`.`updated_by`"},
+	DeletedAt:     whereHelpernull_Time{field: "`device`.`deleted_at`"},
+	DeletedBy:     whereHelpernull_Int64{field: "`device`.`deleted_by`"},
 }
 
 // DeviceRels is where relationship names are stored.
 var DeviceRels = struct {
-	GW    string
-	Model string
+	GW     string
+	Model  string
+	Module string
 }{
-	GW:    "GW",
-	Model: "Model",
+	GW:     "GW",
+	Model:  "Model",
+	Module: "Module",
 }
 
 // deviceR is where relationships are stored.
 type deviceR struct {
-	GW    *Gateway     `boil:"GW" json:"GW" toml:"GW" yaml:"GW"`
-	Model *DeviceModel `boil:"Model" json:"Model" toml:"Model" yaml:"Model"`
+	GW     *Gateway      `boil:"GW" json:"GW" toml:"GW" yaml:"GW"`
+	Model  *DeviceModel  `boil:"Model" json:"Model" toml:"Model" yaml:"Model"`
+	Module *DeviceModule `boil:"Module" json:"Module" toml:"Module" yaml:"Module"`
 }
 
 // NewStruct creates a new relationship struct
@@ -163,12 +253,19 @@ func (r *deviceR) GetModel() *DeviceModel {
 	return r.Model
 }
 
+func (r *deviceR) GetModule() *DeviceModule {
+	if r == nil {
+		return nil
+	}
+	return r.Module
+}
+
 // deviceL is where Load methods for each relationship are stored.
 type deviceL struct{}
 
 var (
-	deviceAllColumns            = []string{"id", "modbusid", "uueid", "model_id", "gw_uuid", "remark", "enable", "created_at", "updated_at"}
-	deviceColumnsWithoutDefault = []string{"modbusid", "uueid", "model_id", "gw_uuid", "remark", "enable"}
+	deviceAllColumns            = []string{"id", "modbusid", "module_id", "model_id", "gw_id", "power_capacity", "extra_info", "remark", "created_at", "created_by", "updated_at", "updated_by", "deleted_at", "deleted_by"}
+	deviceColumnsWithoutDefault = []string{"modbusid", "module_id", "model_id", "gw_id", "power_capacity", "extra_info", "remark", "created_by", "updated_by", "deleted_at", "deleted_by"}
 	deviceColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	devicePrimaryKeyColumns     = []string{"id"}
 	deviceGeneratedColumns      = []string{}
@@ -268,7 +365,7 @@ func (q deviceQuery) Exists(exec boil.Executor) (bool, error) {
 // GW pointed to by the foreign key.
 func (o *Device) GW(mods ...qm.QueryMod) gatewayQuery {
 	queryMods := []qm.QueryMod{
-		qm.Where("`uuid` = ?", o.GWUUID),
+		qm.Where("`id` = ?", o.GWID),
 	}
 
 	queryMods = append(queryMods, mods...)
@@ -285,6 +382,17 @@ func (o *Device) Model(mods ...qm.QueryMod) deviceModelQuery {
 	queryMods = append(queryMods, mods...)
 
 	return DeviceModels(queryMods...)
+}
+
+// Module pointed to by the foreign key.
+func (o *Device) Module(mods ...qm.QueryMod) deviceModuleQuery {
+	queryMods := []qm.QueryMod{
+		qm.Where("`id` = ?", o.ModuleID),
+	}
+
+	queryMods = append(queryMods, mods...)
+
+	return DeviceModules(queryMods...)
 }
 
 // LoadGW allows an eager lookup of values, cached into the
@@ -304,7 +412,9 @@ func (deviceL) LoadGW(e boil.Executor, singular bool, maybeDevice interface{}, m
 		if object.R == nil {
 			object.R = &deviceR{}
 		}
-		args = append(args, object.GWUUID)
+		if !queries.IsNil(object.GWID) {
+			args = append(args, object.GWID)
+		}
 
 	} else {
 	Outer:
@@ -314,12 +424,14 @@ func (deviceL) LoadGW(e boil.Executor, singular bool, maybeDevice interface{}, m
 			}
 
 			for _, a := range args {
-				if a == obj.GWUUID {
+				if queries.Equal(a, obj.GWID) {
 					continue Outer
 				}
 			}
 
-			args = append(args, obj.GWUUID)
+			if !queries.IsNil(obj.GWID) {
+				args = append(args, obj.GWID)
+			}
 
 		}
 	}
@@ -330,7 +442,7 @@ func (deviceL) LoadGW(e boil.Executor, singular bool, maybeDevice interface{}, m
 
 	query := NewQuery(
 		qm.From(`gateway`),
-		qm.WhereIn(`gateway.uuid in ?`, args...),
+		qm.WhereIn(`gateway.id in ?`, args...),
 	)
 	if mods != nil {
 		mods.Apply(query)
@@ -369,7 +481,7 @@ func (deviceL) LoadGW(e boil.Executor, singular bool, maybeDevice interface{}, m
 
 	for _, local := range slice {
 		for _, foreign := range resultSlice {
-			if local.GWUUID == foreign.UUID {
+			if queries.Equal(local.GWID, foreign.ID) {
 				local.R.GW = foreign
 				if foreign.R == nil {
 					foreign.R = &gatewayR{}
@@ -479,6 +591,102 @@ func (deviceL) LoadModel(e boil.Executor, singular bool, maybeDevice interface{}
 	return nil
 }
 
+// LoadModule allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for an N-1 relationship.
+func (deviceL) LoadModule(e boil.Executor, singular bool, maybeDevice interface{}, mods queries.Applicator) error {
+	var slice []*Device
+	var object *Device
+
+	if singular {
+		object = maybeDevice.(*Device)
+	} else {
+		slice = *maybeDevice.(*[]*Device)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &deviceR{}
+		}
+		args = append(args, object.ModuleID)
+
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &deviceR{}
+			}
+
+			for _, a := range args {
+				if a == obj.ModuleID {
+					continue Outer
+				}
+			}
+
+			args = append(args, obj.ModuleID)
+
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(
+		qm.From(`device_module`),
+		qm.WhereIn(`device_module.id in ?`, args...),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.Query(e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load DeviceModule")
+	}
+
+	var resultSlice []*DeviceModule
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice DeviceModule")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results of eager load for device_module")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for device_module")
+	}
+
+	if len(resultSlice) == 0 {
+		return nil
+	}
+
+	if singular {
+		foreign := resultSlice[0]
+		object.R.Module = foreign
+		if foreign.R == nil {
+			foreign.R = &deviceModuleR{}
+		}
+		foreign.R.ModuleDevices = append(foreign.R.ModuleDevices, object)
+		return nil
+	}
+
+	for _, local := range slice {
+		for _, foreign := range resultSlice {
+			if local.ModuleID == foreign.ID {
+				local.R.Module = foreign
+				if foreign.R == nil {
+					foreign.R = &deviceModuleR{}
+				}
+				foreign.R.ModuleDevices = append(foreign.R.ModuleDevices, local)
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
 // SetGW of the device to the related item.
 // Sets o.R.GW to related.
 // Adds o to related.R.GWDevices.
@@ -492,10 +700,10 @@ func (o *Device) SetGW(exec boil.Executor, insert bool, related *Gateway) error 
 
 	updateQuery := fmt.Sprintf(
 		"UPDATE `device` SET %s WHERE %s",
-		strmangle.SetParamNames("`", "`", 0, []string{"gw_uuid"}),
+		strmangle.SetParamNames("`", "`", 0, []string{"gw_id"}),
 		strmangle.WhereClause("`", "`", 0, devicePrimaryKeyColumns),
 	)
-	values := []interface{}{related.UUID, o.ID}
+	values := []interface{}{related.ID, o.ID}
 
 	if boil.DebugMode {
 		fmt.Fprintln(boil.DebugWriter, updateQuery)
@@ -505,7 +713,7 @@ func (o *Device) SetGW(exec boil.Executor, insert bool, related *Gateway) error 
 		return errors.Wrap(err, "failed to update local table")
 	}
 
-	o.GWUUID = related.UUID
+	queries.Assign(&o.GWID, related.ID)
 	if o.R == nil {
 		o.R = &deviceR{
 			GW: related,
@@ -522,6 +730,39 @@ func (o *Device) SetGW(exec boil.Executor, insert bool, related *Gateway) error 
 		related.R.GWDevices = append(related.R.GWDevices, o)
 	}
 
+	return nil
+}
+
+// RemoveGW relationship.
+// Sets o.R.GW to nil.
+// Removes o from all passed in related items' relationships struct.
+func (o *Device) RemoveGW(exec boil.Executor, related *Gateway) error {
+	var err error
+
+	queries.SetScanner(&o.GWID, nil)
+	if _, err = o.Update(exec, boil.Whitelist("gw_id")); err != nil {
+		return errors.Wrap(err, "failed to update local table")
+	}
+
+	if o.R != nil {
+		o.R.GW = nil
+	}
+	if related == nil || related.R == nil {
+		return nil
+	}
+
+	for i, ri := range related.R.GWDevices {
+		if queries.Equal(o.GWID, ri.GWID) {
+			continue
+		}
+
+		ln := len(related.R.GWDevices)
+		if ln > 1 && i < ln-1 {
+			related.R.GWDevices[i] = related.R.GWDevices[ln-1]
+		}
+		related.R.GWDevices = related.R.GWDevices[:ln-1]
+		break
+	}
 	return nil
 }
 
@@ -566,6 +807,52 @@ func (o *Device) SetModel(exec boil.Executor, insert bool, related *DeviceModel)
 		}
 	} else {
 		related.R.ModelDevices = append(related.R.ModelDevices, o)
+	}
+
+	return nil
+}
+
+// SetModule of the device to the related item.
+// Sets o.R.Module to related.
+// Adds o to related.R.ModuleDevices.
+func (o *Device) SetModule(exec boil.Executor, insert bool, related *DeviceModule) error {
+	var err error
+	if insert {
+		if err = related.Insert(exec, boil.Infer()); err != nil {
+			return errors.Wrap(err, "failed to insert into foreign table")
+		}
+	}
+
+	updateQuery := fmt.Sprintf(
+		"UPDATE `device` SET %s WHERE %s",
+		strmangle.SetParamNames("`", "`", 0, []string{"module_id"}),
+		strmangle.WhereClause("`", "`", 0, devicePrimaryKeyColumns),
+	)
+	values := []interface{}{related.ID, o.ID}
+
+	if boil.DebugMode {
+		fmt.Fprintln(boil.DebugWriter, updateQuery)
+		fmt.Fprintln(boil.DebugWriter, values)
+	}
+	if _, err = exec.Exec(updateQuery, values...); err != nil {
+		return errors.Wrap(err, "failed to update local table")
+	}
+
+	o.ModuleID = related.ID
+	if o.R == nil {
+		o.R = &deviceR{
+			Module: related,
+		}
+	} else {
+		o.R.Module = related
+	}
+
+	if related.R == nil {
+		related.R = &deviceModuleR{
+			ModuleDevices: DeviceSlice{o},
+		}
+	} else {
+		related.R.ModuleDevices = append(related.R.ModuleDevices, o)
 	}
 
 	return nil

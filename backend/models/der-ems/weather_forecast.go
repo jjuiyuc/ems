@@ -78,35 +78,6 @@ var WeatherForecastTableColumns = struct {
 
 // Generated where
 
-type whereHelperfloat32 struct{ field string }
-
-func (w whereHelperfloat32) EQ(x float32) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.EQ, x) }
-func (w whereHelperfloat32) NEQ(x float32) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.NEQ, x)
-}
-func (w whereHelperfloat32) LT(x float32) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.LT, x) }
-func (w whereHelperfloat32) LTE(x float32) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LTE, x)
-}
-func (w whereHelperfloat32) GT(x float32) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GT, x) }
-func (w whereHelperfloat32) GTE(x float32) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GTE, x)
-}
-func (w whereHelperfloat32) IN(slice []float32) qm.QueryMod {
-	values := make([]interface{}, 0, len(slice))
-	for _, value := range slice {
-		values = append(values, value)
-	}
-	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
-}
-func (w whereHelperfloat32) NIN(slice []float32) qm.QueryMod {
-	values := make([]interface{}, 0, len(slice))
-	for _, value := range slice {
-		values = append(values, value)
-	}
-	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
-}
-
 var WeatherForecastWhere = struct {
 	ID        whereHelperint64
 	Lat       whereHelperfloat32

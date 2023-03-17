@@ -23,11 +23,17 @@ import (
 
 // Gateway is an object representing the database table.
 type Gateway struct {
-	ID         int64      `boil:"id" json:"id" toml:"id" yaml:"id"`
-	UUID       string     `boil:"uuid" json:"uuid" toml:"uuid" yaml:"uuid"`
-	LocationID null.Int64 `boil:"location_id" json:"locationID,omitempty" toml:"locationID" yaml:"locationID,omitempty"`
-	CreatedAt  time.Time  `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
-	UpdatedAt  time.Time  `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
+	ID         int64       `boil:"id" json:"id" toml:"id" yaml:"id"`
+	UUID       string      `boil:"uuid" json:"uuid" toml:"uuid" yaml:"uuid"`
+	LocationID null.Int64  `boil:"location_id" json:"locationID,omitempty" toml:"locationID" yaml:"locationID,omitempty"`
+	Enable     null.Bool   `boil:"enable" json:"enable,omitempty" toml:"enable" yaml:"enable,omitempty"`
+	Remark     null.String `boil:"remark" json:"remark,omitempty" toml:"remark" yaml:"remark,omitempty"`
+	CreatedAt  time.Time   `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
+	CreatedBy  null.Int64  `boil:"created_by" json:"createdBy,omitempty" toml:"createdBy" yaml:"createdBy,omitempty"`
+	UpdatedAt  time.Time   `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
+	UpdatedBy  null.Int64  `boil:"updated_by" json:"updatedBy,omitempty" toml:"updatedBy" yaml:"updatedBy,omitempty"`
+	DeletedAt  null.Time   `boil:"deleted_at" json:"deletedAt,omitempty" toml:"deletedAt" yaml:"deletedAt,omitempty"`
+	DeletedBy  null.Int64  `boil:"deleted_by" json:"deletedBy,omitempty" toml:"deletedBy" yaml:"deletedBy,omitempty"`
 
 	R *gatewayR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L gatewayL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -37,62 +43,125 @@ var GatewayColumns = struct {
 	ID         string
 	UUID       string
 	LocationID string
+	Enable     string
+	Remark     string
 	CreatedAt  string
+	CreatedBy  string
 	UpdatedAt  string
+	UpdatedBy  string
+	DeletedAt  string
+	DeletedBy  string
 }{
 	ID:         "id",
 	UUID:       "uuid",
 	LocationID: "location_id",
+	Enable:     "enable",
+	Remark:     "remark",
 	CreatedAt:  "created_at",
+	CreatedBy:  "created_by",
 	UpdatedAt:  "updated_at",
+	UpdatedBy:  "updated_by",
+	DeletedAt:  "deleted_at",
+	DeletedBy:  "deleted_by",
 }
 
 var GatewayTableColumns = struct {
 	ID         string
 	UUID       string
 	LocationID string
+	Enable     string
+	Remark     string
 	CreatedAt  string
+	CreatedBy  string
 	UpdatedAt  string
+	UpdatedBy  string
+	DeletedAt  string
+	DeletedBy  string
 }{
 	ID:         "gateway.id",
 	UUID:       "gateway.uuid",
 	LocationID: "gateway.location_id",
+	Enable:     "gateway.enable",
+	Remark:     "gateway.remark",
 	CreatedAt:  "gateway.created_at",
+	CreatedBy:  "gateway.created_by",
 	UpdatedAt:  "gateway.updated_at",
+	UpdatedBy:  "gateway.updated_by",
+	DeletedAt:  "gateway.deleted_at",
+	DeletedBy:  "gateway.deleted_by",
 }
 
 // Generated where
+
+type whereHelpernull_Bool struct{ field string }
+
+func (w whereHelpernull_Bool) EQ(x null.Bool) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, false, x)
+}
+func (w whereHelpernull_Bool) NEQ(x null.Bool) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, true, x)
+}
+func (w whereHelpernull_Bool) LT(x null.Bool) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LT, x)
+}
+func (w whereHelpernull_Bool) LTE(x null.Bool) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LTE, x)
+}
+func (w whereHelpernull_Bool) GT(x null.Bool) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GT, x)
+}
+func (w whereHelpernull_Bool) GTE(x null.Bool) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GTE, x)
+}
+
+func (w whereHelpernull_Bool) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
+func (w whereHelpernull_Bool) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
 
 var GatewayWhere = struct {
 	ID         whereHelperint64
 	UUID       whereHelperstring
 	LocationID whereHelpernull_Int64
+	Enable     whereHelpernull_Bool
+	Remark     whereHelpernull_String
 	CreatedAt  whereHelpertime_Time
+	CreatedBy  whereHelpernull_Int64
 	UpdatedAt  whereHelpertime_Time
+	UpdatedBy  whereHelpernull_Int64
+	DeletedAt  whereHelpernull_Time
+	DeletedBy  whereHelpernull_Int64
 }{
 	ID:         whereHelperint64{field: "`gateway`.`id`"},
 	UUID:       whereHelperstring{field: "`gateway`.`uuid`"},
 	LocationID: whereHelpernull_Int64{field: "`gateway`.`location_id`"},
+	Enable:     whereHelpernull_Bool{field: "`gateway`.`enable`"},
+	Remark:     whereHelpernull_String{field: "`gateway`.`remark`"},
 	CreatedAt:  whereHelpertime_Time{field: "`gateway`.`created_at`"},
+	CreatedBy:  whereHelpernull_Int64{field: "`gateway`.`created_by`"},
 	UpdatedAt:  whereHelpertime_Time{field: "`gateway`.`updated_at`"},
+	UpdatedBy:  whereHelpernull_Int64{field: "`gateway`.`updated_by`"},
+	DeletedAt:  whereHelpernull_Time{field: "`gateway`.`deleted_at`"},
+	DeletedBy:  whereHelpernull_Int64{field: "`gateway`.`deleted_by`"},
 }
 
 // GatewayRels is where relationship names are stored.
 var GatewayRels = struct {
-	Location            string
-	GWDevices           string
-	GWUserGatewayRights string
+	Location             string
+	GWDevices            string
+	GWGroupGatewayRights string
+	GWUserGatewayRights  string
 }{
-	Location:            "Location",
-	GWDevices:           "GWDevices",
-	GWUserGatewayRights: "GWUserGatewayRights",
+	Location:             "Location",
+	GWDevices:            "GWDevices",
+	GWGroupGatewayRights: "GWGroupGatewayRights",
+	GWUserGatewayRights:  "GWUserGatewayRights",
 }
 
 // gatewayR is where relationships are stored.
 type gatewayR struct {
-	Location            *Location             `boil:"Location" json:"Location" toml:"Location" yaml:"Location"`
-	GWDevices           DeviceSlice           `boil:"GWDevices" json:"GWDevices" toml:"GWDevices" yaml:"GWDevices"`
-	GWUserGatewayRights UserGatewayRightSlice `boil:"GWUserGatewayRights" json:"GWUserGatewayRights" toml:"GWUserGatewayRights" yaml:"GWUserGatewayRights"`
+	Location             *Location              `boil:"Location" json:"Location" toml:"Location" yaml:"Location"`
+	GWDevices            DeviceSlice            `boil:"GWDevices" json:"GWDevices" toml:"GWDevices" yaml:"GWDevices"`
+	GWGroupGatewayRights GroupGatewayRightSlice `boil:"GWGroupGatewayRights" json:"GWGroupGatewayRights" toml:"GWGroupGatewayRights" yaml:"GWGroupGatewayRights"`
+	GWUserGatewayRights  UserGatewayRightSlice  `boil:"GWUserGatewayRights" json:"GWUserGatewayRights" toml:"GWUserGatewayRights" yaml:"GWUserGatewayRights"`
 }
 
 // NewStruct creates a new relationship struct
@@ -114,6 +183,13 @@ func (r *gatewayR) GetGWDevices() DeviceSlice {
 	return r.GWDevices
 }
 
+func (r *gatewayR) GetGWGroupGatewayRights() GroupGatewayRightSlice {
+	if r == nil {
+		return nil
+	}
+	return r.GWGroupGatewayRights
+}
+
 func (r *gatewayR) GetGWUserGatewayRights() UserGatewayRightSlice {
 	if r == nil {
 		return nil
@@ -125,8 +201,8 @@ func (r *gatewayR) GetGWUserGatewayRights() UserGatewayRightSlice {
 type gatewayL struct{}
 
 var (
-	gatewayAllColumns            = []string{"id", "uuid", "location_id", "created_at", "updated_at"}
-	gatewayColumnsWithoutDefault = []string{"uuid", "location_id"}
+	gatewayAllColumns            = []string{"id", "uuid", "location_id", "enable", "remark", "created_at", "created_by", "updated_at", "updated_by", "deleted_at", "deleted_by"}
+	gatewayColumnsWithoutDefault = []string{"uuid", "location_id", "enable", "remark", "created_by", "updated_by", "deleted_at", "deleted_by"}
 	gatewayColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	gatewayPrimaryKeyColumns     = []string{"id"}
 	gatewayGeneratedColumns      = []string{}
@@ -234,7 +310,7 @@ func (o *Gateway) Location(mods ...qm.QueryMod) locationQuery {
 	return Locations(queryMods...)
 }
 
-// GWDevices retrieves all the device's Devices with an executor via gw_uuid column.
+// GWDevices retrieves all the device's Devices with an executor via gw_id column.
 func (o *Gateway) GWDevices(mods ...qm.QueryMod) deviceQuery {
 	var queryMods []qm.QueryMod
 	if len(mods) != 0 {
@@ -242,10 +318,24 @@ func (o *Gateway) GWDevices(mods ...qm.QueryMod) deviceQuery {
 	}
 
 	queryMods = append(queryMods,
-		qm.Where("`device`.`gw_uuid`=?", o.UUID),
+		qm.Where("`device`.`gw_id`=?", o.ID),
 	)
 
 	return Devices(queryMods...)
+}
+
+// GWGroupGatewayRights retrieves all the group_gateway_right's GroupGatewayRights with an executor via gw_id column.
+func (o *Gateway) GWGroupGatewayRights(mods ...qm.QueryMod) groupGatewayRightQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("`group_gateway_right`.`gw_id`=?", o.ID),
+	)
+
+	return GroupGatewayRights(queryMods...)
 }
 
 // GWUserGatewayRights retrieves all the user_gateway_right's UserGatewayRights with an executor via gw_id column.
@@ -379,7 +469,7 @@ func (gatewayL) LoadGWDevices(e boil.Executor, singular bool, maybeGateway inter
 		if object.R == nil {
 			object.R = &gatewayR{}
 		}
-		args = append(args, object.UUID)
+		args = append(args, object.ID)
 	} else {
 	Outer:
 		for _, obj := range slice {
@@ -388,12 +478,12 @@ func (gatewayL) LoadGWDevices(e boil.Executor, singular bool, maybeGateway inter
 			}
 
 			for _, a := range args {
-				if a == obj.UUID {
+				if queries.Equal(a, obj.ID) {
 					continue Outer
 				}
 			}
 
-			args = append(args, obj.UUID)
+			args = append(args, obj.ID)
 		}
 	}
 
@@ -403,7 +493,7 @@ func (gatewayL) LoadGWDevices(e boil.Executor, singular bool, maybeGateway inter
 
 	query := NewQuery(
 		qm.From(`device`),
-		qm.WhereIn(`device.gw_uuid in ?`, args...),
+		qm.WhereIn(`device.gw_id in ?`, args...),
 	)
 	if mods != nil {
 		mods.Apply(query)
@@ -439,10 +529,101 @@ func (gatewayL) LoadGWDevices(e boil.Executor, singular bool, maybeGateway inter
 
 	for _, foreign := range resultSlice {
 		for _, local := range slice {
-			if local.UUID == foreign.GWUUID {
+			if queries.Equal(local.ID, foreign.GWID) {
 				local.R.GWDevices = append(local.R.GWDevices, foreign)
 				if foreign.R == nil {
 					foreign.R = &deviceR{}
+				}
+				foreign.R.GW = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
+// LoadGWGroupGatewayRights allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (gatewayL) LoadGWGroupGatewayRights(e boil.Executor, singular bool, maybeGateway interface{}, mods queries.Applicator) error {
+	var slice []*Gateway
+	var object *Gateway
+
+	if singular {
+		object = maybeGateway.(*Gateway)
+	} else {
+		slice = *maybeGateway.(*[]*Gateway)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &gatewayR{}
+		}
+		args = append(args, object.ID)
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &gatewayR{}
+			}
+
+			for _, a := range args {
+				if a == obj.ID {
+					continue Outer
+				}
+			}
+
+			args = append(args, obj.ID)
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(
+		qm.From(`group_gateway_right`),
+		qm.WhereIn(`group_gateway_right.gw_id in ?`, args...),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.Query(e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load group_gateway_right")
+	}
+
+	var resultSlice []*GroupGatewayRight
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice group_gateway_right")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on group_gateway_right")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for group_gateway_right")
+	}
+
+	if singular {
+		object.R.GWGroupGatewayRights = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &groupGatewayRightR{}
+			}
+			foreign.R.GW = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if local.ID == foreign.GWID {
+				local.R.GWGroupGatewayRights = append(local.R.GWGroupGatewayRights, foreign)
+				if foreign.R == nil {
+					foreign.R = &groupGatewayRightR{}
 				}
 				foreign.R.GW = local
 				break
@@ -631,17 +812,17 @@ func (o *Gateway) AddGWDevices(exec boil.Executor, insert bool, related ...*Devi
 	var err error
 	for _, rel := range related {
 		if insert {
-			rel.GWUUID = o.UUID
+			queries.Assign(&rel.GWID, o.ID)
 			if err = rel.Insert(exec, boil.Infer()); err != nil {
 				return errors.Wrap(err, "failed to insert into foreign table")
 			}
 		} else {
 			updateQuery := fmt.Sprintf(
 				"UPDATE `device` SET %s WHERE %s",
-				strmangle.SetParamNames("`", "`", 0, []string{"gw_uuid"}),
+				strmangle.SetParamNames("`", "`", 0, []string{"gw_id"}),
 				strmangle.WhereClause("`", "`", 0, devicePrimaryKeyColumns),
 			)
-			values := []interface{}{o.UUID, rel.ID}
+			values := []interface{}{o.ID, rel.ID}
 
 			if boil.DebugMode {
 				fmt.Fprintln(boil.DebugWriter, updateQuery)
@@ -651,7 +832,7 @@ func (o *Gateway) AddGWDevices(exec boil.Executor, insert bool, related ...*Devi
 				return errors.Wrap(err, "failed to update foreign table")
 			}
 
-			rel.GWUUID = o.UUID
+			queries.Assign(&rel.GWID, o.ID)
 		}
 	}
 
@@ -666,6 +847,131 @@ func (o *Gateway) AddGWDevices(exec boil.Executor, insert bool, related ...*Devi
 	for _, rel := range related {
 		if rel.R == nil {
 			rel.R = &deviceR{
+				GW: o,
+			}
+		} else {
+			rel.R.GW = o
+		}
+	}
+	return nil
+}
+
+// SetGWDevices removes all previously related items of the
+// gateway replacing them completely with the passed
+// in related items, optionally inserting them as new records.
+// Sets o.R.GW's GWDevices accordingly.
+// Replaces o.R.GWDevices with related.
+// Sets related.R.GW's GWDevices accordingly.
+func (o *Gateway) SetGWDevices(exec boil.Executor, insert bool, related ...*Device) error {
+	query := "update `device` set `gw_id` = null where `gw_id` = ?"
+	values := []interface{}{o.ID}
+	if boil.DebugMode {
+		fmt.Fprintln(boil.DebugWriter, query)
+		fmt.Fprintln(boil.DebugWriter, values)
+	}
+	_, err := exec.Exec(query, values...)
+	if err != nil {
+		return errors.Wrap(err, "failed to remove relationships before set")
+	}
+
+	if o.R != nil {
+		for _, rel := range o.R.GWDevices {
+			queries.SetScanner(&rel.GWID, nil)
+			if rel.R == nil {
+				continue
+			}
+
+			rel.R.GW = nil
+		}
+		o.R.GWDevices = nil
+	}
+
+	return o.AddGWDevices(exec, insert, related...)
+}
+
+// RemoveGWDevices relationships from objects passed in.
+// Removes related items from R.GWDevices (uses pointer comparison, removal does not keep order)
+// Sets related.R.GW.
+func (o *Gateway) RemoveGWDevices(exec boil.Executor, related ...*Device) error {
+	if len(related) == 0 {
+		return nil
+	}
+
+	var err error
+	for _, rel := range related {
+		queries.SetScanner(&rel.GWID, nil)
+		if rel.R != nil {
+			rel.R.GW = nil
+		}
+		if _, err = rel.Update(exec, boil.Whitelist("gw_id")); err != nil {
+			return err
+		}
+	}
+	if o.R == nil {
+		return nil
+	}
+
+	for _, rel := range related {
+		for i, ri := range o.R.GWDevices {
+			if rel != ri {
+				continue
+			}
+
+			ln := len(o.R.GWDevices)
+			if ln > 1 && i < ln-1 {
+				o.R.GWDevices[i] = o.R.GWDevices[ln-1]
+			}
+			o.R.GWDevices = o.R.GWDevices[:ln-1]
+			break
+		}
+	}
+
+	return nil
+}
+
+// AddGWGroupGatewayRights adds the given related objects to the existing relationships
+// of the gateway, optionally inserting them as new records.
+// Appends related to o.R.GWGroupGatewayRights.
+// Sets related.R.GW appropriately.
+func (o *Gateway) AddGWGroupGatewayRights(exec boil.Executor, insert bool, related ...*GroupGatewayRight) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			rel.GWID = o.ID
+			if err = rel.Insert(exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE `group_gateway_right` SET %s WHERE %s",
+				strmangle.SetParamNames("`", "`", 0, []string{"gw_id"}),
+				strmangle.WhereClause("`", "`", 0, groupGatewayRightPrimaryKeyColumns),
+			)
+			values := []interface{}{o.ID, rel.ID}
+
+			if boil.DebugMode {
+				fmt.Fprintln(boil.DebugWriter, updateQuery)
+				fmt.Fprintln(boil.DebugWriter, values)
+			}
+			if _, err = exec.Exec(updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			rel.GWID = o.ID
+		}
+	}
+
+	if o.R == nil {
+		o.R = &gatewayR{
+			GWGroupGatewayRights: related,
+		}
+	} else {
+		o.R.GWGroupGatewayRights = append(o.R.GWGroupGatewayRights, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &groupGatewayRightR{
 				GW: o,
 			}
 		} else {

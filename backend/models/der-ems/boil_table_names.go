@@ -26,7 +26,6 @@ var TableNames = struct {
 	TouHoliday                 string
 	TouLocation                string
 	User                       string
-	UserGatewayRight           string
 	WeatherForecast            string
 	Webpage                    string
 }{
@@ -52,7 +51,6 @@ var TableNames = struct {
 	TouHoliday:                 "tou_holiday",
 	TouLocation:                "tou_location",
 	User:                       "user",
-	UserGatewayRight:           "user_gateway_right",
 	WeatherForecast:            "weather_forecast",
 	Webpage:                    "webpage",
 }

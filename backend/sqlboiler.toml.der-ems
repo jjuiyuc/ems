@@ -75,4 +75,4 @@ port    = 3306
 user    = "ubiik"
 pass    = "testing123"
 sslmode = "false"
-whitelist = ["weather_forecast", "location", "gateway", "device_model", "device", "login_log", "user", "cc_data", "tou", "tou_holiday", "tou_location", "user_gateway_right", "cc_data_log", "ai_data", "cc_data_log_calculated_daily", "cc_data_log_calculated_monthly", "group_type", "group", "webpage", "group_type_webpage_right", "gateway_log", "group_gateway_right", "group_gateway_right_log", "device_module", "device_log"]
+whitelist = ["weather_forecast", "location", "gateway", "device_model", "device", "login_log", "user", "cc_data", "tou", "tou_holiday", "tou_location", "cc_data_log", "ai_data", "cc_data_log_calculated_daily", "cc_data_log_calculated_monthly", "group_type", "group", "webpage", "group_type_webpage_right", "gateway_log", "group_gateway_right", "group_gateway_right_log", "device_module", "device_log"]

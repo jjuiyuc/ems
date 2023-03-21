@@ -50,12 +50,12 @@ var _ = Describe("TimeOfUse", func() {
 		Expect(err).Should(BeNil())
 		token, err = utils.GenerateToken(fixtures.UtUser.ID)
 		Expect(err).Should(BeNil())
-		// Mock user_gateway_right table
-		_, err = db.Exec("TRUNCATE TABLE user_gateway_right")
+		// Mock group_gateway_right table
+		_, err = db.Exec("TRUNCATE TABLE group_gateway_right")
 		Expect(err).Should(BeNil())
 		_, err = db.Exec(`
-			INSERT INTO user_gateway_right (id,user_id,gw_id) VALUES
-			(1,1,1);
+			INSERT INTO group_gateway_right (id,group_id,gw_id,enabled_at) VALUES
+			(1,2,1,'2022-07-01 00:00:00');
 		`)
 		Expect(err).Should(BeNil())
 

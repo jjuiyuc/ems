@@ -54,12 +54,12 @@ func (s *DashboardSuite) SetupSuite() {
 	token, err := utils.GenerateToken(fixtures.UtUser.ID)
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	s.token = token
-	// Mock user_gateway_right table
-	_, err = db.Exec("TRUNCATE TABLE user_gateway_right")
+	// Mock group_gateway_right table
+	_, err = db.Exec("TRUNCATE TABLE group_gateway_right")
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	_, err = db.Exec(`
-			INSERT INTO user_gateway_right (id,user_id,gw_id) VALUES
-			(1,1,1);
+			INSERT INTO group_gateway_right (id,group_id,gw_id,enabled_at) VALUES
+			(1,2,1,'2022-07-01 00:00:00');
 		`)
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 

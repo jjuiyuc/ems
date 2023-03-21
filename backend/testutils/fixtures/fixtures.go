@@ -12,7 +12,7 @@ import (
 var UtUser = &deremsmodels.User{
 	ID:             1,
 	Username:       "ut-user@gmail.com",
-	GroupID:        1,
+	GroupID:        2,
 	Password:       "testing123",
 	ExpirationDate: null.NewTime(time.Date(2100, 1, 1, 0, 0, 0, 0, time.UTC), true),
 }

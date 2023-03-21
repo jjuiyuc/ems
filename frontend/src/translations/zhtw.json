@@ -1,12 +1,12 @@
 {
     "accountManagementGroup":{
         "fieldList":"場域列表",
-        "groupName":"群組名稱",
         "groupType":"群組類型",
         "parentGroup":"父層群組"
     },
     "accountManagementUser":{
         "account":"帳號",
+        "addUser":"新增使用者",
         "name":"名稱",
         "password":"密碼",
         "user":"使用者"
@@ -54,6 +54,7 @@
         "exportToGrid": "回送市電",
         "grid": "市電",
         "group":"群組",
+        "groupName":"群組名稱",
         "inactive":"未啟動",
         "kw": "kW",
         "kwh": "度",
@@ -97,17 +98,9 @@
         "realizedSavings": "已避免超約費用"
     },
     "dialog": {
-        "account":"帳號",
         "confirmedMsg":"Are you sure you want to turn off all the charging resources?",
         "deleteMsg":"請問您是否要刪除這筆資料?",
-        "fieldList":"場域列表",
-        "groupName":"群組名稱",
-        "groupType":"群組類型",
-        "name":"名稱",
-        "parentGroup":"父層群組",
-        "password":"密碼",
-        "promptMsg":"If all charging resources are turned off, the battery will be in standby mode.",
-        "user":"使用者"
+        "promptMsg":"If all charging resources are turned off, the battery will be in standby mode."
     },
     "economics": {
         "ancillaryServices": "輔助服務",

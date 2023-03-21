@@ -1,12 +1,12 @@
 {
     "accountManagementGroup":{
         "fieldList":"Field List",
-        "groupName":"Group Name",
         "groupType":"Group Type",
         "parentGroup":"Parent Group"
     },
     "accountManagementUser":{
         "account":"Account",
+        "addUser":"Add User",
         "name":"Name",
         "password":"Password",
         "user":"User"
@@ -54,6 +54,7 @@
         "exportToGrid": "Export to Grid",
         "grid": "Grid",
         "group":"Group",
+        "groupName":"Group Name",
         "inactive":"Inactive",
         "load": "Load",
         "logIn": "Log In",
@@ -97,17 +98,9 @@
         "realizedSavings": "Realized Savings"
     },
     "dialog": {
-        "account":"Account",
         "confirmedMsg":"Are you sure you want to turn off all the charging resources?",
-        "fieldList":"Field List",
-        "groupName":"Group Name",
-        "groupType":"Group Type",
         "deleteMsg":"Are you sure you want to delete this?",
-        "name":"Name",
-        "parentGroup":"Parent Group",
-        "password":"Password",
-        "promptMsg":"If all charging resources are turned off, the battery will be in standby mode.",
-        "user":"User"
+        "promptMsg":"If all charging resources are turned off, the battery will be in standby mode."
     },
     "economics": {
         "ancillaryServices": "Ancillary Services",

@@ -1,16 +1,14 @@
 import {
-    Button, Dialog, DialogTitle, DialogActions, Divider, FormControl,
-    ListItem, MenuItem, TextField
+    Button, DialogActions, Divider, FormControl, ListItem,
+    MenuItem, TextField
 } from "@mui/material"
-import moment from "moment"
+import AddIcon from "@mui/icons-material/Add"
 import { useTranslation } from "react-multi-lang"
 import { useEffect, useMemo, useState } from "react"
 
-import DialogBox from "../components/DialogBox"
 import DialogForm from "../components/DialogForm"
 import Table from "../components/DataTable"
 
-import AddIcon from "@mui/icons-material/Add"
 import { ReactComponent as DeleteIcon } from "../assets/icons/trash_solid.svg"
 import { ReactComponent as EditIcon } from "../assets/icons/edit.svg"
 import { ReactComponent as NoticeIcon } from "../assets/icons/notice.svg"
@@ -96,7 +94,7 @@ export default function AccountManagementGroup() {
         {
             cell: row => <span className="font-mono">{row.groupName}</span>,
             center: true,
-            name: pageT("groupName"),
+            name: commonT("groupName"),
             selector: row => row.groupName
         },
         {
@@ -150,6 +148,7 @@ export default function AccountManagementGroup() {
                 dialogTitle={commonT("group")}
                 open={openAdd}
                 setOpen={setOpenAdd}>
+                <Divider variant="middle" />
                 <FormControl sx={{
                     display: "flex",
                     flexDirection: "column",
@@ -160,14 +159,14 @@ export default function AccountManagementGroup() {
                 }}>
                     <TextField
                         id="add-name"
-                        label={dialogT("groupName")}
+                        label={commonT("groupName")}
                         value={groupName}
                         focused
                     />
                     <TextField
                         id="add-type"
                         select
-                        label={dialogT("groupType")}
+                        label={pageT("groupType")}
                         defaultValue=""
                     >
                         {typeGroup.map((option) => (
@@ -179,7 +178,7 @@ export default function AccountManagementGroup() {
                     <TextField
                         id="add-parent-group-type"
                         select
-                        label={dialogT("parentGroup")}
+                        label={pageT("parentGroup")}
                         defaultValue=""
                     >
                         {parentGroupType.map((option) => (
@@ -189,6 +188,7 @@ export default function AccountManagementGroup() {
                         ))}
                     </TextField>
                 </FormControl>
+                <Divider variant="middle" />
                 <DialogActions sx={{ margin: "1rem 0.5rem 1rem 0" }}>
                     <Button onClick={() => { setOpenAdd(false) }}
                         radius="pill"
@@ -220,34 +220,35 @@ export default function AccountManagementGroup() {
             dialogTitle={commonT("group")}
             open={openNotice}
             setOpen={setOpenNotice}>
+            <Divider variant="middle" />
             <div className="flex flex-col m-auto mt-4 min-w-49.5 w-fit">
                 <div className="grid grid-cols-1fr-auto">
-                    <h5 className="ml-6 mt-2">{dialogT("groupName")} :</h5>
+                    <h5 className="ml-6 mt-2">{commonT("groupName")} :</h5>
                     <ListItem
                         id="name"
-                        label={dialogT("groupName")}>
+                        label={commonT("groupName")}>
                         {target?.groupName || ""}
                     </ListItem>
-                    <h5 className="ml-6 mt-2">{dialogT("groupType")} :</h5>
+                    <h5 className="ml-6 mt-2">{pageT("groupType")} :</h5>
                     <ListItem
                         id="group-type"
-                        label={dialogT("groupType")}
+                        label={pageT("groupType")}
                     >
                         {target?.groupType || ""}
                     </ListItem>
                     {target?.parentGroup
-                        ? <> <h5 className="ml-6 mt-2">{dialogT("parentGroup")} :</h5>
+                        ? <> <h5 className="ml-6 mt-2">{pageT("parentGroup")} :</h5>
                             <ListItem
                                 id="parent-group-type"
-                                label={dialogT("parentGroup")}
+                                label={pageT("parentGroup")}
                             >
                                 {target?.parentGroup || ""}
                             </ListItem></>
                         : null}
-                    <h5 className="ml-6 mt-2">{dialogT("fieldList")} :</h5>
+                    <h5 className="ml-6 mt-2">{pageT("fieldList")} :</h5>
                     <ListItem
                         id="field-list"
-                        label={dialogT("fieldList")}
+                        label={pageT("fieldList")}
                     >
                         {target?.fieldList || ""}
                     </ListItem>
@@ -268,6 +269,7 @@ export default function AccountManagementGroup() {
             dialogTitle={commonT("group")}
             open={openEdit}
             setOpen={setOpenEdit}>
+            <Divider variant="middle" />
             <FormControl sx={{
                 display: "flex",
                 flexDirection: "column",
@@ -278,7 +280,7 @@ export default function AccountManagementGroup() {
             }}>
                 <TextField
                     id="edit-name"
-                    label={dialogT("groupName")}
+                    label={commonT("groupName")}
                     onChange={handleChange}
                     value={target?.groupName || ""}
                     focused>
@@ -309,7 +311,7 @@ export default function AccountManagementGroup() {
             open={openDelete}
             setOpen={setOpenDelete}>
             <div className="flex">
-                <h5 className="ml-6 mr-2">{dialogT("groupName")} :</h5>
+                <h5 className="ml-6 mr-2">{commonT("groupName")} :</h5>
                 {target?.groupName || ""}
             </div>
             <DialogActions sx={{ margin: "0.5rem 0.5rem 0.5rem 0" }}>

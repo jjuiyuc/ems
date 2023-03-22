@@ -191,7 +191,6 @@ export default function AccountManagementUser() {
         <div className="mb-9">
             <Button
                 onClick={() => { setOpenAdd(true) }}
-                key={"ac-b-"}
                 size="x-large"
                 variant="outlined"
                 radius="pill"
@@ -201,7 +200,6 @@ export default function AccountManagementUser() {
                 {commonT("add")}
             </Button>
             <DialogForm
-                type={"addUser"}
                 dialogTitle={pageT("addUser")}
                 open={openAdd}
                 setOpen={setOpenAdd}>
@@ -267,6 +265,11 @@ export default function AccountManagementUser() {
                             </MenuItem>
                         ))}
                     </TextField>
+                    {otherError
+                        ? <div className="box mb-8 negative text-center text-red-400">
+                            {otherError}
+                        </div>
+                        : null}
                 </FormControl>
                 <Divider variant="middle" />
                 <DialogActions sx={{ margin: "1rem 0.5rem 1rem 0" }}>
@@ -308,7 +311,6 @@ export default function AccountManagementUser() {
         />
         {/* edit */}
         <DialogForm
-            type={"editUser"}
             dialogTitle={pageT("user")}
             open={openEdit}
             setOpen={setOpenEdit}
@@ -397,7 +399,6 @@ export default function AccountManagementUser() {
         </DialogForm>
         {/* delete */}
         <DialogForm
-            type={"delete"}
             dialogTitle={dialogT("deleteMsg")}
             open={openDelete}
             setOpen={setOpenDelete}>

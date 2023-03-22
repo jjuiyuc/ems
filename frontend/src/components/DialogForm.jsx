@@ -14,18 +14,16 @@ export default function DialogForm({
         [maxWidth, setMaxWidth] = useState("sm")
 
     return <>
-        <div>
-            <Dialog
-                fullWidth={fullWidth}
-                maxWidth={maxWidth}
-                open={open}
-                onClose={closeOutside ? handleClose : () => { }}
-            >
-                <DialogTitle id="form-dialog-title">
-                    {dialogTitle}
-                </DialogTitle>
-                {children}
-            </Dialog>
-        </div>
+        <Dialog
+            fullWidth={fullWidth}
+            maxWidth={maxWidth}
+            open={open}
+            onClose={closeOutside ? handleClose : () => { }}
+        >
+            <DialogTitle id="form-dialog-title">
+                {dialogTitle}
+            </DialogTitle>
+            {children}
+        </Dialog>
     </>
 }

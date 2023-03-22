@@ -134,7 +134,6 @@ export default function AccountManagementGroup() {
         <div className="mb-9">
             <Button
                 onClick={() => { setOpenAdd(true) }}
-                key={"ac-b-"}
                 size="x-large"
                 variant="outlined"
                 radius="pill"
@@ -144,7 +143,6 @@ export default function AccountManagementGroup() {
                 {commonT("add")}
             </Button>
             <DialogForm
-                type={"addGroup"}
                 dialogTitle={commonT("group")}
                 open={openAdd}
                 setOpen={setOpenAdd}>
@@ -216,12 +214,11 @@ export default function AccountManagementGroup() {
         />
         {/* notice */}
         <DialogForm
-            type={"notice"}
             dialogTitle={commonT("group")}
             open={openNotice}
             setOpen={setOpenNotice}>
             <Divider variant="middle" />
-            <div className="flex flex-col m-auto mt-4 min-w-49.5 w-fit">
+            <div className="flex flex-col m-auto mt-4 min-w-49 w-fit">
                 <div className="grid grid-cols-1fr-auto">
                     <h5 className="ml-6 mt-2">{commonT("groupName")} :</h5>
                     <ListItem
@@ -265,7 +262,6 @@ export default function AccountManagementGroup() {
         </DialogForm>
         {/* edit */}
         <DialogForm
-            type={"editGroup"}
             dialogTitle={commonT("group")}
             open={openEdit}
             setOpen={setOpenEdit}>
@@ -306,7 +302,6 @@ export default function AccountManagementGroup() {
         </DialogForm>
         {/* delete */}
         <DialogForm
-            type={"delete"}
             dialogTitle={dialogT("deleteMsg")}
             open={openDelete}
             setOpen={setOpenDelete}>

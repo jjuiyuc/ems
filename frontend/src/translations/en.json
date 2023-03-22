@@ -1,4 +1,16 @@
 {
+    "accountManagementGroup":{
+        "fieldList":"Field List",
+        "groupType":"Group Type",
+        "parentGroup":"Parent Group"
+    },
+    "accountManagementUser":{
+        "account":"Account",
+        "addUser":"Add User",
+        "name":"Name",
+        "password":"Password",
+        "user":"User"
+    },
     "analysis": {
         "accumulatedKwh": "Accumulated kWh",
         "analysis": "Analysis",
@@ -26,24 +38,33 @@
         "YesterdayPowerkW":"Yesterday Power (kW)"
     },
     "common": {
+        "accountManagementGroup":"Account Management Group",
+        "accountManagementUser":"Account Management User",
         "active": "Active",
+        "add":"Add",
         "battery": "Battery",
         "batteryPower": "Battery Power",
+        "cancel":"Cancel",
         "chargingFrom": "Charging From",
         "chargeFromGrid":"Charge from Grid",
         "copyright": "© 2022 Ubiik Inc. All rights reserved",
+        "delete":"Delete",
         "demandCharge": "Demand Charge",
         "dischargingTo": "Discharging To",
         "exportToGrid": "Export to Grid",
         "grid": "Grid",
+        "group":"Group",
+        "groupName":"Group Name",
         "inactive":"Inactive",
         "load": "Load",
         "logIn": "Log In",
         "logOut": "Log Out",
         "kw": "kW",
         "kwh": "kWh",
+        "okay":"Okay",
         "passwordRule": "Password must be at least six characters long, and include 3 out of 4 of the following: uppercase letter, lowercase letter, numeric character and special character.",
         "peakShave": "Peak Shave",
+        "save":"Save",
         "solar": "Solar",
         "sources":"Sources",
         "stateOfCharge": "State of Charge",
@@ -64,6 +85,10 @@
         "solar":"Solar",
         "unableToConnect": "Unable to connect"
     },
+    "dataTable":{
+        "group":"Group",
+        "noDataMsg":"No Data Message"
+    },
     "demandCharge": {
         "chartError": "Can't get chart data",
         "currentBillingCycle": "Current Billing Cycle",
@@ -74,6 +99,7 @@
     },
     "dialog": {
         "confirmedMsg":"Are you sure you want to turn off all the charging resources?",
+        "deleteMsg":"Are you sure you want to delete this?",
         "promptMsg":"If all charging resources are turned off, the battery will be in standby mode."
     },
     "economics": {
@@ -194,6 +220,8 @@
         "forgotPassword": "Forgot Password?"
     },
     "navigator": {
+        "accountManagementGroup":"Account Management Group",
+        "accountManagementUser":"Account Management User",
         "analysis": "Analysis",
         "dashboard": "Dashboard",
         "demandCharge": "Demand Charge",

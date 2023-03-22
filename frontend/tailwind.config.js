@@ -29,6 +29,7 @@ module.exports = {
                 "auto-1fr": "auto 1fr",
                 "auto-19rem": "auto 19rem",
                 "1fr-1px-1fr": "1fr 1px 1fr",
+                "1fr-auto": "1fr auto",
                 "3-auto": "auto auto auto",
                 "5rem-1fr": "5rem 1fr",
                 "15rem-1fr": "15rem 1fr",
@@ -53,6 +54,7 @@ module.exports = {
             margin: {
                 "0.7": "0.188rem",
                 "18": "4.5rem",
+                "auto": "auto"
             },
             maxWidth: {
                 "2/3": "66.6%"
@@ -60,7 +62,8 @@ module.exports = {
             minWidth: {
                 "16": "4rem",
                 "20": "5rem",
-                "42": "10.5rem"
+                "42": "10.5rem",
+                "49": "12.25rem"
             },
             padding: {
                 "7": "1.75rem",

@@ -57,17 +57,24 @@ const theme = createTheme({
                         }
                     }),
                 },
+
+                {
+                    props: { size: "x-large" },
+                    style: {
+                        borderRadius: "20px",
+                        paddingLeft: "2rem",
+                        paddingRight: "2rem",
+                        fontSize: "1rem",
+                        height: "60px"
+                    }
+                },
                 {
                     props: { radius: "pill" },
                     style: { borderRadius: "100vh" },
                 },
                 {
-                    props: { size: "x-large" },
-                    style: {
-                        borderRadius: "20px",
-                        fontSize: "1rem",
-                        height: "60px"
-                    }
+                    props: { fontSize: "large" },
+                    style: { fontSize: "1.2rem" },
                 },
                 {
                     props: { size: "small", variant: "text" },

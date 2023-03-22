@@ -4,10 +4,13 @@ import React from "react"
 import { Fade, Tooltip } from "@mui/material"
 import { useTranslation } from "react-multi-lang"
 
+import { ReactComponent as AccountGroup } from "../assets/icons/group.svg"
+import { ReactComponent as AccountUser } from "../assets/icons/user.svg"
 import { ReactComponent as Analysis } from "../assets/icons/analysis.svg"
 import { ReactComponent as Dashboard } from "../assets/icons/dashboard.svg"
 import { ReactComponent as Demand } from "../assets/icons/demand_charge.svg"
 import { ReactComponent as Economics } from "../assets/icons/economics.svg"
+import { ReactComponent as Field } from "../assets/icons/field_management.svg"
 import { ReactComponent as Menu } from "../assets/icons/menu.svg"
 import { ReactComponent as Logo } from "../assets/images/logo.svg"
 import { ReactComponent as LogoWithName } from "../assets/images/logoWithName.svg"
@@ -34,6 +37,9 @@ function Sidebar(props) {
             { icon: <Economics />, path: "economics" },
             { icon: <Demand />, path: "demand-charge", text: "demandCharge" },
             { icon: <Resource />, path: "energy-resources", text: "energyResources" },
+            // { icon: <Field />, path: "field-management", text: "fieldManagement" },
+            { icon: <AccountGroup />, path: "account-management-group", text: "accountManagementGroup" },
+            { icon: <AccountUser />, path: "account-management-user", text: "accountManagementUser" },
             { icon: <Settings />, path: "settings" }
         ],
         t = useTranslation(),

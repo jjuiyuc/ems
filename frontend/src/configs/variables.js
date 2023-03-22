@@ -22,9 +22,7 @@ const variables = {
         purple,
         negative,
         red
-
     },
-
     languages: {
         en: "English",
         zhtw: "中文"

@@ -2,6 +2,7 @@ import {
     Button, Divider, FormControl, ListItemIcon, Menu, MenuItem,
     OutlinedInput, Select
 } from "@mui/material"
+import { NavLink } from "react-router-dom"
 import { connect } from "react-redux"
 import { Language as LanguageIcon, Logout as LogoutIcon }
     from "@mui/icons-material"
@@ -39,6 +40,11 @@ function TopNav(props) {
                 label: "018F1623ADD8E739F7C6CBE62A7DF3C0",
             }
         ]
+
+    // const routes = [
+    //     { icon: <Account />, path: "account" }
+    // ],
+
 
     const
         [menuAnchorEl, setMenuAnchorEl] = useState(null),
@@ -139,9 +145,14 @@ function TopNav(props) {
                 <LanguageSelector id="lang" size="small" />
             </MenuItem>
             <Divider />
-            <MenuItem onClick={logout}>
-                <ListItemIcon><UserIcon /></ListItemIcon>
-                {commonT("account")}
+            <MenuItem className="top-menu">
+                <NavLink
+                    className={({ isActive }) => isActive ? " active" : ""}
+                    to="/account">
+                    <ListItemIcon><UserIcon /></ListItemIcon>
+                    {commonT("account")}
+                </NavLink>
+
             </MenuItem>
             <Divider />
             <MenuItem onClick={logout}>

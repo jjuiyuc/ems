@@ -9,9 +9,10 @@ import Sidebar from "../components/Sidebar"
 import TopNav from "../components/TopNav"
 import Sample from "../configs/Sample"
 
-import Analysis from "../pages/Analysis"
+import Account from "../pages/Account"
 import AccountManagementGroup from "../pages/AccountManagementGroup"
 import AccountManagementUser from "../pages/AccountManagementUser"
+import Analysis from "../pages/Analysis"
 import Dashboard from "../pages/Dashboard"
 import DemandCharge from "../pages/DemandCharge"
 import Economics from "../pages/Economics"
@@ -66,9 +67,12 @@ function LoggedIn(props) {
                                 replace
                                 to="/energy-resources/solar" />}
                             path="/energy-resources" />
-                        <Route element={<AccountManagementGroup />}
+                        <Route element={<Account />} path="/account" />
+                        <Route
+                            element={<AccountManagementGroup />}
                             path="/account-management-group" />
-                        <Route element={<AccountManagementUser />}
+                        <Route
+                            element={<AccountManagementUser />}
                             path="/account-management-user" />
                         <Route element={<Settings />} path="/settings" />
                         <Route

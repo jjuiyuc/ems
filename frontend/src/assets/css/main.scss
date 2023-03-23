@@ -105,6 +105,19 @@ h6 {
         @apply mb-3 sm:mb-0;
     }
 }
+.top-menu {
+
+        a {
+            @apply flex items-center text-white;
+
+            &:hover {
+                @apply  text-white;
+            }
+            &.active {
+                @apply  cursor-default text-white;
+            }
+    }
+}
 .sidebar-menu {
     li {
         a {

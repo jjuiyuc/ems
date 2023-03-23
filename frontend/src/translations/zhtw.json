@@ -58,7 +58,7 @@
         "delete":"刪除",
         "demandCharge": "契約容量超約",
         "exportToGrid": "回送市電",
-        "gateway":"Gateway",
+        "gatewayID":"Gateway ID",
         "grid": "市電",
         "group":"群組",
         "groupName":"群組名稱",
@@ -209,6 +209,9 @@
         "timeOverlapError":"時間區間不能重疊。",
         "userLocked": "使用者帳號已被鎖定。"
     },
+    "fieldManagement":{
+
+    },
     "forgotPassword": {
         "backToLogin": "回登入頁",
         "forgotPassword": "忘記密碼",
@@ -236,6 +239,7 @@
         "demandCharge": "契約容量超約",
         "economics": "經濟收益",
         "energyResources": "分散式能源",
+        "fieldManagement":"場域管理",
         "settings": "設定",
         "timeOfUseEnergy": "時間電價"
     },

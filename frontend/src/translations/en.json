@@ -58,7 +58,7 @@
         "demandCharge": "Demand Charge",
         "dischargingTo": "Discharging To",
         "exportToGrid": "Export to Grid",
-        "gateway":"Gateway",
+        "gatewayID":"Gateway ID",
         "grid": "Grid",
         "group":"Group",
         "groupName":"Group Name",
@@ -208,6 +208,9 @@
         "timeOverlapError":"The time range cannot overlap.",
         "userLocked": "User is locked."
     },
+    "fieldManagement":{
+
+    },
     "forgotPassword": {
         "backToLogin": "Back to Login",
         "forgotPassword": "Forgot Password",
@@ -235,6 +238,7 @@
         "demandCharge": "Demand Charge",
         "economics": "Economics",
         "energyResources": "Energy Resources",
+        "fieldManagement":"Field Management",
         "settings": "Settings",
         "timeOfUseEnergy": "Time of Use Energy"
     },

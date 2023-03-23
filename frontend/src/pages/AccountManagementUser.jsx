@@ -22,8 +22,8 @@ export default function AccountManagementUser() {
 
     const groupData = [
         {
-            value: "AreaOwner_TW",
-            label: "AreaOwner_TW",
+            value: "Area Owner_TW",
+            label: "Area Owner_TW",
         },
         {
             value: "Area Maintainer_TW",
@@ -57,7 +57,7 @@ export default function AccountManagementUser() {
                 account: "YYYYY@ubiik.com",
                 password: "x77xxxxll",
                 name: "YYYYY",
-                group: "AreaMaintainer_TW"
+                group: "Area Maintainer_TW"
             },
             {
                 id: 3,
@@ -316,7 +316,6 @@ export default function AccountManagementUser() {
             setOpen={setOpenEdit}
         >
             <Divider variant="middle" />
-
             <FormControl sx={{
                 display: "flex",
                 flexDirection: "column",
@@ -424,3 +423,4 @@ export default function AccountManagementUser() {
         </DialogForm>
     </>
 }
+// flex flex-col mt-4 min-w-49 w-fit min-w-xs

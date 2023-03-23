@@ -1,4 +1,9 @@
 {
+    "account":{
+        "accountInformationModification":"帳號資料修改",
+        "name":"名稱",
+        "password":"密碼"
+    },
     "accountManagementGroup":{
         "fieldList":"場域列表",
         "groupType":"群組類型",
@@ -38,6 +43,7 @@
         "YesterdayPowerkW":"昨日功率 (kW)"
     },
     "common": {
+        "account":"個人帳號",
         "accountManagementGroup":"帳號管理（群組）",
         "accountManagementUser":"帳號管理（使用者）",
         "active": "已啟動",
@@ -52,6 +58,7 @@
         "delete":"刪除",
         "demandCharge": "契約容量超約",
         "exportToGrid": "回送市電",
+        "gateway":"Gateway",
         "grid": "市電",
         "group":"群組",
         "groupName":"群組名稱",
@@ -59,6 +66,7 @@
         "kw": "kW",
         "kwh": "度",
         "load": "用電負載",
+        "locationName":"場域名稱",
         "logIn": "登入",
         "logOut": "登出",
         "okay":"Okay",
@@ -86,8 +94,8 @@
         "unableToConnect": "無法建立連線"
     },
     "dataTable":{
-        "group":"Group",
-        "noDataMsg":"No Data Message"
+        "noDataMsg":"沒有資料",
+        "rowsPerPage":"每頁行數"
     },
     "demandCharge": {
         "chartError": "無法取得圖表資料",

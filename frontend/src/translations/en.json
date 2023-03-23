@@ -1,4 +1,9 @@
 {
+    "account":{
+        "accountInformationModification":"Account Information Modification",
+        "name":"Name",
+        "password":"Password"
+    },
     "accountManagementGroup":{
         "fieldList":"Field List",
         "groupType":"Group Type",
@@ -38,6 +43,7 @@
         "YesterdayPowerkW":"Yesterday Power (kW)"
     },
     "common": {
+        "account":"Account",
         "accountManagementGroup":"Account Management Group",
         "accountManagementUser":"Account Management User",
         "active": "Active",
@@ -52,11 +58,13 @@
         "demandCharge": "Demand Charge",
         "dischargingTo": "Discharging To",
         "exportToGrid": "Export to Grid",
+        "gateway":"Gateway",
         "grid": "Grid",
         "group":"Group",
         "groupName":"Group Name",
         "inactive":"Inactive",
         "load": "Load",
+        "locationName":"Location Name",
         "logIn": "Log In",
         "logOut": "Log Out",
         "kw": "kW",
@@ -86,8 +94,8 @@
         "unableToConnect": "Unable to connect"
     },
     "dataTable":{
-        "group":"Group",
-        "noDataMsg":"No Data Message"
+        "noDataMsg":"No Data Message",
+        "rowsPerPage":"Rows per page"
     },
     "demandCharge": {
         "chartError": "Can't get chart data",

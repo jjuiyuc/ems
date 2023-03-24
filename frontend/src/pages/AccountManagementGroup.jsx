@@ -68,6 +68,8 @@ export default function AccountManagementGroup() {
         ]),
         [error, setError] = useState(null),
         [loading, setLoading] = useState(false),
+        [fullWidth, setFullWidth] = useState(true),
+        [maxWidth, setMaxWidth] = useState("sm"),
         [openAdd, setOpenAdd] = useState(false),
         [openNotice, setOpenNotice] = useState(false),
         [openEdit, setOpenEdit] = useState(false),
@@ -144,6 +146,8 @@ export default function AccountManagementGroup() {
             </Button>
             <DialogForm
                 dialogTitle={commonT("group")}
+                fullWidth={fullWidth}
+                maxWidth={maxWidth}
                 open={openAdd}
                 setOpen={setOpenAdd}>
                 <Divider variant="middle" />
@@ -215,6 +219,8 @@ export default function AccountManagementGroup() {
         {/* notice */}
         <DialogForm
             dialogTitle={commonT("group")}
+            fullWidth={fullWidth}
+            maxWidth={maxWidth}
             open={openNotice}
             setOpen={setOpenNotice}>
             <Divider variant="middle" />
@@ -263,6 +269,8 @@ export default function AccountManagementGroup() {
         {/* edit */}
         <DialogForm
             dialogTitle={commonT("group")}
+            fullWidth={fullWidth}
+            maxWidth={maxWidth}
             open={openEdit}
             setOpen={setOpenEdit}>
             <Divider variant="middle" />
@@ -303,6 +311,8 @@ export default function AccountManagementGroup() {
         {/* delete */}
         <DialogForm
             dialogTitle={dialogT("deleteMsg")}
+            fullWidth={fullWidth}
+            maxWidth={maxWidth}
             open={openDelete}
             setOpen={setOpenDelete}>
             <div className="flex">

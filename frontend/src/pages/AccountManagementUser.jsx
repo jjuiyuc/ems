@@ -74,6 +74,8 @@ export default function AccountManagementUser() {
                 group: "Cht_Miaoli"
             }
         ]),
+        [fullWidth, setFullWidth] = useState(true),
+        [maxWidth, setMaxWidth] = useState("sm"),
         [openAdd, setOpenAdd] = useState(false),
         [openEdit, setOpenEdit] = useState(false),
         [openDelete, setOpenDelete] = useState(false),
@@ -90,6 +92,7 @@ export default function AccountManagementUser() {
         [error, setError] = useState(null),
         [otherError, setOtherError] = useState(""),
         [loading, setLoading] = useState(false)
+
     const
         changeAccount = (e) => {
             setAccount(e.target.value)
@@ -201,6 +204,8 @@ export default function AccountManagementUser() {
             </Button>
             <DialogForm
                 dialogTitle={pageT("addUser")}
+                fullWidth={fullWidth}
+                maxWidth={maxWidth}
                 open={openAdd}
                 setOpen={setOpenAdd}>
                 <Divider variant="middle" />
@@ -312,6 +317,8 @@ export default function AccountManagementUser() {
         {/* edit */}
         <DialogForm
             dialogTitle={pageT("user")}
+            fullWidth={fullWidth}
+            maxWidth={maxWidth}
             open={openEdit}
             setOpen={setOpenEdit}
         >
@@ -399,6 +406,8 @@ export default function AccountManagementUser() {
         {/* delete */}
         <DialogForm
             dialogTitle={dialogT("deleteMsg")}
+            fullWidth={fullWidth}
+            maxWidth={maxWidth}
             open={openDelete}
             setOpen={setOpenDelete}>
             <div className="flex">

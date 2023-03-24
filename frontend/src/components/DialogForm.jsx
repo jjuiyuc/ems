@@ -4,14 +4,12 @@ import { useState } from "react"
 export default function DialogForm({
     children = null,
     dialogTitle = "",
+    fullWidth,
+    maxWidth,
     open,
     setOpen,
     closeOutside = false
 }) {
-
-    const
-        [fullWidth, setFullWidth] = useState(true),
-        [maxWidth, setMaxWidth] = useState("sm")
 
     return <>
         <Dialog

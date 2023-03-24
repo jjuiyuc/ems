@@ -6,8 +6,10 @@ import AddIcon from "@mui/icons-material/Add"
 import { useTranslation } from "react-multi-lang"
 import { useEffect, useMemo, useState } from "react"
 
+import AddField from "../components/AddField"
 import DialogForm from "../components/DialogForm"
 import Table from "../components/DataTable"
+import FullScreenDialog from "../components/FullScreenDialog"
 
 import { ReactComponent as EditIcon } from "../assets/icons/edit.svg"
 import { ReactComponent as NoticeIcon } from "../assets/icons/notice.svg"
@@ -44,14 +46,14 @@ export default function FieldManagement() {
             },
             {
                 id: 2,
-                locationName: "Serenegray",
-                gatewayID: "0E0BA27A8175AF978C49396BDE9D7A1E"
+                locationName: "Cht_Miaoli",
+                gatewayID: "018F1623ADD8E739F7C6CBE62A7DF3C0"
 
             }
         ]),
         [error, setError] = useState(null),
         [loading, setLoading] = useState(false),
-        [openAdd, setOpenAdd] = useState(false),
+
         [openNotice, setOpenNotice] = useState(false),
         [openEdit, setOpenEdit] = useState(false),
         [locationName, setLocationName] = useState(data?.locationName || ""),
@@ -80,7 +82,7 @@ export default function FieldManagement() {
         {
             cell: row => <span className="font-mono">{row.gatewayID}</span>,
             center: true,
-            name: pageT("gatewayID"),
+            name: commonT("gatewayID"),
             selector: row => row.gatewayID
         },
         {
@@ -104,79 +106,10 @@ export default function FieldManagement() {
     ]
 
     return <>
-        <h1 className="mb-9">{commonT("accountManagementGroup")}</h1>
-        {/* <div className="mb-9">
-            <Button
-                onClick={() => { setOpenAdd(true) }}
-                size="x-large"
-                variant="outlined"
-                radius="pill"
-                fontSize="large"
-                color="brand"
-                startIcon={<AddIcon />}>
-                {commonT("add")}
-            </Button>
-            <DialogForm
-                dialogTitle={commonT("group")}
-                open={openAdd}
-                setOpen={setOpenAdd}>
-                <Divider variant="middle" />
-                <FormControl sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    margin: "auto",
-                    width: "fit-content",
-                    mt: 2,
-                    minWidth: 120
-                }}>
-                    <TextField
-                        id="add-name"
-                        label={commonT("groupName")}
-                        value={groupName}
-                        focused
-                    />
-                    <TextField
-                        id="add-type"
-                        select
-                        label={pageT("groupType")}
-                        defaultValue=""
-                    >
-                        {typeGroup.map((option) => (
-                            <MenuItem key={option.value} value={option.value}>
-                                {option.label}
-                            </MenuItem>
-                        ))}
-                    </TextField>
-                    <TextField
-                        id="add-parent-group-type"
-                        select
-                        label={pageT("parentGroup")}
-                        defaultValue=""
-                    >
-                        {parentGroupType.map((option) => (
-                            <MenuItem key={option.value} value={option.value}>
-                                {option.label}
-                            </MenuItem>
-                        ))}
-                    </TextField>
-                </FormControl>
-                <Divider variant="middle" />
-                <DialogActions sx={{ margin: "1rem 0.5rem 1rem 0" }}>
-                    <Button onClick={() => { setOpenAdd(false) }}
-                        radius="pill"
-                        variant="outlined"
-                        color="gray">
-                        {commonT("cancel")}
-                    </Button>
-                    <Button onClick={() => { setOpenAdd(false) }}
-                        radius="pill"
-                        variant="contained"
-                        color="primary">
-                        {commonT("add")}
-                    </Button>
-                </DialogActions>
-            </DialogForm>
-        </div> */}
+        <h1 className="mb-9">{commonT("fieldManagement")}</h1>
+        <div className="mb-9">
+            <AddField locationTitle={pageT("locationInformation")} />
+        </div>
         <Table
             {...{ columns, data }}
             paginationComponentOptions={{
@@ -186,6 +119,7 @@ export default function FieldManagement() {
             progressPending={loading}
             theme="dark"
         />
+        {/* <FullScreenDialog /> */}
 
     </>
 }

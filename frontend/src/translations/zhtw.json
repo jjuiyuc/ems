@@ -213,6 +213,9 @@
         "userLocked": "使用者帳號已被鎖定。"
     },
     "fieldManagement":{
+        "deviceInformation":"Device Information",
+        "extraDeviceInfo":"Extra Device Information",
+        "fieldDevices":"場域裝置",
         "locationInformation":"場域資訊"
     },
     "forgotPassword": {
@@ -223,16 +226,28 @@
     },
     "form": {
         "address":"地址",
+        "battery":"電池",
+        "chargingSource":"充電來源",
         "confirmPassword": "確認密碼",
+        "deviceModel":"Device Model",
+        "deviceType":"裝置類型",
         "email": "Email",
         "highVoltage":"高電壓",
+        "hybridInverter":"Hybrid-Inverter",
         "language": "語言",
         "lat":"經度",
         "lng":"緯度",
+        "inverter":"Inverter",
         "lowVoltage":"低電壓",
+        "meter":"Meter",
+        "modbusID":"Modbus ID",
         "newPassword": "新密碼",
         "password": "密碼",
+        "pcs":"PCS",
+        "powerCapacity":"Power Capacity",
         "powerCompany":"電力公司",
+        "pv":"PV",
+        "reservedForGridOutagePercent":"Reserved for Grid Outage Percent",
         "touType":"TOU Type",
         "twoSection":"兩段式",
         "voltageType":"電壓類型"

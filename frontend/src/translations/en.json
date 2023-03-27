@@ -212,6 +212,9 @@
         "userLocked": "User is locked."
     },
     "fieldManagement":{
+        "deviceInformation":"Device Information",
+        "extraDeviceInfo":"Extra Device Information",
+        "fieldDevices":"Field Devices",
         "locationInformation":"Location Information"
     },
     "forgotPassword": {
@@ -222,16 +225,28 @@
     },
     "form": {
         "address":"Address",
+        "battery":"Battery",
+        "chargingSource":"Charging Source",
         "confirmPassword": "Confirm Password",
+        "deviceModel":"Device Model",
+        "deviceType":"Device Type",
         "email": "Email",
         "highVoltage":"High Voltage",
+        "hybridInverter":"Hybrid-Inverter",
         "language": "Language",
         "lat":"Lat",
         "lng":"Lng",
+        "inverter":"Inverter",
         "lowVoltage":"Low Voltage",
+        "meter":"Meter",
+        "modbusID":"Modbus ID",
         "newPassword": "New Password",
         "password": "Password",
+        "pcs":"PCS",
+        "powerCapacity":"Power Capacity",
         "powerCompany":"Power Company",
+        "pv":"PV",
+        "reservedForGridOutagePercent":"Reserved for Grid Outage Percent",
         "touType":"TOU Type",
         "twoSection":"Two-section",
         "voltageType":"Voltage Type"

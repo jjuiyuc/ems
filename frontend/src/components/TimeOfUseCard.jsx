@@ -10,6 +10,7 @@ import variables from "../configs/variables"
 import { ReactComponent as AddIcon } from "../assets/icons/add.svg"
 import { ReactComponent as DeleteIcon } from "../assets/icons/delete.svg"
 import { ReactComponent as TimerIcon } from "../assets/icons/timer.svg"
+import { apiCall } from "../utils/api"
 
 const { colors } = variables
 
@@ -78,40 +79,6 @@ export default function TimeOfUseCard(props) {
         [clockDataset, setClockDataset] = useState({
             data: [], backgroundColor: []
         }),
-        [timeOfUse, setTimeOfUse] = useState([
-            {
-                end: "05:00",
-                name: "superOffPeak",
-                price: 1.2,
-                start: "00:00"
-            },
-            {
-                end: "11:00",
-                name: "offPeak",
-                price: 1.8,
-                start: "05:00"
-            },
-            {
-                end: "17:00",
-                name: "midPeak",
-                price: 2.2,
-                start: "11:00"
-            },
-            {
-                end: "23:00",
-                name: "onPeak",
-                price: 3.5,
-                start: "17:00"
-            },
-            {
-                end: "24:00",
-                name: "superOffPeak",
-                price: 1.2,
-                start: "23:00"
-            }
-        ]),
-        [prices, setPrices]
-            = useState({ onPeak: 0, midPeak: 0, offPeak: 0, superOffPeak: 0 }),
         [policyConfig, setPolicyConfig] = useState(defaultPolicyConfig),
         [policyPrice, setPolicyPrice] = useState(defaultPolicyPrice),
         [tariff, setTariff] = useState("")
@@ -119,34 +86,67 @@ export default function TimeOfUseCard(props) {
         handleChange = (e) => {
             setTariff(e.target.value)
         }
-    // console.log(Object.keys(policyConfig))
     const getMoment = string => {
         const [hour, minute] = string.split(":")
 
         return moment().hour(parseInt(hour)).minute(parseInt(minute)).second(0)
     }
 
+    const onSave = () => {
+        apiCall()
+    }
+
     useEffect(() => {
-        const
-            dataset = { data: [], backgroundColor: [] },
-            prices = { onPeak: 0, midPeak: 0, offPeak: 0, superOffPeak: 0 }
+        const timeOfUse = Object
+            .entries(policyPrice)
+            .reduce((acc, cur) => {
+                const [policy, priceArr] = cur
+                const { name } = policyConfig[policy]
+                const priceArrWithName = priceArr
+                    .filter(({ startTime, endTime }) => startTime && endTime)
+                    .map((obj) => ({ ...obj, policy, name }))
+                return [...acc, ...priceArrWithName]
+            }, [])
+        console.log(timeOfUse)
 
         if (timeOfUse.length === 0) return
+        const transformDataToGraphic = () => {
+            const allTimeNodes = [
+                ...new Set(timeOfUse.map(({ startTime, endTime }) =>
+                    [startTime, endTime]).flat()), "00:00"]
+                .sort()
+            const sections = allTimeNodes.map((timeNode, i) => [timeNode, allTimeNodes[i + 1] || "24:00"])
+            console.log(allTimeNodes, sections)
 
-        timeOfUse.forEach(item => {
+            const data = sections.map(([start, end]) => {
+                const { overlappedNum, policies } = timeOfUse.reduce((acc, cur) => {
+                    return cur.startTime <= start && cur.endTime > start
+                        ? { overlappedNum: acc.overlappedNum + 1, policies: [...acc.policies, cur.policy] }
+                        : acc
+                }, { overlappedNum: 0, policies: [] })
+
+                switch (overlappedNum) {
+                    case 0:
+                        return { startTime: start, endTime: end, condition: "empty", color: "transparent" }
+                    case 1:
+                        return { startTime: start, endTime: end, condition: "one", color: colors[policies[0]] }
+                    default:
+                        return { startTime: start, endTime: end, condition: "overlapped", color: "#eeeeee" }
+                }
+            })
+            return data
+        }
+        const graphicData = transformDataToGraphic()
+        const dataset = graphicData.reduce((acc, item) => {
             const
-                { end, start } = item,
-                endTime = getMoment(end),
-                startTime = getMoment(start),
-                duration = moment.duration(endTime.diff(startTime)).as("hours")
-
-            dataset.data.push(duration)
-            dataset.backgroundColor.push(colors[item.name])
-            prices[item.name] = item.price
-        })
+                { endTime, startTime, color } = item,
+                duration = moment.duration(getMoment(endTime).diff(getMoment(startTime))).as("minutes")
+            acc.data.push(duration)
+            acc.backgroundColor.push(color)
+            return acc
+        }, { data: [], backgroundColor: [] })
         setClockDataset(dataset)
-        setPrices(prices)
-    }, [timeOfUse])
+    }, [policyPrice])
 
     return <div className="card">
         <div className="flex justify-between sm:col-span-2 items-center">
@@ -251,6 +251,18 @@ export default function TimeOfUseCard(props) {
                                     </div> : null}
                             </div>
                             {priceGroup.map(({ startTime, endTime, basicPrice, rate }, index) => {
+                                const onChange = (key, value) => {
+                                    setPolicyPrice((prevPolicyPrice) => {
+                                        const prevPriceGroup = prevPolicyPrice[policy]
+                                        return {
+                                            ...prevPolicyPrice,
+                                            [policy]: prevPriceGroup.map((row, i) =>
+                                                i === index
+                                                    ? { ...row, [key]: value }
+                                                    : row)
+                                        }
+                                    })
+                                }
                                 return (
                                     <div key={`${policy}-${i}-${index}`} className="time-range-picker grid
                                         grid-cols-settings-input gap-x-4 items-center mt-4">
@@ -260,46 +272,10 @@ export default function TimeOfUseCard(props) {
                                             endTime={endTime}
                                             basicPrice={basicPrice}
                                             rate={rate}
-                                            setStartTime={(time) => {
-                                                const newPolicyPrice = {
-                                                    ...policyPrice,
-                                                    [policy]: priceGroup.map((row, i) =>
-                                                        i === index
-                                                            ? { ...row, startTime: time }
-                                                            : row)
-                                                }
-                                                setPolicyPrice(newPolicyPrice)
-                                            }}
-                                            setEndTime={(time) => {
-                                                const newPolicyPrice = {
-                                                    ...policyPrice,
-                                                    [policy]: priceGroup.map((row, i) =>
-                                                        i === index
-                                                            ? { ...row, endTime: time }
-                                                            : row)
-                                                }
-                                                setPolicyPrice(newPolicyPrice)
-                                            }}
-                                            setBasicPrice={(price) => {
-                                                const newPolicyPrice = {
-                                                    ...policyPrice,
-                                                    [policy]: priceGroup.map((row, i) =>
-                                                        i === index
-                                                            ? { ...row, basicPrice: price }
-                                                            : row)
-                                                }
-                                                setPolicyPrice(newPolicyPrice)
-                                            }}
-                                            setRate={(price) => {
-                                                const newPolicyPrice = {
-                                                    ...policyPrice,
-                                                    [policy]: priceGroup.map((row, i) =>
-                                                        i == index
-                                                            ? { ...row, rate: price }
-                                                            : row)
-                                                }
-                                                setPolicyPrice(newPolicyPrice)
-                                            }}
+                                            setStartTime={(time) => onChange("startTime", time)}
+                                            setEndTime={(time) => onChange("endTime", time)}
+                                            setBasicPrice={(price) => onChange("basicPrice", price)}
+                                            setRate={(price) => onChange("rate", price)}
                                         />
                                         {index ?
                                             <div className="ml-2 mt-4 h-4 w-4 flex cursor-pointer">

@@ -4,12 +4,11 @@ import {
 } from "@mui/material"
 import AddIcon from "@mui/icons-material/Add"
 import { useTranslation } from "react-multi-lang"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 
 import AddField from "../components/AddField"
 import DialogForm from "../components/DialogForm"
 import Table from "../components/DataTable"
-import FullScreenDialog from "../components/FullScreenDialog"
 
 import { ReactComponent as EditIcon } from "../assets/icons/edit.svg"
 import { ReactComponent as NoticeIcon } from "../assets/icons/notice.svg"
@@ -77,13 +76,17 @@ export default function FieldManagement() {
             cell: row => <span className="font-mono">{row.locationName}</span>,
             center: true,
             name: commonT("locationName"),
-            selector: row => row.locationName
+            selector: row => row.locationName,
+            grow: 0.5
+
         },
         {
-            cell: row => <span className="font-mono">{row.gatewayID}</span>,
+            cell: row =>
+                <span className="font-mono">{row.gatewayID}</span>,
             center: true,
             name: commonT("gatewayID"),
-            selector: row => row.gatewayID
+            selector: row => row.gatewayID,
+            grow: 1
         },
         {
             cell: (row, index) => <div className="flex w-28">
@@ -101,14 +104,20 @@ export default function FieldManagement() {
                     }} />
 
             </div>,
-            center: true
+            center: true,
+            grow: 0.5
         }
     ]
 
     return <>
         <h1 className="mb-9">{commonT("fieldManagement")}</h1>
         <div className="mb-9">
-            <AddField locationTitle={pageT("locationInformation")} />
+            <AddField
+                locationInfo={pageT("locationInformation")}
+                fieldDevices={pageT("fieldDevices")}
+                deviceInfo={pageT("deviceInformation")}
+                extraDeviceInfo={pageT("extraDeviceInfo")}
+            />
         </div>
         <Table
             {...{ columns, data }}
@@ -119,7 +128,5 @@ export default function FieldManagement() {
             progressPending={loading}
             theme="dark"
         />
-        {/* <FullScreenDialog /> */}
-
     </>
 }

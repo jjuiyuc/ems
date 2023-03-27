@@ -1,4 +1,4 @@
-import { Fragment as Frag, useEffect, useState, useRef } from "react"
+import { Fragment as Frag, useEffect, useState, useRef, useMemo } from "react"
 import { Button, Box, FormControl, Stack, InputLabel, Select, MenuItem, TextField } from "@mui/material"
 import { useTranslation } from "react-multi-lang"
 import moment from "moment"
@@ -16,6 +16,7 @@ const { colors } = variables
 
 const maxLength = 4
 const maxPolicyCount = 5
+const newColors = ["#43B0FF"]
 
 export default function TimeOfUseCard(props) {
     // const { data } = props
@@ -31,28 +32,32 @@ export default function TimeOfUseCard(props) {
             tempName: "onPeak",
             extensible: true,
             nameEditable: false,
-            deletable: false
+            deletable: false,
+            color: colors.onPeak
         },
         midPeak: {
             name: pageT("midPeak"),
             tempName: "midPeak",
             extensible: true,
             nameEditable: false,
-            deletable: false
+            deletable: false,
+            color: colors.midPeak
         },
         offPeak: {
             name: pageT("offPeak"),
             tempName: "offPeak",
             extensible: true,
             nameEditable: false,
-            deletable: false
+            deletable: false,
+            color: colors.offPeak
         },
         superOffPeak: {
             name: pageT("superOffPeak"),
             tempName: "superOffPeak",
             extensible: true,
             nameEditable: false,
-            deletable: false
+            deletable: false,
+            color: colors.superOffPeak
         },
     }
     const defaultPolicyPrice = {
@@ -76,9 +81,6 @@ export default function TimeOfUseCard(props) {
     const customCount = useRef(1)
     const
         [dayTab, setDayTab] = useState(dayTabs[0]),
-        [clockDataset, setClockDataset] = useState({
-            data: [], backgroundColor: []
-        }),
         [policyConfig, setPolicyConfig] = useState(defaultPolicyConfig),
         [policyPrice, setPolicyPrice] = useState(defaultPolicyPrice),
         [tariff, setTariff] = useState("")
@@ -96,57 +98,64 @@ export default function TimeOfUseCard(props) {
         apiCall()
     }
 
-    useEffect(() => {
+    const sectionData = useMemo(() => {
         const timeOfUse = Object
             .entries(policyPrice)
-            .reduce((acc, cur) => {
-                const [policy, priceArr] = cur
+            .reduce((acc, [policy, priceArr]) => {
                 const { name } = policyConfig[policy]
-                const priceArrWithName = priceArr
+                const priceArrWithPolicy = priceArr
                     .filter(({ startTime, endTime }) => startTime && endTime)
                     .map((obj) => ({ ...obj, policy, name }))
-                return [...acc, ...priceArrWithName]
+                return [...acc, ...priceArrWithPolicy]
             }, [])
-        console.log(timeOfUse)
 
-        if (timeOfUse.length === 0) return
-        const transformDataToGraphic = () => {
-            const allTimeNodes = [
-                ...new Set(timeOfUse.map(({ startTime, endTime }) =>
-                    [startTime, endTime]).flat()), "00:00"]
-                .sort()
-            const sections = allTimeNodes.map((timeNode, i) => [timeNode, allTimeNodes[i + 1] || "24:00"])
-            console.log(allTimeNodes, sections)
+        const allTimeNodes = [
+            ...new Set(timeOfUse.map(({ startTime, endTime }) =>
+                [startTime, endTime]).flat()), "00:00"]
+            .sort()
+        const sections = allTimeNodes.map((timeNode, i) => [timeNode, allTimeNodes[i + 1] || "24:00"])
 
-            const data = sections.map(([start, end]) => {
-                const { overlappedNum, policies } = timeOfUse.reduce((acc, cur) => {
-                    return cur.startTime <= start && cur.endTime > start
-                        ? { overlappedNum: acc.overlappedNum + 1, policies: [...acc.policies, cur.policy] }
-                        : acc
-                }, { overlappedNum: 0, policies: [] })
+        const data = sections.map(([start, end]) => {
+            const { overlappedNum, policies } = timeOfUse.reduce((acc, cur) => {
+                return cur.startTime <= start && cur.endTime >= end
+                    ? {
+                        overlappedNum: acc.overlappedNum + 1,
+                        policies: [...acc.policies, cur.policy]
+                    }
+                    : acc
+            }, { overlappedNum: 0, policies: [] })
+            return { startTime: start, endTime: end, policies }
+        })
+        return data
+    }, [policyPrice])
 
-                switch (overlappedNum) {
-                    case 0:
-                        return { startTime: start, endTime: end, condition: "empty", color: "transparent" }
-                    case 1:
-                        return { startTime: start, endTime: end, condition: "one", color: colors[policies[0]] }
-                    default:
-                        return { startTime: start, endTime: end, condition: "overlapped", color: "#eeeeee" }
-                }
-            })
-            return data
-        }
-        const graphicData = transformDataToGraphic()
-        const dataset = graphicData.reduce((acc, item) => {
+    const clockDataset = useMemo(() => {
+        return sectionData.reduce((acc, item) => {
             const
-                { endTime, startTime, color } = item,
+                { endTime, startTime, policies } = item,
                 duration = moment.duration(getMoment(endTime).diff(getMoment(startTime))).as("minutes")
+
             acc.data.push(duration)
-            acc.backgroundColor.push(color)
+            switch (policies.length) {
+                case 0:
+                    acc.backgroundColor.push('transparent')
+                    break
+                case 1:
+                    acc.backgroundColor.push(policyConfig[policies[0]].color)
+                    break
+                default:
+                    acc.backgroundColor.push('#eee')
+                    break
+            }
             return acc
         }, { data: [], backgroundColor: [] })
-        setClockDataset(dataset)
-    }, [policyPrice])
+    }, [sectionData])
+
+    const overLappedSection = useMemo(() => {
+        return sectionData
+            .filter((item) => item.policies.length >= 2)
+    }, [sectionData])
+    console.log(overLappedSection)
 
     return <div className="card">
         <div className="flex justify-between sm:col-span-2 items-center">
@@ -244,8 +253,10 @@ export default function TimeOfUseCard(props) {
                                     <div className="ml-2 mb-9 h-4 w-4 flex cursor-pointer">
                                         <DeleteIcon
                                             onClick={() => {
-                                                const { [policy]: deleted, ...newPolicyConfig } = policyConfig
+                                                const { [policy]: deletedConfig, ...newPolicyConfig } = policyConfig
+                                                const { [policy]: deletedPrice, ...newPolicyPrice } = policyPrice
                                                 setPolicyConfig(newPolicyConfig)
+                                                setPolicyPrice(newPolicyPrice)
                                             }}
                                         />
                                     </div> : null}
@@ -263,10 +274,14 @@ export default function TimeOfUseCard(props) {
                                         }
                                     })
                                 }
+                                const timeError = overLappedSection.some((section) => {
+                                    return startTime <= section.startTime && section.endTime <= endTime
+                                })
                                 return (
                                     <div key={`${policy}-${i}-${index}`} className="time-range-picker grid
                                         grid-cols-settings-input gap-x-4 items-center mt-4">
                                         <TimeRangePicker
+                                            timeError={timeError}
                                             key={index}
                                             startTime={startTime}
                                             endTime={endTime}
@@ -324,7 +339,8 @@ export default function TimeOfUseCard(props) {
                                         tempName: newName,
                                         extensible: true,
                                         nameEditable: true,
-                                        deletable: true
+                                        deletable: true,
+                                        color: newColors[0]
                                     }
                                 }
                                 setPolicyConfig(newPolicyConfig)

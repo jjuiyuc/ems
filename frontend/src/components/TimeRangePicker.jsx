@@ -60,6 +60,7 @@ export default function TimeRangePicker(props) {
             <div>
                 <h6 className="mb-1 ml-1">{pageT("startTime")}</h6>
                 <Select
+                    error={props.timeError}
                     sx={{ minWidth: 90 }}
                     id="outlined-basic"
                     variant="outlined"
@@ -83,6 +84,7 @@ export default function TimeRangePicker(props) {
             <div>
                 <h6 className="mb-1 ml-1">{pageT("endTime")}</h6>
                 <Select
+                    error={props.timeError}
                     sx={{ minWidth: 90 }}
                     className="react-datepicker__input-container"
                     id="outlined-basic"

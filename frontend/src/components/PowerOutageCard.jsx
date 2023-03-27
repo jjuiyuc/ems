@@ -50,7 +50,7 @@ export default function PowerOutageCard(props) {
                 key={"s-b-"}
                 radius="pill"
                 variant="contained">
-                {pageT("save")}
+                {commonT("save")}
             </Button>
         </div>
         <div className="flex items-start mt-12">

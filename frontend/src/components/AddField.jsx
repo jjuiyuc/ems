@@ -8,6 +8,7 @@ import { useEffect, useMemo, useState } from "react"
 import { ValidateNumPercent } from "../utils/utils"
 
 import DialogForm from "../components/DialogForm"
+import SubDeviceForm from "../components/SubDeviceForm"
 
 export default function AddField({
     children = null,
@@ -16,6 +17,7 @@ export default function AddField({
     fieldDevices,
     deviceInfo,
     extraDeviceInfo,
+    subdevice,
     open,
     setOpen,
     closeOutside = false
@@ -70,6 +72,7 @@ export default function AddField({
                 label: "pcs",
             }
         ],
+
         deviceModel = [
             {
                 value: "LXP-12K US-Luxpower Hybrid-Inverter",
@@ -87,12 +90,12 @@ export default function AddField({
         [gridOutagePercent, setGridOutagePercent] = useState(""),
         [chargingSource, setChargingSource] = useState([
             {
-                value: "solar+grid",
-                label: "solar+grid",
+                value: "Solar+Grid",
+                label: "Solar+Grid",
             },
             {
-                value: "solar",
-                label: "solar",
+                value: "Solar",
+                label: "Solar",
             }
         ]),
         [fullWidth, setFullWidth] = useState(true),
@@ -219,7 +222,7 @@ export default function AddField({
                             value={formT(`${option.value}`)}
                             onClick={() => {
                                 setDeviceType(option)
-                                console.log(deviceType)
+                                // console.log(deviceType)
                             }}>
                             {formT(`${option.label}`)}
                         </MenuItem>
@@ -293,6 +296,23 @@ export default function AddField({
                                 </MenuItem>
                             ))}
                         </TextField>
+                        <TextField
+                            id="energyCapacity"
+                            type="number"
+                            label={formT("energyCapacity")}
+                        // value={energyCapacity}
+                        />
+                        <TextField
+                            id="voltage"
+                            type="number"
+                            label={commonT("voltage")}
+                        // value={voltage}
+                        />
+                    </>
+                    : null}
+                {deviceType.value === "hybridInverter"
+                    ? <>
+                        <SubDeviceForm title={subdevice} />
                     </>
                     : null}
             </FormControl>

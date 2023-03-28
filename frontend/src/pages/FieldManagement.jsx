@@ -117,6 +117,7 @@ export default function FieldManagement() {
                 fieldDevices={pageT("fieldDevices")}
                 deviceInfo={pageT("deviceInformation")}
                 extraDeviceInfo={pageT("extraDeviceInfo")}
+                subdevice={pageT("subdevice")}
             />
         </div>
         <Table

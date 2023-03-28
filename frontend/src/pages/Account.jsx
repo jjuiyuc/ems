@@ -27,8 +27,10 @@ export default function Account() {
         ),
         [account, setAccount] = useState(""),
         [accountError, setAccountError] = useState(null),
-        [password, setPassword] = useState(""),
-        [passwordError, setPasswordError] = useState(false),
+        [curPassword, setCurPassword] = useState(""),
+        [curPasswordError, setCurPasswordError] = useState(false),
+        [newPassword, setNewPassword] = useState(""),
+        [newPasswordError, setNewPasswordError] = useState(false),
         [showPassword, setShowPassword] = useState(false),
         [name, setName] = useState(""),
         [nameError, setNameError] = useState(null),
@@ -51,8 +53,13 @@ export default function Account() {
         }
     const
         changePassword = (e) => {
-            setPassword(e.target.value)
-            setPasswordError(false)
+            setCurPassword(e.target.value)
+            setCurPasswordError(false)
+            setOtherError("")
+        },
+        changeNewPassword = (e) => {
+            setNewPassword(e.target.value)
+            setNewPasswordError(false)
             setOtherError("")
         },
         changeName = (e) => {
@@ -72,67 +79,124 @@ export default function Account() {
     return <>
         <h1 className="mb-9">{commonT("account")}</h1>
         {/* <div className="card flex flex-col m-auto mt-4 min-w-49 w-fit"> */}
-        <div className="card w-fit">
-            <h4 className="mb-6">
-                {pageT("accountInformationModification")}
-            </h4>
-            <Divider variant="fullWidth" sx={{ marginBottom: "1.5rem" }} />
-            <form className="grid grid-cols-1fr-auto gap-x-5 gap-y-6">
-                <label>{commonT("account")}</label>
-                <span className="pl-1"> serenegray@ubiik.com</span>
-                <label className="pt-2">{pageT("password")}</label>
-                <OutlinedInput
-                    id="edit-password"
-                    size="small"
-                    type={showPassword ? "text" : "password"}
-                    value={password || ""}
-                    onChange={changePassword}
-                    autoComplete="current-password"
-                    endAdornment={
-                        <InputAdornment position="end">
-                            <IconButton
-                                aria-label="toggle password visibility"
-                                onClick={handleClickShowPassword}
-                                onMouseDown={handleMouseDownPassword}
-                                edge="end"
-                            >
-                                {showPassword
-                                    ? <Visibility />
-                                    : <VisibilityOff />
-                                }
-                            </IconButton>
-                        </InputAdornment>
-                    }
-                />
-                <label className="pt-2">{pageT("name")}</label>
-                <OutlinedInput
-                    id="edit-name"
-                    size="small"
-                    value={name || ""}
-                    onChange={changeName}
-                />
-            </form>
-            <Divider variant="fullWidth" sx={{ marginTop: "1.5rem" }} />
-            <div className="flex flex-row-reverse mt-6">
-                <Button
-                    sx={{ marginLeft: "0.5rem" }}
-                    onClick={() => {
+        <div className="gap-y-5 flex flex-wrap lg:gap-x-5">
+            <div className="card w-fit">
+                <h4 className="mb-6">
+                    {pageT("accountInformationModification")}
+                </h4>
+                <Divider variant="fullWidth" sx={{ marginBottom: "1.5rem" }} />
+                <form className="grid grid-cols-1fr-auto gap-x-5 gap-y-6">
+                    <label>{commonT("account")}</label>
+                    <span className="pl-1"> serenegray@ubiik.com</span>
+                    <label className="pt-2">{pageT("name")}</label>
+                    <OutlinedInput
+                        id="edit-name"
+                        size="small"
+                        value={name || ""}
+                        onChange={changeName}
+                    />
+                </form>
+                <Divider variant="fullWidth" sx={{ marginTop: "1.5rem" }} />
+                <div className="flex flex-row-reverse mt-6">
+                    <Button
+                        sx={{ marginLeft: "0.5rem" }}
+                        onClick={() => {
 
-                        editSave()
-                    }}
-                    radius="pill"
-                    variant="contained"
-                    color="primary">
-                    {commonT("save")}
-                </Button>
-                <Button
-                    // onClick={}
-                    variant="outlined"
-                    radius="pill"
-                    color="gray">
-                    {commonT("cancel")}
-                </Button>
+                            editSave()
+                        }}
+                        radius="pill"
+                        variant="contained"
+                        color="primary">
+                        {commonT("save")}
+                    </Button>
+                    <Button
+                        // onClick={}
+                        variant="outlined"
+                        radius="pill"
+                        color="gray">
+                        {commonT("cancel")}
+                    </Button>
+                </div>
+            </div>
+            <div className="card w-fit">
+                <h4 className="mb-6">
+                    {pageT("changePassword")}
+                </h4>
+                <Divider variant="fullWidth" sx={{ marginBottom: "1.5rem" }} />
+                <form className="grid grid-cols-1fr-auto gap-x-5 gap-y-6">
+                    <label className="pt-2">{pageT("currentPassword")}</label>
+                    <OutlinedInput
+                        id="cur-password"
+                        size="small"
+                        type={showPassword ? "text" : "password"}
+                        value={curPassword || ""}
+                        onChange={changePassword}
+                        autoComplete="current-password"
+                        endAdornment={
+                            <InputAdornment position="end">
+                                <IconButton
+                                    aria-label="toggle password visibility"
+                                    onClick={handleClickShowPassword}
+                                    onMouseDown={handleMouseDownPassword}
+                                    edge="end"
+                                >
+                                    {showPassword
+                                        ? <Visibility />
+                                        : <VisibilityOff />
+                                    }
+                                </IconButton>
+                            </InputAdornment>
+                        }
+                    />
+                    <label className="pt-2">{pageT("newPassword")}</label>
+                    <OutlinedInput
+                        id="new-password"
+                        size="small"
+                        type={showPassword ? "text" : "password"}
+                        value={newPassword || ""}
+                        onChange={changeNewPassword}
+                        autoComplete="current-password"
+                        endAdornment={
+                            <InputAdornment position="end">
+                                <IconButton
+                                    aria-label="toggle password visibility"
+                                    onClick={handleClickShowPassword}
+                                    onMouseDown={handleMouseDownPassword}
+                                    edge="end"
+                                >
+                                    {showPassword
+                                        ? <Visibility />
+                                        : <VisibilityOff />
+                                    }
+                                </IconButton>
+                            </InputAdornment>
+                        }
+                    />
+
+                </form>
+                <Divider variant="fullWidth" sx={{ marginTop: "1.5rem" }} />
+                <div className="flex flex-row-reverse mt-6">
+                    <Button
+                        sx={{ marginLeft: "0.5rem" }}
+                        onClick={() => {
+
+                            editSave()
+                        }}
+                        radius="pill"
+                        variant="contained"
+                        color="primary">
+                        {commonT("save")}
+                    </Button>
+                    <Button
+                        // onClick={}
+                        variant="outlined"
+                        radius="pill"
+                        color="gray">
+                        {commonT("cancel")}
+                    </Button>
+                </div>
             </div>
         </div>
+
     </>
 }

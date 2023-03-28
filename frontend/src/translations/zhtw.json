@@ -82,7 +82,8 @@
         "thisMonth": "當月",
         "today": "今日",
         "v":"V",
-        "verify":"驗證"
+        "verify":"驗證",
+        "voltage": "電壓"
     },
     "dashboard": {
         "batteryDischarge": "由電池提供",
@@ -218,7 +219,8 @@
         "deviceInformation":"Device Information",
         "extraDeviceInfo":"Extra Device Information",
         "fieldDevices":"場域裝置",
-        "locationInformation":"場域資訊"
+        "locationInformation":"場域資訊",
+        "subdevice":"Subdevice"
     },
     "forgotPassword": {
         "backToLogin": "回登入頁",
@@ -231,9 +233,11 @@
         "battery":"電池",
         "chargingSource":"充電來源",
         "confirmPassword": "確認密碼",
+        "deviceInformation":"Device Information",
         "deviceModel":"Device Model",
         "deviceType":"裝置類型",
         "email": "Email",
+        "energyCapacity":"Energy Capacity",
         "highVoltage":"高電壓",
         "hybridInverter":"Hybrid-Inverter",
         "language": "語言",

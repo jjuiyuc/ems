@@ -82,7 +82,8 @@
         "thisMonth": "This Month",
         "today": "Today",
         "v":"V",
-        "verify":"Verify"
+        "verify":"Verify",
+        "voltage": "Voltage"
     },
     "dashboard": {
         "batteryDischarge": "Battery Discharge",
@@ -217,7 +218,8 @@
         "deviceInformation":"Device Information",
         "extraDeviceInfo":"Extra Device Information",
         "fieldDevices":"Field Devices",
-        "locationInformation":"Location Information"
+        "locationInformation":"Location Information",
+        "subdevice":"Subdevice"
     },
     "forgotPassword": {
         "backToLogin": "Back to Login",
@@ -230,9 +232,11 @@
         "battery":"Battery",
         "chargingSource":"Charging Source",
         "confirmPassword": "Confirm Password",
+        "deviceInformation":"Device Information",
         "deviceModel":"Device Model",
         "deviceType":"Device Type",
         "email": "Email",
+        "energyCapacity":"Energy Capacity",
         "highVoltage":"High Voltage",
         "hybridInverter":"Hybrid-Inverter",
         "language": "Language",

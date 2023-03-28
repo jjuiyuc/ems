@@ -26,6 +26,7 @@ type GroupGatewayRight struct {
 	ID         int64      `boil:"id" json:"id" toml:"id" yaml:"id"`
 	GroupID    int64      `boil:"group_id" json:"groupID" toml:"groupID" yaml:"groupID"`
 	GWID       int64      `boil:"gw_id" json:"gwID" toml:"gwID" yaml:"gwID"`
+	LocationID null.Int64 `boil:"location_id" json:"locationID,omitempty" toml:"locationID" yaml:"locationID,omitempty"`
 	EnabledAt  time.Time  `boil:"enabled_at" json:"enabledAt" toml:"enabledAt" yaml:"enabledAt"`
 	EnabledBy  null.Int64 `boil:"enabled_by" json:"enabledBy,omitempty" toml:"enabledBy" yaml:"enabledBy,omitempty"`
 	DisabledAt null.Time  `boil:"disabled_at" json:"disabledAt,omitempty" toml:"disabledAt" yaml:"disabledAt,omitempty"`
@@ -43,6 +44,7 @@ var GroupGatewayRightColumns = struct {
 	ID         string
 	GroupID    string
 	GWID       string
+	LocationID string
 	EnabledAt  string
 	EnabledBy  string
 	DisabledAt string
@@ -55,6 +57,7 @@ var GroupGatewayRightColumns = struct {
 	ID:         "id",
 	GroupID:    "group_id",
 	GWID:       "gw_id",
+	LocationID: "location_id",
 	EnabledAt:  "enabled_at",
 	EnabledBy:  "enabled_by",
 	DisabledAt: "disabled_at",
@@ -69,6 +72,7 @@ var GroupGatewayRightTableColumns = struct {
 	ID         string
 	GroupID    string
 	GWID       string
+	LocationID string
 	EnabledAt  string
 	EnabledBy  string
 	DisabledAt string
@@ -81,6 +85,7 @@ var GroupGatewayRightTableColumns = struct {
 	ID:         "group_gateway_right.id",
 	GroupID:    "group_gateway_right.group_id",
 	GWID:       "group_gateway_right.gw_id",
+	LocationID: "group_gateway_right.location_id",
 	EnabledAt:  "group_gateway_right.enabled_at",
 	EnabledBy:  "group_gateway_right.enabled_by",
 	DisabledAt: "group_gateway_right.disabled_at",
@@ -97,6 +102,7 @@ var GroupGatewayRightWhere = struct {
 	ID         whereHelperint64
 	GroupID    whereHelperint64
 	GWID       whereHelperint64
+	LocationID whereHelpernull_Int64
 	EnabledAt  whereHelpertime_Time
 	EnabledBy  whereHelpernull_Int64
 	DisabledAt whereHelpernull_Time
@@ -109,6 +115,7 @@ var GroupGatewayRightWhere = struct {
 	ID:         whereHelperint64{field: "`group_gateway_right`.`id`"},
 	GroupID:    whereHelperint64{field: "`group_gateway_right`.`group_id`"},
 	GWID:       whereHelperint64{field: "`group_gateway_right`.`gw_id`"},
+	LocationID: whereHelpernull_Int64{field: "`group_gateway_right`.`location_id`"},
 	EnabledAt:  whereHelpertime_Time{field: "`group_gateway_right`.`enabled_at`"},
 	EnabledBy:  whereHelpernull_Int64{field: "`group_gateway_right`.`enabled_by`"},
 	DisabledAt: whereHelpernull_Time{field: "`group_gateway_right`.`disabled_at`"},
@@ -121,17 +128,20 @@ var GroupGatewayRightWhere = struct {
 
 // GroupGatewayRightRels is where relationship names are stored.
 var GroupGatewayRightRels = struct {
-	Group string
-	GW    string
+	Group    string
+	GW       string
+	Location string
 }{
-	Group: "Group",
-	GW:    "GW",
+	Group:    "Group",
+	GW:       "GW",
+	Location: "Location",
 }
 
 // groupGatewayRightR is where relationships are stored.
 type groupGatewayRightR struct {
-	Group *Group   `boil:"Group" json:"Group" toml:"Group" yaml:"Group"`
-	GW    *Gateway `boil:"GW" json:"GW" toml:"GW" yaml:"GW"`
+	Group    *Group    `boil:"Group" json:"Group" toml:"Group" yaml:"Group"`
+	GW       *Gateway  `boil:"GW" json:"GW" toml:"GW" yaml:"GW"`
+	Location *Location `boil:"Location" json:"Location" toml:"Location" yaml:"Location"`
 }
 
 // NewStruct creates a new relationship struct
@@ -153,12 +163,19 @@ func (r *groupGatewayRightR) GetGW() *Gateway {
 	return r.GW
 }
 
+func (r *groupGatewayRightR) GetLocation() *Location {
+	if r == nil {
+		return nil
+	}
+	return r.Location
+}
+
 // groupGatewayRightL is where Load methods for each relationship are stored.
 type groupGatewayRightL struct{}
 
 var (
-	groupGatewayRightAllColumns            = []string{"id", "group_id", "gw_id", "enabled_at", "enabled_by", "disabled_at", "disabled_by", "created_at", "created_by", "updated_at", "updated_by"}
-	groupGatewayRightColumnsWithoutDefault = []string{"group_id", "gw_id", "enabled_at", "enabled_by", "disabled_at", "disabled_by", "created_by", "updated_by"}
+	groupGatewayRightAllColumns            = []string{"id", "group_id", "gw_id", "location_id", "enabled_at", "enabled_by", "disabled_at", "disabled_by", "created_at", "created_by", "updated_at", "updated_by"}
+	groupGatewayRightColumnsWithoutDefault = []string{"group_id", "gw_id", "location_id", "enabled_at", "enabled_by", "disabled_at", "disabled_by", "created_by", "updated_by"}
 	groupGatewayRightColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	groupGatewayRightPrimaryKeyColumns     = []string{"id"}
 	groupGatewayRightGeneratedColumns      = []string{}
@@ -275,6 +292,17 @@ func (o *GroupGatewayRight) GW(mods ...qm.QueryMod) gatewayQuery {
 	queryMods = append(queryMods, mods...)
 
 	return Gateways(queryMods...)
+}
+
+// Location pointed to by the foreign key.
+func (o *GroupGatewayRight) Location(mods ...qm.QueryMod) locationQuery {
+	queryMods := []qm.QueryMod{
+		qm.Where("`id` = ?", o.LocationID),
+	}
+
+	queryMods = append(queryMods, mods...)
+
+	return Locations(queryMods...)
 }
 
 // LoadGroup allows an eager lookup of values, cached into the
@@ -469,6 +497,106 @@ func (groupGatewayRightL) LoadGW(e boil.Executor, singular bool, maybeGroupGatew
 	return nil
 }
 
+// LoadLocation allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for an N-1 relationship.
+func (groupGatewayRightL) LoadLocation(e boil.Executor, singular bool, maybeGroupGatewayRight interface{}, mods queries.Applicator) error {
+	var slice []*GroupGatewayRight
+	var object *GroupGatewayRight
+
+	if singular {
+		object = maybeGroupGatewayRight.(*GroupGatewayRight)
+	} else {
+		slice = *maybeGroupGatewayRight.(*[]*GroupGatewayRight)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &groupGatewayRightR{}
+		}
+		if !queries.IsNil(object.LocationID) {
+			args = append(args, object.LocationID)
+		}
+
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &groupGatewayRightR{}
+			}
+
+			for _, a := range args {
+				if queries.Equal(a, obj.LocationID) {
+					continue Outer
+				}
+			}
+
+			if !queries.IsNil(obj.LocationID) {
+				args = append(args, obj.LocationID)
+			}
+
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(
+		qm.From(`location`),
+		qm.WhereIn(`location.id in ?`, args...),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.Query(e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load Location")
+	}
+
+	var resultSlice []*Location
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice Location")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results of eager load for location")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for location")
+	}
+
+	if len(resultSlice) == 0 {
+		return nil
+	}
+
+	if singular {
+		foreign := resultSlice[0]
+		object.R.Location = foreign
+		if foreign.R == nil {
+			foreign.R = &locationR{}
+		}
+		foreign.R.GroupGatewayRights = append(foreign.R.GroupGatewayRights, object)
+		return nil
+	}
+
+	for _, local := range slice {
+		for _, foreign := range resultSlice {
+			if queries.Equal(local.LocationID, foreign.ID) {
+				local.R.Location = foreign
+				if foreign.R == nil {
+					foreign.R = &locationR{}
+				}
+				foreign.R.GroupGatewayRights = append(foreign.R.GroupGatewayRights, local)
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
 // SetGroup of the groupGatewayRight to the related item.
 // Sets o.R.Group to related.
 // Adds o to related.R.GroupGatewayRights.
@@ -558,6 +686,85 @@ func (o *GroupGatewayRight) SetGW(exec boil.Executor, insert bool, related *Gate
 		related.R.GWGroupGatewayRights = append(related.R.GWGroupGatewayRights, o)
 	}
 
+	return nil
+}
+
+// SetLocation of the groupGatewayRight to the related item.
+// Sets o.R.Location to related.
+// Adds o to related.R.GroupGatewayRights.
+func (o *GroupGatewayRight) SetLocation(exec boil.Executor, insert bool, related *Location) error {
+	var err error
+	if insert {
+		if err = related.Insert(exec, boil.Infer()); err != nil {
+			return errors.Wrap(err, "failed to insert into foreign table")
+		}
+	}
+
+	updateQuery := fmt.Sprintf(
+		"UPDATE `group_gateway_right` SET %s WHERE %s",
+		strmangle.SetParamNames("`", "`", 0, []string{"location_id"}),
+		strmangle.WhereClause("`", "`", 0, groupGatewayRightPrimaryKeyColumns),
+	)
+	values := []interface{}{related.ID, o.ID}
+
+	if boil.DebugMode {
+		fmt.Fprintln(boil.DebugWriter, updateQuery)
+		fmt.Fprintln(boil.DebugWriter, values)
+	}
+	if _, err = exec.Exec(updateQuery, values...); err != nil {
+		return errors.Wrap(err, "failed to update local table")
+	}
+
+	queries.Assign(&o.LocationID, related.ID)
+	if o.R == nil {
+		o.R = &groupGatewayRightR{
+			Location: related,
+		}
+	} else {
+		o.R.Location = related
+	}
+
+	if related.R == nil {
+		related.R = &locationR{
+			GroupGatewayRights: GroupGatewayRightSlice{o},
+		}
+	} else {
+		related.R.GroupGatewayRights = append(related.R.GroupGatewayRights, o)
+	}
+
+	return nil
+}
+
+// RemoveLocation relationship.
+// Sets o.R.Location to nil.
+// Removes o from all passed in related items' relationships struct.
+func (o *GroupGatewayRight) RemoveLocation(exec boil.Executor, related *Location) error {
+	var err error
+
+	queries.SetScanner(&o.LocationID, nil)
+	if _, err = o.Update(exec, boil.Whitelist("location_id")); err != nil {
+		return errors.Wrap(err, "failed to update local table")
+	}
+
+	if o.R != nil {
+		o.R.Location = nil
+	}
+	if related == nil || related.R == nil {
+		return nil
+	}
+
+	for i, ri := range related.R.GroupGatewayRights {
+		if queries.Equal(o.LocationID, ri.LocationID) {
+			continue
+		}
+
+		ln := len(related.R.GroupGatewayRights)
+		if ln > 1 && i < ln-1 {
+			related.R.GroupGatewayRights[i] = related.R.GroupGatewayRights[ln-1]
+		}
+		related.R.GroupGatewayRights = related.R.GroupGatewayRights[:ln-1]
+		break
+	}
 	return nil
 }
 

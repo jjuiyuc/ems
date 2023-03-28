@@ -192,8 +192,8 @@ type gatewayL struct{}
 
 var (
 	gatewayAllColumns            = []string{"id", "uuid", "location_id", "enable", "remark", "created_at", "created_by", "updated_at", "updated_by", "deleted_at", "deleted_by"}
-	gatewayColumnsWithoutDefault = []string{"uuid", "location_id", "enable", "remark", "created_by", "updated_by", "deleted_at", "deleted_by"}
-	gatewayColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
+	gatewayColumnsWithoutDefault = []string{"uuid", "location_id", "remark", "created_by", "updated_by", "deleted_at", "deleted_by"}
+	gatewayColumnsWithDefault    = []string{"id", "enable", "created_at", "updated_at"}
 	gatewayPrimaryKeyColumns     = []string{"id"}
 	gatewayGeneratedColumns      = []string{}
 )

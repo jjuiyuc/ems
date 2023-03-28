@@ -24,7 +24,7 @@ import (
 // Tou is an object representing the database table.
 type Tou struct {
 	ID            int64        `boil:"id" json:"id" toml:"id" yaml:"id"`
-	TOULocationID null.Int     `boil:"tou_location_id" json:"touLocationID,omitempty" toml:"touLocationID" yaml:"touLocationID,omitempty"`
+	TOULocationID null.Int64   `boil:"tou_location_id" json:"touLocationID,omitempty" toml:"touLocationID" yaml:"touLocationID,omitempty"`
 	VoltageType   null.String  `boil:"voltage_type" json:"voltageType,omitempty" toml:"voltageType" yaml:"voltageType,omitempty"`
 	TOUType       null.String  `boil:"tou_type" json:"touType,omitempty" toml:"touType" yaml:"touType,omitempty"`
 	PeriodType    null.String  `boil:"period_type" json:"periodType,omitempty" toml:"periodType" yaml:"periodType,omitempty"`
@@ -120,7 +120,7 @@ var TouTableColumns = struct {
 
 var TouWhere = struct {
 	ID            whereHelperint64
-	TOULocationID whereHelpernull_Int
+	TOULocationID whereHelpernull_Int64
 	VoltageType   whereHelpernull_String
 	TOUType       whereHelpernull_String
 	PeriodType    whereHelpernull_String
@@ -137,7 +137,7 @@ var TouWhere = struct {
 	UpdatedAt     whereHelpertime_Time
 }{
 	ID:            whereHelperint64{field: "`tou`.`id`"},
-	TOULocationID: whereHelpernull_Int{field: "`tou`.`tou_location_id`"},
+	TOULocationID: whereHelpernull_Int64{field: "`tou`.`tou_location_id`"},
 	VoltageType:   whereHelpernull_String{field: "`tou`.`voltage_type`"},
 	TOUType:       whereHelpernull_String{field: "`tou`.`tou_type`"},
 	PeriodType:    whereHelpernull_String{field: "`tou`.`period_type`"},
@@ -172,8 +172,8 @@ type touL struct{}
 
 var (
 	touAllColumns            = []string{"id", "tou_location_id", "voltage_type", "tou_type", "period_type", "peak_type", "is_summer", "period_stime", "period_etime", "basic_charge", "basic_rate", "flow_rate", "enable_at", "disable_at", "created_at", "updated_at"}
-	touColumnsWithoutDefault = []string{"tou_location_id", "voltage_type", "tou_type", "period_type", "peak_type", "is_summer", "period_stime", "period_etime", "basic_charge", "basic_rate", "flow_rate", "enable_at", "disable_at"}
-	touColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
+	touColumnsWithoutDefault = []string{"tou_location_id", "voltage_type", "tou_type", "period_type", "peak_type", "period_stime", "period_etime", "basic_charge", "basic_rate", "flow_rate", "enable_at", "disable_at"}
+	touColumnsWithDefault    = []string{"id", "is_summer", "created_at", "updated_at"}
 	touPrimaryKeyColumns     = []string{"id"}
 	touGeneratedColumns      = []string{}
 )

@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { MenuItem, OutlinedInput, Select, TextField } from "@mui/material"
+import { MenuItem, InputAdornment, Select, TextField } from "@mui/material"
 import DatePicker from "react-datepicker"
 import { useTranslation } from "react-multi-lang"
 import moment from "moment"
@@ -30,6 +30,7 @@ const
 export default function TimeRangePicker(props) {
     const
         t = useTranslation(),
+        commonT = string => t("common." + string),
         pageT = (string, params) => t("settings." + string, params),
         errorT = (string) => t("error." + string)
 
@@ -61,7 +62,7 @@ export default function TimeRangePicker(props) {
                 <h6 className="mb-1 ml-1">{pageT("startTime")}</h6>
                 <Select
                     error={props.timeError}
-                    sx={{ minWidth: 90 }}
+                    sx={{ minWidth: 100 }}
                     id="outlined-basic"
                     variant="outlined"
                     size="medium"
@@ -85,7 +86,7 @@ export default function TimeRangePicker(props) {
                 <h6 className="mb-1 ml-1">{pageT("endTime")}</h6>
                 <Select
                     error={props.timeError}
-                    sx={{ minWidth: 90 }}
+                    sx={{ minWidth: 100 }}
                     className="react-datepicker__input-container"
                     id="outlined-basic"
                     variant="outlined"
@@ -108,6 +109,12 @@ export default function TimeRangePicker(props) {
                     variant="outlined"
                     value={basicPrice}
                     onChange={inputPrice}
+                    InputProps={{
+                        endAdornment:
+                            <InputAdornment position="end">
+                                {commonT("$/kWh")}
+                            </InputAdornment>
+                    }}
                 />
             </div>
             <div>
@@ -117,6 +124,12 @@ export default function TimeRangePicker(props) {
                     variant="outlined"
                     value={rate}
                     onChange={inputRate}
+                    InputProps={{
+                        endAdornment:
+                            <InputAdornment position="end">
+                                {commonT("$/kWh")}
+                            </InputAdornment>
+                    }}
                 />
             </div>
         </>

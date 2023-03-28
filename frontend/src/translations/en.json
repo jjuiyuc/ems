@@ -43,6 +43,7 @@
         "YesterdayPowerkW":"Yesterday Power (kW)"
     },
     "common": {
+        "$/kWh":"$/kWh",
         "account":"Account",
         "accountManagementGroup":"Account Management Group",
         "accountManagementUser":"Account Management User",
@@ -245,13 +246,13 @@
         "resetPassword": "Reset Password"
     },
     "settings":{
-        "aboveBaseline":"Above Baseline ($/kWh)",
+        "aboveBaseline":"Above Baseline",
         "addRatePeriod":"Add Rate Period",
         "addDateRange":"Add Date Range",
         "addTimeRange":"Add Time Range",
         "availableRegularUsage":"Available Regular Usage",
         "backupReserve":"Backup Reserve",
-        "belowBaseline":"Below Baseline ($/kWh)",
+        "belowBaseline":"Below Baseline",
         "cancel":"Cancel",
         "chargingSources":"Charging Sources",
         "endDate": "End Date",

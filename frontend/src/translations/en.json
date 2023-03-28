@@ -1,8 +1,10 @@
 {
     "account":{
         "accountInformationModification":"Account Information Modification",
+        "changePassword":"Change Password",
+        "currentPassword":"Current Password",
         "name":"Name",
-        "password":"Password"
+        "newPassword":"New Password"
     },
     "accountManagementGroup":{
         "fieldList":"Field List",

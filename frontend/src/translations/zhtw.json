@@ -1,8 +1,10 @@
 {
     "account":{
         "accountInformationModification":"帳號資料修改",
+        "changePassword":"修改密碼",
+        "currentPassword":"現在的密碼",
         "name":"名稱",
-        "password":"密碼"
+        "newPassword":"新密碼"
     },
     "accountManagementGroup":{
         "fieldList":"場域列表",

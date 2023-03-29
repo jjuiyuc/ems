@@ -8,6 +8,7 @@ import { useEffect, useMemo, useState } from "react"
 import { ValidateNumPercent } from "../utils/utils"
 
 import DialogForm from "../components/DialogForm"
+import ExtraDeviceInfoForm from "../components/ExtraDeviceInfoForm"
 import SubDeviceForm from "../components/SubDeviceForm"
 
 export default function AddField({
@@ -98,6 +99,8 @@ export default function AddField({
                 label: "Solar",
             }
         ]),
+        [energyCapacity, setEnergyCapacity] = useState(null),
+        [voltage, setVoltage] = useState(null),
         [fullWidth, setFullWidth] = useState(true),
         [maxWidth, setMaxWidth] = useState("lg"),
         [openAdd, setOpenAdd] = useState(false)
@@ -208,8 +211,8 @@ export default function AddField({
                         </MenuItem>
                     ))}
                 </TextField>
-                <Divider variant="middle" />
-                <h5 className="mt-8 mb-5 ml-2">{fieldDevices}</h5>
+                <Divider variant="middle" sx={{ margin: "1rem 0 2.5rem" }} />
+                <h5 className="mb-5 ml-2">{fieldDevices}</h5>
                 <TextField
                     id="deviceType"
                     select
@@ -270,49 +273,45 @@ export default function AddField({
                     label={formT("powerCapacity")}
                 // value={powerCapacity}
                 />
-                <Divider variant="middle" />
+                <Divider variant="middle" sx={{ margin: "1rem 0 2.5rem" }} />
                 {deviceType.value === "battery"
-                    ? <>
-                        <h5 className="mt-8 mb-5 ml-2">{extraDeviceInfo}</h5>
-                        <TextField
-                            id="reservedForGridOutagePercent"
-                            label={formT("reservedForGridOutagePercent")}
-                            value={gridOutagePercent}
-                            onChange={inputPercent}
-                            InputProps={{
-                                endAdornment:
-                                    <InputAdornment position="end">%</InputAdornment>
-                            }}
-                        />
-                        <TextField
-                            id="chargingSource"
-                            select
-                            label={formT("chargingSource")}
-                            defaultValue=""
-                        >
-                            {chargingSource.map((option) => (
-                                <MenuItem key={option.value} value={option.value}>
-                                    {option.label}
-                                </MenuItem>
-                            ))}
-                        </TextField>
-                        <TextField
-                            id="energyCapacity"
-                            type="number"
-                            label={formT("energyCapacity")}
-                        // value={energyCapacity}
-                        />
-                        <TextField
-                            id="voltage"
-                            type="number"
-                            label={commonT("voltage")}
-                        // value={voltage}
-                        />
-                    </>
+                    ? <ExtraDeviceInfoForm
+                        subTitle={extraDeviceInfo}
+                        gridOutagePercent={gridOutagePercent}
+                        setGridOutagePercent={setGridOutagePercent}
+                        chargingSource={chargingSource}
+                        setChargingSource={setChargingSource}
+                        energyCapacity={energyCapacity}
+                        setEnergyCapacity={setEnergyCapacity}
+                        voltage={voltage}
+                        setVoltage={setVoltage}
+                    />
                     : null}
                 {deviceType.value === "hybridInverter"
                     ? <>
-                        <SubDeviceForm title={subdevice} />
+                        <SubDeviceForm
+                            title={subdevice}
+                            mainDeviceType={deviceType}
+                        />
+                        <ExtraDeviceInfoForm
+                            subTitle={extraDeviceInfo}
+                            gridOutagePercent={gridOutagePercent}
+                            setGridOutagePercent={setGridOutagePercent}
+                            chargingSource={chargingSource}
+                            setChargingSource={setChargingSource}
+                            energyCapacity={energyCapacity}
+                            setEnergyCapacity={setEnergyCapacity}
+                            voltage={voltage}
+                            setVoltage={setVoltage}
+                        />
+                    </>
+                    : null}
+                {deviceType.value === "inverter"
+                    ? <>
+                        <SubDeviceForm
+                            title={subdevice}
+                            mainDeviceType={deviceType}
+                        />
                     </>
                     : null}
             </FormControl>

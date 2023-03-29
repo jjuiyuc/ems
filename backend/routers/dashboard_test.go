@@ -19,7 +19,7 @@ import (
 	"der-ems/repository"
 	"der-ems/services"
 	"der-ems/testutils"
-	"der-ems/testutils/fixtures"
+	"der-ems/testutils/testdata"
 )
 
 type DashboardSuite struct {
@@ -51,7 +51,7 @@ func (s *DashboardSuite) SetupSuite() {
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	err = testutils.SeedUtLocationAndGateway(db)
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
-	token, err := utils.GenerateToken(fixtures.UtUser.ID)
+	token, err := utils.GenerateToken(testdata.UtUser.ID)
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	s.token = token
 	// Mock group_gateway_right table
@@ -124,7 +124,7 @@ func (s *DashboardSuite) Test_dashboardHandler() {
 
 	server := httptest.NewServer(http.HandlerFunc(s.dashboardHandler))
 	defer server.Close()
-	seedUtURLStr := "ws" + strings.TrimPrefix(server.URL, "http") + "/api/" + fixtures.UtGateway.UUID + "/devices/energy-info"
+	seedUtURLStr := "ws" + strings.TrimPrefix(server.URL, "http") + "/api/" + testdata.UtGateway.UUID + "/devices/energy-info"
 	tt := struct {
 		name   string
 		token  string
@@ -165,9 +165,9 @@ func (s *DashboardSuite) dashboardHandler(writer http.ResponseWriter, request *h
 	conn, err := s.worker.upgrade(writer, request)
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	client := &Client{
-		ID:          fixtures.UtUser.ID,
+		ID:          testdata.UtUser.ID,
 		Token:       s.token,
-		GatewayUUID: fixtures.UtGateway.UUID,
+		GatewayUUID: testdata.UtGateway.UUID,
 		Conn:        conn,
 		Pool:        pool,
 	}

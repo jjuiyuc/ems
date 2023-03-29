@@ -14,7 +14,7 @@ import (
 	"der-ems/models"
 	"der-ems/repository"
 	"der-ems/testutils"
-	"der-ems/testutils/fixtures"
+	"der-ems/testutils/testdata"
 )
 
 type LocalCCWorkerSuite struct {
@@ -71,7 +71,7 @@ func (s *LocalCCWorkerSuite) SetupSuite() {
 		"grid": 0,
 	}
 	s.seedUtLocalCCData = map[string]interface{}{
-		"gwID":                              fixtures.UtGateway.UUID,
+		"gwID":                              testdata.UtGateway.UUID,
 		"timestamp":                         1659340800,
 		"gridIsPeakShaving":                 0,
 		"loadGridAveragePowerAC":            10,

@@ -17,7 +17,7 @@ import (
 	"der-ems/repository"
 	"der-ems/services"
 	"der-ems/testutils"
-	"der-ems/testutils/fixtures"
+	"der-ems/testutils/testdata"
 )
 
 var _ = Describe("DemandCharge", func() {
@@ -48,7 +48,7 @@ var _ = Describe("DemandCharge", func() {
 		Expect(err).Should(BeNil())
 		err = testutils.SeedUtLocationAndGateway(db)
 		Expect(err).Should(BeNil())
-		token, err = utils.GenerateToken(fixtures.UtUser.ID)
+		token, err = utils.GenerateToken(testdata.UtUser.ID)
 		Expect(err).Should(BeNil())
 		// Mock group_gateway_right table
 		_, err = db.Exec("TRUNCATE TABLE group_gateway_right")
@@ -69,7 +69,7 @@ var _ = Describe("DemandCharge", func() {
 	Describe("GetChargeInfo", func() {
 		Context("success", func() {
 			It("should be ok", func() {
-				prefixURL := fmt.Sprintf("/api/%s/devices/charge-info", fixtures.UtGateway.UUID)
+				prefixURL := fmt.Sprintf("/api/%s/devices/charge-info", testdata.UtGateway.UUID)
 				seedUtURL := fmt.Sprintf("%s?startTime=%s", prefixURL, UtStartTime)
 				expectedResponseData := services.ChargeInfoResponse{
 					GridPowerCost:              0,
@@ -102,7 +102,7 @@ var _ = Describe("DemandCharge", func() {
 
 		Context("fail", func() {
 			It("should return invalid parameters", func() {
-				prefixURL := fmt.Sprintf("/api/%s/devices/charge-info", fixtures.UtGateway.UUID)
+				prefixURL := fmt.Sprintf("/api/%s/devices/charge-info", testdata.UtGateway.UUID)
 				seedUtInvalidParamsURL := fmt.Sprintf("%s?startTime=%s", prefixURL, "xxx")
 				tt := testutils.TestInfo{
 					Token:      token,
@@ -121,7 +121,7 @@ var _ = Describe("DemandCharge", func() {
 	Describe("GetDemandState", func() {
 		Context("success", func() {
 			It("should be ok", func() {
-				prefixURL := fmt.Sprintf("/api/%s/devices/demand-state", fixtures.UtGateway.UUID)
+				prefixURL := fmt.Sprintf("/api/%s/devices/demand-state", testdata.UtGateway.UUID)
 				seedUtURL := fmt.Sprintf("%s?startTime=%s&endTime=%s", prefixURL, UtStartTime, UtEndTime)
 				expectedTimestamps := []int{1659543000, 1659557100}
 				expectedGridLifetimeEnergyACDiffToPowers := []float32{0, 40}
@@ -153,7 +153,7 @@ var _ = Describe("DemandCharge", func() {
 
 		Context("fail", func() {
 			It("should return invalid parameters", func() {
-				prefixURL := fmt.Sprintf("/api/%s/devices/demand-state", fixtures.UtGateway.UUID)
+				prefixURL := fmt.Sprintf("/api/%s/devices/demand-state", testdata.UtGateway.UUID)
 				seedUtInvalidParamsURL := fmt.Sprintf("%s?startTime=%s&endTime=%s", prefixURL, UtStartTime, "xxx")
 				tt := testutils.TestInfo{
 					Token:      token,

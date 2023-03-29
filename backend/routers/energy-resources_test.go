@@ -17,7 +17,7 @@ import (
 	"der-ems/repository"
 	"der-ems/services"
 	"der-ems/testutils"
-	"der-ems/testutils/fixtures"
+	"der-ems/testutils/testdata"
 )
 
 var _ = Describe("EnergyResources", func() {
@@ -58,7 +58,7 @@ var _ = Describe("EnergyResources", func() {
 		Expect(err).Should(BeNil())
 		err = testutils.SeedUtLocationAndGateway(db)
 		Expect(err).Should(BeNil())
-		token, err = utils.GenerateToken(fixtures.UtUser.ID)
+		token, err = utils.GenerateToken(testdata.UtUser.ID)
 		Expect(err).Should(BeNil())
 		// Mock group_gateway_right table
 		_, err = db.Exec("TRUNCATE TABLE group_gateway_right")
@@ -79,7 +79,7 @@ var _ = Describe("EnergyResources", func() {
 	Describe("GetSolarEnergyInfo", func() {
 		Context("success", func() {
 			It("should be ok", func() {
-				prefixURL := fmt.Sprintf("/api/%s/devices/solar/energy-info", fixtures.UtGateway.UUID)
+				prefixURL := fmt.Sprintf("/api/%s/devices/solar/energy-info", testdata.UtGateway.UUID)
 				seedUtURL := fmt.Sprintf("%s?startTime=%s", prefixURL, UtStartTime)
 				expectedResponseData := services.SolarEnergyInfoResponse{
 					PvProducedLifetimeEnergyACDiff:        10,
@@ -115,7 +115,7 @@ var _ = Describe("EnergyResources", func() {
 
 		Context("fail", func() {
 			It("should return invalid parameters", func() {
-				prefixURL := fmt.Sprintf("/api/%s/devices/solar/energy-info", fixtures.UtGateway.UUID)
+				prefixURL := fmt.Sprintf("/api/%s/devices/solar/energy-info", testdata.UtGateway.UUID)
 				seedUtInvalidParamsURL := fmt.Sprintf("%s?startTime=%s", prefixURL, "xxx")
 				tt := testutils.TestInfo{
 					Token:      token,
@@ -134,7 +134,7 @@ var _ = Describe("EnergyResources", func() {
 	Describe("GetSolarPowerState", func() {
 		Context("success", func() {
 			It("should be ok", func() {
-				prefixURL := fmt.Sprintf("/api/%s/devices/solar/power-state", fixtures.UtGateway.UUID)
+				prefixURL := fmt.Sprintf("/api/%s/devices/solar/power-state", testdata.UtGateway.UUID)
 				seedUtURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, "hour", UtStartTime, UtEndTime)
 				expectedTimestamps := []int{1659543000, 1659557100}
 				expectedPvAveragePowerACs := []float32{40, 40}
@@ -166,7 +166,7 @@ var _ = Describe("EnergyResources", func() {
 
 		Context("fail", func() {
 			It("should return invalid parameters", func() {
-				prefixURL := fmt.Sprintf("/api/%s/devices/solar/power-state", fixtures.UtGateway.UUID)
+				prefixURL := fmt.Sprintf("/api/%s/devices/solar/power-state", testdata.UtGateway.UUID)
 				seedUtInvalidParamsURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, "xxx", UtStartTime, UtEndTime)
 				tt := testutils.TestInfo{
 					Token:      token,
@@ -185,7 +185,7 @@ var _ = Describe("EnergyResources", func() {
 	Describe("GetBatteryEnergyInfo", func() {
 		Context("success", func() {
 			It("should be ok", func() {
-				prefixURL := fmt.Sprintf("/api/%s/devices/battery/energy-info", fixtures.UtGateway.UUID)
+				prefixURL := fmt.Sprintf("/api/%s/devices/battery/energy-info", testdata.UtGateway.UUID)
 				seedUtURL := fmt.Sprintf("%s?startTime=%s", prefixURL, UtStartTime)
 				expectedResponseData := services.BatteryEnergyInfoResponse{
 					BatteryLifetimeOperationCyclesDiff:  8,
@@ -224,7 +224,7 @@ var _ = Describe("EnergyResources", func() {
 
 		Context("fail", func() {
 			It("should return invalid parameters", func() {
-				prefixURL := fmt.Sprintf("/api/%s/devices/battery/energy-info", fixtures.UtGateway.UUID)
+				prefixURL := fmt.Sprintf("/api/%s/devices/battery/energy-info", testdata.UtGateway.UUID)
 				seedUtInvalidParamsURL := fmt.Sprintf("%s?startTime=%s", prefixURL, "xxx")
 				tt := testutils.TestInfo{
 					Token:      token,
@@ -243,7 +243,7 @@ var _ = Describe("EnergyResources", func() {
 	Describe("GetBatteryPowerState", func() {
 		Context("success", func() {
 			It("should be ok", func() {
-				prefixURL := fmt.Sprintf("/api/%s/devices/battery/power-state", fixtures.UtGateway.UUID)
+				prefixURL := fmt.Sprintf("/api/%s/devices/battery/power-state", testdata.UtGateway.UUID)
 				seedUtURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, "hour", UtStartTime, UtEndTime)
 				expectedTimestamps := []int{1659543000, 1659557100}
 				expectedBatteryAveragePowerACs := []float32{-3.5, -7}
@@ -275,7 +275,7 @@ var _ = Describe("EnergyResources", func() {
 
 		Context("fail-invalid resolution param", func() {
 			It("should return invalid parameters", func() {
-				prefixURL := fmt.Sprintf("/api/%s/devices/battery/power-state", fixtures.UtGateway.UUID)
+				prefixURL := fmt.Sprintf("/api/%s/devices/battery/power-state", testdata.UtGateway.UUID)
 				seedUtInvalidParamsURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, "xxx", UtStartTime, UtEndTime)
 				tt := testutils.TestInfo{
 					Token:      token,
@@ -292,7 +292,7 @@ var _ = Describe("EnergyResources", func() {
 
 		Context("fail-invalid startTime param", func() {
 			It("should return invalid parameters", func() {
-				prefixURL := fmt.Sprintf("/api/%s/devices/battery/power-state", fixtures.UtGateway.UUID)
+				prefixURL := fmt.Sprintf("/api/%s/devices/battery/power-state", testdata.UtGateway.UUID)
 				seedUtInvalidParamsURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, "hour", "xxx", UtEndTime)
 				tt := testutils.TestInfo{
 					Token:      token,
@@ -309,7 +309,7 @@ var _ = Describe("EnergyResources", func() {
 
 		Context("fail-invalid endTime param", func() {
 			It("should return invalid parameters", func() {
-				prefixURL := fmt.Sprintf("/api/%s/devices/battery/power-state", fixtures.UtGateway.UUID)
+				prefixURL := fmt.Sprintf("/api/%s/devices/battery/power-state", testdata.UtGateway.UUID)
 				seedUtInvalidParamsURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, "hour", UtStartTime, UtStartTime)
 				tt := testutils.TestInfo{
 					Token:      token,
@@ -326,7 +326,7 @@ var _ = Describe("EnergyResources", func() {
 
 		Context("fail-invalid period endTime param", func() {
 			It("should return invalid parameters", func() {
-				prefixURL := fmt.Sprintf("/api/%s/devices/battery/power-state", fixtures.UtGateway.UUID)
+				prefixURL := fmt.Sprintf("/api/%s/devices/battery/power-state", testdata.UtGateway.UUID)
 				seedUtInvalidParamsURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, "hour", UtStartTime, UtStartTime)
 				tt := testutils.TestInfo{
 					Token:      token,
@@ -343,7 +343,7 @@ var _ = Describe("EnergyResources", func() {
 
 		Context("fail-no resolution param", func() {
 			It("should return invalid parameters", func() {
-				prefixURL := fmt.Sprintf("/api/%s/devices/battery/power-state", fixtures.UtGateway.UUID)
+				prefixURL := fmt.Sprintf("/api/%s/devices/battery/power-state", testdata.UtGateway.UUID)
 				seedUtInvalidParamsURL := fmt.Sprintf("%s?startTime=%s&endTime=%s", prefixURL, UtStartTime, UtEndTime)
 				tt := testutils.TestInfo{
 					Token:      token,
@@ -362,7 +362,7 @@ var _ = Describe("EnergyResources", func() {
 	Describe("GetBatteryChargeVoltageState", func() {
 		Context("success", func() {
 			It("should be ok", func() {
-				prefixURL := fmt.Sprintf("/api/%s/devices/battery/charge-voltage-state", fixtures.UtGateway.UUID)
+				prefixURL := fmt.Sprintf("/api/%s/devices/battery/charge-voltage-state", testdata.UtGateway.UUID)
 				seedUtURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, "hour", UtStartTime, UtEndTime)
 				expectedTimestamps := []int{1659543000, 1659557100}
 				expectedBatterySoCs := []float32{80, 160}
@@ -396,7 +396,7 @@ var _ = Describe("EnergyResources", func() {
 
 		Context("fail", func() {
 			It("should return invalid parameters", func() {
-				prefixURL := fmt.Sprintf("/api/%s/devices/battery/charge-voltage-state", fixtures.UtGateway.UUID)
+				prefixURL := fmt.Sprintf("/api/%s/devices/battery/charge-voltage-state", testdata.UtGateway.UUID)
 				seedUtInvalidParamsURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, "xxx", UtStartTime, UtEndTime)
 				tt := testutils.TestInfo{
 					Token:      token,
@@ -415,7 +415,7 @@ var _ = Describe("EnergyResources", func() {
 	Describe("GetGridEnergyInfo", func() {
 		Context("success", func() {
 			It("should be ok", func() {
-				prefixURL := fmt.Sprintf("/api/%s/devices/grid/energy-info", fixtures.UtGateway.UUID)
+				prefixURL := fmt.Sprintf("/api/%s/devices/grid/energy-info", testdata.UtGateway.UUID)
 				seedUtURL := fmt.Sprintf("%s?startTime=%s", prefixURL, UtStartTime)
 				expectedResponseData := services.GridEnergyInfoResponse{
 					GridConsumedLifetimeEnergyACDiff: 15,
@@ -446,7 +446,7 @@ var _ = Describe("EnergyResources", func() {
 
 		Context("fail", func() {
 			It("should return invalid parameters", func() {
-				prefixURL := fmt.Sprintf("/api/%s/devices/grid/energy-info", fixtures.UtGateway.UUID)
+				prefixURL := fmt.Sprintf("/api/%s/devices/grid/energy-info", testdata.UtGateway.UUID)
 				seedUtInvalidParamsURL := fmt.Sprintf("%s?startTime=%s", prefixURL, "xxx")
 				tt := testutils.TestInfo{
 					Token:      token,
@@ -465,7 +465,7 @@ var _ = Describe("EnergyResources", func() {
 	Describe("GetGridPowerState", func() {
 		Context("success", func() {
 			It("should be ok", func() {
-				prefixURL := fmt.Sprintf("/api/%s/devices/grid/power-state", fixtures.UtGateway.UUID)
+				prefixURL := fmt.Sprintf("/api/%s/devices/grid/power-state", testdata.UtGateway.UUID)
 				seedUtURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, "hour", UtStartTime, UtEndTime)
 				expectedTimestamps := []int{1659543000, 1659557100}
 				expectedGridAveragePowerACs := []float32{50, 50}
@@ -497,7 +497,7 @@ var _ = Describe("EnergyResources", func() {
 
 		Context("fail", func() {
 			It("should return invalid parameters", func() {
-				prefixURL := fmt.Sprintf("/api/%s/devices/grid/power-state", fixtures.UtGateway.UUID)
+				prefixURL := fmt.Sprintf("/api/%s/devices/grid/power-state", testdata.UtGateway.UUID)
 				seedUtInvalidParamsURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, "xxx", UtStartTime, UtEndTime)
 				tt := testutils.TestInfo{
 					Token:      token,

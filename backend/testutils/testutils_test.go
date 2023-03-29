@@ -13,7 +13,7 @@ import (
 	"der-ems/kafka"
 	"der-ems/models"
 	"der-ems/repository"
-	"der-ems/testutils/fixtures"
+	"der-ems/testutils/testdata"
 )
 
 type TestutilsSuite struct {
@@ -43,7 +43,7 @@ func (s *TestutilsSuite) SetupSuite() {
 
 func (s *TestutilsSuite) Test_SeedUtUser() {
 	SeedUtUser(s.db)
-	_, err := s.repo.User.GetUserByUsername(fixtures.UtUser.Username)
+	_, err := s.repo.User.GetUserByUsername(testdata.UtUser.Username)
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 }
 

@@ -22,7 +22,7 @@ import (
 
 	"der-ems/internal/app"
 	deremsmodels "der-ems/models/der-ems"
-	"der-ems/testutils/fixtures"
+	"der-ems/testutils/testdata"
 )
 
 // TestInfo godoc
@@ -54,15 +54,15 @@ func SeedUtUser(db *sql.DB) (err error) {
 	if err != nil {
 		return
 	}
-	hashPassword, err := bcrypt.GenerateFromPassword([]byte(fixtures.UtUser.Password), bcrypt.DefaultCost)
+	hashPassword, err := bcrypt.GenerateFromPassword([]byte(testdata.UtUser.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return
 	}
 	user := &deremsmodels.User{
-		Username:       fixtures.UtUser.Username,
-		GroupID:        fixtures.UtUser.GroupID,
+		Username:       testdata.UtUser.Username,
+		GroupID:        testdata.UtUser.GroupID,
 		Password:       string(hashPassword[:]),
-		ExpirationDate: fixtures.UtUser.ExpirationDate,
+		ExpirationDate: testdata.UtUser.ExpirationDate,
 	}
 	err = user.Insert(db, boil.Infer())
 	return
@@ -86,12 +86,12 @@ func SeedUtLocationAndGateway(db *sql.DB) (err error) {
 	if err != nil {
 		return
 	}
-	location := fixtures.UtLocation
+	location := testdata.UtLocation
 	err = location.Insert(db, boil.Infer())
 	if err != nil {
 		return
 	}
-	gateway := fixtures.UtGateway
+	gateway := testdata.UtGateway
 	err = gateway.Insert(db, boil.Infer())
 	return
 }

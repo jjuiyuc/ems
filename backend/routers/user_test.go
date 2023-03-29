@@ -18,7 +18,7 @@ import (
 	"der-ems/repository"
 	"der-ems/services"
 	"der-ems/testutils"
-	"der-ems/testutils/fixtures"
+	"der-ems/testutils/testdata"
 )
 
 type UserSuite struct {
@@ -52,7 +52,7 @@ func (s *UserSuite) SetupSuite() {
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	err = testutils.SeedUtLocationAndGateway(db)
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
-	token, err := utils.GenerateToken(fixtures.UtUser.ID)
+	token, err := utils.GenerateToken(testdata.UtUser.ID)
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	s.token = token
 	// Mock group_gateway_right table
@@ -105,7 +105,7 @@ func (s *UserSuite) Test_PasswordLostAndResetByToken() {
 				},
 			},
 			passwordLostArgs{
-				Username: fixtures.UtUser.Username,
+				Username: testdata.UtUser.Username,
 			},
 		},
 		{
@@ -149,7 +149,7 @@ func (s *UserSuite) Test_PasswordLostAndResetByToken() {
 				},
 			},
 			passwordResetArgs{
-				Password: fixtures.UtUser.Password,
+				Password: testdata.UtUser.Password,
 			},
 		},
 		{
@@ -163,7 +163,7 @@ func (s *UserSuite) Test_PasswordLostAndResetByToken() {
 				},
 			},
 			passwordResetArgs{
-				Password: fixtures.UtUser.Password,
+				Password: testdata.UtUser.Password,
 			},
 		},
 		{
@@ -178,7 +178,7 @@ func (s *UserSuite) Test_PasswordLostAndResetByToken() {
 			},
 			passwordResetArgs{
 				Token:    "xxx",
-				Password: fixtures.UtUser.Password,
+				Password: testdata.UtUser.Password,
 			},
 		},
 	}
@@ -190,11 +190,11 @@ func (s *UserSuite) Test_PasswordLostAndResetByToken() {
 		rvData := testutils.AssertRequest(tt.TestInfo, s.Require(), s.router, "PUT", bytes.NewBuffer(payloadBuf))
 		if tt.Name == "passwordLost" {
 			dataMap := rvData.(map[string]interface{})
-			s.Equalf(fixtures.UtUser.Username, dataMap["username"], e.ErrNewMessageNotEqual.Error())
+			s.Equalf(testdata.UtUser.Username, dataMap["username"], e.ErrNewMessageNotEqual.Error())
 		}
 	}
 
-	user, err := s.repo.User.GetUserByUsername(fixtures.UtUser.Username)
+	user, err := s.repo.User.GetUserByUsername(testdata.UtUser.Username)
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 
 	for _, tt := range passwordResetTest {
@@ -269,9 +269,9 @@ func (s *UserSuite) Test_GetProfile() {
 	var data services.ProfileResponse
 	err = json.Unmarshal(dataJSON, &data)
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
-	s.Equalf(fixtures.UtUser.ID, data.ID, e.ErrNewMessageNotEqual.Error())
-	s.Equalf(fixtures.UtUser.Username, data.Username, e.ErrNewMessageNotEqual.Error())
-	s.Equalf(fixtures.UtUser.ExpirationDate, data.ExpirationDate, e.ErrNewMessageNotEqual.Error())
-	s.Equalf(fixtures.UtGateway.UUID, data.Gateways[0].GatewayID, e.ErrNewMessageNotEqual.Error())
-	s.Equalf(fixtures.UtLocation.Address.String, data.Gateways[0].Address, e.ErrNewMessageNotEqual.Error())
+	s.Equalf(testdata.UtUser.ID, data.ID, e.ErrNewMessageNotEqual.Error())
+	s.Equalf(testdata.UtUser.Username, data.Username, e.ErrNewMessageNotEqual.Error())
+	s.Equalf(testdata.UtUser.ExpirationDate, data.ExpirationDate, e.ErrNewMessageNotEqual.Error())
+	s.Equalf(testdata.UtGateway.UUID, data.Gateways[0].GatewayID, e.ErrNewMessageNotEqual.Error())
+	s.Equalf(testdata.UtLocation.Address.String, data.Gateways[0].Address, e.ErrNewMessageNotEqual.Error())
 }

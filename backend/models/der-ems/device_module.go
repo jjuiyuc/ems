@@ -20,118 +20,111 @@ import (
 	"github.com/volatiletech/strmangle"
 )
 
-// DeviceModel is an object representing the database table.
-type DeviceModel struct {
+// DeviceModule is an object representing the database table.
+type DeviceModule struct {
 	ID        int64     `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Name      string    `boil:"name" json:"name" toml:"name" yaml:"name"`
-	Type      string    `boil:"type" json:"type" toml:"type" yaml:"type"`
+	Uueid     string    `boil:"uueid" json:"uueid" toml:"uueid" yaml:"uueid"`
 	CreatedAt time.Time `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
 	UpdatedAt time.Time `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
 
-	R *deviceModelR `boil:"-" json:"-" toml:"-" yaml:"-"`
-	L deviceModelL  `boil:"-" json:"-" toml:"-" yaml:"-"`
+	R *deviceModuleR `boil:"-" json:"-" toml:"-" yaml:"-"`
+	L deviceModuleL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
-var DeviceModelColumns = struct {
+var DeviceModuleColumns = struct {
 	ID        string
-	Name      string
-	Type      string
+	Uueid     string
 	CreatedAt string
 	UpdatedAt string
 }{
 	ID:        "id",
-	Name:      "name",
-	Type:      "type",
+	Uueid:     "uueid",
 	CreatedAt: "created_at",
 	UpdatedAt: "updated_at",
 }
 
-var DeviceModelTableColumns = struct {
+var DeviceModuleTableColumns = struct {
 	ID        string
-	Name      string
-	Type      string
+	Uueid     string
 	CreatedAt string
 	UpdatedAt string
 }{
-	ID:        "device_model.id",
-	Name:      "device_model.name",
-	Type:      "device_model.type",
-	CreatedAt: "device_model.created_at",
-	UpdatedAt: "device_model.updated_at",
+	ID:        "device_module.id",
+	Uueid:     "device_module.uueid",
+	CreatedAt: "device_module.created_at",
+	UpdatedAt: "device_module.updated_at",
 }
 
 // Generated where
 
-var DeviceModelWhere = struct {
+var DeviceModuleWhere = struct {
 	ID        whereHelperint64
-	Name      whereHelperstring
-	Type      whereHelperstring
+	Uueid     whereHelperstring
 	CreatedAt whereHelpertime_Time
 	UpdatedAt whereHelpertime_Time
 }{
-	ID:        whereHelperint64{field: "`device_model`.`id`"},
-	Name:      whereHelperstring{field: "`device_model`.`name`"},
-	Type:      whereHelperstring{field: "`device_model`.`type`"},
-	CreatedAt: whereHelpertime_Time{field: "`device_model`.`created_at`"},
-	UpdatedAt: whereHelpertime_Time{field: "`device_model`.`updated_at`"},
+	ID:        whereHelperint64{field: "`device_module`.`id`"},
+	Uueid:     whereHelperstring{field: "`device_module`.`uueid`"},
+	CreatedAt: whereHelpertime_Time{field: "`device_module`.`created_at`"},
+	UpdatedAt: whereHelpertime_Time{field: "`device_module`.`updated_at`"},
 }
 
-// DeviceModelRels is where relationship names are stored.
-var DeviceModelRels = struct {
-	ModelDevices string
+// DeviceModuleRels is where relationship names are stored.
+var DeviceModuleRels = struct {
+	ModuleDevices string
 }{
-	ModelDevices: "ModelDevices",
+	ModuleDevices: "ModuleDevices",
 }
 
-// deviceModelR is where relationships are stored.
-type deviceModelR struct {
-	ModelDevices DeviceSlice `boil:"ModelDevices" json:"ModelDevices" toml:"ModelDevices" yaml:"ModelDevices"`
+// deviceModuleR is where relationships are stored.
+type deviceModuleR struct {
+	ModuleDevices DeviceSlice `boil:"ModuleDevices" json:"ModuleDevices" toml:"ModuleDevices" yaml:"ModuleDevices"`
 }
 
 // NewStruct creates a new relationship struct
-func (*deviceModelR) NewStruct() *deviceModelR {
-	return &deviceModelR{}
+func (*deviceModuleR) NewStruct() *deviceModuleR {
+	return &deviceModuleR{}
 }
 
-func (r *deviceModelR) GetModelDevices() DeviceSlice {
+func (r *deviceModuleR) GetModuleDevices() DeviceSlice {
 	if r == nil {
 		return nil
 	}
-	return r.ModelDevices
+	return r.ModuleDevices
 }
 
-// deviceModelL is where Load methods for each relationship are stored.
-type deviceModelL struct{}
+// deviceModuleL is where Load methods for each relationship are stored.
+type deviceModuleL struct{}
 
 var (
-	deviceModelAllColumns            = []string{"id", "name", "type", "created_at", "updated_at"}
-	deviceModelColumnsWithoutDefault = []string{"name", "type"}
-	deviceModelColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
-	deviceModelPrimaryKeyColumns     = []string{"id"}
-	deviceModelGeneratedColumns      = []string{}
+	deviceModuleAllColumns            = []string{"id", "uueid", "created_at", "updated_at"}
+	deviceModuleColumnsWithoutDefault = []string{"uueid"}
+	deviceModuleColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
+	deviceModulePrimaryKeyColumns     = []string{"id"}
+	deviceModuleGeneratedColumns      = []string{}
 )
 
 type (
-	// DeviceModelSlice is an alias for a slice of pointers to DeviceModel.
-	// This should almost always be used instead of []DeviceModel.
-	DeviceModelSlice []*DeviceModel
+	// DeviceModuleSlice is an alias for a slice of pointers to DeviceModule.
+	// This should almost always be used instead of []DeviceModule.
+	DeviceModuleSlice []*DeviceModule
 
-	deviceModelQuery struct {
+	deviceModuleQuery struct {
 		*queries.Query
 	}
 )
 
 // Cache for insert, update and upsert
 var (
-	deviceModelType                 = reflect.TypeOf(&DeviceModel{})
-	deviceModelMapping              = queries.MakeStructMapping(deviceModelType)
-	deviceModelPrimaryKeyMapping, _ = queries.BindMapping(deviceModelType, deviceModelMapping, deviceModelPrimaryKeyColumns)
-	deviceModelInsertCacheMut       sync.RWMutex
-	deviceModelInsertCache          = make(map[string]insertCache)
-	deviceModelUpdateCacheMut       sync.RWMutex
-	deviceModelUpdateCache          = make(map[string]updateCache)
-	deviceModelUpsertCacheMut       sync.RWMutex
-	deviceModelUpsertCache          = make(map[string]insertCache)
+	deviceModuleType                 = reflect.TypeOf(&DeviceModule{})
+	deviceModuleMapping              = queries.MakeStructMapping(deviceModuleType)
+	deviceModulePrimaryKeyMapping, _ = queries.BindMapping(deviceModuleType, deviceModuleMapping, deviceModulePrimaryKeyColumns)
+	deviceModuleInsertCacheMut       sync.RWMutex
+	deviceModuleInsertCache          = make(map[string]insertCache)
+	deviceModuleUpdateCacheMut       sync.RWMutex
+	deviceModuleUpdateCache          = make(map[string]updateCache)
+	deviceModuleUpsertCacheMut       sync.RWMutex
+	deviceModuleUpsertCache          = make(map[string]insertCache)
 )
 
 var (
@@ -142,9 +135,9 @@ var (
 	_ = qmhelper.Where
 )
 
-// One returns a single deviceModel record from the query.
-func (q deviceModelQuery) One(exec boil.Executor) (*DeviceModel, error) {
-	o := &DeviceModel{}
+// One returns a single deviceModule record from the query.
+func (q deviceModuleQuery) One(exec boil.Executor) (*DeviceModule, error) {
+	o := &DeviceModule{}
 
 	queries.SetLimit(q.Query, 1)
 
@@ -153,26 +146,26 @@ func (q deviceModelQuery) One(exec boil.Executor) (*DeviceModel, error) {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, sql.ErrNoRows
 		}
-		return nil, errors.Wrap(err, "deremsmodels: failed to execute a one query for device_model")
+		return nil, errors.Wrap(err, "deremsmodels: failed to execute a one query for device_module")
 	}
 
 	return o, nil
 }
 
-// All returns all DeviceModel records from the query.
-func (q deviceModelQuery) All(exec boil.Executor) (DeviceModelSlice, error) {
-	var o []*DeviceModel
+// All returns all DeviceModule records from the query.
+func (q deviceModuleQuery) All(exec boil.Executor) (DeviceModuleSlice, error) {
+	var o []*DeviceModule
 
 	err := q.Bind(nil, exec, &o)
 	if err != nil {
-		return nil, errors.Wrap(err, "deremsmodels: failed to assign all query results to DeviceModel slice")
+		return nil, errors.Wrap(err, "deremsmodels: failed to assign all query results to DeviceModule slice")
 	}
 
 	return o, nil
 }
 
-// Count returns the count of all DeviceModel records in the query.
-func (q deviceModelQuery) Count(exec boil.Executor) (int64, error) {
+// Count returns the count of all DeviceModule records in the query.
+func (q deviceModuleQuery) Count(exec boil.Executor) (int64, error) {
 	var count int64
 
 	queries.SetSelect(q.Query, nil)
@@ -180,14 +173,14 @@ func (q deviceModelQuery) Count(exec boil.Executor) (int64, error) {
 
 	err := q.Query.QueryRow(exec).Scan(&count)
 	if err != nil {
-		return 0, errors.Wrap(err, "deremsmodels: failed to count device_model rows")
+		return 0, errors.Wrap(err, "deremsmodels: failed to count device_module rows")
 	}
 
 	return count, nil
 }
 
 // Exists checks if the row exists in the table.
-func (q deviceModelQuery) Exists(exec boil.Executor) (bool, error) {
+func (q deviceModuleQuery) Exists(exec boil.Executor) (bool, error) {
 	var count int64
 
 	queries.SetSelect(q.Query, nil)
@@ -196,49 +189,49 @@ func (q deviceModelQuery) Exists(exec boil.Executor) (bool, error) {
 
 	err := q.Query.QueryRow(exec).Scan(&count)
 	if err != nil {
-		return false, errors.Wrap(err, "deremsmodels: failed to check if device_model exists")
+		return false, errors.Wrap(err, "deremsmodels: failed to check if device_module exists")
 	}
 
 	return count > 0, nil
 }
 
-// ModelDevices retrieves all the device's Devices with an executor via model_id column.
-func (o *DeviceModel) ModelDevices(mods ...qm.QueryMod) deviceQuery {
+// ModuleDevices retrieves all the device's Devices with an executor via module_id column.
+func (o *DeviceModule) ModuleDevices(mods ...qm.QueryMod) deviceQuery {
 	var queryMods []qm.QueryMod
 	if len(mods) != 0 {
 		queryMods = append(queryMods, mods...)
 	}
 
 	queryMods = append(queryMods,
-		qm.Where("`device`.`model_id`=?", o.ID),
+		qm.Where("`device`.`module_id`=?", o.ID),
 	)
 
 	return Devices(queryMods...)
 }
 
-// LoadModelDevices allows an eager lookup of values, cached into the
+// LoadModuleDevices allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for a 1-M or N-M relationship.
-func (deviceModelL) LoadModelDevices(e boil.Executor, singular bool, maybeDeviceModel interface{}, mods queries.Applicator) error {
-	var slice []*DeviceModel
-	var object *DeviceModel
+func (deviceModuleL) LoadModuleDevices(e boil.Executor, singular bool, maybeDeviceModule interface{}, mods queries.Applicator) error {
+	var slice []*DeviceModule
+	var object *DeviceModule
 
 	if singular {
-		object = maybeDeviceModel.(*DeviceModel)
+		object = maybeDeviceModule.(*DeviceModule)
 	} else {
-		slice = *maybeDeviceModel.(*[]*DeviceModel)
+		slice = *maybeDeviceModule.(*[]*DeviceModule)
 	}
 
 	args := make([]interface{}, 0, 1)
 	if singular {
 		if object.R == nil {
-			object.R = &deviceModelR{}
+			object.R = &deviceModuleR{}
 		}
 		args = append(args, object.ID)
 	} else {
 	Outer:
 		for _, obj := range slice {
 			if obj.R == nil {
-				obj.R = &deviceModelR{}
+				obj.R = &deviceModuleR{}
 			}
 
 			for _, a := range args {
@@ -257,7 +250,7 @@ func (deviceModelL) LoadModelDevices(e boil.Executor, singular bool, maybeDevice
 
 	query := NewQuery(
 		qm.From(`device`),
-		qm.WhereIn(`device.model_id in ?`, args...),
+		qm.WhereIn(`device.module_id in ?`, args...),
 	)
 	if mods != nil {
 		mods.Apply(query)
@@ -281,24 +274,24 @@ func (deviceModelL) LoadModelDevices(e boil.Executor, singular bool, maybeDevice
 	}
 
 	if singular {
-		object.R.ModelDevices = resultSlice
+		object.R.ModuleDevices = resultSlice
 		for _, foreign := range resultSlice {
 			if foreign.R == nil {
 				foreign.R = &deviceR{}
 			}
-			foreign.R.Model = object
+			foreign.R.Module = object
 		}
 		return nil
 	}
 
 	for _, foreign := range resultSlice {
 		for _, local := range slice {
-			if local.ID == foreign.ModelID {
-				local.R.ModelDevices = append(local.R.ModelDevices, foreign)
+			if local.ID == foreign.ModuleID {
+				local.R.ModuleDevices = append(local.R.ModuleDevices, foreign)
 				if foreign.R == nil {
 					foreign.R = &deviceR{}
 				}
-				foreign.R.Model = local
+				foreign.R.Module = local
 				break
 			}
 		}
@@ -307,22 +300,22 @@ func (deviceModelL) LoadModelDevices(e boil.Executor, singular bool, maybeDevice
 	return nil
 }
 
-// AddModelDevices adds the given related objects to the existing relationships
-// of the device_model, optionally inserting them as new records.
-// Appends related to o.R.ModelDevices.
-// Sets related.R.Model appropriately.
-func (o *DeviceModel) AddModelDevices(exec boil.Executor, insert bool, related ...*Device) error {
+// AddModuleDevices adds the given related objects to the existing relationships
+// of the device_module, optionally inserting them as new records.
+// Appends related to o.R.ModuleDevices.
+// Sets related.R.Module appropriately.
+func (o *DeviceModule) AddModuleDevices(exec boil.Executor, insert bool, related ...*Device) error {
 	var err error
 	for _, rel := range related {
 		if insert {
-			rel.ModelID = o.ID
+			rel.ModuleID = o.ID
 			if err = rel.Insert(exec, boil.Infer()); err != nil {
 				return errors.Wrap(err, "failed to insert into foreign table")
 			}
 		} else {
 			updateQuery := fmt.Sprintf(
 				"UPDATE `device` SET %s WHERE %s",
-				strmangle.SetParamNames("`", "`", 0, []string{"model_id"}),
+				strmangle.SetParamNames("`", "`", 0, []string{"module_id"}),
 				strmangle.WhereClause("`", "`", 0, devicePrimaryKeyColumns),
 			)
 			values := []interface{}{o.ID, rel.ID}
@@ -335,72 +328,72 @@ func (o *DeviceModel) AddModelDevices(exec boil.Executor, insert bool, related .
 				return errors.Wrap(err, "failed to update foreign table")
 			}
 
-			rel.ModelID = o.ID
+			rel.ModuleID = o.ID
 		}
 	}
 
 	if o.R == nil {
-		o.R = &deviceModelR{
-			ModelDevices: related,
+		o.R = &deviceModuleR{
+			ModuleDevices: related,
 		}
 	} else {
-		o.R.ModelDevices = append(o.R.ModelDevices, related...)
+		o.R.ModuleDevices = append(o.R.ModuleDevices, related...)
 	}
 
 	for _, rel := range related {
 		if rel.R == nil {
 			rel.R = &deviceR{
-				Model: o,
+				Module: o,
 			}
 		} else {
-			rel.R.Model = o
+			rel.R.Module = o
 		}
 	}
 	return nil
 }
 
-// DeviceModels retrieves all the records using an executor.
-func DeviceModels(mods ...qm.QueryMod) deviceModelQuery {
-	mods = append(mods, qm.From("`device_model`"))
+// DeviceModules retrieves all the records using an executor.
+func DeviceModules(mods ...qm.QueryMod) deviceModuleQuery {
+	mods = append(mods, qm.From("`device_module`"))
 	q := NewQuery(mods...)
 	if len(queries.GetSelect(q)) == 0 {
-		queries.SetSelect(q, []string{"`device_model`.*"})
+		queries.SetSelect(q, []string{"`device_module`.*"})
 	}
 
-	return deviceModelQuery{q}
+	return deviceModuleQuery{q}
 }
 
-// FindDeviceModel retrieves a single record by ID with an executor.
+// FindDeviceModule retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindDeviceModel(exec boil.Executor, iD int64, selectCols ...string) (*DeviceModel, error) {
-	deviceModelObj := &DeviceModel{}
+func FindDeviceModule(exec boil.Executor, iD int64, selectCols ...string) (*DeviceModule, error) {
+	deviceModuleObj := &DeviceModule{}
 
 	sel := "*"
 	if len(selectCols) > 0 {
 		sel = strings.Join(strmangle.IdentQuoteSlice(dialect.LQ, dialect.RQ, selectCols), ",")
 	}
 	query := fmt.Sprintf(
-		"select %s from `device_model` where `id`=?", sel,
+		"select %s from `device_module` where `id`=?", sel,
 	)
 
 	q := queries.Raw(query, iD)
 
-	err := q.Bind(nil, exec, deviceModelObj)
+	err := q.Bind(nil, exec, deviceModuleObj)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, sql.ErrNoRows
 		}
-		return nil, errors.Wrap(err, "deremsmodels: unable to select from device_model")
+		return nil, errors.Wrap(err, "deremsmodels: unable to select from device_module")
 	}
 
-	return deviceModelObj, nil
+	return deviceModuleObj, nil
 }
 
 // Insert a single record using an executor.
 // See boil.Columns.InsertColumnSet documentation to understand column list inference for inserts.
-func (o *DeviceModel) Insert(exec boil.Executor, columns boil.Columns) error {
+func (o *DeviceModule) Insert(exec boil.Executor, columns boil.Columns) error {
 	if o == nil {
-		return errors.New("deremsmodels: no device_model provided for insertion")
+		return errors.New("deremsmodels: no device_module provided for insertion")
 	}
 
 	var err error
@@ -413,39 +406,39 @@ func (o *DeviceModel) Insert(exec boil.Executor, columns boil.Columns) error {
 		o.UpdatedAt = currTime
 	}
 
-	nzDefaults := queries.NonZeroDefaultSet(deviceModelColumnsWithDefault, o)
+	nzDefaults := queries.NonZeroDefaultSet(deviceModuleColumnsWithDefault, o)
 
 	key := makeCacheKey(columns, nzDefaults)
-	deviceModelInsertCacheMut.RLock()
-	cache, cached := deviceModelInsertCache[key]
-	deviceModelInsertCacheMut.RUnlock()
+	deviceModuleInsertCacheMut.RLock()
+	cache, cached := deviceModuleInsertCache[key]
+	deviceModuleInsertCacheMut.RUnlock()
 
 	if !cached {
 		wl, returnColumns := columns.InsertColumnSet(
-			deviceModelAllColumns,
-			deviceModelColumnsWithDefault,
-			deviceModelColumnsWithoutDefault,
+			deviceModuleAllColumns,
+			deviceModuleColumnsWithDefault,
+			deviceModuleColumnsWithoutDefault,
 			nzDefaults,
 		)
 
-		cache.valueMapping, err = queries.BindMapping(deviceModelType, deviceModelMapping, wl)
+		cache.valueMapping, err = queries.BindMapping(deviceModuleType, deviceModuleMapping, wl)
 		if err != nil {
 			return err
 		}
-		cache.retMapping, err = queries.BindMapping(deviceModelType, deviceModelMapping, returnColumns)
+		cache.retMapping, err = queries.BindMapping(deviceModuleType, deviceModuleMapping, returnColumns)
 		if err != nil {
 			return err
 		}
 		if len(wl) != 0 {
-			cache.query = fmt.Sprintf("INSERT INTO `device_model` (`%s`) %%sVALUES (%s)%%s", strings.Join(wl, "`,`"), strmangle.Placeholders(dialect.UseIndexPlaceholders, len(wl), 1, 1))
+			cache.query = fmt.Sprintf("INSERT INTO `device_module` (`%s`) %%sVALUES (%s)%%s", strings.Join(wl, "`,`"), strmangle.Placeholders(dialect.UseIndexPlaceholders, len(wl), 1, 1))
 		} else {
-			cache.query = "INSERT INTO `device_model` () VALUES ()%s%s"
+			cache.query = "INSERT INTO `device_module` () VALUES ()%s%s"
 		}
 
 		var queryOutput, queryReturning string
 
 		if len(cache.retMapping) != 0 {
-			cache.retQuery = fmt.Sprintf("SELECT `%s` FROM `device_model` WHERE %s", strings.Join(returnColumns, "`,`"), strmangle.WhereClause("`", "`", 0, deviceModelPrimaryKeyColumns))
+			cache.retQuery = fmt.Sprintf("SELECT `%s` FROM `device_module` WHERE %s", strings.Join(returnColumns, "`,`"), strmangle.WhereClause("`", "`", 0, deviceModulePrimaryKeyColumns))
 		}
 
 		cache.query = fmt.Sprintf(cache.query, queryOutput, queryReturning)
@@ -461,7 +454,7 @@ func (o *DeviceModel) Insert(exec boil.Executor, columns boil.Columns) error {
 	result, err := exec.Exec(cache.query, vals...)
 
 	if err != nil {
-		return errors.Wrap(err, "deremsmodels: unable to insert into device_model")
+		return errors.Wrap(err, "deremsmodels: unable to insert into device_module")
 	}
 
 	var lastID int64
@@ -477,7 +470,7 @@ func (o *DeviceModel) Insert(exec boil.Executor, columns boil.Columns) error {
 	}
 
 	o.ID = int64(lastID)
-	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == deviceModelMapping["id"] {
+	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == deviceModuleMapping["id"] {
 		goto CacheNoHooks
 	}
 
@@ -491,51 +484,51 @@ func (o *DeviceModel) Insert(exec boil.Executor, columns boil.Columns) error {
 	}
 	err = exec.QueryRow(cache.retQuery, identifierCols...).Scan(queries.PtrsFromMapping(value, cache.retMapping)...)
 	if err != nil {
-		return errors.Wrap(err, "deremsmodels: unable to populate default values for device_model")
+		return errors.Wrap(err, "deremsmodels: unable to populate default values for device_module")
 	}
 
 CacheNoHooks:
 	if !cached {
-		deviceModelInsertCacheMut.Lock()
-		deviceModelInsertCache[key] = cache
-		deviceModelInsertCacheMut.Unlock()
+		deviceModuleInsertCacheMut.Lock()
+		deviceModuleInsertCache[key] = cache
+		deviceModuleInsertCacheMut.Unlock()
 	}
 
 	return nil
 }
 
-// Update uses an executor to update the DeviceModel.
+// Update uses an executor to update the DeviceModule.
 // See boil.Columns.UpdateColumnSet documentation to understand column list inference for updates.
 // Update does not automatically update the record in case of default values. Use .Reload() to refresh the records.
-func (o *DeviceModel) Update(exec boil.Executor, columns boil.Columns) (int64, error) {
+func (o *DeviceModule) Update(exec boil.Executor, columns boil.Columns) (int64, error) {
 	currTime := time.Now().In(boil.GetLocation())
 
 	o.UpdatedAt = currTime
 
 	var err error
 	key := makeCacheKey(columns, nil)
-	deviceModelUpdateCacheMut.RLock()
-	cache, cached := deviceModelUpdateCache[key]
-	deviceModelUpdateCacheMut.RUnlock()
+	deviceModuleUpdateCacheMut.RLock()
+	cache, cached := deviceModuleUpdateCache[key]
+	deviceModuleUpdateCacheMut.RUnlock()
 
 	if !cached {
 		wl := columns.UpdateColumnSet(
-			deviceModelAllColumns,
-			deviceModelPrimaryKeyColumns,
+			deviceModuleAllColumns,
+			deviceModulePrimaryKeyColumns,
 		)
 
 		if !columns.IsWhitelist() {
 			wl = strmangle.SetComplement(wl, []string{"created_at"})
 		}
 		if len(wl) == 0 {
-			return 0, errors.New("deremsmodels: unable to update device_model, could not build whitelist")
+			return 0, errors.New("deremsmodels: unable to update device_module, could not build whitelist")
 		}
 
-		cache.query = fmt.Sprintf("UPDATE `device_model` SET %s WHERE %s",
+		cache.query = fmt.Sprintf("UPDATE `device_module` SET %s WHERE %s",
 			strmangle.SetParamNames("`", "`", 0, wl),
-			strmangle.WhereClause("`", "`", 0, deviceModelPrimaryKeyColumns),
+			strmangle.WhereClause("`", "`", 0, deviceModulePrimaryKeyColumns),
 		)
-		cache.valueMapping, err = queries.BindMapping(deviceModelType, deviceModelMapping, append(wl, deviceModelPrimaryKeyColumns...))
+		cache.valueMapping, err = queries.BindMapping(deviceModuleType, deviceModuleMapping, append(wl, deviceModulePrimaryKeyColumns...))
 		if err != nil {
 			return 0, err
 		}
@@ -550,42 +543,42 @@ func (o *DeviceModel) Update(exec boil.Executor, columns boil.Columns) (int64, e
 	var result sql.Result
 	result, err = exec.Exec(cache.query, values...)
 	if err != nil {
-		return 0, errors.Wrap(err, "deremsmodels: unable to update device_model row")
+		return 0, errors.Wrap(err, "deremsmodels: unable to update device_module row")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "deremsmodels: failed to get rows affected by update for device_model")
+		return 0, errors.Wrap(err, "deremsmodels: failed to get rows affected by update for device_module")
 	}
 
 	if !cached {
-		deviceModelUpdateCacheMut.Lock()
-		deviceModelUpdateCache[key] = cache
-		deviceModelUpdateCacheMut.Unlock()
+		deviceModuleUpdateCacheMut.Lock()
+		deviceModuleUpdateCache[key] = cache
+		deviceModuleUpdateCacheMut.Unlock()
 	}
 
 	return rowsAff, nil
 }
 
 // UpdateAll updates all rows with the specified column values.
-func (q deviceModelQuery) UpdateAll(exec boil.Executor, cols M) (int64, error) {
+func (q deviceModuleQuery) UpdateAll(exec boil.Executor, cols M) (int64, error) {
 	queries.SetUpdate(q.Query, cols)
 
 	result, err := q.Query.Exec(exec)
 	if err != nil {
-		return 0, errors.Wrap(err, "deremsmodels: unable to update all for device_model")
+		return 0, errors.Wrap(err, "deremsmodels: unable to update all for device_module")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "deremsmodels: unable to retrieve rows affected for device_model")
+		return 0, errors.Wrap(err, "deremsmodels: unable to retrieve rows affected for device_module")
 	}
 
 	return rowsAff, nil
 }
 
 // UpdateAll updates all rows with the specified column values, using an executor.
-func (o DeviceModelSlice) UpdateAll(exec boil.Executor, cols M) (int64, error) {
+func (o DeviceModuleSlice) UpdateAll(exec boil.Executor, cols M) (int64, error) {
 	ln := int64(len(o))
 	if ln == 0 {
 		return 0, nil
@@ -607,13 +600,13 @@ func (o DeviceModelSlice) UpdateAll(exec boil.Executor, cols M) (int64, error) {
 
 	// Append all of the primary key values for each column
 	for _, obj := range o {
-		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), deviceModelPrimaryKeyMapping)
+		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), deviceModulePrimaryKeyMapping)
 		args = append(args, pkeyArgs...)
 	}
 
-	sql := fmt.Sprintf("UPDATE `device_model` SET %s WHERE %s",
+	sql := fmt.Sprintf("UPDATE `device_module` SET %s WHERE %s",
 		strmangle.SetParamNames("`", "`", 0, colNames),
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, deviceModelPrimaryKeyColumns, len(o)))
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, deviceModulePrimaryKeyColumns, len(o)))
 
 	if boil.DebugMode {
 		fmt.Fprintln(boil.DebugWriter, sql)
@@ -621,25 +614,25 @@ func (o DeviceModelSlice) UpdateAll(exec boil.Executor, cols M) (int64, error) {
 	}
 	result, err := exec.Exec(sql, args...)
 	if err != nil {
-		return 0, errors.Wrap(err, "deremsmodels: unable to update all in deviceModel slice")
+		return 0, errors.Wrap(err, "deremsmodels: unable to update all in deviceModule slice")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "deremsmodels: unable to retrieve rows affected all in update all deviceModel")
+		return 0, errors.Wrap(err, "deremsmodels: unable to retrieve rows affected all in update all deviceModule")
 	}
 	return rowsAff, nil
 }
 
-var mySQLDeviceModelUniqueColumns = []string{
+var mySQLDeviceModuleUniqueColumns = []string{
 	"id",
 }
 
 // Upsert attempts an insert using an executor, and does an update or ignore on conflict.
 // See boil.Columns documentation for how to properly use updateColumns and insertColumns.
-func (o *DeviceModel) Upsert(exec boil.Executor, updateColumns, insertColumns boil.Columns) error {
+func (o *DeviceModule) Upsert(exec boil.Executor, updateColumns, insertColumns boil.Columns) error {
 	if o == nil {
-		return errors.New("deremsmodels: no device_model provided for upsert")
+		return errors.New("deremsmodels: no device_module provided for upsert")
 	}
 	currTime := time.Now().In(boil.GetLocation())
 
@@ -648,8 +641,8 @@ func (o *DeviceModel) Upsert(exec boil.Executor, updateColumns, insertColumns bo
 	}
 	o.UpdatedAt = currTime
 
-	nzDefaults := queries.NonZeroDefaultSet(deviceModelColumnsWithDefault, o)
-	nzUniques := queries.NonZeroDefaultSet(mySQLDeviceModelUniqueColumns, o)
+	nzDefaults := queries.NonZeroDefaultSet(deviceModuleColumnsWithDefault, o)
+	nzUniques := queries.NonZeroDefaultSet(mySQLDeviceModuleUniqueColumns, o)
 
 	if len(nzUniques) == 0 {
 		return errors.New("cannot upsert with a table that cannot conflict on a unique column")
@@ -677,43 +670,43 @@ func (o *DeviceModel) Upsert(exec boil.Executor, updateColumns, insertColumns bo
 	key := buf.String()
 	strmangle.PutBuffer(buf)
 
-	deviceModelUpsertCacheMut.RLock()
-	cache, cached := deviceModelUpsertCache[key]
-	deviceModelUpsertCacheMut.RUnlock()
+	deviceModuleUpsertCacheMut.RLock()
+	cache, cached := deviceModuleUpsertCache[key]
+	deviceModuleUpsertCacheMut.RUnlock()
 
 	var err error
 
 	if !cached {
 		insert, ret := insertColumns.InsertColumnSet(
-			deviceModelAllColumns,
-			deviceModelColumnsWithDefault,
-			deviceModelColumnsWithoutDefault,
+			deviceModuleAllColumns,
+			deviceModuleColumnsWithDefault,
+			deviceModuleColumnsWithoutDefault,
 			nzDefaults,
 		)
 
 		update := updateColumns.UpdateColumnSet(
-			deviceModelAllColumns,
-			deviceModelPrimaryKeyColumns,
+			deviceModuleAllColumns,
+			deviceModulePrimaryKeyColumns,
 		)
 
 		if !updateColumns.IsNone() && len(update) == 0 {
-			return errors.New("deremsmodels: unable to upsert device_model, could not build update column list")
+			return errors.New("deremsmodels: unable to upsert device_module, could not build update column list")
 		}
 
 		ret = strmangle.SetComplement(ret, nzUniques)
-		cache.query = buildUpsertQueryMySQL(dialect, "`device_model`", update, insert)
+		cache.query = buildUpsertQueryMySQL(dialect, "`device_module`", update, insert)
 		cache.retQuery = fmt.Sprintf(
-			"SELECT %s FROM `device_model` WHERE %s",
+			"SELECT %s FROM `device_module` WHERE %s",
 			strings.Join(strmangle.IdentQuoteSlice(dialect.LQ, dialect.RQ, ret), ","),
 			strmangle.WhereClause("`", "`", 0, nzUniques),
 		)
 
-		cache.valueMapping, err = queries.BindMapping(deviceModelType, deviceModelMapping, insert)
+		cache.valueMapping, err = queries.BindMapping(deviceModuleType, deviceModuleMapping, insert)
 		if err != nil {
 			return err
 		}
 		if len(ret) != 0 {
-			cache.retMapping, err = queries.BindMapping(deviceModelType, deviceModelMapping, ret)
+			cache.retMapping, err = queries.BindMapping(deviceModuleType, deviceModuleMapping, ret)
 			if err != nil {
 				return err
 			}
@@ -734,7 +727,7 @@ func (o *DeviceModel) Upsert(exec boil.Executor, updateColumns, insertColumns bo
 	result, err := exec.Exec(cache.query, vals...)
 
 	if err != nil {
-		return errors.Wrap(err, "deremsmodels: unable to upsert for device_model")
+		return errors.Wrap(err, "deremsmodels: unable to upsert for device_module")
 	}
 
 	var lastID int64
@@ -751,13 +744,13 @@ func (o *DeviceModel) Upsert(exec boil.Executor, updateColumns, insertColumns bo
 	}
 
 	o.ID = int64(lastID)
-	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == deviceModelMapping["id"] {
+	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == deviceModuleMapping["id"] {
 		goto CacheNoHooks
 	}
 
-	uniqueMap, err = queries.BindMapping(deviceModelType, deviceModelMapping, nzUniques)
+	uniqueMap, err = queries.BindMapping(deviceModuleType, deviceModuleMapping, nzUniques)
 	if err != nil {
-		return errors.Wrap(err, "deremsmodels: unable to retrieve unique values for device_model")
+		return errors.Wrap(err, "deremsmodels: unable to retrieve unique values for device_module")
 	}
 	nzUniqueCols = queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), uniqueMap)
 
@@ -767,28 +760,28 @@ func (o *DeviceModel) Upsert(exec boil.Executor, updateColumns, insertColumns bo
 	}
 	err = exec.QueryRow(cache.retQuery, nzUniqueCols...).Scan(returns...)
 	if err != nil {
-		return errors.Wrap(err, "deremsmodels: unable to populate default values for device_model")
+		return errors.Wrap(err, "deremsmodels: unable to populate default values for device_module")
 	}
 
 CacheNoHooks:
 	if !cached {
-		deviceModelUpsertCacheMut.Lock()
-		deviceModelUpsertCache[key] = cache
-		deviceModelUpsertCacheMut.Unlock()
+		deviceModuleUpsertCacheMut.Lock()
+		deviceModuleUpsertCache[key] = cache
+		deviceModuleUpsertCacheMut.Unlock()
 	}
 
 	return nil
 }
 
-// Delete deletes a single DeviceModel record with an executor.
+// Delete deletes a single DeviceModule record with an executor.
 // Delete will match against the primary key column to find the record to delete.
-func (o *DeviceModel) Delete(exec boil.Executor) (int64, error) {
+func (o *DeviceModule) Delete(exec boil.Executor) (int64, error) {
 	if o == nil {
-		return 0, errors.New("deremsmodels: no DeviceModel provided for delete")
+		return 0, errors.New("deremsmodels: no DeviceModule provided for delete")
 	}
 
-	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), deviceModelPrimaryKeyMapping)
-	sql := "DELETE FROM `device_model` WHERE `id`=?"
+	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), deviceModulePrimaryKeyMapping)
+	sql := "DELETE FROM `device_module` WHERE `id`=?"
 
 	if boil.DebugMode {
 		fmt.Fprintln(boil.DebugWriter, sql)
@@ -796,52 +789,52 @@ func (o *DeviceModel) Delete(exec boil.Executor) (int64, error) {
 	}
 	result, err := exec.Exec(sql, args...)
 	if err != nil {
-		return 0, errors.Wrap(err, "deremsmodels: unable to delete from device_model")
+		return 0, errors.Wrap(err, "deremsmodels: unable to delete from device_module")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "deremsmodels: failed to get rows affected by delete for device_model")
+		return 0, errors.Wrap(err, "deremsmodels: failed to get rows affected by delete for device_module")
 	}
 
 	return rowsAff, nil
 }
 
 // DeleteAll deletes all matching rows.
-func (q deviceModelQuery) DeleteAll(exec boil.Executor) (int64, error) {
+func (q deviceModuleQuery) DeleteAll(exec boil.Executor) (int64, error) {
 	if q.Query == nil {
-		return 0, errors.New("deremsmodels: no deviceModelQuery provided for delete all")
+		return 0, errors.New("deremsmodels: no deviceModuleQuery provided for delete all")
 	}
 
 	queries.SetDelete(q.Query)
 
 	result, err := q.Query.Exec(exec)
 	if err != nil {
-		return 0, errors.Wrap(err, "deremsmodels: unable to delete all from device_model")
+		return 0, errors.Wrap(err, "deremsmodels: unable to delete all from device_module")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "deremsmodels: failed to get rows affected by deleteall for device_model")
+		return 0, errors.Wrap(err, "deremsmodels: failed to get rows affected by deleteall for device_module")
 	}
 
 	return rowsAff, nil
 }
 
 // DeleteAll deletes all rows in the slice, using an executor.
-func (o DeviceModelSlice) DeleteAll(exec boil.Executor) (int64, error) {
+func (o DeviceModuleSlice) DeleteAll(exec boil.Executor) (int64, error) {
 	if len(o) == 0 {
 		return 0, nil
 	}
 
 	var args []interface{}
 	for _, obj := range o {
-		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), deviceModelPrimaryKeyMapping)
+		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), deviceModulePrimaryKeyMapping)
 		args = append(args, pkeyArgs...)
 	}
 
-	sql := "DELETE FROM `device_model` WHERE " +
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, deviceModelPrimaryKeyColumns, len(o))
+	sql := "DELETE FROM `device_module` WHERE " +
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, deviceModulePrimaryKeyColumns, len(o))
 
 	if boil.DebugMode {
 		fmt.Fprintln(boil.DebugWriter, sql)
@@ -849,12 +842,12 @@ func (o DeviceModelSlice) DeleteAll(exec boil.Executor) (int64, error) {
 	}
 	result, err := exec.Exec(sql, args...)
 	if err != nil {
-		return 0, errors.Wrap(err, "deremsmodels: unable to delete all from deviceModel slice")
+		return 0, errors.Wrap(err, "deremsmodels: unable to delete all from deviceModule slice")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "deremsmodels: failed to get rows affected by deleteall for device_model")
+		return 0, errors.Wrap(err, "deremsmodels: failed to get rows affected by deleteall for device_module")
 	}
 
 	return rowsAff, nil
@@ -862,8 +855,8 @@ func (o DeviceModelSlice) DeleteAll(exec boil.Executor) (int64, error) {
 
 // Reload refetches the object from the database
 // using the primary keys with an executor.
-func (o *DeviceModel) Reload(exec boil.Executor) error {
-	ret, err := FindDeviceModel(exec, o.ID)
+func (o *DeviceModule) Reload(exec boil.Executor) error {
+	ret, err := FindDeviceModule(exec, o.ID)
 	if err != nil {
 		return err
 	}
@@ -874,26 +867,26 @@ func (o *DeviceModel) Reload(exec boil.Executor) error {
 
 // ReloadAll refetches every row with matching primary key column values
 // and overwrites the original object slice with the newly updated slice.
-func (o *DeviceModelSlice) ReloadAll(exec boil.Executor) error {
+func (o *DeviceModuleSlice) ReloadAll(exec boil.Executor) error {
 	if o == nil || len(*o) == 0 {
 		return nil
 	}
 
-	slice := DeviceModelSlice{}
+	slice := DeviceModuleSlice{}
 	var args []interface{}
 	for _, obj := range *o {
-		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), deviceModelPrimaryKeyMapping)
+		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), deviceModulePrimaryKeyMapping)
 		args = append(args, pkeyArgs...)
 	}
 
-	sql := "SELECT `device_model`.* FROM `device_model` WHERE " +
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, deviceModelPrimaryKeyColumns, len(*o))
+	sql := "SELECT `device_module`.* FROM `device_module` WHERE " +
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, deviceModulePrimaryKeyColumns, len(*o))
 
 	q := queries.Raw(sql, args...)
 
 	err := q.Bind(nil, exec, &slice)
 	if err != nil {
-		return errors.Wrap(err, "deremsmodels: unable to reload all in DeviceModelSlice")
+		return errors.Wrap(err, "deremsmodels: unable to reload all in DeviceModuleSlice")
 	}
 
 	*o = slice
@@ -901,10 +894,10 @@ func (o *DeviceModelSlice) ReloadAll(exec boil.Executor) error {
 	return nil
 }
 
-// DeviceModelExists checks if the DeviceModel row exists.
-func DeviceModelExists(exec boil.Executor, iD int64) (bool, error) {
+// DeviceModuleExists checks if the DeviceModule row exists.
+func DeviceModuleExists(exec boil.Executor, iD int64) (bool, error) {
 	var exists bool
-	sql := "select exists(select 1 from `device_model` where `id`=? limit 1)"
+	sql := "select exists(select 1 from `device_module` where `id`=? limit 1)"
 
 	if boil.DebugMode {
 		fmt.Fprintln(boil.DebugWriter, sql)
@@ -914,7 +907,7 @@ func DeviceModelExists(exec boil.Executor, iD int64) (bool, error) {
 
 	err := row.Scan(&exists)
 	if err != nil {
-		return false, errors.Wrap(err, "deremsmodels: unable to check if device_model exists")
+		return false, errors.Wrap(err, "deremsmodels: unable to check if device_module exists")
 	}
 
 	return exists, nil

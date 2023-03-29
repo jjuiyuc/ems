@@ -15,7 +15,7 @@ import (
 	"der-ems/repository"
 	"der-ems/services"
 	"der-ems/testutils"
-	"der-ems/testutils/fixtures"
+	"der-ems/testutils/testdata"
 )
 
 type BillingWorkerSuite struct {
@@ -58,14 +58,14 @@ func (s *BillingWorkerSuite) Test_GetBillingTypeByLocationID() {
 	}
 
 	testGateway := &deremsmodels.Gateway{
-		ID:         fixtures.UtGateway.ID,
-		UUID:       fixtures.UtGateway.UUID,
-		LocationID: fixtures.UtGateway.LocationID,
+		ID:         testdata.UtGateway.ID,
+		UUID:       testdata.UtGateway.UUID,
+		LocationID: testdata.UtGateway.LocationID,
 	}
 	testBillingType := &services.BillingType{
-		TOULocationID: fixtures.UtLocation.TOULocationID.Int64,
-		VoltageType:   fixtures.UtLocation.VoltageType.String,
-		TOUType:       fixtures.UtLocation.TOUType.String,
+		TOULocationID: testdata.UtLocation.TOULocationID.Int64,
+		VoltageType:   testdata.UtLocation.VoltageType.String,
+		TOUType:       testdata.UtLocation.TOUType.String,
 	}
 
 	tt := struct {
@@ -185,9 +185,9 @@ func (s *BillingWorkerSuite) Test_getWeeklyBillingParamsByType() {
 	}
 
 	seedUtBillingType := &services.BillingType{
-		TOULocationID: fixtures.UtLocation.TOULocationID.Int64,
-		VoltageType:   fixtures.UtLocation.VoltageType.String,
-		TOUType:       fixtures.UtLocation.TOUType.String,
+		TOULocationID: testdata.UtLocation.TOULocationID.Int64,
+		VoltageType:   testdata.UtLocation.VoltageType.String,
+		TOUType:       testdata.UtLocation.TOUType.String,
 	}
 
 	var testBillingParams BillingParams

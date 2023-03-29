@@ -102,12 +102,12 @@ func (h localAIConsumerHandler) saveLocalAIData(msg []byte) (err error) {
 	aiData := &deremsmodels.AiDatum{
 		GWUUID:      gwUUID,
 		LogDate:     time.Unix(logDate, 0),
-		LocalAiData: null.NewJSON(dataJSON, true),
+		LocalAiData: null.JSONFrom(dataJSON),
 	}
 
 	gateway, err := h.repo.Gateway.GetGatewayByGatewayUUID(gwUUID)
 	if err == nil {
-		aiData.GWID = null.NewInt64(gateway.ID, true)
+		aiData.GWID = null.Int64From(gateway.ID)
 		aiData.LocationID = gateway.LocationID
 	} else {
 		log.WithFields(log.Fields{

@@ -7,27 +7,20 @@ no-hooks = true
 tag-ignore = ["password"]
 
 [aliases.tables]
-  name = "weather_forecast"
   [aliases.tables.weather_forecast.columns]
   lng = "Lng"
-  name = "location"
   [aliases.tables.location.columns]
   lng = "Lng"
   weather_lng = "WeatherLng"
   tou_location_id = "TOULocationID"
   tou_type = "TOUType"
-  name = "device"
   [aliases.tables.device.columns]
   modbusid = "ModbusID"
-  uueid = "UUEID"
-  name = "tou"
   [aliases.tables.tou.columns]
   tou_location_id = "TOULocationID"
   tou_type = "TOUType"
-  name = "tou_holiday"
   [aliases.tables.tou_holiday.columns]
   tou_location_id = "TOULocationID"
-  name = "cc_data_log"
   [aliases.tables.cc_data_log.columns]
   load_grid_average_power_ac = "LoadGridAveragePowerAC"
   battery_grid_average_power_ac = "BatteryGridAveragePowerAC"
@@ -82,4 +75,4 @@ port    = 3306
 user    = "ubiik"
 pass    = "testing123"
 sslmode = "false"
-whitelist = ["weather_forecast", "location", "gateway", "device_model", "device", "login_log", "user", "cc_data", "tou", "tou_holiday", "tou_location", "user_gateway_right", "cc_data_log", "ai_data", "cc_data_log_calculated_daily", "cc_data_log_calculated_monthly"]
+whitelist = ["weather_forecast", "location", "gateway", "device_model", "device", "login_log", "user", "cc_data", "tou", "tou_holiday", "tou_location", "cc_data_log", "ai_data", "cc_data_log_calculated_daily", "cc_data_log_calculated_monthly", "group_type", "group", "webpage", "group_type_webpage_right", "gateway_log", "group_gateway_right", "group_gateway_right_log", "device_module", "device_log"]

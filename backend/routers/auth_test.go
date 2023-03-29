@@ -17,7 +17,7 @@ import (
 	"der-ems/repository"
 	"der-ems/services"
 	"der-ems/testutils"
-	"der-ems/testutils/fixtures"
+	"der-ems/testutils/testdata"
 )
 
 type AuthorizationSuite struct {
@@ -80,8 +80,8 @@ func (s *AuthorizationSuite) Test_GetAuth() {
 				},
 			},
 			args{
-				Username: fixtures.UtUser.Username,
-				Password: fixtures.UtUser.Password,
+				Username: testdata.UtUser.Username,
+				Password: testdata.UtUser.Password,
 			},
 		},
 		{
@@ -95,7 +95,7 @@ func (s *AuthorizationSuite) Test_GetAuth() {
 				},
 			},
 			args{
-				Username: fixtures.UtUser.Username,
+				Username: testdata.UtUser.Username,
 			},
 		},
 		{
@@ -110,7 +110,7 @@ func (s *AuthorizationSuite) Test_GetAuth() {
 			},
 			args{
 				Username: "xxx",
-				Password: fixtures.UtUser.Password,
+				Password: testdata.UtUser.Password,
 			},
 		},
 		{
@@ -124,7 +124,7 @@ func (s *AuthorizationSuite) Test_GetAuth() {
 				},
 			},
 			args{
-				Username: fixtures.UtUser.Username,
+				Username: testdata.UtUser.Username,
 				Password: "xxx",
 			},
 		},

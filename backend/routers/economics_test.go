@@ -17,7 +17,7 @@ import (
 	"der-ems/repository"
 	"der-ems/services"
 	"der-ems/testutils"
-	"der-ems/testutils/fixtures"
+	"der-ems/testutils/testdata"
 )
 
 var _ = Describe("Economics", func() {
@@ -48,14 +48,14 @@ var _ = Describe("Economics", func() {
 		Expect(err).Should(BeNil())
 		err = testutils.SeedUtLocationAndGateway(db)
 		Expect(err).Should(BeNil())
-		token, err = utils.GenerateToken(fixtures.UtUser.ID)
+		token, err = utils.GenerateToken(testdata.UtUser.ID)
 		Expect(err).Should(BeNil())
-		// Mock user_gateway_right table
-		_, err = db.Exec("TRUNCATE TABLE user_gateway_right")
+		// Mock group_gateway_right table
+		_, err = db.Exec("TRUNCATE TABLE group_gateway_right")
 		Expect(err).Should(BeNil())
 		_, err = db.Exec(`
-			INSERT INTO user_gateway_right (id,user_id,gw_id) VALUES
-			(1,1,1);
+			INSERT INTO group_gateway_right (id,group_id,gw_id,enabled_at) VALUES
+			(1,2,1,'2022-07-01 00:00:00');
 		`)
 		Expect(err).Should(BeNil())
 
@@ -69,7 +69,7 @@ var _ = Describe("Economics", func() {
 	Describe("GetTimeOfUseEnergyCost", func() {
 		Context("success", func() {
 			It("should be ok", func() {
-				prefixURL := fmt.Sprintf("/api/%s/devices/tou/energy-cost", fixtures.UtGateway.UUID)
+				prefixURL := fmt.Sprintf("/api/%s/devices/tou/energy-cost", testdata.UtGateway.UUID)
 				seedUtURL := fmt.Sprintf("%s?startTime=%s&endTime=%s", prefixURL, UtStartTime, UtEndTime)
 				expectedResponseData := services.TimeOfUseEnergyCostResponse{
 					EnergyCosts: services.EnergyCostsInfo{
@@ -116,7 +116,7 @@ var _ = Describe("Economics", func() {
 
 		Context("fail", func() {
 			It("should return invalid parameters", func() {
-				prefixURL := fmt.Sprintf("/api/%s/devices/tou/energy-cost", fixtures.UtGateway.UUID)
+				prefixURL := fmt.Sprintf("/api/%s/devices/tou/energy-cost", testdata.UtGateway.UUID)
 				seedUtInvalidParamsURL := fmt.Sprintf("%s?startTime=%s&endTime=%s", prefixURL, "xxx", UtEndTime)
 				tt := testutils.TestInfo{
 					Token:      token,

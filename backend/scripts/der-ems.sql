@@ -185,21 +185,18 @@ DROP TABLE IF EXISTS `location`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `location` (
   `id` bigint NOT NULL AUTO_INCREMENT,
-  `customer_number` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `field_number` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `address` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `lat` double DEFAULT NULL,
   `lng` double DEFAULT NULL,
   `weather_lat` float DEFAULT NULL,
   `weather_lng` float DEFAULT NULL,
-  `timezone` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `tou_location_id` bigint DEFAULT NULL,
   `voltage_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `tou_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `customer_number_field_number_UNIQUE` (`customer_number`,`field_number`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -212,20 +209,27 @@ DROP TABLE IF EXISTS `device`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `device` (
   `id` bigint NOT NULL AUTO_INCREMENT,
-  `modbusid` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `uueid` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `modbusid` int NOT NULL,
+  `module_id` bigint NOT NULL,
   `model_id` bigint NOT NULL,
-  `gw_uuid` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `gw_id` bigint DEFAULT NULL,
+  `power_capacity` float NOT NULL,
+  `extra_info` json DEFAULT NULL,
   `remark` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `enable` tinyint(1) DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_by` bigint DEFAULT NULL,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_by` bigint DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted_by` bigint DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `modbusid_uueid_UNIQUE` (`modbusid`,`uueid`),
+  UNIQUE KEY `modbusid_module_id_UNIQUE` (`modbusid`,`module_id`),
+  KEY `device_module_id_device_module_id_foreign` (`module_id`),
   KEY `device_model_id_device_model_id_foreign` (`model_id`),
-  KEY `device_gw_uuid_gateway_uuid_foreign` (`gw_uuid`),
-  CONSTRAINT `device_gw_uuid_gateway_uuid_foreign` FOREIGN KEY (`gw_uuid`) REFERENCES `gateway` (`uuid`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  CONSTRAINT `device_model_id_device_model_id_foreign` FOREIGN KEY (`model_id`) REFERENCES `device_model` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+  KEY `device_gw_id_gateway_id_foreign` (`gw_id`),
+  CONSTRAINT `device_gw_id_gateway_id_foreign` FOREIGN KEY (`gw_id`) REFERENCES `gateway` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `device_model_id_device_model_id_foreign` FOREIGN KEY (`model_id`) REFERENCES `device_model` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `device_module_id_device_module_id_foreign` FOREIGN KEY (`module_id`) REFERENCES `device_module` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -238,9 +242,8 @@ DROP TABLE IF EXISTS `device_model`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `device_model` (
   `id` bigint NOT NULL AUTO_INCREMENT,
-  `device_type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `model_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `capacity` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
@@ -258,8 +261,14 @@ CREATE TABLE `gateway` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `uuid` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `location_id` bigint DEFAULT NULL,
+  `enable` tinyint(1) DEFAULT NULL,
+  `remark` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_by` bigint DEFAULT NULL,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_by` bigint DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted_by` bigint DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uuid_UNIQUE` (`uuid`),
   KEY `gateway_location_id_location_id_foreign` (`location_id`),
@@ -356,6 +365,7 @@ DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `username` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `group_id` bigint NOT NULL,
   `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `password_last_changed` datetime DEFAULT NULL,
   `password_retry_count` int DEFAULT '0',
@@ -367,29 +377,10 @@ CREATE TABLE `user` (
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `deleted_at` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `user_gateway_right`
---
-
-DROP TABLE IF EXISTS `user_gateway_right`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `user_gateway_right` (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `user_id` bigint DEFAULT NULL,
-  `gw_id` bigint DEFAULT NULL,
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `deleted_by` bigint DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `user_id_gw_id_UNIQUE` (`user_id`,`gw_id`),
-  KEY `user_gateway_right_user_id_user_id_foreign` (`user_id`),
-  KEY `user_gateway_right_gw_id_gateway_id_foreign` (`gw_id`),
-  CONSTRAINT `user_gateway_right_gw_id_gateway_id_foreign` FOREIGN KEY (`gw_id`) REFERENCES `gateway` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  CONSTRAINT `user_gateway_right_user_id_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+  KEY `user_group_id_group_id_foreign` (`group_id`),
+  CONSTRAINT `user_group_id_group_id_foreign` FOREIGN KEY (`group_id`) REFERENCES `group` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -411,6 +402,202 @@ CREATE TABLE `weather_forecast` (
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `lat_lng_valid_date_UNIQUE` (`lat`,`lng`,`valid_date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `group_type`
+--
+
+DROP TABLE IF EXISTS `group_type`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `group_type` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `group`
+--
+
+DROP TABLE IF EXISTS `group`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `group` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `type_id` bigint NOT NULL,
+  `parent_id` bigint DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted_by` bigint DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `group_type_id_group_type_id_foreign` (`type_id`),
+  CONSTRAINT `group_type_id_group_type_id_foreign` FOREIGN KEY (`type_id`) REFERENCES `group_type` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `webpage`
+--
+
+DROP TABLE IF EXISTS `webpage`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `webpage` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `group_type_webpage_right`
+--
+
+DROP TABLE IF EXISTS `group_type_webpage_right`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `group_type_webpage_right` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `type_id` bigint NOT NULL,
+  `webpage_id` bigint NOT NULL,
+  `view_data` tinyint(1) DEFAULT NULL,
+  `add_data` tinyint(1) DEFAULT NULL,
+  `edit_data` tinyint(1) DEFAULT NULL,
+  `delete_data` tinyint(1) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `type_id_webpage_id_UNIQUE` (`type_id`,`webpage_id`),
+  KEY `group_type_webpage_right_type_id_group_type_id_foreign` (`type_id`),
+  KEY `group_type_webpage_right_webpage_id_webpage_id_foreign` (`webpage_id`),
+  CONSTRAINT `group_type_webpage_right_type_id_group_type_id_foreign` FOREIGN KEY (`type_id`) REFERENCES `group_type` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `group_type_webpage_right_webpage_id_webpage_id_foreign` FOREIGN KEY (`webpage_id`) REFERENCES `webpage` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `gateway_log`
+--
+
+DROP TABLE IF EXISTS `gateway_log`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `gateway_log` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `gw_id` bigint DEFAULT NULL,
+  `uuid` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `location_id` bigint DEFAULT NULL,
+  `enable` tinyint(1) DEFAULT NULL,
+  `remark` varchar(50) DEFAULT NULL,
+  `gw_updated_at` datetime DEFAULT NULL,
+  `gw_updated_by` bigint DEFAULT NULL,
+  `gw_deleted_at` datetime DEFAULT NULL,
+  `gw_deleted_by` bigint DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `group_gateway_right`
+--
+
+DROP TABLE IF EXISTS `group_gateway_right`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `group_gateway_right` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `group_id` bigint NOT NULL,
+  `gw_id` bigint NOT NULL,
+  `enabled_at` datetime NOT NULL,
+  `enabled_by` bigint DEFAULT NULL,
+  `disabled_at` datetime DEFAULT NULL,
+  `disabled_by` bigint DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_by` bigint DEFAULT NULL,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_by` bigint DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `group_id_gw_id_enabled_at_UNIQUE` (`group_id`,`gw_id`,`enabled_at`),
+  KEY `group_gateway_right_group_id_group_id_foreign` (`group_id`),
+  KEY `group_gateway_right_gw_id_gateway_id_foreign` (`gw_id`),
+  CONSTRAINT `group_gateway_right_group_id_group_id_foreign` FOREIGN KEY (`group_id`) REFERENCES `group` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `group_gateway_right_gw_id_gateway_id_foreign` FOREIGN KEY (`gw_id`) REFERENCES `gateway` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `group_gateway_right_log`
+--
+
+DROP TABLE IF EXISTS `group_gateway_right_log`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `group_gateway_right_log` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `group_gateway_right_id` bigint DEFAULT NULL,
+  `group_id` bigint DEFAULT NULL,
+  `gw_id` bigint DEFAULT NULL,
+  `enabled_at` datetime DEFAULT NULL,
+  `enabled_by` bigint DEFAULT NULL,
+  `disabled_at` datetime DEFAULT NULL,
+  `disabled_by` bigint DEFAULT NULL,
+  `group_gateway_right_updated_at` datetime DEFAULT NULL,
+  `group_gateway_right_updated_by` bigint DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `device_module`
+--
+
+DROP TABLE IF EXISTS `device_module`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `device_module` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `uueid` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `device_log`
+--
+
+DROP TABLE IF EXISTS `device_log`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `device_log` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `device_id` bigint DEFAULT NULL,
+  `modbusid` int DEFAULT NULL,
+  `module_id` bigint DEFAULT NULL,
+  `model_id` bigint DEFAULT NULL,
+  `gw_id` bigint DEFAULT NULL,
+  `power_capacity` float DEFAULT NULL,
+  `extra_info` json DEFAULT NULL,
+  `remark` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `device_updated_at` datetime DEFAULT NULL,
+  `device_updated_by` bigint DEFAULT NULL,
+  `device_deleted_at` datetime DEFAULT NULL,
+  `device_deleted_by` bigint DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

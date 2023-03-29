@@ -41,8 +41,9 @@ func (repo defaultGatewayRepository) GetGatewaysByLocation(lat, lng float32) ([]
 // GetGatewaysByUserID godoc
 func (repo defaultGatewayRepository) GetGatewaysByUserID(userID int64) ([]*deremsmodels.Gateway, error) {
 	return deremsmodels.Gateways(
-		qm.InnerJoin("user_gateway_right AS u ON gateway.id = u.gw_id"),
-		qm.Where("(u.user_id = ?)", userID)).All(repo.db)
+		qm.InnerJoin("group_gateway_right AS gr ON gateway.id = gr.gw_id"),
+		qm.InnerJoin("user AS u ON gr.group_id = u.group_id"),
+		qm.Where("(u.id = ?)", userID)).All(repo.db)
 }
 
 // GetGateways godoc

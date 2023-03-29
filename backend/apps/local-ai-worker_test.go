@@ -14,7 +14,7 @@ import (
 	"der-ems/models"
 	"der-ems/repository"
 	"der-ems/testutils"
-	"der-ems/testutils/fixtures"
+	"der-ems/testutils/testdata"
 )
 
 type LocalAIWorkerSuite struct {
@@ -51,7 +51,7 @@ func (s *LocalAIWorkerSuite) SetupSuite() {
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	// Mock seedUtLocalAIData data
 	s.seedUtLocalAIData = map[string]interface{}{
-		"gwID":      fixtures.UtGateway.UUID,
+		"gwID":      testdata.UtGateway.UUID,
 		"timestamp": 1659340800,
 		"value":     16,
 		"type":      "batterySchedule",

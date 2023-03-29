@@ -103,12 +103,12 @@ func (h localCCConsumerHandler) saveLocalCCData(msg []byte) (err error) {
 	ccData := &deremsmodels.CCDatum{
 		GWUUID:      gwUUID,
 		LogDate:     time.Unix(logDate, 0),
-		LocalCCData: null.NewJSON(dataJSON, true),
+		LocalCCData: null.JSONFrom(dataJSON),
 	}
 
 	gateway, err := h.repo.Gateway.GetGatewayByGatewayUUID(gwUUID)
 	if err == nil {
-		ccData.GWID = null.NewInt64(gateway.ID, true)
+		ccData.GWID = null.Int64From(gateway.ID)
 		ccData.LocationID = gateway.LocationID
 	} else {
 		log.WithFields(log.Fields{
@@ -155,7 +155,7 @@ func (h localCCConsumerHandler) saveLocalCCDataLog(msg []byte) (err error) {
 	ccDataLog.LogDate = time.Unix(int64(timestampValue.(float64)), 0)
 	gateway, err := h.repo.Gateway.GetGatewayByGatewayUUID(gwIDValue.(string))
 	if err == nil {
-		ccDataLog.GWID = null.NewInt64(gateway.ID, true)
+		ccDataLog.GWID = null.Int64From(gateway.ID)
 		ccDataLog.LocationID = gateway.LocationID
 	} else {
 		log.WithFields(log.Fields{

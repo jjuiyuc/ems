@@ -10,16 +10,24 @@ var TableNames = struct {
 	CCDataLogCalculatedDaily   string
 	CCDataLogCalculatedMonthly string
 	Device                     string
+	DeviceLog                  string
 	DeviceModel                string
+	DeviceModule               string
 	Gateway                    string
+	GatewayLog                 string
+	Group                      string
+	GroupGatewayRight          string
+	GroupGatewayRightLog       string
+	GroupType                  string
+	GroupTypeWebpageRight      string
 	Location                   string
 	LoginLog                   string
 	Tou                        string
 	TouHoliday                 string
 	TouLocation                string
 	User                       string
-	UserGatewayRight           string
 	WeatherForecast            string
+	Webpage                    string
 }{
 	AiData:                     "ai_data",
 	CCData:                     "cc_data",
@@ -27,14 +35,22 @@ var TableNames = struct {
 	CCDataLogCalculatedDaily:   "cc_data_log_calculated_daily",
 	CCDataLogCalculatedMonthly: "cc_data_log_calculated_monthly",
 	Device:                     "device",
+	DeviceLog:                  "device_log",
 	DeviceModel:                "device_model",
+	DeviceModule:               "device_module",
 	Gateway:                    "gateway",
+	GatewayLog:                 "gateway_log",
+	Group:                      "group",
+	GroupGatewayRight:          "group_gateway_right",
+	GroupGatewayRightLog:       "group_gateway_right_log",
+	GroupType:                  "group_type",
+	GroupTypeWebpageRight:      "group_type_webpage_right",
 	Location:                   "location",
 	LoginLog:                   "login_log",
 	Tou:                        "tou",
 	TouHoliday:                 "tou_holiday",
 	TouLocation:                "tou_location",
 	User:                       "user",
-	UserGatewayRight:           "user_gateway_right",
 	WeatherForecast:            "weather_forecast",
+	Webpage:                    "webpage",
 }

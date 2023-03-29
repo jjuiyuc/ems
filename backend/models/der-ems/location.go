@@ -23,87 +23,77 @@ import (
 
 // Location is an object representing the database table.
 type Location struct {
-	ID             int64        `boil:"id" json:"id" toml:"id" yaml:"id"`
-	CustomerNumber string       `boil:"customer_number" json:"customerNumber" toml:"customerNumber" yaml:"customerNumber"`
-	FieldNumber    string       `boil:"field_number" json:"fieldNumber" toml:"fieldNumber" yaml:"fieldNumber"`
-	Address        null.String  `boil:"address" json:"address,omitempty" toml:"address" yaml:"address,omitempty"`
-	Lat            null.Float64 `boil:"lat" json:"lat,omitempty" toml:"lat" yaml:"lat,omitempty"`
-	Lng            null.Float64 `boil:"lng" json:"lng,omitempty" toml:"lng" yaml:"lng,omitempty"`
-	WeatherLat     null.Float32 `boil:"weather_lat" json:"weatherLat,omitempty" toml:"weatherLat" yaml:"weatherLat,omitempty"`
-	WeatherLng     null.Float32 `boil:"weather_lng" json:"weatherLNG,omitempty" toml:"weatherLNG" yaml:"weatherLNG,omitempty"`
-	Timezone       null.String  `boil:"timezone" json:"timezone,omitempty" toml:"timezone" yaml:"timezone,omitempty"`
-	TOULocationID  null.Int64   `boil:"tou_location_id" json:"touLocationID,omitempty" toml:"touLocationID" yaml:"touLocationID,omitempty"`
-	VoltageType    null.String  `boil:"voltage_type" json:"voltageType,omitempty" toml:"voltageType" yaml:"voltageType,omitempty"`
-	TOUType        null.String  `boil:"tou_type" json:"touType,omitempty" toml:"touType" yaml:"touType,omitempty"`
-	CreatedAt      time.Time    `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
-	UpdatedAt      time.Time    `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
+	ID            int64        `boil:"id" json:"id" toml:"id" yaml:"id"`
+	Name          string       `boil:"name" json:"name" toml:"name" yaml:"name"`
+	Address       null.String  `boil:"address" json:"address,omitempty" toml:"address" yaml:"address,omitempty"`
+	Lat           null.Float64 `boil:"lat" json:"lat,omitempty" toml:"lat" yaml:"lat,omitempty"`
+	Lng           null.Float64 `boil:"lng" json:"lng,omitempty" toml:"lng" yaml:"lng,omitempty"`
+	WeatherLat    null.Float32 `boil:"weather_lat" json:"weatherLat,omitempty" toml:"weatherLat" yaml:"weatherLat,omitempty"`
+	WeatherLng    null.Float32 `boil:"weather_lng" json:"weatherLNG,omitempty" toml:"weatherLNG" yaml:"weatherLNG,omitempty"`
+	TOULocationID null.Int64   `boil:"tou_location_id" json:"touLocationID,omitempty" toml:"touLocationID" yaml:"touLocationID,omitempty"`
+	VoltageType   null.String  `boil:"voltage_type" json:"voltageType,omitempty" toml:"voltageType" yaml:"voltageType,omitempty"`
+	TOUType       null.String  `boil:"tou_type" json:"touType,omitempty" toml:"touType" yaml:"touType,omitempty"`
+	CreatedAt     time.Time    `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
+	UpdatedAt     time.Time    `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
 
 	R *locationR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L locationL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var LocationColumns = struct {
-	ID             string
-	CustomerNumber string
-	FieldNumber    string
-	Address        string
-	Lat            string
-	Lng            string
-	WeatherLat     string
-	WeatherLng     string
-	Timezone       string
-	TOULocationID  string
-	VoltageType    string
-	TOUType        string
-	CreatedAt      string
-	UpdatedAt      string
+	ID            string
+	Name          string
+	Address       string
+	Lat           string
+	Lng           string
+	WeatherLat    string
+	WeatherLng    string
+	TOULocationID string
+	VoltageType   string
+	TOUType       string
+	CreatedAt     string
+	UpdatedAt     string
 }{
-	ID:             "id",
-	CustomerNumber: "customer_number",
-	FieldNumber:    "field_number",
-	Address:        "address",
-	Lat:            "lat",
-	Lng:            "lng",
-	WeatherLat:     "weather_lat",
-	WeatherLng:     "weather_lng",
-	Timezone:       "timezone",
-	TOULocationID:  "tou_location_id",
-	VoltageType:    "voltage_type",
-	TOUType:        "tou_type",
-	CreatedAt:      "created_at",
-	UpdatedAt:      "updated_at",
+	ID:            "id",
+	Name:          "name",
+	Address:       "address",
+	Lat:           "lat",
+	Lng:           "lng",
+	WeatherLat:    "weather_lat",
+	WeatherLng:    "weather_lng",
+	TOULocationID: "tou_location_id",
+	VoltageType:   "voltage_type",
+	TOUType:       "tou_type",
+	CreatedAt:     "created_at",
+	UpdatedAt:     "updated_at",
 }
 
 var LocationTableColumns = struct {
-	ID             string
-	CustomerNumber string
-	FieldNumber    string
-	Address        string
-	Lat            string
-	Lng            string
-	WeatherLat     string
-	WeatherLng     string
-	Timezone       string
-	TOULocationID  string
-	VoltageType    string
-	TOUType        string
-	CreatedAt      string
-	UpdatedAt      string
+	ID            string
+	Name          string
+	Address       string
+	Lat           string
+	Lng           string
+	WeatherLat    string
+	WeatherLng    string
+	TOULocationID string
+	VoltageType   string
+	TOUType       string
+	CreatedAt     string
+	UpdatedAt     string
 }{
-	ID:             "location.id",
-	CustomerNumber: "location.customer_number",
-	FieldNumber:    "location.field_number",
-	Address:        "location.address",
-	Lat:            "location.lat",
-	Lng:            "location.lng",
-	WeatherLat:     "location.weather_lat",
-	WeatherLng:     "location.weather_lng",
-	Timezone:       "location.timezone",
-	TOULocationID:  "location.tou_location_id",
-	VoltageType:    "location.voltage_type",
-	TOUType:        "location.tou_type",
-	CreatedAt:      "location.created_at",
-	UpdatedAt:      "location.updated_at",
+	ID:            "location.id",
+	Name:          "location.name",
+	Address:       "location.address",
+	Lat:           "location.lat",
+	Lng:           "location.lng",
+	WeatherLat:    "location.weather_lat",
+	WeatherLng:    "location.weather_lng",
+	TOULocationID: "location.tou_location_id",
+	VoltageType:   "location.voltage_type",
+	TOUType:       "location.tou_type",
+	CreatedAt:     "location.created_at",
+	UpdatedAt:     "location.updated_at",
 }
 
 // Generated where
@@ -133,35 +123,31 @@ func (w whereHelpernull_Float64) IsNull() qm.QueryMod    { return qmhelper.Where
 func (w whereHelpernull_Float64) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
 
 var LocationWhere = struct {
-	ID             whereHelperint64
-	CustomerNumber whereHelperstring
-	FieldNumber    whereHelperstring
-	Address        whereHelpernull_String
-	Lat            whereHelpernull_Float64
-	Lng            whereHelpernull_Float64
-	WeatherLat     whereHelpernull_Float32
-	WeatherLng     whereHelpernull_Float32
-	Timezone       whereHelpernull_String
-	TOULocationID  whereHelpernull_Int64
-	VoltageType    whereHelpernull_String
-	TOUType        whereHelpernull_String
-	CreatedAt      whereHelpertime_Time
-	UpdatedAt      whereHelpertime_Time
+	ID            whereHelperint64
+	Name          whereHelperstring
+	Address       whereHelpernull_String
+	Lat           whereHelpernull_Float64
+	Lng           whereHelpernull_Float64
+	WeatherLat    whereHelpernull_Float32
+	WeatherLng    whereHelpernull_Float32
+	TOULocationID whereHelpernull_Int64
+	VoltageType   whereHelpernull_String
+	TOUType       whereHelpernull_String
+	CreatedAt     whereHelpertime_Time
+	UpdatedAt     whereHelpertime_Time
 }{
-	ID:             whereHelperint64{field: "`location`.`id`"},
-	CustomerNumber: whereHelperstring{field: "`location`.`customer_number`"},
-	FieldNumber:    whereHelperstring{field: "`location`.`field_number`"},
-	Address:        whereHelpernull_String{field: "`location`.`address`"},
-	Lat:            whereHelpernull_Float64{field: "`location`.`lat`"},
-	Lng:            whereHelpernull_Float64{field: "`location`.`lng`"},
-	WeatherLat:     whereHelpernull_Float32{field: "`location`.`weather_lat`"},
-	WeatherLng:     whereHelpernull_Float32{field: "`location`.`weather_lng`"},
-	Timezone:       whereHelpernull_String{field: "`location`.`timezone`"},
-	TOULocationID:  whereHelpernull_Int64{field: "`location`.`tou_location_id`"},
-	VoltageType:    whereHelpernull_String{field: "`location`.`voltage_type`"},
-	TOUType:        whereHelpernull_String{field: "`location`.`tou_type`"},
-	CreatedAt:      whereHelpertime_Time{field: "`location`.`created_at`"},
-	UpdatedAt:      whereHelpertime_Time{field: "`location`.`updated_at`"},
+	ID:            whereHelperint64{field: "`location`.`id`"},
+	Name:          whereHelperstring{field: "`location`.`name`"},
+	Address:       whereHelpernull_String{field: "`location`.`address`"},
+	Lat:           whereHelpernull_Float64{field: "`location`.`lat`"},
+	Lng:           whereHelpernull_Float64{field: "`location`.`lng`"},
+	WeatherLat:    whereHelpernull_Float32{field: "`location`.`weather_lat`"},
+	WeatherLng:    whereHelpernull_Float32{field: "`location`.`weather_lng`"},
+	TOULocationID: whereHelpernull_Int64{field: "`location`.`tou_location_id`"},
+	VoltageType:   whereHelpernull_String{field: "`location`.`voltage_type`"},
+	TOUType:       whereHelpernull_String{field: "`location`.`tou_type`"},
+	CreatedAt:     whereHelpertime_Time{field: "`location`.`created_at`"},
+	UpdatedAt:     whereHelpertime_Time{field: "`location`.`updated_at`"},
 }
 
 // LocationRels is where relationship names are stored.
@@ -192,8 +178,8 @@ func (r *locationR) GetGateways() GatewaySlice {
 type locationL struct{}
 
 var (
-	locationAllColumns            = []string{"id", "customer_number", "field_number", "address", "lat", "lng", "weather_lat", "weather_lng", "timezone", "tou_location_id", "voltage_type", "tou_type", "created_at", "updated_at"}
-	locationColumnsWithoutDefault = []string{"customer_number", "field_number", "address", "lat", "lng", "weather_lat", "weather_lng", "timezone", "tou_location_id", "voltage_type", "tou_type"}
+	locationAllColumns            = []string{"id", "name", "address", "lat", "lng", "weather_lat", "weather_lng", "tou_location_id", "voltage_type", "tou_type", "created_at", "updated_at"}
+	locationColumnsWithoutDefault = []string{"name", "address", "lat", "lng", "weather_lat", "weather_lng", "tou_location_id", "voltage_type", "tou_type"}
 	locationColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	locationPrimaryKeyColumns     = []string{"id"}
 	locationGeneratedColumns      = []string{}

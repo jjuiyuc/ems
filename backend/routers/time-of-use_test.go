@@ -17,7 +17,7 @@ import (
 	"der-ems/repository"
 	"der-ems/services"
 	"der-ems/testutils"
-	"der-ems/testutils/fixtures"
+	"der-ems/testutils/testdata"
 )
 
 var _ = Describe("TimeOfUse", func() {
@@ -48,14 +48,14 @@ var _ = Describe("TimeOfUse", func() {
 		Expect(err).Should(BeNil())
 		err = testutils.SeedUtLocationAndGateway(db)
 		Expect(err).Should(BeNil())
-		token, err = utils.GenerateToken(fixtures.UtUser.ID)
+		token, err = utils.GenerateToken(testdata.UtUser.ID)
 		Expect(err).Should(BeNil())
-		// Mock user_gateway_right table
-		_, err = db.Exec("TRUNCATE TABLE user_gateway_right")
+		// Mock group_gateway_right table
+		_, err = db.Exec("TRUNCATE TABLE group_gateway_right")
 		Expect(err).Should(BeNil())
 		_, err = db.Exec(`
-			INSERT INTO user_gateway_right (id,user_id,gw_id) VALUES
-			(1,1,1);
+			INSERT INTO group_gateway_right (id,group_id,gw_id,enabled_at) VALUES
+			(1,2,1,'2022-07-01 00:00:00');
 		`)
 		Expect(err).Should(BeNil())
 
@@ -69,7 +69,7 @@ var _ = Describe("TimeOfUse", func() {
 	Describe("GetBatteryUsageInfo", func() {
 		Context("success", func() {
 			It("should be ok", func() {
-				prefixURL := fmt.Sprintf("/api/%s/devices/battery/usage-info", fixtures.UtGateway.UUID)
+				prefixURL := fmt.Sprintf("/api/%s/devices/battery/usage-info", testdata.UtGateway.UUID)
 				seedUtURL := fmt.Sprintf("%s?startTime=%s", prefixURL, UtStartTime)
 				expectedResponseData := services.BatteryUsageInfoResponse{
 					BatterySoC:                    160,
@@ -101,7 +101,7 @@ var _ = Describe("TimeOfUse", func() {
 
 		Context("fail", func() {
 			It("should return invalid parameters", func() {
-				prefixURL := fmt.Sprintf("/api/%s/devices/battery/usage-info", fixtures.UtGateway.UUID)
+				prefixURL := fmt.Sprintf("/api/%s/devices/battery/usage-info", testdata.UtGateway.UUID)
 				seedUtInvalidParamsURL := fmt.Sprintf("%s?startTime=%s", prefixURL, "xxx")
 				tt := testutils.TestInfo{
 					Token:      token,
@@ -120,7 +120,7 @@ var _ = Describe("TimeOfUse", func() {
 	Describe("GetTimeOfUseInfo", func() {
 		Context("success", func() {
 			It("should be ok", func() {
-				prefixURL := fmt.Sprintf("/api/%s/devices/tou/info", fixtures.UtGateway.UUID)
+				prefixURL := fmt.Sprintf("/api/%s/devices/tou/info", testdata.UtGateway.UUID)
 				seedUtURL := fmt.Sprintf("%s?startTime=%s", prefixURL, UtStartTime)
 				expectedEnergySources := map[string]interface{}{
 					"offPeak": map[string]interface{}{
@@ -184,7 +184,7 @@ var _ = Describe("TimeOfUse", func() {
 
 		Context("fail", func() {
 			It("should return invalid parameters", func() {
-				prefixURL := fmt.Sprintf("/api/%s/devices/tou/info", fixtures.UtGateway.UUID)
+				prefixURL := fmt.Sprintf("/api/%s/devices/tou/info", testdata.UtGateway.UUID)
 				seedUtInvalidParamsURL := fmt.Sprintf("%s?startTime=%s", prefixURL, "xxx")
 				tt := testutils.TestInfo{
 					Token:      token,
@@ -203,7 +203,7 @@ var _ = Describe("TimeOfUse", func() {
 	Describe("GetSolarEnergyUsage", func() {
 		Context("success", func() {
 			It("should be ok", func() {
-				prefixURL := fmt.Sprintf("/api/%s/devices/solar/energy-usage", fixtures.UtGateway.UUID)
+				prefixURL := fmt.Sprintf("/api/%s/devices/solar/energy-usage", testdata.UtGateway.UUID)
 				seedUtURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, "hour", UtStartTime, UtEndTime)
 				expectedTimestamps := []int{1659543000, 1659557100}
 				expectedLoadPvConsumedEnergyPercentACs := []float32{50, 50}
@@ -234,7 +234,7 @@ var _ = Describe("TimeOfUse", func() {
 
 		Context("fail", func() {
 			It("should return invalid parameters", func() {
-				prefixURL := fmt.Sprintf("/api/%s/devices/solar/energy-usage", fixtures.UtGateway.UUID)
+				prefixURL := fmt.Sprintf("/api/%s/devices/solar/energy-usage", testdata.UtGateway.UUID)
 				seedUtInvalidParamsURL := fmt.Sprintf("%s?resolution=%s&startTime=%s&endTime=%s", prefixURL, "xxx", UtStartTime, UtEndTime)
 				tt := testutils.TestInfo{
 					Token:      token,

@@ -100,10 +100,9 @@ func (s *WeatherWorkerSuite) SetupSuite() {
 
 	// Mock location table
 	_, err = db.Exec(`
-		INSERT INTO location (id,customer_number,field_number,weather_lat,weather_lng) VALUES
-		(1,'00001','001',24.75,121.75),
-		(2,'00001','002',24.75,121.75),
-		(3,'00002','001',24.75,121.75);
+		INSERT INTO location (id,name,weather_lat,weather_lng) VALUES
+		(1,'Field A',24.75,121.75),
+		(2,'Field B',24.75,121.75);
 	`)
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 
@@ -111,9 +110,7 @@ func (s *WeatherWorkerSuite) SetupSuite() {
 	_, err = db.Exec(`
 		INSERT INTO gateway (id,uuid,location_id) VALUES
 		(1,'U00001',1),
-		(2,'U00002',1),
-		(3,'U00003',2),
-		(4,'U00004',3);
+		(2,'U00002',2);
 	`)
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 }
@@ -239,7 +236,7 @@ func (s *WeatherWorkerSuite) Test_02_GenerateWeatherSendingInfo() {
 		}
 	}
 	testWeatherData, _ := json.Marshal(testData)
-	testUUIDs := []string{"U00001", "U00002", "U00003", "U00004"}
+	testUUIDs := []string{"U00001", "U00002"}
 
 	tt := struct {
 		name   string

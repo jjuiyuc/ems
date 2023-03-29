@@ -551,6 +551,7 @@ CREATE TABLE `group_gateway_right_log` (
   `group_gateway_right_id` bigint DEFAULT NULL,
   `group_id` bigint DEFAULT NULL,
   `gw_id` bigint DEFAULT NULL,
+  `location_id` bigint DEFAULT NULL,
   `enabled_at` datetime DEFAULT NULL,
   `enabled_by` bigint DEFAULT NULL,
   `disabled_at` datetime DEFAULT NULL,

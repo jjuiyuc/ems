@@ -74,16 +74,16 @@ func (s defaultAuthService) Login(username, password string) (user *deremsmodels
 			"err":       err,
 		}).Error()
 
-		user.PasswordRetryCount = null.NewInt(nowPasswordRetryCount+1, true)
+		user.PasswordRetryCount = null.IntFrom(nowPasswordRetryCount+1)
 		if user.PasswordRetryCount.Int == passwordLockCount {
 			now := time.Now().UTC()
-			user.LockedAt = null.NewTime(now, true)
+			user.LockedAt = null.TimeFrom(now)
 		}
 		s.repo.User.UpdateUser(user)
 		return
 	}
 	if nowPasswordRetryCount > 0 {
-		user.PasswordRetryCount = null.NewInt(0, true)
+		user.PasswordRetryCount = null.IntFrom(0)
 		s.repo.User.UpdateUser(user)
 	}
 
@@ -93,7 +93,7 @@ func (s defaultAuthService) Login(username, password string) (user *deremsmodels
 // CreateLoginLog godoc
 func (s defaultAuthService) CreateLoginLog(user *deremsmodels.User, token string) (err error) {
 	loginLog := &deremsmodels.LoginLog{
-		UserID: null.NewInt64(user.ID, true),
+		UserID: null.Int64From(user.ID),
 	}
 
 	err = s.repo.User.InsertLoginLog(loginLog)

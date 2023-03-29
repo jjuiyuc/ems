@@ -14,26 +14,26 @@ var UtUser = &deremsmodels.User{
 	Username:       "ut-user@gmail.com",
 	GroupID:        2,
 	Password:       "testing123",
-	ExpirationDate: null.NewTime(time.Date(2100, 1, 1, 0, 0, 0, 0, time.UTC), true),
+	ExpirationDate: null.TimeFrom(time.Date(2100, 1, 1, 0, 0, 0, 0, time.UTC)),
 }
 
 // UtLocation godoc
 var UtLocation = &deremsmodels.Location{
 	ID:            1,
 	Name:          "Field A",
-	Address:       null.NewString("宜蘭縣五結鄉大吉五路157巷68號", true),
-	Lat:           null.NewFloat64(24.70155508690467, true),
-	Lng:           null.NewFloat64(121.7973398847259, true),
-	WeatherLat:    null.NewFloat32(24.75, true),
-	WeatherLng:    null.NewFloat32(121.75, true),
-	TOULocationID: null.NewInt64(1, true),
-	VoltageType:   null.NewString("Low voltage", true),
-	TOUType:       null.NewString("Two-section", true),
+	Address:       null.StringFrom("宜蘭縣五結鄉大吉五路157巷68號"),
+	Lat:           null.Float64From(24.70155508690467),
+	Lng:           null.Float64From(121.7973398847259),
+	WeatherLat:    null.Float32From(24.75),
+	WeatherLng:    null.Float32From(121.75),
+	TOULocationID: null.Int64From(1),
+	VoltageType:   null.StringFrom("Low voltage"),
+	TOUType:       null.StringFrom("Two-section"),
 }
 
 // UtGateway godoc
 var UtGateway = &deremsmodels.Gateway{
 	ID:         1,
 	UUID:       "0E0BA27A8175AF978C49396BDE9D7A1E",
-	LocationID: null.NewInt64(1, true),
+	LocationID: null.Int64From(1),
 }

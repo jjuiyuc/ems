@@ -145,9 +145,9 @@ func (h weatherConsumerHandler) saveWeatherData(msg []byte) (lat, lng float32, e
 		weatherForecast := &deremsmodels.WeatherForecast{
 			Lat:       latestWeather.Lat,
 			Lng:       latestWeather.Lng,
-			Alt:       null.NewFloat32(latestWeather.Alt, true),
+			Alt:       null.Float32From(latestWeather.Alt),
 			ValidDate: dt.(time.Time),
-			Data:      null.NewJSON(dataJSON, true),
+			Data:      null.JSONFrom(dataJSON),
 		}
 
 		log.WithFields(log.Fields{

@@ -5,7 +5,6 @@ import { useTranslation } from "react-multi-lang"
 import { useEffect, useMemo, useState } from "react"
 import { validateNumTwoDecimalPlaces } from "../utils/utils"
 
-
 export default function SubDeviceForm(props) {
     const { title, mainDeviceType } = props
     const
@@ -50,8 +49,6 @@ export default function SubDeviceForm(props) {
                 ]
             }
         ]
-    const DeviceModelOption = subDeviceData
-        .map(option => Object.values(option)[1]).flat()
 
     const
         t = useTranslation(),
@@ -86,13 +83,14 @@ export default function SubDeviceForm(props) {
                             select
                             label={formT("deviceModel")}
                             defaultValue="">
-                            {DeviceModelOption.map((option, i) => (
-                                <MenuItem
-                                    key={"option-d-m-" + i}
-                                    value={option.value}>
-                                    {option.label}
-                                </MenuItem>
-                            ))}
+                            {item.deviceModel
+                                .map((option, i) => (
+                                    <MenuItem
+                                        key={"option-d-m-" + i}
+                                        value={option.value}>
+                                        {option.label}
+                                    </MenuItem>
+                                ))}
                         </TextField>
                         <h5 className="mb-5 ml-2">{formT("deviceInformation")}</h5>
                         <TextField
@@ -107,18 +105,18 @@ export default function SubDeviceForm(props) {
                 ))}
             </>
             : null}
-        {/* {mainDeviceType.value === "inverter"
+        {mainDeviceType.value === "inverter"
             ? <>
                 <TextField
-                    key={"i-sub-d-t-" + i}
+                    key={"i-sub-d-t-"}
                     label={formT("deviceType")}
                     value={formT(`${subDeviceData[1].deviceType}`)} />
                 <TextField
-                    key={"i-sub-d-m-" + i}
+                    key={"i-sub-d-m-"}
                     select
                     label={formT("deviceModel")}
                     defaultValue="">
-                    {DeviceModelOption.map((option, i) => (
+                    {subDeviceData[1].deviceModel.map((option, i) => (
                         <MenuItem
                             key={"option-d-m-" + i}
                             value={option.value}>
@@ -128,14 +126,14 @@ export default function SubDeviceForm(props) {
                 </TextField>
                 <h5 className="mb-5 ml-2">{formT("deviceInformation")}</h5>
                 <TextField
-                    key={"i-p-c-" + i}
+                    key={"i-p-c-"}
                     type="number"
                     label={formT("powerCapacity")}
                     onChange={inputPowerCapacity}
                 // value={subPowerCapacity}
                 />
             </>
-            : null} */}
+            : null}
 
     </>
 }

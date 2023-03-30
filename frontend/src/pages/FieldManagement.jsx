@@ -2,22 +2,22 @@ import {
     Button, DialogActions, Divider, FormControl, ListItem,
     MenuItem, TextField
 } from "@mui/material"
-import AddIcon from "@mui/icons-material/Add"
 import { useTranslation } from "react-multi-lang"
 import { useEffect, useState } from "react"
 
 import AddField from "../components/AddField"
 import DialogForm from "../components/DialogForm"
+import InfoField from "../components/InfoField"
 import Table from "../components/DataTable"
 
 import { ReactComponent as EditIcon } from "../assets/icons/edit.svg"
-import { ReactComponent as NoticeIcon } from "../assets/icons/notice.svg"
 
 export default function FieldManagement() {
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
         dialogT = (string) => t("dialog." + string),
+        formT = (string) => t("form." + string),
         pageT = (string, params) => t("fieldManagement." + string, params)
 
     const typeGroup = [
@@ -41,18 +41,33 @@ export default function FieldManagement() {
             {
                 id: 1,
                 locationName: "Serenegray",
-                gatewayID: "0E0BA27A8175AF978C49396BDE9D7A1E"
+                gatewayID: "0E0BA27A8175AF978C49396BDE9D7A1E",
+                address: "宜蘭縣五結鄉大吉五路157巷68號",
+                "lat": "24.702",
+                "lng": "121.797",
+                "powerCompany": "TPC",
+                "voltageType": formT("lowVoltage"),
+                "touType": formT("twoSection"),
+                "deviceType": "hybridInverter",
+                "deviceModel": "LXP-12K US-Luxpower Hybrid-Inverter",
+                "modbusID": "1",
+                "UUEID": "0E8F167E58271833EA01BAE79F2FD8C0",
+                "powerCapacity": "24"
             },
             {
                 id: 2,
                 locationName: "Cht_Miaoli",
-                gatewayID: "018F1623ADD8E739F7C6CBE62A7DF3C0"
-
+                gatewayID: "018F1623ADD8E739F7C6CBE62A7DF3C0",
+                address: "苗栗",
+                "lat": "",
+                "lng": "",
+                "powerCompany": "TPC",
+                "voltageType": "",
+                "touType": ""
             }
         ]),
         [error, setError] = useState(null),
         [loading, setLoading] = useState(false),
-
         [openNotice, setOpenNotice] = useState(false),
         [openEdit, setOpenEdit] = useState(false),
         [locationName, setLocationName] = useState(data?.locationName || ""),
@@ -90,13 +105,21 @@ export default function FieldManagement() {
         },
         {
             cell: (row, index) => <div className="flex w-28">
-                <NoticeIcon
-                    className="mr-5"
+                <InfoField
+                    openNotice={openNotice}
+                    setOpenNotice={setOpenNotice}
+                    target={target}
+                    setTarget={setTarget}
                     onClick={() => {
                         setOpenNotice(true)
                         setTarget(row)
-                    }} />
-
+                    }}
+                    locationInfo={pageT("locationInformation")}
+                    fieldDevices={pageT("fieldDevices")}
+                    deviceInfo={pageT("deviceInformation")}
+                    extraDeviceInfo={pageT("extraDeviceInfo")}
+                    subdevice={pageT("subdevice")}
+                />
                 <EditIcon className="mr-5"
                     onClick={() => {
                         setOpenEdit(true)

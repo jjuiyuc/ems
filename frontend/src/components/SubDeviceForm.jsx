@@ -66,7 +66,7 @@ export default function SubDeviceForm(props) {
             const isNum = validateNumTwoDecimalPlaces(num)
             if (!isNum) return
             setSubPowerCapacity(num)
-            console.log(subDeviceData[1])
+            // console.log(mainDeviceType.value)
         }
     return <>
         <h5 className="mb-5 ml-2">{title}</h5>

@@ -19,8 +19,6 @@ export default function AddField({
     deviceInfo,
     extraDeviceInfo,
     subdevice,
-    open,
-    setOpen,
     closeOutside = false
 }) {
 

@@ -237,6 +237,7 @@
         "deviceModel":"Device Model",
         "deviceType":"裝置類型",
         "email": "Email",
+        "enableField":"Enable Field",
         "energyCapacity":"Energy Capacity",
         "highVoltage":"高電壓",
         "hybridInverter":"Hybrid-Inverter",

@@ -1,6 +1,6 @@
 import {
     Button, DialogActions, Divider, FormControl, InputAdornment, ListItem,
-    MenuItem, TextField
+    MenuItem, Switch, TextField
 } from "@mui/material"
 import AddIcon from "@mui/icons-material/Add"
 import { useTranslation } from "react-multi-lang"
@@ -87,6 +87,11 @@ export default function AddField({
         formT = (string) => t("form." + string)
 
     const
+        [gatewayID, setGatewayID] = useState(""),
+        [locationName, setLocationName] = useState(""),
+        [address, setAddress] = useState(""),
+        [lat, setLat] = useState(""),
+        [lng, setLng] = useState(""),
         [deviceType, setDeviceType] = useState(""),
         [gridOutagePercent, setGridOutagePercent] = useState(""),
         [chargingSource, setChargingSource] = useState([
@@ -154,11 +159,17 @@ export default function AddField({
                         {commonT("verify")}
                     </Button>
                 </div>
+
                 <h5 className="mb-5 ml-2">{locationInfo}</h5>
                 <TextField
+                    id="location-name"
+                    label={commonT("locationName")}
+                // value={locationName}
+                />
+                <TextField
                     id="address"
-                    // value={address}
                     label={formT("address")}
+                // value={address}
                 />
                 <div className="flex-nowrap">
                     <TextField
@@ -273,7 +284,7 @@ export default function AddField({
                     label={formT("powerCapacity")}
                 // value={powerCapacity}
                 />
-                <Divider variant="middle" sx={{ margin: "1rem 0 2.5rem" }} />
+                <Divider variant="middle" sx={{ margin: "1rem 0 2rem" }} />
                 {deviceType.value === "battery"
                     ? <ExtraDeviceInfoForm
                         subTitle={extraDeviceInfo}
@@ -314,16 +325,24 @@ export default function AddField({
                         />
                     </>
                     : null}
+                <div className="mb-8 flex items-baseline">
+                    <p className="ml-1 mr-2">{formT("enableField")}</p>
+                    <Switch />
+                </div>
             </FormControl>
             <Divider variant="middle" />
-            <DialogActions sx={{ margin: "1rem 0.5rem 1rem 0" }}>
+            <DialogActions sx={{ margin: "1rem 0.8rem 1rem 0" }}>
                 <Button onClick={() => { setOpenAdd(false) }}
+                    sx={{ marginRight: "0.4rem" }}
+                    size="large"
                     radius="pill"
                     variant="outlined"
                     color="gray">
                     {commonT("cancel")}
                 </Button>
                 <Button onClick={() => { setOpenAdd(false) }}
+                    sx={{ marginRight: "0.4rem" }}
+                    size="large"
                     radius="pill"
                     variant="contained"
                     color="primary">

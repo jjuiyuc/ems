@@ -236,6 +236,7 @@
         "deviceModel":"Device Model",
         "deviceType":"Device Type",
         "email": "Email",
+        "enableField":"Enable Field",
         "energyCapacity":"Energy Capacity",
         "highVoltage":"High Voltage",
         "hybridInverter":"Hybrid-Inverter",

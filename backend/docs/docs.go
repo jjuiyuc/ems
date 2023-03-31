@@ -1842,11 +1842,9 @@ var doc = `{
                     "type": "object",
                     "$ref": "#/definitions/services.Float32ArrayFormat"
                 },
-                "onPeakTime": {
+                "timeOfUse": {
                     "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    }
+                    "additionalProperties": true
                 },
                 "timestamps": {
                     "type": "array",
@@ -1904,11 +1902,9 @@ var doc = `{
                     "type": "object",
                     "$ref": "#/definitions/services.Float32ArrayFormat"
                 },
-                "onPeakTime": {
+                "timeOfUse": {
                     "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    }
+                    "additionalProperties": true
                 },
                 "timestamps": {
                     "type": "array",
@@ -2125,11 +2121,35 @@ var doc = `{
         "services.GatewayInfo": {
             "type": "object",
             "properties": {
-                "address": {
-                    "type": "string"
-                },
                 "gatewayID": {
                     "type": "string"
+                },
+                "permissions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/services.GatewayPermissionInfo"
+                    }
+                }
+            }
+        },
+        "services.GatewayPermissionInfo": {
+            "type": "object",
+            "properties": {
+                "disabledAt": {
+                    "type": "string"
+                },
+                "disabledBy": {
+                    "type": "string"
+                },
+                "enabledAt": {
+                    "type": "string"
+                },
+                "enabledBy": {
+                    "type": "string"
+                },
+                "location": {
+                    "type": "object",
+                    "$ref": "#/definitions/services.LocationInfo"
                 }
             }
         },
@@ -2157,17 +2177,67 @@ var doc = `{
                     "type": "object",
                     "$ref": "#/definitions/services.Float32ArrayFormat"
                 },
-                "onPeakTime": {
+                "timeOfUse": {
                     "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    }
+                    "additionalProperties": true
                 },
                 "timestamps": {
                     "type": "array",
                     "items": {
                         "type": "integer"
                     }
+                }
+            }
+        },
+        "services.GroupInfo": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "type": "string"
+                },
+                "deletedBy": {
+                    "type": "string"
+                },
+                "gateways": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/services.GatewayInfo"
+                    }
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "parentID": {
+                    "type": "string"
+                },
+                "typeID": {
+                    "type": "integer"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "webpages": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/services.WebpageInfo"
+                    }
+                }
+            }
+        },
+        "services.LocationInfo": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         },
@@ -2222,14 +2292,18 @@ var doc = `{
                 "deletedAt": {
                     "type": "string"
                 },
+                "deletedBy": {
+                    "type": "string"
+                },
                 "expirationDate": {
                     "type": "string"
                 },
-                "gateways": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/services.GatewayInfo"
-                    }
+                "group": {
+                    "type": "object",
+                    "$ref": "#/definitions/services.GroupInfo"
+                },
+                "groupID": {
+                    "type": "integer"
                 },
                 "id": {
                     "type": "integer"
@@ -2310,15 +2384,13 @@ var doc = `{
         "services.SolarPowerStateResponse": {
             "type": "object",
             "properties": {
-                "onPeakTime": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    }
-                },
                 "pvAveragePowerACs": {
                     "type": "object",
                     "$ref": "#/definitions/services.Float32ArrayFormat"
+                },
+                "timeOfUse": {
+                    "type": "object",
+                    "additionalProperties": true
                 },
                 "timestamps": {
                     "type": "array",
@@ -2351,6 +2423,38 @@ var doc = `{
                 "timeOfUse": {
                     "type": "object",
                     "additionalProperties": true
+                }
+            }
+        },
+        "services.WebpageInfo": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "permissions": {
+                    "type": "object",
+                    "$ref": "#/definitions/services.WebpagePermissionsInfo"
+                }
+            }
+        },
+        "services.WebpagePermissionsInfo": {
+            "type": "object",
+            "properties": {
+                "create": {
+                    "type": "boolean"
+                },
+                "delete": {
+                    "type": "boolean"
+                },
+                "read": {
+                    "type": "boolean"
+                },
+                "update": {
+                    "type": "boolean"
                 }
             }
         }

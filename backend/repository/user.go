@@ -18,6 +18,10 @@ type UserRepository interface {
 	GetUserByUserID(userID int64) (*deremsmodels.User, error)
 	GetUserByUsername(username string) (*deremsmodels.User, error)
 	GetUserByPasswordToken(token string) (*deremsmodels.User, error)
+	GetGroupByGroupID(groupID int64) (*deremsmodels.Group, error)
+	GetGatewaysPermissionByGroupID(groupID int64) ([]*deremsmodels.GroupGatewayRight, error)
+	GetWebpagesPermissionByGroupTypeID(groupTypeID int64) ([]*deremsmodels.GroupTypeWebpageRight, error)
+	GetWebpageByWebpageID(webpagesID int64) (*deremsmodels.Webpage, error)
 }
 
 type defaultUserRepository struct {
@@ -66,4 +70,22 @@ func (repo defaultUserRepository) GetUserByPasswordToken(token string) (*deremsm
 	return deremsmodels.Users(
 		qm.Where("reset_pwd_token = ?", token),
 		qm.Where("pwd_token_expiry > ?", time.Now().UTC())).One(repo.db)
+}
+
+func (repo defaultUserRepository) GetGroupByGroupID(groupID int64) (*deremsmodels.Group, error) {
+	return deremsmodels.FindGroup(repo.db, groupID)
+}
+
+func (repo defaultUserRepository) GetGatewaysPermissionByGroupID(groupID int64) ([]*deremsmodels.GroupGatewayRight, error) {
+	return deremsmodels.GroupGatewayRights(
+		qm.Where("group_id = ?", groupID)).All(repo.db)
+}
+
+func (repo defaultUserRepository) GetWebpagesPermissionByGroupTypeID(groupTypeID int64) ([]*deremsmodels.GroupTypeWebpageRight, error) {
+	return deremsmodels.GroupTypeWebpageRights(
+		qm.Where("type_id = ?", groupTypeID)).All(repo.db)
+}
+
+func (repo defaultUserRepository) GetWebpageByWebpageID(webpagesID int64) (*deremsmodels.Webpage, error) {
+	return deremsmodels.FindWebpage(repo.db, webpagesID)
 }

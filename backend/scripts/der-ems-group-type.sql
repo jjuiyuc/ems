@@ -1,7 +1,7 @@
 INSERT INTO der_ems.`group_type`
 	(`id`,`name`,`created_at`,`updated_at`)
 VALUES
-	(1,'Admin',UTC_TIMESTAMP(),UTC_TIMESTAMP()),
-	(2,'Area owner',UTC_TIMESTAMP(),UTC_TIMESTAMP()),
-	(3,'Area maintainer',UTC_TIMESTAMP(),UTC_TIMESTAMP()),
-	(4,'Field owner',UTC_TIMESTAMP(),UTC_TIMESTAMP());
+	(1,'Admin','2022-07-01 00:00:00','2022-07-01 00:00:00'),
+	(2,'Area owner','2022-07-01 00:00:00','2022-07-01 00:00:00'),
+	(3,'Area maintainer','2022-07-01 00:00:00','2022-07-01 00:00:00'),
+	(4,'Field owner','2022-07-01 00:00:00','2022-07-01 00:00:00');

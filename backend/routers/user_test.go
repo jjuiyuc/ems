@@ -5,16 +5,19 @@ import (
 	"encoding/json"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
+	"github.com/volatiletech/null/v8"
 
 	"der-ems/config"
 	"der-ems/internal/app"
 	"der-ems/internal/e"
 	"der-ems/internal/utils"
 	"der-ems/models"
+	deremsmodels "der-ems/models/der-ems"
 	"der-ems/repository"
 	"der-ems/services"
 	"der-ems/testutils"
@@ -59,8 +62,8 @@ func (s *UserSuite) SetupSuite() {
 	_, err = db.Exec("TRUNCATE TABLE group_gateway_right")
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	_, err = db.Exec(`
-		INSERT INTO group_gateway_right (id,group_id,gw_id,enabled_at) VALUES
-		(1,2,1,'2022-07-01 00:00:00');
+		INSERT INTO group_gateway_right (id,group_id,gw_id,location_id,enabled_at) VALUES
+		(1,1,1,1,'2022-07-01 00:00:00');
 	`)
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 
@@ -250,6 +253,56 @@ func (s *UserSuite) Test_Authorize() {
 
 func (s *UserSuite) Test_GetProfile() {
 	seedUtURL := "/api/users/profile"
+	expectedWebpagePermissionsInfoType1 := services.WebpagePermissionsInfo{Create: false, Read: true, Update: false, Delete: false}
+	expectedWebpagePermissionsInfoType2 := services.WebpagePermissionsInfo{Create: true, Read: true, Update: true, Delete: false}
+	expectedWebpagePermissionsInfoType3 := services.WebpagePermissionsInfo{Create: true, Read: true, Update: true, Delete: true}
+	expectedResponseData := services.ProfileResponse{
+		User: &deremsmodels.User{
+			ID:                 1,
+			Username:           "ut-user@gmail.com",
+			GroupID:            1,
+			PasswordRetryCount: null.IntFrom(0),
+			ExpirationDate:     null.TimeFrom(time.Date(2100, 1, 1, 0, 0, 0, 0, time.UTC)),
+			CreatedAt:          time.Date(2022, 7, 1, 0, 0, 0, 0, time.UTC),
+			UpdatedAt:          time.Date(2022, 7, 1, 0, 0, 0, 0, time.UTC),
+		},
+		Group: services.GroupInfo{
+			Group: &deremsmodels.Group{
+				ID:        1,
+				Name:      "Admin",
+				TypeID:    1,
+				CreatedAt: time.Date(2022, 7, 1, 0, 0, 0, 0, time.UTC),
+				UpdatedAt: time.Date(2022, 7, 1, 0, 0, 0, 0, time.UTC),
+			},
+			Gateways: []services.GatewayInfo{
+				{
+					GatewayID: "0E0BA27A8175AF978C49396BDE9D7A1E",
+					Permissions: []services.GatewayPermissionInfo{
+						{
+							EnabledAt: time.Date(2022, 7, 1, 0, 0, 0, 0, time.UTC),
+							Location: services.LocationInfo{
+								Name:    "Field A",
+								Address: null.StringFrom("宜蘭縣五結鄉大吉五路157巷68號"),
+							},
+						},
+					},
+				},
+			},
+			Webpages: []services.WebpageInfo{
+				{ID: 1, Name: "dashboard", Permissions: expectedWebpagePermissionsInfoType1},
+				{ID: 2, Name: "analysis", Permissions: expectedWebpagePermissionsInfoType1},
+				{ID: 3, Name: "timeOfUseEnergy", Permissions: expectedWebpagePermissionsInfoType1},
+				{ID: 4, Name: "economics", Permissions: expectedWebpagePermissionsInfoType1},
+				{ID: 5, Name: "demandCharge", Permissions: expectedWebpagePermissionsInfoType1},
+				{ID: 6, Name: "energyResources", Permissions: expectedWebpagePermissionsInfoType1},
+				{ID: 7, Name: "fieldManagement", Permissions: expectedWebpagePermissionsInfoType2},
+				{ID: 8, Name: "accountManagementGroup", Permissions: expectedWebpagePermissionsInfoType3},
+				{ID: 9, Name: "accountManagementUser", Permissions: expectedWebpagePermissionsInfoType3},
+				{ID: 10, Name: "settings", Permissions: expectedWebpagePermissionsInfoType3},
+				{ID: 11, Name: "advancedSettings", Permissions: expectedWebpagePermissionsInfoType2},
+			},
+		},
+	}
 	tt := testutils.TestInfo{
 		Name:       "profile",
 		Token:      s.token,
@@ -269,9 +322,5 @@ func (s *UserSuite) Test_GetProfile() {
 	var data services.ProfileResponse
 	err = json.Unmarshal(dataJSON, &data)
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
-	s.Equalf(testdata.UtUser.ID, data.ID, e.ErrNewMessageNotEqual.Error())
-	s.Equalf(testdata.UtUser.Username, data.Username, e.ErrNewMessageNotEqual.Error())
-	s.Equalf(testdata.UtUser.ExpirationDate, data.ExpirationDate, e.ErrNewMessageNotEqual.Error())
-	s.Equalf(testdata.UtGateway.UUID, data.Gateways[0].GatewayID, e.ErrNewMessageNotEqual.Error())
-	s.Equalf(testdata.UtLocation.Address.String, data.Gateways[0].Address, e.ErrNewMessageNotEqual.Error())
+	s.Equalf(expectedResponseData, data, e.ErrNewMessageNotEqual.Error())
 }

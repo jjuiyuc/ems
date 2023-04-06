@@ -7,10 +7,9 @@ import { useEffect, useState } from "react"
 
 import AddField from "../components/AddField"
 import DialogForm from "../components/DialogForm"
+import EditField from "../components/EditField"
 import InfoField from "../components/InfoField"
 import Table from "../components/DataTable"
-
-import { ReactComponent as EditIcon } from "../assets/icons/edit.svg"
 
 export default function FieldManagement() {
     const
@@ -19,23 +18,6 @@ export default function FieldManagement() {
         dialogT = (string) => t("dialog." + string),
         formT = (string) => t("form." + string),
         pageT = (string, params) => t("fieldManagement." + string, params)
-
-    const typeGroup = [
-        {
-            value: "Area Maintainer",
-            label: "Area Maintainer",
-        },
-        {
-            value: "Field Owner",
-            label: "Field Owner",
-        },
-    ],
-        parentGroupType = [
-            {
-                value: "AreaOwner_TW",
-                label: "AreaOwner_TW"
-            }
-        ]
     const
         [data, setData] = useState([
             {
@@ -91,6 +73,8 @@ export default function FieldManagement() {
         [locationNameError, setLocationNameError] = useState(null),
         [gatewayID, setGatewayID] = useState(data?.gatewayID || ""),
         [gatewayIDError, setGatewayIDError] = useState(null),
+        [checkState, setCheckState] = useState(false),
+        [groupState, setGroupState] = useState({}),
         [target, setTarget] = useState({})
 
     const handleChange = (e) => {
@@ -127,6 +111,8 @@ export default function FieldManagement() {
                     setOpenNotice={setOpenNotice}
                     target={target}
                     setTarget={setTarget}
+                    groupState={groupState}
+                    setGroupState={setGroupState}
                     onClick={() => {
                         setOpenNotice(true)
                         setTarget(row)
@@ -137,12 +123,20 @@ export default function FieldManagement() {
                     extraDeviceInfo={pageT("extraDeviceInfo")}
                     subdevice={pageT("subdevice")}
                 />
-                <EditIcon className="mr-5"
+                <EditField className="mr-5"
+                    openEdit={openEdit}
+                    setOpenEdit={setOpenEdit}
+                    target={target}
+                    setTarget={setTarget}
+                    checkState={checkState}
+                    setCheckState={setCheckState}
+                    groupState={groupState}
+                    setGroupState={setGroupState}
                     onClick={() => {
                         setOpenEdit(true)
-                        setTarget({ ...row, index })
-                    }} />
-
+                        setTarget(row)
+                    }}
+                />
             </div>,
             center: true,
             grow: 0.5

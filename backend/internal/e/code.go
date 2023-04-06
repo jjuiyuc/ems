@@ -18,6 +18,7 @@ const (
 	ErrPasswordToken = 30000
 	// ErrPasswordReset = 30001
 	ErrPasswordLost = 30002
+	ErrNameUpdate   = 30003
 
 	ErrToken = 40000
 

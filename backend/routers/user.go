@@ -11,6 +11,11 @@ import (
 	"der-ems/internal/e"
 )
 
+// PersonalName godoc
+type PersonalName struct {
+	Name string `form:"name" binding:"required,max=20"`
+}
+
 // PasswordLost godoc
 // @Summary     Send an email for reset the password
 // @Description get email by username
@@ -120,4 +125,21 @@ func (w *APIWorker) GetProfile(c *gin.Context) {
 		return
 	}
 	appG.Response(http.StatusOK, e.Success, profile)
+}
+
+// UpdateName godoc
+func (w *APIWorker) UpdateName(c *gin.Context) {
+	appG := app.Gin{c}
+	userID, _ := c.Get("userID")
+	var json PersonalName
+	if err := c.BindJSON(&json); err != nil {
+		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
+		return
+	}
+	if err := w.Services.User.UpdateName(userID.(int64), json.Name); err != nil {
+		log.WithField("caused-by", "update name").Error()
+		appG.Response(http.StatusInternalServerError, e.ErrNameUpdate, err.Error())
+		return
+	}
+	appG.Response(http.StatusOK, e.Success, nil)
 }

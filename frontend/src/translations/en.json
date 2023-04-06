@@ -114,6 +114,7 @@
         "addField":"Add Field",
         "confirmedMsg":"Are you sure you want to turn off all the charging resources?",
         "deleteMsg":"Are you sure you want to delete this?",
+        "fieldInfo":"Field Info",
         "promptMsg":"If all charging resources are turned off, the battery will be in standby mode."
     },
     "economics": {

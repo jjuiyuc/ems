@@ -114,6 +114,7 @@
         "addField":"新增場域",
         "confirmedMsg":"Are you sure you want to turn off all the charging resources?",
         "deleteMsg":"請問您是否要刪除這筆資料?",
+        "fieldInfo":"場域資訊",
         "promptMsg":"If all charging resources are turned off, the battery will be in standby mode."
     },
     "economics": {

@@ -46,13 +46,30 @@ export default function FieldManagement() {
                 "lat": "24.702",
                 "lng": "121.797",
                 "powerCompany": "TPC",
-                "voltageType": formT("lowVoltage"),
-                "touType": formT("twoSection"),
+                "voltageType": "lowVoltage",
+                "touType": "twoSection",
                 "deviceType": "hybridInverter",
                 "deviceModel": "LXP-12K US-Luxpower Hybrid-Inverter",
                 "modbusID": "1",
                 "UUEID": "0E8F167E58271833EA01BAE79F2FD8C0",
-                "powerCapacity": "24"
+                "powerCapacity": "24",
+                "subDevice": [
+                    {
+                        deviceType: "meter",
+                        deviceModel: "CMO336 CM Meter",
+                        "powerCapacity": "22"
+                    },
+                    {
+                        deviceType: "pv",
+                        deviceModel: "D1K330H3A URE PV",
+                        "powerCapacity": "23"
+                    },
+                    {
+                        deviceType: "battery",
+                        deviceModel: "L051100-A UZ-Energy Battery",
+                        "powerCapacity": "24"
+                    }
+                ]
             },
             {
                 id: 2,

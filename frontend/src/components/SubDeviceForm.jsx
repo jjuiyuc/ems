@@ -134,7 +134,6 @@ export default function SubDeviceForm(props) {
                 />
             </>
             : null}
-
     </>
 }
 

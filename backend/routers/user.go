@@ -128,6 +128,17 @@ func (w *APIWorker) GetProfile(c *gin.Context) {
 }
 
 // UpdateName godoc
+// @Summary Update the display name about an individual user
+// @Description update user's name by token
+// @Tags        user
+// @Security    ApiKeyAuth
+// @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
+// @Accept      json
+// @Param       name           body      string true "Name"
+// @Success     200            {object}  app.Response
+// @Failure     401            {object}  app.Response
+// @Failure     500            {object}  app.Response
+// @Router      /users/name [put]
 func (w *APIWorker) UpdateName(c *gin.Context) {
 	appG := app.Gin{c}
 	userID, _ := c.Get("userID")

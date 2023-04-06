@@ -1581,4 +1581,40 @@ paths:
       summary: Show the detailed information about an individual user
       tags:
       - user
+  /users/name:
+    put:
+      consumes:
+      - application/json
+      description: update user's name by token
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Input user's access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Name
+        in: body
+        name: name
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Update the display name about an individual user
+      tags:
+      - user
 swagger: "2.0"

@@ -91,7 +91,7 @@ func (s defaultUserService) CreatePasswordToken(username string) (name, token st
 
 	token = uuid.New().String()
 	user.ResetPWDToken = null.StringFrom(token)
-	user.PWDTokenExpiry = null.TimeFrom(time.Now().UTC().Add(1*time.Hour))
+	user.PWDTokenExpiry = null.TimeFrom(time.Now().UTC().Add(1 * time.Hour))
 	err = s.repo.User.UpdateUser(user)
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -184,8 +184,8 @@ func (s defaultUserService) getGroupGatewayInfo(groupID int64) (gatewayInfos []G
 	}
 	for _, gatewayPermission := range gatewaysPermission {
 		var (
-			gatewayInfo         GatewayInfo
-			permissions         []GatewayPermissionInfo
+			gatewayInfo GatewayInfo
+			permissions []GatewayPermissionInfo
 		)
 		gateway, getErr := s.repo.Gateway.GetGatewayByGatewayID(gatewayPermission.GWID)
 		if getErr != nil {

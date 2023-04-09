@@ -6,7 +6,6 @@ import { useTranslation } from "react-multi-lang"
 import { useEffect, useState } from "react"
 
 import AddField from "../components/AddField"
-import DialogForm from "../components/DialogForm"
 import EditField from "../components/EditField"
 import InfoField from "../components/InfoField"
 import Table from "../components/DataTable"
@@ -51,6 +50,10 @@ export default function FieldManagement() {
                         deviceModel: "L051100-A UZ-Energy Battery",
                         "powerCapacity": "24"
                     }
+                ],
+                "enableField": true,
+                "group": [
+                    "AreaOwnerTW", "AreaMaintainer", "Serenegray"
                 ]
             },
             {
@@ -62,30 +65,27 @@ export default function FieldManagement() {
                 "lng": "",
                 "powerCompany": "TPC",
                 "voltageType": "",
-                "touType": ""
+                "touType": "",
+                "enableField": false,
+                "group": [
+                    "AreaOwnerTW", "AreaMaintainer"
+                ]
             }
         ]),
         [error, setError] = useState(null),
         [loading, setLoading] = useState(false),
         [openNotice, setOpenNotice] = useState(false),
-        [openEdit, setOpenEdit] = useState(false),
         [locationName, setLocationName] = useState(data?.locationName || ""),
         [locationNameError, setLocationNameError] = useState(null),
         [gatewayID, setGatewayID] = useState(data?.gatewayID || ""),
         [gatewayIDError, setGatewayIDError] = useState(null),
-        [checkState, setCheckState] = useState(false),
-        [groupState, setGroupState] = useState({}),
         [target, setTarget] = useState({})
 
-    const handleChange = (e) => {
-        setTarget(r => ({ ...r, groupName: e.target.value }))
-    }
-    const editSave = () => {
-        setData(r => {
-            const newData = [...r]
-            newData[target.index].groupName = target.groupName
-            return newData
-        })
+    const editSave = (row) => {
+        const newData = data.map((v) =>
+            v.id === row.id ? row : v
+        )
+        setData(newData)
     }
     const columns = [
         {
@@ -124,18 +124,8 @@ export default function FieldManagement() {
                     subdevice={pageT("subdevice")}
                 />
                 <EditField className="mr-5"
-                    openEdit={openEdit}
-                    setOpenEdit={setOpenEdit}
-                    target={target}
-                    setTarget={setTarget}
-                    checkState={checkState}
-                    setCheckState={setCheckState}
-                    groupState={groupState}
-                    setGroupState={setGroupState}
-                    onClick={() => {
-                        setOpenEdit(true)
-                        setTarget(row)
-                    }}
+                    row={row}
+                    onSave={editSave}
                 />
             </div>,
             center: true,
@@ -155,7 +145,8 @@ export default function FieldManagement() {
             />
         </div>
         <Table
-            {...{ columns, data }}
+            data={data}
+            columns={columns}
             paginationComponentOptions={{
                 rowsPerPageText: t("dataTable.rowsPerPage")
             }}

@@ -19,6 +19,8 @@ export default function InfoField({
     setOpenNotice,
     target,
     setTarget,
+    groupState,
+    setGroupState,
     onClick,
     locationInfo,
     fieldDevices,
@@ -133,6 +135,8 @@ export default function InfoField({
         [subPowerCapacity, setSubPowerCapacity] = useState(""),
         [fullWidth, setFullWidth] = useState(true),
         [maxWidth, setMaxWidth] = useState("md")
+
+    // const { AreaOwner_TW, AreaMaintainer, Serenegray } = groupState
 
     const
         inputPercent = (e) => {

@@ -1,6 +1,6 @@
 import {
-    Button, Chip, DialogActions, Divider, FormControl, InputAdornment, ListItem,
-    MenuItem, Switch, TextField
+    Button, Chip, DialogActions, Divider, FormControl, InputAdornment,
+    Switch, TextField
 } from "@mui/material"
 import { useTranslation } from "react-multi-lang"
 import { useEffect, useMemo, useState } from "react"
@@ -8,26 +8,17 @@ import { ValidateNumPercent } from "../utils/utils"
 
 import DialogForm from "../components/DialogForm"
 import ExtraDeviceInfoForm from "../components/ExtraDeviceInfoForm"
-import SubDeviceForm from "../components/SubDeviceForm"
 
 import { ReactComponent as NoticeIcon } from "../assets/icons/notice.svg"
 
 export default function InfoField({
-    children = null,
     dialogTitle = "",
-    openNotice,
-    setOpenNotice,
-    target,
-    setTarget,
-    groupState,
-    setGroupState,
-    onClick,
+    row,
     locationInfo,
     fieldDevices,
     deviceInfo,
     extraDeviceInfo,
-    subdevice,
-    closeOutside = false
+    subdevice
 }) {
 
     const
@@ -112,6 +103,7 @@ export default function InfoField({
         formT = (string) => t("form." + string)
 
     const
+        [openNotice, setOpenNotice] = useState(false),
         [gatewayID, setGatewayID] = useState(""),
         [locationName, setLocationName] = useState(""),
         [address, setAddress] = useState(""),
@@ -144,11 +136,14 @@ export default function InfoField({
             const isNum = ValidateNumPercent(num)
             if (!isNum) return
             setGridOutagePercent(num)
+        },
+        handleClick = () => {
+            setOpenNotice(true)
         }
     return <>
         <NoticeIcon
             className="mr-5"
-            onClick={onClick} />
+            onClick={handleClick} />
         <DialogForm
             dialogTitle={dialogT("fieldInfo")}
             fullWidth={fullWidth}
@@ -161,7 +156,7 @@ export default function InfoField({
                     sx={{ marginBottom: 2 }}
                     key="gatewayID"
                     label={commonT("gatewayID")}
-                    value={target?.gatewayID || ""}
+                    value={row?.gatewayID || ""}
                     focused
                     disabled={true}
                 />
@@ -169,14 +164,14 @@ export default function InfoField({
                 <TextField
                     key="location-name"
                     label={commonT("locationName")}
-                    value={target?.locationName || ""}
+                    value={row?.locationName || ""}
                     focused
                     disabled={true}
                 />
                 <TextField
                     key="address"
                     label={formT("address")}
-                    value={target?.address || ""}
+                    value={row?.address || ""}
                     focused
                     disabled={true}
                 />
@@ -185,7 +180,7 @@ export default function InfoField({
                         key="lat"
                         type="number"
                         label={formT("lat")}
-                        value={target?.lat || ""}
+                        value={row?.lat || ""}
                         focused
                         disabled={true}
                     />
@@ -194,26 +189,26 @@ export default function InfoField({
                         key="lng"
                         type="number"
                         label={formT("lng")}
-                        value={target?.lng || ""}
+                        value={row?.lng || ""}
                         disabled={true}
                     />
                 </div>
                 <TextField
                     key="powerCompany"
                     label={formT("powerCompany")}
-                    value={target?.powerCompany || ""}
+                    value={row?.powerCompany || ""}
                     disabled={true}
                 />
                 <TextField
                     key="voltageType"
                     label={formT("voltageType")}
-                    value={formT(target?.voltageType) || ""}
+                    value={formT(row?.voltageType) || ""}
                     disabled={true}
                 />
                 <TextField
                     key="touType"
                     label={formT("touType")}
-                    value={formT(target?.touType) || ""}
+                    value={formT(row?.touType) || ""}
                     disabled={true}
                 />
                 <Divider variant="middle" />
@@ -221,13 +216,13 @@ export default function InfoField({
                 <TextField
                     key="deviceType"
                     label={formT("deviceType")}
-                    value={formT(target?.deviceType) || ""}
+                    value={formT(row?.deviceType) || ""}
                     disabled={true}
                 />
                 <TextField
                     key="deviceModel"
                     label={formT("deviceModel")}
-                    value={target?.deviceModel || ""}
+                    value={row?.deviceModel || ""}
                     disabled={true}
                 />
                 <Divider variant="middle" />
@@ -236,24 +231,24 @@ export default function InfoField({
                     key="modbusID"
                     type="number"
                     label={formT("modbusID")}
-                    value={target?.modbusID || ""}
+                    value={row?.modbusID || ""}
                     disabled={true}
                 />
                 <TextField
                     key="UUEID"
                     label="UUEID"
-                    value={target?.UUEID || ""}
+                    value={row?.UUEID || ""}
                     disabled={true}
                 />
                 <TextField
                     key="powerCapacity"
                     type="number"
                     label={formT("powerCapacity")}
-                    value={target?.powerCapacity || ""}
+                    value={row?.powerCapacity || ""}
                     disabled={true}
                 />
                 <Divider variant="middle" sx={{ margin: "0 0 2rem" }} />
-                {target?.deviceType === "battery"
+                {row?.deviceType === "battery"
                     ? <ExtraDeviceInfoForm
                         subTitle={extraDeviceInfo}
                         gridOutagePercent={gridOutagePercent}
@@ -266,9 +261,9 @@ export default function InfoField({
                         setVoltage={setVoltage}
                     />
                     : null}
-                {target?.deviceType === "hybridInverter"
+                {row?.deviceType === "hybridInverter"
                     ? <>
-                        {target?.subDevice.map((item, i) => (
+                        {row?.subDevice.map((item, i) => (
                             <>
                                 <TextField
                                     key={"sub-d-t-" + i}
@@ -306,18 +301,18 @@ export default function InfoField({
                         />
                     </>
                     : null}
-                {target?.deviceType === "inverter"
+                {row?.deviceType === "inverter"
                     ? <>
                         <TextField
                             key={"i-sub-d-t-"}
                             label={formT("deviceType")}
-                            value={formT(`${target?.subDevice[1].deviceType}`)}
+                            value={formT(`${row?.subDevice[1].deviceType}`)}
                             disabled={true}
                         />
                         <TextField
                             key={"i-sub-d-m-"}
                             label={formT("deviceModel")}
-                            value={target?.subDevice[1].deviceModel || ""}
+                            value={row?.subDevice[1].deviceModel || ""}
                             disabled={true}
                         />
                         <h5 className="mb-5 ml-2">{formT("deviceInformation")}</h5>
@@ -325,7 +320,7 @@ export default function InfoField({
                             key={"i-p-c-"}
                             type="number"
                             label={formT("powerCapacity")}
-                            value={target?.subDevice[1].powerCapacity || ""}
+                            value={row?.subDevice[1].powerCapacity || ""}
                             disabled={true}
                         />
                     </>

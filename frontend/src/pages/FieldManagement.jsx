@@ -74,16 +74,14 @@ export default function FieldManagement() {
         ]),
         [error, setError] = useState(null),
         [loading, setLoading] = useState(false),
-        [openNotice, setOpenNotice] = useState(false),
         [locationName, setLocationName] = useState(data?.locationName || ""),
         [locationNameError, setLocationNameError] = useState(null),
         [gatewayID, setGatewayID] = useState(data?.gatewayID || ""),
-        [gatewayIDError, setGatewayIDError] = useState(null),
-        [target, setTarget] = useState({})
+        [gatewayIDError, setGatewayIDError] = useState(null)
 
     const editSave = (row) => {
-        const newData = data.map((v) =>
-            v.id === row.id ? row : v
+        const newData = data.map((value) =>
+            value.id === row.id ? row : value
         )
         setData(newData)
     }
@@ -107,16 +105,7 @@ export default function FieldManagement() {
         {
             cell: (row, index) => <div className="flex w-28">
                 <InfoField
-                    openNotice={openNotice}
-                    setOpenNotice={setOpenNotice}
-                    target={target}
-                    setTarget={setTarget}
-                    groupState={groupState}
-                    setGroupState={setGroupState}
-                    onClick={() => {
-                        setOpenNotice(true)
-                        setTarget(row)
-                    }}
+                    row={row}
                     locationInfo={pageT("locationInformation")}
                     fieldDevices={pageT("fieldDevices")}
                     deviceInfo={pageT("deviceInformation")}

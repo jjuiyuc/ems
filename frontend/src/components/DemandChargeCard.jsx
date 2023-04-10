@@ -36,7 +36,7 @@ export default function DemandChargeCard(props) {
                 key={"s-b-"}
                 radius="pill"
                 variant="contained">
-                {pageT("save")}
+                {commonT("save")}
             </Button>
         </div>
         <div className="flex items-center mt-12">

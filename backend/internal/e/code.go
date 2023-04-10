@@ -15,10 +15,9 @@ const (
 	ErrAuthUserLocked       = 20006
 	ErrAuthPasswordNotMatch = 20007
 
-	ErrPasswordToken  = 30000
-	ErrPasswordUpdate = 30001
-	ErrPasswordLost   = 30002
-	ErrNameUpdate     = 30003
+	ErrPasswordToken = 30000
+	// 30001
+	ErrPasswordLost = 30002
 
 	ErrToken = 40000
 
@@ -29,4 +28,7 @@ const (
 	ErrSolarPowerStateGen           = 50004
 	ErrGridPowerStateGen            = 50005
 	ErrTimeOfUseInfoGen             = 50006
+
+	ErrNameUpdate     = 60000
+	ErrPasswordUpdate = 60001
 )

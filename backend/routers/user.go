@@ -142,6 +142,7 @@ func (w *APIWorker) GetProfile(c *gin.Context) {
 // @Accept      json
 // @Param       name           body      string true "Name"
 // @Success     200            {object}  app.Response
+// @Failure     400            {object}  app.Response
 // @Failure     401            {object}  app.Response
 // @Failure     500            {object}  app.Response
 // @Router      /users/name [put]
@@ -162,6 +163,18 @@ func (w *APIWorker) UpdateName(c *gin.Context) {
 }
 
 // UpdatePassword godoc
+// @Summary Update the password about an individual user
+// @Description update user's password by token
+// @Tags        user
+// @Security    ApiKeyAuth
+// @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
+// @Accept      json
+// @Param       password       body      string true "Password"
+// @Success     200            {object}  app.Response
+// @Failure     400            {object}  app.Response
+// @Failure     401            {object}  app.Response
+// @Failure     500            {object}  app.Response
+// @Router      /users/password [put]
 func (w *APIWorker) UpdatePassword(c *gin.Context) {
 	appG := app.Gin{c}
 	userID, _ := c.Get("userID")

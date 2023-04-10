@@ -110,7 +110,16 @@ export default function EditField({
                         )}
                     </FormGroup>
                 </div>
+                <Button
+                    // onClick={handleSave}
+                    size="medium"
+                    variant="outlined"
+                    sx={{ margin: "1rem 2rem" }}
+                    color="brand">
+                    {formT("syncDeviceSettings")}
+                </Button>
             </div>
+
             <DialogActions sx={{ margin: "1rem 1.5rem 1rem 0" }}>
                 <Button
                     onClick={() => { setOpenEdit(false) }}

@@ -1,15 +1,11 @@
 import {
     Button, Checkbox, DialogActions, Divider, FormGroup, FormControlLabel,
-    Switch, TextField
+    Switch
 } from "@mui/material"
 import { useTranslation } from "react-multi-lang"
-import { useEffect, useMemo, useState } from "react"
-import { ValidateNumPercent } from "../utils/utils"
+import { useEffect, useState } from "react"
 
 import DialogForm from "../components/DialogForm"
-import ExtraDeviceInfoForm from "../components/ExtraDeviceInfoForm"
-import SubDeviceForm from "../components/SubDeviceForm"
-
 import { ReactComponent as EditIcon } from "../assets/icons/edit.svg"
 
 const groups = [

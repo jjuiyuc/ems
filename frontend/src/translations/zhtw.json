@@ -258,6 +258,7 @@
         "powerCompany":"電力公司",
         "pv":"PV",
         "reservedForGridOutagePercent":"Reserved for Grid Outage Percent",
+        "syncDeviceSettings":"Sync Device Settings",
         "touType":"TOU Type",
         "twoSection":"兩段式",
         "voltageType":"電壓類型"

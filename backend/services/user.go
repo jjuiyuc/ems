@@ -18,6 +18,7 @@ type UserService interface {
 	PasswordResetByPasswordToken(token, newPassword string) (err error)
 	GetProfile(userID int64) (profile *ProfileResponse, err error)
 	UpdateName(userID int64, name string) (err error)
+	UpdatePassword(userID int64, currentPassword, newPassword string) (err error)
 }
 
 type defaultUserService struct {
@@ -277,6 +278,39 @@ func (s defaultUserService) UpdateName(userID int64, name string) (err error) {
 	}
 
 	user.Name = null.StringFrom(name)
+	if err = s.repo.User.UpdateUser(user); err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "s.repo.User.UpdateUser",
+			"err":       err,
+		}).Error()
+	}
+	return
+}
+
+func (s defaultUserService) UpdatePassword(userID int64, currentPassword, newPassword string) (err error) {
+	user, err := s.repo.User.GetUserByUserID(userID)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "s.repo.User.GetUserByUserID",
+			"err":       err,
+		}).Error()
+		return
+	}
+
+	if err = utils.ComparePassword(currentPassword, user.Password); err != nil {
+		return
+	}
+
+	hashPassword, err := utils.CreateHashedPassword(newPassword)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "s.createHashPassword",
+			"err":       err,
+		}).Error()
+		return
+	}
+	user.Password = hashPassword
+	user.PasswordLastChanged = null.TimeFrom(time.Now().UTC())
 	if err = s.repo.User.UpdateUser(user); err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "s.repo.User.UpdateUser",

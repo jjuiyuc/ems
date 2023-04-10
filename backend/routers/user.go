@@ -16,6 +16,12 @@ type PersonalName struct {
 	Name string `form:"name" binding:"required,max=20"`
 }
 
+// PersonalPassword godoc
+type PersonalPassword struct {
+	CurrentPassword string `form:"currentPassword" binding:"required,max=50"`
+	NewPassword     string `form:"newPassword" binding:"required,max=50"`
+}
+
 // PasswordLost godoc
 // @Summary     Send an email for reset the password
 // @Description get email by username
@@ -150,6 +156,23 @@ func (w *APIWorker) UpdateName(c *gin.Context) {
 	if err := w.Services.User.UpdateName(userID.(int64), json.Name); err != nil {
 		log.WithField("caused-by", "update name").Error()
 		appG.Response(http.StatusInternalServerError, e.ErrNameUpdate, err.Error())
+		return
+	}
+	appG.Response(http.StatusOK, e.Success, nil)
+}
+
+// UpdatePassword godoc
+func (w *APIWorker) UpdatePassword(c *gin.Context) {
+	appG := app.Gin{c}
+	userID, _ := c.Get("userID")
+	var json PersonalPassword
+	if err := c.BindJSON(&json); err != nil {
+		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
+		return
+	}
+	if err := w.Services.User.UpdatePassword(userID.(int64), json.CurrentPassword, json.NewPassword); err != nil {
+		log.WithField("caused-by", "update password").Error()
+		appG.Response(http.StatusInternalServerError, e.ErrPasswordUpdate, err.Error())
 		return
 	}
 	appG.Response(http.StatusOK, e.Success, nil)

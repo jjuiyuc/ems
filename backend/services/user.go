@@ -6,8 +6,8 @@ import (
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 	"github.com/volatiletech/null/v8"
-	"golang.org/x/crypto/bcrypt"
 
+	"der-ems/internal/utils"
 	deremsmodels "der-ems/models/der-ems"
 	"der-ems/repository"
 )
@@ -116,15 +116,11 @@ func (s defaultUserService) PasswordResetByPasswordToken(token, newPassword stri
 		return
 	}
 
-	hashPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	hashedPassword, err := utils.CreateHashedPassword(newPassword)
 	if err != nil {
-		log.WithFields(log.Fields{
-			"caused-by": "bcrypt.GenerateFromPassword",
-			"err":       err,
-		}).Error()
 		return
 	}
-	user.Password = string(hashPassword[:])
+	user.Password = hashedPassword
 	user.PasswordLastChanged = null.TimeFrom(time.Now().UTC())
 	user.ResetPWDToken = null.StringFrom("")
 	err = s.repo.User.UpdateUser(user)

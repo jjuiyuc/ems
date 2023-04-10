@@ -5,9 +5,9 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	"github.com/volatiletech/null/v8"
-	"golang.org/x/crypto/bcrypt"
 
 	"der-ems/internal/e"
+	"der-ems/internal/utils"
 	deremsmodels "der-ems/models/der-ems"
 	"der-ems/repository"
 )
@@ -66,15 +66,9 @@ func (s defaultAuthService) Login(username, password string) (user *deremsmodels
 
 	// Check password
 	nowPasswordRetryCount := user.PasswordRetryCount.Int
-	err = comparePassword(password, user.Password)
-	if err != nil {
+	if err = utils.ComparePassword(password, user.Password); err != nil {
 		errCode = e.ErrAuthPasswordNotMatch
-		log.WithFields(log.Fields{
-			"caused-by": "comparePassword",
-			"err":       err,
-		}).Error()
-
-		user.PasswordRetryCount = null.IntFrom(nowPasswordRetryCount+1)
+		user.PasswordRetryCount = null.IntFrom(nowPasswordRetryCount + 1)
 		if user.PasswordRetryCount.Int == passwordLockCount {
 			now := time.Now().UTC()
 			user.LockedAt = null.TimeFrom(now)
@@ -104,9 +98,4 @@ func (s defaultAuthService) CreateLoginLog(user *deremsmodels.User, token string
 		}).Error()
 	}
 	return
-}
-
-func comparePassword(rawPassword, hashedPassword string) error {
-	return bcrypt.CompareHashAndPassword(
-		[]byte(hashedPassword), []byte(rawPassword))
 }

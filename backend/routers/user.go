@@ -127,7 +127,7 @@ func (w *APIWorker) GetProfile(c *gin.Context) {
 	profile, err := w.Services.User.GetProfile(userID.(int64))
 	if err != nil {
 		log.WithField("caused-by", "get profile").Error()
-		appG.Response(http.StatusInternalServerError, e.ErrUserProfileGen, err.Error())
+		appG.Response(http.StatusInternalServerError, e.ErrUserProfileGen, nil)
 		return
 	}
 	appG.Response(http.StatusOK, e.Success, profile)
@@ -155,7 +155,7 @@ func (w *APIWorker) UpdateName(c *gin.Context) {
 	}
 	if err := w.Services.User.UpdateName(userID.(int64), json.Name); err != nil {
 		log.WithField("caused-by", "update name").Error()
-		appG.Response(http.StatusInternalServerError, e.ErrNameUpdate, err.Error())
+		appG.Response(http.StatusInternalServerError, e.ErrNameUpdate, nil)
 		return
 	}
 	appG.Response(http.StatusOK, e.Success, nil)
@@ -172,7 +172,7 @@ func (w *APIWorker) UpdatePassword(c *gin.Context) {
 	}
 	if err := w.Services.User.UpdatePassword(userID.(int64), json.CurrentPassword, json.NewPassword); err != nil {
 		log.WithField("caused-by", "update password").Error()
-		appG.Response(http.StatusInternalServerError, e.ErrPasswordUpdate, err.Error())
+		appG.Response(http.StatusInternalServerError, e.ErrPasswordUpdate, nil)
 		return
 	}
 	appG.Response(http.StatusOK, e.Success, nil)

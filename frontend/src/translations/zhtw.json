@@ -60,7 +60,8 @@
         "delete":"刪除",
         "demandCharge": "契約容量超約",
         "exportToGrid": "回送市電",
-        "gateway":"Gateway",
+        "fieldManagement":"場域管理",
+        "gatewayID":"Gateway ID",
         "grid": "市電",
         "group":"群組",
         "groupName":"群組名稱",
@@ -80,7 +81,9 @@
         "stateOfCharge": "電池電量",
         "thisMonth": "當月",
         "today": "今日",
-        "v":"V"
+        "v":"V",
+        "verify":"驗證",
+        "voltage": "電壓"
     },
     "dashboard": {
         "batteryDischarge": "由電池提供",
@@ -108,8 +111,11 @@
         "realizedSavings": "已避免超約費用"
     },
     "dialog": {
+        "addField":"新增場域",
         "confirmedMsg":"Are you sure you want to turn off all the charging resources?",
         "deleteMsg":"請問您是否要刪除這筆資料?",
+        "editFieldInfo":"編輯場域資訊",
+        "fieldInfo":"場域資訊",
         "promptMsg":"If all charging resources are turned off, the battery will be in standby mode."
     },
     "economics": {
@@ -211,6 +217,13 @@
         "timeOverlapError":"時間區間不能重疊。",
         "userLocked": "使用者帳號已被鎖定。"
     },
+    "fieldManagement":{
+        "deviceInformation":"Device Information",
+        "extraDeviceInfo":"Extra Device Information",
+        "fieldDevices":"場域裝置",
+        "locationInformation":"場域資訊",
+        "subdevice":"Subdevice"
+    },
     "forgotPassword": {
         "backToLogin": "回登入頁",
         "forgotPassword": "忘記密碼",
@@ -218,11 +231,36 @@
         "sentResetLink": "重設密碼連結已寄送至信箱「{email}」。請檢查信箱收件匣或是垃圾郵件匣。"
     },
     "form": {
+        "address":"地址",
+        "battery":"電池",
+        "chargingSource":"充電來源",
         "confirmPassword": "確認密碼",
+        "deviceInformation":"Device Information",
+        "deviceModel":"Device Model",
+        "deviceType":"裝置類型",
         "email": "Email",
+        "enableField":"Enable Field",
+        "energyCapacity":"Energy Capacity",
+        "highVoltage":"高電壓",
+        "hybridInverter":"Hybrid-Inverter",
         "language": "語言",
+        "lat":"經度",
+        "lng":"緯度",
+        "inverter":"Inverter",
+        "lowVoltage":"低電壓",
+        "meter":"Meter",
+        "modbusID":"Modbus ID",
         "newPassword": "新密碼",
-        "password": "密碼"
+        "password": "密碼",
+        "pcs":"PCS",
+        "powerCapacity":"Power Capacity",
+        "powerCompany":"電力公司",
+        "pv":"PV",
+        "reservedForGridOutagePercent":"Reserved for Grid Outage Percent",
+        "touType":"TOU Type",
+        "twoSection":"兩段式",
+        "voltageType":"電壓類型"
+
     },
     "info":{
         "pleaseNote":"溫馨提示："
@@ -238,6 +276,7 @@
         "demandCharge": "契約容量超約",
         "economics": "經濟收益",
         "energyResources": "分散式能源",
+        "fieldManagement":"場域管理",
         "settings": "設定",
         "timeOfUseEnergy": "時間電價"
     },

@@ -20,6 +20,7 @@ import Economics from "../pages/Economics"
 import EnergyResourcesBattery from "../pages/EnergyResourcesBattery"
 import EnergyResourcesGrid from "../pages/EnergyResourcesGrid"
 import EnergyResourcesSolar from "../pages/EnergyResourcesSolar"
+import FieldManagement from "../pages/FieldManagement"
 import TimeOfUse from "../pages/TimeOfUse"
 import Settings from "../pages/Settings"
 
@@ -68,6 +69,9 @@ function LoggedIn(props) {
                                 to="/energy-resources/solar" />}
                             path="/energy-resources" />
                         <Route element={<Account />} path="/account" />
+                        <Route
+                            element={<FieldManagement />}
+                            path="/field-management" />
                         <Route
                             element={<AccountManagementGroup />}
                             path="/account-management-group" />

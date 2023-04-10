@@ -60,7 +60,8 @@
         "demandCharge": "Demand Charge",
         "dischargingTo": "Discharging To",
         "exportToGrid": "Export to Grid",
-        "gateway":"Gateway",
+        "fieldManagement":"Field Management",
+        "gatewayID":"Gateway ID",
         "grid": "Grid",
         "group":"Group",
         "groupName":"Group Name",
@@ -80,7 +81,9 @@
         "stateOfCharge": "State of Charge",
         "thisMonth": "This Month",
         "today": "Today",
-        "v":"V"
+        "v":"V",
+        "verify":"Verify",
+        "voltage": "Voltage"
     },
     "dashboard": {
         "batteryDischarge": "Battery Discharge",
@@ -108,8 +111,11 @@
         "realizedSavings": "Realized Savings"
     },
     "dialog": {
+        "addField":"Add Field",
         "confirmedMsg":"Are you sure you want to turn off all the charging resources?",
         "deleteMsg":"Are you sure you want to delete this?",
+        "editFieldInfo":"Edit Field Info",
+        "fieldInfo":"Field Info",
         "promptMsg":"If all charging resources are turned off, the battery will be in standby mode."
     },
     "economics": {
@@ -210,6 +216,13 @@
         "timeOverlapError":"The time range cannot overlap.",
         "userLocked": "User is locked."
     },
+    "fieldManagement":{
+        "deviceInformation":"Device Information",
+        "extraDeviceInfo":"Extra Device Information",
+        "fieldDevices":"Field Devices",
+        "locationInformation":"Location Information",
+        "subdevice":"Subdevice"
+    },
     "forgotPassword": {
         "backToLogin": "Back to Login",
         "forgotPassword": "Forgot Password",
@@ -217,11 +230,35 @@
         "sentResetLink": "We've just sent password reset link to {email}. Please check your inbox and spam folders."
     },
     "form": {
+        "address":"Address",
+        "battery":"Battery",
+        "chargingSource":"Charging Source",
         "confirmPassword": "Confirm Password",
+        "deviceInformation":"Device Information",
+        "deviceModel":"Device Model",
+        "deviceType":"Device Type",
         "email": "Email",
+        "enableField":"Enable Field",
+        "energyCapacity":"Energy Capacity",
+        "highVoltage":"High Voltage",
+        "hybridInverter":"Hybrid-Inverter",
         "language": "Language",
+        "lat":"Lat",
+        "lng":"Lng",
+        "inverter":"Inverter",
+        "lowVoltage":"Low Voltage",
+        "meter":"Meter",
+        "modbusID":"Modbus ID",
         "newPassword": "New Password",
-        "password": "Password"
+        "password": "Password",
+        "pcs":"PCS",
+        "powerCapacity":"Power Capacity",
+        "powerCompany":"Power Company",
+        "pv":"PV",
+        "reservedForGridOutagePercent":"Reserved for Grid Outage Percent",
+        "touType":"TOU Type",
+        "twoSection":"Two-section",
+        "voltageType":"Voltage Type"
     },
     "info": {
         "pleaseNote":"Please Note:"
@@ -237,6 +274,7 @@
         "demandCharge": "Demand Charge",
         "economics": "Economics",
         "energyResources": "Energy Resources",
+        "fieldManagement":"Field Management",
         "settings": "Settings",
         "timeOfUseEnergy": "Time of Use Energy"
     },

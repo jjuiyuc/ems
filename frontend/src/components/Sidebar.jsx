@@ -37,7 +37,7 @@ function Sidebar(props) {
             { icon: <Economics />, path: "economics" },
             { icon: <Demand />, path: "demand-charge", text: "demandCharge" },
             { icon: <Resource />, path: "energy-resources", text: "energyResources" },
-            // { icon: <Field />, path: "field-management", text: "fieldManagement" },
+            { icon: <Field />, path: "field-management", text: "fieldManagement" },
             { icon: <AccountGroup />, path: "account-management-group", text: "accountManagementGroup" },
             { icon: <AccountUser />, path: "account-management-user", text: "accountManagementUser" },
             { icon: <Settings />, path: "settings" }

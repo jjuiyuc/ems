@@ -49,7 +49,7 @@ function TopNav(props) {
     const
         [menuAnchorEl, setMenuAnchorEl] = useState(null),
         [locationName, setLocationName] = useState(""),
-        [gateway, setGateway] = useState("")
+        [gatewayID, setGatewayID] = useState("")
 
     const
         closeMenu = () => setMenuAnchorEl(null),
@@ -113,15 +113,15 @@ function TopNav(props) {
                 <FormControl sx={{ m: 1, minWidth: 300 }}>
                     <Select
                         id="location-name"
-                        label={commonT("gateway")}
-                        value={gateway}
+                        label={commonT("gatewayID")}
+                        value={gatewayID}
                         size="small"
                         onChange={gatewayHandleChange}
                         input={<OutlinedInput />}
                         inputProps={{ "aria-label": "Without label" }}
                         displayEmpty >
                         <MenuItem disabled value="">
-                            <em>{commonT("gateway")}</em>
+                            <em>{commonT("gatewayID")}</em>
                         </MenuItem>
                         {gatewayData.map((option) => (
                             <MenuItem key={option.value} value={option.value}>

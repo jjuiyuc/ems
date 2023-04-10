@@ -1,6 +1,4 @@
-import {
-    Button, Divider, InputAdornment, ListItem, MenuItem, Select, TextField
-} from "@mui/material"
+import { Button, Divider, MenuItem, TextField } from "@mui/material"
 import { useTranslation } from "react-multi-lang"
 import { useEffect, useMemo, useState } from "react"
 import { validateNumTwoDecimalPlaces } from "../utils/utils"
@@ -98,7 +96,7 @@ export default function SubDeviceForm(props) {
                             type="number"
                             label={formT("powerCapacity")}
                             onChange={inputPowerCapacity}
-                        // value={subPowerCapacity}
+                        // value={}
                         />
                         <Divider key={"line-" + i} variant="middle" sx={{ margin: "1rem 0 2.5rem" }} />
                     </>
@@ -118,7 +116,7 @@ export default function SubDeviceForm(props) {
                     defaultValue="">
                     {subDeviceData[1].deviceModel.map((option, i) => (
                         <MenuItem
-                            key={"option-d-m-" + i}
+                            key={"option-sub-d-m-" + i}
                             value={option.value}>
                             {option.label}
                         </MenuItem>
@@ -130,7 +128,7 @@ export default function SubDeviceForm(props) {
                     type="number"
                     label={formT("powerCapacity")}
                     onChange={inputPowerCapacity}
-                // value={subPowerCapacity}
+                // value={}
                 />
             </>
             : null}

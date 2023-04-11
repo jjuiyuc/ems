@@ -1,7 +1,3 @@
-import {
-    Button, DialogActions, Divider, FormControl, ListItem,
-    MenuItem, TextField
-} from "@mui/material"
 import { useTranslation } from "react-multi-lang"
 import { useEffect, useState } from "react"
 
@@ -14,8 +10,6 @@ export default function FieldManagement() {
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
-        dialogT = (string) => t("dialog." + string),
-        formT = (string) => t("form." + string),
         pageT = (string, params) => t("fieldManagement." + string, params)
     const
         [data, setData] = useState([

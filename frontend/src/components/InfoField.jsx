@@ -1,7 +1,4 @@
-import {
-    Button, Chip, DialogActions, Divider, FormControl, InputAdornment,
-    Switch, TextField
-} from "@mui/material"
+import { Button, Chip, DialogActions, Divider, Switch, TextField } from "@mui/material"
 import { useTranslation } from "react-multi-lang"
 import { useEffect, useMemo, useState } from "react"
 import { ValidateNumPercent } from "../utils/utils"
@@ -12,90 +9,12 @@ import ExtraDeviceInfoForm from "../components/ExtraDeviceInfoForm"
 import { ReactComponent as NoticeIcon } from "../assets/icons/notice.svg"
 
 export default function InfoField({
-    dialogTitle = "",
     row,
     locationInfo,
     fieldDevices,
     deviceInfo,
-    extraDeviceInfo,
-    subdevice
+    extraDeviceInfo
 }) {
-
-    const
-        deviceTypes = [
-            {
-                value: "hybridInverter",
-                label: "hybridInverter",
-            },
-            {
-                value: "inverter",
-                label: "inverter",
-            },
-            {
-                value: "meter",
-                label: "meter",
-            },
-            {
-                value: "pv",
-                label: "pv",
-            },
-            {
-                value: "battery",
-                label: "battery",
-            },
-            {
-                value: "pcs",
-                label: "pcs",
-            }
-        ],
-
-        deviceModel = [
-            {
-                value: "LXP-12K US-Luxpower Hybrid-Inverter",
-                label: "LXP-12K US-Luxpower Hybrid-Inverter"
-            }
-        ],
-        subDeviceData = [
-            {
-                deviceType: "meter",
-                deviceModel: [
-                    {
-                        value: "CMO336 CM Meter",
-                        label: "CMO336 CM Meter"
-                    },
-                    {
-                        value: "CMO337 CM Meter",
-                        label: "CMO337 CM Meter"
-                    }
-                ],
-            },
-            {
-                deviceType: "pv",
-                deviceModel: [
-                    {
-                        value: "D1K330H3A URE PV",
-                        label: "D1K330H3A URE PV"
-                    },
-                    {
-                        value: "D1K330H4B URE PV",
-                        label: "D1K330H4B URE PV"
-                    }
-                ],
-            },
-            {
-                deviceType: "battery",
-                deviceModel: [
-                    {
-                        value: "L051100-A UZ-Energy Battery",
-                        label: "L051100-A UZ-Energy Battery"
-                    },
-                    {
-                        value: "L051101-B UZ-Energy Battery",
-                        label: "L051101-B UZ-Energy Battery"
-                    }
-                ]
-            }
-        ]
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
@@ -128,8 +47,6 @@ export default function InfoField({
         [fullWidth, setFullWidth] = useState(true),
         [maxWidth, setMaxWidth] = useState("md")
 
-    // const { AreaOwner_TW, AreaMaintainer, Serenegray } = groupState
-
     const
         inputPercent = (e) => {
             const num = e.target.value
@@ -154,7 +71,7 @@ export default function InfoField({
             <div className="flex flex-col m-auto mt-4 min-w-49 w-fit">
                 <TextField
                     sx={{ marginBottom: 2 }}
-                    key="gatewayID"
+                    key="gateway-id"
                     label={commonT("gatewayID")}
                     value={row?.gatewayID || ""}
                     focused
@@ -194,19 +111,19 @@ export default function InfoField({
                     />
                 </div>
                 <TextField
-                    key="powerCompany"
+                    key="power-company"
                     label={formT("powerCompany")}
                     value={row?.powerCompany || ""}
                     disabled={true}
                 />
                 <TextField
-                    key="voltageType"
+                    key="v-t"
                     label={formT("voltageType")}
                     value={formT(row?.voltageType) || ""}
                     disabled={true}
                 />
                 <TextField
-                    key="touType"
+                    key="tou-t"
                     label={formT("touType")}
                     value={formT(row?.touType) || ""}
                     disabled={true}
@@ -214,13 +131,13 @@ export default function InfoField({
                 <Divider variant="middle" />
                 <h5 className="mb-4 mt-4 ml-2">{fieldDevices}</h5>
                 <TextField
-                    key="deviceType"
+                    key="d-t"
                     label={formT("deviceType")}
                     value={formT(row?.deviceType) || ""}
                     disabled={true}
                 />
                 <TextField
-                    key="deviceModel"
+                    key="d-m"
                     label={formT("deviceModel")}
                     value={row?.deviceModel || ""}
                     disabled={true}
@@ -228,20 +145,20 @@ export default function InfoField({
                 <Divider variant="middle" />
                 <h5 className="mb-4 mt-4 ml-2">{deviceInfo}</h5>
                 <TextField
-                    key="modbusID"
+                    key="m-id"
                     type="number"
                     label={formT("modbusID")}
                     value={row?.modbusID || ""}
                     disabled={true}
                 />
                 <TextField
-                    key="UUEID"
+                    key="uueid"
                     label="UUEID"
                     value={row?.UUEID || ""}
                     disabled={true}
                 />
                 <TextField
-                    key="powerCapacity"
+                    key="power-capacity"
                     type="number"
                     label={formT("powerCapacity")}
                     value={row?.powerCapacity || ""}
@@ -250,6 +167,7 @@ export default function InfoField({
                 <Divider variant="middle" sx={{ margin: "0 0 2rem" }} />
                 {row?.deviceType === "battery"
                     ? <ExtraDeviceInfoForm
+                        key={"b-e-d-i"}
                         subTitle={extraDeviceInfo}
                         gridOutagePercent={gridOutagePercent}
                         setGridOutagePercent={setGridOutagePercent}
@@ -266,13 +184,13 @@ export default function InfoField({
                         {row?.subDevice.map((item, i) => (
                             <>
                                 <TextField
-                                    key={"sub-d-t-" + i}
+                                    key={"h-sub-d-t-" + i}
                                     label={formT("deviceType")}
                                     value={formT(`${item.deviceType}`)}
                                     disabled={true}
                                 />
                                 <TextField
-                                    key={"sub-d-m-" + i}
+                                    key={"h-sub-d-m-" + i}
                                     label={formT("deviceModel")}
                                     value={item.deviceModel || ""}
                                     disabled={true}
@@ -280,15 +198,16 @@ export default function InfoField({
 
                                 <h5 className="mb-5 ml-2">{formT("deviceInformation")}</h5>
                                 <TextField
-                                    key={"p-c-" + i}
+                                    key={"h-p-c-" + i}
                                     type="number"
                                     label={formT("powerCapacity")}
                                     value={item.powerCapacity || ""}
                                 />
-                                <Divider key={"line-" + i} variant="middle" sx={{ margin: "1rem 0 2.5rem" }} />
+                                <Divider key={"h-line-" + i} variant="middle" sx={{ margin: "1rem 0 2.5rem" }} />
                             </>
                         ))}
                         <ExtraDeviceInfoForm
+                            key={"h-e-d-i"}
                             subTitle={extraDeviceInfo}
                             gridOutagePercent={gridOutagePercent}
                             setGridOutagePercent={setGridOutagePercent}
@@ -317,7 +236,7 @@ export default function InfoField({
                         />
                         <h5 className="mb-5 ml-2">{formT("deviceInformation")}</h5>
                         <TextField
-                            key={"i-p-c-"}
+                            key={"d-i-p-c-"}
                             type="number"
                             label={formT("powerCapacity")}
                             value={row?.subDevice[1].powerCapacity || ""}

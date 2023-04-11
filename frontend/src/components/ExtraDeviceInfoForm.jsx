@@ -1,6 +1,4 @@
-import {
-    Button, Divider, InputAdornment, ListItem, MenuItem, Select, TextField
-} from "@mui/material"
+import { Divider, InputAdornment, MenuItem, TextField } from "@mui/material"
 import { useTranslation } from "react-multi-lang"
 import { useEffect, useMemo, useState } from "react"
 import { ValidateNumPercent } from "../utils/utils"
@@ -27,10 +25,9 @@ export default function ExtraDeviceInfoForm(props) {
             setGridOutagePercent(num)
         }
     return <>
-
         <h5 className="mb-5 ml-2">{subTitle}</h5>
         <TextField
-            id="reservedForGridOutagePercent"
+            key="r-g-o-p"
             label={formT("reservedForGridOutagePercent")}
             value={gridOutagePercent}
             onChange={inputPercent}
@@ -40,7 +37,7 @@ export default function ExtraDeviceInfoForm(props) {
             }}
         />
         <TextField
-            id="chargingSource"
+            key="charging-source"
             select
             label={formT("chargingSource")}
             defaultValue=""
@@ -52,13 +49,13 @@ export default function ExtraDeviceInfoForm(props) {
             ))}
         </TextField>
         <TextField
-            id="energyCapacity"
+            key="energy-capacity"
             type="number"
             label={formT("energyCapacity")}
         // value={energyCapacity}
         />
         <TextField
-            id="voltage"
+            key="voltage"
             type="number"
             label={commonT("voltage")}
         // value={voltage}

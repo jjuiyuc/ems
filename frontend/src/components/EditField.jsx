@@ -97,8 +97,9 @@ export default function EditField({
                 <div className="border-gray-400 border rounded-xl
                     grid grid-cols-2 gap-2 items-center mb-4 p-4">
                     <FormGroup>
-                        {groups.map((option) =>
+                        {groups.map((option, i) =>
                             <FormControlLabel
+                                key={"option-g-" + i}
                                 control={
                                     <Checkbox
                                         checked={checked[option.value]}
@@ -119,7 +120,6 @@ export default function EditField({
                     {formT("syncDeviceSettings")}
                 </Button>
             </div>
-
             <DialogActions sx={{ margin: "1rem 1.5rem 1rem 0" }}>
                 <Button
                     onClick={() => { setOpenEdit(false) }}

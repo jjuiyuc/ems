@@ -16,7 +16,33 @@ import { ReactComponent as Logo } from "../assets/images/logo.svg"
 import { ReactComponent as LogoWithName } from "../assets/images/logoWithName.svg"
 import { ReactComponent as Resource } from "../assets/icons/resource.svg"
 import { ReactComponent as Settings } from "../assets/icons/settings.svg"
+import { ReactComponent as AdvancedSettings } from "../assets/icons/settings.svg"
 import { ReactComponent as Timer } from "../assets/icons/timer.svg"
+
+const navs = {
+    dashboard:
+        { icon: <Dashboard />, path: "dashboard" },
+    analysis:
+        { icon: <Analysis />, path: "analysis" },
+    timeOfUseEnergy:
+        { icon: <Timer />, path: "time-of-use", text: "timeOfUseEnergy" },
+    economics:
+        { icon: <Economics />, path: "economics" },
+    demandCharge:
+        { icon: <Demand />, path: "demand-charge", text: "demandCharge" },
+    energyResources:
+        { icon: <Resource />, path: "energy-resources", text: "energyResources" },
+    fieldManagement:
+        { icon: <Field />, path: "field-management", text: "fieldManagement" },
+    accountManagementGroup:
+        { icon: <AccountGroup />, path: "account-management-group", text: "accountManagementGroup" },
+    accountManagementUser:
+        { icon: <AccountUser />, path: "account-management-user", text: "accountManagementUser" },
+    settings:
+        { icon: <Settings />, path: "settings", text: "settings" },
+    advancedSettings:
+        { icon: <AdvancedSettings />, path: "advanced-settings", text: "advancedSettings" }
+}
 
 function Sidebar(props) {
     const toggle = () =>
@@ -30,18 +56,6 @@ function Sidebar(props) {
 
     const MenuIcon = isExpanded ? Menu : Logo
     const
-        navs = [
-            { icon: <Dashboard />, path: "dashboard" },
-            { icon: <Analysis />, path: "analysis" },
-            { icon: <Timer />, path: "time-of-use", text: "timeOfUseEnergy" },
-            { icon: <Economics />, path: "economics" },
-            { icon: <Demand />, path: "demand-charge", text: "demandCharge" },
-            { icon: <Resource />, path: "energy-resources", text: "energyResources" },
-            { icon: <Field />, path: "field-management", text: "fieldManagement" },
-            { icon: <AccountGroup />, path: "account-management-group", text: "accountManagementGroup" },
-            { icon: <AccountUser />, path: "account-management-user", text: "accountManagementUser" },
-            { icon: <Settings />, path: "settings" }
-        ],
         t = useTranslation(),
         navT = string => t("navigator." + string),
         navLink = ({ icon, path, text }, index) => {
@@ -64,7 +78,8 @@ function Sidebar(props) {
                 </NavLink>
             </li>
         },
-        navList = navs.map((item, i) => navLink(item, i))
+        authNavList = props.webpages
+            .map((authPage, i) => navLink(navs[authPage.name], i))
 
     return <aside className="h-full overflow-x-hidden">
         <div className="w-60">
@@ -77,12 +92,15 @@ function Sidebar(props) {
                     <LogoWithName className="logo" />
                 </Link>
             </div>
-            <ul className="mt-6 sidebar-menu">{navList}</ul>
+            <ul className="mt-6 sidebar-menu">{authNavList}</ul>
         </div>
     </aside>
 }
 const
-    mapState = state => ({ status: state.sidebarStatus.value }),
+    mapState = state => ({
+        status: state.sidebarStatus.value,
+        webpages: (state.user.group.webpages || [])
+    }),
     mapDispatch = dispatch => ({
         updateSidebarStatus: value => dispatch({
             type: "sidebarStatus/updateSidebarStatus", payload: value

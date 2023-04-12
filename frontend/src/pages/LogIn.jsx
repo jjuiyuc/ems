@@ -69,23 +69,22 @@ function LogIn(props) {
 
             const token = loginStatus.data.token
 
-            props.updateUser({token, username: email})
+            props.updateUser({ token, username: email })
 
-            const userProfile = await apiCall({url: "/api/users/profile"})
+            const userProfile = await apiCall({ url: "/api/users/profile" })
 
             if (!userProfile) return
 
             const
-                {gateways, id, name} = userProfile.data,
+                { gateways, group, id, name, username } = userProfile.data,
                 // Tokens will expire in 3 hours
                 tokenExpiryTime = new Date().getTime() + 1000 * 60 * 60 * 3
-
+            console.log(group)
             if (gateways && gateways.length > 0) {
                 props.setGateway(gateways[0])
                 props.setGatewayList(gateways)
             }
-
-            props.updateUserProfile({id, name, tokenExpiryTime})
+            props.updateUserProfile({ group, id, name, username, tokenExpiryTime })
         }
     return (
         <div>
@@ -112,11 +111,11 @@ function LogIn(props) {
                     variant="outlined"
                     value={password}
                 />
-            {otherError
-                ? <div className="box mb-8 negative text-center text-red-400">
-                    {otherError}
-                </div>
-                : null}
+                {otherError
+                    ? <div className="box mb-8 negative text-center text-red-400">
+                        {otherError}
+                    </div>
+                    : null}
                 <Button
                     color="primary"
                     disabled={!email || !password}
@@ -135,7 +134,7 @@ function LogIn(props) {
 }
 
 const mapDispatch = dispatch => {
-    const updateStore = (payload, type) => dispatch({payload, type})
+    const updateStore = (payload, type) => dispatch({ payload, type })
 
     return ({
         setGateway: v => updateStore(v, "gateways/changeGateway"),

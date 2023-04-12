@@ -22,7 +22,82 @@ import EnergyResourcesGrid from "../pages/EnergyResourcesGrid"
 import EnergyResourcesSolar from "../pages/EnergyResourcesSolar"
 import FieldManagement from "../pages/FieldManagement"
 import TimeOfUse from "../pages/TimeOfUse"
+import AdvancedSettings from "../pages/AdvancedSettings"
 import Settings from "../pages/Settings"
+
+const routes = {
+    dashboard: [
+        <Route element={<Dashboard />} path="/dashboard" key="dashboard" />,
+    ],
+    analysis: [
+        <Route element={<Analysis />} path="/analysis" key="analysis" />
+    ],
+    timeOfUseEnergy: [
+        <Route element={<TimeOfUse />} path="/time-of-use" key="timeOfUseEnergy" />
+    ],
+    economics: [
+        <Route element={<Economics />} path="/economics" key="economics" />
+    ],
+    demandCharge: [
+        <Route element={<DemandCharge />} path="/demand-charge" key="demandCharge" />
+    ],
+    energyResources: [
+        <Route
+            element={<EnergyResourcesGrid />}
+            path="/energy-resources/grid"
+            key="energyResourcesGrid"
+        />,
+        <Route
+            element={<EnergyResourcesBattery />}
+            path="/energy-resources/battery"
+            key="energyResourcesBattery"
+        />,
+        <Route
+            element={<EnergyResourcesSolar />}
+            path="/energy-resources/solar"
+            key="energyResourcesSolar"
+        />,
+        <Route
+            element={
+                <Navigate
+                    to="/energy-resources/solar"
+                    replace />}
+            path="/energy-resources"
+            key="energyResources"
+        />
+    ],
+    fieldManagement: [
+        <Route
+
+            element={<FieldManagement />}
+            path="/field-management"
+            key="fieldManagement" />
+    ],
+    accountManagementGroup: [
+        <Route
+            element={<AccountManagementGroup />}
+            path="/account-management-group"
+            key="accountManagementGroup" />
+    ],
+    accountManagementUser: [
+        <Route
+            element={<AccountManagementUser />}
+            path="/account-management-user"
+            key="accountManagementUser" />
+    ],
+    settings: [
+        <Route
+            element={<Settings />}
+            path="/settings"
+            key="settings" />
+    ],
+    advancedSettings: [
+        <Route
+            element={<AdvancedSettings />}
+            path="/advanced-settings"
+            key="advancedSettings" />
+    ]
+}
 
 function LoggedIn(props) {
     const
@@ -36,6 +111,10 @@ function LoggedIn(props) {
         if (new Date().getTime() > props.tokenExpiryTime) logout()
     })
 
+    const authPages = props.webpages
+        .map((authPage) => routes[authPage.name])
+        .flat()
+
     return <div className="grid grid-rows-1fr-auto min-h-screen">
         <div className="align-items-stretch flex">
             <div className={"duration-300 transition-width " + sidebarW}>
@@ -46,42 +125,11 @@ function LoggedIn(props) {
                 <div className={"bg-gray-700 min-w-0 shadow-main z-0 "
                     + "pl-10 pr-8 py-8 lg:pl-25 lg:pr-20 lg:py-20"}>
                     <Routes>
-                        <Route element={<Dashboard />} path="/dashboard" />
-                        <Route element={<Analysis />} path="/analysis" />
-                        <Route element={<TimeOfUse />} path="/time-of-use" />
-                        {/* <Route element={<EconomicsOrigin />} path="/economics" /> */}
-                        <Route element={<Economics />} path="/economics" />
-                        <Route
-                            element={<DemandCharge />}
-                            path="/demand-charge" />
-                        <Route
-                            element={<EnergyResourcesGrid />}
-                            path="/energy-resources/grid" />
-                        <Route
-                            element={<EnergyResourcesBattery />}
-                            path="/energy-resources/battery" />
-                        <Route
-                            element={<EnergyResourcesSolar />}
-                            path="/energy-resources/solar" />
-                        <Route
-                            element={<Navigate
-                                replace
-                                to="/energy-resources/solar" />}
-                            path="/energy-resources" />
                         <Route element={<Account />} path="/account" />
-                        <Route
-                            element={<FieldManagement />}
-                            path="/field-management" />
-                        <Route
-                            element={<AccountManagementGroup />}
-                            path="/account-management-group" />
-                        <Route
-                            element={<AccountManagementUser />}
-                            path="/account-management-user" />
-                        <Route element={<Settings />} path="/settings" />
-                        <Route
-                            element={<Navigate to="/dashboard" replace />}
-                            path="*" />
+                        {authPages}
+                        {authPages && <Route
+                            element={<Navigate to={authPages[0].props.path} replace />}
+                            path="*" />}
                     </Routes>
                 </div>
             </div>
@@ -99,7 +147,8 @@ function LoggedIn(props) {
 
 const mapState = state => ({
     sidebarStatus: state.sidebarStatus.value,
-    tokenExpiryTime: state.user.tokenExpiryTime
+    tokenExpiryTime: state.user.tokenExpiryTime,
+    webpages: (state.user.group.webpages || [])
 })
 
 export default connect(mapState)(LoggedIn)

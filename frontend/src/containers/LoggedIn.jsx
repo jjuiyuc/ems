@@ -148,7 +148,7 @@ function LoggedIn(props) {
 const mapState = state => ({
     sidebarStatus: state.sidebarStatus.value,
     tokenExpiryTime: state.user.tokenExpiryTime,
-    webpages: (state.user.group.webpages || [])
+    webpages: (state?.user?.webpages) || []
 })
 
 export default connect(mapState)(LoggedIn)

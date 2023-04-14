@@ -20,6 +20,7 @@ function LogIn(props) {
         [email, setEmail] = useState(""),
         [emailError, setEmailError] = useState(null),
         [otherError, setOtherError] = useState(""),
+        [profileError, setProfileError] = useState(""),
         [password, setPassword] = useState(""),
         [passwordError, setPasswordError] = useState(false)
 
@@ -57,7 +58,7 @@ function LogIn(props) {
                 }
             }
 
-            const data = { username: email, password };
+            const data = { username: email, password }
             const loginStatus = await apiCall({
                 url: "/api/auth",
                 method: "post",
@@ -71,20 +72,28 @@ function LogIn(props) {
 
             props.updateUser({ token, username: email })
 
-            const userProfile = await apiCall({ url: "/api/users/profile" })
 
+            const profileOnError = (err) => {
+                setProfileError(err)
+            }
+            const userProfile = await apiCall({
+                url: "/api/users/profile",
+                profileOnError
+            })
             if (!userProfile) return
-
             const
                 { gateways, group, id, name, username } = userProfile.data,
-                // Tokens will expire in 3 hours
-                tokenExpiryTime = new Date().getTime() + 1000 * 60 * 60 * 3
-            console.log(group)
+                webpages = group.webpages.filter(webpage => webpage?.permissions?.read)
+
+            // Tokens will expire in 3 hours
+            const tokenExpiryTime = new Date().getTime() + 1000 * 60 * 60 * 3
+
             if (gateways && gateways.length > 0) {
                 props.setGateway(gateways[0])
                 props.setGatewayList(gateways)
             }
-            props.updateUserProfile({ group, id, name, username, tokenExpiryTime })
+            props.updateUserProfile({ group, id, name, username, tokenExpiryTime, webpages })
+
         }
     return (
         <div>
@@ -114,6 +123,11 @@ function LogIn(props) {
                 {otherError
                     ? <div className="box mb-8 negative text-center text-red-400">
                         {otherError}
+                    </div>
+                    : null}
+                {profileError
+                    ? <div className="box mb-8 negative text-center text-red-400">
+                        {profileError ? errorT("userProfileError") : ""}
                     </div>
                     : null}
                 <Button

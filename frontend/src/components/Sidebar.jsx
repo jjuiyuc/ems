@@ -99,7 +99,7 @@ function Sidebar(props) {
 const
     mapState = state => ({
         status: state.sidebarStatus.value,
-        webpages: (state.user.group.webpages || [])
+        webpages: (state.user.webpages || [])
     }),
     mapDispatch = dispatch => ({
         updateSidebarStatus: value => dispatch({

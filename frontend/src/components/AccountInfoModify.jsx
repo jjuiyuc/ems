@@ -1,81 +1,104 @@
 import { connect } from "react-redux"
-import { Button, Divider, OutlinedInput } from "@mui/material"
+import { Button, Divider, Snackbar, TextField } from "@mui/material"
+import CheckCircleIcon from "@mui/icons-material/CheckCircle"
+import CloseIcon from "@mui/icons-material/Close"
 import { useTranslation } from "react-multi-lang"
 import { useEffect, useState } from "react"
-import { Link, useSearchParams } from "react-router-dom"
 
 import { apiCall } from "../utils/api"
-import { PropaneSharp } from "@mui/icons-material"
+
+import FinishedBox from "../components/FinishedBox"
 
 const mapState = state => ({
-
     name: state.user.name,
     username: state.user.username
 })
-export default connect(mapState)(function AccountInfoModify(props) {
+const mapDispatch = dispatch => ({
+    updateSnackbarMsg: value =>
+        dispatch({ type: "snackbarMsg/updateSnackbarMsg", payload: value }),
+    updateUserProfile: value =>
+        dispatch({ type: "user/updateUserProfile", payload: value })
+
+})
+
+export default connect(mapState, mapDispatch)(function AccountInfoModify(props) {
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
-        formT = (string) => t("form." + string),
+        dialogT = string => t("dialog." + string),
+        errorT = string => t("error." + string),
         pageT = (string, params) => t("account." + string, params)
 
     const
         [account, setAccount] = useState(props.username),
-        [accountError, setAccountError] = useState(null),
         [name, setName] = useState(props.name),
-        [nameError, setNameError] = useState(null),
-        [loading, setLoading] = useState(false)
+        [newName, setNewName] = useState(""),
+        // [nameError, setNameError] = useState(false),
+        [loading, setLoading] = useState(false),
+        [isReset, setIsReset] = useState(false)
 
     const
         changeName = (e) => {
             setName(e.target.value)
-            setNameError(null)
         },
         submit = () => {
+            const data = { name: name }
+
             apiCall({
-                data: { name: name },
                 method: "put",
-                onSuccess: () => console.log("ok"),
-                url: "/users/name"
+                data,
+                onSuccess: () => {
+                    setIsReset(true)
+                    props.updateUserProfile(data)
+                    props.updateSnackbarMsg({
+                        type: "success",
+                        msg: dialogT("modifyNameMsg")
+                    })
+                },
+                onError: () => {
+                    props.updateSnackbarMsg({
+                        type: "error",
+                        msg: errorT("failureToSave")
+                    })
+                },
+                url: "/api/users/name"
             })
         }
-
-
+    const nameError = name.length == 0 || name.length > 20
     return <>
         <div className="card w-fit">
             <h4 className="mb-6">
-                {pageT("accountInformationModification")}
+                {pageT("ModifyAccountInformation")}
             </h4>
             <Divider variant="fullWidth" sx={{ marginBottom: "1.5rem" }} />
-            <form className="grid grid-cols-1fr-auto gap-x-5 gap-y-6">
-                <label>{commonT("account")}</label>
-                <span className="pl-1">{account}</span>
-                <label className="pt-2">{pageT("name")}</label>
-                <OutlinedInput
-                    id="edit-name"
-                    size="small"
+            <form className="grid ">
+                <TextField
+                    label={commonT("account")}
+                    defaultValue={account}
+                    variant="outlined"
+                    required
+                    disabled
+                />
+                <TextField
+                    error={nameError}
+                    label={pageT("name")}
                     value={name || ""}
                     onChange={changeName}
+                    helperText={nameError ? errorT("nameLength") : ""}
+                    required
+                    variant="outlined"
                 />
             </form>
-            <Divider variant="fullWidth" sx={{ marginTop: "1.5rem" }} />
+            <Divider variant="fullWidth" sx={{ marginTop: "0.5rem" }} />
             <div className="flex flex-row-reverse mt-6">
                 <Button
                     sx={{ marginLeft: "0.5rem" }}
-                    onClick={
-                        submit
-                    }
+                    onClick={submit}
+                    disabled={name.length == 0}
                     radius="pill"
                     variant="contained"
                     color="primary">
                     {commonT("save")}
-                </Button>
-                <Button
-                    // onClick={}
-                    variant="outlined"
-                    radius="pill"
-                    color="gray">
-                    {commonT("cancel")}
                 </Button>
             </div>
         </div>

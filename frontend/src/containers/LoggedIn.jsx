@@ -1,7 +1,8 @@
 import { connect } from "react-redux"
 import { Navigate, Route, Routes, useLocation } from "react-router-dom"
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import { useTranslation } from "react-multi-lang"
+import { Snackbar, Alert } from "@mui/material"
 
 import logout from "../utils/logout"
 
@@ -107,6 +108,11 @@ function LoggedIn(props) {
         sidebarW = sidebarStatus === "expand" ? "w-60" : "w-20",
         t = useTranslation()
 
+    // const [open, setOpen] = useState(true)
+    // const handleClose = () => {
+
+    //     setOpen(false)
+    // }
     useEffect(() => {
         if (new Date().getTime() > props.tokenExpiryTime) logout()
     })
@@ -134,6 +140,19 @@ function LoggedIn(props) {
                 </div>
             </div>
         </div>
+        <Snackbar
+            open={props.snackbarMsg.msg != ""}
+            autoHideDuration={3000}
+            // onClose={handleClose}
+            anchorOrigin={{ vertical: "top", horizontal: "center" }}
+            sx={{ width: "500px" }}
+        >
+            <Alert
+                severity={props.snackbarMsg.type}
+                sx={{ width: "100%", fontSize: "16px" }}>
+                {props.snackbarMsg.msg}
+            </Alert>
+        </Snackbar>
         <footer className="bg-gray-800 flex items-center justify-between
                             text-center text-gray-300 text-sm
                             h-14 md:h-20 px-10 md:px-20">
@@ -145,10 +164,16 @@ function LoggedIn(props) {
     </div>
 }
 
-const mapState = state => ({
-    sidebarStatus: state.sidebarStatus.value,
-    tokenExpiryTime: state.user.tokenExpiryTime,
-    webpages: (state?.user?.webpages) || []
-})
+const
+    mapState = state => ({
+        sidebarStatus: state.sidebarStatus.value,
+        snackbarMsg: state.snackbarMsg,
+        tokenExpiryTime: state.user.tokenExpiryTime,
+        webpages: (state?.user?.webpages) || []
+    }),
+    mapDispatch = dispatch => ({
+        updateSnackbarMsg: value =>
+            dispatch({ type: "snackbarMsg/updateSnackbarMsg", payload: value })
+    })
 
-export default connect(mapState)(LoggedIn)
+export default connect(mapState, mapDispatch)(LoggedIn)

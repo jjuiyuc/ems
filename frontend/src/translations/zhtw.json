@@ -1,6 +1,6 @@
 {
     "account":{
-        "accountInformationModification":"帳號資料修改",
+        "ModifyAccountInformation":"個人帳號資料修改",
         "changePassword":"修改密碼",
         "currentPassword":"現在的密碼",
         "name":"名稱",
@@ -117,6 +117,7 @@
         "deleteMsg":"請問您是否要刪除這筆資料?",
         "editFieldInfo":"編輯場域資訊",
         "fieldInfo":"場域資訊",
+        "modifyNameMsg":"成功更改名字",
         "promptMsg":"If all charging resources are turned off, the battery will be in standby mode."
     },
     "economics": {
@@ -209,6 +210,8 @@
     "error": {
         "emailFormat": "Email 帳號格式錯誤，請重新輸入。",
         "emailNotExist": "帳號不存在，請重新輸入。",
+        "failureToSave":"儲存失敗！",
+        "nameLength":"請輸入介於1到20個字",
         "passwordFormat": "您輸入的密碼不符合密碼原則的要求，請重新輸入。",
         "passwordIncorrect": "密碼錯誤，請重新輸入。",
         "passwordNotMatch": "密碼不一致，請重新輸入。",
@@ -216,7 +219,8 @@
         "pricingError":"價格須大於0",
         "sumError":"時間區間加總須為二十四小時。",
         "timeOverlapError":"時間區間不能重疊。",
-        "userLocked": "使用者帳號已被鎖定。"
+        "userLocked": "使用者帳號已被鎖定。",
+        "userProfileError":"載入使用者資料失敗。"
     },
     "fieldManagement":{
         "deviceInformation":"Device Information",
@@ -273,6 +277,7 @@
     "navigator": {
         "accountManagementGroup":"帳號管理（群組）",
         "accountManagementUser":"帳號管理（使用者）",
+        "advancedSettings":"Advanced Settings",
         "analysis": "電力分析",
         "dashboard": "儀表板",
         "demandCharge": "契約容量超約",

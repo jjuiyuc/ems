@@ -27,6 +27,7 @@ type GroupGatewayRightLog struct {
 	GroupGatewayRightID        null.Int64 `boil:"group_gateway_right_id" json:"groupGatewayRightID,omitempty" toml:"groupGatewayRightID" yaml:"groupGatewayRightID,omitempty"`
 	GroupID                    null.Int64 `boil:"group_id" json:"groupID,omitempty" toml:"groupID" yaml:"groupID,omitempty"`
 	GWID                       null.Int64 `boil:"gw_id" json:"gwID,omitempty" toml:"gwID" yaml:"gwID,omitempty"`
+	LocationID                 null.Int64 `boil:"location_id" json:"locationID,omitempty" toml:"locationID" yaml:"locationID,omitempty"`
 	EnabledAt                  null.Time  `boil:"enabled_at" json:"enabledAt,omitempty" toml:"enabledAt" yaml:"enabledAt,omitempty"`
 	EnabledBy                  null.Int64 `boil:"enabled_by" json:"enabledBy,omitempty" toml:"enabledBy" yaml:"enabledBy,omitempty"`
 	DisabledAt                 null.Time  `boil:"disabled_at" json:"disabledAt,omitempty" toml:"disabledAt" yaml:"disabledAt,omitempty"`
@@ -44,6 +45,7 @@ var GroupGatewayRightLogColumns = struct {
 	GroupGatewayRightID        string
 	GroupID                    string
 	GWID                       string
+	LocationID                 string
 	EnabledAt                  string
 	EnabledBy                  string
 	DisabledAt                 string
@@ -56,6 +58,7 @@ var GroupGatewayRightLogColumns = struct {
 	GroupGatewayRightID:        "group_gateway_right_id",
 	GroupID:                    "group_id",
 	GWID:                       "gw_id",
+	LocationID:                 "location_id",
 	EnabledAt:                  "enabled_at",
 	EnabledBy:                  "enabled_by",
 	DisabledAt:                 "disabled_at",
@@ -70,6 +73,7 @@ var GroupGatewayRightLogTableColumns = struct {
 	GroupGatewayRightID        string
 	GroupID                    string
 	GWID                       string
+	LocationID                 string
 	EnabledAt                  string
 	EnabledBy                  string
 	DisabledAt                 string
@@ -82,6 +86,7 @@ var GroupGatewayRightLogTableColumns = struct {
 	GroupGatewayRightID:        "group_gateway_right_log.group_gateway_right_id",
 	GroupID:                    "group_gateway_right_log.group_id",
 	GWID:                       "group_gateway_right_log.gw_id",
+	LocationID:                 "group_gateway_right_log.location_id",
 	EnabledAt:                  "group_gateway_right_log.enabled_at",
 	EnabledBy:                  "group_gateway_right_log.enabled_by",
 	DisabledAt:                 "group_gateway_right_log.disabled_at",
@@ -98,6 +103,7 @@ var GroupGatewayRightLogWhere = struct {
 	GroupGatewayRightID        whereHelpernull_Int64
 	GroupID                    whereHelpernull_Int64
 	GWID                       whereHelpernull_Int64
+	LocationID                 whereHelpernull_Int64
 	EnabledAt                  whereHelpernull_Time
 	EnabledBy                  whereHelpernull_Int64
 	DisabledAt                 whereHelpernull_Time
@@ -110,6 +116,7 @@ var GroupGatewayRightLogWhere = struct {
 	GroupGatewayRightID:        whereHelpernull_Int64{field: "`group_gateway_right_log`.`group_gateway_right_id`"},
 	GroupID:                    whereHelpernull_Int64{field: "`group_gateway_right_log`.`group_id`"},
 	GWID:                       whereHelpernull_Int64{field: "`group_gateway_right_log`.`gw_id`"},
+	LocationID:                 whereHelpernull_Int64{field: "`group_gateway_right_log`.`location_id`"},
 	EnabledAt:                  whereHelpernull_Time{field: "`group_gateway_right_log`.`enabled_at`"},
 	EnabledBy:                  whereHelpernull_Int64{field: "`group_gateway_right_log`.`enabled_by`"},
 	DisabledAt:                 whereHelpernull_Time{field: "`group_gateway_right_log`.`disabled_at`"},
@@ -136,8 +143,8 @@ func (*groupGatewayRightLogR) NewStruct() *groupGatewayRightLogR {
 type groupGatewayRightLogL struct{}
 
 var (
-	groupGatewayRightLogAllColumns            = []string{"id", "group_gateway_right_id", "group_id", "gw_id", "enabled_at", "enabled_by", "disabled_at", "disabled_by", "group_gateway_right_updated_at", "group_gateway_right_updated_by", "created_at"}
-	groupGatewayRightLogColumnsWithoutDefault = []string{"group_gateway_right_id", "group_id", "gw_id", "enabled_at", "enabled_by", "disabled_at", "disabled_by", "group_gateway_right_updated_at", "group_gateway_right_updated_by"}
+	groupGatewayRightLogAllColumns            = []string{"id", "group_gateway_right_id", "group_id", "gw_id", "location_id", "enabled_at", "enabled_by", "disabled_at", "disabled_by", "group_gateway_right_updated_at", "group_gateway_right_updated_by", "created_at"}
+	groupGatewayRightLogColumnsWithoutDefault = []string{"group_gateway_right_id", "group_id", "gw_id", "location_id", "enabled_at", "enabled_by", "disabled_at", "disabled_by", "group_gateway_right_updated_at", "group_gateway_right_updated_by"}
 	groupGatewayRightLogColumnsWithDefault    = []string{"id", "created_at"}
 	groupGatewayRightLogPrimaryKeyColumns     = []string{"id"}
 	groupGatewayRightLogGeneratedColumns      = []string{}

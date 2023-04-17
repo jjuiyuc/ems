@@ -152,14 +152,17 @@ var LocationWhere = struct {
 
 // LocationRels is where relationship names are stored.
 var LocationRels = struct {
-	Gateways string
+	Gateways           string
+	GroupGatewayRights string
 }{
-	Gateways: "Gateways",
+	Gateways:           "Gateways",
+	GroupGatewayRights: "GroupGatewayRights",
 }
 
 // locationR is where relationships are stored.
 type locationR struct {
-	Gateways GatewaySlice `boil:"Gateways" json:"Gateways" toml:"Gateways" yaml:"Gateways"`
+	Gateways           GatewaySlice           `boil:"Gateways" json:"Gateways" toml:"Gateways" yaml:"Gateways"`
+	GroupGatewayRights GroupGatewayRightSlice `boil:"GroupGatewayRights" json:"GroupGatewayRights" toml:"GroupGatewayRights" yaml:"GroupGatewayRights"`
 }
 
 // NewStruct creates a new relationship struct
@@ -172,6 +175,13 @@ func (r *locationR) GetGateways() GatewaySlice {
 		return nil
 	}
 	return r.Gateways
+}
+
+func (r *locationR) GetGroupGatewayRights() GroupGatewayRightSlice {
+	if r == nil {
+		return nil
+	}
+	return r.GroupGatewayRights
 }
 
 // locationL is where Load methods for each relationship are stored.
@@ -290,6 +300,20 @@ func (o *Location) Gateways(mods ...qm.QueryMod) gatewayQuery {
 	return Gateways(queryMods...)
 }
 
+// GroupGatewayRights retrieves all the group_gateway_right's GroupGatewayRights with an executor.
+func (o *Location) GroupGatewayRights(mods ...qm.QueryMod) groupGatewayRightQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("`group_gateway_right`.`location_id`=?", o.ID),
+	)
+
+	return GroupGatewayRights(queryMods...)
+}
+
 // LoadGateways allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for a 1-M or N-M relationship.
 func (locationL) LoadGateways(e boil.Executor, singular bool, maybeLocation interface{}, mods queries.Applicator) error {
@@ -371,6 +395,97 @@ func (locationL) LoadGateways(e boil.Executor, singular bool, maybeLocation inte
 				local.R.Gateways = append(local.R.Gateways, foreign)
 				if foreign.R == nil {
 					foreign.R = &gatewayR{}
+				}
+				foreign.R.Location = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
+// LoadGroupGatewayRights allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (locationL) LoadGroupGatewayRights(e boil.Executor, singular bool, maybeLocation interface{}, mods queries.Applicator) error {
+	var slice []*Location
+	var object *Location
+
+	if singular {
+		object = maybeLocation.(*Location)
+	} else {
+		slice = *maybeLocation.(*[]*Location)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &locationR{}
+		}
+		args = append(args, object.ID)
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &locationR{}
+			}
+
+			for _, a := range args {
+				if queries.Equal(a, obj.ID) {
+					continue Outer
+				}
+			}
+
+			args = append(args, obj.ID)
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(
+		qm.From(`group_gateway_right`),
+		qm.WhereIn(`group_gateway_right.location_id in ?`, args...),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.Query(e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load group_gateway_right")
+	}
+
+	var resultSlice []*GroupGatewayRight
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice group_gateway_right")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on group_gateway_right")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for group_gateway_right")
+	}
+
+	if singular {
+		object.R.GroupGatewayRights = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &groupGatewayRightR{}
+			}
+			foreign.R.Location = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if queries.Equal(local.ID, foreign.LocationID) {
+				local.R.GroupGatewayRights = append(local.R.GroupGatewayRights, foreign)
+				if foreign.R == nil {
+					foreign.R = &groupGatewayRightR{}
 				}
 				foreign.R.Location = local
 				break
@@ -499,6 +614,131 @@ func (o *Location) RemoveGateways(exec boil.Executor, related ...*Gateway) error
 				o.R.Gateways[i] = o.R.Gateways[ln-1]
 			}
 			o.R.Gateways = o.R.Gateways[:ln-1]
+			break
+		}
+	}
+
+	return nil
+}
+
+// AddGroupGatewayRights adds the given related objects to the existing relationships
+// of the location, optionally inserting them as new records.
+// Appends related to o.R.GroupGatewayRights.
+// Sets related.R.Location appropriately.
+func (o *Location) AddGroupGatewayRights(exec boil.Executor, insert bool, related ...*GroupGatewayRight) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			queries.Assign(&rel.LocationID, o.ID)
+			if err = rel.Insert(exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE `group_gateway_right` SET %s WHERE %s",
+				strmangle.SetParamNames("`", "`", 0, []string{"location_id"}),
+				strmangle.WhereClause("`", "`", 0, groupGatewayRightPrimaryKeyColumns),
+			)
+			values := []interface{}{o.ID, rel.ID}
+
+			if boil.DebugMode {
+				fmt.Fprintln(boil.DebugWriter, updateQuery)
+				fmt.Fprintln(boil.DebugWriter, values)
+			}
+			if _, err = exec.Exec(updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			queries.Assign(&rel.LocationID, o.ID)
+		}
+	}
+
+	if o.R == nil {
+		o.R = &locationR{
+			GroupGatewayRights: related,
+		}
+	} else {
+		o.R.GroupGatewayRights = append(o.R.GroupGatewayRights, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &groupGatewayRightR{
+				Location: o,
+			}
+		} else {
+			rel.R.Location = o
+		}
+	}
+	return nil
+}
+
+// SetGroupGatewayRights removes all previously related items of the
+// location replacing them completely with the passed
+// in related items, optionally inserting them as new records.
+// Sets o.R.Location's GroupGatewayRights accordingly.
+// Replaces o.R.GroupGatewayRights with related.
+// Sets related.R.Location's GroupGatewayRights accordingly.
+func (o *Location) SetGroupGatewayRights(exec boil.Executor, insert bool, related ...*GroupGatewayRight) error {
+	query := "update `group_gateway_right` set `location_id` = null where `location_id` = ?"
+	values := []interface{}{o.ID}
+	if boil.DebugMode {
+		fmt.Fprintln(boil.DebugWriter, query)
+		fmt.Fprintln(boil.DebugWriter, values)
+	}
+	_, err := exec.Exec(query, values...)
+	if err != nil {
+		return errors.Wrap(err, "failed to remove relationships before set")
+	}
+
+	if o.R != nil {
+		for _, rel := range o.R.GroupGatewayRights {
+			queries.SetScanner(&rel.LocationID, nil)
+			if rel.R == nil {
+				continue
+			}
+
+			rel.R.Location = nil
+		}
+		o.R.GroupGatewayRights = nil
+	}
+
+	return o.AddGroupGatewayRights(exec, insert, related...)
+}
+
+// RemoveGroupGatewayRights relationships from objects passed in.
+// Removes related items from R.GroupGatewayRights (uses pointer comparison, removal does not keep order)
+// Sets related.R.Location.
+func (o *Location) RemoveGroupGatewayRights(exec boil.Executor, related ...*GroupGatewayRight) error {
+	if len(related) == 0 {
+		return nil
+	}
+
+	var err error
+	for _, rel := range related {
+		queries.SetScanner(&rel.LocationID, nil)
+		if rel.R != nil {
+			rel.R.Location = nil
+		}
+		if _, err = rel.Update(exec, boil.Whitelist("location_id")); err != nil {
+			return err
+		}
+	}
+	if o.R == nil {
+		return nil
+	}
+
+	for _, rel := range related {
+		for i, ri := range o.R.GroupGatewayRights {
+			if rel != ri {
+				continue
+			}
+
+			ln := len(o.R.GroupGatewayRights)
+			if ln > 1 && i < ln-1 {
+				o.R.GroupGatewayRights[i] = o.R.GroupGatewayRights[ln-1]
+			}
+			o.R.GroupGatewayRights = o.R.GroupGatewayRights[:ln-1]
 			break
 		}
 	}

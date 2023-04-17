@@ -62,7 +62,7 @@ export default function ChangePassword(props) {
                 <label className="pt-2">{pageT("currentPassword")}</label>
                 <OutlinedInput
                     id="cur-password"
-                    size="small"
+                    size="medium"
                     type={showPassword ? "text" : "password"}
                     value={curPassword || ""}
                     onChange={changePassword}
@@ -86,7 +86,7 @@ export default function ChangePassword(props) {
                 <label className="pt-2">{pageT("newPassword")}</label>
                 <OutlinedInput
                     id="new-password"
-                    size="small"
+                    size="medium"
                     type={showPassword ? "text" : "password"}
                     value={newPassword || ""}
                     onChange={changeNewPassword}
@@ -109,7 +109,7 @@ export default function ChangePassword(props) {
                 />
 
             </form>
-            <Divider variant="fullWidth" sx={{ marginTop: "1.5rem" }} />
+            <Divider variant="fullWidth" sx={{ marginTop: "2.8rem" }} />
             <div className="flex flex-row-reverse mt-6">
                 <Button
                     sx={{ marginLeft: "0.5rem" }}
@@ -118,13 +118,6 @@ export default function ChangePassword(props) {
                     variant="contained"
                     color="primary">
                     {commonT("save")}
-                </Button>
-                <Button
-                    // onClick={}
-                    variant="outlined"
-                    radius="pill"
-                    color="gray">
-                    {commonT("cancel")}
                 </Button>
             </div>
         </div>

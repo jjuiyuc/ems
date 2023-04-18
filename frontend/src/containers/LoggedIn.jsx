@@ -108,11 +108,13 @@ function LoggedIn(props) {
         sidebarW = sidebarStatus === "expand" ? "w-60" : "w-20",
         t = useTranslation()
 
-    // const [open, setOpen] = useState(true)
-    // const handleClose = () => {
+    const handleClose = () => {
 
-    //     setOpen(false)
-    // }
+        props.updateSnackbarMsg({
+            msg: "", type: props.snackbarMsg.type
+        })
+    }
+
     useEffect(() => {
         if (new Date().getTime() > props.tokenExpiryTime) logout()
     })
@@ -142,8 +144,8 @@ function LoggedIn(props) {
         </div>
         <Snackbar
             open={props.snackbarMsg.msg != ""}
-            autoHideDuration={3000}
-            // onClose={handleClose}
+            autoHideDuration={4000}
+            onClose={handleClose}
             anchorOrigin={{ vertical: "top", horizontal: "center" }}
             sx={{ width: "500px" }}
         >
@@ -161,7 +163,7 @@ function LoggedIn(props) {
             </span>
             {t("common.copyright")}
         </footer>
-    </div>
+    </div >
 }
 
 const
@@ -175,5 +177,4 @@ const
         updateSnackbarMsg: value =>
             dispatch({ type: "snackbarMsg/updateSnackbarMsg", payload: value })
     })
-
 export default connect(mapState, mapDispatch)(LoggedIn)

@@ -46,7 +46,7 @@ const ValidateEmail = email =>
     /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)
 
 const ValidatePassword = password =>
-    /^(?=.{8,})((?=.*[^a-zA-Z\s])(?=.*[a-z])(?=.*[A-Z])|(?=.*[^a-zA-Z0-9\s])(?=.*\d)(?=.*[a-zA-Z])).*$/.test(password)
+    /^(?=.{8,})((?=.*[^a-zA-Z]))|(?=.*\d)(?=.*[a-zA-Z])|(?=.*[^a-zA-Z0-9]).*$/.test(password)
 
 const ValidateNum = num =>
     /^(0?|[1-9][0-9]*)$/.test(num)

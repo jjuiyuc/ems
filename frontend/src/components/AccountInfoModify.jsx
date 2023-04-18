@@ -7,8 +7,6 @@ import { useEffect, useState } from "react"
 
 import { apiCall } from "../utils/api"
 
-import FinishedBox from "../components/FinishedBox"
-
 const mapState = state => ({
     name: state.user.name,
     username: state.user.username
@@ -31,16 +29,13 @@ export default connect(mapState, mapDispatch)(function AccountInfoModify(props) 
 
     const
         [account, setAccount] = useState(props.username),
-        [name, setName] = useState(props.name),
-        [newName, setNewName] = useState(""),
-        // [nameError, setNameError] = useState(false),
-        [loading, setLoading] = useState(false),
-        [isReset, setIsReset] = useState(false)
+        [name, setName] = useState(props.name)
 
     const
         changeName = (e) => {
             setName(e.target.value)
         },
+        nameError = name.length == 0 || name.length > 20,
         submit = () => {
             const data = { name: name }
 
@@ -48,7 +43,6 @@ export default connect(mapState, mapDispatch)(function AccountInfoModify(props) 
                 method: "put",
                 data,
                 onSuccess: () => {
-                    setIsReset(true)
                     props.updateUserProfile(data)
                     props.updateSnackbarMsg({
                         type: "success",
@@ -64,14 +58,13 @@ export default connect(mapState, mapDispatch)(function AccountInfoModify(props) 
                 url: "/api/users/name"
             })
         }
-    const nameError = name.length == 0 || name.length > 20
     return <>
-        <div className="card w-fit">
+        <div className="card w-fit lg:w-88">
             <h4 className="mb-6">
                 {pageT("ModifyAccountInformation")}
             </h4>
             <Divider variant="fullWidth" sx={{ marginBottom: "1.5rem" }} />
-            <form className="grid ">
+            <form className="grid">
                 <TextField
                     label={commonT("account")}
                     defaultValue={account}
@@ -92,7 +85,6 @@ export default connect(mapState, mapDispatch)(function AccountInfoModify(props) 
             <Divider variant="fullWidth" sx={{ marginTop: "0.5rem" }} />
             <div className="flex flex-row-reverse mt-6">
                 <Button
-                    sx={{ marginLeft: "0.5rem" }}
                     onClick={submit}
                     disabled={name.length == 0}
                     radius="pill"

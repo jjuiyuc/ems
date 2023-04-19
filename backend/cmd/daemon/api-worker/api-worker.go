@@ -23,5 +23,5 @@ func main() {
 	repo := repository.NewRepository(db)
 	services := services.NewServices(cfg, repo)
 
-	routers.NewAPIWorker(cfg, services)
+	routers.NewAPIWorker(*dir, cfg, services)
 }

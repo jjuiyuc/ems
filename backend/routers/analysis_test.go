@@ -50,7 +50,7 @@ var _ = Describe("Analysis", func() {
 		Expect(err).Should(BeNil())
 		err = testutils.SeedUtLocationAndGateway(db)
 		Expect(err).Should(BeNil())
-		token, err = utils.GenerateToken(testdata.UtUser.ID)
+		token, err = utils.GenerateToken(testdata.UtUser.ID, testdata.UtUser.GroupID)
 		Expect(err).Should(BeNil())
 		// Mock group_gateway_right table
 		_, err = db.Exec("TRUNCATE TABLE group_gateway_right")
@@ -61,7 +61,7 @@ var _ = Describe("Analysis", func() {
 		`)
 		Expect(err).Should(BeNil())
 
-		router = InitRouter(cfg.GetBool("server.cors"), cfg.GetString("server.ginMode"), w)
+		router = InitRouter(cfg.GetBool("server.cors"), cfg.GetString("server.ginMode"), initPolicy(testutils.GetConfigDir()), w)
 	})
 
 	AfterEach(func() {

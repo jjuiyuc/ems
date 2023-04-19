@@ -14,6 +14,9 @@ const (
 	ErrAuthUserExpirated    = 20005
 	ErrAuthUserLocked       = 20006
 	ErrAuthPasswordNotMatch = 20007
+	ErrAuthPolicyLoad       = 20008
+	ErrAuthPolicyCheck      = 20009
+	ErrAuthPolicyNotAllow   = 20010
 
 	ErrPasswordToken = 30000
 	// 30001

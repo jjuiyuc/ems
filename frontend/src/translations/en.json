@@ -207,13 +207,16 @@
         }
     },
     "error": {
+        "curPasswordNotMatch":"Current password does not match, please try again.",
         "emailFormat": "Email is incorrect, please try again.",
         "emailNotExist": "Account does not exist, please try again.",
         "failureToSave":"Failure to save",
         "nameLength":"Please enter between 1 to 20 characters.",
         "passwordFormat": "Password must meet complexity requirements, please try again.",
         "passwordIncorrect": "Password is incorrect, please try again.",
+        "passwordLength":"Please enter between 8 to 50 characters.",
         "passwordNotMatch": "Password does not match, please try again.",
+        "passwordUpdateError":"Password updates error",
         "passwordTokenError": "The reset password link is invalid.",
         "pricingError":"Pricing must be greater than 0.",
         "sumError":"The sum of the time range must be equal to 24 hours.",

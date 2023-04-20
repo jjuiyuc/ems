@@ -63,6 +63,8 @@ func SeedUtUser(db *sql.DB) (err error) {
 		GroupID:        testdata.UtUser.GroupID,
 		Password:       string(hashPassword[:]),
 		ExpirationDate: testdata.UtUser.ExpirationDate,
+		CreatedAt:      testdata.UtUser.CreatedAt,
+		UpdatedAt:      testdata.UtUser.UpdatedAt,
 	}
 	err = user.Insert(db, boil.Infer())
 	return

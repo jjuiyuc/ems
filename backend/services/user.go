@@ -26,13 +26,50 @@ type defaultUserService struct {
 // ProfileResponse godoc
 type ProfileResponse struct {
 	*deremsmodels.User
+	Group GroupInfo `json:"group"`
+}
+
+// GroupInfo godoc
+type GroupInfo struct {
+	*deremsmodels.Group
 	Gateways []GatewayInfo `json:"gateways"`
+	Webpages []WebpageInfo `json:"webpages"`
 }
 
 // GatewayInfo godoc
 type GatewayInfo struct {
-	GatewayID string `json:"gatewayID"`
-	Address   string `json:"address"`
+	GatewayID   string                  `json:"gatewayID"`
+	Permissions []GatewayPermissionInfo `json:"permissions"`
+}
+
+// WebpageInfo godoc
+type WebpageInfo struct {
+	ID          int64                  `json:"id"`
+	Name        string                 `json:"name"`
+	Permissions WebpagePermissionsInfo `json:"permissions"`
+}
+
+// GatewayPermissionInfo godoc
+type GatewayPermissionInfo struct {
+	EnabledAt  time.Time    `json:"enabledAt"`
+	EnabledBy  null.Int64   `json:"enabledBy"`
+	DisabledAt null.Time    `json:"disabledAt"`
+	DisabledBy null.Int64   `json:"disabledBy"`
+	Location   LocationInfo `json:"location"`
+}
+
+// LocationInfo godoc
+type LocationInfo struct {
+	Name    string      `json:"name"`
+	Address null.String `json:"address"`
+}
+
+// WebpagePermissionsInfo godoc
+type WebpagePermissionsInfo struct {
+	Create bool `json:"create"`
+	Read   bool `json:"read"`
+	Update bool `json:"update"`
+	Delete bool `json:"delete"`
 }
 
 // NewUserService godoc
@@ -111,38 +148,127 @@ func (s defaultUserService) GetProfile(userID int64) (profile *ProfileResponse, 
 		return
 	}
 
-	// Get gateway information
-	gateways, err := s.repo.Gateway.GetGatewaysByUserID(userID)
+	// Get group information
+	group, err := s.repo.User.GetGroupByGroupID(user.GroupID)
 	if err != nil {
 		log.WithFields(log.Fields{
-			"caused-by": "s.repo.Gateway.GetGatewaysByUserID",
+			"caused-by": "s.repo.User.GetGroupByGroupID",
 			"err":       err,
 		}).Error()
 		return
 	}
-	gatewayInfos := []GatewayInfo{}
-	for _, gateway := range gateways {
-		log.Debug("gateway.UUID: ", gateway.UUID)
-		location, err := s.repo.Location.GetLocationByLocationID(gateway.LocationID.Int64)
-		if err != nil {
-			log.WithFields(log.Fields{
-				"caused-by": "s.repo.Location.GetLocationByLocationID",
-				"err":       err,
-			}).Error()
-			continue
-		}
-		log.Debug("location.Address: ", location.Address)
-
-		gatewayInfo := GatewayInfo{
-			GatewayID: gateway.UUID,
-			Address:   location.Address.String,
-		}
-		gatewayInfos = append(gatewayInfos, gatewayInfo)
+	groupInfo := GroupInfo{
+		Group:    group,
+		Gateways: s.getGroupGatewayInfo(group.ID),
+	}
+	groupInfo.Webpages, err = s.getGroupWebpageInfo(group.TypeID)
+	if err != nil {
+		return
 	}
 
 	profile = &ProfileResponse{
-		User:     user,
-		Gateways: gatewayInfos,
+		User:  user,
+		Group: groupInfo,
 	}
 	return
+}
+
+func (s defaultUserService) getGroupGatewayInfo(groupID int64) (gatewayInfos []GatewayInfo) {
+	gatewaysPermission, getErr := s.repo.User.GetGatewaysPermissionByGroupID(groupID)
+	if getErr != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "s.repo.User.GetGatewaysPermissionByGroupID",
+			"err":       getErr,
+		}).Warn()
+	}
+	for _, gatewayPermission := range gatewaysPermission {
+		var (
+			gatewayInfo         GatewayInfo
+			permissions         []GatewayPermissionInfo
+		)
+		gateway, getErr := s.repo.Gateway.GetGatewayByGatewayID(gatewayPermission.GWID)
+		if getErr != nil {
+			log.WithFields(log.Fields{
+				"caused-by": "s.repo.Gateway.GetGatewayByGatewayID",
+				"err":       getErr,
+			}).Warn()
+			continue
+		}
+		// Check if gateway UUID exists
+		existedGatewayIndex := -1
+		for i, existedGatewayInfo := range gatewayInfos {
+			if existedGatewayInfo.GatewayID == gateway.UUID {
+				existedGatewayIndex = i
+				gatewayInfo = existedGatewayInfo
+				permissions = gatewayInfo.Permissions
+				break
+			}
+		}
+		if existedGatewayIndex >= 0 {
+			gatewayInfos = s.removeGatewayInfo(gatewayInfos, existedGatewayIndex)
+		}
+		gatewayInfo.GatewayID = gateway.UUID
+		permissionInfo := GatewayPermissionInfo{
+			EnabledAt:  gatewayPermission.EnabledAt,
+			EnabledBy:  gatewayPermission.EnabledBy,
+			DisabledAt: gatewayPermission.DisabledAt,
+			DisabledBy: gatewayPermission.DisabledBy,
+		}
+
+		location, getErr := s.repo.Location.GetLocationByLocationID(gatewayPermission.LocationID.Int64)
+		if getErr == nil {
+			permissionInfo.Location = LocationInfo{
+				location.Name,
+				location.Address,
+			}
+		} else {
+			log.WithFields(log.Fields{
+				"caused-by": "s.repo.Location.GetLocationByLocationID",
+				"err":       getErr,
+			}).Warn()
+		}
+
+		permissions = append(permissions, permissionInfo)
+		gatewayInfo.Permissions = permissions
+		gatewayInfos = append(gatewayInfos, gatewayInfo)
+	}
+	return
+}
+
+func (s defaultUserService) getGroupWebpageInfo(groupTypeID int64) (webpageInfos []WebpageInfo, err error) {
+	webpagesPermission, err := s.repo.User.GetWebpagesPermissionByGroupTypeID(groupTypeID)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "s.repo.User.GetWebpagesPermissionByGroupTypeID",
+			"err":       err,
+		}).Error()
+		return
+	}
+	for _, webpagePermission := range webpagesPermission {
+		webpage, err := s.repo.User.GetWebpageByWebpageID(webpagePermission.WebpageID)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"caused-by": "s.repo.User.GetWebpageByWebpageID",
+				"err":       err,
+			}).Error()
+			break
+		}
+
+		webpageInfo := WebpageInfo{
+			webpage.ID,
+			webpage.Name,
+			WebpagePermissionsInfo{
+				webpagePermission.CreateData.Bool,
+				webpagePermission.ReadData.Bool,
+				webpagePermission.UpdateData.Bool,
+				webpagePermission.DeleteData.Bool,
+			},
+		}
+		webpageInfos = append(webpageInfos, webpageInfo)
+	}
+	return
+}
+
+func (s defaultUserService) removeGatewayInfo(slice []GatewayInfo, i int) []GatewayInfo {
+	return append(slice[:i], slice[i+1:]...)
 }

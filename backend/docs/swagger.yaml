@@ -99,9 +99,8 @@ definitions:
       batteryVoltages:
         $ref: '#/definitions/services.Float32ArrayFormat'
         type: object
-      onPeakTime:
-        additionalProperties:
-          type: string
+      timeOfUse:
+        additionalProperties: true
         type: object
       timestamps:
         items:
@@ -140,9 +139,8 @@ definitions:
       batteryAveragePowerACs:
         $ref: '#/definitions/services.Float32ArrayFormat'
         type: object
-      onPeakTime:
-        additionalProperties:
-          type: string
+      timeOfUse:
+        additionalProperties: true
         type: object
       timestamps:
         items:
@@ -285,10 +283,26 @@ definitions:
     type: array
   services.GatewayInfo:
     properties:
-      address:
-        type: string
       gatewayID:
         type: string
+      permissions:
+        items:
+          $ref: '#/definitions/services.GatewayPermissionInfo'
+        type: array
+    type: object
+  services.GatewayPermissionInfo:
+    properties:
+      disabledAt:
+        type: string
+      disabledBy:
+        type: string
+      enabledAt:
+        type: string
+      enabledBy:
+        type: string
+      location:
+        $ref: '#/definitions/services.LocationInfo'
+        type: object
     type: object
   services.GridEnergyInfoResponse:
     properties:
@@ -306,14 +320,47 @@ definitions:
       gridAveragePowerACs:
         $ref: '#/definitions/services.Float32ArrayFormat'
         type: object
-      onPeakTime:
-        additionalProperties:
-          type: string
+      timeOfUse:
+        additionalProperties: true
         type: object
       timestamps:
         items:
           type: integer
         type: array
+    type: object
+  services.GroupInfo:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        type: string
+      deletedBy:
+        type: string
+      gateways:
+        items:
+          $ref: '#/definitions/services.GatewayInfo'
+        type: array
+      id:
+        type: integer
+      name:
+        type: string
+      parentID:
+        type: string
+      typeID:
+        type: integer
+      updatedAt:
+        type: string
+      webpages:
+        items:
+          $ref: '#/definitions/services.WebpageInfo'
+        type: array
+    type: object
+  services.LocationInfo:
+    properties:
+      address:
+        type: string
+      name:
+        type: string
     type: object
   services.PowerSelfSupplyRateResponse:
     properties:
@@ -350,12 +397,15 @@ definitions:
         type: string
       deletedAt:
         type: string
+      deletedBy:
+        type: string
       expirationDate:
         type: string
-      gateways:
-        items:
-          $ref: '#/definitions/services.GatewayInfo'
-        type: array
+      group:
+        $ref: '#/definitions/services.GroupInfo'
+        type: object
+      groupID:
+        type: integer
       id:
         type: integer
       lockedAt:
@@ -408,12 +458,11 @@ definitions:
     type: object
   services.SolarPowerStateResponse:
     properties:
-      onPeakTime:
-        additionalProperties:
-          type: string
-        type: object
       pvAveragePowerACs:
         $ref: '#/definitions/services.Float32ArrayFormat'
+        type: object
+      timeOfUse:
+        additionalProperties: true
         type: object
       timestamps:
         items:
@@ -437,6 +486,27 @@ definitions:
       timeOfUse:
         additionalProperties: true
         type: object
+    type: object
+  services.WebpageInfo:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      permissions:
+        $ref: '#/definitions/services.WebpagePermissionsInfo'
+        type: object
+    type: object
+  services.WebpagePermissionsInfo:
+    properties:
+      create:
+        type: boolean
+      delete:
+        type: boolean
+      read:
+        type: boolean
+      update:
+        type: boolean
     type: object
 info:
   contact: {}

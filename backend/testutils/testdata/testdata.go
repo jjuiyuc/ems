@@ -12,9 +12,11 @@ import (
 var UtUser = &deremsmodels.User{
 	ID:             1,
 	Username:       "ut-user@gmail.com",
-	GroupID:        2,
+	GroupID:        1,
 	Password:       "testing123",
 	ExpirationDate: null.TimeFrom(time.Date(2100, 1, 1, 0, 0, 0, 0, time.UTC)),
+	CreatedAt:      time.Date(2022, 7, 1, 0, 0, 0, 0, time.UTC),
+	UpdatedAt:      time.Date(2022, 7, 1, 0, 0, 0, 0, time.UTC),
 }
 
 // UtLocation godoc

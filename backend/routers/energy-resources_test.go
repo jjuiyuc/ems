@@ -64,8 +64,8 @@ var _ = Describe("EnergyResources", func() {
 		_, err = db.Exec("TRUNCATE TABLE group_gateway_right")
 		Expect(err).Should(BeNil())
 		_, err = db.Exec(`
-			INSERT INTO group_gateway_right (id,group_id,gw_id,enabled_at) VALUES
-			(1,2,1,'2022-07-01 00:00:00');
+			INSERT INTO group_gateway_right (id,group_id,gw_id,location_id,enabled_at) VALUES
+			(1,1,1,1,'2022-07-01 00:00:00');
 		`)
 		Expect(err).Should(BeNil())
 

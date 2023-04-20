@@ -13,6 +13,7 @@ type GatewayRepository interface {
 	GetGatewayByGatewayUUID(gwUUID string) (*deremsmodels.Gateway, error)
 	GetGatewaysByLocation(lat, lng float32) ([]*deremsmodels.Gateway, error)
 	GetGatewaysByUserID(userID int64) ([]*deremsmodels.Gateway, error)
+	GetGatewayByGatewayID(gwID int64) (*deremsmodels.Gateway, error)
 	GetGateways() ([]*deremsmodels.Gateway, error)
 }
 
@@ -44,6 +45,10 @@ func (repo defaultGatewayRepository) GetGatewaysByUserID(userID int64) ([]*derem
 		qm.InnerJoin("group_gateway_right AS gr ON gateway.id = gr.gw_id"),
 		qm.InnerJoin("user AS u ON gr.group_id = u.group_id"),
 		qm.Where("(u.id = ?)", userID)).All(repo.db)
+}
+
+func (repo defaultGatewayRepository) GetGatewayByGatewayID(gwID int64) (*deremsmodels.Gateway, error) {
+	return deremsmodels.FindGateway(repo.db, gwID)
 }
 
 // GetGateways godoc

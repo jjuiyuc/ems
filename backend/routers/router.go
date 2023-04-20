@@ -301,13 +301,13 @@ func authorizePolicy(webpage string, action string, enforcer *casbin.Enforcer) g
 		sub := strconv.FormatInt(groupID.(int64), 10)
 		ok, err := enforcer.Enforce(sub, webpage, action)
 		if !ok {
-			log.WithField("caused-by", "access denied").Error()
-			appG.Response(http.StatusUnauthorized, e.ErrAuthPolicyNotAllow, nil)
+			log.WithField("caused-by", "permission denied").Error()
+			appG.Response(http.StatusUnauthorized, e.ErrAuthPermissionNotAllow, nil)
 			c.Abort()
 			return
 		} else if err != nil {
-			log.WithField("caused-by", "authorize policy").Error()
-			appG.Response(http.StatusUnauthorized, e.ErrAuthPolicyCheck, nil)
+			log.WithField("caused-by", "check permission").Error()
+			appG.Response(http.StatusUnauthorized, e.ErrAuthPermissionCheck, nil)
 			c.Abort()
 			return
 		}

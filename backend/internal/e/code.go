@@ -15,8 +15,8 @@ const (
 	ErrAuthUserLocked            = 20006
 	ErrAuthPasswordNotMatch      = 20007
 	ErrAuthPolicyLoad            = 20008
-	ErrAuthPolicyCheck           = 20009
-	ErrAuthPolicyNotAllow        = 20010
+	ErrAuthPermissionCheck       = 20009
+	ErrAuthPermissionNotAllow    = 20010
 	ErrAuthFrontendPermissionGen = 20011
 
 	ErrPasswordToken = 30000

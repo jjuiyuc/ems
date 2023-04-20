@@ -199,6 +199,9 @@ func InitRouter(isCORS bool, ginMode string, enforcer *casbin.Enforcer, w *APIWo
 	apiGroup.GET("/:gwid/devices/grid/energy-info", authorizeJWT(REST), authorizePolicy(EnergyResources.String(), Read.String(), enforcer), w.GetGridEnergyInfo)
 	apiGroup.GET("/:gwid/devices/grid/power-state", authorizeJWT(REST), authorizePolicy(EnergyResources.String(), Read.String(), enforcer), w.GetGridPowerState)
 
+	// Casbin middleware
+	apiGroup.GET("/casbin", w.getFrontendPermission(enforcer))
+
 	// Dashboard
 	wsGroup.GET("/:gwid/devices/energy-info", authorizeJWT(WebSocket), authorizePolicy(Dashboard.String(), Read.String(), enforcer), w.dashboardHandler)
 

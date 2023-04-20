@@ -63,7 +63,6 @@ export default connect(mapState, mapDispatch)(function AccountInfoModify(props) 
             <h4 className="mb-6">
                 {pageT("ModifyAccountInformation")}
             </h4>
-            <Divider variant="fullWidth" sx={{ marginBottom: "1.5rem" }} />
             <form className="grid">
                 <TextField
                     label={commonT("account")}
@@ -77,7 +76,7 @@ export default connect(mapState, mapDispatch)(function AccountInfoModify(props) 
                     label={pageT("name")}
                     value={name || ""}
                     onChange={changeName}
-                    helperText={nameError ? errorT("nameLength") : ""}
+                    helperText={errorT("nameLength") || ""}
                     required
                     variant="outlined"
                 />

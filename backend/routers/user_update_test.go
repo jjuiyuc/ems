@@ -129,6 +129,28 @@ var _ = Describe("User", func() {
 		})
 
 		Context("fail", func() {
+			It("should return fail", func() {
+				seedUtURL := "/api/users/password"
+				seedUtPassword := "abc123def456"
+				seedUtArg := &PersonalPassword{
+					CurrentPassword: seedUtPassword,
+					NewPassword:     seedUtPassword,
+				}
+				tt := testutils.TestInfo{
+					Token:      token,
+					URL:        seedUtURL,
+					WantStatus: http.StatusUnauthorized,
+					WantRv: app.Response{
+						Code: e.ErrAuthPasswordNotMatch,
+						Msg:  "fail",
+					},
+				}
+				payloadBuf, _ := json.Marshal(seedUtArg)
+				testutils.GinkgoAssertRequest(tt, router, "PUT", bytes.NewBuffer(payloadBuf))
+			})
+		})
+
+		Context("fail", func() {
 			It("should return invalid parameters", func() {
 				seedUtURL := "/api/users/password"
 				tt := testutils.TestInfo{

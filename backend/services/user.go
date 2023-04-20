@@ -7,6 +7,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/volatiletech/null/v8"
 
+	"der-ems/internal/e"
 	"der-ems/internal/utils"
 	deremsmodels "der-ems/models/der-ems"
 	"der-ems/repository"
@@ -18,7 +19,7 @@ type UserService interface {
 	PasswordResetByPasswordToken(token, newPassword string) (err error)
 	GetProfile(userID int64) (profile *ProfileResponse, err error)
 	UpdateName(userID int64, name string) (err error)
-	UpdatePassword(userID int64, currentPassword, newPassword string) (err error)
+	UpdatePassword(userID int64, currentPassword, newPassword string) (errCode int, err error)
 }
 
 type defaultUserService struct {
@@ -287,7 +288,7 @@ func (s defaultUserService) UpdateName(userID int64, name string) (err error) {
 	return
 }
 
-func (s defaultUserService) UpdatePassword(userID int64, currentPassword, newPassword string) (err error) {
+func (s defaultUserService) UpdatePassword(userID int64, currentPassword, newPassword string) (errCode int, err error) {
 	user, err := s.repo.User.GetUserByUserID(userID)
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -298,6 +299,7 @@ func (s defaultUserService) UpdatePassword(userID int64, currentPassword, newPas
 	}
 
 	if err = utils.ComparePassword(currentPassword, user.Password); err != nil {
+		errCode = e.ErrAuthPasswordNotMatch
 		return
 	}
 

@@ -183,9 +183,14 @@ func (w *APIWorker) UpdatePassword(c *gin.Context) {
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
-	if err := w.Services.User.UpdatePassword(userID.(int64), json.CurrentPassword, json.NewPassword); err != nil {
+	errCode, err := w.Services.User.UpdatePassword(userID.(int64), json.CurrentPassword, json.NewPassword)
+	if err != nil {
 		log.WithField("caused-by", "update password").Error()
-		appG.Response(http.StatusInternalServerError, e.ErrPasswordUpdate, nil)
+		if errCode == e.ErrAuthPasswordNotMatch {
+			appG.Response(http.StatusUnauthorized, e.ErrAuthPasswordNotMatch, nil)
+		} else {
+			appG.Response(http.StatusInternalServerError, e.ErrPasswordUpdate, nil)
+		}
 		return
 	}
 	appG.Response(http.StatusOK, e.Success, nil)

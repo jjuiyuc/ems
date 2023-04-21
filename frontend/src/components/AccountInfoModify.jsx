@@ -18,19 +18,14 @@ const mapDispatch = dispatch => ({
         dispatch({ type: "user/updateUserProfile", payload: value })
 
 })
-
 export default connect(mapState, mapDispatch)(function AccountInfoModify(props) {
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
-        dialogT = string => t("dialog." + string),
         errorT = string => t("error." + string),
-        pageT = (string, params) => t("account." + string, params)
+        pageT = (string, params) => t("account." + string)
 
-    const
-        [account, setAccount] = useState(props.username),
-        [name, setName] = useState(props.name)
-
+    const [name, setName] = useState(props.name || "")
     const
         changeName = (e) => {
             setName(e.target.value)
@@ -46,7 +41,7 @@ export default connect(mapState, mapDispatch)(function AccountInfoModify(props) 
                     props.updateUserProfile(data)
                     props.updateSnackbarMsg({
                         type: "success",
-                        msg: dialogT("modifyNameMsg")
+                        msg: t("dialog.modifyNameMsg")
                     })
                 },
                 onError: () => {
@@ -66,17 +61,16 @@ export default connect(mapState, mapDispatch)(function AccountInfoModify(props) 
             <form className="grid">
                 <TextField
                     label={commonT("account")}
-                    defaultValue={account}
+                    defaultValue={props.username}
                     variant="outlined"
-                    required
                     disabled
                 />
                 <TextField
                     error={nameError}
                     label={pageT("name")}
-                    value={name || ""}
+                    value={name}
                     onChange={changeName}
-                    helperText={errorT("nameLength") || ""}
+                    helperText={errorT("nameLength")}
                     required
                     variant="outlined"
                 />

@@ -66,6 +66,7 @@ func (s *LocalAIWorkerSuite) Test_SaveLocalAIData() {
 	const (
 		gwID      = "gwID"
 		timestamp = "timestamp"
+		msgType   = "type"
 	)
 	type args struct {
 		Msg map[string]interface{}
@@ -78,10 +79,14 @@ func (s *LocalAIWorkerSuite) Test_SaveLocalAIData() {
 	delete(seedUtDataNoGWID, gwID)
 	seedUtDataNoTimestamp := testutils.CopyMap(s.seedUtLocalAIData)
 	delete(seedUtDataNoTimestamp, timestamp)
+	seedUtDataNoType := testutils.CopyMap(s.seedUtLocalAIData)
+	delete(seedUtDataNoType, msgType)
 	seedUtDataGWIDUnexpectedValue := testutils.CopyMap(s.seedUtLocalAIData)
 	seedUtDataGWIDUnexpectedValue[gwID] = nil
 	seedUtDataTimestampUnexpectedValue := testutils.CopyMap(s.seedUtLocalAIData)
 	seedUtDataTimestampUnexpectedValue[timestamp] = nil
+	seedUtDataTypeUnexpectedValue := testutils.CopyMap(s.seedUtLocalAIData)
+	seedUtDataTypeUnexpectedValue[msgType] = nil
 
 	tests := []struct {
 		name string
@@ -112,6 +117,12 @@ func (s *LocalAIWorkerSuite) Test_SaveLocalAIData() {
 			},
 		},
 		{
+			name: "saveLocalAIDataNoType",
+			args: args{
+				Msg: seedUtDataNoType,
+			},
+		},
+		{
 			name: "saveLocalAIDataGWIDUnexpectedValue",
 			args: args{
 				Msg: seedUtDataGWIDUnexpectedValue,
@@ -121,6 +132,12 @@ func (s *LocalAIWorkerSuite) Test_SaveLocalAIData() {
 			name: "saveLocalAIDataTimestampUnexpectedValue",
 			args: args{
 				Msg: seedUtDataTimestampUnexpectedValue,
+			},
+		},
+		{
+			name: "saveLocalAIDataTypeUnexpectedValue",
+			args: args{
+				Msg: seedUtDataTypeUnexpectedValue,
 			},
 		},
 		{
@@ -156,10 +173,14 @@ func (s *LocalAIWorkerSuite) Test_SaveLocalAIData() {
 			s.Equalf(e.ErrNewKeyNotExist(gwID).Error(), saveErr.Error(), e.ErrNewMessageNotEqual.Error())
 		case "saveLocalAIDataNoTimestamp":
 			s.Equalf(e.ErrNewKeyNotExist(timestamp).Error(), saveErr.Error(), e.ErrNewMessageNotEqual.Error())
+		case "saveLocalAIDataNoType":
+			s.Equalf(e.ErrNewKeyNotExist(msgType).Error(), saveErr.Error(), e.ErrNewMessageNotEqual.Error())
 		case "saveLocalAIDataGWIDUnexpectedValue":
 			s.Equalf(e.ErrNewKeyUnexpectedValue(gwID).Error(), saveErr.Error(), e.ErrNewMessageNotEqual.Error())
 		case "saveLocalAIDataTimestampUnexpectedValue":
 			s.Equalf(e.ErrNewKeyUnexpectedValue(timestamp).Error(), saveErr.Error(), e.ErrNewMessageNotEqual.Error())
+		case "saveLocalAIDataTypeUnexpectedValue":
+			s.Equalf(e.ErrNewKeyUnexpectedValue(msgType).Error(), saveErr.Error(), e.ErrNewMessageNotEqual.Error())
 		}
 	}
 }

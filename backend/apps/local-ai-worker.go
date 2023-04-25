@@ -95,13 +95,19 @@ func (h localAIConsumerHandler) saveLocalAIData(msg []byte) (err error) {
 	if err != nil {
 		return
 	}
+	typeValue, err := utils.AssertGatewayMessageType(data)
+	if err != nil {
+		return
+	}
 	gwUUID := gwIDValue.(string)
 	logDate := int64(timestampValue.(float64))
+	logType := typeValue.(string)
 	dataJSON, _ := json.Marshal(data)
 
 	aiData := &deremsmodels.AiDatum{
 		GWUUID:      gwUUID,
 		LogDate:     time.Unix(logDate, 0),
+		LogType:     null.StringFrom(logType),
 		LocalAiData: null.JSONFrom(dataJSON),
 	}
 
@@ -119,6 +125,7 @@ func (h localAIConsumerHandler) saveLocalAIData(msg []byte) (err error) {
 	log.WithFields(log.Fields{
 		deremsmodels.AiDatumColumns.GWUUID:      aiData.GWUUID,
 		deremsmodels.AiDatumColumns.LogDate:     aiData.LogDate,
+		deremsmodels.AiDatumColumns.LogType:     aiData.LogType,
 		deremsmodels.AiDatumColumns.LocationID:  aiData.LocationID,
 		deremsmodels.AiDatumColumns.LocalAiData: string(aiData.LocalAiData.JSON),
 	}).Debug("upsert local AI data")

@@ -57,29 +57,30 @@ function Sidebar(props) {
     const MenuIcon = isExpanded ? Menu : Logo
     const
         t = useTranslation(),
-        navT = string => t("navigator." + string),
-        navLink = ({ icon, path, text }, index) => {
-            const name = navT(text || path)
+        navT = string => t("navigator." + string)
 
-            return <li key={"sb-n-" + index}>
-                <NavLink
-                    className={({ isActive }) => isActive ? " active" : ""}
-                    to={"/" + path}>
-                    <Tooltip
-                        arrow
-                        disableHoverListener={isExpanded}
-                        placement="left"
-                        TransitionComponent={Fade}
-                        TransitionProps={{ timeout: 300 }}
-                        title={name}>
-                        <div>{icon}</div>
-                    </Tooltip>
-                    <span className={transitionClasses}>{name}</span>
-                </NavLink>
-            </li>
-        },
-        authNavList = props.webpages
-            .map((authPage, i) => navLink(navs[authPage.name], i))
+    const ListItem = ({ icon, path, text }, index) => {
+        const name = navT(text || path)
+
+        return <li key={"sb-n-" + index}>
+            <NavLink
+                className={({ isActive }) => isActive ? " active" : ""}
+                to={"/" + path}>
+                <Tooltip
+                    arrow
+                    disableHoverListener={isExpanded}
+                    placement="left"
+                    TransitionComponent={Fade}
+                    TransitionProps={{ timeout: 300 }}
+                    title={name}>
+                    <div>{icon}</div>
+                </Tooltip>
+                <span className={transitionClasses}>{name}</span>
+            </NavLink>
+        </li>
+    }
+    const authNavList = props.webpages.map((authPage, i) =>
+        <ListItem key={"sb-n-" + i} {...navs[authPage.name]} />)
 
     return <aside className="h-full overflow-x-hidden">
         <div className="w-60">

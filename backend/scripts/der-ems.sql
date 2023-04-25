@@ -26,13 +26,14 @@ CREATE TABLE `ai_data` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `gw_uuid` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `log_date` datetime NOT NULL,
+  `log_type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `gw_id` bigint DEFAULT NULL,
   `location_id` bigint DEFAULT NULL,
   `local_ai_data` json DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `gw_uuid_log_date_UNIQUE` (`gw_uuid`,`log_date`)
+  UNIQUE KEY `gw_uuid_log_date_log_type_UNIQUE` (`gw_uuid`,`log_date`,`log_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

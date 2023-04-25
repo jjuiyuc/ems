@@ -96,7 +96,7 @@ export default connect(null, mapDispatch)(function ChangePassword(props) {
                     size="medium"
                     label={pageT("currentPassword")}
                     type={showPassword ? "text" : "password"}
-                    value={curPassword || ""}
+                    value={curPassword}
                     onChange={changePassword}
                     error={curPasswordError}
                     autoComplete="current-password"
@@ -122,13 +122,13 @@ export default connect(null, mapDispatch)(function ChangePassword(props) {
                     size="medium"
                     label={pageT("newPassword")}
                     type={showPassword ? "text" : "password"}
-                    value={newPassword || ""}
+                    value={newPassword}
                     onBlur={validateNewPassword}
                     onChange={changeNewPassword}
                     error={newPasswordError}
                     helperText={newPasswordLengthError ? errorT("passwordLength") : ""
                         || newPasswordError ? errorT("passwordFormat") : ""}
-                    autoComplete="current-password"
+                    autoComplete="new-password"
                     InputProps={{
                         endAdornment:
                             <InputAdornment position="end">

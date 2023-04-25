@@ -118,7 +118,8 @@
         "editFieldInfo":"Edit Field Info",
         "fieldInfo":"Field Info",
         "modifyNameMsg":"Modify name successfully",
-        "promptMsg":"If all charging resources are turned off, the battery will be in standby mode."
+        "promptMsg":"If all charging resources are turned off, the battery will be in standby mode.",
+        "updatedPasswordMsg":"Your password has been updated."
     },
     "economics": {
         "ancillaryServices": "Ancillary Services",

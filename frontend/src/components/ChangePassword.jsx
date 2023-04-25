@@ -72,7 +72,8 @@ export default connect(null, mapDispatch)(function ChangePassword(props) {
                 onSuccess: () => {
                     props.updateSnackbarMsg({
                         type: "success",
-                        msg: "333"
+                        msg: t("dialog.updatedPasswordMsg")
+
                     })
                     setCurPasswordError(false)
                     setNewPasswordError(false)

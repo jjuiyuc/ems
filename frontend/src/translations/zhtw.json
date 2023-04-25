@@ -118,7 +118,8 @@
         "editFieldInfo":"編輯場域資訊",
         "fieldInfo":"場域資訊",
         "modifyNameMsg":"成功更改名字",
-        "promptMsg":"If all charging resources are turned off, the battery will be in standby mode."
+        "promptMsg":"If all charging resources are turned off, the battery will be in standby mode.",
+        "updatedPasswordMsg":"密碼變更成功"
     },
     "economics": {
         "ancillaryServices": "輔助服務",

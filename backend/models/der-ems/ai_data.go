@@ -23,14 +23,15 @@ import (
 
 // AiDatum is an object representing the database table.
 type AiDatum struct {
-	ID          int64      `boil:"id" json:"id" toml:"id" yaml:"id"`
-	GWUUID      string     `boil:"gw_uuid" json:"gwUUID" toml:"gwUUID" yaml:"gwUUID"`
-	LogDate     time.Time  `boil:"log_date" json:"logDate" toml:"logDate" yaml:"logDate"`
-	GWID        null.Int64 `boil:"gw_id" json:"gwID,omitempty" toml:"gwID" yaml:"gwID,omitempty"`
-	LocationID  null.Int64 `boil:"location_id" json:"locationID,omitempty" toml:"locationID" yaml:"locationID,omitempty"`
-	LocalAiData null.JSON  `boil:"local_ai_data" json:"localAiData,omitempty" toml:"localAiData" yaml:"localAiData,omitempty"`
-	CreatedAt   time.Time  `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
-	UpdatedAt   time.Time  `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
+	ID          int64       `boil:"id" json:"id" toml:"id" yaml:"id"`
+	GWUUID      string      `boil:"gw_uuid" json:"gwUUID" toml:"gwUUID" yaml:"gwUUID"`
+	LogDate     time.Time   `boil:"log_date" json:"logDate" toml:"logDate" yaml:"logDate"`
+	LogType     null.String `boil:"log_type" json:"logType,omitempty" toml:"logType" yaml:"logType,omitempty"`
+	GWID        null.Int64  `boil:"gw_id" json:"gwID,omitempty" toml:"gwID" yaml:"gwID,omitempty"`
+	LocationID  null.Int64  `boil:"location_id" json:"locationID,omitempty" toml:"locationID" yaml:"locationID,omitempty"`
+	LocalAiData null.JSON   `boil:"local_ai_data" json:"localAiData,omitempty" toml:"localAiData" yaml:"localAiData,omitempty"`
+	CreatedAt   time.Time   `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
+	UpdatedAt   time.Time   `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
 
 	R *aiDatumR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L aiDatumL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -40,6 +41,7 @@ var AiDatumColumns = struct {
 	ID          string
 	GWUUID      string
 	LogDate     string
+	LogType     string
 	GWID        string
 	LocationID  string
 	LocalAiData string
@@ -49,6 +51,7 @@ var AiDatumColumns = struct {
 	ID:          "id",
 	GWUUID:      "gw_uuid",
 	LogDate:     "log_date",
+	LogType:     "log_type",
 	GWID:        "gw_id",
 	LocationID:  "location_id",
 	LocalAiData: "local_ai_data",
@@ -60,6 +63,7 @@ var AiDatumTableColumns = struct {
 	ID          string
 	GWUUID      string
 	LogDate     string
+	LogType     string
 	GWID        string
 	LocationID  string
 	LocalAiData string
@@ -69,6 +73,7 @@ var AiDatumTableColumns = struct {
 	ID:          "ai_data.id",
 	GWUUID:      "ai_data.gw_uuid",
 	LogDate:     "ai_data.log_date",
+	LogType:     "ai_data.log_type",
 	GWID:        "ai_data.gw_id",
 	LocationID:  "ai_data.location_id",
 	LocalAiData: "ai_data.local_ai_data",
@@ -145,6 +150,30 @@ func (w whereHelpertime_Time) GTE(x time.Time) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.GTE, x)
 }
 
+type whereHelpernull_String struct{ field string }
+
+func (w whereHelpernull_String) EQ(x null.String) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, false, x)
+}
+func (w whereHelpernull_String) NEQ(x null.String) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, true, x)
+}
+func (w whereHelpernull_String) LT(x null.String) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LT, x)
+}
+func (w whereHelpernull_String) LTE(x null.String) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LTE, x)
+}
+func (w whereHelpernull_String) GT(x null.String) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GT, x)
+}
+func (w whereHelpernull_String) GTE(x null.String) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GTE, x)
+}
+
+func (w whereHelpernull_String) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
+func (w whereHelpernull_String) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
+
 type whereHelpernull_Int64 struct{ field string }
 
 func (w whereHelpernull_Int64) EQ(x null.Int64) qm.QueryMod {
@@ -197,6 +226,7 @@ var AiDatumWhere = struct {
 	ID          whereHelperint64
 	GWUUID      whereHelperstring
 	LogDate     whereHelpertime_Time
+	LogType     whereHelpernull_String
 	GWID        whereHelpernull_Int64
 	LocationID  whereHelpernull_Int64
 	LocalAiData whereHelpernull_JSON
@@ -206,6 +236,7 @@ var AiDatumWhere = struct {
 	ID:          whereHelperint64{field: "`ai_data`.`id`"},
 	GWUUID:      whereHelperstring{field: "`ai_data`.`gw_uuid`"},
 	LogDate:     whereHelpertime_Time{field: "`ai_data`.`log_date`"},
+	LogType:     whereHelpernull_String{field: "`ai_data`.`log_type`"},
 	GWID:        whereHelpernull_Int64{field: "`ai_data`.`gw_id`"},
 	LocationID:  whereHelpernull_Int64{field: "`ai_data`.`location_id`"},
 	LocalAiData: whereHelpernull_JSON{field: "`ai_data`.`local_ai_data`"},
@@ -230,8 +261,8 @@ func (*aiDatumR) NewStruct() *aiDatumR {
 type aiDatumL struct{}
 
 var (
-	aiDatumAllColumns            = []string{"id", "gw_uuid", "log_date", "gw_id", "location_id", "local_ai_data", "created_at", "updated_at"}
-	aiDatumColumnsWithoutDefault = []string{"gw_uuid", "log_date", "gw_id", "location_id", "local_ai_data"}
+	aiDatumAllColumns            = []string{"id", "gw_uuid", "log_date", "log_type", "gw_id", "location_id", "local_ai_data", "created_at", "updated_at"}
+	aiDatumColumnsWithoutDefault = []string{"gw_uuid", "log_date", "log_type", "gw_id", "location_id", "local_ai_data"}
 	aiDatumColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	aiDatumPrimaryKeyColumns     = []string{"id"}
 	aiDatumGeneratedColumns      = []string{}

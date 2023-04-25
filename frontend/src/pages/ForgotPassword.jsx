@@ -4,7 +4,7 @@ import { Link } from "react-router-dom"
 import React, { useState } from "react"
 import { useTranslation } from "react-multi-lang"
 
-import { ValidateEmail } from "../utils/utils"
+import { validateEmail } from "../utils/utils"
 import { apiCall } from "../utils/api"
 
 import AlertBox from "../components/AlertBox"
@@ -29,7 +29,7 @@ function ForgotPassword() {
             setEmailError(null)
         },
         submit = () => {
-            const isEmail = ValidateEmail(email)
+            const isEmail = validateEmail(email)
 
             if (!isEmail) {
                 setEmailError({ type: "emailFormat" })

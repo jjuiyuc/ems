@@ -5,7 +5,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle"
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import { Button, FormControl, TextField } from "@mui/material"
 
-import { ValidatePassword } from "../utils/utils"
+import { validatePassword } from "../utils/utils"
 import { apiCall } from "../utils/api"
 
 import AlertBox from "../components/AlertBox"
@@ -43,7 +43,7 @@ function ResetPassword() {
             setNewPasswordError(false)
         },
         validateNewPassword = () => setNewPasswordError(
-            newPassword.length > 0 && !ValidatePassword(newPassword)
+            newPassword.length > 0 && !validatePassword(newPassword)
         ),
         validateMatchPassword = () => setConfirmPasswordError(
             newPassword.length > 0

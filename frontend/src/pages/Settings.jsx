@@ -89,7 +89,6 @@ export default function Settings(props) {
             </div>
         </div>
         <PowerOutageCard />
-        <TimeOfUseCard />
         <DemandChargeCard
             data={maxDemandCapacity}
             title={pageT("maximumDemandCapacity")}

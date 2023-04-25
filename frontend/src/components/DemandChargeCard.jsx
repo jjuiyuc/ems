@@ -2,7 +2,7 @@ import { Button, TextField, InputAdornment } from "@mui/material"
 import { useState } from "react"
 import { useTranslation } from "react-multi-lang"
 
-import { ValidateNum } from "../utils/utils"
+import { validateNum } from "../utils/utils"
 
 import { ReactComponent as DemandChargeIcon } from
     "../assets/icons/demand_charge_line.svg"
@@ -17,7 +17,7 @@ export default function DemandChargeCard(props) {
     const
         inputNum = (e) => {
             const num = e.target.value
-            const isNum = ValidateNum(num)
+            const isNum = validateNum(num)
             if (!isNum) return
             setInputValue(num)
         }

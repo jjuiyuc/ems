@@ -1,7 +1,7 @@
 import { Divider, InputAdornment, MenuItem, TextField } from "@mui/material"
 import { useTranslation } from "react-multi-lang"
 import { useEffect, useMemo, useState } from "react"
-import { ValidateNumPercent } from "../utils/utils"
+import { validateNumPercent } from "../utils/utils"
 
 
 export default function ExtraDeviceInfoForm(props) {
@@ -20,7 +20,7 @@ export default function ExtraDeviceInfoForm(props) {
     const
         inputPercent = (e) => {
             const num = e.target.value
-            const isNum = ValidateNumPercent(num)
+            const isNum = validateNumPercent(num)
             if (!isNum) return
             setGridOutagePercent(num)
         }

@@ -5,7 +5,7 @@ import { useEffect, useState } from "react"
 import { useTranslation } from "react-multi-lang"
 
 import { apiCall } from "../utils/api"
-import { ConvertTimeToNumber, drawHighPeak } from "../utils/utils"
+import { convertTimeToNumber, drawHighPeak } from "../utils/utils"
 import variables from "../configs/variables"
 
 import AlertBox from "../components/AlertBox"
@@ -193,8 +193,8 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
                     ],
                     highPeak = onPeak?.map(item => {
                         const { start, end } = item,
-                            peakStart = ConvertTimeToNumber(start, timezone),
-                            peakEnd = ConvertTimeToNumber(end, timezone)
+                            peakStart = convertTimeToNumber(start, timezone),
+                            peakEnd = convertTimeToNumber(end, timezone)
                         return ({ start: peakStart, end: peakEnd })
                     }) || []
                 setPower({
@@ -226,8 +226,8 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
                     ],
                     highPeak = onPeak?.map(item => {
                         const { start, end } = item,
-                            peakStart = ConvertTimeToNumber(start, timezone),
-                            peakEnd = ConvertTimeToNumber(end, timezone)
+                            peakStart = convertTimeToNumber(start, timezone),
+                            peakEnd = convertTimeToNumber(end, timezone)
                         return ({ start: peakStart, end: peakEnd })
                     }) || []
                 setChargeVoltage({

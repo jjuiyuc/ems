@@ -18,7 +18,7 @@ export const userSlice = createSlice({
             return action.payload
         },
         updateUserProfile: (state, action) => {
-            const user = {...state, ...action.payload}
+            const user = { ...state, ...action.payload }
             setLocalStorage(user)
             return user
         }

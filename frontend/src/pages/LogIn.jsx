@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Button, FormControl, TextField } from "@mui/material"
 import { useTranslation } from "react-multi-lang"
 
-import { ValidateEmail } from "../utils/utils"
+import { validateEmail } from "../utils/utils"
 import { apiCall } from "../utils/api"
 
 import LanguageField from "../components/NonLoggedInLanguageField"
@@ -20,6 +20,7 @@ function LogIn(props) {
         [email, setEmail] = useState(""),
         [emailError, setEmailError] = useState(null),
         [otherError, setOtherError] = useState(""),
+        [showProfileError, setShowProfileError] = useState(false),
         [password, setPassword] = useState(""),
         [passwordError, setPasswordError] = useState(false)
 
@@ -35,7 +36,7 @@ function LogIn(props) {
             setOtherError("")
         },
         submit = async () => {
-            const isEmail = ValidateEmail(email)
+            const isEmail = validateEmail(email)
 
             if (!isEmail) {
                 setEmailError({ type: "emailFormat" })
@@ -57,7 +58,7 @@ function LogIn(props) {
                 }
             }
 
-            const data = { username: email, password };
+            const data = { username: email, password }
             const loginStatus = await apiCall({
                 url: "/api/auth",
                 method: "post",
@@ -69,23 +70,30 @@ function LogIn(props) {
 
             const token = loginStatus.data.token
 
-            props.updateUser({token, username: email})
+            props.updateUser({ token, username: email })
 
-            const userProfile = await apiCall({url: "/api/users/profile"})
 
+            const profileOnError = () => {
+                setShowProfileError(true)
+            }
+            const userProfile = await apiCall({
+                url: "/api/users/profile",
+                profileOnError
+            })
             if (!userProfile) return
-
             const
-                {gateways, id, name} = userProfile.data,
-                // Tokens will expire in 3 hours
-                tokenExpiryTime = new Date().getTime() + 1000 * 60 * 60 * 3
+                { gateways, group, id, name, username } = userProfile.data,
+                webpages = group.webpages.filter(webpage => webpage?.permissions?.read)
+
+            // Tokens will expire in 3 hours
+            const tokenExpiryTime = new Date().getTime() + 1000 * 60 * 60 * 3
 
             if (gateways && gateways.length > 0) {
                 props.setGateway(gateways[0])
                 props.setGatewayList(gateways)
             }
+            props.updateUserProfile({ group, id, name, username, tokenExpiryTime, webpages })
 
-            props.updateUserProfile({id, name, tokenExpiryTime})
         }
     return (
         <div>
@@ -112,11 +120,16 @@ function LogIn(props) {
                     variant="outlined"
                     value={password}
                 />
-            {otherError
-                ? <div className="box mb-8 negative text-center text-red-400">
-                    {otherError}
-                </div>
-                : null}
+                {otherError && (
+                    <div className="box mb-8 negative text-center text-red-400">
+                        {otherError}
+                    </div>
+                )}
+                {showProfileError && (
+                    <div className="box mb-8 negative text-center text-red-400">
+                        {showProfileError ? errorT("userProfileError") : ""}
+                    </div>
+                )}
                 <Button
                     color="primary"
                     disabled={!email || !password}
@@ -135,7 +148,7 @@ function LogIn(props) {
 }
 
 const mapDispatch = dispatch => {
-    const updateStore = (payload, type) => dispatch({payload, type})
+    const updateStore = (payload, type) => dispatch({ payload, type })
 
     return ({
         setGateway: v => updateStore(v, "gateways/changeGateway"),

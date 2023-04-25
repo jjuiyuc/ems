@@ -73,8 +73,8 @@ function LogIn(props) {
             props.updateUser({ token, username: email })
 
 
-            const profileOnError = (err) => {
-                setShowProfileError(err)
+            const profileOnError = () => {
+                setShowProfileError(true)
             }
             const userProfile = await apiCall({
                 url: "/api/users/profile",
@@ -120,16 +120,16 @@ function LogIn(props) {
                     variant="outlined"
                     value={password}
                 />
-                {otherError
-                    ? <div className="box mb-8 negative text-center text-red-400">
+                {otherError && (
+                    <div className="box mb-8 negative text-center text-red-400">
                         {otherError}
                     </div>
-                    : null}
-                {showProfileError
-                    ? <div className="box mb-8 negative text-center text-red-400">
+                )}
+                {showProfileError && (
+                    <div className="box mb-8 negative text-center text-red-400">
                         {showProfileError ? errorT("userProfileError") : ""}
                     </div>
-                    : null}
+                )}
                 <Button
                     color="primary"
                     disabled={!email || !password}

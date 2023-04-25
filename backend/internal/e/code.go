@@ -18,14 +18,15 @@ const (
 	ErrPasswordToken = 30000
 	// ErrPasswordReset = 30001
 	ErrPasswordLost = 30002
+	ErrNameUpdate   = 30003
 
 	ErrToken = 40000
 
-	ErrUserProfileGen       = 50000
-	ErrDashboardDataGen     = 50001
-	ErrBatteryPowerStateGen = 50002
+	ErrUserProfileGen               = 50000
+	ErrDashboardDataGen             = 50001
+	ErrBatteryPowerStateGen         = 50002
 	ErrBatteryChargeVoltageStateGen = 50003
-	ErrSolarPowerStateGen = 50004
-	ErrGridPowerStateGen = 50005
-	ErrTimeOfUseInfoGen = 50006
+	ErrSolarPowerStateGen           = 50004
+	ErrGridPowerStateGen            = 50005
+	ErrTimeOfUseInfoGen             = 50006
 )

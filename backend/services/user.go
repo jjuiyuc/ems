@@ -17,6 +17,7 @@ type UserService interface {
 	CreatePasswordToken(username string) (name, token string, err error)
 	PasswordResetByPasswordToken(token, newPassword string) (err error)
 	GetProfile(userID int64) (profile *ProfileResponse, err error)
+	UpdateName(userID int64, name string) (err error)
 }
 
 type defaultUserService struct {
@@ -90,7 +91,7 @@ func (s defaultUserService) CreatePasswordToken(username string) (name, token st
 
 	token = uuid.New().String()
 	user.ResetPWDToken = null.StringFrom(token)
-	user.PWDTokenExpiry = null.TimeFrom(time.Now().UTC().Add(1*time.Hour))
+	user.PWDTokenExpiry = null.TimeFrom(time.Now().UTC().Add(1 * time.Hour))
 	err = s.repo.User.UpdateUser(user)
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -183,8 +184,8 @@ func (s defaultUserService) getGroupGatewayInfo(groupID int64) (gatewayInfos []G
 	}
 	for _, gatewayPermission := range gatewaysPermission {
 		var (
-			gatewayInfo         GatewayInfo
-			permissions         []GatewayPermissionInfo
+			gatewayInfo GatewayInfo
+			permissions []GatewayPermissionInfo
 		)
 		gateway, getErr := s.repo.Gateway.GetGatewayByGatewayID(gatewayPermission.GWID)
 		if getErr != nil {
@@ -265,6 +266,26 @@ func (s defaultUserService) getGroupWebpageInfo(groupTypeID int64) (webpageInfos
 			},
 		}
 		webpageInfos = append(webpageInfos, webpageInfo)
+	}
+	return
+}
+
+func (s defaultUserService) UpdateName(userID int64, name string) (err error) {
+	user, err := s.repo.User.GetUserByUserID(userID)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "s.repo.User.GetUserByUserID",
+			"err":       err,
+		}).Error()
+		return
+	}
+
+	user.Name = null.StringFrom(name)
+	if err = s.repo.User.UpdateUser(user); err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "s.repo.User.UpdateUser",
+			"err":       err,
+		}).Error()
 	}
 	return
 }

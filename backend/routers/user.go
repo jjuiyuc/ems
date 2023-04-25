@@ -16,6 +16,12 @@ type PersonalName struct {
 	Name string `form:"name" binding:"required,max=20"`
 }
 
+// PersonalPassword godoc
+type PersonalPassword struct {
+	CurrentPassword string `form:"currentPassword" binding:"required,max=50"`
+	NewPassword     string `form:"newPassword" binding:"required,max=50"`
+}
+
 // PasswordLost godoc
 // @Summary     Send an email for reset the password
 // @Description get email by username
@@ -121,7 +127,7 @@ func (w *APIWorker) GetProfile(c *gin.Context) {
 	profile, err := w.Services.User.GetProfile(userID.(int64))
 	if err != nil {
 		log.WithField("caused-by", "get profile").Error()
-		appG.Response(http.StatusInternalServerError, e.ErrUserProfileGen, err.Error())
+		appG.Response(http.StatusInternalServerError, e.ErrUserProfileGen, nil)
 		return
 	}
 	appG.Response(http.StatusOK, e.Success, profile)
@@ -136,6 +142,7 @@ func (w *APIWorker) GetProfile(c *gin.Context) {
 // @Accept      json
 // @Param       name           body      string true "Name"
 // @Success     200            {object}  app.Response
+// @Failure     400            {object}  app.Response
 // @Failure     401            {object}  app.Response
 // @Failure     500            {object}  app.Response
 // @Router      /users/name [put]
@@ -149,7 +156,41 @@ func (w *APIWorker) UpdateName(c *gin.Context) {
 	}
 	if err := w.Services.User.UpdateName(userID.(int64), json.Name); err != nil {
 		log.WithField("caused-by", "update name").Error()
-		appG.Response(http.StatusInternalServerError, e.ErrNameUpdate, err.Error())
+		appG.Response(http.StatusInternalServerError, e.ErrNameUpdate, nil)
+		return
+	}
+	appG.Response(http.StatusOK, e.Success, nil)
+}
+
+// UpdatePassword godoc
+// @Summary Update the password about an individual user
+// @Description update user's password by token
+// @Tags        user
+// @Security    ApiKeyAuth
+// @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
+// @Accept      json
+// @Param       password       body      string true "Password"
+// @Success     200            {object}  app.Response
+// @Failure     400            {object}  app.Response
+// @Failure     401            {object}  app.Response
+// @Failure     500            {object}  app.Response
+// @Router      /users/password [put]
+func (w *APIWorker) UpdatePassword(c *gin.Context) {
+	appG := app.Gin{c}
+	userID, _ := c.Get("userID")
+	var json PersonalPassword
+	if err := c.BindJSON(&json); err != nil {
+		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
+		return
+	}
+	errCode, err := w.Services.User.UpdatePassword(userID.(int64), json.CurrentPassword, json.NewPassword)
+	if err != nil {
+		log.WithField("caused-by", "update password").Error()
+		if errCode == e.ErrAuthPasswordNotMatch {
+			appG.Response(http.StatusUnauthorized, e.ErrAuthPasswordNotMatch, nil)
+		} else {
+			appG.Response(http.StatusInternalServerError, e.ErrPasswordUpdate, nil)
+		}
 		return
 	}
 	appG.Response(http.StatusOK, e.Success, nil)

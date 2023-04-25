@@ -18,9 +18,9 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 	"github.com/volatiletech/sqlboiler/v4/boil"
-	"golang.org/x/crypto/bcrypt"
 
 	"der-ems/internal/app"
+	"der-ems/internal/utils"
 	deremsmodels "der-ems/models/der-ems"
 	"der-ems/testutils/testdata"
 )
@@ -54,14 +54,14 @@ func SeedUtUser(db *sql.DB) (err error) {
 	if err != nil {
 		return
 	}
-	hashPassword, err := bcrypt.GenerateFromPassword([]byte(testdata.UtUser.Password), bcrypt.DefaultCost)
+	hashedPassword, err := utils.CreateHashedPassword(testdata.UtUser.Password)
 	if err != nil {
 		return
 	}
 	user := &deremsmodels.User{
 		Username:       testdata.UtUser.Username,
 		GroupID:        testdata.UtUser.GroupID,
-		Password:       string(hashPassword[:]),
+		Password:       hashedPassword,
 		ExpirationDate: testdata.UtUser.ExpirationDate,
 		CreatedAt:      testdata.UtUser.CreatedAt,
 		UpdatedAt:      testdata.UtUser.UpdatedAt,

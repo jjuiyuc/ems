@@ -93,4 +93,77 @@ var _ = Describe("User", func() {
 			})
 		})
 	})
+
+	Describe("UpdatePassword", func() {
+		Context("success", func() {
+			It("should be ok", func() {
+				seedUtURL := "/api/users/password"
+				seedUtPassword := "abc123def456"
+				seedUtArg := &PersonalPassword{
+					CurrentPassword: testdata.UtUser.Password,
+					NewPassword:     seedUtPassword,
+				}
+				seedUtAfterArg := &PersonalPassword{
+					CurrentPassword: seedUtPassword,
+					NewPassword:     testdata.UtUser.Password,
+				}
+				tt := testutils.TestInfo{
+					Token:      token,
+					URL:        seedUtURL,
+					WantStatus: http.StatusOK,
+					WantRv: app.Response{
+						Code: e.Success,
+						Msg:  "ok",
+					},
+				}
+				payloadBuf, _ := json.Marshal(seedUtArg)
+				testutils.GinkgoAssertRequest(tt, router, "PUT", bytes.NewBuffer(payloadBuf))
+				user, err := repo.User.GetUserByUserID(testdata.UtUser.ID)
+				Expect(err).Should(BeNil())
+				err = utils.ComparePassword(seedUtPassword, user.Password)
+				Expect(err).Should(BeNil())
+
+				payloadBuf, _ = json.Marshal(seedUtAfterArg)
+				testutils.GinkgoAssertRequest(tt, router, "PUT", bytes.NewBuffer(payloadBuf))
+			})
+		})
+
+		Context("fail", func() {
+			It("should return fail", func() {
+				seedUtURL := "/api/users/password"
+				seedUtPassword := "abc123def456"
+				seedUtArg := &PersonalPassword{
+					CurrentPassword: seedUtPassword,
+					NewPassword:     seedUtPassword,
+				}
+				tt := testutils.TestInfo{
+					Token:      token,
+					URL:        seedUtURL,
+					WantStatus: http.StatusUnauthorized,
+					WantRv: app.Response{
+						Code: e.ErrAuthPasswordNotMatch,
+						Msg:  "fail",
+					},
+				}
+				payloadBuf, _ := json.Marshal(seedUtArg)
+				testutils.GinkgoAssertRequest(tt, router, "PUT", bytes.NewBuffer(payloadBuf))
+			})
+		})
+
+		Context("fail", func() {
+			It("should return invalid parameters", func() {
+				seedUtURL := "/api/users/password"
+				tt := testutils.TestInfo{
+					Token:      token,
+					URL:        seedUtURL,
+					WantStatus: http.StatusBadRequest,
+					WantRv: app.Response{
+						Code: e.InvalidParams,
+						Msg:  "invalid parameters",
+					},
+				}
+				testutils.GinkgoAssertRequest(tt, router, "PUT", nil)
+			})
+		})
+	})
 })

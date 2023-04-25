@@ -20,7 +20,7 @@ function LogIn(props) {
         [email, setEmail] = useState(""),
         [emailError, setEmailError] = useState(null),
         [otherError, setOtherError] = useState(""),
-        [profileError, setProfileError] = useState(""),
+        [showProfileError, setShowProfileError] = useState(false),
         [password, setPassword] = useState(""),
         [passwordError, setPasswordError] = useState(false)
 
@@ -74,7 +74,7 @@ function LogIn(props) {
 
 
             const profileOnError = (err) => {
-                setProfileError(err)
+                setShowProfileError(err)
             }
             const userProfile = await apiCall({
                 url: "/api/users/profile",
@@ -125,9 +125,9 @@ function LogIn(props) {
                         {otherError}
                     </div>
                     : null}
-                {profileError
+                {showProfileError
                     ? <div className="box mb-8 negative text-center text-red-400">
-                        {profileError ? errorT("userProfileError") : ""}
+                        {showProfileError ? errorT("userProfileError") : ""}
                     </div>
                     : null}
                 <Button

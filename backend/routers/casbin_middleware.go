@@ -10,6 +10,7 @@ import (
 	"der-ems/internal/e"
 )
 
+// CasbinQuery godoc
 type CasbinQuery struct {
 	CasbinSubject string `form:"casbin_subject" binding:"required"`
 }

@@ -56,7 +56,7 @@ export default connect(mapState, mapDispatch)(function AccountInfoModify(props) 
     return <>
         <div className="card w-fit lg:w-88">
             <h4 className="mb-6">
-                {pageT("ModifyAccountInformation")}
+                {pageT("modifyAccountInformation")}
             </h4>
             <form className="grid">
                 <TextField

@@ -10,7 +10,7 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff"
 import { useTranslation } from "react-multi-lang"
 import { useEffect, useMemo, useState } from "react"
 
-import { ValidateEmail } from "../utils/utils"
+import { validateEmail } from "../utils/utils"
 
 import DialogForm from "../components/DialogForm"
 import Table from "../components/DataTable"
@@ -129,7 +129,7 @@ export default function AccountManagementUser() {
         })
     }
     const submit = async () => {
-        const isEmail = ValidateEmail(email)
+        const isEmail = validateEmail(email)
 
         if (!isEmail) {
             setEmailError({ type: "emailFormat" })

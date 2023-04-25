@@ -5,7 +5,7 @@ import {
 import AddIcon from "@mui/icons-material/Add"
 import { useTranslation } from "react-multi-lang"
 import { useEffect, useMemo, useState } from "react"
-import { ValidateNumPercent } from "../utils/utils"
+import { validateNumPercent } from "../utils/utils"
 
 import DialogForm from "../components/DialogForm"
 import ExtraDeviceInfoForm from "../components/ExtraDeviceInfoForm"
@@ -110,7 +110,7 @@ export default function AddField({
     const
         inputPercent = (e) => {
             const num = e.target.value
-            const isNum = ValidateNumPercent(num)
+            const isNum = validateNumPercent(num)
             if (!isNum) return
             setGridOutagePercent(num)
         }

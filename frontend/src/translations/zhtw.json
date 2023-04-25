@@ -1,6 +1,6 @@
 {
     "account":{
-        "ModifyAccountInformation":"個人帳號資料修改",
+        "modifyAccountInformation":"個人帳號資料修改",
         "changePassword":"修改密碼",
         "currentPassword":"現在的密碼",
         "name":"名稱",

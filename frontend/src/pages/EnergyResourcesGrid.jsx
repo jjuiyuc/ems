@@ -5,7 +5,7 @@ import { useTranslation } from "react-multi-lang"
 import ReportProblemIcon from "@mui/icons-material/ReportProblem"
 
 import { apiCall } from "../utils/api"
-import { ConvertTimeToNumber, drawHighPeak } from "../utils/utils"
+import { convertTimeToNumber, drawHighPeak } from "../utils/utils"
 import variables from "../configs/variables"
 
 import AlertBox from "../components/AlertBox"
@@ -140,8 +140,8 @@ export default connect(mapState)(function EnergyResourcesGrid(props) {
                     ],
                     highPeak = onPeak?.map(item => {
                         const { start, end } = item,
-                            peakStart = ConvertTimeToNumber(start, timezone),
-                            peakEnd = ConvertTimeToNumber(end, timezone)
+                            peakStart = convertTimeToNumber(start, timezone),
+                            peakEnd = convertTimeToNumber(end, timezone)
                         return ({ start: peakStart, end: peakEnd })
                     }) || []
                 setLineChartGridPower({

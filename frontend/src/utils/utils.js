@@ -3,7 +3,7 @@ import variables from "../configs/variables"
 
 const { colors } = variables
 
-const ConvertTimeToNumber = (string, timezone) => {
+const convertTimeToNumber = (string, timezone) => {
     const
         today = moment().format("YYYY-MM-DD"),
         time = moment(today + " " + string + timezone),
@@ -42,19 +42,19 @@ const drawHighPeak = (onPeak) => chart => {
         )
     }
 }
-const ValidateEmail = email =>
+const validateEmail = email =>
     /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)
 
-const ValidatePassword = password =>
+const validatePassword = password =>
     /^(?=.{8,})((?=.*[^a-zA-Z]))|(?=.*\d)(?=.*[a-zA-Z])|(?=.*[^a-zA-Z0-9]).*$/.test(password)
 
-const ValidateNum = num =>
+const validateNum = num =>
     /^(0?|[1-9][0-9]*)$/.test(num)
 
-const ValidateNumPercent = num =>
+const validateNumPercent = num =>
     /^(0?|[1-9]\d?|100)$/.test(num)
 
 const validateNumTwoDecimalPlaces = num =>
     /^((0?|[1-9][0-9]*)|([0-9]*\.)|([0]\.\d{1,2}|[1-9][0-9]*\.\d{1,2}))$/.test(num)
 
-export { ConvertTimeToNumber, drawHighPeak, ValidateEmail, ValidatePassword, ValidateNum, ValidateNumPercent, validateNumTwoDecimalPlaces }
+export { convertTimeToNumber, drawHighPeak, validateEmail, validatePassword, validateNum, validateNumPercent, validateNumTwoDecimalPlaces }

@@ -6,7 +6,7 @@ import { useTranslation } from "react-multi-lang"
 import { useState } from "react"
 
 import { apiCall } from "../utils/api"
-import { ValidatePassword } from "../utils/utils"
+import { validatePassword } from "../utils/utils"
 
 const mapDispatch = dispatch => ({
     updateSnackbarMsg: value =>
@@ -39,7 +39,7 @@ export default connect(null, mapDispatch)(function ChangePassword(props) {
             setNewPassword(e.target.value)
         },
         validateNewPassword = () => setNewPasswordError(
-            newPassword.length > 0 && !ValidatePassword(newPassword)
+            newPassword.length > 0 && !validatePassword(newPassword)
         ),
         newPasswordLengthError = newPassword.length == 0 || newPassword.length > 50,
         submit = async () => {

@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Button, FormControl, TextField } from "@mui/material"
 import { useTranslation } from "react-multi-lang"
 
-import { ValidateEmail } from "../utils/utils"
+import { validateEmail } from "../utils/utils"
 import { apiCall } from "../utils/api"
 
 import LanguageField from "../components/NonLoggedInLanguageField"
@@ -36,7 +36,7 @@ function LogIn(props) {
             setOtherError("")
         },
         submit = async () => {
-            const isEmail = ValidateEmail(email)
+            const isEmail = validateEmail(email)
 
             if (!isEmail) {
                 setEmailError({ type: "emailFormat" })

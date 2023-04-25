@@ -1,6 +1,6 @@
 {
     "account":{
-        "ModifyAccountInformation":"Modify Account Information",
+        "modifyAccountInformation":"Modify Account Information",
         "changePassword":"Change Password",
         "currentPassword":"Current Password",
         "name":"Name",

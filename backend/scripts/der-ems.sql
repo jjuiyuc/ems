@@ -26,7 +26,7 @@ CREATE TABLE `ai_data` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `gw_uuid` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `log_date` datetime NOT NULL,
-  `log_type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `log_type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `gw_id` bigint DEFAULT NULL,
   `location_id` bigint DEFAULT NULL,
   `local_ai_data` json DEFAULT NULL,

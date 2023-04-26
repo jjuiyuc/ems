@@ -107,7 +107,7 @@ func (h localAIConsumerHandler) saveLocalAIData(msg []byte) (err error) {
 	aiData := &deremsmodels.AiDatum{
 		GWUUID:      gwUUID,
 		LogDate:     time.Unix(logDate, 0),
-		LogType:     null.StringFrom(logType),
+		LogType:     logType,
 		LocalAiData: null.JSONFrom(dataJSON),
 	}
 

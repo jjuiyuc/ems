@@ -51,7 +51,11 @@ func (w *APIWorker) GetAuth(c *gin.Context) {
 		return
 	}
 
-	token, err := utils.GenerateToken(user.ID, user.GroupID)
+	claims := utils.Claims{
+		UserID:  user.ID,
+		GroupID: user.GroupID,
+	}
+	token, err := utils.GenerateToken(claims)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "utils.GenerateToken",

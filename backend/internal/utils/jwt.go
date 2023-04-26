@@ -16,16 +16,12 @@ type Claims struct {
 }
 
 // GenerateToken returns the token used for auth
-func GenerateToken(userID, groupID int64) (token string, err error) {
+func GenerateToken(claims Claims) (token string, err error) {
 	nowTime := time.Now().UTC()
 	expireTime := nowTime.Add(3 * time.Hour)
-	claims := Claims{
-		userID,
-		groupID,
-		jwt.StandardClaims{
-			ExpiresAt: expireTime.Unix(),
-			Issuer:    "derems",
-		},
+	claims.StandardClaims = jwt.StandardClaims{
+		ExpiresAt: expireTime.Unix(),
+		Issuer:    "derems",
 	}
 
 	tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

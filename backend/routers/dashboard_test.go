@@ -51,7 +51,7 @@ func (s *DashboardSuite) SetupSuite() {
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	err = testutils.SeedUtLocationAndGateway(db)
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
-	token, err := utils.GenerateToken(testdata.UtUser.ID, testdata.UtUser.GroupID)
+	token, err := utils.GenerateToken(testutils.SeedUtClaims())
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	s.token = token
 	// Mock group_gateway_right table

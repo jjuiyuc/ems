@@ -41,7 +41,7 @@ var _ = Describe("User", func() {
 			Services: services.NewServices(cfg, repo),
 		}
 
-		token, err = utils.GenerateToken(testdata.UtUser.ID, testdata.UtUser.GroupID)
+		token, err = utils.GenerateToken(testutils.SeedUtClaims())
 		Expect(err).Should(BeNil())
 
 		router = InitRouter(cfg.GetBool("server.cors"), cfg.GetString("server.ginMode"), initPolicy(testutils.GetConfigDir()), w)

@@ -45,10 +45,10 @@ const (
 	TimeOfUseEnergy PolicyWebpageObject = "timeOfUseEnergy"
 	// Economics godoc
 	Economics PolicyWebpageObject = "economics"
-	// EnergyResources godoc
-	EnergyResources PolicyWebpageObject = "energyResources"
 	// DemandCharge godoc
 	DemandCharge PolicyWebpageObject = "demandCharge"
+	// EnergyResources godoc
+	EnergyResources PolicyWebpageObject = "energyResources"
 	// FieldManagement godoc
 	FieldManagement PolicyWebpageObject = "fieldManagement"
 	// AccountManagementGroup godoc

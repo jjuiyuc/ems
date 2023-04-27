@@ -2,8 +2,8 @@ p, 1, dashboard, read
 p, 1, analysis, read
 p, 1, timeOfUseEnergy, read
 p, 1, economics, read
-p, 1, energyResources, read
 p, 1, demandCharge, read
+p, 1, energyResources, read
 p, 1, fieldManagement, create
 p, 1, fieldManagement, read
 p, 1, fieldManagement, update
@@ -26,8 +26,8 @@ p, 2, dashboard, read
 p, 2, analysis, read
 p, 2, timeOfUseEnergy, read
 p, 2, economics, read
-p, 2, energyResources, read
 p, 2, demandCharge, read
+p, 2, energyResources, read
 p, 2, fieldManagement, create
 p, 2, fieldManagement, read
 p, 2, fieldManagement, update

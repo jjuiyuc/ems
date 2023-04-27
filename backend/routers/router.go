@@ -198,7 +198,7 @@ func InitRouter(isCORS bool, ginMode string, enforcer *casbin.Enforcer, w *APIWo
 	r.GET(EndpointMapping[EnergyResources][5], authorizeJWT(REST), authorizePolicy(enforcer), w.GetGridEnergyInfo)
 	r.GET(EndpointMapping[EnergyResources][6], authorizeJWT(REST), authorizePolicy(enforcer), w.GetGridPowerState)
 
-	// Casbin middleware
+	// Casbin route
 	apiGroup.GET("/casbin", w.getFrontendPermission(enforcer))
 
 	// Leap - webhook endpoint

@@ -30,7 +30,8 @@ func (repo defaultAIDataRepository) UpsertAIData(aiData *deremsmodels.AiDatum) (
 	var aiDataReturn *deremsmodels.AiDatum
 	aiDataReturn, err = deremsmodels.AiData(
 		qm.Where("gw_uuid = ?", aiData.GWUUID),
-		qm.Where("log_date = ?", aiData.LogDate)).One(repo.db)
+		qm.Where("log_date = ?", aiData.LogDate),
+		qm.Where("log_type = ?", aiData.LogType)).One(repo.db)
 	now := time.Now().UTC()
 	aiData.UpdatedAt = now
 	if err != nil {

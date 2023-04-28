@@ -11,6 +11,7 @@ import (
 const (
 	gwID      = "gwID"
 	timestamp = "timestamp"
+	msgType   = "type"
 )
 
 // AssertGatewayMessage godoc
@@ -53,6 +54,27 @@ func AssertGatewayMessage(msg []byte) (gwIDValue, timestampValue interface{}, da
 		err = e.ErrNewKeyUnexpectedValue(timestamp)
 		log.WithFields(log.Fields{
 			"caused-by": timestamp,
+			"err":       err,
+		}).Error()
+	}
+	return
+}
+
+// AssertGatewayMessageType godoc
+func AssertGatewayMessageType(data map[string]interface{}) (typeValue interface{}, err error) {
+	typeValue, ok := data[msgType]
+	if !ok {
+		err = e.ErrNewKeyNotExist(msgType)
+		log.WithFields(log.Fields{
+			"caused-by": msgType,
+			"err":       err,
+		}).Error()
+		return
+	}
+	if _, ok = typeValue.(string); !ok {
+		err = e.ErrNewKeyUnexpectedValue(msgType)
+		log.WithFields(log.Fields{
+			"caused-by": msgType,
 			"err":       err,
 		}).Error()
 	}

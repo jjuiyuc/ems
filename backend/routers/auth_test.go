@@ -49,7 +49,7 @@ func (s *AuthorizationSuite) SetupSuite() {
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 
 	s.repo = repo
-	s.router = InitRouter(cfg.GetBool("server.cors"), cfg.GetString("server.ginMode"), worker)
+	s.router = InitRouter(cfg.GetBool("server.cors"), cfg.GetString("server.ginMode"), initPolicy(testutils.GetConfigDir()), worker)
 }
 
 func (s *AuthorizationSuite) TearDownSuite() {

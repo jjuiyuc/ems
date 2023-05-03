@@ -55,7 +55,7 @@ func (s *UserSuite) SetupSuite() {
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	err = testutils.SeedUtLocationAndGateway(db)
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
-	token, err := utils.GenerateToken(testdata.UtUser.ID)
+	token, err := utils.GenerateToken(testutils.SeedUtClaims())
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	s.token = token
 	// Mock group_gateway_right table
@@ -68,7 +68,7 @@ func (s *UserSuite) SetupSuite() {
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 
 	s.repo = repo
-	s.router = InitRouter(cfg.GetBool("server.cors"), cfg.GetString("server.ginMode"), w)
+	s.router = InitRouter(cfg.GetBool("server.cors"), cfg.GetString("server.ginMode"), initPolicy(testutils.GetConfigDir()), w)
 }
 
 func (s *UserSuite) TearDownSuite() {

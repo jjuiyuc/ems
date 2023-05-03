@@ -98,6 +98,15 @@ func SeedUtLocationAndGateway(db *sql.DB) (err error) {
 	return
 }
 
+// SeedUtClaims godoc
+func SeedUtClaims() (claims utils.Claims) {
+	claims = utils.Claims{
+		UserID:  testdata.UtUser.ID,
+		GroupID: testdata.UtUser.GroupID,
+	}
+	return
+}
+
 // GetAuthorization godoc
 func GetAuthorization(token string) string {
 	return fmt.Sprintf("Bearer %s", token)

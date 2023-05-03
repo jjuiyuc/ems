@@ -2,8 +2,10 @@ package routers
 
 import (
 	"net/http"
+	"strconv"
 	"strings"
 
+	"github.com/casbin/casbin/v2"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
@@ -18,8 +20,14 @@ import (
 	"der-ems/services"
 )
 
-// APIType godoc
-type APIType int
+type (
+	// APIType godoc
+	APIType int
+	// PolicyWebpageObject godoc
+	PolicyWebpageObject string
+	// PolicyWebpageAction godoc
+	PolicyWebpageAction string
+)
 
 const (
 	// REST godoc
@@ -28,6 +36,81 @@ const (
 	WebSocket
 )
 
+const (
+	// Dashboard godoc
+	Dashboard PolicyWebpageObject = "dashboard"
+	// Analysis godoc
+	Analysis PolicyWebpageObject = "analysis"
+	// TimeOfUseEnergy godoc
+	TimeOfUseEnergy PolicyWebpageObject = "timeOfUseEnergy"
+	// Economics godoc
+	Economics PolicyWebpageObject = "economics"
+	// DemandCharge godoc
+	DemandCharge PolicyWebpageObject = "demandCharge"
+	// EnergyResources godoc
+	EnergyResources PolicyWebpageObject = "energyResources"
+	// FieldManagement godoc
+	FieldManagement PolicyWebpageObject = "fieldManagement"
+	// AccountManagementGroup godoc
+	AccountManagementGroup PolicyWebpageObject = "accountManagementGroup"
+	// AccountManagementUser godoc
+	AccountManagementUser PolicyWebpageObject = "accountManagementUser"
+	// Settings godoc
+	Settings PolicyWebpageObject = "settings"
+	// AdvancedSettings godoc
+	AdvancedSettings PolicyWebpageObject = "advancedSettings"
+)
+
+const (
+	// Create godoc
+	Create PolicyWebpageAction = "create"
+	// Read godoc
+	Read PolicyWebpageAction = "read"
+	// Update godoc
+	Update PolicyWebpageAction = "update"
+	// Delete godoc
+	Delete PolicyWebpageAction = "delete"
+)
+
+// EndpointMapping godoc
+var EndpointMapping = map[PolicyWebpageObject][]string{
+	Dashboard: {
+		"/ws/:gwid/devices/energy-info",
+	},
+	Analysis: {
+		"/api/:gwid/devices/energy-distribution-info",
+		"/api/:gwid/devices/power-state",
+		"/api/:gwid/devices/accumulated-power-state",
+		"/api/:gwid/devices/power-self-supply-rate",
+	},
+	TimeOfUseEnergy: {
+		"/api/:gwid/devices/battery/usage-info",
+		"/api/:gwid/devices/tou/info",
+		"/api/:gwid/devices/solar/energy-usage",
+	},
+	Economics: {
+		"/api/:gwid/devices/tou/energy-cost",
+	},
+	DemandCharge: {
+		"/api/:gwid/devices/charge-info",
+		"/api/:gwid/devices/demand-state",
+	},
+	EnergyResources: {
+		"/api/:gwid/devices/solar/energy-info",
+		"/api/:gwid/devices/solar/power-state",
+		"/api/:gwid/devices/battery/energy-info",
+		"/api/:gwid/devices/battery/power-state",
+		"/api/:gwid/devices/battery/charge-voltage-state",
+		"/api/:gwid/devices/grid/energy-info",
+		"/api/:gwid/devices/grid/power-state",
+	},
+}
+
+// MethodMapping godoc
+var MethodMapping = map[PolicyWebpageAction]string{
+	Read: "GET",
+}
+
 // APIWorker godoc
 type APIWorker struct {
 	Cfg      *viper.Viper
@@ -35,20 +118,20 @@ type APIWorker struct {
 }
 
 // NewAPIWorker godoc
-func NewAPIWorker(cfg *viper.Viper, services *services.Services) {
+func NewAPIWorker(dir string, cfg *viper.Viper, services *services.Services) {
 	w := &APIWorker{
 		Cfg:      cfg,
 		Services: services,
 	}
 
-	r := InitRouter(cfg.GetBool("server.cors"), cfg.GetString("server.ginMode"), w)
+	r := InitRouter(cfg.GetBool("server.cors"), cfg.GetString("server.ginMode"), initPolicy(dir), w)
 	r.Run(cfg.GetString("server.port"))
 }
 
 // InitRouter godoc
 // @title DER-EMS API
 // @BasePath /api
-func InitRouter(isCORS bool, ginMode string, w *APIWorker) *gin.Engine {
+func InitRouter(isCORS bool, ginMode string, enforcer *casbin.Enforcer, w *APIWorker) *gin.Engine {
 	r := gin.New()
 	if isCORS {
 		r.Use(cors.New(cors.Config{
@@ -72,7 +155,6 @@ func InitRouter(isCORS bool, ginMode string, w *APIWorker) *gin.Engine {
 	}
 
 	apiGroup := r.Group("/api")
-	wsGroup := r.Group("/ws")
 
 	// Auth
 	apiGroup.POST("/auth", w.GetAuth)
@@ -80,41 +162,44 @@ func InitRouter(isCORS bool, ginMode string, w *APIWorker) *gin.Engine {
 	// User
 	apiGroup.PUT("/users/password/lost", w.PasswordLost)
 	apiGroup.PUT("/users/password/reset-by-token", w.PasswordResetByToken)
-	apiGroup.GET("/users/profile", authorize(REST), w.GetProfile)
-	apiGroup.PUT("/users/name", authorize(REST), w.UpdateName)
-	apiGroup.PUT("/users/password", authorize(REST), w.UpdatePassword)
-
-	// Analysis
-	apiGroup.GET("/:gwid/devices/energy-distribution-info", authorize(REST), w.GetEnergyDistributionInfo)
-	apiGroup.GET("/:gwid/devices/power-state", authorize(REST), w.GetPowerState)
-	apiGroup.GET("/:gwid/devices/accumulated-power-state", authorize(REST), w.GetAccumulatedPowerState)
-	apiGroup.GET("/:gwid/devices/power-self-supply-rate", authorize(REST), w.GetPowerSelfSupplyRate)
-
-	// Time of Use
-	apiGroup.GET("/:gwid/devices/battery/usage-info", authorize(REST), w.GetBatteryUsageInfo)
-	apiGroup.GET("/:gwid/devices/tou/info", authorize(REST), w.GetTimeOfUseInfo)
-	apiGroup.GET("/:gwid/devices/solar/energy-usage", authorize(REST), w.GetSolarEnergyUsage)
-
-	// Economics
-	apiGroup.GET("/:gwid/devices/tou/energy-cost", authorize(REST), w.GetTimeOfUseEnergyCost)
-
-	// Demand Charge
-	apiGroup.GET("/:gwid/devices/charge-info", authorize(REST), w.GetChargeInfo)
-	apiGroup.GET("/:gwid/devices/demand-state", authorize(REST), w.GetDemandState)
-
-	// Energy Resources - Solar tab
-	apiGroup.GET("/:gwid/devices/solar/energy-info", authorize(REST), w.GetSolarEnergyInfo)
-	apiGroup.GET("/:gwid/devices/solar/power-state", authorize(REST), w.GetSolarPowerState)
-	// Energy Resources - Battery tab
-	apiGroup.GET("/:gwid/devices/battery/energy-info", authorize(REST), w.GetBatteryEnergyInfo)
-	apiGroup.GET("/:gwid/devices/battery/power-state", authorize(REST), w.GetBatteryPowerState)
-	apiGroup.GET("/:gwid/devices/battery/charge-voltage-state", authorize(REST), w.GetBatteryChargeVoltageState)
-	// Energy Resources - Grid tab
-	apiGroup.GET("/:gwid/devices/grid/energy-info", authorize(REST), w.GetGridEnergyInfo)
-	apiGroup.GET("/:gwid/devices/grid/power-state", authorize(REST), w.GetGridPowerState)
+	apiGroup.GET("/users/profile", authorizeJWT(REST), w.GetProfile)
+	apiGroup.PUT("/users/name", authorizeJWT(REST), w.UpdateName)
+	apiGroup.PUT("/users/password", authorizeJWT(REST), w.UpdatePassword)
 
 	// Dashboard
-	wsGroup.GET("/:gwid/devices/energy-info", authorize(WebSocket), w.dashboardHandler)
+	r.GET(EndpointMapping[Dashboard][0], authorizeJWT(WebSocket), authorizePolicy(enforcer), w.dashboardHandler)
+
+	// Analysis
+	r.GET(EndpointMapping[Analysis][0], authorizeJWT(REST), authorizePolicy(enforcer), w.GetEnergyDistributionInfo)
+	r.GET(EndpointMapping[Analysis][1], authorizeJWT(REST), authorizePolicy(enforcer), w.GetPowerState)
+	r.GET(EndpointMapping[Analysis][2], authorizeJWT(REST), authorizePolicy(enforcer), w.GetAccumulatedPowerState)
+	r.GET(EndpointMapping[Analysis][3], authorizeJWT(REST), authorizePolicy(enforcer), w.GetPowerSelfSupplyRate)
+
+	// Time of Use
+	r.GET(EndpointMapping[TimeOfUseEnergy][0], authorizeJWT(REST), authorizePolicy(enforcer), w.GetBatteryUsageInfo)
+	r.GET(EndpointMapping[TimeOfUseEnergy][1], authorizeJWT(REST), authorizePolicy(enforcer), w.GetTimeOfUseInfo)
+	r.GET(EndpointMapping[TimeOfUseEnergy][2], authorizeJWT(REST), authorizePolicy(enforcer), w.GetSolarEnergyUsage)
+
+	// Economics
+	r.GET(EndpointMapping[Economics][0], authorizeJWT(REST), authorizePolicy(enforcer), w.GetTimeOfUseEnergyCost)
+
+	// Demand Charge
+	r.GET(EndpointMapping[DemandCharge][0], authorizeJWT(REST), authorizePolicy(enforcer), w.GetChargeInfo)
+	r.GET(EndpointMapping[DemandCharge][1], authorizeJWT(REST), authorizePolicy(enforcer), w.GetDemandState)
+
+	// Energy Resources - Solar tab
+	r.GET(EndpointMapping[EnergyResources][0], authorizeJWT(REST), authorizePolicy(enforcer), w.GetSolarEnergyInfo)
+	r.GET(EndpointMapping[EnergyResources][1], authorizeJWT(REST), authorizePolicy(enforcer), w.GetSolarPowerState)
+	// Energy Resources - Battery tab
+	r.GET(EndpointMapping[EnergyResources][2], authorizeJWT(REST), authorizePolicy(enforcer), w.GetBatteryEnergyInfo)
+	r.GET(EndpointMapping[EnergyResources][3], authorizeJWT(REST), authorizePolicy(enforcer), w.GetBatteryPowerState)
+	r.GET(EndpointMapping[EnergyResources][4], authorizeJWT(REST), authorizePolicy(enforcer), w.GetBatteryChargeVoltageState)
+	// Energy Resources - Grid tab
+	r.GET(EndpointMapping[EnergyResources][5], authorizeJWT(REST), authorizePolicy(enforcer), w.GetGridEnergyInfo)
+	r.GET(EndpointMapping[EnergyResources][6], authorizeJWT(REST), authorizePolicy(enforcer), w.GetGridPowerState)
+
+	// Casbin route
+	apiGroup.GET("/casbin", w.getFrontendPermission(enforcer))
 
 	// Leap - webhook endpoint
 	apiGroup.POST("/leap/bidding/dispatch/webhook", leapAuthorize(), w.GetLeapBiddingDispatch)
@@ -122,7 +207,7 @@ func InitRouter(isCORS bool, ginMode string, w *APIWorker) *gin.Engine {
 	return r
 }
 
-func authorize(apiType APIType) gin.HandlerFunc {
+func authorizeJWT(apiType APIType) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		appG := app.Gin{c}
 
@@ -168,12 +253,87 @@ func authorize(apiType APIType) gin.HandlerFunc {
 		}
 
 		c.Set("userID", claims.UserID)
+		c.Set("groupID", claims.GroupID)
 		if apiType == WebSocket {
 			c.Set("token", token)
 		}
 
 		c.Next()
 	}
+}
+
+func initPolicy(dir string) (enforcer *casbin.Enforcer) {
+	var err error
+	enforcer, err = casbin.NewEnforcer(dir+"/rbac_model.conf", dir+"/rbac_policy.csv")
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "casbin.NewEnforcer",
+			"err":       err,
+		}).Panic()
+	}
+	return
+}
+
+func authorizePolicy(enforcer *casbin.Enforcer) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		appG := app.Gin{c}
+
+		groupID, _ := c.Get("groupID")
+		if groupID == nil {
+			log.WithField("caused-by", "error token").Error()
+			appG.Response(http.StatusUnauthorized, e.ErrToken, nil)
+			c.Abort()
+			return
+		}
+
+		err := enforcer.LoadPolicy()
+		if err != nil {
+			log.WithField("caused-by", "load policy").Error()
+			appG.Response(http.StatusUnauthorized, e.ErrAuthPolicyLoad, nil)
+			c.Abort()
+			return
+		}
+
+		sub := strconv.FormatInt(groupID.(int64), 10)
+		webpage := getWebpage(c.FullPath())
+		action := getAction(c.Request.Method)
+		ok, err := enforcer.Enforce(sub, string(webpage), string(action))
+		if !ok {
+			log.WithField("caused-by", "permission denied").Error()
+			appG.Response(http.StatusUnauthorized, e.ErrAuthPermissionNotAllow, nil)
+			c.Abort()
+			return
+		} else if err != nil {
+			log.WithField("caused-by", "check permission").Error()
+			appG.Response(http.StatusUnauthorized, e.ErrAuthPermissionCheck, nil)
+			c.Abort()
+			return
+		}
+
+		c.Next()
+	}
+}
+
+func getWebpage(path string) (webpage PolicyWebpageObject) {
+	for key, endpoints := range EndpointMapping {
+		for _, e := range endpoints {
+			if e == path {
+				webpage = key
+				break
+			}
+		}
+	}
+	return
+}
+
+func getAction(method string) (action PolicyWebpageAction) {
+	for key, m := range MethodMapping {
+		if m == method {
+			action = key
+			break
+		}
+	}
+	return
 }
 
 func leapAuthorize() gin.HandlerFunc {

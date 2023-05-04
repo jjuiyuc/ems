@@ -19,6 +19,7 @@ type UserRepository interface {
 	GetUserByUsername(username string) (*deremsmodels.User, error)
 	GetUserByPasswordToken(token string) (*deremsmodels.User, error)
 	GetGroupByGroupID(groupID int64) (*deremsmodels.Group, error)
+	GetSubGroupsByGroupID(groupID int64) ([]*deremsmodels.Group, error)
 	GetGatewaysPermissionByGroupID(groupID int64) ([]*deremsmodels.GroupGatewayRight, error)
 	GetWebpagesPermissionByGroupTypeID(groupTypeID int64) ([]*deremsmodels.GroupTypeWebpageRight, error)
 	GetWebpageByWebpageID(webpagesID int64) (*deremsmodels.Webpage, error)
@@ -74,6 +75,23 @@ func (repo defaultUserRepository) GetUserByPasswordToken(token string) (*deremsm
 
 func (repo defaultUserRepository) GetGroupByGroupID(groupID int64) (*deremsmodels.Group, error) {
 	return deremsmodels.FindGroup(repo.db, groupID)
+}
+
+func (repo defaultUserRepository) GetSubGroupsByGroupID(groupID int64) ([]*deremsmodels.Group, error) {
+	return deremsmodels.Groups(
+		qm.SQL(`
+		WITH RECURSIVE group_path AS
+		(
+		SELECT *
+			FROM der_ems.group
+			WHERE id = ?
+		UNION ALL
+		SELECT g.*
+			FROM group_path AS gp JOIN der_ems.group AS g
+			ON gp.id = g.parent_id
+			AND g.deleted_at IS NULL
+		)
+		SELECT * FROM group_path;`, groupID)).All(repo.db)
 }
 
 func (repo defaultUserRepository) GetGatewaysPermissionByGroupID(groupID int64) ([]*deremsmodels.GroupGatewayRight, error) {

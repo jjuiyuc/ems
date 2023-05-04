@@ -33,6 +33,7 @@ const (
 	ErrGridPowerStateGen            = 50005
 	ErrTimeOfUseInfoGen             = 50006
 
-	ErrNameUpdate     = 60000
-	ErrPasswordUpdate = 60001
+	ErrNameUpdate       = 60000
+	ErrPasswordUpdate   = 60001
+	ErrAccountGroupsGen = 60002
 )

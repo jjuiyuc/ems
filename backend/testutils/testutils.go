@@ -102,7 +102,7 @@ func SeedUtLocationAndGateway(db *sql.DB) (err error) {
 func SeedUtClaims() (claims utils.Claims) {
 	claims = utils.Claims{
 		UserID:  testdata.UtUser.ID,
-		GroupID: testdata.UtUser.GroupID,
+		GroupType: testdata.UtGroupType,
 	}
 	return
 }

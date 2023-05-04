@@ -253,7 +253,7 @@ func authorizeJWT(apiType APIType) gin.HandlerFunc {
 		}
 
 		c.Set("userID", claims.UserID)
-		c.Set("groupID", claims.GroupID)
+		c.Set("groupType", claims.GroupType)
 		if apiType == WebSocket {
 			c.Set("token", token)
 		}
@@ -278,8 +278,8 @@ func authorizePolicy(enforcer *casbin.Enforcer) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		appG := app.Gin{c}
 
-		groupID, _ := c.Get("groupID")
-		if groupID == nil {
+		groupType, _ := c.Get("groupType")
+		if groupType == nil {
 			log.WithField("caused-by", "error token").Error()
 			appG.Response(http.StatusUnauthorized, e.ErrToken, nil)
 			c.Abort()
@@ -294,7 +294,7 @@ func authorizePolicy(enforcer *casbin.Enforcer) gin.HandlerFunc {
 			return
 		}
 
-		sub := strconv.FormatInt(groupID.(int64), 10)
+		sub := strconv.FormatInt(groupType.(int64), 10)
 		webpage := getWebpage(c.FullPath())
 		action := getAction(c.Request.Method)
 		ok, err := enforcer.Enforce(sub, string(webpage), string(action))

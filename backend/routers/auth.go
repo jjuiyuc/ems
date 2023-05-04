@@ -43,7 +43,7 @@ func (w *APIWorker) GetAuth(c *gin.Context) {
 		return
 	}
 
-	user, errCode, err := w.Services.Auth.Login(a.Username, a.Password)
+	user, groupType, errCode, err := w.Services.Auth.Login(a.Username, a.Password)
 	if err != nil {
 		appG.Response(http.StatusUnauthorized, errCode, map[string]string{
 			"msg": err.Error(),
@@ -52,8 +52,8 @@ func (w *APIWorker) GetAuth(c *gin.Context) {
 	}
 
 	claims := utils.Claims{
-		UserID:  user.ID,
-		GroupID: user.GroupID,
+		UserID:    user.ID,
+		GroupType: groupType,
 	}
 	token, err := utils.GenerateToken(claims)
 	if err != nil {

@@ -19,6 +19,8 @@ var UtUser = &deremsmodels.User{
 	UpdatedAt:      time.Date(2022, 7, 1, 0, 0, 0, 0, time.UTC),
 }
 
+var UtGroupType int64 = 1
+
 // UtLocation godoc
 var UtLocation = &deremsmodels.Location{
 	ID:            1,

@@ -16,7 +16,7 @@ const passwordLockCount = 5
 
 // AuthService godoc
 type AuthService interface {
-	Login(username, password string) (user *deremsmodels.User, errCode int, err error)
+	Login(username, password string) (user *deremsmodels.User, groupType int64, errCode int, err error)
 	CreateLoginLog(user *deremsmodels.User, token string) (err error)
 }
 
@@ -30,7 +30,7 @@ func NewAuthService(repo *repository.Repository) AuthService {
 }
 
 // Login godoc
-func (s defaultAuthService) Login(username, password string) (user *deremsmodels.User, errCode int, err error) {
+func (s defaultAuthService) Login(username, password string) (user *deremsmodels.User, groupType int64, errCode int, err error) {
 	user, err = s.repo.User.GetUserByUsername(username)
 	if err != nil {
 		errCode = e.ErrAuthUserNotExist
@@ -80,6 +80,17 @@ func (s defaultAuthService) Login(username, password string) (user *deremsmodels
 		user.PasswordRetryCount = null.IntFrom(0)
 		s.repo.User.UpdateUser(user)
 	}
+
+	group, err := s.repo.User.GetGroupByGroupID(user.GroupID)
+	if err != nil {
+		errCode = e.ErrAuthUserNotExist
+		log.WithFields(log.Fields{
+			"caused-by": "repository.GetGroupByGroupID",
+			"err":       err,
+		}).Error()
+		return
+	}
+	groupType = group.TypeID
 
 	return
 }

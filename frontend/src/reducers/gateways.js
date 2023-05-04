@@ -9,10 +9,10 @@ export const slice = createSlice({
     name: "gateways",
     initialState: lsGateways
         ? JSON.parse(lsGateways)
-        : {active: {address: "", gatewayID: ""}, list: []},
+        : { active: { address: "", gatewayID: "" }, list: [] },
     reducers: {
         clear: state => {
-            state = {active: {address: "", gatewayID: ""}, list: []}
+            state = { active: { address: "", gatewayID: "" }, list: [] }
             localStorage.removeItem("gateways")
         },
         changeGateway: (state, action) => {

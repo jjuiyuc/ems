@@ -1,9 +1,7 @@
 import { connect } from "react-redux"
-import { Button, Divider, Snackbar, TextField } from "@mui/material"
-import CheckCircleIcon from "@mui/icons-material/CheckCircle"
-import CloseIcon from "@mui/icons-material/Close"
+import { Button, Divider, TextField } from "@mui/material"
 import { useTranslation } from "react-multi-lang"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 
 import { apiCall } from "../utils/api"
 

@@ -82,8 +82,9 @@ function LogIn(props) {
             })
             if (!userProfile) return
             const
-                { gateways, group, id, name, username } = userProfile.data,
-                webpages = group.webpages.filter(webpage => webpage?.permissions?.read)
+                { group, id, name, username } = userProfile.data,
+                webpages = group.webpages.filter(webpage => webpage?.permissions?.read),
+                gateways = group.gateways
 
             // Tokens will expire in 3 hours
             const tokenExpiryTime = new Date().getTime() + 1000 * 60 * 60 * 3

@@ -61,7 +61,7 @@ function TopNav(props) {
         },
         containerClasses = "border-b border-black-main bg-gray-900 flex "
             + "flex-col h-20 items-end overflow-visible"
-            + (className ? " " + className : "")
+            + (className && ` ${className}`)
     const
         locationHandleChange = (event) => {
             setLocationName(event.target.value)

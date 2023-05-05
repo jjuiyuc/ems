@@ -28,7 +28,6 @@ export const apiCall = async ({
             }
         })
         if (res.status === 200) {
-
             onSuccess(res.data)
             return res.data
         }

@@ -6,14 +6,12 @@ import { NavLink } from "react-router-dom"
 import { connect } from "react-redux"
 import { Language as LanguageIcon, Logout as LogoutIcon }
     from "@mui/icons-material"
-import React, { useState } from "react"
+import React, { useState, useEffect, useMemo } from "react"
 import { useTranslation } from "react-multi-lang"
 
 import LanguageSelector from "./LanguageSelector"
 import logout from "../utils/logout"
 
-import { ReactComponent as AlertIcon } from "../assets/icons/alert_default.svg"
-import { ReactComponent as LocationIcon } from "../assets/icons/location.svg"
 import { ReactComponent as UserCircleIcon } from "../assets/icons/profile.svg"
 import { ReactComponent as UserIcon } from "../assets/icons/user.svg"
 
@@ -21,30 +19,26 @@ function TopNav(props) {
     const
         t = useTranslation(),
         commonT = string => t("common." + string)
-    const
-        locationNameData = [
-            {
-                value: "Serenegray",
-                label: "Serenegray",
-            }, {
-                value: "Cht_Miaoli",
-                label: "Cht_Miaoli",
-            }],
-        gatewayData = [
-            {
-                value: "0E0BA27A8175AF978C49396BDE9D7A1E",
-                label: "0E0BA27A8175AF978C49396BDE9D7A1E",
-            },
-            {
-                value: "018F1623ADD8E739F7C6CBE62A7DF3C0",
-                label: "018F1623ADD8E739F7C6CBE62A7DF3C0",
+
+    const locationMap = useMemo(() =>
+        props.gatewayList.reduce((acc, cur) => {
+            const
+                { gatewayID, permissions } = cur,
+                { name, address } = permissions[0].location
+            acc[name] = {
+                address: address,
+                gateways: [...(acc[name]?.gateways || []), gatewayID]
             }
-        ]
+            return acc
+        }, {}), [props.gatewayList])
 
-    // const routes = [
-    //     { icon: <Account />, path: "account" }
-    // ],
-
+    const locationOptions = useMemo(() =>
+        Object.entries(locationMap)
+            .map(([key, value]) => ({
+                name: key,
+                ...value
+            }))
+        , [locationMap])
 
     const
         [menuAnchorEl, setMenuAnchorEl] = useState(null),
@@ -64,24 +58,35 @@ function TopNav(props) {
                 borderTopRightRadius: 0,
                 "&.MuiPaper-root": { marginTop: "1.125rem" }
             }
-        }
-
+        },
+        containerClasses = "border-b border-black-main bg-gray-900 flex "
+            + "flex-col h-20 items-end overflow-visible"
+            + (className && ` ${className}`)
     const
         locationHandleChange = (event) => {
             setLocationName(event.target.value)
         },
         gatewayHandleChange = (event) => {
-            setGateway(event.target.value)
+            setGatewayID(event.target.value)
         }
-    const containerClasses = "border-b border-black-main bg-gray-900 flex "
-        + "flex-col h-20 items-end overflow-visible"
-        + (className ? " " + className : "")
+
+    useEffect(() => {
+        const newLocationName = locationOptions[0]?.name
+        if (newLocationName) {
+            setLocationName(newLocationName)
+            setGatewayID(locationMap[newLocationName].gateways[0])
+        }
+    }, [locationOptions])
+
+    useEffect(() => {
+        const active = props.gatewayList.find((gateway) => gateway.gatewayID === gatewayID)
+        if (active) props.changeGateway(active)
+    }, [gatewayID])
 
     return <div className={containerClasses}>
         <div className="flex flex-row-reverse h-20 items-center
                         justify-between px-12 z-10 w-full">
             <div className="flex h-20 items-center">
-                {/* <AlertIcon className="h-8 w-8 opacity-30" /> */}
                 <Button onClick={openMenu} sx={{ marginLeft: "1.5rem" }}>
                     <UserCircleIcon className="h-8 mr-2 w-8" />
                     {name}
@@ -94,7 +99,6 @@ function TopNav(props) {
                         label={commonT("locationName")}
                         value={locationName}
                         size="small"
-                        defaultValue={locationNameData[0]}
                         onChange={locationHandleChange}
                         input={<OutlinedInput />}
                         inputProps={{ "aria-label": "Without label" }}
@@ -103,9 +107,9 @@ function TopNav(props) {
                         <MenuItem disabled value="">
                             <em>{commonT("locationName")}</em>
                         </MenuItem>
-                        {locationNameData.map((option) => (
-                            <MenuItem key={option.value} value={option.value}>
-                                {option.label}
+                        {locationOptions.map((option) => (
+                            <MenuItem key={option.name} value={option.name}>
+                                {option.name}
                             </MenuItem>
                         ))}
                     </Select>
@@ -123,11 +127,11 @@ function TopNav(props) {
                         <MenuItem disabled value="">
                             <em>{commonT("gatewayID")}</em>
                         </MenuItem>
-                        {gatewayData.map((option) => (
-                            <MenuItem key={option.value} value={option.value}>
-                                {option.label}
+                        {locationMap[locationName]?.gateways.map((option) => (
+                            <MenuItem key={option} value={option}>
+                                {option}
                             </MenuItem>
-                        ))}
+                        )) || null}
                     </Select>
                 </FormControl>
             </div>
@@ -152,7 +156,6 @@ function TopNav(props) {
                     <ListItemIcon><UserIcon /></ListItemIcon>
                     {commonT("account")}
                 </NavLink>
-
             </MenuItem>
             <Divider />
             <MenuItem onClick={logout}>
@@ -164,9 +167,13 @@ function TopNav(props) {
 }
 
 const mapState = state => ({
-    address: state.gateways.active.address,
     lang: state.lang.value,
-    user: state.user
+    user: state.user,
+    gatewayList: state.gateways.list
+})
+const mapDispatch = dispatch => ({
+    changeGateway: value =>
+        dispatch({ type: "gateways/changeGateway", payload: value })
 })
 
-export default connect(mapState)(TopNav)
+export default connect(mapState, mapDispatch)(TopNav)

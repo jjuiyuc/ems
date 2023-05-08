@@ -21,6 +21,7 @@ import (
 // @Success     200            {object}  app.Response{data=services.SolarEnergyInfoResponse}
 // @Failure     400            {object}  app.Response
 // @Failure     401            {object}  app.Response
+// @Failure     403            {object}  app.Response
 // @Router      /{gwid}/devices/solar/energy-info [get]
 func (w *APIWorker) GetSolarEnergyInfo(c *gin.Context) {
 	appG := app.Gin{c}
@@ -45,6 +46,7 @@ func (w *APIWorker) GetSolarEnergyInfo(c *gin.Context) {
 // @Success     200            {object}  app.Response{data=services.SolarPowerStateResponse}
 // @Failure     400            {object}  app.Response
 // @Failure     401            {object}  app.Response
+// @Failure     403            {object}  app.Response
 // @Failure     500            {object}  app.Response
 // @Router      /{gwid}/devices/solar/power-state [get]
 func (w *APIWorker) GetSolarPowerState(c *gin.Context) {
@@ -74,6 +76,7 @@ func (w *APIWorker) GetSolarPowerState(c *gin.Context) {
 // @Success     200            {object}  app.Response{data=services.BatteryEnergyInfoResponse}
 // @Failure     400            {object}  app.Response
 // @Failure     401            {object}  app.Response
+// @Failure     403            {object}  app.Response
 // @Router      /{gwid}/devices/battery/energy-info [get]
 func (w *APIWorker) GetBatteryEnergyInfo(c *gin.Context) {
 	appG := app.Gin{c}
@@ -98,6 +101,7 @@ func (w *APIWorker) GetBatteryEnergyInfo(c *gin.Context) {
 // @Success     200            {object}  app.Response{data=services.BatteryPowerStateResponse}
 // @Failure     400            {object}  app.Response
 // @Failure     401            {object}  app.Response
+// @Failure     403            {object}  app.Response
 // @Failure     500            {object}  app.Response
 // @Router      /{gwid}/devices/battery/power-state [get]
 func (w *APIWorker) GetBatteryPowerState(c *gin.Context) {
@@ -127,6 +131,7 @@ func (w *APIWorker) GetBatteryPowerState(c *gin.Context) {
 // @Success     200            {object}  app.Response{data=services.BatteryChargeVoltageStateResponse}
 // @Failure     400            {object}  app.Response
 // @Failure     401            {object}  app.Response
+// @Failure     403            {object}  app.Response
 // @Failure     500            {object}  app.Response
 // @Router /{gwid}/devices/battery/charge-voltage-state [get]
 func (w *APIWorker) GetBatteryChargeVoltageState(c *gin.Context) {
@@ -156,6 +161,7 @@ func (w *APIWorker) GetBatteryChargeVoltageState(c *gin.Context) {
 // @Success     200            {object}  app.Response{data=services.GridEnergyInfoResponse}
 // @Failure     400            {object}  app.Response
 // @Failure     401            {object}  app.Response
+// @Failure     403            {object}  app.Response
 // @Router      /{gwid}/devices/grid/energy-info [get]
 func (w *APIWorker) GetGridEnergyInfo(c *gin.Context) {
 	appG := app.Gin{c}
@@ -180,6 +186,7 @@ func (w *APIWorker) GetGridEnergyInfo(c *gin.Context) {
 // @Success     200            {object}  app.Response{data=services.GridPowerStateResponse}
 // @Failure     400            {object}  app.Response
 // @Failure     401            {object}  app.Response
+// @Failure     403            {object}  app.Response
 // @Failure     500            {object}  app.Response
 // @Router      /{gwid}/devices/grid/power-state [get]
 func (w *APIWorker) GetGridPowerState(c *gin.Context) {

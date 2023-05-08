@@ -75,6 +75,12 @@ var doc = `{
                             "$ref": "#/definitions/app.Response"
                         }
                     },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -152,6 +158,12 @@ var doc = `{
                     },
                     "401": {
                         "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
                         "schema": {
                             "$ref": "#/definitions/app.Response"
                         }
@@ -598,6 +610,12 @@ var doc = `{
                         "schema": {
                             "$ref": "#/definitions/app.Response"
                         }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
                     }
                 }
             }
@@ -691,6 +709,12 @@ var doc = `{
                             "$ref": "#/definitions/app.Response"
                         }
                     },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -767,6 +791,12 @@ var doc = `{
                     },
                     "401": {
                         "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
                         "schema": {
                             "$ref": "#/definitions/app.Response"
                         }
@@ -863,6 +893,12 @@ var doc = `{
                             "$ref": "#/definitions/app.Response"
                         }
                     },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -942,6 +978,12 @@ var doc = `{
                         "schema": {
                             "$ref": "#/definitions/app.Response"
                         }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
                     }
                 }
             }
@@ -1013,6 +1055,12 @@ var doc = `{
                     },
                     "401": {
                         "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
                         "schema": {
                             "$ref": "#/definitions/app.Response"
                         }
@@ -1098,6 +1146,12 @@ var doc = `{
                         "schema": {
                             "$ref": "#/definitions/app.Response"
                         }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
                     }
                 }
             }
@@ -1180,6 +1234,12 @@ var doc = `{
                         "schema": {
                             "$ref": "#/definitions/app.Response"
                         }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
                     }
                 }
             }
@@ -1251,6 +1311,12 @@ var doc = `{
                     },
                     "401": {
                         "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
                         "schema": {
                             "$ref": "#/definitions/app.Response"
                         }
@@ -1343,6 +1409,12 @@ var doc = `{
                     },
                     "401": {
                         "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
                         "schema": {
                             "$ref": "#/definitions/app.Response"
                         }
@@ -1444,6 +1516,12 @@ var doc = `{
                         "schema": {
                             "$ref": "#/definitions/app.Response"
                         }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
                     }
                 }
             }
@@ -1536,6 +1614,12 @@ var doc = `{
                         "schema": {
                             "$ref": "#/definitions/app.Response"
                         }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
                     }
                 }
             }
@@ -1607,6 +1691,12 @@ var doc = `{
                     },
                     "401": {
                         "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
                         "schema": {
                             "$ref": "#/definitions/app.Response"
                         }
@@ -1699,6 +1789,12 @@ var doc = `{
                     },
                     "401": {
                         "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
                         "schema": {
                             "$ref": "#/definitions/app.Response"
                         }
@@ -1795,6 +1891,12 @@ var doc = `{
                             "$ref": "#/definitions/app.Response"
                         }
                     },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -1882,6 +1984,12 @@ var doc = `{
                         "schema": {
                             "$ref": "#/definitions/app.Response"
                         }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
                     }
                 }
             }
@@ -1953,6 +2061,12 @@ var doc = `{
                     },
                     "401": {
                         "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
                         "schema": {
                             "$ref": "#/definitions/app.Response"
                         }

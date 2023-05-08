@@ -21,6 +21,7 @@ import (
 // @Success     200            {object}  app.Response{data=services.ChargeInfoResponse}
 // @Failure     400            {object}  app.Response
 // @Failure     401            {object}  app.Response
+// @Failure     403            {object}  app.Response
 // @Router      /{gwid}/devices/charge-info [get]
 func (w *APIWorker) GetChargeInfo(c *gin.Context) {
 	appG := app.Gin{c}
@@ -45,6 +46,7 @@ func (w *APIWorker) GetChargeInfo(c *gin.Context) {
 // @Success     200            {object}  app.Response{data=services.DemandStateResponse}
 // @Failure     400            {object}  app.Response
 // @Failure     401            {object}  app.Response
+// @Failure     403            {object}  app.Response
 // @Router      /{gwid}/devices/demand-state [get]
 func (w *APIWorker) GetDemandState(c *gin.Context) {
 	appG := app.Gin{c}

@@ -19,6 +19,7 @@ import (
 // @Produce     json
 // @Success     200            {object}  app.Response{data=services.GetGroupsResponse}
 // @Failure     401            {object}  app.Response
+// @Failure     403            {object}  app.Response
 // @Failure     500            {object}  app.Response
 // @Router      /account-management/groups [get]
 func (w *APIWorker) GetGroups(c *gin.Context) {
@@ -46,13 +47,14 @@ func (w *APIWorker) GetGroups(c *gin.Context) {
 // @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
 // @Accept      json
 // @Produce     json
-// @Param       name      body      string true "Name"
-// @Param       typeID    body      int true "TypeID"
-// @Param       parentID  body      int true "ParentID"
-// @Success     200       {object}  app.Response
-// @Failure     400       {object}  app.Response
-// @Failure     401       {object}  app.Response
-// @Failure     500       {object}  app.Response
+// @Param       name           body      string true "Name"
+// @Param       typeID         body      int true "TypeID"
+// @Param       parentID       body      int true "ParentID"
+// @Success     200            {object}  app.Response
+// @Failure     400            {object}  app.Response
+// @Failure     401            {object}  app.Response
+// @Failure     403            {object}  app.Response
+// @Failure     500            {object}  app.Response
 // @Router      /account-management/groups [post]
 func (w *APIWorker) CreateGroup(c *gin.Context) {
 	appG := app.Gin{c}

@@ -586,6 +586,10 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/app.Response'
       security:
       - ApiKeyAuth: []
       summary: Show daily/monthly accumulated power state of Load/Solar/Battery/Grid
@@ -645,6 +649,10 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/app.Response'
         "500":
           description: Internal Server Error
           schema:
@@ -693,6 +701,10 @@ paths:
             $ref: '#/definitions/app.Response'
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
           schema:
             $ref: '#/definitions/app.Response'
       security:
@@ -754,6 +766,10 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/app.Response'
         "500":
           description: Internal Server Error
           schema:
@@ -804,6 +820,10 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/app.Response'
       security:
       - ApiKeyAuth: []
       summary: Show current usage state about battery
@@ -848,6 +868,10 @@ paths:
             $ref: '#/definitions/app.Response'
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
           schema:
             $ref: '#/definitions/app.Response'
       security:
@@ -902,6 +926,10 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/app.Response'
       security:
       - ApiKeyAuth: []
       summary: Show today's demand details
@@ -954,6 +982,10 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/app.Response'
       security:
       - ApiKeyAuth: []
       summary: Show the distribution of energy sources and distinations
@@ -998,6 +1030,10 @@ paths:
             $ref: '#/definitions/app.Response'
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
           schema:
             $ref: '#/definitions/app.Response'
       security:
@@ -1057,6 +1093,10 @@ paths:
             $ref: '#/definitions/app.Response'
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
           schema:
             $ref: '#/definitions/app.Response'
         "500":
@@ -1123,6 +1163,10 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/app.Response'
       security:
       - ApiKeyAuth: []
       summary: Show daily/monthly power self supply rate
@@ -1183,6 +1227,10 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/app.Response'
       security:
       - ApiKeyAuth: []
       summary: Show today's hourly power state of Load/Solar/Battery/Grid
@@ -1227,6 +1275,10 @@ paths:
             $ref: '#/definitions/app.Response'
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
           schema:
             $ref: '#/definitions/app.Response'
       security:
@@ -1288,6 +1340,10 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/app.Response'
       security:
       - ApiKeyAuth: []
       summary: Show the day's hourly energy usage of solar
@@ -1347,6 +1403,10 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/app.Response'
         "500":
           description: Internal Server Error
           schema:
@@ -1403,6 +1463,10 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/app.Response'
       security:
       - ApiKeyAuth: []
       summary: Show energy cost of Pre-Ubiik and Post-Ubiik
@@ -1449,6 +1513,10 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/app.Response'
         "500":
           description: Internal Server Error
           schema:
@@ -1482,6 +1550,10 @@ paths:
               type: object
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
           schema:
             $ref: '#/definitions/app.Response'
         "500":
@@ -1535,6 +1607,10 @@ paths:
             $ref: '#/definitions/app.Response'
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
           schema:
             $ref: '#/definitions/app.Response'
         "500":

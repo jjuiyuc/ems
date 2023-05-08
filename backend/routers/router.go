@@ -297,7 +297,7 @@ func authorizePolicy(enforcer *casbin.Enforcer) gin.HandlerFunc {
 		err := enforcer.LoadPolicy()
 		if err != nil {
 			log.WithField("caused-by", "load policy").Error()
-			appG.Response(http.StatusUnauthorized, e.ErrAuthPolicyLoad, nil)
+			appG.Response(http.StatusForbidden, e.ErrAuthPolicyLoad, nil)
 			c.Abort()
 			return
 		}
@@ -308,12 +308,12 @@ func authorizePolicy(enforcer *casbin.Enforcer) gin.HandlerFunc {
 		ok, err := enforcer.Enforce(sub, string(webpage), string(action))
 		if !ok {
 			log.WithField("caused-by", "permission denied").Error()
-			appG.Response(http.StatusUnauthorized, e.ErrAuthPermissionNotAllow, nil)
+			appG.Response(http.StatusForbidden, e.ErrAuthPermissionNotAllow, nil)
 			c.Abort()
 			return
 		} else if err != nil {
 			log.WithField("caused-by", "check permission").Error()
-			appG.Response(http.StatusUnauthorized, e.ErrAuthPermissionCheck, nil)
+			appG.Response(http.StatusForbidden, e.ErrAuthPermissionCheck, nil)
 			c.Abort()
 			return
 		}

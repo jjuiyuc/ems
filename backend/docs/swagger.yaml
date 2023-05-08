@@ -304,6 +304,24 @@ definitions:
         $ref: '#/definitions/services.LocationInfo'
         type: object
     type: object
+  services.GetGroupInfo:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      parentID:
+        type: string
+      typeID:
+        type: integer
+    type: object
+  services.GetGroupsResponse:
+    properties:
+      groups:
+        items:
+          $ref: '#/definitions/services.GetGroupInfo'
+        type: array
+    type: object
   services.GridEnergyInfoResponse:
     properties:
       gridConsumedLifetimeEnergyACDiff:
@@ -1440,6 +1458,94 @@ paths:
       summary: Show the distribution of energy sources for peak types of the day
       tags:
       - time of use
+  /account-management/groups:
+    get:
+      description: list groups based on token
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Input user's access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/app.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/services.GetGroupsResponse'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: List groups
+      tags:
+      - account management group
+    post:
+      consumes:
+      - application/json
+      description: create a group by token
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Input user's access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Name
+        in: body
+        name: name
+        required: true
+        schema:
+          type: string
+      - description: TypeID
+        in: body
+        name: typeID
+        required: true
+        schema:
+          type: integer
+      - description: ParentID
+        in: body
+        name: parentID
+        required: true
+        schema:
+          type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Create a group
+      tags:
+      - account management group
   /auth:
     post:
       consumes:

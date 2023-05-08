@@ -33,7 +33,9 @@ const (
 	ErrGridPowerStateGen            = 50005
 	ErrTimeOfUseInfoGen             = 50006
 
-	ErrNameUpdate       = 60000
-	ErrPasswordUpdate   = 60001
-	ErrAccountGroupsGen = 60002
+	ErrNameUpdate                       = 60000
+	ErrPasswordUpdate                   = 60001
+	ErrAccountGroupsGen                 = 60002
+	ErrAccountGroupNameOnSameLevelExist = 60003
+	ErrorAccountGroupCreate             = 60004
 )

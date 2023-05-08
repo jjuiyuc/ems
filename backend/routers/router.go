@@ -111,7 +111,8 @@ var EndpointMapping = map[PolicyWebpageObject][]string{
 
 // MethodMapping godoc
 var MethodMapping = map[PolicyWebpageAction]string{
-	Read: "GET",
+	Create: "POST",
+	Read:   "GET",
 }
 
 // APIWorker godoc
@@ -203,6 +204,7 @@ func InitRouter(isCORS bool, ginMode string, enforcer *casbin.Enforcer, w *APIWo
 
 	// Account Management Group
 	r.GET(EndpointMapping[AccountManagementGroup][0], authorizeJWT(REST), authorizePolicy(enforcer), w.GetSubGroups)
+	r.POST(EndpointMapping[AccountManagementGroup][0], authorizeJWT(REST), authorizePolicy(enforcer), w.CreateGroup)
 
 	// Casbin route
 	apiGroup.GET("/casbin", w.getFrontendPermission(enforcer))

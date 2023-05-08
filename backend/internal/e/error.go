@@ -21,6 +21,8 @@ var (
 	ErrNewUnexpectedResolution = errors.New("unexpected resolution")
 	// ErrNewBillingsNotExist godoc
 	ErrNewBillingsNotExist = errors.New("billings do not exist")
+	// ErrNewAccountGroupNameOnSameLevelExist godoc
+	ErrNewAccountGroupNameOnSameLevelExist = errors.New("account group name exists on the same level")
 )
 
 // ErrNewKeyNotExist godoc

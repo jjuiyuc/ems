@@ -27,3 +27,23 @@ func (w *APIWorker) GetSubGroups(c *gin.Context) {
 	}
 	appG.Response(http.StatusOK, e.Success, responseData)
 }
+
+// CreateGroup godoc
+func (w *APIWorker) CreateGroup(c *gin.Context) {
+	appG := app.Gin{c}
+	body := &app.CreateGroupBody{}
+	if err := body.Validate(c); err != nil {
+		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
+		return
+	}
+
+	errCode, err := w.Services.AccountManagement.CreateGroup(body)
+	if err != nil {
+		if errCode != e.ErrAccountGroupNameOnSameLevelExist {
+			errCode = e.ErrorAccountGroupCreate
+		}
+		appG.Response(http.StatusInternalServerError, errCode, nil)
+		return
+	}
+	appG.Response(http.StatusOK, e.Success, nil)
+}

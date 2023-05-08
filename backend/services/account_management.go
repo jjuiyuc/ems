@@ -4,12 +4,15 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/volatiletech/null/v8"
 
+	"der-ems/internal/app"
+	deremsmodels "der-ems/models/der-ems"
 	"der-ems/repository"
 )
 
 // AccountManagementService godoc
 type AccountManagementService interface {
 	GetSubGroups(userID int64) (subGroups *SubGroupsResponse, err error)
+	CreateGroup(body *app.CreateGroupBody) (errCode int, err error)
 }
 
 // SubGroupsResponse godoc
@@ -64,6 +67,24 @@ func (s defaultAccountManagementService) GetSubGroups(userID int64) (subGroups *
 	}
 	subGroups = &SubGroupsResponse{
 		Groups: subGroupInfos,
+	}
+	return
+}
+
+func (s defaultAccountManagementService) CreateGroup(body *app.CreateGroupBody) (errCode int, err error) {
+	group := &deremsmodels.Group{
+		Name:     body.Name,
+		TypeID:   int64(body.TypeID),
+		ParentID: null.Int64From(int64(body.ParentID)),
+	}
+
+	errCode, err = s.repo.User.CreateGroup(group)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "s.repo.User.CreateGroup",
+			"err":       err,
+			"body":      *body,
+		}).Error()
 	}
 	return
 }

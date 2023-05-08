@@ -44,7 +44,6 @@ function TopNav(props) {
         [menuAnchorEl, setMenuAnchorEl] = useState(null),
         [locationName, setLocationName] = useState(""),
         [gatewayID, setGatewayID] = useState("")
-
     const
         closeMenu = () => setMenuAnchorEl(null),
         openMenu = e => setMenuAnchorEl(e.currentTarget)
@@ -64,7 +63,9 @@ function TopNav(props) {
             + (className && ` ${className}`)
     const
         locationHandleChange = (event) => {
-            setLocationName(event.target.value)
+            const newLocationName = event.target.value
+            setLocationName(newLocationName)
+            setGatewayID(locationMap[newLocationName].gateways[0])
         },
         gatewayHandleChange = (event) => {
             setGatewayID(event.target.value)
@@ -96,7 +97,6 @@ function TopNav(props) {
                 <FormControl sx={{ m: 1, minWidth: 200 }}>
                     <Select
                         id="location-name"
-                        label={commonT("locationName")}
                         value={locationName}
                         size="small"
                         onChange={locationHandleChange}
@@ -117,13 +117,13 @@ function TopNav(props) {
                 <FormControl sx={{ m: 1, minWidth: 300 }}>
                     <Select
                         id="location-name"
-                        label={commonT("gatewayID")}
                         value={gatewayID}
                         size="small"
                         onChange={gatewayHandleChange}
                         input={<OutlinedInput />}
                         inputProps={{ "aria-label": "Without label" }}
-                        displayEmpty >
+                        displayEmpty
+                    >
                         <MenuItem disabled value="">
                             <em>{commonT("gatewayID")}</em>
                         </MenuItem>

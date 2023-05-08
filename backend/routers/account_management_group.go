@@ -10,8 +10,8 @@ import (
 	"der-ems/internal/e"
 )
 
-// GetSubGroups godoc
-func (w *APIWorker) GetSubGroups(c *gin.Context) {
+// GetGroups godoc
+func (w *APIWorker) GetGroups(c *gin.Context) {
 	appG := app.Gin{c}
 	userID, _ := c.Get("userID")
 	if userID == nil {
@@ -20,7 +20,7 @@ func (w *APIWorker) GetSubGroups(c *gin.Context) {
 		return
 	}
 
-	responseData, err := w.Services.AccountManagement.GetSubGroups(userID.(int64))
+	responseData, err := w.Services.AccountManagement.GetGroups(userID.(int64))
 	if err != nil {
 		appG.Response(http.StatusInternalServerError, e.ErrAccountGroupsGen, err.Error())
 		return

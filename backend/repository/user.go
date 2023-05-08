@@ -21,7 +21,7 @@ type UserRepository interface {
 	GetUserByPasswordToken(token string) (*deremsmodels.User, error)
 	CreateGroup(group *deremsmodels.Group) (errCode int, err error)
 	GetGroupByGroupID(groupID int64) (*deremsmodels.Group, error)
-	GetSubGroupsByGroupID(groupID int64) ([]*deremsmodels.Group, error)
+	GetGroupsByGroupID(groupID int64) ([]*deremsmodels.Group, error)
 	GetGatewaysPermissionByGroupID(groupID int64) ([]*deremsmodels.GroupGatewayRight, error)
 	GetWebpagesPermissionByGroupTypeID(groupTypeID int64) ([]*deremsmodels.GroupTypeWebpageRight, error)
 	GetWebpageByWebpageID(webpagesID int64) (*deremsmodels.Webpage, error)
@@ -93,7 +93,7 @@ func (repo defaultUserRepository) GetGroupByGroupID(groupID int64) (*deremsmodel
 	return deremsmodels.FindGroup(repo.db, groupID)
 }
 
-func (repo defaultUserRepository) GetSubGroupsByGroupID(groupID int64) ([]*deremsmodels.Group, error) {
+func (repo defaultUserRepository) GetGroupsByGroupID(groupID int64) ([]*deremsmodels.Group, error) {
 	return deremsmodels.Groups(
 		qm.SQL(`
 		WITH RECURSIVE group_path AS

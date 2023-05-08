@@ -11,17 +11,17 @@ import (
 
 // AccountManagementService godoc
 type AccountManagementService interface {
-	GetSubGroups(userID int64) (subGroups *SubGroupsResponse, err error)
+	GetGroups(userID int64) (getGroups *GetGroupsResponse, err error)
 	CreateGroup(body *app.CreateGroupBody) (errCode int, err error)
 }
 
-// SubGroupsResponse godoc
-type SubGroupsResponse struct {
-	Groups []SubGroupInfo `json:"groups"`
+// GetGroupsResponse godoc
+type GetGroupsResponse struct {
+	Groups []GetGroupInfo `json:"groups"`
 }
 
-// SubGroupInfo godoc
-type SubGroupInfo struct {
+// GetGroupInfo godoc
+type GetGroupInfo struct {
 	ID       int64      `json:"id"`
 	Name     string     `json:"name"`
 	TypeID   int64      `json:"typeID"`
@@ -37,7 +37,7 @@ func NewAccountManagementService(repo *repository.Repository) AccountManagementS
 	return &defaultAccountManagementService{repo}
 }
 
-func (s defaultAccountManagementService) GetSubGroups(userID int64) (subGroups *SubGroupsResponse, err error) {
+func (s defaultAccountManagementService) GetGroups(userID int64) (getGroups *GetGroupsResponse, err error) {
 	user, err := s.repo.User.GetUserByUserID(userID)
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -46,27 +46,27 @@ func (s defaultAccountManagementService) GetSubGroups(userID int64) (subGroups *
 		}).Error()
 		return
 	}
-	groups, err := s.repo.User.GetSubGroupsByGroupID(user.GroupID)
+	groups, err := s.repo.User.GetGroupsByGroupID(user.GroupID)
 	if err != nil {
 		log.WithFields(log.Fields{
-			"caused-by": "s.repo.User.GetSubGroupsByGroupID",
+			"caused-by": "s.repo.User.GetGroupsByGroupID",
 			"err":       err,
 		}).Error()
 		return
 	}
 
-	var subGroupInfos []SubGroupInfo
+	var getGroupInfos []GetGroupInfo
 	for _, group := range groups {
-		subGroupInfo := SubGroupInfo{
+		getGroupInfo := GetGroupInfo{
 			ID:       group.ID,
 			Name:     group.Name,
 			TypeID:   group.TypeID,
 			ParentID: group.ParentID,
 		}
-		subGroupInfos = append(subGroupInfos, subGroupInfo)
+		getGroupInfos = append(getGroupInfos, getGroupInfo)
 	}
-	subGroups = &SubGroupsResponse{
-		Groups: subGroupInfos,
+	getGroups = &GetGroupsResponse{
+		Groups: getGroupInfos,
 	}
 	return
 }

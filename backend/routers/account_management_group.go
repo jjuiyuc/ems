@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 
 	"der-ems/internal/app"
 	"der-ems/internal/e"
@@ -26,7 +26,7 @@ func (w *APIWorker) GetGroups(c *gin.Context) {
 	appG := app.Gin{c}
 	userID, _ := c.Get("userID")
 	if userID == nil {
-		log.WithField("caused-by", "error token").Error()
+		logrus.WithField("caused-by", "error token").Error()
 		appG.Response(http.StatusUnauthorized, e.ErrToken, nil)
 		return
 	}

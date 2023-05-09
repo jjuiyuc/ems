@@ -1,7 +1,7 @@
 package services
 
 import (
-	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	"github.com/volatiletech/null/v8"
 
 	"der-ems/internal/app"
@@ -41,7 +41,7 @@ func NewAccountManagementService(repo *repository.Repository) AccountManagementS
 func (s defaultAccountManagementService) GetGroups(userID int64) (getGroups *GetGroupsResponse, err error) {
 	user, err := s.repo.User.GetUserByUserID(userID)
 	if err != nil {
-		log.WithFields(log.Fields{
+		logrus.WithFields(logrus.Fields{
 			"caused-by": "s.repo.User.GetUserByUserID",
 			"err":       err,
 		}).Error()
@@ -49,7 +49,7 @@ func (s defaultAccountManagementService) GetGroups(userID int64) (getGroups *Get
 	}
 	groups, err := s.repo.User.GetGroupsByGroupID(user.GroupID)
 	if err != nil {
-		log.WithFields(log.Fields{
+		logrus.WithFields(logrus.Fields{
 			"caused-by": "s.repo.User.GetGroupsByGroupID",
 			"err":       err,
 		}).Error()
@@ -74,7 +74,7 @@ func (s defaultAccountManagementService) GetGroups(userID int64) (getGroups *Get
 
 func (s defaultAccountManagementService) CreateGroup(body *app.CreateGroupBody) (errCode int, err error) {
 	if !s.validateGroupType(int64(body.ParentID), 2) {
-		log.WithField("parent-id", int64(body.ParentID)).Error("validate-group-type-failed")
+		logrus.WithField("parent-id", int64(body.ParentID)).Error("validate-group-type-failed")
 		err = e.ErrNewAccountParentGroupTypeUnexpected
 		return
 	}
@@ -86,7 +86,7 @@ func (s defaultAccountManagementService) CreateGroup(body *app.CreateGroupBody) 
 	}
 	errCode, err = s.repo.User.CreateGroup(group)
 	if err != nil {
-		log.WithFields(log.Fields{
+		logrus.WithFields(logrus.Fields{
 			"caused-by": "s.repo.User.CreateGroup",
 			"err":       err,
 			"body":      *body,

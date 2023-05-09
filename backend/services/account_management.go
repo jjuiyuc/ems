@@ -5,6 +5,7 @@ import (
 	"github.com/volatiletech/null/v8"
 
 	"der-ems/internal/app"
+	"der-ems/internal/e"
 	deremsmodels "der-ems/models/der-ems"
 	"der-ems/repository"
 )
@@ -72,12 +73,17 @@ func (s defaultAccountManagementService) GetGroups(userID int64) (getGroups *Get
 }
 
 func (s defaultAccountManagementService) CreateGroup(body *app.CreateGroupBody) (errCode int, err error) {
+	if !s.validateGroupType(int64(body.ParentID), 2) {
+		log.WithField("parent-id", int64(body.ParentID)).Error("validate-group-type-failed")
+		err = e.ErrNewAccountParentGroupTypeUnexpected
+		return
+	}
+
 	group := &deremsmodels.Group{
 		Name:     body.Name,
 		TypeID:   int64(body.TypeID),
 		ParentID: null.Int64From(int64(body.ParentID)),
 	}
-
 	errCode, err = s.repo.User.CreateGroup(group)
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -87,4 +93,12 @@ func (s defaultAccountManagementService) CreateGroup(body *app.CreateGroupBody) 
 		}).Error()
 	}
 	return
+}
+
+func (s defaultAccountManagementService) validateGroupType(groupID, expectedTypeID int64) bool {
+	group, err := s.repo.User.GetGroupByGroupID(groupID)
+	if err == nil && group.TypeID == expectedTypeID {
+		return true
+	}
+	return false
 }

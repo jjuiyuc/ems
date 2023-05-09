@@ -69,7 +69,7 @@ func (w *APIWorker) CreateGroup(c *gin.Context) {
 		if errCode != e.ErrAccountGroupNameOnSameLevelExist {
 			errCode = e.ErrorAccountGroupCreate
 		}
-		appG.Response(http.StatusInternalServerError, errCode, nil)
+		appG.Response(http.StatusInternalServerError, errCode, err.Error())
 		return
 	}
 	appG.Response(http.StatusOK, e.Success, nil)

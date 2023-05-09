@@ -9,7 +9,7 @@ import (
 type CreateGroupBody struct {
 	Name     string `form:"name" binding:"required,max=20"`
 	TypeID   int    `form:"typeID" binding:"required,oneof=3 4"`
-	ParentID int    `form:"parentID" binding:"required,oneof=2"`
+	ParentID int    `form:"parentID" binding:"required"`
 }
 
 // BodyData godoc

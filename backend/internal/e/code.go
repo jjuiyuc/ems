@@ -38,4 +38,5 @@ const (
 	ErrAccountGroupsGen                 = 60002
 	ErrAccountGroupNameOnSameLevelExist = 60003
 	ErrorAccountGroupCreate             = 60004
+	ErrAccountGroupGen                  = 60005
 )

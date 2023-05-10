@@ -106,6 +106,7 @@ var EndpointMapping = map[PolicyWebpageObject][]string{
 	},
 	AccountManagementGroup: {
 		"/api/account-management/groups",
+		"/api/account-management/groups/:groupid",
 	},
 }
 
@@ -205,6 +206,7 @@ func InitRouter(isCORS bool, ginMode string, enforcer *casbin.Enforcer, w *APIWo
 	// Account Management Group
 	r.GET(EndpointMapping[AccountManagementGroup][0], authorizeJWT(REST), authorizePolicy(enforcer), w.GetGroups)
 	r.POST(EndpointMapping[AccountManagementGroup][0], authorizeJWT(REST), authorizePolicy(enforcer), w.CreateGroup)
+	r.GET(EndpointMapping[AccountManagementGroup][1], authorizeJWT(REST), authorizePolicy(enforcer), w.GetGroup)
 
 	// Casbin route
 	apiGroup.GET("/casbin", w.getFrontendPermission(enforcer))

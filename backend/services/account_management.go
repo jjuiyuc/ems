@@ -14,6 +14,7 @@ import (
 type AccountManagementService interface {
 	GetGroups(userID int64) (getGroups *GetGroupsResponse, err error)
 	CreateGroup(body *app.CreateGroupBody) (err error)
+	GetGroup(groupID int64) (getGroup *GetGroupResponse, err error)
 }
 
 // GetGroupsResponse godoc
@@ -27,6 +28,20 @@ type GetGroupInfo struct {
 	Name     string     `json:"name"`
 	TypeID   int64      `json:"typeID"`
 	ParentID null.Int64 `json:"parentID"`
+}
+
+// GetGroupResponse godoc
+type GetGroupResponse struct {
+	Name     string             `json:"name"`
+	TypeID   int64              `json:"typeID"`
+	ParentID null.Int64         `json:"parentID"`
+	Gateways []GroupGatewayInfo `json:"gateways"`
+}
+
+// GroupGatewayInfo godoc
+type GroupGatewayInfo struct {
+	GatewayID    string `json:"gatewayID"`
+	LocationName string `json:"locationName"`
 }
 
 type defaultAccountManagementService struct {
@@ -101,4 +116,60 @@ func (s defaultAccountManagementService) validateGroupType(groupID, expectedType
 		return true
 	}
 	return false
+}
+
+func (s defaultAccountManagementService) GetGroup(groupID int64) (getGroup *GetGroupResponse, err error) {
+	group, err := s.repo.User.GetGroupByGroupID(groupID)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.User.GetGroupByGroupID",
+			"err":       err,
+		}).Error()
+		return
+	}
+	gateways := s.getGroupGateways(groupID)
+
+	getGroup = &GetGroupResponse{
+		Name:     group.Name,
+		TypeID:   group.TypeID,
+		ParentID: group.ParentID,
+		Gateways: gateways,
+	}
+	return
+}
+
+func (s defaultAccountManagementService) getGroupGateways(groupID int64) (groupGateways []GroupGatewayInfo) {
+	gatewaysPermission, err := s.repo.User.GetGatewaysPermissionByGroupID(groupID, false)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.User.GetGatewaysPermissionByGroupID",
+			"err":       err,
+		}).Warn()
+		return
+	}
+	for _, gatewayPermission := range gatewaysPermission {
+		var groupGatewayInfo GroupGatewayInfo
+		gateway, err := s.repo.Gateway.GetGatewayByGatewayID(gatewayPermission.GWID)
+		if err != nil {
+			logrus.WithFields(logrus.Fields{
+				"caused-by": "s.repo.Gateway.GetGatewayByGatewayID",
+				"err":       err,
+			}).Warn()
+			continue
+		}
+		groupGatewayInfo.GatewayID = gateway.UUID
+
+		location, err := s.repo.Location.GetLocationByLocationID(gatewayPermission.LocationID.Int64)
+		if err == nil {
+			groupGatewayInfo.LocationName = location.Name
+		} else {
+			logrus.WithFields(logrus.Fields{
+				"caused-by": "s.repo.Location.GetLocationByLocationID",
+				"err":       err,
+			}).Warn()
+		}
+
+		groupGateways = append(groupGateways, groupGatewayInfo)
+	}
+	return
 }

@@ -22,7 +22,7 @@ type UserRepository interface {
 	CreateGroup(group *deremsmodels.Group) (err error)
 	GetGroupByGroupID(groupID int64) (*deremsmodels.Group, error)
 	GetGroupsByGroupID(groupID int64) ([]*deremsmodels.Group, error)
-	GetGatewaysPermissionByGroupID(groupID int64) ([]*deremsmodels.GroupGatewayRight, error)
+	GetGatewaysPermissionByGroupID(groupID int64, findDisabled bool) ([]*deremsmodels.GroupGatewayRight, error)
 	GetWebpagesPermissionByGroupTypeID(groupTypeID int64) ([]*deremsmodels.GroupTypeWebpageRight, error)
 	GetWebpageByWebpageID(webpagesID int64) (*deremsmodels.Webpage, error)
 }
@@ -109,9 +109,14 @@ func (repo defaultUserRepository) GetGroupsByGroupID(groupID int64) ([]*deremsmo
 		SELECT * FROM group_path;`, groupID)).All(repo.db)
 }
 
-func (repo defaultUserRepository) GetGatewaysPermissionByGroupID(groupID int64) ([]*deremsmodels.GroupGatewayRight, error) {
+func (repo defaultUserRepository) GetGatewaysPermissionByGroupID(groupID int64, findDisabled bool) ([]*deremsmodels.GroupGatewayRight, error) {
+	if findDisabled {
+		return deremsmodels.GroupGatewayRights(
+			qm.Where("group_id = ?", groupID)).All(repo.db)
+	}
 	return deremsmodels.GroupGatewayRights(
-		qm.Where("group_id = ?", groupID)).All(repo.db)
+		qm.Where("group_id = ?", groupID),
+		qm.Where("disabled_at IS NULL")).All(repo.db)
 }
 
 func (repo defaultUserRepository) GetWebpagesPermissionByGroupTypeID(groupTypeID int64) ([]*deremsmodels.GroupTypeWebpageRight, error) {

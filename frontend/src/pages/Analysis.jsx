@@ -12,6 +12,7 @@ import AlertBox from "../components/AlertBox"
 import AnalysisCard from "../components/AnalysisCard"
 import BarChart from "../components/BarChart"
 import DateRangePicker from "../components/DateRangePicker"
+import DayPicker from "../components/DayPicker"
 import LineChart from "../components/LineChart"
 import MonthPicker from "../components/MonthPicker"
 import Spinner from "../components/Spinner"
@@ -42,6 +43,8 @@ export default connect(mapState)(function Analysis(props) {
     const defaultMonth = moment().get("date") == 1
         ? moment().subtract(1, "month").startOf("month")._d
         : new Date()
+
+    const defaultDay = moment().subtract(1, "day").startOf("day")._d
 
     const chartRealTimePowerSet = ({ data, labels }) => ({
         datasets: [
@@ -260,7 +263,9 @@ export default connect(mapState)(function Analysis(props) {
         [lineChartSupplyLoading, setLineChartSupplyLoading] = useState(false),
         [startDate, setStartDate] = useState(null),
         [endDate, setEndDate] = useState(null),
-        [startMonth, setStartMonth] = useState(defaultMonth)
+        [startMonth, setStartMonth] = useState(defaultMonth),
+        [startDay, setStartDay] = useState(defaultDay),
+        [enableRequest, setEnableRequest] = useState(true)
 
     const urlPrefix = `/api/${props.gatewayID}/devices`
     const
@@ -319,7 +324,10 @@ export default connect(mapState)(function Analysis(props) {
         },
         callYesterdayCards = (preStartTime, preEndTime) => {
             apiCall({
-                onComplete: () => setPreInfoLoading(false),
+                onComplete: () => {
+                    setPreInfoLoading(false)
+                    setEnableRequest(false)
+                },
                 onError: error => setPreInfoError(error),
                 onStart: () => setPreInfoLoading(true),
                 onSuccess: rawData => {
@@ -408,7 +416,10 @@ export default connect(mapState)(function Analysis(props) {
                 }).toString()
 
             apiCall({
-                onComplete: () => setPreLineChartPowerLoading(false),
+                onComplete: () => {
+                    setPreLineChartPowerLoading(false)
+                    setEnableRequest(false)
+                },
                 onError: error => setPreLineChartPowerError(error),
                 onStart: () => setPreLineChartPowerLoading(true),
                 onSuccess: rawData => {
@@ -489,12 +500,9 @@ export default connect(mapState)(function Analysis(props) {
         if (!props.gatewayID) return
 
         let startTime = "", endTime = ""
-        let preStartTime = "", preEndTime = ""
         if (tab === "day") {
             startTime = moment().startOf("day").toISOString()
             endTime = moment().toISOString()
-            preStartTime = moment().subtract(1, "day").startOf("day").toISOString()
-            preEndTime = moment().subtract(1, "day").endOf("day").toISOString()
 
         } else if (tab === "week") {
             startTime = moment().startOf("week").toISOString()
@@ -528,14 +536,24 @@ export default connect(mapState)(function Analysis(props) {
                 callLineChartSupply(startTime, endTime)
             }
         }
-        if (preStartTime && preEndTime) {
-            callYesterdayCards(preStartTime, preEndTime)
-
-            if (tab === "day") {
-                callPreLineChartPower(preStartTime, preEndTime)
-            }
-        }
     }, [props.gatewayID, tab, startDate, endDate, startMonth])
+
+    useEffect(() => {
+        if (!props.gatewayID || !enableRequest || preLineChartPowerLoading || preInfoLoading) return
+
+        let preStartTime = "", preEndTime = ""
+        if (tab === "day") {
+            preStartTime = startDay ? moment(startDay).toISOString() : ""
+            preEndTime = moment(startDay).add(1, "day").startOf("day").toISOString()
+        }
+        if (!preStartTime || !preEndTime) return
+
+        callYesterdayCards(preStartTime, preEndTime)
+
+        if (tab === "day") {
+            callPreLineChartPower(preStartTime, preEndTime)
+        }
+    }, [props.gatewayID, tab, startDay, enableRequest, preLineChartPowerLoading, preInfoLoading])
 
     const tabs = ["day", "week", "month", "year", "custom"]
 
@@ -602,7 +620,12 @@ export default connect(mapState)(function Analysis(props) {
                         <LoadingBox loading={lineChartPowerLoading} />
                     </div>
                 </div>
-                <h2 className="mt-10">{pageT("yesterday")}</h2>
+                <h5 className="mt-10 mb-2 ml-8">{pageT("selectBeforeToday")}</h5>
+                <div className="flex items-center">
+                    <DayPicker
+                        {...{ startDay, setStartDay, setEnableRequest }}
+                    />
+                </div>
                 <div className="gap-8 grid md:grid-cols-2 items-start mt-8">
                     <AnalysisCard
                         data={preEnergySourcesTotal}
@@ -618,7 +641,10 @@ export default connect(mapState)(function Analysis(props) {
                         : null}
                 </div>
                 <div className="card mt-8">
-                    <h4>{pageT("YesterdayPowerkW")}</h4>
+                    <div className="flex">
+                        <h4>{moment(startDay).format("YYYY/MM/DD")}</h4>
+                        <h4 className="ml-2">{pageT("powerKW")}</h4>
+                    </div>
                     <div className="max-h-80vh h-160 mt-10 relative w-full">
                         <LineChart
                             data={chartRealTimePowerSet({

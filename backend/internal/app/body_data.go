@@ -7,9 +7,10 @@ import (
 
 // CreateGroupBody godoc
 type CreateGroupBody struct {
-	Name     string `form:"name" binding:"required,max=20"`
-	TypeID   int    `form:"typeID" binding:"required,oneof=3 4"`
-	ParentID int    `form:"parentID" binding:"required"`
+	Name string `form:"name" binding:"required,max=20"`
+	// TypeID 3 is "Area maintainer" and 4 is "Field owner"
+	TypeID   int `form:"typeID" binding:"required,oneof=3 4"`
+	ParentID int `form:"parentID" binding:"required"`
 }
 
 // BodyData godoc

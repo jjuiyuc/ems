@@ -3,7 +3,7 @@ import { Button } from "@mui/material"
 import { useTranslation } from "react-multi-lang"
 import moment from "moment"
 import ReportProblemIcon from "@mui/icons-material/ReportProblem"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 
 import { apiCall } from "../utils/api"
 import variables from "../configs/variables"
@@ -15,9 +15,10 @@ import DateRangePicker from "../components/DateRangePicker"
 import DayPicker from "../components/DayPicker"
 import LineChart from "../components/LineChart"
 import MonthPicker from "../components/MonthPicker"
-import Spinner from "../components/Spinner"
+import LoadingBox from "../components/LoadingBox"
 
 const { colors } = variables
+
 const ErrorBox = ({ error, margin = "", message }) => error
     ? <AlertBox
         boxClass={`${margin} negative`}
@@ -27,9 +28,6 @@ const ErrorBox = ({ error, margin = "", message }) => error
         </>}
         icon={ReportProblemIcon}
         iconColor="negative-main" />
-    : null
-const LoadingBox = ({ loading }) => loading
-    ? <div className="grid h-24 place-items-center"><Spinner /></div>
     : null
 
 const mapState = state => ({ gatewayID: state.gateways.active.gatewayID })
@@ -265,7 +263,7 @@ export default connect(mapState)(function Analysis(props) {
         [endDate, setEndDate] = useState(null),
         [startMonth, setStartMonth] = useState(defaultMonth),
         [startDay, setStartDay] = useState(defaultDay),
-        [enableRequest, setEnableRequest] = useState(true)
+        timeID = useRef(true)
 
     const urlPrefix = `/api/${props.gatewayID}/devices`
     const
@@ -324,12 +322,8 @@ export default connect(mapState)(function Analysis(props) {
         },
         callYesterdayCards = (preStartTime, preEndTime) => {
             apiCall({
-                onComplete: () => {
-                    setPreInfoLoading(false)
-                    setEnableRequest(false)
-                },
+                onComplete: () => setPreInfoLoading(false),
                 onError: error => setPreInfoError(error),
-                onStart: () => setPreInfoLoading(true),
                 onSuccess: rawData => {
                     if (!rawData?.data) return
 
@@ -416,12 +410,8 @@ export default connect(mapState)(function Analysis(props) {
                 }).toString()
 
             apiCall({
-                onComplete: () => {
-                    setPreLineChartPowerLoading(false)
-                    setEnableRequest(false)
-                },
+                onComplete: () => setPreLineChartPowerLoading(false),
                 onError: error => setPreLineChartPowerError(error),
-                onStart: () => setPreLineChartPowerLoading(true),
                 onSuccess: rawData => {
                     if (!rawData || !rawData.data) return
 
@@ -500,6 +490,7 @@ export default connect(mapState)(function Analysis(props) {
         if (!props.gatewayID) return
 
         let startTime = "", endTime = ""
+
         if (tab === "day") {
             startTime = moment().startOf("day").toISOString()
             endTime = moment().toISOString()
@@ -539,21 +530,25 @@ export default connect(mapState)(function Analysis(props) {
     }, [props.gatewayID, tab, startDate, endDate, startMonth])
 
     useEffect(() => {
-        if (!props.gatewayID || !enableRequest || preLineChartPowerLoading || preInfoLoading) return
-
+        if (!props.gatewayID) return
         let preStartTime = "", preEndTime = ""
+
         if (tab === "day") {
             preStartTime = startDay ? moment(startDay).toISOString() : ""
             preEndTime = moment(startDay).add(1, "day").startOf("day").toISOString()
         }
         if (!preStartTime || !preEndTime) return
 
-        callYesterdayCards(preStartTime, preEndTime)
+        setPreLineChartPowerLoading(true)
+        setPreInfoLoading(true)
 
-        if (tab === "day") {
+        clearTimeout(timeID.current)
+        timeID.current = setTimeout(() => {
+            callYesterdayCards(preStartTime, preEndTime)
             callPreLineChartPower(preStartTime, preEndTime)
-        }
-    }, [props.gatewayID, tab, startDay, enableRequest, preLineChartPowerLoading, preInfoLoading])
+        }, 200)
+
+    }, [props.gatewayID, tab, startDay])
 
     const tabs = ["day", "week", "month", "year", "custom"]
 
@@ -598,12 +593,7 @@ export default connect(mapState)(function Analysis(props) {
             <AnalysisCard
                 data={energyDestinations}
                 title={pageT("energyDestinationsTotal")} />
-            {infoLoading
-                ? <div className="absolute bg-black-main-opacity-95 grid inset-0
-                                place-items-center rounded-3xl">
-                    <Spinner />
-                </div>
-                : null}
+            <LoadingBox loading={infoLoading} />
         </div>
         {tab == "day"
             ? <>
@@ -620,25 +610,20 @@ export default connect(mapState)(function Analysis(props) {
                         <LoadingBox loading={lineChartPowerLoading} />
                     </div>
                 </div>
-                <h5 className="mt-10 mb-2 ml-8">{pageT("selectBeforeToday")}</h5>
+                <h5 className="mt-10 mb-2 ml-8">{pageT("selectPreviousDays")}</h5>
                 <div className="flex items-center">
                     <DayPicker
-                        {...{ startDay, setStartDay, setEnableRequest }}
+                        {...{ startDay, setStartDay }}
                     />
                 </div>
-                <div className="gap-8 grid md:grid-cols-2 items-start mt-8">
+                <div className="gap-8 grid relative md:grid-cols-2 items-start mt-8">
                     <AnalysisCard
                         data={preEnergySourcesTotal}
                         title={pageT("energySourcesTotal")} />
                     <AnalysisCard
                         data={preEnergyDestinations}
                         title={pageT("energyDestinationsTotal")} />
-                    {infoLoading
-                        ? <div className="absolute bg-black-main-opacity-95 grid inset-0
-                                place-items-center rounded-3xl">
-                            <Spinner />
-                        </div>
-                        : null}
+                    <LoadingBox loading={preInfoLoading} />
                 </div>
                 <div className="card mt-8">
                     <div className="flex">

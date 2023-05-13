@@ -14,8 +14,8 @@ import BarChart from "../components/BarChart"
 import DateRangePicker from "../components/DateRangePicker"
 import DayPicker from "../components/DayPicker"
 import LineChart from "../components/LineChart"
-import MonthPicker from "../components/MonthPicker"
 import LoadingBox from "../components/LoadingBox"
+import MonthPicker from "../components/MonthPicker"
 
 const { colors } = variables
 

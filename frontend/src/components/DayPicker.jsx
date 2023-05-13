@@ -9,39 +9,30 @@ export default function DayPicker(props) {
 
     const
         minDate = moment().subtract(1, "month").add(-1, "days")._d,
-        maxDate = moment(new Date()).startOf("day").subtract(1, "days")._d
+        maxDate = moment().startOf("day").subtract(1, "days")._d
 
-    const { startDay, setStartDay, setEnableRequest } = props
+    const { startDay, setStartDay } = props
 
-    const [timeoutId, setTimeoutId] = useState(null)
-
-    const timeoutHandler = () => {
-        clearTimeout(timeoutId)
-
-        const newTimeoutId = setTimeout(() => {
-            setEnableRequest(true)
-        }, 300)
-        setTimeoutId(newTimeoutId)
-    }
     const
         onLeftClick = () => {
             if (startDay >= minDate) {
                 const newDay = moment(startDay).subtract(1, "day")._d
                 setStartDay(newDay)
-                timeoutHandler()
             }
         },
         onRightClick = () => {
             if (startDay < maxDate) {
                 const newDay = moment(startDay).add(1, "day")._d
                 setStartDay(newDay)
-                timeoutHandler()
             }
         }
     return (
         <>
             <div className="flex items-center">
-                <ArrowBackIosIcon onClick={onLeftClick} />
+                <ArrowBackIosIcon
+                    onClick={onLeftClick}
+                    className={startDay <= minDate ? "opacity-30" : ""}
+                />
                 <DatePicker
                     dateFormat="yyyy/MM/dd"
                     selected={startDay}
@@ -52,7 +43,10 @@ export default function DayPicker(props) {
                     monthsShown={2}
                     showDisabledMonthNavigation
                 />
-                <ArrowForwardIosIcon onClick={onRightClick} className="ml-1" />
+                <ArrowForwardIosIcon
+                    onClick={onRightClick}
+                    className={"ml-1" + (startDay >= maxDate ? " opacity-30" : "")}
+                />
             </div>
         </>
     )

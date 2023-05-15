@@ -26,27 +26,25 @@ export default function PrevDatePicker(props) {
             }
         }
     return (
-        <>
-            <div className="flex items-center">
-                <ArrowBackIosIcon
-                    onClick={onLeftClick}
-                    className={prevDate <= minDate ? "opacity-30" : ""}
-                />
-                <DatePicker
-                    dateFormat="yyyy/MM/dd"
-                    selected={prevDate}
-                    onChange={(date) => setPrevDate(date)}
-                    value={prevDate ? moment(prevDate).format("yyyy/MM/DD") : ""}
-                    minDate={minDate}
-                    maxDate={maxDate}
-                    monthsShown={2}
-                    showDisabledMonthNavigation
-                />
-                <ArrowForwardIosIcon
-                    onClick={onRightClick}
-                    className={"ml-1" + (prevDate >= maxDate ? " opacity-30" : "")}
-                />
-            </div>
-        </>
+        <div className="flex items-center">
+            <ArrowBackIosIcon
+                onClick={onLeftClick}
+                className={prevDate <= minDate ? "opacity-30" : ""}
+            />
+            <DatePicker
+                dateFormat="yyyy/MM/dd"
+                selected={prevDate}
+                onChange={(date) => setPrevDate(date)}
+                value={prevDate ? moment(prevDate).format("yyyy/MM/DD") : ""}
+                minDate={minDate}
+                maxDate={maxDate}
+                monthsShown={2}
+                showDisabledMonthNavigation
+            />
+            <ArrowForwardIosIcon
+                onClick={onRightClick}
+                className={"ml-1" + (prevDate >= maxDate ? " opacity-30" : "")}
+            />
+        </div>
     )
 }

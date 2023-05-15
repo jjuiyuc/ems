@@ -39,4 +39,6 @@ const (
 	ErrAccountGroupNameOnSameLevelExist = 60003
 	ErrorAccountGroupCreate             = 60004
 	ErrAccountGroupGen                  = 60005
+	ErrOwnAccountGroupUpdatedNotAllow   = 60006
+	ErrAccountGroupUpdate               = 60007
 )

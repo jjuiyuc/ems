@@ -15,6 +15,7 @@ type AccountManagementService interface {
 	GetGroups(userID int64) (getGroups *GetGroupsResponse, err error)
 	CreateGroup(body *app.CreateGroupBody) (err error)
 	GetGroup(groupID int64) (getGroup *GetGroupResponse, err error)
+	UpdateGroup(userID, groupID int64, body *app.UpdateGroupBody) (err error)
 }
 
 // GetGroupsResponse godoc
@@ -172,4 +173,39 @@ func (s defaultAccountManagementService) getGroupGateways(groupID int64) (groupG
 		groupGateways = append(groupGateways, groupGatewayInfo)
 	}
 	return
+}
+
+func (s defaultAccountManagementService) UpdateGroup(userID, groupID int64, body *app.UpdateGroupBody) (err error) {
+	if s.isOwnAccountGroup(userID, groupID) {
+		err = e.ErrNewOwnAccountGroupUpdatedNotAllow
+		logrus.WithField("caused-by", err).Error()
+		return
+	}
+
+	group, err := s.repo.User.GetGroupByGroupID(groupID)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.User.GetGroupByGroupID",
+			"err":       err,
+		}).Error()
+		return
+	}
+	group.Name = body.Name
+	err = s.repo.User.UpdateGroup(group)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.User.UpdateGroup",
+			"err":       err,
+			"body":      *body,
+		}).Error()
+	}
+	return
+}
+
+func (s defaultAccountManagementService) isOwnAccountGroup(userID, groupID int64) bool {
+	user, err := s.repo.User.GetUserByUserID(userID)
+	if err == nil && user.GroupID == groupID {
+		return true
+	}
+	return false
 }

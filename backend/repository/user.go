@@ -20,6 +20,7 @@ type UserRepository interface {
 	GetUserByUsername(username string) (*deremsmodels.User, error)
 	GetUserByPasswordToken(token string) (*deremsmodels.User, error)
 	CreateGroup(group *deremsmodels.Group) (err error)
+	UpdateGroup(group *deremsmodels.Group) (err error)
 	GetGroupByGroupID(groupID int64) (*deremsmodels.Group, error)
 	GetGroupsByGroupID(groupID int64) ([]*deremsmodels.Group, error)
 	GetGatewaysPermissionByGroupID(groupID int64, findDisabled bool) ([]*deremsmodels.GroupGatewayRight, error)
@@ -85,6 +86,20 @@ func (repo defaultUserRepository) CreateGroup(group *deremsmodels.Group) (err er
 		return
 	}
 	err = group.Insert(repo.db, boil.Infer())
+	return
+}
+
+func (repo defaultUserRepository) UpdateGroup(group *deremsmodels.Group) (err error) {
+	_, err = deremsmodels.Groups(
+		qm.Where("name = ?", group.Name),
+		qm.Where("parent_id = ?", group.ParentID),
+		qm.Where("deleted_at IS NULL")).One(repo.db)
+	if err == nil {
+		err = e.ErrNewAccountGroupNameOnSameLevelExist
+		return
+	}
+	group.UpdatedAt = time.Now().UTC()
+	_, err = group.Update(repo.db, boil.Infer())
 	return
 }
 

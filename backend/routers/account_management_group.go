@@ -95,3 +95,40 @@ func (w *APIWorker) GetGroup(c *gin.Context) {
 	}
 	appG.Response(http.StatusOK, e.Success, responseData)
 }
+
+// UpdateGroup godoc
+func (w *APIWorker) UpdateGroup(c *gin.Context) {
+	appG := app.Gin{c}
+	userID, _ := c.Get("userID")
+	if userID == nil {
+		logrus.WithField("caused-by", "error token").Error()
+		appG.Response(http.StatusUnauthorized, e.ErrToken, nil)
+		return
+	}
+	uri := &app.GroupURI{}
+	if err := uri.Validate(c); err != nil {
+		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
+		return
+	}
+	body := &app.UpdateGroupBody{}
+	if err := body.Validate(c); err != nil {
+		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
+		return
+	}
+
+	err := w.Services.AccountManagement.UpdateGroup(userID.(int64), uri.GroupID, body)
+	if err != nil {
+		var code int
+		switch err {
+		case e.ErrNewAccountGroupNameOnSameLevelExist:
+			code = e.ErrAccountGroupNameOnSameLevelExist
+		case e.ErrNewOwnAccountGroupUpdatedNotAllow:
+			code = e.ErrOwnAccountGroupUpdatedNotAllow
+		default:
+			code = e.ErrorAccountGroupCreate
+		}
+		appG.Response(http.StatusInternalServerError, code, nil)
+		return
+	}
+	appG.Response(http.StatusOK, e.Success, nil)
+}

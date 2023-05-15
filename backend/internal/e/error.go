@@ -25,6 +25,8 @@ var (
 	ErrNewAccountGroupNameOnSameLevelExist = errors.New("account group name exists on the same level")
 	// ErrNewAccountParentGroupTypeUnexpected godoc
 	ErrNewAccountParentGroupTypeUnexpected = errors.New("account parent group type is unexpected")
+	//ErrNewOwnAccountGroupUpdatedNotAllow godoc
+	ErrNewOwnAccountGroupUpdatedNotAllow = errors.New("update own account group does not allow")
 )
 
 // ErrNewKeyNotExist godoc

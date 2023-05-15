@@ -5,8 +5,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// GetGroupURI godoc
-type GetGroupURI struct {
+// GroupURI godoc
+type GroupURI struct {
 	GroupID int64 `uri:"groupid" binding:"required"`
 }
 
@@ -16,7 +16,7 @@ type URI interface {
 }
 
 // Validate godoc
-func (u *GetGroupURI) Validate(c *gin.Context) (err error) {
+func (u *GroupURI) Validate(c *gin.Context) (err error) {
 	if err = c.ShouldBindUri(u); err != nil {
 		logrus.WithField("caused-by", err).Error()
 	}

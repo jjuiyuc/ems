@@ -82,7 +82,7 @@ func (w *APIWorker) CreateGroup(c *gin.Context) {
 // GetGroup godoc
 func (w *APIWorker) GetGroup(c *gin.Context) {
 	appG := app.Gin{c}
-	uri := &app.GetGroupURI{}
+	uri := &app.GroupURI{}
 	if err := uri.Validate(c); err != nil {
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
@@ -90,7 +90,7 @@ func (w *APIWorker) GetGroup(c *gin.Context) {
 
 	responseData, err := w.Services.AccountManagement.GetGroup(uri.GroupID)
 	if err != nil {
-		appG.Response(http.StatusInternalServerError, e.ErrAccountGroupGen, err.Error())
+		appG.Response(http.StatusInternalServerError, e.ErrAccountGroupGen, nil)
 		return
 	}
 	appG.Response(http.StatusOK, e.Success, responseData)

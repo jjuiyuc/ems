@@ -7,6 +7,7 @@ import (
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 
+	"der-ems/internal/e"
 	deremsmodels "der-ems/models/der-ems"
 )
 
@@ -18,7 +19,9 @@ type UserRepository interface {
 	GetUserByUserID(userID int64) (*deremsmodels.User, error)
 	GetUserByUsername(username string) (*deremsmodels.User, error)
 	GetUserByPasswordToken(token string) (*deremsmodels.User, error)
+	CreateGroup(group *deremsmodels.Group) (err error)
 	GetGroupByGroupID(groupID int64) (*deremsmodels.Group, error)
+	GetGroupsByGroupID(groupID int64) ([]*deremsmodels.Group, error)
 	GetGatewaysPermissionByGroupID(groupID int64) ([]*deremsmodels.GroupGatewayRight, error)
 	GetWebpagesPermissionByGroupTypeID(groupTypeID int64) ([]*deremsmodels.GroupTypeWebpageRight, error)
 	GetWebpageByWebpageID(webpagesID int64) (*deremsmodels.Webpage, error)
@@ -72,8 +75,38 @@ func (repo defaultUserRepository) GetUserByPasswordToken(token string) (*deremsm
 		qm.Where("pwd_token_expiry > ?", time.Now().UTC())).One(repo.db)
 }
 
+func (repo defaultUserRepository) CreateGroup(group *deremsmodels.Group) (err error) {
+	_, err = deremsmodels.Groups(
+		qm.Where("name = ?", group.Name),
+		qm.Where("parent_id = ?", group.ParentID),
+		qm.Where("deleted_at IS NULL")).One(repo.db)
+	if err == nil {
+		err = e.ErrNewAccountGroupNameOnSameLevelExist
+		return
+	}
+	err = group.Insert(repo.db, boil.Infer())
+	return
+}
+
 func (repo defaultUserRepository) GetGroupByGroupID(groupID int64) (*deremsmodels.Group, error) {
 	return deremsmodels.FindGroup(repo.db, groupID)
+}
+
+func (repo defaultUserRepository) GetGroupsByGroupID(groupID int64) ([]*deremsmodels.Group, error) {
+	return deremsmodels.Groups(
+		qm.SQL(`
+		WITH RECURSIVE group_path AS
+		(
+		SELECT *
+			FROM der_ems.group
+			WHERE id = ?
+		UNION ALL
+		SELECT g.*
+			FROM group_path AS gp JOIN der_ems.group AS g
+			ON gp.id = g.parent_id
+			AND g.deleted_at IS NULL
+		)
+		SELECT * FROM group_path;`, groupID)).All(repo.db)
 }
 
 func (repo defaultUserRepository) GetGatewaysPermissionByGroupID(groupID int64) ([]*deremsmodels.GroupGatewayRight, error) {

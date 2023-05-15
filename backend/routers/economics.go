@@ -21,6 +21,7 @@ import (
 // @Success     200            {object}  app.Response{data=services.TimeOfUseEnergyCostResponse}
 // @Failure     400            {object}  app.Response
 // @Failure     401            {object}  app.Response
+// @Failure     403            {object}  app.Response
 // @Router      /{gwid}/devices/tou/energy-cost [get]
 func (w *APIWorker) GetTimeOfUseEnergyCost(c *gin.Context) {
 	appG := app.Gin{c}

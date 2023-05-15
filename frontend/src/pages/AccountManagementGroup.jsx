@@ -1,3 +1,4 @@
+import { connect } from "react-redux"
 import {
     Button, DialogActions, Divider, FormControl, ListItem, TextField
 } from "@mui/material"
@@ -12,7 +13,9 @@ import { ReactComponent as DeleteIcon } from "../assets/icons/trash_solid.svg"
 import { ReactComponent as EditIcon } from "../assets/icons/edit.svg"
 import { ReactComponent as NoticeIcon } from "../assets/icons/notice.svg"
 
-export default function AccountManagementGroup() {
+const mapState = state => ({ gatewayID: state.gateways.active.gatewayID })
+
+export default connect(mapState)(function AccountManagementGroup() {
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
@@ -50,6 +53,7 @@ export default function AccountManagementGroup() {
 
             }
         ]),
+        [groupList, setGroupList] = useState({}),
         [error, setError] = useState(null),
         [loading, setLoading] = useState(false),
         [fullWidth, setFullWidth] = useState(true),
@@ -107,7 +111,7 @@ export default function AccountManagementGroup() {
             center: true
         }
     ]
-
+    // useEffect(() => { }, [props.gatewayID])
     return <>
         <h1 className="mb-9">{commonT("accountManagementGroup")}</h1>
         <div className="mb-9">
@@ -242,4 +246,4 @@ export default function AccountManagementGroup() {
             </DialogActions>
         </DialogForm>
     </>
-}
+})

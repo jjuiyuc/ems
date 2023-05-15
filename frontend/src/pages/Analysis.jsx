@@ -12,7 +12,7 @@ import AlertBox from "../components/AlertBox"
 import AnalysisCard from "../components/AnalysisCard"
 import BarChart from "../components/BarChart"
 import DateRangePicker from "../components/DateRangePicker"
-import DayPicker from "../components/DayPicker"
+import PrevDatePicker from "../components/PrevDatePicker"
 import LineChart from "../components/LineChart"
 import LoadingBox from "../components/LoadingBox"
 import MonthPicker from "../components/MonthPicker"
@@ -42,7 +42,7 @@ export default connect(mapState)(function Analysis(props) {
         ? moment().subtract(1, "month").startOf("month")._d
         : new Date()
 
-    const defaultDay = moment().subtract(1, "day").startOf("day")._d
+    const defaultDate = moment().subtract(1, "day").startOf("day")._d
 
     const chartRealTimePowerSet = ({ data, labels }) => ({
         datasets: [
@@ -262,7 +262,7 @@ export default connect(mapState)(function Analysis(props) {
         [startDate, setStartDate] = useState(null),
         [endDate, setEndDate] = useState(null),
         [startMonth, setStartMonth] = useState(defaultMonth),
-        [startDay, setStartDay] = useState(defaultDay),
+        [prevDate, setPrevDate] = useState(defaultDate),
         timeID = useRef(true)
 
     const urlPrefix = `/api/${props.gatewayID}/devices`
@@ -534,8 +534,8 @@ export default connect(mapState)(function Analysis(props) {
         let preStartTime = "", preEndTime = ""
 
         if (tab === "day") {
-            preStartTime = startDay ? moment(startDay).toISOString() : ""
-            preEndTime = moment(startDay).add(1, "day").startOf("day").toISOString()
+            preStartTime = prevDate ? moment(prevDate).toISOString() : ""
+            preEndTime = moment(prevDate).add(1, "day").startOf("day").toISOString()
         }
         if (!preStartTime || !preEndTime) return
 
@@ -548,7 +548,7 @@ export default connect(mapState)(function Analysis(props) {
             callPreLineChartPower(preStartTime, preEndTime)
         }, 200)
 
-    }, [props.gatewayID, tab, startDay])
+    }, [props.gatewayID, tab, prevDate])
 
     const tabs = ["day", "week", "month", "year", "custom"]
 
@@ -579,7 +579,7 @@ export default connect(mapState)(function Analysis(props) {
             : null}
         {tab === "custom"
             ? <div className="flex justify-end mb-10 relative w-auto">
-                <div className="flex items-center">
+                <div className="flex">
                     <DateRangePicker
                         {...{ startDate, setStartDate, endDate, setEndDate }}
                     />
@@ -610,11 +610,9 @@ export default connect(mapState)(function Analysis(props) {
                         <LoadingBox loading={lineChartPowerLoading} />
                     </div>
                 </div>
-                <h5 className="mt-10 mb-2 ml-8">{pageT("selectPreviousDays")}</h5>
+                <h5 className="mt-10 mb-2 ml-8">{pageT("selectPreviousDate")}</h5>
                 <div className="flex items-center">
-                    <DayPicker
-                        {...{ startDay, setStartDay }}
-                    />
+                    <PrevDatePicker {...{ prevDate, setPrevDate }} />
                 </div>
                 <div className="gap-8 grid relative md:grid-cols-2 items-start mt-8">
                     <AnalysisCard
@@ -626,10 +624,10 @@ export default connect(mapState)(function Analysis(props) {
                     <LoadingBox loading={preInfoLoading} />
                 </div>
                 <div className="card mt-8">
-                    <div className="flex">
-                        <h4>{moment(startDay).format("YYYY/MM/DD")}</h4>
-                        <h4 className="ml-2">{pageT("powerKW")}</h4>
-                    </div>
+                    <h4>
+                        {moment(prevDate).format("YYYY/MM/DD")}
+                        <span className="ml-2">{pageT("powerKW")}</span>
+                    </h4>
                     <div className="max-h-80vh h-160 mt-10 relative w-full">
                         <LineChart
                             data={chartRealTimePowerSet({
@@ -642,7 +640,8 @@ export default connect(mapState)(function Analysis(props) {
                     </div>
                 </div>
             </>
-            : null}
+            : null
+        }
         {tab !== "day"
             ? <>
                 <div className="card mt-8">

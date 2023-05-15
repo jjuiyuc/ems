@@ -3,27 +3,26 @@ import moment from "moment"
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos"
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos"
 import "../assets/css/dateRangePicker.css"
-import { useState } from "react"
 
-export default function DayPicker(props) {
+export default function PrevDatePicker(props) {
 
     const
         minDate = moment().subtract(1, "month").add(-1, "days")._d,
         maxDate = moment().startOf("day").subtract(1, "days")._d
 
-    const { startDay, setStartDay } = props
+    const { prevDate, setPrevDate } = props
 
     const
         onLeftClick = () => {
-            if (startDay >= minDate) {
-                const newDay = moment(startDay).subtract(1, "day")._d
-                setStartDay(newDay)
+            if (prevDate >= minDate) {
+                const newDate = moment(prevDate).subtract(1, "day")._d
+                setPrevDate(newDate)
             }
         },
         onRightClick = () => {
-            if (startDay < maxDate) {
-                const newDay = moment(startDay).add(1, "day")._d
-                setStartDay(newDay)
+            if (prevDate < maxDate) {
+                const newDate = moment(prevDate).add(1, "day")._d
+                setPrevDate(newDate)
             }
         }
     return (
@@ -31,13 +30,13 @@ export default function DayPicker(props) {
             <div className="flex items-center">
                 <ArrowBackIosIcon
                     onClick={onLeftClick}
-                    className={startDay <= minDate ? "opacity-30" : ""}
+                    className={prevDate <= minDate ? "opacity-30" : ""}
                 />
                 <DatePicker
                     dateFormat="yyyy/MM/dd"
-                    selected={startDay}
-                    onChange={(date) => setStartDay(date)}
-                    value={startDay ? moment(startDay).format("yyyy/MM/DD") : ""}
+                    selected={prevDate}
+                    onChange={(date) => setPrevDate(date)}
+                    value={prevDate ? moment(prevDate).format("yyyy/MM/DD") : ""}
                     minDate={minDate}
                     maxDate={maxDate}
                     monthsShown={2}
@@ -45,7 +44,7 @@ export default function DayPicker(props) {
                 />
                 <ArrowForwardIosIcon
                     onClick={onRightClick}
-                    className={"ml-1" + (startDay >= maxDate ? " opacity-30" : "")}
+                    className={"ml-1" + (prevDate >= maxDate ? " opacity-30" : "")}
                 />
             </div>
         </>

@@ -19,7 +19,7 @@ type UserRepository interface {
 	GetUserByUserID(userID int64) (*deremsmodels.User, error)
 	GetUserByUsername(username string) (*deremsmodels.User, error)
 	GetUserByPasswordToken(token string) (*deremsmodels.User, error)
-	CreateGroup(group *deremsmodels.Group) (errCode int, err error)
+	CreateGroup(group *deremsmodels.Group) (err error)
 	GetGroupByGroupID(groupID int64) (*deremsmodels.Group, error)
 	GetGroupsByGroupID(groupID int64) ([]*deremsmodels.Group, error)
 	GetGatewaysPermissionByGroupID(groupID int64) ([]*deremsmodels.GroupGatewayRight, error)
@@ -75,13 +75,12 @@ func (repo defaultUserRepository) GetUserByPasswordToken(token string) (*deremsm
 		qm.Where("pwd_token_expiry > ?", time.Now().UTC())).One(repo.db)
 }
 
-func (repo defaultUserRepository) CreateGroup(group *deremsmodels.Group) (errCode int, err error) {
+func (repo defaultUserRepository) CreateGroup(group *deremsmodels.Group) (err error) {
 	_, err = deremsmodels.Groups(
 		qm.Where("name = ?", group.Name),
 		qm.Where("parent_id = ?", group.ParentID),
 		qm.Where("deleted_at IS NULL")).One(repo.db)
 	if err == nil {
-		errCode = e.ErrAccountGroupNameOnSameLevelExist
 		err = e.ErrNewAccountGroupNameOnSameLevelExist
 		return
 	}

@@ -1,6 +1,7 @@
 package routers
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -33,7 +34,7 @@ func (w *APIWorker) GetGroups(c *gin.Context) {
 
 	responseData, err := w.Services.AccountManagement.GetGroups(userID.(int64))
 	if err != nil {
-		appG.Response(http.StatusInternalServerError, e.ErrAccountGroupsGen, err.Error())
+		appG.Response(http.StatusInternalServerError, e.ErrAccountGroupsGen, nil)
 		return
 	}
 	appG.Response(http.StatusOK, e.Success, responseData)
@@ -64,12 +65,15 @@ func (w *APIWorker) CreateGroup(c *gin.Context) {
 		return
 	}
 
-	errCode, err := w.Services.AccountManagement.CreateGroup(body)
+	err := w.Services.AccountManagement.CreateGroup(body)
 	if err != nil {
-		if errCode != e.ErrAccountGroupNameOnSameLevelExist {
-			errCode = e.ErrorAccountGroupCreate
+		var code int
+		if errors.Is(err, e.ErrNewAccountGroupNameOnSameLevelExist) {
+			code = e.ErrAccountGroupNameOnSameLevelExist
+		} else {
+			code = e.ErrorAccountGroupCreate
 		}
-		appG.Response(http.StatusInternalServerError, errCode, err.Error())
+		appG.Response(http.StatusInternalServerError, code, nil)
 		return
 	}
 	appG.Response(http.StatusOK, e.Success, nil)

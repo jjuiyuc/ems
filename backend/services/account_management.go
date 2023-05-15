@@ -13,7 +13,7 @@ import (
 // AccountManagementService godoc
 type AccountManagementService interface {
 	GetGroups(userID int64) (getGroups *GetGroupsResponse, err error)
-	CreateGroup(body *app.CreateGroupBody) (errCode int, err error)
+	CreateGroup(body *app.CreateGroupBody) (err error)
 }
 
 // GetGroupsResponse godoc
@@ -72,7 +72,7 @@ func (s defaultAccountManagementService) GetGroups(userID int64) (getGroups *Get
 	return
 }
 
-func (s defaultAccountManagementService) CreateGroup(body *app.CreateGroupBody) (errCode int, err error) {
+func (s defaultAccountManagementService) CreateGroup(body *app.CreateGroupBody) (err error) {
 	if !s.validateGroupType(int64(body.ParentID), 2) {
 		logrus.WithField("parent-id", int64(body.ParentID)).Error("validate-group-type-failed")
 		err = e.ErrNewAccountParentGroupTypeUnexpected
@@ -84,7 +84,7 @@ func (s defaultAccountManagementService) CreateGroup(body *app.CreateGroupBody) 
 		TypeID:   int64(body.TypeID),
 		ParentID: null.Int64From(int64(body.ParentID)),
 	}
-	errCode, err = s.repo.User.CreateGroup(group)
+	err = s.repo.User.CreateGroup(group)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"caused-by": "s.repo.User.CreateGroup",

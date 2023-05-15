@@ -77,30 +77,29 @@ func (repo defaultUserRepository) GetUserByPasswordToken(token string) (*deremsm
 }
 
 func (repo defaultUserRepository) CreateGroup(group *deremsmodels.Group) (err error) {
-	_, err = deremsmodels.Groups(
-		qm.Where("name = ?", group.Name),
-		qm.Where("parent_id = ?", group.ParentID),
-		qm.Where("deleted_at IS NULL")).One(repo.db)
-	if err == nil {
+	if repo.isGroupNameExistedOnSameLevel(group) {
 		err = e.ErrNewAccountGroupNameOnSameLevelExist
 		return
 	}
-	err = group.Insert(repo.db, boil.Infer())
-	return
+	return group.Insert(repo.db, boil.Infer())
 }
 
 func (repo defaultUserRepository) UpdateGroup(group *deremsmodels.Group) (err error) {
-	_, err = deremsmodels.Groups(
-		qm.Where("name = ?", group.Name),
-		qm.Where("parent_id = ?", group.ParentID),
-		qm.Where("deleted_at IS NULL")).One(repo.db)
-	if err == nil {
+	if repo.isGroupNameExistedOnSameLevel(group) {
 		err = e.ErrNewAccountGroupNameOnSameLevelExist
 		return
 	}
 	group.UpdatedAt = time.Now().UTC()
 	_, err = group.Update(repo.db, boil.Infer())
 	return
+}
+
+func (repo defaultUserRepository) isGroupNameExistedOnSameLevel(group *deremsmodels.Group) bool {
+	_, err := deremsmodels.Groups(
+		qm.Where("name = ?", group.Name),
+		qm.Where("parent_id = ?", group.ParentID),
+		qm.Where("deleted_at IS NULL")).One(repo.db)
+	return err == nil
 }
 
 func (repo defaultUserRepository) GetGroupByGroupID(groupID int64) (*deremsmodels.Group, error) {

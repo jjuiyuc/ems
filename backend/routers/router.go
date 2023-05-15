@@ -104,11 +104,15 @@ var EndpointMapping = map[PolicyWebpageObject][]string{
 		"/api/:gwid/devices/grid/energy-info",
 		"/api/:gwid/devices/grid/power-state",
 	},
+	AccountManagementGroup: {
+		"/api/account-management/groups",
+	},
 }
 
 // MethodMapping godoc
 var MethodMapping = map[PolicyWebpageAction]string{
-	Read: "GET",
+	Create: "POST",
+	Read:   "GET",
 }
 
 // APIWorker godoc
@@ -198,6 +202,10 @@ func InitRouter(isCORS bool, ginMode string, enforcer *casbin.Enforcer, w *APIWo
 	r.GET(EndpointMapping[EnergyResources][5], authorizeJWT(REST), authorizePolicy(enforcer), w.GetGridEnergyInfo)
 	r.GET(EndpointMapping[EnergyResources][6], authorizeJWT(REST), authorizePolicy(enforcer), w.GetGridPowerState)
 
+	// Account Management Group
+	r.GET(EndpointMapping[AccountManagementGroup][0], authorizeJWT(REST), authorizePolicy(enforcer), w.GetGroups)
+	r.POST(EndpointMapping[AccountManagementGroup][0], authorizeJWT(REST), authorizePolicy(enforcer), w.CreateGroup)
+
 	// Casbin route
 	apiGroup.GET("/casbin", w.getFrontendPermission(enforcer))
 
@@ -253,7 +261,7 @@ func authorizeJWT(apiType APIType) gin.HandlerFunc {
 		}
 
 		c.Set("userID", claims.UserID)
-		c.Set("groupID", claims.GroupID)
+		c.Set("groupType", claims.GroupType)
 		if apiType == WebSocket {
 			c.Set("token", token)
 		}
@@ -278,8 +286,8 @@ func authorizePolicy(enforcer *casbin.Enforcer) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		appG := app.Gin{c}
 
-		groupID, _ := c.Get("groupID")
-		if groupID == nil {
+		groupType, _ := c.Get("groupType")
+		if groupType == nil {
 			log.WithField("caused-by", "error token").Error()
 			appG.Response(http.StatusUnauthorized, e.ErrToken, nil)
 			c.Abort()
@@ -289,23 +297,23 @@ func authorizePolicy(enforcer *casbin.Enforcer) gin.HandlerFunc {
 		err := enforcer.LoadPolicy()
 		if err != nil {
 			log.WithField("caused-by", "load policy").Error()
-			appG.Response(http.StatusUnauthorized, e.ErrAuthPolicyLoad, nil)
+			appG.Response(http.StatusForbidden, e.ErrAuthPolicyLoad, nil)
 			c.Abort()
 			return
 		}
 
-		sub := strconv.FormatInt(groupID.(int64), 10)
+		sub := strconv.FormatInt(groupType.(int64), 10)
 		webpage := getWebpage(c.FullPath())
 		action := getAction(c.Request.Method)
 		ok, err := enforcer.Enforce(sub, string(webpage), string(action))
 		if !ok {
 			log.WithField("caused-by", "permission denied").Error()
-			appG.Response(http.StatusUnauthorized, e.ErrAuthPermissionNotAllow, nil)
+			appG.Response(http.StatusForbidden, e.ErrAuthPermissionNotAllow, nil)
 			c.Abort()
 			return
 		} else if err != nil {
 			log.WithField("caused-by", "check permission").Error()
-			appG.Response(http.StatusUnauthorized, e.ErrAuthPermissionCheck, nil)
+			appG.Response(http.StatusForbidden, e.ErrAuthPermissionCheck, nil)
 			c.Abort()
 			return
 		}

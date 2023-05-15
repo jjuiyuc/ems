@@ -10,8 +10,8 @@ var jwtSecret []byte
 
 // Claims godoc
 type Claims struct {
-	UserID  int64
-	GroupID int64
+	UserID    int64
+	GroupType int64
 	jwt.StandardClaims
 }
 

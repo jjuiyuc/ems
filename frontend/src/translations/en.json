@@ -35,14 +35,14 @@
         "load": "Load",
         "month": "Month",
         "todayPowerkW": "Today Power (kW)",
+        "selectPreviousDate":"Select Previous Date",
         "selectMonth":"Select Month",
         "selfSupplyRate": "Self-supply Rate (%)",
         "startDate": "Start Date",
         "to": "to",
         "week": "Week",
         "year": "Year",
-        "yesterday": "Yesterday",
-        "YesterdayPowerkW":"Yesterday Power (kW)"
+        "powerKW":"Power (kW)"
     },
     "common": {
         "$/kWh":"$/kWh",

@@ -21,6 +21,7 @@ import (
 // @Success     200            {object}  app.Response{data=services.BatteryUsageInfoResponse}
 // @Failure     400            {object}  app.Response
 // @Failure     401            {object}  app.Response
+// @Failure     403            {object}  app.Response
 // @Router      /{gwid}/devices/battery/usage-info [get]
 func (w *APIWorker) GetBatteryUsageInfo(c *gin.Context) {
 	appG := app.Gin{c}
@@ -45,6 +46,7 @@ func (w *APIWorker) GetBatteryUsageInfo(c *gin.Context) {
 // @Success     200            {object}  app.Response{data=services.TimeOfUseInfoResponse}
 // @Failure     400            {object}  app.Response
 // @Failure     401            {object}  app.Response
+// @Failure     403            {object}  app.Response
 // @Failure     500            {object}  app.Response
 // @Router      /{gwid}/devices/tou/info [get]
 func (w *APIWorker) GetTimeOfUseInfo(c *gin.Context) {
@@ -74,6 +76,7 @@ func (w *APIWorker) GetTimeOfUseInfo(c *gin.Context) {
 // @Success     200            {object}  app.Response{data=services.SolarEnergyUsageResponse}
 // @Failure     400            {object}  app.Response
 // @Failure     401            {object}  app.Response
+// @Failure     403            {object}  app.Response
 // @Router      /{gwid}/devices/solar/energy-usage [get]
 func (w *APIWorker) GetSolarEnergyUsage(c *gin.Context) {
 	appG := app.Gin{c}

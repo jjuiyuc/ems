@@ -21,6 +21,7 @@ import (
 // @Success     200            {object}  app.Response{data=services.EnergyDistributionInfoResponse}
 // @Failure     400            {object}  app.Response
 // @Failure     401            {object}  app.Response
+// @Failure     403            {object}  app.Response
 // @Router      /{gwid}/devices/energy-distribution-info [get]
 func (w *APIWorker) GetEnergyDistributionInfo(c *gin.Context) {
 	appG := app.Gin{c}
@@ -45,6 +46,7 @@ func (w *APIWorker) GetEnergyDistributionInfo(c *gin.Context) {
 // @Success     200            {object}  app.Response{data=services.PowerStateResponse}
 // @Failure     400            {object}  app.Response
 // @Failure     401            {object}  app.Response
+// @Failure     403            {object}  app.Response
 // @Router      /{gwid}/devices/power-state [get]
 func (w *APIWorker) GetPowerState(c *gin.Context) {
 	appG := app.Gin{c}
@@ -69,6 +71,7 @@ func (w *APIWorker) GetPowerState(c *gin.Context) {
 // @Success     200            {object}  app.Response{data=services.AccumulatedPowerStateResponse}
 // @Failure     400            {object}  app.Response
 // @Failure     401            {object}  app.Response
+// @Failure     403            {object}  app.Response
 // @Router      /{gwid}/devices/accumulated-power-state [get]
 func (w *APIWorker) GetAccumulatedPowerState(c *gin.Context) {
 	appG := app.Gin{c}
@@ -93,6 +96,7 @@ func (w *APIWorker) GetAccumulatedPowerState(c *gin.Context) {
 // @Success     200            {object}  app.Response{data=services.PowerSelfSupplyRateResponse}
 // @Failure     400            {object}  app.Response
 // @Failure     401            {object}  app.Response
+// @Failure     403            {object}  app.Response
 // @Router      /{gwid}/devices/power-self-supply-rate [get]
 func (w *APIWorker) GetPowerSelfSupplyRate(c *gin.Context) {
 	appG := app.Gin{c}

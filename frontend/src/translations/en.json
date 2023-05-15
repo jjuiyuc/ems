@@ -35,7 +35,7 @@
         "load": "Load",
         "month": "Month",
         "todayPowerkW": "Today Power (kW)",
-        "selectPreviousDays":"Select Previous Days",
+        "selectPreviousDate":"Select Previous Date",
         "selectMonth":"Select Month",
         "selfSupplyRate": "Self-supply Rate (%)",
         "startDate": "Start Date",

@@ -82,12 +82,22 @@ func (w *APIWorker) CreateGroup(c *gin.Context) {
 // GetGroup godoc
 func (w *APIWorker) GetGroup(c *gin.Context) {
 	appG := app.Gin{c}
+	userID, _ := c.Get("userID")
+	if userID == nil {
+		logrus.WithField("caused-by", "error token").Error()
+		appG.Response(http.StatusUnauthorized, e.ErrToken, nil)
+		return
+	}
 	uri := &app.GroupURI{}
 	if err := uri.Validate(c); err != nil {
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
 
+	if !w.Services.AccountManagement.AuthorizeGroupID(userID.(int64), uri.GroupID) {
+		appG.Response(http.StatusForbidden, e.ErrAuthPermissionNotAllow, nil)
+		return
+	}
 	responseData, err := w.Services.AccountManagement.GetGroup(uri.GroupID)
 	if err != nil {
 		appG.Response(http.StatusInternalServerError, e.ErrAccountGroupGen, nil)
@@ -116,6 +126,10 @@ func (w *APIWorker) UpdateGroup(c *gin.Context) {
 		return
 	}
 
+	if !w.Services.AccountManagement.AuthorizeGroupID(userID.(int64), uri.GroupID) {
+		appG.Response(http.StatusForbidden, e.ErrAuthPermissionNotAllow, nil)
+		return
+	}
 	err := w.Services.AccountManagement.UpdateGroup(userID.(int64), uri.GroupID, body)
 	if err != nil {
 		var code int
@@ -148,6 +162,10 @@ func (w *APIWorker) DeleteGroup(c *gin.Context) {
 		return
 	}
 
+	if !w.Services.AccountManagement.AuthorizeGroupID(userID.(int64), uri.GroupID) {
+		appG.Response(http.StatusForbidden, e.ErrAuthPermissionNotAllow, nil)
+		return
+	}
 	err := w.Services.AccountManagement.DeleteGroup(userID.(int64), uri.GroupID)
 	if err != nil {
 		var code int

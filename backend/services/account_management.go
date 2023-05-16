@@ -17,6 +17,7 @@ type AccountManagementService interface {
 	GetGroup(groupID int64) (getGroup *GetGroupResponse, err error)
 	UpdateGroup(userID, groupID int64, body *app.UpdateGroupBody) (err error)
 	DeleteGroup(userID, groupID int64) (err error)
+	AuthorizeGroupID(userID, groupID int64) bool
 }
 
 // GetGroupsResponse godoc
@@ -56,20 +57,8 @@ func NewAccountManagementService(repo *repository.Repository) AccountManagementS
 }
 
 func (s defaultAccountManagementService) GetGroups(userID int64) (getGroups *GetGroupsResponse, err error) {
-	user, err := s.repo.User.GetUserByUserID(userID)
+	groups, err := s.getGroupTreeNodes(userID)
 	if err != nil {
-		logrus.WithFields(logrus.Fields{
-			"caused-by": "s.repo.User.GetUserByUserID",
-			"err":       err,
-		}).Error()
-		return
-	}
-	groups, err := s.repo.User.GetGroupsByGroupID(user.GroupID)
-	if err != nil {
-		logrus.WithFields(logrus.Fields{
-			"caused-by": "s.repo.User.GetGroupsByGroupID",
-			"err":       err,
-		}).Error()
 		return
 	}
 
@@ -85,6 +74,25 @@ func (s defaultAccountManagementService) GetGroups(userID int64) (getGroups *Get
 	}
 	getGroups = &GetGroupsResponse{
 		Groups: getGroupInfos,
+	}
+	return
+}
+
+func (s defaultAccountManagementService) getGroupTreeNodes(userID int64) (groups []*deremsmodels.Group, err error) {
+	user, err := s.repo.User.GetUserByUserID(userID)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.User.GetUserByUserID",
+			"err":       err,
+		}).Error()
+		return
+	}
+	groups, err = s.repo.User.GetGroupsByGroupID(user.GroupID)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.User.GetGroupsByGroupID",
+			"err":       err,
+		}).Error()
 	}
 	return
 }
@@ -270,4 +278,16 @@ func (s defaultAccountManagementService) isUserExistedInGroup(groupID int64) boo
 func (s defaultAccountManagementService) isFieldExisted(groupID int64) bool {
 	count, _ := s.repo.User.GetGatewayPermissionCountByGroupID(groupID, false)
 	return count > 0
+}
+
+func (s defaultAccountManagementService) AuthorizeGroupID(userID, groupID int64) bool {
+	groups, err := s.getGroupTreeNodes(userID)
+	if err == nil {
+		for _, group := range groups {
+			if group.ID == groupID {
+				return true
+			}
+		}
+	}
+	return false
 }

@@ -25,8 +25,14 @@ var (
 	ErrNewAccountGroupNameOnSameLevelExist = errors.New("account group name exists on the same level")
 	// ErrNewAccountParentGroupTypeUnexpected godoc
 	ErrNewAccountParentGroupTypeUnexpected = errors.New("account parent group type is unexpected")
-	//ErrNewOwnAccountGroupUpdatedNotAllow godoc
-	ErrNewOwnAccountGroupUpdatedNotAllow = errors.New("update own account group does not allow")
+	// ErrNewOwnAccountGroupModifiedNotAllow godoc
+	ErrNewOwnAccountGroupModifiedNotAllow = errors.New("modify own account group does not allow")
+	// ErrNewAccountGroupHasSubGroup godoc
+	ErrNewAccountGroupHasSubGroup = errors.New("account group has sub group")
+	// ErrNewAccountGroupHasUser godoc
+	ErrNewAccountGroupHasUser = errors.New("account group has user")
+	// ErrNewAccountGroupHasField godoc
+	ErrNewAccountGroupHasField = errors.New("account group has field")
 )
 
 // ErrNewKeyNotExist godoc

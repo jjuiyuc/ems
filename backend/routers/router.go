@@ -115,6 +115,7 @@ var MethodMapping = map[PolicyWebpageAction]string{
 	Create: "POST",
 	Read:   "GET",
 	Update: "PUT",
+	Delete: "DELETE",
 }
 
 // APIWorker godoc
@@ -209,6 +210,7 @@ func InitRouter(isCORS bool, ginMode string, enforcer *casbin.Enforcer, w *APIWo
 	r.POST(EndpointMapping[AccountManagementGroup][0], authorizeJWT(REST), authorizePolicy(enforcer), w.CreateGroup)
 	r.GET(EndpointMapping[AccountManagementGroup][1], authorizeJWT(REST), authorizePolicy(enforcer), w.GetGroup)
 	r.PUT(EndpointMapping[AccountManagementGroup][1], authorizeJWT(REST), authorizePolicy(enforcer), w.UpdateGroup)
+	r.DELETE(EndpointMapping[AccountManagementGroup][1], authorizeJWT(REST), authorizePolicy(enforcer), w.DeleteGroup)
 
 	// Casbin route
 	apiGroup.GET("/casbin", w.getFrontendPermission(enforcer))

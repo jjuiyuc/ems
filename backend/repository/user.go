@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 
@@ -19,11 +20,14 @@ type UserRepository interface {
 	GetUserByUserID(userID int64) (*deremsmodels.User, error)
 	GetUserByUsername(username string) (*deremsmodels.User, error)
 	GetUserByPasswordToken(token string) (*deremsmodels.User, error)
+	GetUserCountByGroupID(groupID int64) (int64, error)
 	CreateGroup(group *deremsmodels.Group) (err error)
 	UpdateGroup(group *deremsmodels.Group) (err error)
+	DeleteGroup(userID, groupID int64) (err error)
 	GetGroupByGroupID(groupID int64) (*deremsmodels.Group, error)
 	GetGroupsByGroupID(groupID int64) ([]*deremsmodels.Group, error)
 	GetGatewaysPermissionByGroupID(groupID int64, findDisabled bool) ([]*deremsmodels.GroupGatewayRight, error)
+	GetGatewayPermissionCountByGroupID(groupID int64, findDisabled bool) (int64, error)
 	GetWebpagesPermissionByGroupTypeID(groupTypeID int64) ([]*deremsmodels.GroupTypeWebpageRight, error)
 	GetWebpageByWebpageID(webpagesID int64) (*deremsmodels.Webpage, error)
 }
@@ -76,6 +80,12 @@ func (repo defaultUserRepository) GetUserByPasswordToken(token string) (*deremsm
 		qm.Where("pwd_token_expiry > ?", time.Now().UTC())).One(repo.db)
 }
 
+func (repo defaultUserRepository) GetUserCountByGroupID(groupID int64) (int64, error) {
+	return deremsmodels.Users(
+		qm.Where("group_id = ?", groupID),
+		qm.Where("deleted_at IS NULL")).Count(repo.db)
+}
+
 func (repo defaultUserRepository) CreateGroup(group *deremsmodels.Group) (err error) {
 	if repo.isGroupNameExistedOnSameLevel(group) {
 		err = e.ErrNewAccountGroupNameOnSameLevelExist
@@ -91,6 +101,18 @@ func (repo defaultUserRepository) UpdateGroup(group *deremsmodels.Group) (err er
 	}
 	group.UpdatedAt = time.Now().UTC()
 	_, err = group.Update(repo.db, boil.Infer())
+	return
+}
+
+func (repo defaultUserRepository) DeleteGroup(userID, groupID int64) (err error) {
+	group, err := deremsmodels.FindGroup(repo.db, groupID)
+	if err == nil {
+		now := time.Now().UTC()
+		group.UpdatedAt = now
+		group.DeletedAt = null.TimeFrom(now)
+		group.DeletedBy = null.Int64From(userID)
+		_, err = group.Update(repo.db, boil.Infer())
+	}
 	return
 }
 
@@ -131,6 +153,16 @@ func (repo defaultUserRepository) GetGatewaysPermissionByGroupID(groupID int64, 
 	return deremsmodels.GroupGatewayRights(
 		qm.Where("group_id = ?", groupID),
 		qm.Where("disabled_at IS NULL")).All(repo.db)
+}
+
+func (repo defaultUserRepository) GetGatewayPermissionCountByGroupID(groupID int64, findDisabled bool) (int64, error) {
+	if findDisabled {
+		return deremsmodels.GroupGatewayRights(
+			qm.Where("group_id = ?", groupID)).Count(repo.db)
+	}
+	return deremsmodels.GroupGatewayRights(
+		qm.Where("group_id = ?", groupID),
+		qm.Where("disabled_at IS NULL")).Count(repo.db)
 }
 
 func (repo defaultUserRepository) GetWebpagesPermissionByGroupTypeID(groupTypeID int64) ([]*deremsmodels.GroupTypeWebpageRight, error) {

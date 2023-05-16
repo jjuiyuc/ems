@@ -16,6 +16,7 @@ type AccountManagementService interface {
 	CreateGroup(body *app.CreateGroupBody) (err error)
 	GetGroup(groupID int64) (getGroup *GetGroupResponse, err error)
 	UpdateGroup(userID, groupID int64, body *app.UpdateGroupBody) (err error)
+	DeleteGroup(userID, groupID int64) (err error)
 }
 
 // GetGroupsResponse godoc
@@ -177,7 +178,7 @@ func (s defaultAccountManagementService) getGroupGateways(groupID int64) (groupG
 
 func (s defaultAccountManagementService) UpdateGroup(userID, groupID int64, body *app.UpdateGroupBody) (err error) {
 	if s.isOwnAccountGroup(userID, groupID) {
-		err = e.ErrNewOwnAccountGroupUpdatedNotAllow
+		err = e.ErrNewOwnAccountGroupModifiedNotAllow
 		logrus.WithField("caused-by", err).Error()
 		return
 	}
@@ -208,4 +209,65 @@ func (s defaultAccountManagementService) isOwnAccountGroup(userID, groupID int64
 		return true
 	}
 	return false
+}
+
+func (s defaultAccountManagementService) DeleteGroup(userID, groupID int64) (err error) {
+	err = s.checkDeletedRules(userID, groupID)
+	if err != nil {
+		return
+	}
+
+	err = s.repo.User.DeleteGroup(userID, groupID)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.User.DeleteGroup",
+			"err":       err,
+		}).Error()
+	}
+	return
+}
+
+func (s defaultAccountManagementService) checkDeletedRules(userID, groupID int64) (err error) {
+	if s.isOwnAccountGroup(userID, groupID) {
+		err = e.ErrNewOwnAccountGroupModifiedNotAllow
+		logrus.WithField("caused-by", err).Error()
+		return
+	}
+	if s.isSubGroupExisted(groupID) {
+		err = e.ErrNewAccountGroupHasSubGroup
+		logrus.WithField("caused-by", err).Error()
+		return
+	}
+	if s.isUserExistedInGroup(groupID) {
+		err = e.ErrNewAccountGroupHasUser
+		logrus.WithField("caused-by", err).Error()
+		return
+	}
+	if s.isFieldExisted(groupID) {
+		err = e.ErrNewAccountGroupHasField
+		logrus.WithField("caused-by", err).Error()
+	}
+	return
+}
+
+func (s defaultAccountManagementService) isSubGroupExisted(groupID int64) bool {
+	groups, err := s.repo.User.GetGroupsByGroupID(groupID)
+	if err == nil {
+		for _, group := range groups {
+			if group.ParentID.Int64 == groupID {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func (s defaultAccountManagementService) isUserExistedInGroup(groupID int64) bool {
+	count, _ := s.repo.User.GetUserCountByGroupID(groupID)
+	return count > 0
+}
+
+func (s defaultAccountManagementService) isFieldExisted(groupID int64) bool {
+	count, _ := s.repo.User.GetGatewayPermissionCountByGroupID(groupID, false)
+	return count > 0
 }

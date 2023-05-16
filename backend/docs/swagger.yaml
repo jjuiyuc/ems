@@ -315,6 +315,19 @@ definitions:
       typeID:
         type: integer
     type: object
+  services.GetGroupResponse:
+    properties:
+      gateways:
+        items:
+          $ref: '#/definitions/services.GroupGatewayInfo'
+        type: array
+      name:
+        type: string
+      parentID:
+        type: string
+      typeID:
+        type: integer
+    type: object
   services.GetGroupsResponse:
     properties:
       groups:
@@ -345,6 +358,13 @@ definitions:
         items:
           type: integer
         type: array
+    type: object
+  services.GroupGatewayInfo:
+    properties:
+      gatewayID:
+        type: string
+      locationName:
+        type: string
     type: object
   services.GroupInfo:
     properties:
@@ -1620,6 +1640,146 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Create a group
+      tags:
+      - account management group
+  /api/account-management/groups/{groupid}:
+    delete:
+      description: delete a group by token and group id
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Input user's access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Group ID
+        in: path
+        name: groupid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete a group
+      tags:
+      - account management group
+    get:
+      description: get a group by token and group id
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Input user's access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Group ID
+        in: path
+        name: groupid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/app.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/services.GetGroupResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Show a group
+      tags:
+      - account management group
+    put:
+      consumes:
+      - application/json
+      description: update a group by token and group id
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Input user's access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Group ID
+        in: path
+        name: groupid
+        required: true
+        type: string
+      - description: Name
+        in: body
+        name: name
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Update a group
       tags:
       - account management group
   /auth:

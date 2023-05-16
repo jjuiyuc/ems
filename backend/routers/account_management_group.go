@@ -47,10 +47,10 @@ func (w *APIWorker) GetGroups(c *gin.Context) {
 // @Security    ApiKeyAuth
 // @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
 // @Accept      json
-// @Produce     json
 // @Param       name           body      string true "Name"
 // @Param       typeID         body      int true "TypeID"
 // @Param       parentID       body      int true "ParentID"
+// @Produce     json
 // @Success     200            {object}  app.Response
 // @Failure     400            {object}  app.Response
 // @Failure     401            {object}  app.Response
@@ -80,6 +80,19 @@ func (w *APIWorker) CreateGroup(c *gin.Context) {
 }
 
 // GetGroup godoc
+// @Summary Show a group
+// @Description get a group by token and group id
+// @Tags        account management group
+// @Security    ApiKeyAuth
+// @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
+// @Param       groupid        path      string true "Group ID"
+// @Produce     json
+// @Success     200            {object}  app.Response{data=services.GetGroupResponse}
+// @Failure     400            {object}  app.Response
+// @Failure     401            {object}  app.Response
+// @Failure     403            {object}  app.Response
+// @Failure     500            {object}  app.Response
+// @Router      /api/account-management/groups/{groupid} [get]
 func (w *APIWorker) GetGroup(c *gin.Context) {
 	appG := app.Gin{c}
 	userID, _ := c.Get("userID")
@@ -107,6 +120,21 @@ func (w *APIWorker) GetGroup(c *gin.Context) {
 }
 
 // UpdateGroup godoc
+// @Summary Update a group
+// @Description update a group by token and group id
+// @Tags        account management group
+// @Security    ApiKeyAuth
+// @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
+// @Param       groupid        path      string true "Group ID"
+// @Accept      json
+// @Param       name           body      string true "Name"
+// @Produce     json
+// @Success     200            {object}  app.Response
+// @Failure     400            {object}  app.Response
+// @Failure     401            {object}  app.Response
+// @Failure     403            {object}  app.Response
+// @Failure     500            {object}  app.Response
+// @Router      /api/account-management/groups/{groupid} [put]
 func (w *APIWorker) UpdateGroup(c *gin.Context) {
 	appG := app.Gin{c}
 	userID, _ := c.Get("userID")
@@ -148,6 +176,19 @@ func (w *APIWorker) UpdateGroup(c *gin.Context) {
 }
 
 // DeleteGroup godoc
+// @Summary Delete a group
+// @Description delete a group by token and group id
+// @Tags        account management group
+// @Security    ApiKeyAuth
+// @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
+// @Param       groupid        path      string true "Group ID"
+// @Produce     json
+// @Success     200            {object}  app.Response
+// @Failure     400            {object}  app.Response
+// @Failure     401            {object}  app.Response
+// @Failure     403            {object}  app.Response
+// @Failure     500            {object}  app.Response
+// @Router      /api/account-management/groups/{groupid} [delete]
 func (w *APIWorker) DeleteGroup(c *gin.Context) {
 	appG := app.Gin{c}
 	userID, _ := c.Get("userID")

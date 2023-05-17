@@ -218,7 +218,7 @@ func (w *APIWorker) DeleteGroup(c *gin.Context) {
 		case e.ErrNewAccountGroupHasUser:
 			code = e.ErrAccountGroupHasUser
 		default:
-			code = e.ErrorAccountGroupDelete
+			code = e.ErrAccountGroupDelete
 		}
 		appG.Response(http.StatusInternalServerError, code, nil)
 		return

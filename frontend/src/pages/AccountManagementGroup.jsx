@@ -1,9 +1,10 @@
-import { connect } from "react-redux"
 import {
     Button, DialogActions, Divider, FormControl, ListItem, TextField
 } from "@mui/material"
 import { useTranslation } from "react-multi-lang"
 import { useEffect, useMemo, useState } from "react"
+
+import { apiCall } from "../utils/api"
 
 import AddGroup from "../components/AddGroup"
 import DialogForm from "../components/DialogForm"
@@ -13,9 +14,8 @@ import { ReactComponent as DeleteIcon } from "../assets/icons/trash_solid.svg"
 import { ReactComponent as EditIcon } from "../assets/icons/edit.svg"
 import { ReactComponent as NoticeIcon } from "../assets/icons/notice.svg"
 
-const mapState = state => ({ gatewayID: state.gateways.active.gatewayID })
 
-export default connect(mapState)(function AccountManagementGroup() {
+export default function AccountManagementGroup(props) {
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
@@ -23,39 +23,10 @@ export default connect(mapState)(function AccountManagementGroup() {
         pageT = (string, params) => t("accountManagementGroup." + string, params)
 
     const
-        [data, setData] = useState([
-            {
-                id: 1,
-                groupName: "AreaOwner_TW",
-                groupType: "Area Owner",
-                fieldList: "AreaOwner_TW-0E0BA27A8175AF978C49396BDE9D7A1E"
-            },
-            {
-                id: 2,
-                groupName: "AreaMaintainer_TW",
-                groupType: "Area Maintainer",
-                fieldList: "AreaMaintainer_TW-0E0BA27A8175AF978C49396BDE9D7A1E"
-
-            },
-            {
-                id: 3,
-                groupName: "Serenegray",
-                groupType: "Field Owner",
-                fieldList: "Serenegray-0E0BA27A8175AF978C49396BDE9D7A1E",
-                parentGroup: "AreaOwner_TW"
-            },
-            {
-                id: 4,
-                groupName: "Cht_Miaoli",
-                groupType: "Area maintainer",
-                fieldList: "Cht_Miaoli-0E0BA27A8175AF978C49396BDE9D7A1E",
-                parentGroup: "AreaOwner_TW"
-
-            }
-        ]),
-        [groupList, setGroupList] = useState({}),
-        [error, setError] = useState(null),
+        [groupList, setGroupList] = useState([]),
+        [groupTypes, setGroupTypes] = useState({}),
         [loading, setLoading] = useState(false),
+        [infoError, setInfoError] = useState(""),
         [fullWidth, setFullWidth] = useState(true),
         [maxWidth, setMaxWidth] = useState("sm"),
         [openNotice, setOpenNotice] = useState(false),
@@ -75,16 +46,19 @@ export default connect(mapState)(function AccountManagementGroup() {
     }
     const columns = [
         {
-            cell: row => <span className="font-mono">{row.groupName}</span>,
+            cell: row => <span className="font-mono">{row.name || ""}</span>,
             center: true,
             name: commonT("groupName"),
-            selector: row => row.groupName
+            selector: row => row.name
         },
         {
-            cell: row => <span className="font-mono">{row.groupType}</span>,
+            cell: row =>
+                <span className="font-mono">
+                    {groupTypes[row.typeID] || ""}
+                </span>,
             center: true,
             name: pageT("groupType"),
-            selector: row => row.groupType
+            selector: row => row.typeID
         },
         {
             cell: (row, index) => <div className="flex w-28">
@@ -111,14 +85,33 @@ export default connect(mapState)(function AccountManagementGroup() {
             center: true
         }
     ]
-    // useEffect(() => { }, [props.gatewayID])
+    useEffect(() => {
+        apiCall({
+            onComplete: () => setLoading(false),
+            onError: error => setInfoError(error),
+            onStart: () => setLoading(true),
+            onSuccess: rawData => {
+                if (!rawData?.data) return
+
+                const { data } = rawData
+
+                setGroupList(data.groups || [])
+                setGroupTypes(data.groupTypes?.reduce((acc, cur) => {
+                    acc[cur.id] = cur.name
+                    return acc
+                }, {}) || {})
+            },
+            url: `/api/account-management/groups`
+        })
+    }, [])
     return <>
         <h1 className="mb-9">{commonT("accountManagementGroup")}</h1>
         <div className="mb-9">
-            <AddGroup />
+            <AddGroup {...{ setGroupList }} />
         </div>
         <Table
-            {...{ columns, data }}
+            columns={columns}
+            data={groupList}
             paginationComponentOptions={{
                 rowsPerPageText: t("dataTable.rowsPerPage")
             }}
@@ -246,4 +239,4 @@ export default connect(mapState)(function AccountManagementGroup() {
             </DialogActions>
         </DialogForm>
     </>
-})
+}

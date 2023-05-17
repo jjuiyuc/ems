@@ -12,7 +12,6 @@ import ExtraDeviceInfoForm from "../components/ExtraDeviceInfoForm"
 import SubDeviceForm from "../components/SubDeviceForm"
 
 export default function AddField({
-    children = null,
     dialogTitle = "",
     locationInfo,
     fieldDevices,

@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"fmt"
 	"time"
 
 	"github.com/volatiletech/null/v8"
@@ -130,19 +131,19 @@ func (repo defaultUserRepository) GetGroupByGroupID(groupID int64) (*deremsmodel
 
 func (repo defaultUserRepository) GetGroupsByGroupID(groupID int64) ([]*deremsmodels.Group, error) {
 	return deremsmodels.Groups(
-		qm.SQL(`
+		qm.SQL(fmt.Sprintf(`
 		WITH RECURSIVE group_path AS
 		(
 		SELECT *
-			FROM der_ems.group
+			FROM %s
 			WHERE id = ?
 		UNION ALL
 		SELECT g.*
-			FROM group_path AS gp JOIN der_ems.group AS g
+			FROM group_path AS gp JOIN %s AS g
 			ON gp.id = g.parent_id
 			AND g.deleted_at IS NULL
 		)
-		SELECT * FROM group_path;`, groupID)).All(repo.db)
+		SELECT * FROM group_path;`, "`group`", "`group`"), groupID)).All(repo.db)
 }
 
 func (repo defaultUserRepository) GetGatewaysPermissionByGroupID(groupID int64, findDisabled bool) ([]*deremsmodels.GroupGatewayRight, error) {

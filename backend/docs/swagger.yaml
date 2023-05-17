@@ -328,8 +328,19 @@ definitions:
       typeID:
         type: integer
     type: object
+  services.GetGroupTypeInfo:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
   services.GetGroupsResponse:
     properties:
+      groupTypes:
+        items:
+          $ref: '#/definitions/services.GetGroupTypeInfo'
+        type: array
       groups:
         items:
           $ref: '#/definitions/services.GetGroupInfo'

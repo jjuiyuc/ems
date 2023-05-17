@@ -27,6 +27,7 @@ type UserRepository interface {
 	DeleteGroup(userID, groupID int64) (err error)
 	GetGroupByGroupID(groupID int64) (*deremsmodels.Group, error)
 	GetGroupsByGroupID(groupID int64) ([]*deremsmodels.Group, error)
+	GetGroupTypes() ([]*deremsmodels.GroupType, error)
 	GetGatewaysPermissionByGroupID(groupID int64, findDisabled bool) ([]*deremsmodels.GroupGatewayRight, error)
 	GetWebpagesPermissionByGroupTypeID(groupTypeID int64) ([]*deremsmodels.GroupTypeWebpageRight, error)
 	GetWebpageByWebpageID(webpagesID int64) (*deremsmodels.Webpage, error)
@@ -143,6 +144,10 @@ func (repo defaultUserRepository) GetGroupsByGroupID(groupID int64) ([]*deremsmo
 			AND g.deleted_at IS NULL
 		)
 		SELECT * FROM group_path;`, "`group`", "`group`"), groupID)).All(repo.db)
+}
+
+func (repo defaultUserRepository) GetGroupTypes() ([]*deremsmodels.GroupType, error) {
+	return deremsmodels.GroupTypes().All(repo.db)
 }
 
 func (repo defaultUserRepository) GetGatewaysPermissionByGroupID(groupID int64, findDisabled bool) ([]*deremsmodels.GroupGatewayRight, error) {

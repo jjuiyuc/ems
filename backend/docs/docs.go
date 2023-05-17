@@ -2786,9 +2786,26 @@ var doc = `{
                 }
             }
         },
+        "services.GetGroupTypeInfo": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "services.GetGroupsResponse": {
             "type": "object",
             "properties": {
+                "groupTypes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/services.GetGroupTypeInfo"
+                    }
+                },
                 "groups": {
                     "type": "array",
                     "items": {

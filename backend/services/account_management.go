@@ -22,7 +22,8 @@ type AccountManagementService interface {
 
 // GetGroupsResponse godoc
 type GetGroupsResponse struct {
-	Groups []GetGroupInfo `json:"groups"`
+	Groups     []GetGroupInfo     `json:"groups"`
+	GroupTypes []GetGroupTypeInfo `json:"groupTypes"`
 }
 
 // GetGroupInfo godoc
@@ -31,6 +32,12 @@ type GetGroupInfo struct {
 	Name     string     `json:"name"`
 	TypeID   int64      `json:"typeID"`
 	ParentID null.Int64 `json:"parentID"`
+}
+
+// GetGroupTypeInfo godoc
+type GetGroupTypeInfo struct {
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
 }
 
 // GetGroupResponse godoc
@@ -61,8 +68,19 @@ func (s defaultAccountManagementService) GetGroups(userID int64) (getGroups *Get
 	if err != nil {
 		return
 	}
+	groupTypes, err := s.repo.User.GetGroupTypes()
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.User.GetGroupTypes",
+			"err":       err,
+		}).Error()
+		return
+	}
 
-	var getGroupInfos []GetGroupInfo
+	var (
+		getGroupInfos     []GetGroupInfo
+		getGroupTypeInfos []GetGroupTypeInfo
+	)
 	for _, group := range groups {
 		getGroupInfo := GetGroupInfo{
 			ID:       group.ID,
@@ -72,8 +90,16 @@ func (s defaultAccountManagementService) GetGroups(userID int64) (getGroups *Get
 		}
 		getGroupInfos = append(getGroupInfos, getGroupInfo)
 	}
+	for _, groupType := range groupTypes {
+		getGroupTypeInfo := GetGroupTypeInfo{
+			ID:   groupType.ID,
+			Name: groupType.Name,
+		}
+		getGroupTypeInfos = append(getGroupTypeInfos, getGroupTypeInfo)
+	}
 	getGroups = &GetGroupsResponse{
-		Groups: getGroupInfos,
+		Groups:     getGroupInfos,
+		GroupTypes: getGroupTypeInfos,
 	}
 	return
 }

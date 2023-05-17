@@ -31,8 +31,6 @@ var (
 	ErrNewAccountGroupHasSubGroup = errors.New("account group has sub group")
 	// ErrNewAccountGroupHasUser godoc
 	ErrNewAccountGroupHasUser = errors.New("account group has user")
-	// ErrNewAccountGroupHasField godoc
-	ErrNewAccountGroupHasField = errors.New("account group has field")
 )
 
 // ErrNewKeyNotExist godoc

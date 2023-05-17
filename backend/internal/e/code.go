@@ -43,6 +43,5 @@ const (
 	ErrAccountGroupUpdate               = 60007
 	ErrAccountGroupHasSubGroup          = 60008
 	ErrAccountGroupHasUser              = 60009
-	ErrAccountGroupHasField             = 60010
-	ErrorAccountGroupDelete             = 60011
+	ErrorAccountGroupDelete             = 60010
 )

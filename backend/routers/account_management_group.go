@@ -217,8 +217,6 @@ func (w *APIWorker) DeleteGroup(c *gin.Context) {
 			code = e.ErrAccountGroupHasSubGroup
 		case e.ErrNewAccountGroupHasUser:
 			code = e.ErrAccountGroupHasUser
-		case e.ErrNewAccountGroupHasField:
-			code = e.ErrAccountGroupHasField
 		default:
 			code = e.ErrorAccountGroupDelete
 		}

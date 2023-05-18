@@ -47,4 +47,5 @@ const (
 	ErrAccountUsersGen                  = 60011
 	ErrAccountUsernameExist             = 60012
 	ErrAccountUserCreate                = 60013
+	ErrAccountUserUpdate                = 60014
 )

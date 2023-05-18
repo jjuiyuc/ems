@@ -35,11 +35,12 @@ func (w *APIWorker) CreateUser(c *gin.Context, body *app.CreateUserBody) {
 	userID, _ := c.Get("userID")
 	err := w.Services.AccountManagement.CreateUser(userID.(int64), body)
 	if err != nil {
-		var code int
 		if errors.Is(err, e.ErrNewAuthPermissionNotAllow) {
 			appG.Response(http.StatusForbidden, e.ErrAuthPermissionNotAllow, nil)
 			return
 		}
+
+		var code int
 		switch err {
 		case e.ErrNewAccountUsernameExist:
 			code = e.ErrAccountUsernameExist
@@ -47,6 +48,22 @@ func (w *APIWorker) CreateUser(c *gin.Context, body *app.CreateUserBody) {
 			code = e.ErrAccountUserCreate
 		}
 		appG.Response(http.StatusInternalServerError, code, nil)
+		return
+	}
+	appG.Response(http.StatusOK, e.Success, nil)
+}
+
+// UpdateUser godoc
+func (w *APIWorker) UpdateUser(c *gin.Context, uri *app.UserURI, body *app.UpdateUserBody) {
+	appG := app.Gin{c}
+	userID, _ := c.Get("userID")
+	err := w.Services.AccountManagement.UpdateUser(userID.(int64), uri.UserID, body)
+	if err != nil {
+		if errors.Is(err, e.ErrNewAuthPermissionNotAllow) {
+			appG.Response(http.StatusForbidden, e.ErrAuthPermissionNotAllow, nil)
+			return
+		}
+		appG.Response(http.StatusInternalServerError, e.ErrAccountUserUpdate, nil)
 		return
 	}
 	appG.Response(http.StatusOK, e.Success, nil)

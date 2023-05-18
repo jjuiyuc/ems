@@ -24,6 +24,7 @@ type AccountManagementService interface {
 	DeleteGroup(userID, groupID int64) (err error)
 	GetUsers(userID int64) (getUsers *GetUsersResponse, err error)
 	CreateUser(userID int64, body *app.CreateUserBody) error
+	UpdateUser(executedUserID, userID int64, body *app.UpdateUserBody) (err error)
 }
 
 // GetGroupsResponse godoc
@@ -428,4 +429,69 @@ func (s defaultAccountManagementService) CreateUser(userID int64, body *app.Crea
 func (s defaultAccountManagementService) isUsernameExisted(username string) bool {
 	count, _ := s.repo.User.GetUserCountByUsername(username)
 	return count > 0
+}
+
+func (s defaultAccountManagementService) UpdateUser(executedUserID, userID int64, body *app.UpdateUserBody) (err error) {
+	if !s.authorizeUserID(executedUserID, userID) ||
+		(body.GroupID > 0 && !s.authorizeGroupID(nil, executedUserID, int64(body.GroupID))) {
+		err = e.ErrNewAuthPermissionNotAllow
+		return
+	}
+
+	user, err := s.repo.User.GetUserByUserID(nil, userID)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.User.GetUserByUserID",
+			"err":       err,
+		}).Error()
+		return
+	}
+	err = s.processUpdateUser(user, body)
+	return
+}
+
+func (s defaultAccountManagementService) processUpdateUser(user *deremsmodels.User, body *app.UpdateUserBody) (err error) {
+	if body.Password != "" {
+		var hashPassword string
+		hashPassword, err = utils.CreateHashedPassword(body.Password)
+		if err != nil {
+			logrus.WithFields(logrus.Fields{
+				"caused-by": "utils.CreateHashedPassword",
+				"err":       err,
+			}).Error()
+			return
+		}
+		user.Password = hashPassword
+	}
+	if body.Name != "" {
+		user.Name = null.StringFrom(body.Name)
+	}
+	if body.GroupID > 0 {
+		user.GroupID = int64(body.GroupID)
+	}
+	err = s.repo.User.UpdateUser(user)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.User.UpdateUser",
+			"err":       err,
+			"body":      *body,
+		}).Error()
+	}
+	return
+}
+
+func (s defaultAccountManagementService) authorizeUserID(userID, targetUserID int64) bool {
+	targetUser, err := s.repo.User.GetUserByUserID(nil, targetUserID)
+	if err != nil {
+		return false
+	}
+	groups, err := s.getGroupTreeNodes(nil, userID)
+	if err == nil {
+		for _, group := range groups {
+			if group.ID == targetUser.GroupID {
+				return true
+			}
+		}
+	}
+	return false
 }

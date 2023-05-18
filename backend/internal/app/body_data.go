@@ -20,3 +20,10 @@ type CreateUserBody struct {
 	Name     string `form:"name" binding:"required,max=20"`
 	GroupID  int    `form:"groupID" binding:"required"`
 }
+
+// UpdateUserBody godoc
+type UpdateUserBody struct {
+	Password string `form:"password" binding:"max=50"`
+	Name     string `form:"name" binding:"max=20"`
+	GroupID  int    `form:"groupID"`
+}

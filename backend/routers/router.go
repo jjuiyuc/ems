@@ -110,6 +110,7 @@ var EndpointMapping = map[PolicyWebpageObject][]string{
 	},
 	AccountManagementUser: {
 		"/api/account-management/users",
+		"/api/account-management/users/:userid",
 	},
 }
 
@@ -218,6 +219,7 @@ func InitRouter(isCORS bool, ginMode string, enforcer *casbin.Enforcer, w *APIWo
 	// Account Management User
 	r.GET(EndpointMapping[AccountManagementUser][0], authorizeJWT(REST), authorizePolicy(enforcer), w.GetUsers)
 	r.POST(EndpointMapping[AccountManagementUser][0], authorizeJWT(REST), authorizePolicy(enforcer), validateBody(w.CreateUser))
+	r.PUT(EndpointMapping[AccountManagementUser][1], authorizeJWT(REST), authorizePolicy(enforcer), validateURIAndBody(w.UpdateUser))
 
 	// Casbin route
 	apiGroup.GET("/casbin", w.getFrontendPermission(enforcer))

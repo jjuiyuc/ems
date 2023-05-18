@@ -57,7 +57,7 @@ func (w *APIWorker) CreateGroup(c *gin.Context, body *app.CreateGroupBody) {
 		if errors.Is(err, e.ErrNewAccountGroupNameOnSameLevelExist) {
 			code = e.ErrAccountGroupNameOnSameLevelExist
 		} else {
-			code = e.ErrorAccountGroupCreate
+			code = e.ErrAccountGroupCreate
 		}
 		appG.Response(http.StatusInternalServerError, code, nil)
 		return

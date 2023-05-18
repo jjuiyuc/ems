@@ -29,12 +29,14 @@ type UserWrap struct {
 // UserRepository godoc
 type UserRepository interface {
 	InsertLoginLog(loginLog *deremsmodels.LoginLog) error
+	CreateUser(user *deremsmodels.User) error
 	UpdateUser(user *deremsmodels.User) (err error)
 	GetLoginLogCount() (int64, error)
 	GetUserByUserID(tx *sql.Tx, userID int64) (*deremsmodels.User, error)
 	GetUserByUsername(username string) (*deremsmodels.User, error)
 	GetUserByPasswordToken(token string) (*deremsmodels.User, error)
 	GetUserWrapsByGroupIDs(groupIDs []interface{}) ([]*UserWrap, error)	
+	GetUserCountByUsername(username string) (int64, error)
 	IsUserExistedInGroup(tx *sql.Tx, groupID int64) bool
 	CreateGroup(tx *sql.Tx, group *deremsmodels.Group) (err error)
 	UpdateGroup(tx *sql.Tx, group *deremsmodels.Group) (err error)
@@ -63,6 +65,10 @@ func (repo defaultUserRepository) InsertLoginLog(loginLog *deremsmodels.LoginLog
 	loginLog.CreatedAt = now
 	loginLog.UpdatedAt = now
 	return loginLog.Insert(repo.db, boil.Infer())
+}
+
+func (repo defaultUserRepository) CreateUser(user *deremsmodels.User) error {
+	return user.Insert(repo.db, boil.Infer())
 }
 
 // UpdateUser godoc
@@ -127,6 +133,12 @@ func (repo defaultUserRepository) IsUserExistedInGroup(tx *sql.Tx, groupID int64
 
 func (repo defaultUserRepository) CreateGroup(tx *sql.Tx, group *deremsmodels.Group) (err error) {
 	return group.Insert(repo.getExecutor(tx), boil.Infer())
+}
+
+func (repo defaultUserRepository) GetUserCountByUsername(username string) (int64, error) {
+	return deremsmodels.Users(
+		qm.Where("username = ?", username),
+		qm.Where("deleted_at IS NULL")).Count(repo.db)
 }
 
 func (repo defaultUserRepository) UpdateGroup(tx *sql.Tx, group *deremsmodels.Group) (err error) {

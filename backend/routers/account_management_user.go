@@ -1,6 +1,7 @@
 package routers
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -26,4 +27,27 @@ func (w *APIWorker) GetUsers(c *gin.Context) {
 		return
 	}
 	appG.Response(http.StatusOK, e.Success, responseData)
+}
+
+// CreateUser godoc
+func (w *APIWorker) CreateUser(c *gin.Context, body *app.CreateUserBody) {
+	appG := app.Gin{c}
+	userID, _ := c.Get("userID")
+	err := w.Services.AccountManagement.CreateUser(userID.(int64), body)
+	if err != nil {
+		var code int
+		if errors.Is(err, e.ErrNewAuthPermissionNotAllow) {
+			appG.Response(http.StatusForbidden, e.ErrAuthPermissionNotAllow, nil)
+			return
+		}
+		switch err {
+		case e.ErrNewAccountUsernameExist:
+			code = e.ErrAccountUsernameExist
+		default:
+			code = e.ErrAccountUserCreate
+		}
+		appG.Response(http.StatusInternalServerError, code, nil)
+		return
+	}
+	appG.Response(http.StatusOK, e.Success, nil)
 }

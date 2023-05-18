@@ -33,6 +33,8 @@ var (
 	ErrNewAccountGroupHasUser = errors.New("account group has user")
 	// ErrNewAuthPermissionNotAllow godoc
 	ErrNewAuthPermissionNotAllow = errors.New("authorization permission does not allow")
+	// ErrNewAccountUsernameExist godoc
+	ErrNewAccountUsernameExist = errors.New("account username exists")
 )
 
 // ErrNewKeyNotExist godoc

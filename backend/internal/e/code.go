@@ -45,4 +45,6 @@ const (
 	ErrAccountGroupHasUser              = 60009
 	ErrAccountGroupDelete               = 60010
 	ErrAccountUsersGen                  = 60011
+	ErrAccountUsernameExist             = 60012
+	ErrAccountUserCreate                = 60013
 )

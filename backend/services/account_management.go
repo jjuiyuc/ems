@@ -9,6 +9,7 @@ import (
 
 	"der-ems/internal/app"
 	"der-ems/internal/e"
+	"der-ems/internal/utils"
 	"der-ems/models"
 	deremsmodels "der-ems/models/der-ems"
 	"der-ems/repository"
@@ -22,6 +23,7 @@ type AccountManagementService interface {
 	UpdateGroup(userID, groupID int64, body *app.UpdateGroupBody) (err error)
 	DeleteGroup(userID, groupID int64) (err error)
 	GetUsers(userID int64) (getUsers *GetUsersResponse, err error)
+	CreateUser(userID int64, body *app.CreateUserBody) error
 }
 
 // GetGroupsResponse godoc
@@ -385,4 +387,45 @@ func (s defaultAccountManagementService) GetUsers(userID int64) (getUsers *GetUs
 		Users: users,
 	}
 	return
+}
+
+func (s defaultAccountManagementService) CreateUser(userID int64, body *app.CreateUserBody) (err error) {
+	if !s.authorizeGroupID(nil, userID, int64(body.GroupID)) {
+		err = e.ErrNewAuthPermissionNotAllow
+		return
+	}
+	if s.isUsernameExisted(body.Username) {
+		err = e.ErrNewAccountUsernameExist
+		logrus.WithField("caused-by", err).Error()
+		return
+	}
+
+	hashPassword, err := utils.CreateHashedPassword(body.Password)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "utils.CreateHashedPassword",
+			"err":       err,
+		}).Error()
+		return
+	}
+	user := &deremsmodels.User{
+		Username: body.Username,
+		Password: hashPassword,
+		Name:     null.StringFrom(body.Name),
+		GroupID:  int64(body.GroupID),
+	}
+	err = s.repo.User.CreateUser(user)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.User.CreateUser",
+			"err":       err,
+			"body":      *body,
+		}).Error()
+	}
+	return
+}
+
+func (s defaultAccountManagementService) isUsernameExisted(username string) bool {
+	count, _ := s.repo.User.GetUserCountByUsername(username)
+	return count > 0
 }

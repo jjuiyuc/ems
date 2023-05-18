@@ -217,6 +217,7 @@ func InitRouter(isCORS bool, ginMode string, enforcer *casbin.Enforcer, w *APIWo
 
 	// Account Management User
 	r.GET(EndpointMapping[AccountManagementUser][0], authorizeJWT(REST), authorizePolicy(enforcer), w.GetUsers)
+	r.POST(EndpointMapping[AccountManagementUser][0], authorizeJWT(REST), authorizePolicy(enforcer), validateBody(w.CreateUser))
 
 	// Casbin route
 	apiGroup.GET("/casbin", w.getFrontendPermission(enforcer))

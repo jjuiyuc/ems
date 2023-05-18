@@ -85,7 +85,7 @@ export default function AccountManagementGroup(props) {
             center: true
         }
     ]
-    useEffect(() => {
+    const getList = () => {
         apiCall({
             onComplete: () => setLoading(false),
             onError: error => setInfoError(error),
@@ -103,11 +103,12 @@ export default function AccountManagementGroup(props) {
             },
             url: `/api/account-management/groups`
         })
-    }, [])
+    }
+    useEffect(() => getList(), [])
     return <>
         <h1 className="mb-9">{commonT("accountManagementGroup")}</h1>
         <div className="mb-9">
-            <AddGroup {...{ setGroupList }} />
+            <AddGroup {...{ getList, groupList, groupTypes }} />
         </div>
         <Table
             columns={columns}

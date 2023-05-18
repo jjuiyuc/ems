@@ -1,47 +1,89 @@
+import { connect } from "react-redux"
 import {
     Button, DialogActions, Divider, FormControl, MenuItem, TextField
 } from "@mui/material"
 import AddIcon from "@mui/icons-material/Add"
 import { useTranslation } from "react-multi-lang"
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
+
+import { apiCall } from "../utils/api"
 
 import DialogForm from "../components/DialogForm"
+const mapDispatch = dispatch => ({
+    updateSnackbarMsg: value =>
+        dispatch({ type: "snackbarMsg/updateSnackbarMsg", payload: value }),
 
-export default function AddGroup({
-    children = null,
-}) {
-    const typeGroup = [
-        {
-            value: "Area Maintainer",
-            label: "Area Maintainer",
-        },
-        {
-            value: "Field Owner",
-            label: "Field Owner",
-        },
-    ],
-        parentGroupType = [
-            {
-                value: "AreaOwner_TW",
-                label: "AreaOwner_TW"
-            }
-        ]
+})
+export default connect(null, mapDispatch)(function AddGroup(props) {
+    const { getList, groupList, groupTypes } = props
+
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
+        errorT = string => t("error." + string),
         pageT = (string, params) => t("accountManagementGroup." + string, params)
+
+
+    const groupTypeOptions = useMemo(() =>
+        Object.entries(groupTypes).slice(2).map(([key, value]) => ({
+            [key]: value
+
+        }))
+        , [groupTypes])
+
+    const parentGroupTypeOptions = groupList.filter(item => item.parentID == 1)
+        .filter(item => item.typeID == 2)//only show this temporarily
 
     const
         [openAdd, setOpenAdd] = useState(false),
         [groupName, setGroupName] = useState(""),
-        [groupNameError, setGroupNameError] = useState(null),
-        [groupType, setGroupType] = useState(""),
-        [groupTypeError, setGroupTypeError] = useState(null),
-        [parentGroup, setParentGroup] = useState(""),
-        [parentGroupError, setParentGroupError] = useState(null),
+        [isGroupNameError, setIsGroupNameError] = useState(false),
+        [groupType, setGroupType] = useState(null),
+        [groupTypeError, setGroupTypeError] = useState(false),
+        [parentGroup, setParentGroup] = useState(null),
+        [parentGroupError, setParentGroupError] = useState(false),
         [fullWidth, setFullWidth] = useState(true),
         [maxWidth, setMaxWidth] = useState("lg")
 
+    const submitDisabled = !groupName.length || groupType == null || parentGroup == null || isGroupNameError || groupTypeError || parentGroupError
+    const
+        changeGroupName = (e) => {
+            const
+                groupNameTarget = e.target.value,
+                groupNameError = groupNameTarget.length == 0 || groupNameTarget.length > 20
+            setGroupName(groupNameTarget)
+            setIsGroupNameError(groupNameError)
+        }
+    const
+        submit = () => {
+            const data = {
+                name: groupName,
+                typeID: parseInt(groupType),
+                parentID: parseInt(parentGroup)
+            }
+            apiCall({
+                method: "post",
+                data,
+                onSuccess: () => {
+                    console.log("ok")
+                    setOpenAdd(false)
+                    getList()
+                    props.updateSnackbarMsg({
+                        type: "success",
+                        msg: t("dialog.modifyNameMsg")
+                    })
+                    setGroupName("")
+                },
+                onError: () => {
+                    console.log("err")
+                    props.updateSnackbarMsg({
+                        type: "error",
+                        msg: "failureToSave"
+                    })
+                },
+                url: "/api/account-management/groups"
+            })
+        }
     return <>
         <Button
             onClick={() => { setOpenAdd(true) }}
@@ -72,29 +114,40 @@ export default function AddGroup({
                     id="add-name"
                     label={commonT("groupName")}
                     value={groupName}
-                    focused
+                    onChange={changeGroupName}
+                    error={isGroupNameError}
+                    helperText={errorT("nameLength")}
+                    required
                 />
                 <TextField
                     id="add-type"
                     select
                     label={pageT("groupType")}
+                    onChange={e => setGroupType(e.target.value)}
                     defaultValue=""
+                    required
                 >
-                    {typeGroup.map((option) => (
-                        <MenuItem key={option.value} value={option.value}>
-                            {option.label}
-                        </MenuItem>
-                    ))}
+                    {groupTypeOptions.map(obj => {
+                        let key = Object.keys(obj)[0]
+                        let value = obj[key]
+                        return (
+                            <MenuItem key={"g-t-p" + key} value={key}>
+                                {value}
+                            </MenuItem>
+                        )
+                    })}
                 </TextField>
                 <TextField
                     id="add-parent-group-type"
                     select
                     label={pageT("parentGroup")}
+                    onChange={e => setParentGroup(e.target.value)}
                     defaultValue=""
+                    required
                 >
-                    {parentGroupType.map((option) => (
-                        <MenuItem key={option.value} value={option.value}>
-                            {option.label}
+                    {parentGroupTypeOptions.map((option) => (
+                        <MenuItem key={"p-g-t" + option.id} value={option.id}>
+                            {option.name}
                         </MenuItem>
                     ))}
                 </TextField>
@@ -107,7 +160,8 @@ export default function AddGroup({
                     color="gray">
                     {commonT("cancel")}
                 </Button>
-                <Button onClick={() => { setOpenAdd(false) }}
+                <Button onClick={submit}
+                    disabled={submitDisabled}
                     radius="pill"
                     variant="contained"
                     color="primary">
@@ -116,4 +170,4 @@ export default function AddGroup({
             </DialogActions>
         </DialogForm>
     </>
-}
+})

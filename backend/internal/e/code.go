@@ -44,4 +44,5 @@ const (
 	ErrAccountGroupHasSubGroup          = 60008
 	ErrAccountGroupHasUser              = 60009
 	ErrAccountGroupDelete               = 60010
+	ErrAccountUsersGen                  = 60011
 )

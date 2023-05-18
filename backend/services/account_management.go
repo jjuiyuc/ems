@@ -21,6 +21,7 @@ type AccountManagementService interface {
 	GetGroup(userID, groupID int64) (getGroup *GetGroupResponse, err error)
 	UpdateGroup(userID, groupID int64, body *app.UpdateGroupBody) (err error)
 	DeleteGroup(userID, groupID int64) (err error)
+	GetUsers(userID int64) (getUsers *GetUsersResponse, err error)
 }
 
 // GetGroupsResponse godoc
@@ -55,6 +56,11 @@ type GetGroupResponse struct {
 type GroupGatewayInfo struct {
 	GatewayID    string `json:"gatewayID"`
 	LocationName string `json:"locationName"`
+}
+
+// GetUsersResponse godoc
+type GetUsersResponse struct {
+	Users []*repository.UserWrap `json:"users"`
 }
 
 type defaultAccountManagementService struct {
@@ -355,4 +361,28 @@ func (s defaultAccountManagementService) authorizeGroupID(tx *sql.Tx, userID, gr
 	}
 	logrus.WithField("userID", userID).Error("authorize-group-id-failed")
 	return false
+}
+
+func (s defaultAccountManagementService) GetUsers(userID int64) (getUsers *GetUsersResponse, err error) {
+	groups, err := s.getGroupTreeNodes(nil, userID)
+	if err != nil {
+		return
+	}
+
+	var groupIDs []interface{}
+	for _, group := range groups {
+		groupIDs = append(groupIDs, group.ID)
+	}
+	users, err := s.repo.User.GetUserWrapsByGroupIDs(groupIDs)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.User.GetUserWrapsByGroupIDs",
+			"err":       err,
+		}).Error()
+		return
+	}
+	getUsers = &GetUsersResponse{
+		Users: users,
+	}
+	return
 }

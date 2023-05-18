@@ -1,16 +1,30 @@
 package repository
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"time"
 
 	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
+
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 
+	"der-ems/models"
 	deremsmodels "der-ems/models/der-ems"
 )
+
+// UserWrap godoc
+type UserWrap struct {
+	ID              int64       `json:"id"`
+	Username        string      `json:"username"`
+	Name            null.String `json:"name"`
+	GroupID         int64       `json:"groupID"`
+	GroupName       string      `json:"groupName"`
+	GroupParentID   null.Int64  `json:"groupParentID"`
+	GroupParentName null.String `json:"groupParentName"`
+}
 
 // UserRepository godoc
 type UserRepository interface {
@@ -20,6 +34,7 @@ type UserRepository interface {
 	GetUserByUserID(tx *sql.Tx, userID int64) (*deremsmodels.User, error)
 	GetUserByUsername(username string) (*deremsmodels.User, error)
 	GetUserByPasswordToken(token string) (*deremsmodels.User, error)
+	GetUserWrapsByGroupIDs(groupIDs []interface{}) ([]*UserWrap, error)	
 	IsUserExistedInGroup(tx *sql.Tx, groupID int64) bool
 	CreateGroup(tx *sql.Tx, group *deremsmodels.Group) (err error)
 	UpdateGroup(tx *sql.Tx, group *deremsmodels.Group) (err error)
@@ -79,6 +94,28 @@ func (repo defaultUserRepository) GetUserByPasswordToken(token string) (*deremsm
 	return deremsmodels.Users(
 		qm.Where("reset_pwd_token = ?", token),
 		qm.Where("pwd_token_expiry > ?", time.Now().UTC())).One(repo.db)
+}
+
+func (repo defaultUserRepository) GetUserWrapsByGroupIDs(groupIDs []interface{}) (users []*UserWrap, err error) {
+	users = make([]*UserWrap, 0)
+	err = deremsmodels.NewQuery(
+		qm.Select(
+			"u.id AS id",
+			"u.username AS username",
+			"u.name AS name",
+			"u.group_id AS group_id",
+			"g.name AS group_name",
+			"g.parent_id AS group_parent_id",
+			"g2.name AS group_parent_name",
+		),
+		qm.From("user AS u"),
+		qm.InnerJoin("`group` AS g ON u.group_id = g.id"),
+		qm.LeftOuterJoin("`group` AS g2 ON g.parent_id = g2.id"),
+		qm.WhereIn("u.group_id IN ?", groupIDs...),
+		qm.Where("u.deleted_at IS NULL"),
+		qm.OrderBy("u.id"),
+	).Bind(context.Background(), models.GetDB(), &users)
+	return
 }
 
 func (repo defaultUserRepository) IsUserExistedInGroup(tx *sql.Tx, groupID int64) (exist bool) {

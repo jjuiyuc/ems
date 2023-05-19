@@ -20,8 +20,8 @@ type AccountManagementService interface {
 	GetGroups(userID int64) (getGroups *GetGroupsResponse, err error)
 	CreateGroup(body *app.CreateGroupBody) (err error)
 	GetGroup(userID, groupID int64) (getGroup *GetGroupResponse, err error)
-	UpdateGroup(userID, groupID int64, body *app.UpdateGroupBody) (err error)
-	DeleteGroup(userID, groupID int64) (err error)
+	UpdateGroup(executedUserID, groupID int64, body *app.UpdateGroupBody) (err error)
+	DeleteGroup(executedUserID, groupID int64) (err error)
 	GetUsers(userID int64) (getUsers *GetUsersResponse, err error)
 	CreateUser(userID int64, body *app.CreateUserBody) error
 	UpdateUser(executedUserID, userID int64, body *app.UpdateUserBody) (err error)
@@ -240,18 +240,18 @@ func (s defaultAccountManagementService) getGroupGateways(groupID int64) (groupG
 	return
 }
 
-func (s defaultAccountManagementService) UpdateGroup(userID, groupID int64, body *app.UpdateGroupBody) (err error) {
+func (s defaultAccountManagementService) UpdateGroup(executedUserID, groupID int64, body *app.UpdateGroupBody) (err error) {
 	tx, err := models.GetDB().BeginTx(context.Background(), nil)
 	if err != nil {
 		return
 	}
 
-	if !s.authorizeGroupID(tx, userID, groupID) {
+	if !s.authorizeGroupID(tx, executedUserID, groupID) {
 		err = e.ErrNewAuthPermissionNotAllow
 		tx.Rollback()
 		return
 	}
-	if s.isOwnAccountGroup(tx, userID, groupID) {
+	if s.isOwnAccountGroup(tx, executedUserID, groupID) {
 		err = e.ErrNewOwnAccountGroupModifiedNotAllow
 		logrus.WithField("caused-by", err).Error()
 		tx.Rollback()
@@ -295,23 +295,23 @@ func (s defaultAccountManagementService) isOwnAccountGroup(tx *sql.Tx, userID, g
 	return false
 }
 
-func (s defaultAccountManagementService) DeleteGroup(userID, groupID int64) (err error) {
+func (s defaultAccountManagementService) DeleteGroup(executedUserID, groupID int64) (err error) {
 	tx, err := models.GetDB().BeginTx(context.Background(), nil)
 	if err != nil {
 		return
 	}
 
-	if !s.authorizeGroupID(tx, userID, groupID) {
+	if !s.authorizeGroupID(tx, executedUserID, groupID) {
 		err = e.ErrNewAuthPermissionNotAllow
 		tx.Rollback()
 		return
 	}
-	if err = s.checkDeletedRules(tx, userID, groupID); err != nil {
+	if err = s.checkDeletedRules(tx, executedUserID, groupID); err != nil {
 		tx.Rollback()
 		return
 	}
 
-	if err = s.repo.User.DeleteGroup(tx, userID, groupID); err != nil {
+	if err = s.repo.User.DeleteGroup(tx, executedUserID, groupID); err != nil {
 		logrus.WithFields(logrus.Fields{
 			"caused-by": "s.repo.User.DeleteGroup",
 			"err":       err,
@@ -324,8 +324,8 @@ func (s defaultAccountManagementService) DeleteGroup(userID, groupID int64) (err
 	return
 }
 
-func (s defaultAccountManagementService) checkDeletedRules(tx *sql.Tx, userID, groupID int64) (err error) {
-	if s.isOwnAccountGroup(tx, userID, groupID) {
+func (s defaultAccountManagementService) checkDeletedRules(tx *sql.Tx, executedUserID, groupID int64) (err error) {
+	if s.isOwnAccountGroup(tx, executedUserID, groupID) {
 		err = e.ErrNewOwnAccountGroupModifiedNotAllow
 		logrus.WithField("caused-by", err).Error()
 		return
@@ -354,8 +354,8 @@ func (s defaultAccountManagementService) isSubGroupExisted(tx *sql.Tx, groupID i
 	return false
 }
 
-func (s defaultAccountManagementService) authorizeGroupID(tx *sql.Tx, userID, groupID int64) bool {
-	groups, err := s.getGroupTreeNodes(tx, userID)
+func (s defaultAccountManagementService) authorizeGroupID(tx *sql.Tx, executedUserID, groupID int64) bool {
+	groups, err := s.getGroupTreeNodes(tx, executedUserID)
 	if err == nil {
 		for _, group := range groups {
 			if group.ID == groupID {
@@ -363,7 +363,7 @@ func (s defaultAccountManagementService) authorizeGroupID(tx *sql.Tx, userID, gr
 			}
 		}
 	}
-	logrus.WithField("userID", userID).Error("authorize-group-id-failed")
+	logrus.WithField("executedUserID", executedUserID).Error("authorize-group-id-failed")
 	return false
 }
 
@@ -502,15 +502,15 @@ func (s defaultAccountManagementService) DeleteUser(executedUserID, userID int64
 	return
 }
 
-func (s defaultAccountManagementService) authorizeUserID(userID, targetUserID int64) bool {
-	targetUser, err := s.repo.User.GetUserByUserID(nil, targetUserID)
-	if err != nil || !targetUser.DeletedAt.IsZero() {
+func (s defaultAccountManagementService) authorizeUserID(executedUserID, userID int64) bool {
+	user, err := s.repo.User.GetUserByUserID(nil, userID)
+	if err != nil || !user.DeletedAt.IsZero() {
 		return false
 	}
-	groups, err := s.getGroupTreeNodes(nil, userID)
+	groups, err := s.getGroupTreeNodes(nil, executedUserID)
 	if err == nil {
 		for _, group := range groups {
-			if group.ID == targetUser.GroupID {
+			if group.ID == user.GroupID {
 				return true
 			}
 		}

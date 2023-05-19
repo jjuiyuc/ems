@@ -41,7 +41,7 @@ type UserRepository interface {
 	IsUserExistedInGroup(tx *sql.Tx, groupID int64) bool
 	CreateGroup(tx *sql.Tx, group *deremsmodels.Group) (err error)
 	UpdateGroup(tx *sql.Tx, group *deremsmodels.Group) (err error)
-	DeleteGroup(tx *sql.Tx, userID, groupID int64) (err error)
+	DeleteGroup(tx *sql.Tx, executedUserID, groupID int64) (err error)
 	IsGroupNameExistedOnSameLevel(tx *sql.Tx, group *deremsmodels.Group) bool
 	GetGroupByGroupID(tx *sql.Tx, groupID int64) (*deremsmodels.Group, error)
 	GetGroupsByGroupID(tx *sql.Tx, groupID int64) ([]*deremsmodels.Group, error)
@@ -160,14 +160,14 @@ func (repo defaultUserRepository) UpdateGroup(tx *sql.Tx, group *deremsmodels.Gr
 	return
 }
 
-func (repo defaultUserRepository) DeleteGroup(tx *sql.Tx, userID, groupID int64) (err error) {
+func (repo defaultUserRepository) DeleteGroup(tx *sql.Tx, executedUserID, groupID int64) (err error) {
 	exec := repo.getExecutor(tx)
 	group, err := deremsmodels.FindGroup(exec, groupID)
 	if err == nil {
 		now := time.Now().UTC()
 		group.UpdatedAt = now
 		group.DeletedAt = null.TimeFrom(now)
-		group.DeletedBy = null.Int64From(userID)
+		group.DeletedBy = null.Int64From(executedUserID)
 		_, err = group.Update(exec, boil.Infer())
 	}
 	return

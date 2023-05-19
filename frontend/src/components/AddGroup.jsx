@@ -65,7 +65,6 @@ export default connect(null, mapDispatch)(function AddGroup(props) {
                 method: "post",
                 data,
                 onSuccess: () => {
-                    console.log("ok")
                     setOpenAdd(false)
                     getList()
                     props.updateSnackbarMsg({
@@ -75,10 +74,9 @@ export default connect(null, mapDispatch)(function AddGroup(props) {
                     setGroupName("")
                 },
                 onError: () => {
-                    console.log("err")
                     props.updateSnackbarMsg({
                         type: "error",
-                        msg: "failureToSave"
+                        msg: errorT("failureToSave")
                     })
                 },
                 url: "/api/account-management/groups"

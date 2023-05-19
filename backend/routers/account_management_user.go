@@ -26,12 +26,6 @@ import (
 func (w *APIWorker) GetUsers(c *gin.Context) {
 	appG := app.Gin{c}
 	userID, _ := c.Get("userID")
-	if userID == nil {
-		logrus.WithField("caused-by", "error token").Error()
-		appG.Response(http.StatusUnauthorized, e.ErrToken, nil)
-		return
-	}
-
 	responseData, err := w.Services.AccountManagement.GetUsers(userID.(int64))
 	if err != nil {
 		appG.Response(http.StatusInternalServerError, e.ErrAccountUsersGen, nil)
@@ -79,6 +73,10 @@ func (w *APIWorker) CreateUser(c *gin.Context, body *app.CreateUserBody) {
 		return
 	}
 	appG.Response(http.StatusOK, e.Success, nil)
+	logrus.WithFields(logrus.Fields{
+		"created-by":       userID,
+		"username":         body.Username,
+	}).Info("user-created")
 }
 
 // UpdateUser godoc
@@ -113,6 +111,9 @@ func (w *APIWorker) UpdateUser(c *gin.Context, uri *app.UserURI, body *app.Updat
 		return
 	}
 	appG.Response(http.StatusOK, e.Success, nil)
+	logrus.WithFields(logrus.Fields{
+		"updated-by":       userID,
+	}).Info("user-updated")
 }
 
 // DeleteUser godoc

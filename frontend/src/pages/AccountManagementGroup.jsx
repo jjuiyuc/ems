@@ -1,21 +1,23 @@
-import {
-    Button, DialogActions, Divider, FormControl, ListItem, TextField
-} from "@mui/material"
+import { connect } from "react-redux"
+import { Button, DialogActions, Divider, FormControl, TextField } from "@mui/material"
 import { useTranslation } from "react-multi-lang"
 import { useEffect, useMemo, useState } from "react"
 
 import { apiCall } from "../utils/api"
 
 import AddGroup from "../components/AddGroup"
+import InfoGroup from "../components/InfoGroup"
 import DialogForm from "../components/DialogForm"
 import Table from "../components/DataTable"
 
 import { ReactComponent as DeleteIcon } from "../assets/icons/trash_solid.svg"
 import { ReactComponent as EditIcon } from "../assets/icons/edit.svg"
 import { ReactComponent as NoticeIcon } from "../assets/icons/notice.svg"
+const mapState = state => ({
+    parentID: state.user.group.parentID
+})
 
-
-export default function AccountManagementGroup(props) {
+export default connect(mapState)(function AccountManagementGroup(props) {
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
@@ -24,12 +26,12 @@ export default function AccountManagementGroup(props) {
 
     const
         [groupList, setGroupList] = useState([]),
-        [groupTypes, setGroupTypes] = useState({}),
+        [groupTypeDict, setGroupTypeDict] = useState({}),
+        [groupDictionary, setGroupDictionary] = useState({}),
         [loading, setLoading] = useState(false),
         [infoError, setInfoError] = useState(""),
         [fullWidth, setFullWidth] = useState(true),
         [maxWidth, setMaxWidth] = useState("sm"),
-        [openNotice, setOpenNotice] = useState(false),
         [openEdit, setOpenEdit] = useState(false),
         [openDelete, setOpenDelete] = useState(false),
         [target, setTarget] = useState({})
@@ -44,6 +46,7 @@ export default function AccountManagementGroup(props) {
             return newData
         })
     }
+    const adminID = groupList[0]?.id
     const columns = [
         {
             cell: row => <span className="font-mono">{row.name || ""}</span>,
@@ -54,7 +57,7 @@ export default function AccountManagementGroup(props) {
         {
             cell: row =>
                 <span className="font-mono">
-                    {groupTypes[row.typeID] || ""}
+                    {groupTypeDict[row.typeID] || ""}
                 </span>,
             center: true,
             name: pageT("groupType"),
@@ -62,19 +65,21 @@ export default function AccountManagementGroup(props) {
         },
         {
             cell: (row, index) => <div className="flex w-28">
-                <NoticeIcon
-                    className="mr-5"
-                    onClick={() => {
-                        setOpenNotice(true)
-                        setTarget(row)
-                    }} />
-                {row.groupType === "Area Owner"
+                <InfoGroup
+                    row={row}
+                    groupList={groupList}
+                    groupTypeDict={groupTypeDict}
+                    groupDictionary={groupDictionary} />
+                {/* Admin has no parentID */}
+                {row.parentID === null || props.parentID === adminID
                     ? null
                     : <>
                         <EditIcon className="mr-5"
                             onClick={() => {
                                 setOpenEdit(true)
                                 setTarget({ ...row, index })
+                                console.log(groupDictionary)
+
                             }} />
                         <DeleteIcon onClick={() => {
                             setOpenDelete(true)
@@ -96,7 +101,11 @@ export default function AccountManagementGroup(props) {
                 const { data } = rawData
 
                 setGroupList(data.groups || [])
-                setGroupTypes(data.groupTypes?.reduce((acc, cur) => {
+                setGroupTypeDict(data.groupTypes?.reduce((acc, cur) => {
+                    acc[cur.id] = cur.name
+                    return acc
+                }, {}) || {})
+                setGroupDictionary(data.groups?.reduce((acc, cur) => {
                     acc[cur.id] = cur.name
                     return acc
                 }, {}) || {})
@@ -104,11 +113,15 @@ export default function AccountManagementGroup(props) {
             url: `/api/account-management/groups`
         })
     }
-    useEffect(() => getList(), [])
+    useEffect(() => {
+        getList()
+
+    }, [])
+
     return <>
         <h1 className="mb-9">{commonT("accountManagementGroup")}</h1>
         <div className="mb-9">
-            <AddGroup {...{ getList, groupList, groupTypes }} />
+            <AddGroup {...{ getList, groupList, groupTypes: groupTypeDict }} />
         </div>
         <Table
             columns={columns}
@@ -120,56 +133,6 @@ export default function AccountManagementGroup(props) {
             progressPending={loading}
             theme="dark"
         />
-        {/* notice */}
-        <DialogForm
-            dialogTitle={commonT("group")}
-            fullWidth={fullWidth}
-            maxWidth={maxWidth}
-            open={openNotice}
-            setOpen={setOpenNotice}>
-            <Divider variant="middle" />
-            <div className="flex flex-col m-auto mt-4 min-w-49 w-fit">
-                <div className="grid grid-cols-1fr-auto">
-                    <h5 className="ml-6 mt-2">{commonT("groupName")} :</h5>
-                    <ListItem
-                        id="name"
-                        label={commonT("groupName")}>
-                        {target?.groupName || ""}
-                    </ListItem>
-                    <h5 className="ml-6 mt-2">{pageT("groupType")} :</h5>
-                    <ListItem
-                        id="group-type"
-                        label={pageT("groupType")}
-                    >
-                        {target?.groupType || ""}
-                    </ListItem>
-                    {target?.parentGroup
-                        ? <> <h5 className="ml-6 mt-2">{pageT("parentGroup")} :</h5>
-                            <ListItem
-                                id="parent-group-type"
-                                label={pageT("parentGroup")}
-                            >
-                                {target?.parentGroup || ""}
-                            </ListItem></>
-                        : null}
-                    <h5 className="ml-6 mt-2">{pageT("fieldList")} :</h5>
-                    <ListItem
-                        id="field-list"
-                        label={pageT("fieldList")}
-                    >
-                        {target?.fieldList || ""}
-                    </ListItem>
-                </div>
-            </div>
-            <DialogActions sx={{ margin: "1rem 0.5rem 1rem 0" }}>
-                <Button onClick={() => { setOpenNotice(false) }}
-                    radius="pill"
-                    variant="contained"
-                    color="primary">
-                    {commonT("okay")}
-                </Button>
-            </DialogActions>
-        </DialogForm>
         {/* edit */}
         <DialogForm
             dialogTitle={commonT("group")}
@@ -240,4 +203,4 @@ export default function AccountManagementGroup(props) {
             </DialogActions>
         </DialogForm>
     </>
-}
+})

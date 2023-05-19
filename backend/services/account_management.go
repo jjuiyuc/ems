@@ -25,6 +25,7 @@ type AccountManagementService interface {
 	GetUsers(userID int64) (getUsers *GetUsersResponse, err error)
 	CreateUser(userID int64, body *app.CreateUserBody) error
 	UpdateUser(executedUserID, userID int64, body *app.UpdateUserBody) (err error)
+	DeleteUser(executedUserID, userID int64) (err error)
 }
 
 // GetGroupsResponse godoc
@@ -480,9 +481,30 @@ func (s defaultAccountManagementService) processUpdateUser(user *deremsmodels.Us
 	return
 }
 
+func (s defaultAccountManagementService) DeleteUser(executedUserID, userID int64) (err error) {
+	if !s.authorizeUserID(executedUserID, userID) {
+		err = e.ErrNewAuthPermissionNotAllow
+		return
+	}
+	if executedUserID == userID {
+		err = e.ErrNewOwnAccountDeletedNotAllow
+		logrus.WithField("caused-by", err).Error()
+		return
+	}
+
+	err = s.repo.User.DeleteUser(executedUserID, userID)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.User.DeleteUser",
+			"err":       err,
+		}).Error()
+	}
+	return
+}
+
 func (s defaultAccountManagementService) authorizeUserID(userID, targetUserID int64) bool {
 	targetUser, err := s.repo.User.GetUserByUserID(nil, targetUserID)
-	if err != nil {
+	if err != nil || !targetUser.DeletedAt.IsZero() {
 		return false
 	}
 	groups, err := s.getGroupTreeNodes(nil, userID)

@@ -31,6 +31,7 @@ type UserRepository interface {
 	InsertLoginLog(loginLog *deremsmodels.LoginLog) error
 	CreateUser(user *deremsmodels.User) error
 	UpdateUser(user *deremsmodels.User) (err error)
+	DeleteUser(executedUserID, userID int64) (err error)
 	GetLoginLogCount() (int64, error)
 	GetUserByUserID(tx *sql.Tx, userID int64) (*deremsmodels.User, error)
 	GetUserByUsername(username string) (*deremsmodels.User, error)
@@ -75,6 +76,18 @@ func (repo defaultUserRepository) CreateUser(user *deremsmodels.User) error {
 func (repo defaultUserRepository) UpdateUser(user *deremsmodels.User) (err error) {
 	user.UpdatedAt = time.Now().UTC()
 	_, err = user.Update(repo.db, boil.Infer())
+	return
+}
+
+func (repo defaultUserRepository) DeleteUser(executedUserID, userID int64) (err error) {
+	user, err := deremsmodels.FindUser(repo.db, userID)
+	if err == nil {
+		now := time.Now().UTC()
+		user.UpdatedAt = now
+		user.DeletedAt = null.TimeFrom(now)
+		user.DeletedBy = null.Int64From(executedUserID)
+		_, err = user.Update(repo.db, boil.Infer())
+	}
 	return
 }
 

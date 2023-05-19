@@ -68,3 +68,26 @@ func (w *APIWorker) UpdateUser(c *gin.Context, uri *app.UserURI, body *app.Updat
 	}
 	appG.Response(http.StatusOK, e.Success, nil)
 }
+
+// DeleteUser godoc
+func (w *APIWorker) DeleteUser(c *gin.Context, uri *app.UserURI) {
+	appG := app.Gin{c}
+	userID, _ := c.Get("userID")
+	err := w.Services.AccountManagement.DeleteUser(userID.(int64), uri.UserID)
+	if err != nil {
+		if errors.Is(err, e.ErrNewAuthPermissionNotAllow) {
+			appG.Response(http.StatusForbidden, e.ErrAuthPermissionNotAllow, nil)
+			return
+		}
+
+		var code int
+		if errors.Is(err, e.ErrNewOwnAccountDeletedNotAllow) {
+			code = e.ErrOwnAccountDeletedNotAllow
+		} else {
+			code = e.ErrAccountUserDelete
+		}
+		appG.Response(http.StatusInternalServerError, code, nil)
+		return
+	}
+	appG.Response(http.StatusOK, e.Success, nil)
+}

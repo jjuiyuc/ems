@@ -48,4 +48,6 @@ const (
 	ErrAccountUsernameExist             = 60012
 	ErrAccountUserCreate                = 60013
 	ErrAccountUserUpdate                = 60014
+	ErrOwnAccountDeletedNotAllow        = 60015
+	ErrAccountUserDelete                = 60016
 )

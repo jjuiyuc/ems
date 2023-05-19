@@ -20,6 +20,7 @@ type UserWrap struct {
 	ID              int64       `json:"id"`
 	Username        string      `json:"username"`
 	Name            null.String `json:"name"`
+	LockedAt        null.Time   `json:"lockedAt"`
 	GroupID         int64       `json:"groupID"`
 	GroupName       string      `json:"groupName"`
 	GroupParentID   null.Int64  `json:"groupParentID"`
@@ -122,6 +123,7 @@ func (repo defaultUserRepository) GetUserWrapsByGroupIDs(groupIDs []interface{})
 			"u.id AS id",
 			"u.username AS username",
 			"u.name AS name",
+			"u.locked_at AS locked_at",
 			"u.group_id AS group_id",
 			"g.name AS group_name",
 			"g.parent_id AS group_parent_id",

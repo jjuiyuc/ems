@@ -470,6 +470,10 @@ func (s defaultAccountManagementService) processUpdateUser(user *deremsmodels.Us
 	if body.GroupID > 0 {
 		user.GroupID = int64(body.GroupID)
 	}
+	if body.Unlock {
+		user.PasswordRetryCount = null.IntFrom(0)
+		user.LockedAt = null.TimeFromPtr(nil)
+	}
 	err = s.repo.User.UpdateUser(user)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{

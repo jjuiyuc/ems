@@ -26,4 +26,5 @@ type UpdateUserBody struct {
 	Password string `form:"password" binding:"max=50"`
 	Name     string `form:"name" binding:"max=20"`
 	GroupID  int    `form:"groupID"`
+	Unlock   bool   `form:"unlock"`
 }

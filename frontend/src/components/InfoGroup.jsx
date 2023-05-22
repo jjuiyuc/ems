@@ -26,7 +26,7 @@ export default function InfoGroup(props) {
         [parentGroup, setParentGroup] = useState(null),
         [fieldList, setFieldList] = useState([]),
         [fullWidth, setFullWidth] = useState(true),
-        [maxWidth, setMaxWidth] = useState("lg")
+        [maxWidth, setMaxWidth] = useState("md")
 
     const
         iconOnClick = () => {
@@ -70,7 +70,7 @@ export default function InfoGroup(props) {
             setOpen={setOpenNotice}>
             <Divider variant="middle" />
             <div className="flex flex-col m-auto mt-4 min-w-49 w-fit">
-                <div className="grid grid-cols-1fr-auto">
+                <div className="grid grid-cols-8rem-auto">
                     <h5 className="ml-6 mt-2">{commonT("groupName")} :</h5>
                     <ListItem
                         id="name"
@@ -93,20 +93,18 @@ export default function InfoGroup(props) {
                                 {groupDictionary[parentGroup]}
                             </ListItem></>
                         : null}
-                    {/* <div className="flex flex-wrap"> */}
                     <h5 className="ml-6 mt-2">{pageT("fieldList")} :</h5>
                     <ListItem
                         id="field-list"
                         label={pageT("fieldList")}
-                        className="grid-col-2 grid"
+                        className="flex flex-wrap gap-y-4"
                     >
                         {fieldList?.map((field, index) => (
-                            <p key={index}>
+                            <p key={index} className="w-9/12" >
                                 {field.locationName}-{field.gatewayID}
                             </p>
                         ))}
                     </ListItem>
-                    {/* </div> */}
                 </div>
             </div>
             <DialogActions sx={{ margin: "1rem 0.5rem 1rem 0" }}>

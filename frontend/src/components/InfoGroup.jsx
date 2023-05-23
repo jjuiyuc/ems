@@ -47,10 +47,6 @@ export default function InfoGroup(props) {
                     setParentGroup(data.parentID || null)
                     setFieldList(data.gateways)
 
-                    // if (Array.isArray(data.gateways)) {
-                    //     setFieldList(data.gateways)
-                    // }
-
                 },
                 url: `/api/account-management/groups/${groupID}`
             })
@@ -100,7 +96,7 @@ export default function InfoGroup(props) {
                         className="flex flex-wrap gap-y-4"
                     >
                         {fieldList?.map((field, index) => (
-                            <p key={index} className="w-9/12" >
+                            <p key={index} className="w-full" >
                                 {field.locationName}-{field.gatewayID}
                             </p>
                         ))}

@@ -9,7 +9,7 @@ import DialogForm from "./DialogForm"
 import { ReactComponent as NoticeIcon } from "../assets/icons/notice.svg"
 
 export default function InfoGroup(props) {
-    const { row, groupList, groupTypeDict, groupDictionary } = props
+    const { row, groupTypeDict, groupDictionary } = props
 
     const
         t = useTranslation(),
@@ -22,7 +22,6 @@ export default function InfoGroup(props) {
         [loading, setLoading] = useState(false),
         [infoError, setInfoError] = useState(""),
         [groupName, setGroupName] = useState(""),
-        [groupType, setGroupType] = useState(null),
         [parentGroup, setParentGroup] = useState(null),
         [fieldList, setFieldList] = useState([]),
         [fullWidth, setFullWidth] = useState(true),

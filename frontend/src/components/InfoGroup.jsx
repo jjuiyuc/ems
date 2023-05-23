@@ -1,11 +1,10 @@
 import { Button, DialogActions, Divider, ListItem } from "@mui/material"
-import { useTranslation, setDefaultTranslations } from "react-multi-lang"
-import { useMemo, useState, useEffect } from "react"
+import { useTranslation } from "react-multi-lang"
+import { useState } from "react"
 
 import { apiCall } from "../utils/api"
 
 import DialogForm from "./DialogForm"
-
 import { ReactComponent as NoticeIcon } from "../assets/icons/notice.svg"
 
 export default function InfoGroup(props) {
@@ -14,7 +13,6 @@ export default function InfoGroup(props) {
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
-        errorT = string => t("error." + string),
         pageT = (string, params) => t("accountManagementGroup." + string, params)
 
     const
@@ -49,8 +47,6 @@ export default function InfoGroup(props) {
                 },
                 url: `/api/account-management/groups/${groupID}`
             })
-            console.log(fieldList)
-
         }
     return <>
         <NoticeIcon

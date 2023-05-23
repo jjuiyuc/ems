@@ -1,7 +1,5 @@
 import { connect } from "react-redux"
-import {
-    Button, DialogActions, Divider, FormControl, MenuItem, TextField
-} from "@mui/material"
+import { Button, DialogActions, Divider, FormControl, MenuItem, TextField } from "@mui/material"
 import AddIcon from "@mui/icons-material/Add"
 import { useTranslation } from "react-multi-lang"
 import { useMemo, useState } from "react"
@@ -69,7 +67,7 @@ export default connect(null, mapDispatch)(function AddGroup(props) {
                     getList()
                     props.updateSnackbarMsg({
                         type: "success",
-                        msg: t("dialog.modifyNameMsg")
+                        msg: t("dialog.addedSuccessfully")
                     })
                     setGroupName("")
                 },

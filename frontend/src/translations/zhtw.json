@@ -113,6 +113,7 @@
     },
     "dialog": {
         "addField":"新增場域",
+        "addedSuccessfully":"新增成功!",
         "confirmedMsg":"Are you sure you want to turn off all the charging resources?",
         "deleteMsg":"請問您是否要刪除這筆資料?",
         "editFieldInfo":"編輯場域資訊",
@@ -213,6 +214,8 @@
         "emailFormat": "Email 帳號格式錯誤，請重新輸入。",
         "emailNotExist": "帳號不存在，請重新輸入。",
         "failureToSave":"儲存失敗！",
+        "groupNameExistsOnTheSameLevel":"在同一個管理層級已存在已存在一樣的群組名稱。",
+        "modifyOwnAccountGroupNotAllow":"無法修改所屬群組的名稱。",
         "nameLength":"請輸入介於1到20個字",
         "passwordFormat": "您輸入的密碼不符合密碼原則的要求，請重新輸入。",
         "passwordIncorrect": "密碼錯誤，請重新輸入。",

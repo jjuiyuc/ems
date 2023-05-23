@@ -1,18 +1,18 @@
 import { connect } from "react-redux"
-import { Button, DialogActions, Divider, FormControl, TextField } from "@mui/material"
+import { Button, DialogActions } from "@mui/material"
 import { useTranslation } from "react-multi-lang"
 import { useEffect, useMemo, useState } from "react"
 
 import { apiCall } from "../utils/api"
 
 import AddGroup from "../components/AddGroup"
+import EditGroup from "../components/EditGroup"
 import InfoGroup from "../components/InfoGroup"
 import DialogForm from "../components/DialogForm"
 import Table from "../components/DataTable"
 
 import { ReactComponent as DeleteIcon } from "../assets/icons/trash_solid.svg"
-import { ReactComponent as EditIcon } from "../assets/icons/edit.svg"
-import { ReactComponent as NoticeIcon } from "../assets/icons/notice.svg"
+
 const mapState = state => ({
     parentID: state.user.group.parentID
 })
@@ -32,19 +32,17 @@ export default connect(mapState)(function AccountManagementGroup(props) {
         [infoError, setInfoError] = useState(""),
         [fullWidth, setFullWidth] = useState(true),
         [maxWidth, setMaxWidth] = useState("sm"),
-        [openEdit, setOpenEdit] = useState(false),
         [openDelete, setOpenDelete] = useState(false),
         [target, setTarget] = useState({})
 
     const handleChange = (e) => {
         setTarget(r => ({ ...r, groupName: e.target.value }))
     }
-    const editSave = () => {
-        setData(r => {
-            const newData = [...r]
-            newData[target.index].groupName = target.groupName
-            return newData
-        })
+    const editSave = (row) => {
+        const newData = groupList.map((value) =>
+            value.id === row.id ? row : value
+        )
+        setGroupList(newData)
     }
     const adminID = groupList[0]?.id
     const columns = [
@@ -67,20 +65,17 @@ export default connect(mapState)(function AccountManagementGroup(props) {
             cell: (row, index) => <div className="flex w-28">
                 <InfoGroup
                     row={row}
-                    groupList={groupList}
                     groupTypeDict={groupTypeDict}
                     groupDictionary={groupDictionary} />
                 {/* Admin has no parentID */}
                 {row.parentID === null || props.parentID === adminID
                     ? null
                     : <>
-                        <EditIcon className="mr-5"
-                            onClick={() => {
-                                setOpenEdit(true)
-                                setTarget({ ...row, index })
-                                console.log(groupDictionary)
-
-                            }} />
+                        <EditGroup className="mr-5"
+                            row={row}
+                            groupList={groupList}
+                            onSave={editSave}
+                        />
                         <DeleteIcon onClick={() => {
                             setOpenDelete(true)
                             setTarget(row)
@@ -115,7 +110,6 @@ export default connect(mapState)(function AccountManagementGroup(props) {
     }
     useEffect(() => {
         getList()
-
     }, [])
 
     return <>
@@ -133,48 +127,6 @@ export default connect(mapState)(function AccountManagementGroup(props) {
             progressPending={loading}
             theme="dark"
         />
-        {/* edit */}
-        <DialogForm
-            dialogTitle={commonT("group")}
-            fullWidth={fullWidth}
-            maxWidth={maxWidth}
-            open={openEdit}
-            setOpen={setOpenEdit}>
-            <Divider variant="middle" />
-            <FormControl sx={{
-                display: "flex",
-                flexDirection: "column",
-                margin: "auto",
-                width: "fit-content",
-                mt: 2,
-                minWidth: 120
-            }}>
-                <TextField
-                    id="edit-name"
-                    label={commonT("groupName")}
-                    onChange={handleChange}
-                    value={target?.groupName || ""}
-                    focused>
-                </TextField>
-            </FormControl>
-            <DialogActions sx={{ margin: "1rem 0.5rem 1rem 0" }}>
-                <Button onClick={() => { setOpenEdit(false) }}
-                    radius="pill"
-                    variant="outlined"
-                    color="gray">
-                    {commonT("cancel")}
-                </Button>
-                <Button onClick={() => {
-                    setOpenEdit(false)
-                    editSave()
-                }}
-                    radius="pill"
-                    variant="contained"
-                    color="primary">
-                    {commonT("save")}
-                </Button>
-            </DialogActions>
-        </DialogForm>
         {/* delete */}
         <DialogForm
             dialogTitle={dialogT("deleteMsg")}
@@ -184,7 +136,7 @@ export default connect(mapState)(function AccountManagementGroup(props) {
             setOpen={setOpenDelete}>
             <div className="flex">
                 <h5 className="ml-6 mr-2">{commonT("groupName")} :</h5>
-                {target?.groupName || ""}
+                {target?.name || ""}
             </div>
             <DialogActions sx={{ margin: "0.5rem 0.5rem 0.5rem 0" }}>
                 <Button onClick={() => { setOpenDelete(false) }}

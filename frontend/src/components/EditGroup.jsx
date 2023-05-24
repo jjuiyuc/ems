@@ -25,9 +25,7 @@ export default connect(null, mapDispatch)(function EditGroup(props) {
         [groupName, setGroupName] = useState(row.name),
         [groupNameError, setGroupNameError] = useState(null),
         [isGroupNameError, setIsGroupNameError] = useState(false),
-        [otherError, setOtherError] = useState(""),
-        [fullWidth, setFullWidth] = useState(true),
-        [maxWidth, setMaxWidth] = useState("sm")
+        [otherError, setOtherError] = useState("")
 
     const submitDisabled = !groupName.length || isGroupNameError
     const
@@ -100,8 +98,8 @@ export default connect(null, mapDispatch)(function EditGroup(props) {
             onClick={handleClick} />
         <DialogForm
             dialogTitle={commonT("group")}
-            fullWidth={fullWidth}
-            maxWidth={maxWidth}
+            fullWidth={true}
+            maxWidth={"sm"}
             open={openEdit}
             setOpen={setOpenEdit}>
             <Divider variant="middle" />

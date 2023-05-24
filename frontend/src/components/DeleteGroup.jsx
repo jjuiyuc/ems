@@ -24,9 +24,7 @@ export default connect(null, mapDispatch)(function DeleteGroup(props) {
     const
         [openDelete, setOpenDelete] = useState(false),
         [groupNameError, setGroupNameError] = useState(null),
-        [otherError, setOtherError] = useState(""),
-        [fullWidth, setFullWidth] = useState(true),
-        [maxWidth, setMaxWidth] = useState("sm")
+        [otherError, setOtherError] = useState("")
 
     const
         handleClick = () => {
@@ -35,7 +33,6 @@ export default connect(null, mapDispatch)(function DeleteGroup(props) {
         submit = async () => {
 
             const groupID = row.id
-
             const data = null
 
             await apiCall({
@@ -79,8 +76,8 @@ export default connect(null, mapDispatch)(function DeleteGroup(props) {
         <DeleteIcon onClick={handleClick} />
         <DialogForm
             dialogTitle={dialogT("deleteMsg")}
-            fullWidth={fullWidth}
-            maxWidth={maxWidth}
+            fullWidth={true}
+            maxWidth={"sm"}
             open={openDelete}
             setOpen={setOpenDelete}>
             <div className="flex">

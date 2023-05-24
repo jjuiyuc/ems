@@ -2,7 +2,7 @@ import { connect } from "react-redux"
 import { Button, DialogActions, Divider, FormControl, MenuItem, TextField } from "@mui/material"
 import AddIcon from "@mui/icons-material/Add"
 import { useTranslation } from "react-multi-lang"
-import { useMemo, useState } from "react"
+import { useState } from "react"
 
 import { apiCall } from "../utils/api"
 
@@ -28,9 +28,7 @@ export default connect(null, mapDispatch)(function AddGroup(props) {
         [groupType, setGroupType] = useState(null),
         [groupTypeError, setGroupTypeError] = useState(false),
         [parentGroup, setParentGroup] = useState(null),
-        [parentGroupError, setParentGroupError] = useState(false),
-        [fullWidth, setFullWidth] = useState(true),
-        [maxWidth, setMaxWidth] = useState("lg")
+        [parentGroupError, setParentGroupError] = useState(false)
 
     const submitDisabled = !groupName.length || groupType == null || parentGroup == null || isGroupNameError || groupTypeError || parentGroupError
     const
@@ -44,17 +42,8 @@ export default connect(null, mapDispatch)(function AddGroup(props) {
         changeGroupType = (e) => {
             setGroupType(e.target.value)
         }
-    const parentGroupTypeOptions = useMemo(() => {
-        if (groupType !== null) {
-            if (groupType === 1) {
-                return groupList.filter(item => item.parentID === null)
-            } else {
-                // 其他 groupType 將 parentGroup 設為對應的 typeID - 1
-                return groupList.filter(item => item.typeID === parseInt(groupType) - 1)
-            }
-        }
-        return []
-    }, [groupType, groupList])
+    const parentGroupTypeOptions = groupList.filter(item => item.parentID == 1)
+        .filter(item => item.typeID == 2)
 
     const
         submit = () => {
@@ -74,6 +63,8 @@ export default connect(null, mapDispatch)(function AddGroup(props) {
                         msg: t("dialog.addedSuccessfully")
                     })
                     setGroupName("")
+                    setGroupType(null)
+                    setParentGroup(null)
                 },
                 onError: () => {
                     props.updateSnackbarMsg({
@@ -84,7 +75,7 @@ export default connect(null, mapDispatch)(function AddGroup(props) {
                 url: "/api/account-management/groups"
             })
         }
-
+    console.log(parentGroup)
     return <>
         <Button
             onClick={() => { setOpenAdd(true) }}
@@ -98,8 +89,8 @@ export default connect(null, mapDispatch)(function AddGroup(props) {
         </Button>
         <DialogForm
             dialogTitle={commonT("group")}
-            fullWidth={fullWidth}
-            maxWidth={maxWidth}
+            fullWidth={true}
+            maxWidth={"lg"}
             open={openAdd}
             setOpen={setOpenAdd}>
             <Divider variant="middle" />
@@ -128,7 +119,7 @@ export default connect(null, mapDispatch)(function AddGroup(props) {
                     defaultValue=""
                     required
                 >
-                    {Object.entries(groupTypes).map(([key, value]) =>
+                    {Object.entries(groupTypes).slice(2).map(([key, value]) =>
                         <MenuItem key={"g-t-p" + key} value={key}>
                             {value}
                         </MenuItem>)}
@@ -140,7 +131,7 @@ export default connect(null, mapDispatch)(function AddGroup(props) {
                     label={pageT("parentGroup")}
                     onChange={e => setParentGroup(e.target.value)}
                     value={parentGroup || ""}
-                    disabled={!groupType || groupType == 1}
+                    disabled={!groupType}
                     defaultValue=""
                     required
                 >

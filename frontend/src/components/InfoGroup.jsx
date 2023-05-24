@@ -1,11 +1,25 @@
 import { Button, DialogActions, Divider, ListItem } from "@mui/material"
+import ReportProblemIcon from "@mui/icons-material/ReportProblem"
 import { useTranslation } from "react-multi-lang"
 import { useState } from "react"
 
 import { apiCall } from "../utils/api"
 
+import AlertBox from "../components/AlertBox"
 import DialogForm from "./DialogForm"
+import LoadingBox from "../components/LoadingBox"
 import { ReactComponent as NoticeIcon } from "../assets/icons/notice.svg"
+
+const ErrorBox = ({ error, margin = "", message }) => error
+    ? <AlertBox
+        boxClass={`${margin} negative`}
+        content={<>
+            <span className="font-mono ml-2">{error}</span>
+            <span className="ml-2">{message}</span>
+        </>}
+        icon={ReportProblemIcon}
+        iconColor="negative-main" />
+    : null
 
 export default function InfoGroup(props) {
     const { row, groupTypeDict, groupDictionary } = props
@@ -98,6 +112,10 @@ export default function InfoGroup(props) {
                     </ListItem>
                 </div>
             </div>
+            <ErrorBox
+                error={infoError}
+                message={t("error.noDataMsg")} />
+            <LoadingBox loading={loading} />
             <DialogActions sx={{ margin: "1rem 0.5rem 1rem 0" }}>
                 <Button onClick={() => { setOpenNotice(false) }}
                     radius="pill"
@@ -107,5 +125,6 @@ export default function InfoGroup(props) {
                 </Button>
             </DialogActions>
         </DialogForm>
+
     </>
 }

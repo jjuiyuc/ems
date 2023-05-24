@@ -35,10 +35,7 @@ export default function InfoGroup(props) {
         [infoError, setInfoError] = useState(""),
         [groupName, setGroupName] = useState(""),
         [parentGroup, setParentGroup] = useState(null),
-        [fieldList, setFieldList] = useState([]),
-        [fullWidth, setFullWidth] = useState(true),
-        [maxWidth, setMaxWidth] = useState("md")
-
+        [fieldList, setFieldList] = useState([])
     const
         iconOnClick = () => {
             setOpenNotice(true)
@@ -69,8 +66,8 @@ export default function InfoGroup(props) {
         />
         <DialogForm
             dialogTitle={commonT("group")}
-            fullWidth={fullWidth}
-            maxWidth={maxWidth}
+            fullWidth={true}
+            maxWidth={"md"}
             open={openNotice}
             setOpen={setOpenNotice}>
             <Divider variant="middle" />

@@ -220,6 +220,7 @@
         "groupNameExistsOnTheSameLevel":"Account group name exists on the same level.",
         "modifyOwnAccountGroupNotAllow":"Modify own account group does not allow.",
         "nameLength":"Please enter between 1 to 20 characters.",
+        "noDataMsg":"No Data Message",
         "passwordFormat": "Password must meet complexity requirements, please try again.",
         "passwordIncorrect": "Password is incorrect, please try again.",
         "passwordLength":"Please enter between 8 to 50 characters.",

@@ -207,8 +207,7 @@ func (w *APIWorker) DeleteGroup(c *gin.Context) {
 		appG.Response(http.StatusForbidden, e.ErrAuthPermissionNotAllow, nil)
 		return
 	}
-	err := w.Services.AccountManagement.DeleteGroup(userID.(int64), uri.GroupID)
-	if err != nil {
+	if err := w.Services.AccountManagement.DeleteGroup(userID.(int64), uri.GroupID); err != nil {
 		var code int
 		switch err {
 		case e.ErrNewOwnAccountGroupModifiedNotAllow:

@@ -21,17 +21,6 @@ export default connect(null, mapDispatch)(function AddGroup(props) {
         errorT = string => t("error." + string),
         pageT = (string, params) => t("accountManagementGroup." + string, params)
 
-
-    const groupTypeOptions = useMemo(() =>
-        Object.entries(groupTypes).slice(2).map(([key, value]) => ({
-            [key]: value
-
-        }))
-        , [groupTypes])
-
-    const parentGroupTypeOptions = groupList.filter(item => item.parentID == 1)
-        .filter(item => item.typeID == 2)//only show this temporarily
-
     const
         [openAdd, setOpenAdd] = useState(false),
         [groupName, setGroupName] = useState(""),
@@ -51,7 +40,22 @@ export default connect(null, mapDispatch)(function AddGroup(props) {
                 groupNameError = groupNameTarget.length == 0 || groupNameTarget.length > 20
             setGroupName(groupNameTarget)
             setIsGroupNameError(groupNameError)
+        },
+        changeGroupType = (e) => {
+            setGroupType(e.target.value)
         }
+    const parentGroupTypeOptions = useMemo(() => {
+        if (groupType !== null) {
+            if (groupType === 1) {
+                return groupList.filter(item => item.parentID === null)
+            } else {
+                // 其他 groupType 將 parentGroup 設為對應的 typeID - 1
+                return groupList.filter(item => item.typeID === parseInt(groupType) - 1)
+            }
+        }
+        return []
+    }, [groupType, groupList])
+
     const
         submit = () => {
             const data = {
@@ -80,6 +84,7 @@ export default connect(null, mapDispatch)(function AddGroup(props) {
                 url: "/api/account-management/groups"
             })
         }
+
     return <>
         <Button
             onClick={() => { setOpenAdd(true) }}
@@ -119,25 +124,23 @@ export default connect(null, mapDispatch)(function AddGroup(props) {
                     id="add-type"
                     select
                     label={pageT("groupType")}
-                    onChange={e => setGroupType(e.target.value)}
+                    onChange={changeGroupType}
                     defaultValue=""
                     required
                 >
-                    {groupTypeOptions.map(obj => {
-                        let key = Object.keys(obj)[0]
-                        let value = obj[key]
-                        return (
-                            <MenuItem key={"g-t-p" + key} value={key}>
-                                {value}
-                            </MenuItem>
-                        )
-                    })}
+                    {Object.entries(groupTypes).map(([key, value]) =>
+                        <MenuItem key={"g-t-p" + key} value={key}>
+                            {value}
+                        </MenuItem>)}
+
                 </TextField>
                 <TextField
                     id="add-parent-group-type"
                     select
                     label={pageT("parentGroup")}
                     onChange={e => setParentGroup(e.target.value)}
+                    value={parentGroup || ""}
+                    disabled={!groupType || groupType == 1}
                     defaultValue=""
                     required
                 >

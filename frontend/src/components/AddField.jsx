@@ -233,7 +233,6 @@ export default function AddField({
                             value={formT(`${option.value}`)}
                             onClick={() => {
                                 setDeviceType(option)
-                                // console.log(deviceType)
                             }}>
                             {formT(`${option.label}`)}
                         </MenuItem>

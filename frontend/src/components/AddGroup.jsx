@@ -75,7 +75,6 @@ export default connect(null, mapDispatch)(function AddGroup(props) {
                 url: "/api/account-management/groups"
             })
         }
-    console.log(parentGroup)
     return <>
         <Button
             onClick={() => { setOpenAdd(true) }}

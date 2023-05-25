@@ -85,13 +85,11 @@ func (w *APIWorker) GetGroup(c *gin.Context, uri *app.GroupURI) {
 	userID, _ := c.Get("userID")
 	responseData, err := w.Services.AccountManagement.GetGroup(userID.(int64), uri.GroupID)
 	if err != nil {
-		var code int
 		if errors.Is(err, e.ErrNewAuthPermissionNotAllow) {
-			code = e.ErrAuthPermissionNotAllow
-		} else {
-			code = e.ErrAccountGroupGen
+			appG.Response(http.StatusForbidden, e.ErrAuthPermissionNotAllow, nil)
+			return
 		}
-		appG.Response(http.StatusInternalServerError, code, nil)
+		appG.Response(http.StatusInternalServerError, e.ErrAccountGroupGen, nil)
 		return
 	}
 	appG.Response(http.StatusOK, e.Success, responseData)
@@ -118,10 +116,13 @@ func (w *APIWorker) UpdateGroup(c *gin.Context, uri *app.GroupURI, body *app.Upd
 	userID, _ := c.Get("userID")
 	err := w.Services.AccountManagement.UpdateGroup(userID.(int64), uri.GroupID, body)
 	if err != nil {
+		if errors.Is(err, e.ErrNewAuthPermissionNotAllow) {
+			appG.Response(http.StatusForbidden, e.ErrAuthPermissionNotAllow, nil)
+			return
+		}
+
 		var code int
 		switch err {
-		case e.ErrNewAuthPermissionNotAllow:
-			code = e.ErrAuthPermissionNotAllow
 		case e.ErrNewAccountGroupNameOnSameLevelExist:
 			code = e.ErrAccountGroupNameOnSameLevelExist
 		case e.ErrNewOwnAccountGroupModifiedNotAllow:
@@ -153,10 +154,13 @@ func (w *APIWorker) DeleteGroup(c *gin.Context, uri *app.GroupURI) {
 	appG := app.Gin{c}
 	userID, _ := c.Get("userID")
 	if err := w.Services.AccountManagement.DeleteGroup(userID.(int64), uri.GroupID); err != nil {
+		if errors.Is(err, e.ErrNewAuthPermissionNotAllow) {
+			appG.Response(http.StatusForbidden, e.ErrAuthPermissionNotAllow, nil)
+			return
+		}
+
 		var code int
 		switch err {
-		case e.ErrNewAuthPermissionNotAllow:
-			code = e.ErrAuthPermissionNotAllow
 		case e.ErrNewOwnAccountGroupModifiedNotAllow:
 			code = e.ErrOwnAccountGroupModifiedNotAllow
 		case e.ErrNewAccountGroupHasSubGroup:

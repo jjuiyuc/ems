@@ -1,214 +1,121 @@
-import {
-    Button, DialogActions, Divider, FormControl, ListItem,
-    MenuItem, TextField
-} from "@mui/material"
-import AddIcon from "@mui/icons-material/Add"
+import { connect } from "react-redux"
 import { useTranslation } from "react-multi-lang"
 import { useEffect, useMemo, useState } from "react"
 
-import DialogForm from "../components/DialogForm"
+import { apiCall } from "../utils/api"
+
+import AddGroup from "../components/AddGroup"
+import DeleteGroup from "../components/DeleteGroup"
+import EditGroup from "../components/EditGroup"
+import InfoGroup from "../components/InfoGroup"
 import Table from "../components/DataTable"
 
-import { ReactComponent as DeleteIcon } from "../assets/icons/trash_solid.svg"
-import { ReactComponent as EditIcon } from "../assets/icons/edit.svg"
-import { ReactComponent as NoticeIcon } from "../assets/icons/notice.svg"
+const mapState = state => ({
+    parentID: state.user.group.parentID
+})
 
-export default function AccountManagementGroup() {
+export default connect(mapState)(function AccountManagementGroup(props) {
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
         dialogT = (string) => t("dialog." + string),
         pageT = (string, params) => t("accountManagementGroup." + string, params)
-    const typeGroup = [
-        {
-            value: "Area Maintainer",
-            label: "Area Maintainer",
-        },
-        {
-            value: "Field Owner",
-            label: "Field Owner",
-        },
-    ],
-        parentGroupType = [
-            {
-                value: "AreaOwner_TW",
-                label: "AreaOwner_TW"
-            }
-        ]
+
     const
-        [data, setData] = useState([
-            {
-                id: 1,
-                groupName: "AreaOwner_TW",
-                groupType: "Area Owner",
-                fieldList: "AreaOwner_TW-0E0BA27A8175AF978C49396BDE9D7A1E"
-            },
-            {
-                id: 2,
-                groupName: "AreaMaintainer_TW",
-                groupType: "Area Maintainer",
-                fieldList: "AreaMaintainer_TW-0E0BA27A8175AF978C49396BDE9D7A1E"
-
-            },
-            {
-                id: 3,
-                groupName: "Serenegray",
-                groupType: "Field Owner",
-                fieldList: "Serenegray-0E0BA27A8175AF978C49396BDE9D7A1E",
-                parentGroup: "AreaOwner_TW"
-            },
-            {
-                id: 4,
-                groupName: "Cht_Miaoli",
-                groupType: "Area maintainer",
-                fieldList: "Cht_Miaoli-0E0BA27A8175AF978C49396BDE9D7A1E",
-                parentGroup: "AreaOwner_TW"
-
-            }
-        ]),
-        [error, setError] = useState(null),
+        [groupList, setGroupList] = useState([]),
+        [groupTypeDict, setGroupTypeDict] = useState({}),
+        [groupDictionary, setGroupDictionary] = useState({}),
         [loading, setLoading] = useState(false),
+        [infoError, setInfoError] = useState(""),
         [fullWidth, setFullWidth] = useState(true),
-        [maxWidth, setMaxWidth] = useState("sm"),
-        [openAdd, setOpenAdd] = useState(false),
-        [openNotice, setOpenNotice] = useState(false),
-        [openEdit, setOpenEdit] = useState(false),
-        [openDelete, setOpenDelete] = useState(false),
-        [groupName, setGroupName] = useState(data?.groupName || ""),
-        [groupNameError, setGroupNameError] = useState(null),
-        [groupType, setGroupType] = useState(""),
-        [groupTypeError, setGroupTypeError] = useState(null),
-        [parentGroup, setParentGroup] = useState(""),
-        [parentGroupError, setParentGroupError] = useState(null),
-        [target, setTarget] = useState({})
+        [maxWidth, setMaxWidth] = useState("sm")
 
-    const handleChange = (e) => {
-        setTarget(r => ({ ...r, groupName: e.target.value }))
+    // const handleChange = (e) => {
+    //     setTarget(r => ({ ...r, groupName: e.target.value }))
+    // }
+    const onSave = (row) => {
+        const newData = groupList.map((value) =>
+            value.id === row.id ? row : value
+        )
+        setGroupList(newData)
     }
-    const editSave = () => {
-        setData(r => {
-            const newData = [...r]
-            newData[target.index].groupName = target.groupName
-            return newData
-        })
-    }
+    const adminID = groupList[0]?.id
     const columns = [
         {
-            cell: row => <span className="font-mono">{row.groupName}</span>,
+            cell: row => <span className="font-mono">{row.name || ""}</span>,
             center: true,
             name: commonT("groupName"),
-            selector: row => row.groupName
+            selector: row => row.name
         },
         {
-            cell: row => <span className="font-mono">{row.groupType}</span>,
+            cell: row =>
+                <span className="font-mono">
+                    {groupTypeDict[row.typeID] || ""}
+                </span>,
             center: true,
             name: pageT("groupType"),
-            selector: row => row.groupType
+            selector: row => row.typeID
         },
         {
-            cell: (row, index) => <div className="flex w-28">
-                <NoticeIcon
-                    className="mr-5"
-                    onClick={() => {
-                        setOpenNotice(true)
-                        setTarget(row)
-                    }} />
-                {row.groupType === "Area Owner"
-                    ? null
-                    : <>
-                        <EditIcon className="mr-5"
-                            onClick={() => {
-                                setOpenEdit(true)
-                                setTarget({ ...row, index })
-                            }} />
-                        <DeleteIcon onClick={() => {
-                            setOpenDelete(true)
-                            setTarget(row)
-                        }} />
-                    </>}
-            </div>,
+            cell: row =>
+                <div className="flex w-28">
+                    <InfoGroup
+                        row={row}
+                        groupTypeDict={groupTypeDict}
+                        groupDictionary={groupDictionary} />
+                    {/* Admin has no parentID */}
+                    {row.parentID === null || props.parentID === adminID
+                        ? null
+                        : <>
+                            <EditGroup className="mr-5"
+                                row={row}
+                                groupList={groupList}
+                                onSave={onSave}
+                            />
+                            <DeleteGroup
+                                row={row}
+                                getList={getList}
+                            />
+                        </>}
+                </div>,
             center: true
         }
     ]
+    const getList = () => {
+        apiCall({
+            onComplete: () => setLoading(false),
+            onError: error => setInfoError(error),
+            onStart: () => setLoading(true),
+            onSuccess: rawData => {
+                if (!rawData?.data) return
+
+                const { data } = rawData
+
+                setGroupList(data.groups || [])
+                setGroupTypeDict(data.groupTypes?.reduce((acc, cur) => {
+                    acc[cur.id] = cur.name
+                    return acc
+                }, {}) || {})
+                setGroupDictionary(data.groups?.reduce((acc, cur) => {
+                    acc[cur.id] = cur.name
+                    return acc
+                }, {}) || {})
+            },
+            url: `/api/account-management/groups`
+        })
+    }
+    useEffect(() => {
+        getList()
+    }, [])
 
     return <>
         <h1 className="mb-9">{commonT("accountManagementGroup")}</h1>
         <div className="mb-9">
-            <Button
-                onClick={() => { setOpenAdd(true) }}
-                size="x-large"
-                variant="outlined"
-                radius="pill"
-                fontSize="large"
-                color="brand"
-                startIcon={<AddIcon />}>
-                {commonT("add")}
-            </Button>
-            <DialogForm
-                dialogTitle={commonT("group")}
-                fullWidth={fullWidth}
-                maxWidth={maxWidth}
-                open={openAdd}
-                setOpen={setOpenAdd}>
-                <Divider variant="middle" />
-                <FormControl sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    margin: "auto",
-                    width: "fit-content",
-                    mt: 2,
-                    minWidth: 120
-                }}>
-                    <TextField
-                        id="add-name"
-                        label={commonT("groupName")}
-                        value={groupName}
-                        focused
-                    />
-                    <TextField
-                        id="add-type"
-                        select
-                        label={pageT("groupType")}
-                        defaultValue=""
-                    >
-                        {typeGroup.map((option) => (
-                            <MenuItem key={option.value} value={option.value}>
-                                {option.label}
-                            </MenuItem>
-                        ))}
-                    </TextField>
-                    <TextField
-                        id="add-parent-group-type"
-                        select
-                        label={pageT("parentGroup")}
-                        defaultValue=""
-                    >
-                        {parentGroupType.map((option) => (
-                            <MenuItem key={option.value} value={option.value}>
-                                {option.label}
-                            </MenuItem>
-                        ))}
-                    </TextField>
-                </FormControl>
-                <Divider variant="middle" />
-                <DialogActions sx={{ margin: "1rem 0.5rem 1rem 0" }}>
-                    <Button onClick={() => { setOpenAdd(false) }}
-                        radius="pill"
-                        variant="outlined"
-                        color="gray">
-                        {commonT("cancel")}
-                    </Button>
-                    <Button onClick={() => { setOpenAdd(false) }}
-                        radius="pill"
-                        variant="contained"
-                        color="primary">
-                        {commonT("add")}
-                    </Button>
-                </DialogActions>
-            </DialogForm>
+            <AddGroup {...{ getList, groupList, groupTypes: groupTypeDict }} />
         </div>
         <Table
-            {...{ columns, data }}
+            columns={columns}
+            data={groupList}
             paginationComponentOptions={{
                 rowsPerPageText: t("dataTable.rowsPerPage")
             }}
@@ -216,124 +123,5 @@ export default function AccountManagementGroup() {
             progressPending={loading}
             theme="dark"
         />
-        {/* notice */}
-        <DialogForm
-            dialogTitle={commonT("group")}
-            fullWidth={fullWidth}
-            maxWidth={maxWidth}
-            open={openNotice}
-            setOpen={setOpenNotice}>
-            <Divider variant="middle" />
-            <div className="flex flex-col m-auto mt-4 min-w-49 w-fit">
-                <div className="grid grid-cols-1fr-auto">
-                    <h5 className="ml-6 mt-2">{commonT("groupName")} :</h5>
-                    <ListItem
-                        id="name"
-                        label={commonT("groupName")}>
-                        {target?.groupName || ""}
-                    </ListItem>
-                    <h5 className="ml-6 mt-2">{pageT("groupType")} :</h5>
-                    <ListItem
-                        id="group-type"
-                        label={pageT("groupType")}
-                    >
-                        {target?.groupType || ""}
-                    </ListItem>
-                    {target?.parentGroup
-                        ? <> <h5 className="ml-6 mt-2">{pageT("parentGroup")} :</h5>
-                            <ListItem
-                                id="parent-group-type"
-                                label={pageT("parentGroup")}
-                            >
-                                {target?.parentGroup || ""}
-                            </ListItem></>
-                        : null}
-                    <h5 className="ml-6 mt-2">{pageT("fieldList")} :</h5>
-                    <ListItem
-                        id="field-list"
-                        label={pageT("fieldList")}
-                    >
-                        {target?.fieldList || ""}
-                    </ListItem>
-                </div>
-            </div>
-            <DialogActions sx={{ margin: "1rem 0.5rem 1rem 0" }}>
-                <Button onClick={() => { setOpenNotice(false) }}
-                    radius="pill"
-                    variant="contained"
-                    color="primary">
-                    {commonT("okay")}
-                </Button>
-            </DialogActions>
-        </DialogForm>
-        {/* edit */}
-        <DialogForm
-            dialogTitle={commonT("group")}
-            fullWidth={fullWidth}
-            maxWidth={maxWidth}
-            open={openEdit}
-            setOpen={setOpenEdit}>
-            <Divider variant="middle" />
-            <FormControl sx={{
-                display: "flex",
-                flexDirection: "column",
-                margin: "auto",
-                width: "fit-content",
-                mt: 2,
-                minWidth: 120
-            }}>
-                <TextField
-                    id="edit-name"
-                    label={commonT("groupName")}
-                    onChange={handleChange}
-                    value={target?.groupName || ""}
-                    focused>
-                </TextField>
-            </FormControl>
-            <DialogActions sx={{ margin: "1rem 0.5rem 1rem 0" }}>
-                <Button onClick={() => { setOpenEdit(false) }}
-                    radius="pill"
-                    variant="outlined"
-                    color="gray">
-                    {commonT("cancel")}
-                </Button>
-                <Button onClick={() => {
-                    setOpenEdit(false)
-                    editSave()
-                }}
-                    radius="pill"
-                    variant="contained"
-                    color="primary">
-                    {commonT("save")}
-                </Button>
-            </DialogActions>
-        </DialogForm>
-        {/* delete */}
-        <DialogForm
-            dialogTitle={dialogT("deleteMsg")}
-            fullWidth={fullWidth}
-            maxWidth={maxWidth}
-            open={openDelete}
-            setOpen={setOpenDelete}>
-            <div className="flex">
-                <h5 className="ml-6 mr-2">{commonT("groupName")} :</h5>
-                {target?.groupName || ""}
-            </div>
-            <DialogActions sx={{ margin: "0.5rem 0.5rem 0.5rem 0" }}>
-                <Button onClick={() => { setOpenDelete(false) }}
-                    radius="pill"
-                    variant="outlined"
-                    color="gray">
-                    {commonT("cancel")}
-                </Button>
-                <Button onClick={() => { setOpenDelete(false) }} autoFocus
-                    radius="pill"
-                    variant="contained"
-                    color="negative"
-                    sx={{ color: "#ffffff" }}>
-                    {commonT("delete")}
-                </Button>
-            </DialogActions>
-        </DialogForm>
     </>
-}
+})

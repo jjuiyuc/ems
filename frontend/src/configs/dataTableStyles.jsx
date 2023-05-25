@@ -14,10 +14,10 @@ const DATATABLE_STYLES = {
     },
     noData: {
         style: {
-            backgroundColor: colors.gray[200],
-            border: "1px solid " + colors.gray[100],
+            backgroundColor: colors.gray[600],
+            border: "1px solid " + colors.gray[200],
             borderRadius: ".25rem",
-            color: colors.gray[600],
+            color: colors.gray[200],
             padding: "1.5rem"
         }
     },

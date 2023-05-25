@@ -67,7 +67,7 @@ export default connect(mapState)(function AccountManagementGroup(props) {
                     {row.parentID === null || props.parentID === adminID
                         ? null
                         : <>
-                            <EditGroup className="mr-5"
+                            <EditGroup
                                 row={row}
                                 groupList={groupList}
                                 onSave={onSave}

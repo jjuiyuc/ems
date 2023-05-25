@@ -127,7 +127,7 @@ func (w *APIWorker) UpdateGroup(c *gin.Context, uri *app.GroupURI, body *app.Upd
 		case e.ErrNewOwnAccountGroupModifiedNotAllow:
 			code = e.ErrOwnAccountGroupModifiedNotAllow
 		default:
-			code = e.ErrorAccountGroupCreate
+			code = e.ErrAccountGroupUpdate
 		}
 		appG.Response(http.StatusInternalServerError, code, nil)
 		return

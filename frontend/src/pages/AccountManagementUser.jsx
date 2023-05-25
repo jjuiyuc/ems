@@ -1,17 +1,19 @@
+import { connect } from "react-redux"
 import {
     Button, DialogActions, Divider, FormControl,
     InputLabel, InputAdornment, IconButton, MenuItem,
     OutlinedInput, TextField
 } from "@mui/material"
-import AddIcon from "@mui/icons-material/Add"
 import Visibility from "@mui/icons-material/Visibility"
 import VisibilityOff from "@mui/icons-material/VisibilityOff"
 
 import { useTranslation } from "react-multi-lang"
 import { useEffect, useMemo, useState } from "react"
 
+import { apiCall } from "../utils/api"
 import { validateEmail } from "../utils/utils"
 
+import AddUser from "../components/AddUser"
 import DialogForm from "../components/DialogForm"
 import Table from "../components/DataTable"
 
@@ -51,32 +53,12 @@ export default function AccountManagementUser() {
                 password: "xxxxxll",
                 name: "XXXXX",
                 group: "Area Owner_TW"
-            },
-            {
-                id: 2,
-                account: "YYYYY@ubiik.com",
-                password: "x77xxxxll",
-                name: "YYYYY",
-                group: "Area Maintainer_TW"
-            },
-            {
-                id: 3,
-                account: "serenegray@ubiik.com",
-                password: "9977xxxxll",
-                name: "Serenegray",
-                group: "Serenegray"
-            },
-            {
-                id: 4,
-                account: "cht_miaoli@ubiik.com",
-                password: "kk977xxxxll",
-                name: "Cht_Miaoli",
-                group: "Cht_Miaoli"
             }
         ]),
-        [fullWidth, setFullWidth] = useState(true),
-        [maxWidth, setMaxWidth] = useState("sm"),
-        [openAdd, setOpenAdd] = useState(false),
+        [userList, setUserList] = useState([]),
+        [groupDict, setGroupDict] = useState({}),
+        [loading, setLoading] = useState(false),
+        [infoError, setInfoError] = useState(""),
         [openEdit, setOpenEdit] = useState(false),
         [openDelete, setOpenDelete] = useState(false),
         [account, setAccount] = useState(data?.account || ""),
@@ -88,17 +70,13 @@ export default function AccountManagementUser() {
         [nameError, setNameError] = useState(null),
         [group, setGroup] = useState(data?.group || ""),
         [groupError, setGroupError] = useState(null),
-        [target, setTarget] = useState({}),
-        [error, setError] = useState(null),
         [otherError, setOtherError] = useState(""),
-        [loading, setLoading] = useState(false)
+        [fullWidth, setFullWidth] = useState(true),
+        [maxWidth, setMaxWidth] = useState("sm"),
+        [target, setTarget] = useState({})
 
     const
-        changeAccount = (e) => {
-            setAccount(e.target.value)
-            setAccountError(null)
-            setOtherError("")
-        },
+
         changePassword = (e) => {
             setTarget(r => ({ ...r, password: e.target.value }))
             setPasswordError(false)
@@ -128,48 +106,31 @@ export default function AccountManagementUser() {
             return newData
         })
     }
-    const submit = async () => {
-        const isEmail = validateEmail(email)
-
-        if (!isEmail) {
-            setEmailError({ type: "emailFormat" })
-            return
-        }
-
-        const onError = (err) => {
-            switch (err) {
-                case 20004:
-                    setEmailError({ type: "emailNotExist" })
-                    break
-                case 20006:
-                    setEmailError({ type: "userLocked" })
-                    break
-                case 20007:
-                    setPasswordError(true)
-                    break
-                default: setOtherError(err)
-            }
-        }
-    }
-
     const columns = [
         {
-            cell: row => <span className="font-mono">{row.account}</span>,
+            cell: row => <span className="font-mono">{row.username}</span>,
             center: true,
             name: pageT("account"),
-            selector: row => row.account
+            selector: row => row.username,
+            grow: 1
+
         },
         {
             cell: row => <span className="font-mono">{row.name}</span>,
             center: true,
             name: pageT("name"),
-            selector: row => row.name
+            selector: row => row.name,
+            grow: 0.3
         },
         {
-            cell: row => <span className="font-mono">{row.group}</span>,
+            cell: row => <span className="font-mono">
+                {`${row.groupName + " " + `(${row.groupParentName})`}`}
+            </span>,
             center: true,
             name: commonT("group"),
-            selector: row => row.group
+            selector: row => `${row.groupName + row.groupParentName}`,
+            grow: 1
+
         },
         {
             cell: (row, index) => <div className="flex w-28">
@@ -187,124 +148,49 @@ export default function AccountManagementUser() {
                 }
             </div>,
             center: true,
+            grow: 0.5
         }
     ]
+    const getList = () => {
+        apiCall({
+            onComplete: () => setLoading(false),
+            onError: error => setInfoError(error),
+            onStart: () => setLoading(true),
+            onSuccess: rawData => {
+                if (!rawData?.data) return
+
+                const { data } = rawData
+
+                setUserList(data.users || [])
+                setGroupDict(data.users?.reduce((acc, cur) => {
+                    acc[cur.groupID] = cur.groupName
+                    return acc
+                }, {}) || {})
+            },
+            url: `/api/account-management/users`
+        })
+    }
+    useEffect(() => {
+        getList()
+    }, [])
+
     return <>
         <h1 className="mb-9">{commonT("accountManagementUser")}</h1>
         <div className="mb-9">
-            <Button
-                onClick={() => { setOpenAdd(true) }}
-                size="x-large"
-                variant="outlined"
-                radius="pill"
-                fontSize="large"
-                color="brand"
-                startIcon={<AddIcon />}>
-                {commonT("add")}
-            </Button>
-            <DialogForm
-                dialogTitle={pageT("addUser")}
-                fullWidth={fullWidth}
-                maxWidth={maxWidth}
-                open={openAdd}
-                setOpen={setOpenAdd}>
-                <Divider variant="middle" />
-                <FormControl sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    margin: "auto",
-                    width: "fit-content",
-                    mt: "1rem",
-                    minWidth: 120
-                }}>
-                    <TextField
-                        id="add-account"
-                        label={pageT("account")}
-                        onChange={changeAccount}
-                        value={account}
-                        error={accountError !== null}
-                        helperText={accountError ? errorT(accountError.type) : ""}
-                        type="email"
-                        focused />
-                    <FormControl sx={{ mb: "2rem", minWidth: 120 }} variant="outlined">
-                        <InputLabel htmlFor="outlined-adornment-password">
-                            {pageT("password")}
-                        </InputLabel>
-                        <OutlinedInput
-                            id="add-password"
-                            type={showPassword ? "text" : "password"}
-                            label={pageT("password")}
-                            autoComplete="current-password"
-                            endAdornment={
-                                <InputAdornment position="end">
-                                    <IconButton
-                                        aria-label="toggle password visibility"
-                                        onClick={handleClickShowPassword}
-                                        onMouseDown={handleMouseDownPassword}
-                                        edge="end"
-                                    >
-                                        {showPassword
-                                            ? <Visibility />
-                                            : <VisibilityOff />
-                                        }
-                                    </IconButton>
-                                </InputAdornment>
-                            }
-                        />
-                    </FormControl>
-                    <TextField
-                        id="add-name"
-                        label={pageT("name")}
-                        value={name}
-                        onChange={changeName}>
-                    </TextField>
-                    <TextField
-                        id="add-group"
-                        select
-                        onChange={changeGroup}
-                        label={commonT("group")}
-                        defaultValue="">
-                        {groupData.map((option) => (
-                            <MenuItem key={option.value} value={option.value}>
-                                {option.label}
-                            </MenuItem>
-                        ))}
-                    </TextField>
-                    {otherError
-                        ? <div className="box mb-8 negative text-center text-red-400">
-                            {otherError}
-                        </div>
-                        : null}
-                </FormControl>
-                <Divider variant="middle" />
-                <DialogActions sx={{ margin: "1rem 0.5rem 1rem 0" }}>
-                    <Button onClick={() => { setOpenAdd(false) }}
-                        radius="pill"
-                        variant="outlined"
-                        color="gray">
-                        {commonT("cancel")}
-                    </Button>
-                    <Button onClick={() => { setOpenAdd(false) }}
-                        radius="pill"
-                        variant="contained"
-                        color="primary">
-                        {commonT("add")}
-                    </Button>
-                </DialogActions>
-            </DialogForm>
+            <AddUser {...{ getList, userList, groupDict }} />
         </div>
         <Table
-            {...{ columns, data }}
-            customStyles={{
-                headRow: {
-                    style: {
-                        backgroundColor: "#12c9c990",
-                        fontWeight: 600,
-                        fontSize: "16px",
-                        borderRadius: ".45rem .45rem 0 0 "
-                    }
-                }
-            }}
+            {...{ columns, data: userList }}
+            // customStyles={{
+            //     headRow: {
+            //         style: {
+            //             backgroundColor: "#12c9c990",
+            //             fontWeight: 600,
+            //             fontSize: "16px",
+            //             borderRadius: ".45rem .45rem 0 0 "
+            //         }
+            //     }
+            // }}
             noDataComponent={t("dataTable.noDataMsg")}
             pagination={true}
             paginationComponentOptions={{
@@ -323,18 +209,11 @@ export default function AccountManagementUser() {
             setOpen={setOpenEdit}
         >
             <Divider variant="middle" />
-            <FormControl sx={{
-                display: "flex",
-                flexDirection: "column",
-                margin: "auto",
-                width: "fit-content",
-                mt: "1rem",
-                minWidth: 120
-            }}>
+            <div className="flex flex-col m-auto mt-4 min-w-49 w-fit">
                 <h5 id="account"
                     className="ml-3 mb-8"
                     label={pageT("account")}>
-                    {target?.account || ""}
+                    {target?.username || ""}
                 </h5>
                 <FormControl sx={{ mb: "2rem", minWidth: 120 }} variant="outlined">
                     <InputLabel htmlFor="outlined-adornment-password">
@@ -383,7 +262,7 @@ export default function AccountManagementUser() {
                         </MenuItem>
                     ))}
                 </TextField>
-            </FormControl>
+            </div>
             <Divider variant="middle" />
             <DialogActions sx={{ margin: "1rem 0.5rem 1rem 0" }}>
                 <Button onClick={() => { setOpenEdit(false) }}

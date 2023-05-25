@@ -1,11 +1,14 @@
 package services
 
 import (
+	"context"
+
 	"github.com/sirupsen/logrus"
 	"github.com/volatiletech/null/v8"
 
 	"der-ems/internal/app"
 	"der-ems/internal/e"
+	"der-ems/models"
 	deremsmodels "der-ems/models/der-ems"
 	"der-ems/repository"
 )
@@ -129,6 +132,11 @@ func (s defaultAccountManagementService) CreateGroup(body *app.CreateGroupBody) 
 		return
 	}
 
+	tx, err := models.GetDB().BeginTx(context.Background(), nil)
+	if err != nil {
+		return
+	}
+
 	group := &deremsmodels.Group{
 		Name:     body.Name,
 		TypeID:   int64(body.TypeID),
@@ -136,6 +144,7 @@ func (s defaultAccountManagementService) CreateGroup(body *app.CreateGroupBody) 
 	}
 	if s.repo.User.IsGroupNameExistedOnSameLevel(group) {
 		err = e.ErrNewAccountGroupNameOnSameLevelExist
+		tx.Rollback()
 		return
 	}
 	err = s.repo.User.CreateGroup(group)
@@ -145,7 +154,11 @@ func (s defaultAccountManagementService) CreateGroup(body *app.CreateGroupBody) 
 			"err":       err,
 			"body":      *body,
 		}).Error()
+		tx.Rollback()
+		return
 	}
+
+	tx.Commit()
 	return
 }
 
@@ -218,13 +231,20 @@ func (s defaultAccountManagementService) getGroupGateways(groupID int64) (groupG
 }
 
 func (s defaultAccountManagementService) UpdateGroup(userID, groupID int64, body *app.UpdateGroupBody) (err error) {
+	tx, err := models.GetDB().BeginTx(context.Background(), nil)
+	if err != nil {
+		return
+	}
+
 	if !s.authorizeGroupID(userID, groupID) {
 		err = e.ErrNewAuthPermissionNotAllow
+		tx.Rollback()
 		return
 	}
 	if s.isOwnAccountGroup(userID, groupID) {
 		err = e.ErrNewOwnAccountGroupModifiedNotAllow
 		logrus.WithField("caused-by", err).Error()
+		tx.Rollback()
 		return
 	}
 
@@ -234,11 +254,13 @@ func (s defaultAccountManagementService) UpdateGroup(userID, groupID int64, body
 			"caused-by": "s.repo.User.GetGroupByGroupID",
 			"err":       err,
 		}).Error()
+		tx.Rollback()
 		return
 	}
 	group.Name = body.Name
 	if s.repo.User.IsGroupNameExistedOnSameLevel(group) {
 		err = e.ErrNewAccountGroupNameOnSameLevelExist
+		tx.Rollback()
 		return
 	}
 	err = s.repo.User.UpdateGroup(group)
@@ -248,7 +270,11 @@ func (s defaultAccountManagementService) UpdateGroup(userID, groupID int64, body
 			"err":       err,
 			"body":      *body,
 		}).Error()
+		tx.Rollback()
+		return
 	}
+
+	tx.Commit()
 	return
 }
 
@@ -261,12 +287,19 @@ func (s defaultAccountManagementService) isOwnAccountGroup(userID, groupID int64
 }
 
 func (s defaultAccountManagementService) DeleteGroup(userID, groupID int64) (err error) {
+	tx, err := models.GetDB().BeginTx(context.Background(), nil)
+	if err != nil {
+		return
+	}
+
 	if !s.authorizeGroupID(userID, groupID) {
 		err = e.ErrNewAuthPermissionNotAllow
+		tx.Rollback()
 		return
 	}
 	err = s.checkDeletedRules(userID, groupID)
 	if err != nil {
+		tx.Rollback()
 		return
 	}
 
@@ -276,7 +309,11 @@ func (s defaultAccountManagementService) DeleteGroup(userID, groupID int64) (err
 			"caused-by": "s.repo.User.DeleteGroup",
 			"err":       err,
 		}).Error()
+		tx.Rollback()
+		return
 	}
+
+	tx.Commit()
 	return
 }
 

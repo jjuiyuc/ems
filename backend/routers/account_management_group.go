@@ -83,13 +83,15 @@ func (w *APIWorker) CreateGroup(c *gin.Context, body *app.CreateGroupBody) {
 func (w *APIWorker) GetGroup(c *gin.Context, uri *app.GroupURI) {
 	appG := app.Gin{c}
 	userID, _ := c.Get("userID")
-	if !w.Services.AccountManagement.AuthorizeGroupID(userID.(int64), uri.GroupID) {
-		appG.Response(http.StatusForbidden, e.ErrAuthPermissionNotAllow, nil)
-		return
-	}
-	responseData, err := w.Services.AccountManagement.GetGroup(uri.GroupID)
+	responseData, err := w.Services.AccountManagement.GetGroup(userID.(int64), uri.GroupID)
 	if err != nil {
-		appG.Response(http.StatusInternalServerError, e.ErrAccountGroupGen, nil)
+		var code int
+		if errors.Is(err, e.ErrNewAuthPermissionNotAllow) {
+			code = e.ErrAuthPermissionNotAllow
+		} else {
+			code = e.ErrAccountGroupGen
+		}
+		appG.Response(http.StatusInternalServerError, code, nil)
 		return
 	}
 	appG.Response(http.StatusOK, e.Success, responseData)
@@ -114,14 +116,12 @@ func (w *APIWorker) GetGroup(c *gin.Context, uri *app.GroupURI) {
 func (w *APIWorker) UpdateGroup(c *gin.Context, uri *app.GroupURI, body *app.UpdateGroupBody) {
 	appG := app.Gin{c}
 	userID, _ := c.Get("userID")
-	if !w.Services.AccountManagement.AuthorizeGroupID(userID.(int64), uri.GroupID) {
-		appG.Response(http.StatusForbidden, e.ErrAuthPermissionNotAllow, nil)
-		return
-	}
 	err := w.Services.AccountManagement.UpdateGroup(userID.(int64), uri.GroupID, body)
 	if err != nil {
 		var code int
 		switch err {
+		case e.ErrNewAuthPermissionNotAllow:
+			code = e.ErrAuthPermissionNotAllow
 		case e.ErrNewAccountGroupNameOnSameLevelExist:
 			code = e.ErrAccountGroupNameOnSameLevelExist
 		case e.ErrNewOwnAccountGroupModifiedNotAllow:
@@ -152,13 +152,11 @@ func (w *APIWorker) UpdateGroup(c *gin.Context, uri *app.GroupURI, body *app.Upd
 func (w *APIWorker) DeleteGroup(c *gin.Context, uri *app.GroupURI) {
 	appG := app.Gin{c}
 	userID, _ := c.Get("userID")
-	if !w.Services.AccountManagement.AuthorizeGroupID(userID.(int64), uri.GroupID) {
-		appG.Response(http.StatusForbidden, e.ErrAuthPermissionNotAllow, nil)
-		return
-	}
 	if err := w.Services.AccountManagement.DeleteGroup(userID.(int64), uri.GroupID); err != nil {
 		var code int
 		switch err {
+		case e.ErrNewAuthPermissionNotAllow:
+			code = e.ErrAuthPermissionNotAllow
 		case e.ErrNewOwnAccountGroupModifiedNotAllow:
 			code = e.ErrOwnAccountGroupModifiedNotAllow
 		case e.ErrNewAccountGroupHasSubGroup:

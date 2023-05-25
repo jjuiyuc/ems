@@ -14,10 +14,9 @@ import (
 type AccountManagementService interface {
 	GetGroups(userID int64) (getGroups *GetGroupsResponse, err error)
 	CreateGroup(body *app.CreateGroupBody) (err error)
-	GetGroup(groupID int64) (getGroup *GetGroupResponse, err error)
+	GetGroup(userID, groupID int64) (getGroup *GetGroupResponse, err error)
 	UpdateGroup(userID, groupID int64, body *app.UpdateGroupBody) (err error)
 	DeleteGroup(userID, groupID int64) (err error)
-	AuthorizeGroupID(userID, groupID int64) bool
 }
 
 // GetGroupsResponse godoc
@@ -154,7 +153,11 @@ func (s defaultAccountManagementService) validateGroupType(groupID, expectedType
 	return false
 }
 
-func (s defaultAccountManagementService) GetGroup(groupID int64) (getGroup *GetGroupResponse, err error) {
+func (s defaultAccountManagementService) GetGroup(userID, groupID int64) (getGroup *GetGroupResponse, err error) {
+	if !s.authorizeGroupID(userID, groupID) {
+		err = e.ErrNewAuthPermissionNotAllow
+		return
+	}
 	group, err := s.repo.User.GetGroupByGroupID(groupID)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
@@ -211,6 +214,10 @@ func (s defaultAccountManagementService) getGroupGateways(groupID int64) (groupG
 }
 
 func (s defaultAccountManagementService) UpdateGroup(userID, groupID int64, body *app.UpdateGroupBody) (err error) {
+	if !s.authorizeGroupID(userID, groupID) {
+		err = e.ErrNewAuthPermissionNotAllow
+		return
+	}
 	if s.isOwnAccountGroup(userID, groupID) {
 		err = e.ErrNewOwnAccountGroupModifiedNotAllow
 		logrus.WithField("caused-by", err).Error()
@@ -246,6 +253,10 @@ func (s defaultAccountManagementService) isOwnAccountGroup(userID, groupID int64
 }
 
 func (s defaultAccountManagementService) DeleteGroup(userID, groupID int64) (err error) {
+	if !s.authorizeGroupID(userID, groupID) {
+		err = e.ErrNewAuthPermissionNotAllow
+		return
+	}
 	err = s.checkDeletedRules(userID, groupID)
 	if err != nil {
 		return
@@ -296,7 +307,7 @@ func (s defaultAccountManagementService) isUserExistedInGroup(groupID int64) boo
 	return count > 0
 }
 
-func (s defaultAccountManagementService) AuthorizeGroupID(userID, groupID int64) bool {
+func (s defaultAccountManagementService) authorizeGroupID(userID, groupID int64) bool {
 	groups, err := s.getGroupTreeNodes(userID)
 	if err == nil {
 		for _, group := range groups {
@@ -305,5 +316,6 @@ func (s defaultAccountManagementService) AuthorizeGroupID(userID, groupID int64)
 			}
 		}
 	}
+	logrus.WithField("userID", userID).Error("authorize-group-id-failed")
 	return false
 }

@@ -31,6 +31,8 @@ var (
 	ErrNewAccountGroupHasSubGroup = errors.New("account group has sub group")
 	// ErrNewAccountGroupHasUser godoc
 	ErrNewAccountGroupHasUser = errors.New("account group has user")
+	// ErrNewAuthPermissionNotAllow godoc
+	ErrNewAuthPermissionNotAllow = errors.New("authorization permission does not allow")
 )
 
 // ErrNewKeyNotExist godoc

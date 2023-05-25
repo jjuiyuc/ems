@@ -207,9 +207,9 @@ func InitRouter(isCORS bool, ginMode string, enforcer *casbin.Enforcer, w *APIWo
 
 	// Account Management Group
 	r.GET(EndpointMapping[AccountManagementGroup][0], authorizeJWT(REST), authorizePolicy(enforcer), w.GetGroups)
-	r.POST(EndpointMapping[AccountManagementGroup][0], authorizeJWT(REST), authorizePolicy(enforcer), w.CreateGroup)
+	r.POST(EndpointMapping[AccountManagementGroup][0], authorizeJWT(REST), authorizePolicy(enforcer), validateBody(w.CreateGroup))
 	r.GET(EndpointMapping[AccountManagementGroup][1], authorizeJWT(REST), authorizePolicy(enforcer), validateURI(w.GetGroup))
-	r.PUT(EndpointMapping[AccountManagementGroup][1], authorizeJWT(REST), authorizePolicy(enforcer), validateURI(w.UpdateGroup))
+	r.PUT(EndpointMapping[AccountManagementGroup][1], authorizeJWT(REST), authorizePolicy(enforcer), validateURIAndBody(w.UpdateGroup))
 	r.DELETE(EndpointMapping[AccountManagementGroup][1], authorizeJWT(REST), authorizePolicy(enforcer), validateURI(w.DeleteGroup))
 
 	// Casbin route
@@ -360,6 +360,38 @@ func validateURI[T any](next func(*gin.Context, *T)) gin.HandlerFunc {
 			return
 		}
 		next(c, uri)
+	}
+}
+
+func validateBody[T any](next func(*gin.Context, *T)) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		appG := app.Gin{c}
+		body:= new(T)
+		if err := c.BindJSON(body); err != nil {
+			log.WithField("caused-by", err).Error()
+			appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
+			return
+		}
+		next(c, body)
+	}
+}
+
+func validateURIAndBody[T, T2 any](next func(*gin.Context, *T, *T2)) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		appG := app.Gin{c}
+		uri := new(T)
+		body:= new(T2)
+		if err := c.ShouldBindUri(uri); err != nil {
+			log.WithField("caused-by", err).Error()
+			appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
+			return
+		}
+		if err := c.BindJSON(body); err != nil {
+			log.WithField("caused-by", err).Error()
+			appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
+			return
+		}
+		next(c, uri, body)
 	}
 }
 

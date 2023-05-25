@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 
 	"der-ems/internal/app"
 	"der-ems/internal/e"
@@ -51,15 +50,8 @@ func (w *APIWorker) GetGroups(c *gin.Context) {
 // @Failure     403            {object}  app.Response
 // @Failure     500            {object}  app.Response
 // @Router      /account-management/groups [post]
-func (w *APIWorker) CreateGroup(c *gin.Context) {
+func (w *APIWorker) CreateGroup(c *gin.Context, body *app.CreateGroupBody) {
 	appG := app.Gin{c}
-	body := &app.CreateGroupBody{}
-	if err := c.BindJSON(body); err != nil {
-		logrus.WithField("caused-by", err).Error()
-		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
-		return
-	}
-
 	err := w.Services.AccountManagement.CreateGroup(body)
 	if err != nil {
 		var code int
@@ -119,15 +111,9 @@ func (w *APIWorker) GetGroup(c *gin.Context, uri *app.GroupURI) {
 // @Failure     403            {object}  app.Response
 // @Failure     500            {object}  app.Response
 // @Router      /api/account-management/groups/{groupid} [put]
-func (w *APIWorker) UpdateGroup(c *gin.Context, uri *app.GroupURI) {
+func (w *APIWorker) UpdateGroup(c *gin.Context, uri *app.GroupURI, body *app.UpdateGroupBody) {
 	appG := app.Gin{c}
 	userID, _ := c.Get("userID")
-	body := &app.UpdateGroupBody{}
-	if err := c.BindJSON(body); err != nil {
-		logrus.WithField("caused-by", err).Error()
-		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
-		return
-	}
 	if !w.Services.AccountManagement.AuthorizeGroupID(userID.(int64), uri.GroupID) {
 		appG.Response(http.StatusForbidden, e.ErrAuthPermissionNotAllow, nil)
 		return

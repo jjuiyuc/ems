@@ -26,13 +26,8 @@ export default connect(mapState)(function AccountManagementGroup(props) {
         [groupTypeDict, setGroupTypeDict] = useState({}),
         [groupDictionary, setGroupDictionary] = useState({}),
         [loading, setLoading] = useState(false),
-        [infoError, setInfoError] = useState(""),
-        [fullWidth, setFullWidth] = useState(true),
-        [maxWidth, setMaxWidth] = useState("sm")
+        [infoError, setInfoError] = useState("")
 
-    // const handleChange = (e) => {
-    //     setTarget(r => ({ ...r, groupName: e.target.value }))
-    // }
     const onSave = (row) => {
         const newData = groupList.map((value) =>
             value.id === row.id ? row : value

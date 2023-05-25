@@ -122,7 +122,6 @@ export default connect(null, mapDispatch)(function AddGroup(props) {
                         <MenuItem key={"g-t-p" + key} value={key}>
                             {value}
                         </MenuItem>)}
-
                 </TextField>
                 <TextField
                     id="add-parent-group-type"

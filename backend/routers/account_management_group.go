@@ -26,12 +26,6 @@ import (
 func (w *APIWorker) GetGroups(c *gin.Context) {
 	appG := app.Gin{c}
 	userID, _ := c.Get("userID")
-	if userID == nil {
-		logrus.WithField("caused-by", "error token").Error()
-		appG.Response(http.StatusUnauthorized, e.ErrToken, nil)
-		return
-	}
-
 	responseData, err := w.Services.AccountManagement.GetGroups(userID.(int64))
 	if err != nil {
 		appG.Response(http.StatusInternalServerError, e.ErrAccountGroupsGen, nil)
@@ -97,12 +91,6 @@ func (w *APIWorker) CreateGroup(c *gin.Context) {
 func (w *APIWorker) GetGroup(c *gin.Context, uri *app.GroupURI) {
 	appG := app.Gin{c}
 	userID, _ := c.Get("userID")
-	if userID == nil {
-		logrus.WithField("caused-by", "error token").Error()
-		appG.Response(http.StatusUnauthorized, e.ErrToken, nil)
-		return
-	}
-
 	if !w.Services.AccountManagement.AuthorizeGroupID(userID.(int64), uri.GroupID) {
 		appG.Response(http.StatusForbidden, e.ErrAuthPermissionNotAllow, nil)
 		return
@@ -134,18 +122,12 @@ func (w *APIWorker) GetGroup(c *gin.Context, uri *app.GroupURI) {
 func (w *APIWorker) UpdateGroup(c *gin.Context, uri *app.GroupURI) {
 	appG := app.Gin{c}
 	userID, _ := c.Get("userID")
-	if userID == nil {
-		logrus.WithField("caused-by", "error token").Error()
-		appG.Response(http.StatusUnauthorized, e.ErrToken, nil)
-		return
-	}
 	body := &app.UpdateGroupBody{}
 	if err := c.BindJSON(body); err != nil {
 		logrus.WithField("caused-by", err).Error()
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
-
 	if !w.Services.AccountManagement.AuthorizeGroupID(userID.(int64), uri.GroupID) {
 		appG.Response(http.StatusForbidden, e.ErrAuthPermissionNotAllow, nil)
 		return
@@ -184,12 +166,6 @@ func (w *APIWorker) UpdateGroup(c *gin.Context, uri *app.GroupURI) {
 func (w *APIWorker) DeleteGroup(c *gin.Context, uri *app.GroupURI) {
 	appG := app.Gin{c}
 	userID, _ := c.Get("userID")
-	if userID == nil {
-		logrus.WithField("caused-by", "error token").Error()
-		appG.Response(http.StatusUnauthorized, e.ErrToken, nil)
-		return
-	}
-
 	if !w.Services.AccountManagement.AuthorizeGroupID(userID.(int64), uri.GroupID) {
 		appG.Response(http.StatusForbidden, e.ErrAuthPermissionNotAllow, nil)
 		return

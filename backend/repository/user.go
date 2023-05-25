@@ -9,7 +9,6 @@ import (
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 
-	"der-ems/internal/e"
 	deremsmodels "der-ems/models/der-ems"
 )
 
@@ -25,6 +24,7 @@ type UserRepository interface {
 	CreateGroup(group *deremsmodels.Group) (err error)
 	UpdateGroup(group *deremsmodels.Group) (err error)
 	DeleteGroup(userID, groupID int64) (err error)
+	IsGroupNameExistedOnSameLevel(group *deremsmodels.Group) bool
 	GetGroupByGroupID(groupID int64) (*deremsmodels.Group, error)
 	GetGroupsByGroupID(groupID int64) ([]*deremsmodels.Group, error)
 	GetGroupTypes() ([]*deremsmodels.GroupType, error)
@@ -88,18 +88,10 @@ func (repo defaultUserRepository) GetUserCountByGroupID(groupID int64) (int64, e
 }
 
 func (repo defaultUserRepository) CreateGroup(group *deremsmodels.Group) (err error) {
-	if repo.isGroupNameExistedOnSameLevel(group) {
-		err = e.ErrNewAccountGroupNameOnSameLevelExist
-		return
-	}
 	return group.Insert(repo.db, boil.Infer())
 }
 
 func (repo defaultUserRepository) UpdateGroup(group *deremsmodels.Group) (err error) {
-	if repo.isGroupNameExistedOnSameLevel(group) {
-		err = e.ErrNewAccountGroupNameOnSameLevelExist
-		return
-	}
 	group.UpdatedAt = time.Now().UTC()
 	_, err = group.Update(repo.db, boil.Infer())
 	return
@@ -117,7 +109,7 @@ func (repo defaultUserRepository) DeleteGroup(userID, groupID int64) (err error)
 	return
 }
 
-func (repo defaultUserRepository) isGroupNameExistedOnSameLevel(group *deremsmodels.Group) bool {
+func (repo defaultUserRepository) IsGroupNameExistedOnSameLevel(group *deremsmodels.Group) bool {
 	count, _ := deremsmodels.Groups(
 		qm.Where("name = ?", group.Name),
 		qm.Where("parent_id = ?", group.ParentID),

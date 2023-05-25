@@ -134,6 +134,10 @@ func (s defaultAccountManagementService) CreateGroup(body *app.CreateGroupBody) 
 		TypeID:   int64(body.TypeID),
 		ParentID: null.Int64From(int64(body.ParentID)),
 	}
+	if s.repo.User.IsGroupNameExistedOnSameLevel(group) {
+		err = e.ErrNewAccountGroupNameOnSameLevelExist
+		return
+	}
 	err = s.repo.User.CreateGroup(group)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
@@ -233,6 +237,10 @@ func (s defaultAccountManagementService) UpdateGroup(userID, groupID int64, body
 		return
 	}
 	group.Name = body.Name
+	if s.repo.User.IsGroupNameExistedOnSameLevel(group) {
+		err = e.ErrNewAccountGroupNameOnSameLevelExist
+		return
+	}
 	err = s.repo.User.UpdateGroup(group)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{

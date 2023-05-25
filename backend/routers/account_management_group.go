@@ -60,7 +60,8 @@ func (w *APIWorker) GetGroups(c *gin.Context) {
 func (w *APIWorker) CreateGroup(c *gin.Context) {
 	appG := app.Gin{c}
 	body := &app.CreateGroupBody{}
-	if err := body.Validate(c); err != nil {
+	if err := c.BindJSON(body); err != nil {
+		logrus.WithField("caused-by", err).Error()
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
@@ -102,7 +103,8 @@ func (w *APIWorker) GetGroup(c *gin.Context) {
 		return
 	}
 	uri := &app.GroupURI{}
-	if err := uri.Validate(c); err != nil {
+	if err := c.ShouldBindUri(uri); err != nil {
+		logrus.WithField("caused-by", err).Error()
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
@@ -144,12 +146,14 @@ func (w *APIWorker) UpdateGroup(c *gin.Context) {
 		return
 	}
 	uri := &app.GroupURI{}
-	if err := uri.Validate(c); err != nil {
+	if err := c.ShouldBindUri(uri); err != nil {
+		logrus.WithField("caused-by", err).Error()
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
 	body := &app.UpdateGroupBody{}
-	if err := body.Validate(c); err != nil {
+	if err := c.BindJSON(body); err != nil {
+		logrus.WithField("caused-by", err).Error()
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
@@ -198,7 +202,8 @@ func (w *APIWorker) DeleteGroup(c *gin.Context) {
 		return
 	}
 	uri := &app.GroupURI{}
-	if err := uri.Validate(c); err != nil {
+	if err := c.ShouldBindUri(uri); err != nil {
+		logrus.WithField("caused-by", err).Error()
 		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}

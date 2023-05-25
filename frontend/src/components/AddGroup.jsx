@@ -90,7 +90,7 @@ export default connect(null, mapDispatch)(function AddGroup(props) {
         <DialogForm
             dialogTitle={commonT("group")}
             fullWidth={true}
-            maxWidth={"lg"}
+            maxWidth="lg"
             open={openAdd}
             setOpen={setOpenAdd}>
             <Divider variant="middle" />

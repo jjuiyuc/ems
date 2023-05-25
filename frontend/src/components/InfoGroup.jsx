@@ -67,7 +67,7 @@ export default function InfoGroup(props) {
         <DialogForm
             dialogTitle={commonT("group")}
             fullWidth={true}
-            maxWidth={"md"}
+            maxWidth="md"
             open={openNotice}
             setOpen={setOpenNotice}>
             <Divider variant="middle" />

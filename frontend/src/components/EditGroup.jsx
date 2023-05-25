@@ -14,7 +14,7 @@ const mapDispatch = dispatch => ({
 
 })
 export default connect(null, mapDispatch)(function EditGroup(props) {
-    const { row, groupList, onSave = () => { } } = props
+    const { row, onSave = () => { } } = props
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
@@ -99,7 +99,7 @@ export default connect(null, mapDispatch)(function EditGroup(props) {
         <DialogForm
             dialogTitle={commonT("group")}
             fullWidth={true}
-            maxWidth={"sm"}
+            maxWidth="sm"
             open={openEdit}
             setOpen={setOpenEdit}>
             <Divider variant="middle" />

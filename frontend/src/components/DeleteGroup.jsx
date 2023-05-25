@@ -77,7 +77,7 @@ export default connect(null, mapDispatch)(function DeleteGroup(props) {
         <DialogForm
             dialogTitle={dialogT("deleteMsg")}
             fullWidth={true}
-            maxWidth={"sm"}
+            maxWidth="sm"
             open={openDelete}
             setOpen={setOpenDelete}>
             <div className="flex">

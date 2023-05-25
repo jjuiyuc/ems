@@ -94,18 +94,12 @@ func (w *APIWorker) CreateGroup(c *gin.Context) {
 // @Failure     403            {object}  app.Response
 // @Failure     500            {object}  app.Response
 // @Router      /api/account-management/groups/{groupid} [get]
-func (w *APIWorker) GetGroup(c *gin.Context) {
+func (w *APIWorker) GetGroup(c *gin.Context, uri *app.GroupURI) {
 	appG := app.Gin{c}
 	userID, _ := c.Get("userID")
 	if userID == nil {
 		logrus.WithField("caused-by", "error token").Error()
 		appG.Response(http.StatusUnauthorized, e.ErrToken, nil)
-		return
-	}
-	uri := &app.GroupURI{}
-	if err := c.ShouldBindUri(uri); err != nil {
-		logrus.WithField("caused-by", err).Error()
-		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
 
@@ -137,18 +131,12 @@ func (w *APIWorker) GetGroup(c *gin.Context) {
 // @Failure     403            {object}  app.Response
 // @Failure     500            {object}  app.Response
 // @Router      /api/account-management/groups/{groupid} [put]
-func (w *APIWorker) UpdateGroup(c *gin.Context) {
+func (w *APIWorker) UpdateGroup(c *gin.Context, uri *app.GroupURI) {
 	appG := app.Gin{c}
 	userID, _ := c.Get("userID")
 	if userID == nil {
 		logrus.WithField("caused-by", "error token").Error()
 		appG.Response(http.StatusUnauthorized, e.ErrToken, nil)
-		return
-	}
-	uri := &app.GroupURI{}
-	if err := c.ShouldBindUri(uri); err != nil {
-		logrus.WithField("caused-by", err).Error()
-		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
 	body := &app.UpdateGroupBody{}
@@ -193,18 +181,12 @@ func (w *APIWorker) UpdateGroup(c *gin.Context) {
 // @Failure     403            {object}  app.Response
 // @Failure     500            {object}  app.Response
 // @Router      /api/account-management/groups/{groupid} [delete]
-func (w *APIWorker) DeleteGroup(c *gin.Context) {
+func (w *APIWorker) DeleteGroup(c *gin.Context, uri *app.GroupURI) {
 	appG := app.Gin{c}
 	userID, _ := c.Get("userID")
 	if userID == nil {
 		logrus.WithField("caused-by", "error token").Error()
 		appG.Response(http.StatusUnauthorized, e.ErrToken, nil)
-		return
-	}
-	uri := &app.GroupURI{}
-	if err := c.ShouldBindUri(uri); err != nil {
-		logrus.WithField("caused-by", err).Error()
-		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
 		return
 	}
 

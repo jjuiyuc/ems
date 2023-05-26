@@ -1,7 +1,4 @@
-import {
-    Button, DialogActions, Divider, FormControl, InputLabel, InputAdornment,
-    IconButton, MenuItem, OutlinedInput, TextField
-} from "@mui/material"
+import { Button, DialogActions, Divider, InputAdornment, IconButton, MenuItem, TextField } from "@mui/material"
 import AddIcon from "@mui/icons-material/Add"
 import Visibility from "@mui/icons-material/Visibility"
 import VisibilityOff from "@mui/icons-material/VisibilityOff"
@@ -11,6 +8,7 @@ import { useState } from "react"
 
 import { apiCall } from "../utils/api"
 import { validateEmail } from "../utils/utils"
+import { validatePassword } from "../utils/utils"
 
 import DialogForm from "../components/DialogForm"
 const mapDispatch = dispatch => ({
@@ -30,7 +28,7 @@ export default connect(null, mapDispatch)(function AddUser(props) {
     const
         [openAdd, setOpenAdd] = useState(false),
         [account, setAccount] = useState(""),
-        [accountError, setAccountError] = useState(null),
+        [accountError, setAccountError] = useState(false),
         [password, setPassword] = useState(""),
         [passwordError, setPasswordError] = useState(false),
         [showPassword, setShowPassword] = useState(false),
@@ -47,12 +45,12 @@ export default connect(null, mapDispatch)(function AddUser(props) {
             setAccountError(null)
         },
         changePassword = (e) => {
-            const
-                passwordTarget = e.target.value,
-                passwordError = passwordTarget.length == 0 || passwordTarget.length > 50
-            setPassword(passwordTarget)
-            setPasswordError(passwordError)
+            setPassword(e.target.value)
         },
+        passwordLengthError = password.length == 0 || password.length < 8 || password.length > 50,
+        validateCurPassword = () => setPasswordError(
+            !validatePassword(password)
+        ),
         changeName = (e) => {
             const
                 nameTarget = e.target.value,
@@ -98,11 +96,24 @@ export default connect(null, mapDispatch)(function AddUser(props) {
                     setName("")
                     setGroup("")
                 },
-                onError: () => {
-                    props.updateSnackbarMsg({
-                        type: "error",
-                        msg: errorT("failureToSave")
-                    })
+                onError: err => {
+                    switch (err) {
+                        case 60012:
+                            setAccountError(true)
+                            props.updateSnackbarMsg({
+                                type: "error",
+                                msg: errorT("emailExist")
+                            })
+                            break
+                        case 60013:
+                            setAccountError(true)
+                            props.updateSnackbarMsg({
+                                type: "error",
+                                msg: errorT("failureToCreate")
+                            })
+                            break
+                        default: setOtherError(err)
+                    }
                 },
                 url: "/api/account-management/users"
             })
@@ -131,22 +142,22 @@ export default connect(null, mapDispatch)(function AddUser(props) {
                     label={pageT("account")}
                     onChange={changeAccount}
                     value={account}
-                    error={accountError !== null}
-                    helperText={accountError ? errorT(accountError.type) : ""}
-                    type="email"
-                    focused />
-                <FormControl sx={{ mb: "2rem", minWidth: 120 }} variant="outlined">
-                    <InputLabel htmlFor="outlined-adornment-password">
-                        {pageT("password")}
-                    </InputLabel>
-                    <OutlinedInput
-                        id="add-password"
-                        type={showPassword ? "text" : "password"}
-                        label={pageT("password")}
-                        value={password || ""}
-                        onChange={changePassword}
-                        autoComplete="current-password"
-                        endAdornment={
+                    error={accountError}
+                    // helperText={accountError ? errorT(accountError.type) : ""}
+                    type="email" />
+                <TextField
+                    id="add-password"
+                    type={showPassword ? "text" : "password"}
+                    label={pageT("password")}
+                    value={password}
+                    onBlur={validateCurPassword}
+                    onChange={changePassword}
+                    error={passwordError}
+                    helperText={passwordError ? errorT("passwordFormat") : ""
+                        || passwordLengthError ? errorT("passwordLength") : ""}
+                    autoComplete="password"
+                    InputProps={{
+                        endAdornment:
                             <InputAdornment position="end">
                                 <IconButton
                                     aria-label="toggle password visibility"
@@ -160,9 +171,8 @@ export default connect(null, mapDispatch)(function AddUser(props) {
                                     }
                                 </IconButton>
                             </InputAdornment>
-                        }
-                    />
-                </FormControl>
+                    }}
+                />
                 <TextField
                     id="add-name"
                     label={pageT("name")}

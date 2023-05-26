@@ -212,7 +212,9 @@
     "error": {
         "curPasswordNotMatch":"Current password does not match, please try again.",
         "emailFormat": "Email is incorrect, please try again.",
+        "emailExist": "Account exists, please try again.",
         "emailNotExist": "Account does not exist, please try again.",
+        "failureToCreate":"Failure to create.",
         "failureToDelete":"Failure to delete",
         "failureToSave":"Failure to save",
         "groupHasSubGroup":"Account group has sub group.",

@@ -213,7 +213,9 @@
     "error": {
         "curPasswordNotMatch": "現在的密碼輸入錯誤，請重新輸入。",
         "emailFormat": "Email 帳號格式錯誤，請重新輸入。",
+        "emailExist": "帳號已存在，請重新輸入。",
         "emailNotExist": "帳號不存在，請重新輸入。",
+        "failureToCreate":"新增失敗",
         "failureToDelete":"刪除失敗！",
         "failureToSave":"儲存失敗！",
         "groupHasSubGroup":"該群組之下尚有子群組。",

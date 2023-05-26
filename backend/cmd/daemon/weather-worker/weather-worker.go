@@ -8,6 +8,7 @@ import (
 	"der-ems/infra"
 	"der-ems/models"
 	"der-ems/repository"
+	"der-ems/services"
 )
 
 func main() {
@@ -21,7 +22,8 @@ func main() {
 	db := models.GetDB()
 	defer models.Close()
 	repo := repository.NewRepository(db)
+	weather := services.NewWeatherService(repo)
 
-	mdWeatherWorker := apps.NewWeatherWorker(infra.GetGracefulShutdownCtx(), cfg, repo, name)
+	mdWeatherWorker := apps.NewWeatherWorker(infra.GetGracefulShutdownCtx(), cfg, repo, weather, name)
 	mdWeatherWorker.MainLoop()
 }

@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/Shopify/sarama"
@@ -17,6 +16,7 @@ import (
 	"der-ems/kafka"
 	deremsmodels "der-ems/models/der-ems"
 	"der-ems/repository"
+	"der-ems/services"
 )
 
 // WeatherWorker godoc
@@ -24,17 +24,10 @@ type WeatherWorker struct {
 	kafka.SimpleConsumer
 }
 
-// LatestWeather godoc
-type LatestWeather struct {
-	Lat    float32                  `json:"lat"`
-	Lng    float32                  `json:"lng"`
-	Alt    float32                  `json:"alt"`
-	Values []map[string]interface{} `json:"values"`
-}
-
 type weatherConsumerHandler struct {
 	cfg  *viper.Viper
 	repo *repository.Repository
+	weather services.WeatherService
 }
 
 func (weatherConsumerHandler) Setup(_ sarama.ConsumerGroupSession) error {
@@ -69,6 +62,7 @@ func NewWeatherWorker(
 	ctx context.Context,
 	cfg *viper.Viper,
 	repo *repository.Repository,
+	weather services.WeatherService,
 	name string,
 ) (w *WeatherWorker) {
 	topics := []string{
@@ -77,6 +71,7 @@ func NewWeatherWorker(
 	handler := weatherConsumerHandler{
 		cfg:  cfg,
 		repo: repo,
+		weather: weather,
 	}
 
 	simpleConsumer, err := kafka.NewSimpleConsumer(ctx, cfg, name, handler, topics)
@@ -102,15 +97,15 @@ func (h weatherConsumerHandler) processWeatherData(msg []byte) {
 	if err != nil {
 		return
 	}
-	latestWeatherJSON, gatewayUUIDs, err := h.generateWeatherSendingInfo(lat, lng)
+	latestWeatherJSON, gatewayUUIDs, err := h.weather.GenerateWeatherSendingInfo(lat, lng)
 	if err != nil {
 		return
 	}
-	h.sendWeatherDataToGateway(latestWeatherJSON, gatewayUUIDs)
+	h.weather.SendWeatherDataToGateway(h.cfg, latestWeatherJSON, gatewayUUIDs)
 }
 
 func (h weatherConsumerHandler) saveWeatherData(msg []byte) (lat, lng float32, err error) {
-	var latestWeather LatestWeather
+	var latestWeather services.LatestWeather
 	if err = json.Unmarshal(msg, &latestWeather); err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "json.Unmarshal",
@@ -171,79 +166,4 @@ func (h weatherConsumerHandler) saveWeatherData(msg []byte) (lat, lng float32, e
 	lat = latestWeather.Lat
 	lng = latestWeather.Lng
 	return
-}
-
-func (h weatherConsumerHandler) generateWeatherSendingInfo(lat, lng float32) (latestWeatherJSON []byte, gatewayUUIDs []string, err error) {
-	latestWeatherJSON, err = h.getWeatherDataByLocation(lat, lng)
-	if err != nil {
-		return
-	}
-	gatewayUUIDs, err = h.getGatewayUUIDsByLocation(lat, lng)
-	return
-}
-
-func (h weatherConsumerHandler) getWeatherDataByLocation(lat, lng float32) (latestWeatherJSON []byte, err error) {
-	now := time.Now().UTC()
-	startValidDate := now
-	endValidDate := now.Add(31 * time.Hour)
-	weatherForecastList, err := h.repo.Weather.GetWeatherForecastByLocation(lat, lng, startValidDate, endValidDate)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"caused-by": "h.repo.Weather.GetWeatherForecastByLocation",
-			"err":       err,
-		}).Error()
-		return
-	}
-	var latestWeather LatestWeather
-	for i, weatherForecast := range weatherForecastList {
-		const validDate = "validDate"
-		var value map[string]interface{}
-		if i == 0 {
-			latestWeather.Lat = weatherForecast.Lat
-			latestWeather.Lng = weatherForecast.Lng
-			latestWeather.Alt = weatherForecast.Alt.Float32
-		}
-
-		if err = json.Unmarshal(weatherForecast.Data.JSON, &value); err != nil {
-			log.WithFields(log.Fields{
-				"caused-by": "json.Unmarshal",
-				"err":       err,
-			}).Error()
-			return
-		}
-		value[validDate] = weatherForecast.ValidDate.Format(time.RFC3339)
-		latestWeather.Values = append(latestWeather.Values, value)
-	}
-	latestWeatherJSON, err = json.Marshal(latestWeather)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"caused-by": "json.Marshal",
-			"err":       err,
-		}).Error()
-	}
-	return
-}
-
-func (h weatherConsumerHandler) getGatewayUUIDsByLocation(lat, lng float32) (gatewayUUIDs []string, err error) {
-	gateways, err := h.repo.Gateway.GetGatewaysByLocation(lat, lng)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"caused-by": "h.repo.Gateway.GetGatewaysByLocation",
-			"err":       err,
-		}).Error()
-		return
-	}
-	for _, gateway := range gateways {
-		gatewayUUIDs = append(gatewayUUIDs, gateway.UUID)
-	}
-	log.Debug("gatewayUUIDs: ", gatewayUUIDs)
-	return
-}
-
-func (h weatherConsumerHandler) sendWeatherDataToGateway(latestWeatherJSON []byte, gatewayUUIDs []string) {
-	for _, uuid := range gatewayUUIDs {
-		sendWeatherDataToLocalGW := strings.Replace(kafka.SendWeatherDataToLocalGW, "{gw-id}", uuid, 1)
-		log.Debug("sendWeatherDataToLocalGW: ", sendWeatherDataToLocalGW)
-		kafka.Produce(h.cfg, sendWeatherDataToLocalGW, string(latestWeatherJSON))
-	}
 }

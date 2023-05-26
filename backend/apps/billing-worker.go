@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/viper"
 
 	"der-ems/internal/utils"
+	"der-ems/kafka"
 	deremsmodels "der-ems/models/der-ems"
 	"der-ems/repository"
 	"der-ems/services"
@@ -47,7 +48,7 @@ func sendAIBillingParams(cfg *viper.Viper, repo *repository.Repository, billing 
 		if err != nil {
 			continue
 		}
-		billing.SendAIBillingParamsToGateway(cfg, billingParamsJSON, gateway.UUID)
+		kafka.SendDataToGateways(cfg, kafka.SendAIBillingParamsToLocalGW, billingParamsJSON, []string{gateway.UUID})
 	}
 }
 

@@ -2,6 +2,7 @@ package kafka
 
 import (
 	"context"
+	"strings"
 	"sync"
 	"time"
 
@@ -11,6 +12,15 @@ import (
 
 	"der-ems/infra"
 )
+
+// SendDataToGateways godoc
+func SendDataToGateways(cfg *viper.Viper, topic string, data []byte, gatewayUUIDs []string) {
+	for _, uuid := range gatewayUUIDs {
+		replacedTopic := strings.Replace(topic, "{gw-id}", uuid, 1)
+		log.Debug("topic: ", replacedTopic)
+		Produce(cfg, replacedTopic, string(data))
+	}
+}
 
 // Produce godoc
 func Produce(cfg *viper.Viper, topic, message string) {

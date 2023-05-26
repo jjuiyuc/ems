@@ -3,15 +3,12 @@ package services
 import (
 	"encoding/json"
 	"strconv"
-	"strings"
 	"time"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 
 	"der-ems/internal/e"
 	"der-ems/internal/utils"
-	"der-ems/kafka"
 	deremsmodels "der-ems/models/der-ems"
 	"der-ems/repository"
 )
@@ -48,7 +45,6 @@ type BillingService interface {
 	GenerateBillingParams(gateway *deremsmodels.Gateway, sendNow bool) (billingParamsJSON []byte, err error)
 	GetWeeklyBillingParamsByType(billingType BillingType, localTime time.Time, sendNow bool) (billingParamsJSON []byte, err error)
 	GetSundayOfBillingWeek(t time.Time, sendNow bool) (timeOnSunday time.Time)
-	SendAIBillingParamsToGateway(cfg *viper.Viper, billingParamsJSON []byte, uuid string)
 }
 
 type defaultBillingService struct {
@@ -343,10 +339,4 @@ func (s defaultBillingService) getTOUInterval(periodStime, periodEtime string) (
 	}
 	interval = startTimeString + "-" + endTimeString
 	return
-}
-
-func (s defaultBillingService) SendAIBillingParamsToGateway(cfg *viper.Viper, billingParamsJSON []byte, uuid string) {
-	sendAIBillingParamsToLocalGW := strings.Replace(kafka.SendAIBillingParamsToLocalGW, "{gw-id}", uuid, 1)
-	log.Debug("sendAIBillingParamsToLocalGW: ", sendAIBillingParamsToLocalGW)
-	kafka.Produce(cfg, sendAIBillingParamsToLocalGW, string(billingParamsJSON))
 }

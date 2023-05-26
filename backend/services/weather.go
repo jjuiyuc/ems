@@ -1,14 +1,12 @@
 package services
 
 import (
-	"der-ems/kafka"
-	"der-ems/repository"
 	"encoding/json"
-	"strings"
 	"time"
 
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
+
+	"der-ems/repository"
 )
 
 // LatestWeather godoc
@@ -22,7 +20,6 @@ type LatestWeather struct {
 // WeatherService godoc
 type WeatherService interface {
 	GenerateWeatherSendingInfo(lat, lng float32) (latestWeatherJSON []byte, gatewayUUIDs []string, err error)
-	SendWeatherDataToGateway(cfg *viper.Viper, latestWeatherJSON []byte, gatewayUUIDs []string)
 }
 
 type defaultWeatherService struct {
@@ -99,12 +96,4 @@ func (s defaultWeatherService) getGatewayUUIDsByLocation(lat, lng float32) (gate
 	}
 	logrus.Debug("gatewayUUIDs: ", gatewayUUIDs)
 	return
-}
-
-func (s defaultWeatherService) SendWeatherDataToGateway(cfg *viper.Viper, latestWeatherJSON []byte, gatewayUUIDs []string) {
-	for _, uuid := range gatewayUUIDs {
-		sendWeatherDataToLocalGW := strings.Replace(kafka.SendWeatherDataToLocalGW, "{gw-id}", uuid, 1)
-		logrus.Debug("sendWeatherDataToLocalGW: ", sendWeatherDataToLocalGW)
-		kafka.Produce(cfg, sendWeatherDataToLocalGW, string(latestWeatherJSON))
-	}
 }

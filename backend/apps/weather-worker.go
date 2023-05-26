@@ -101,7 +101,7 @@ func (h weatherConsumerHandler) processWeatherData(msg []byte) {
 	if err != nil {
 		return
 	}
-	h.weather.SendWeatherDataToGateway(h.cfg, latestWeatherJSON, gatewayUUIDs)
+	kafka.SendDataToGateways(h.cfg, kafka.SendWeatherDataToLocalGW, latestWeatherJSON, gatewayUUIDs)
 }
 
 func (h weatherConsumerHandler) saveWeatherData(msg []byte) (lat, lng float32, err error) {

@@ -60,7 +60,6 @@ func NewBillingService(repo *repository.Repository) BillingService {
 	return &defaultBillingService{repo}
 }
 
-// GetTOUsOfLocalTime godoc
 func (s defaultBillingService) GetTOUsOfLocalTime(gwUUID string, t time.Time) (localTime time.Time, tous []*deremsmodels.Tou, err error) {
 	gateway, err := s.repo.Gateway.GetGatewayByGatewayUUID(gwUUID)
 	if err != nil {
@@ -108,7 +107,6 @@ func (s defaultBillingService) GetTOUsOfLocalTime(gwUUID string, t time.Time) (l
 	return
 }
 
-// GetBillingTypeByLocationID godoc
 func (s defaultBillingService) GetBillingTypeByLocationID(locationID int64) (billingType BillingType, err error) {
 	location, err := s.repo.Location.GetLocationByLocationID(locationID)
 	if err != nil {
@@ -126,7 +124,6 @@ func (s defaultBillingService) GetBillingTypeByLocationID(locationID int64) (bil
 	return
 }
 
-// GetLocalTime godoc
 func (s defaultBillingService) GetLocalTime(touLocationID int64, t time.Time) (localTime time.Time, err error) {
 	touLocation, err := s.repo.TOU.GetTOULocationByTOULocationID(touLocationID)
 	if err != nil {
@@ -148,7 +145,6 @@ func (s defaultBillingService) GetLocalTime(touLocationID int64, t time.Time) (l
 	return
 }
 
-// GetPeriodTypeOfDay godoc
 func (s defaultBillingService) GetPeriodTypeOfDay(touLocationID int64, t time.Time) (periodType string) {
 	// The day is holiday or not
 	count, _ := s.repo.TOU.CountHolidayByDay(touLocationID, t.Format(utils.YYYY), t.Format(utils.YYYYMMDD))
@@ -164,7 +160,6 @@ func (s defaultBillingService) GetPeriodTypeOfDay(touLocationID int64, t time.Ti
 	return
 }
 
-// IsSummer godoc
 func (s defaultBillingService) IsSummer(voltageType string, t time.Time) bool {
 	/* XXX: Hardcode TPC ~2022 summer is 06/30~09/30
 	   TPC 2023~ summer low voltage is 06/30~09/30 and the other is 05/16~10/15 */
@@ -185,7 +180,6 @@ func (s defaultBillingService) IsSummer(voltageType string, t time.Time) bool {
 	}
 }
 
-// GetPeakType godoc
 func (s defaultBillingService) GetPeakType(localTime time.Time, tous []*deremsmodels.Tou) (peakType string, err error) {
 	loc := time.FixedZone(localTime.Zone())
 	localTime, err = time.ParseInLocation(utils.HHMMSS24h, localTime.Format(utils.HHMMSS24h), loc)

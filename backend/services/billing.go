@@ -21,11 +21,11 @@ type BillingType struct {
 
 // BillingService godoc
 type BillingService interface {
+	GetTOUsOfLocalTime(gwUUID string, t time.Time) (localTime time.Time, tous []*deremsmodels.Tou, err error)
 	GetBillingTypeByLocationID(locationID int64) (billingType BillingType, err error)
 	GetLocalTime(touLocationID int64, t time.Time) (localTime time.Time, err error)
 	GetPeriodTypeOfDay(touLocationID int64, t time.Time) (periodType string)
 	IsSummer(voltageType string, t time.Time) bool
-	GetTOUsOfLocalTime(gwUUID string, t time.Time) (localTime time.Time, tous []*deremsmodels.Tou, err error)
 	GetPeakType(localTime time.Time, tous []*deremsmodels.Tou) (peakType string, err error)
 }
 
@@ -36,6 +36,54 @@ type defaultBillingService struct {
 // NewBillingService godoc
 func NewBillingService(repo *repository.Repository) BillingService {
 	return &defaultBillingService{repo}
+}
+
+// GetTOUsOfLocalTime godoc
+func (s defaultBillingService) GetTOUsOfLocalTime(gwUUID string, t time.Time) (localTime time.Time, tous []*deremsmodels.Tou, err error) {
+	gateway, err := s.repo.Gateway.GetGatewayByGatewayUUID(gwUUID)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "s.repo.Gateway.GetGatewayByGatewayUUID",
+			"err":       err,
+		}).Error()
+		return
+	}
+	billingType, err := s.GetBillingTypeByLocationID(gateway.LocationID.Int64)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "s.GetBillingTypeByLocationID",
+			"err":       err,
+		}).Error()
+		return
+	}
+	localTime, err = s.GetLocalTime(billingType.TOULocationID, t)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "s.GetLocalTime",
+			"err":       err,
+		}).Error()
+		return
+	}
+	periodType := s.GetPeriodTypeOfDay(billingType.TOULocationID, localTime)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "s.GetPeriodTypeOfDay",
+			"err":       err,
+		}).Error()
+		return
+	}
+	isSummer := s.IsSummer(billingType.VoltageType, localTime)
+	tous, err = s.repo.TOU.GetTOUsByTOUInfo(billingType.TOULocationID, billingType.VoltageType, billingType.TOUType, periodType, isSummer, localTime.Format(utils.YYYYMMDD))
+	if err == nil && len(tous) == 0 {
+		err = e.ErrNewBillingsNotExist
+	}
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "s.repo.TOU.GetTOUsByTOUInfo",
+			"err":       err,
+		}).Error()
+	}
+	return
 }
 
 // GetBillingTypeByLocationID godoc
@@ -113,54 +161,6 @@ func (s defaultBillingService) IsSummer(voltageType string, t time.Time) bool {
 		}
 		return false
 	}
-}
-
-// GetTOUsOfLocalTime godoc
-func (s defaultBillingService) GetTOUsOfLocalTime(gwUUID string, t time.Time) (localTime time.Time, tous []*deremsmodels.Tou, err error) {
-	gateway, err := s.repo.Gateway.GetGatewayByGatewayUUID(gwUUID)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"caused-by": "s.repo.Gateway.GetGatewayByGatewayUUID",
-			"err":       err,
-		}).Error()
-		return
-	}
-	billingType, err := s.GetBillingTypeByLocationID(gateway.LocationID.Int64)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"caused-by": "s.GetBillingTypeByLocationID",
-			"err":       err,
-		}).Error()
-		return
-	}
-	localTime, err = s.GetLocalTime(billingType.TOULocationID, t)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"caused-by": "s.GetLocalTime",
-			"err":       err,
-		}).Error()
-		return
-	}
-	periodType := s.GetPeriodTypeOfDay(billingType.TOULocationID, localTime)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"caused-by": "s.GetPeriodTypeOfDay",
-			"err":       err,
-		}).Error()
-		return
-	}
-	isSummer := s.IsSummer(billingType.VoltageType, localTime)
-	tous, err = s.repo.TOU.GetTOUsByTOUInfo(billingType.TOULocationID, billingType.VoltageType, billingType.TOUType, periodType, isSummer, localTime.Format(utils.YYYYMMDD))
-	if err == nil && len(tous) == 0 {
-		err = e.ErrNewBillingsNotExist
-	}
-	if err != nil {
-		log.WithFields(log.Fields{
-			"caused-by": "s.repo.TOU.GetTOUsByTOUInfo",
-			"err":       err,
-		}).Error()
-	}
-	return
 }
 
 // GetPeakType godoc

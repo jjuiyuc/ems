@@ -211,7 +211,7 @@ func (s *WeatherWorkerSuite) Test_01_SaveWeatherData() {
 	}
 }
 
-func (s *WeatherWorkerSuite) Test_02_GenerateWeatherSendingInfo() {
+func (s *WeatherWorkerSuite) Test_02_GenerateWeatherInfo() {
 	type args struct {
 		Lat float32
 		Lng float32
@@ -246,7 +246,7 @@ func (s *WeatherWorkerSuite) Test_02_GenerateWeatherSendingInfo() {
 		args   args
 		wantRv response
 	}{
-		name: "GenerateWeatherSendingInfo",
+		name: "GenerateWeatherInfo",
 		args: args{
 			Lat: s.seedUtWeather.Lat,
 			Lng: s.seedUtWeather.Lng,
@@ -258,7 +258,7 @@ func (s *WeatherWorkerSuite) Test_02_GenerateWeatherSendingInfo() {
 	}
 
 	log.Info("test name: ", tt.name)
-	weatherData, uuids, err := s.handler.weather.GenerateWeatherSendingInfo(tt.args.Lat, tt.args.Lng)
+	weatherData, uuids, err := s.handler.weather.GenerateWeatherInfo(tt.args.Lat, tt.args.Lng)
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	s.Equalf(tt.wantRv.WeatherData, weatherData, e.ErrNewMessageNotEqual.Error())
 	s.Equalf(tt.wantRv.UUIDs, uuids, e.ErrNewMessageNotEqual.Error())

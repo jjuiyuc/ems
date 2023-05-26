@@ -42,8 +42,8 @@ type BillingService interface {
 	GetPeriodTypeOfDay(touLocationID int64, t time.Time) (periodType string)
 	IsSummer(voltageType string, t time.Time) bool
 	GetPeakType(localTime time.Time, tous []*deremsmodels.Tou) (peakType string, err error)
-	GenerateBillingParams(gateway *deremsmodels.Gateway, sendNow bool) (billingParamsJSON []byte, err error)
-	GetWeeklyBillingParamsByType(billingType BillingType, localTime time.Time, sendNow bool) (billingParamsJSON []byte, err error)
+	GenerateBillingParams(gateway *deremsmodels.Gateway, sendNow bool) (data []byte, err error)
+	GetWeeklyBillingParamsByType(billingType BillingType, localTime time.Time, sendNow bool) (data []byte, err error)
 	GetSundayOfBillingWeek(t time.Time, sendNow bool) (timeOnSunday time.Time)
 }
 
@@ -215,7 +215,7 @@ func (s defaultBillingService) GetPeakType(localTime time.Time, tous []*deremsmo
 	return
 }
 
-func (s defaultBillingService) GenerateBillingParams(gateway *deremsmodels.Gateway, sendNow bool) (billingParamsJSON []byte, err error) {
+func (s defaultBillingService) GenerateBillingParams(gateway *deremsmodels.Gateway, sendNow bool) (data []byte, err error) {
 	billingType, err := s.GetBillingTypeByLocationID(gateway.LocationID.Int64)
 	if err != nil {
 		return
@@ -224,11 +224,11 @@ func (s defaultBillingService) GenerateBillingParams(gateway *deremsmodels.Gatew
 	if err != nil {
 		return
 	}
-	billingParamsJSON, err = s.GetWeeklyBillingParamsByType(billingType, localTime, sendNow)
+	data, err = s.GetWeeklyBillingParamsByType(billingType, localTime, sendNow)
 	return
 }
 
-func (s defaultBillingService) GetWeeklyBillingParamsByType(billingType BillingType, localTime time.Time, sendNow bool) (billingParamsJSON []byte, err error) {
+func (s defaultBillingService) GetWeeklyBillingParamsByType(billingType BillingType, localTime time.Time, sendNow bool) (data []byte, err error) {
 	var billingParams BillingParams
 	// 1. Get timezone
 	log.Debug("timezone: ", localTime.Format(utils.ZHHMM))
@@ -266,14 +266,14 @@ func (s defaultBillingService) GetWeeklyBillingParamsByType(billingType BillingT
 	if err != nil {
 		return
 	}
-	billingParamsJSON, err = json.Marshal(billingParams)
+	data, err = json.Marshal(billingParams)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "json.Marshal",
 			"err":       err,
 		}).Error()
 	}
-	log.Debug("billingParamsJSON: ", string(billingParamsJSON))
+	log.Debug("billingParamsJSON: ", string(data))
 	return
 }
 

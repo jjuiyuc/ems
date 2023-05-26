@@ -44,11 +44,11 @@ func sendAIBillingParams(cfg *viper.Viper, repo *repository.Repository, billing 
 	}
 
 	for _, gateway := range gateways {
-		billingParamsJSON, err := billing.GenerateBillingParams(gateway, sendNow)
+		data, err := billing.GenerateBillingParams(gateway, sendNow)
 		if err != nil {
 			continue
 		}
-		kafka.SendDataToGateways(cfg, kafka.SendAIBillingParamsToLocalGW, billingParamsJSON, []string{gateway.UUID})
+		kafka.SendDataToGateways(cfg, kafka.SendAIBillingParamsToLocalGW, data, []string{gateway.UUID})
 	}
 }
 

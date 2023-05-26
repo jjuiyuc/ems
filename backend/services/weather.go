@@ -19,7 +19,7 @@ type LatestWeather struct {
 
 // WeatherService godoc
 type WeatherService interface {
-	GenerateWeatherSendingInfo(lat, lng float32) (latestWeatherJSON []byte, gatewayUUIDs []string, err error)
+	GenerateWeatherInfo(lat, lng float32) (data []byte, gatewayUUIDs []string, err error)
 }
 
 type defaultWeatherService struct {
@@ -31,8 +31,8 @@ func NewWeatherService(repo *repository.Repository) WeatherService {
 	return &defaultWeatherService{repo}
 }
 
-func (s defaultWeatherService) GenerateWeatherSendingInfo(lat, lng float32) (latestWeatherJSON []byte, gatewayUUIDs []string, err error) {
-	latestWeatherJSON, err = s.getWeatherDataByLocation(lat, lng)
+func (s defaultWeatherService) GenerateWeatherInfo(lat, lng float32) (data []byte, gatewayUUIDs []string, err error) {
+	data, err = s.getWeatherDataByLocation(lat, lng)
 	if err != nil {
 		return
 	}
@@ -40,7 +40,7 @@ func (s defaultWeatherService) GenerateWeatherSendingInfo(lat, lng float32) (lat
 	return
 }
 
-func (s defaultWeatherService) getWeatherDataByLocation(lat, lng float32) (latestWeatherJSON []byte, err error) {
+func (s defaultWeatherService) getWeatherDataByLocation(lat, lng float32) (data []byte, err error) {
 	now := time.Now().UTC()
 	startValidDate := now
 	endValidDate := now.Add(31 * time.Hour)
@@ -72,7 +72,7 @@ func (s defaultWeatherService) getWeatherDataByLocation(lat, lng float32) (lates
 		value[validDate] = weatherForecast.ValidDate.Format(time.RFC3339)
 		latestWeather.Values = append(latestWeather.Values, value)
 	}
-	latestWeatherJSON, err = json.Marshal(latestWeather)
+	data, err = json.Marshal(latestWeather)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"caused-by": "json.Marshal",

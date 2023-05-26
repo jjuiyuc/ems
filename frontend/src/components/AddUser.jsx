@@ -42,7 +42,6 @@ export default connect(null, mapDispatch)(function AddUser(props) {
     const
         changeAccount = (e) => {
             setAccount(e.target.value)
-            setAccountError(null)
         },
         changePassword = (e) => {
             setPassword(e.target.value)
@@ -143,7 +142,7 @@ export default connect(null, mapDispatch)(function AddUser(props) {
                     onChange={changeAccount}
                     value={account}
                     error={accountError}
-                    // helperText={accountError ? errorT(accountError.type) : ""}
+                    helperText={accountError ? errorT(accountError.type) : ""}
                     type="email" />
                 <TextField
                     id="add-password"

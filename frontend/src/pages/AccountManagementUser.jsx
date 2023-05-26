@@ -4,6 +4,7 @@ import {
     InputLabel, InputAdornment, IconButton, MenuItem,
     OutlinedInput, TextField
 } from "@mui/material"
+import LockOpenIcon from "@mui/icons-material/LockOpen"
 import Visibility from "@mui/icons-material/Visibility"
 import VisibilityOff from "@mui/icons-material/VisibilityOff"
 
@@ -112,7 +113,7 @@ export default function AccountManagementUser() {
             center: true,
             name: pageT("account"),
             selector: row => row.username,
-            grow: 1
+            grow: 1.1
 
         },
         {
@@ -120,7 +121,7 @@ export default function AccountManagementUser() {
             center: true,
             name: pageT("name"),
             selector: row => row.name,
-            grow: 0.3
+            grow: 0.8
         },
         {
             cell: row => <span className="font-mono">
@@ -129,12 +130,12 @@ export default function AccountManagementUser() {
             center: true,
             name: commonT("group"),
             selector: row => `${row.groupName + row.groupParentName}`,
-            grow: 1
+            grow: 1.1
 
         },
         {
-            cell: (row, index) => <div className="flex w-28">
-                <EditIcon className="mr-5"
+            cell: (row, index) => <div className="flex w-24">
+                <EditIcon className="mr-4"
                     onClick={() => {
                         setOpenEdit(true)
                         setTarget({ ...row, index })
@@ -146,9 +147,10 @@ export default function AccountManagementUser() {
                         setTarget(row)
                     }} />
                 }
+                <LockOpenIcon className="ml-4" />
             </div>,
             center: true,
-            grow: 0.5
+            grow: 0.4
         }
     ]
     const getList = () => {
@@ -181,17 +183,6 @@ export default function AccountManagementUser() {
         </div>
         <Table
             {...{ columns, data: userList }}
-            // customStyles={{
-            //     headRow: {
-            //         style: {
-            //             backgroundColor: "#12c9c990",
-            //             fontWeight: 600,
-            //             fontSize: "16px",
-            //             borderRadius: ".45rem .45rem 0 0 "
-            //         }
-            //     }
-            // }}
-            noDataComponent={t("dataTable.noDataMsg")}
             pagination={true}
             paginationComponentOptions={{
                 rowsPerPageText: t("dataTable.rowsPerPage")
@@ -311,4 +302,3 @@ export default function AccountManagementUser() {
         </DialogForm>
     </>
 }
-// flex flex-col mt-4 min-w-49 w-fit min-w-xs

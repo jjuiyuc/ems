@@ -105,8 +105,8 @@ func (h weatherConsumerHandler) processWeatherData(msg []byte) {
 }
 
 func (h weatherConsumerHandler) saveWeatherData(msg []byte) (lat, lng float32, err error) {
-	var latestWeather services.LatestWeather
-	if err = json.Unmarshal(msg, &latestWeather); err != nil {
+	var weatherInfo services.WeatherInfo
+	if err = json.Unmarshal(msg, &weatherInfo); err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "json.Unmarshal",
 			"err":       err,
@@ -114,7 +114,7 @@ func (h weatherConsumerHandler) saveWeatherData(msg []byte) (lat, lng float32, e
 		return
 	}
 
-	for i, data := range latestWeather.Values {
+	for i, data := range weatherInfo.Values {
 		const validDate = "validDate"
 
 		dt, ok := data[validDate]
@@ -138,9 +138,9 @@ func (h weatherConsumerHandler) saveWeatherData(msg []byte) (lat, lng float32, e
 		dataJSON, _ := json.Marshal(data)
 
 		weatherForecast := &deremsmodels.WeatherForecast{
-			Lat:       latestWeather.Lat,
-			Lng:       latestWeather.Lng,
-			Alt:       null.Float32From(latestWeather.Alt),
+			Lat:       weatherInfo.Lat,
+			Lng:       weatherInfo.Lng,
+			Alt:       null.Float32From(weatherInfo.Alt),
 			ValidDate: dt.(time.Time),
 			Data:      null.JSONFrom(dataJSON),
 		}
@@ -163,7 +163,7 @@ func (h weatherConsumerHandler) saveWeatherData(msg []byte) (lat, lng float32, e
 		}
 	}
 
-	lat = latestWeather.Lat
-	lng = latestWeather.Lng
+	lat = weatherInfo.Lat
+	lng = weatherInfo.Lng
 	return
 }

@@ -21,7 +21,7 @@ type WeatherWorkerSuite struct {
 	suite.Suite
 	seedUtTopic   string
 	seedUtTime    time.Time
-	seedUtWeather services.LatestWeather
+	seedUtWeather services.WeatherInfo
 	repo          *repository.Repository
 	handler       weatherConsumerHandler
 }
@@ -60,7 +60,7 @@ func (s *WeatherWorkerSuite) SetupSuite() {
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	// Mock seedUtWeather data
 	s.seedUtTime = time.Now().UTC()
-	s.seedUtWeather = services.LatestWeather{
+	s.seedUtWeather = services.WeatherInfo{
 		Lat: 24.75,
 		Lng: 121.75,
 		Alt: 100,
@@ -127,7 +127,7 @@ func (s *WeatherWorkerSuite) Test_01_SaveWeatherData() {
 
 	// Modify seedUtWeather data
 	// seedUtDataUpdated
-	seedUtDataUpdated := services.LatestWeather{
+	seedUtDataUpdated := services.WeatherInfo{
 		Lat: s.seedUtWeather.Lat,
 		Lng: s.seedUtWeather.Lng,
 		Alt: s.seedUtWeather.Alt,
@@ -144,7 +144,7 @@ func (s *WeatherWorkerSuite) Test_01_SaveWeatherData() {
 		}
 	}
 	// seedUtDataNoValidDate
-	seedUtDataNoValidDate := services.LatestWeather{
+	seedUtDataNoValidDate := services.WeatherInfo{
 		Lat: s.seedUtWeather.Lat,
 		Lng: s.seedUtWeather.Lng,
 		Alt: s.seedUtWeather.Alt,
@@ -158,7 +158,7 @@ func (s *WeatherWorkerSuite) Test_01_SaveWeatherData() {
 
 	tests := []struct {
 		name string
-		args services.LatestWeather
+		args services.WeatherInfo
 	}{
 		{
 			name: "saveWeatherData",
@@ -222,7 +222,7 @@ func (s *WeatherWorkerSuite) Test_02_GenerateWeatherInfo() {
 		UUIDs       []string
 	}
 
-	testData := services.LatestWeather{
+	testData := services.WeatherInfo{
 		Lat: s.seedUtWeather.Lat,
 		Lng: s.seedUtWeather.Lng,
 		Alt: s.seedUtWeather.Alt,

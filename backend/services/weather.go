@@ -9,8 +9,8 @@ import (
 	"der-ems/repository"
 )
 
-// LatestWeather godoc
-type LatestWeather struct {
+// WeatherInfo godoc
+type WeatherInfo struct {
 	Lat    float32                  `json:"lat"`
 	Lng    float32                  `json:"lng"`
 	Alt    float32                  `json:"alt"`
@@ -52,14 +52,14 @@ func (s defaultWeatherService) getWeatherDataByLocation(lat, lng float32) (data 
 		}).Error()
 		return
 	}
-	var latestWeather LatestWeather
+	var weatherInfo WeatherInfo
 	for i, weatherForecast := range weatherForecastList {
 		const validDate = "validDate"
 		var value map[string]interface{}
 		if i == 0 {
-			latestWeather.Lat = weatherForecast.Lat
-			latestWeather.Lng = weatherForecast.Lng
-			latestWeather.Alt = weatherForecast.Alt.Float32
+			weatherInfo.Lat = weatherForecast.Lat
+			weatherInfo.Lng = weatherForecast.Lng
+			weatherInfo.Alt = weatherForecast.Alt.Float32
 		}
 
 		if err = json.Unmarshal(weatherForecast.Data.JSON, &value); err != nil {
@@ -70,9 +70,9 @@ func (s defaultWeatherService) getWeatherDataByLocation(lat, lng float32) (data 
 			return
 		}
 		value[validDate] = weatherForecast.ValidDate.Format(time.RFC3339)
-		latestWeather.Values = append(latestWeather.Values, value)
+		weatherInfo.Values = append(weatherInfo.Values, value)
 	}
-	data, err = json.Marshal(latestWeather)
+	data, err = json.Marshal(weatherInfo)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"caused-by": "json.Marshal",

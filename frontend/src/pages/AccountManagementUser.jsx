@@ -1,20 +1,16 @@
 import { connect } from "react-redux"
 import {
-    Button, DialogActions, Divider, FormControl,
-    InputLabel, InputAdornment, IconButton, MenuItem,
-    OutlinedInput, TextField
+    Button, DialogActions, Divider, FormControl, TextField
 } from "@mui/material"
 import LockOpenIcon from "@mui/icons-material/LockOpen"
-import Visibility from "@mui/icons-material/Visibility"
-import VisibilityOff from "@mui/icons-material/VisibilityOff"
 
 import { useTranslation } from "react-multi-lang"
 import { useEffect, useMemo, useState } from "react"
 
 import { apiCall } from "../utils/api"
-import { validateEmail } from "../utils/utils"
 
 import AddUser from "../components/AddUser"
+import EditUser from "../components/EditUser"
 import DialogForm from "../components/DialogForm"
 import Table from "../components/DataTable"
 
@@ -135,11 +131,9 @@ export default function AccountManagementUser() {
         },
         {
             cell: (row, index) => <div className="flex w-24">
-                <EditIcon className="mr-4"
-                    onClick={() => {
-                        setOpenEdit(true)
-                        setTarget({ ...row, index })
-                    }} />
+                <EditUser className="mr-4"
+                    {...{ row, groupDict }}
+                />
                 {row.group === "Area Owner_TW"
                     ? null
                     : <DeleteIcon onClick={() => {
@@ -191,88 +185,7 @@ export default function AccountManagementUser() {
             progressPending={loading}
             theme="dark"
         />
-        {/* edit */}
-        <DialogForm
-            dialogTitle={pageT("user")}
-            fullWidth={fullWidth}
-            maxWidth={maxWidth}
-            open={openEdit}
-            setOpen={setOpenEdit}
-        >
-            <Divider variant="middle" />
-            <div className="flex flex-col m-auto mt-4 min-w-49 w-fit">
-                <h5 id="account"
-                    className="ml-3 mb-8"
-                    label={pageT("account")}>
-                    {target?.username || ""}
-                </h5>
-                <FormControl sx={{ mb: "2rem", minWidth: 120 }} variant="outlined">
-                    <InputLabel htmlFor="outlined-adornment-password">
-                        {pageT("password")}
-                    </InputLabel>
-                    <OutlinedInput
-                        id="edit-password"
-                        type={showPassword ? "text" : "password"}
-                        label={pageT("password")}
-                        value={target?.password || ""}
-                        onChange={changePassword}
-                        autoComplete="current-password"
-                        endAdornment={
-                            <InputAdornment position="end">
-                                <IconButton
-                                    aria-label="toggle password visibility"
-                                    onClick={handleClickShowPassword}
-                                    onMouseDown={handleMouseDownPassword}
-                                    edge="end"
-                                >
-                                    {showPassword
-                                        ? <Visibility />
-                                        : <VisibilityOff />
-                                    }
-                                </IconButton>
-                            </InputAdornment>
-                        }
-                    />
-                </FormControl>
-                <TextField
-                    id="edit-name"
-                    label={pageT("name")}
-                    onChange={changeName}
-                    value={target?.name || ""}
-                />
-                <TextField
-                    id="edit-group"
-                    select
-                    label={commonT("group")}
-                    onChange={changeGroup}
-                    value={target?.group || ""}
-                >
-                    {groupData.map((option) => (
-                        <MenuItem key={option.value} value={option.value}>
-                            {option.label}
-                        </MenuItem>
-                    ))}
-                </TextField>
-            </div>
-            <Divider variant="middle" />
-            <DialogActions sx={{ margin: "1rem 0.5rem 1rem 0" }}>
-                <Button onClick={() => { setOpenEdit(false) }}
-                    radius="pill"
-                    variant="outlined"
-                    color="gray">
-                    {commonT("cancel")}
-                </Button>
-                <Button onClick={() => {
-                    setOpenEdit(false)
-                    editSave()
-                }}
-                    radius="pill"
-                    variant="contained"
-                    color="primary">
-                    {commonT("save")}
-                </Button>
-            </DialogActions>
-        </DialogForm>
+
         {/* delete */}
         <DialogForm
             dialogTitle={dialogT("deleteMsg")}

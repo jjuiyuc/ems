@@ -25,6 +25,12 @@ type GatewayLocationWrap struct {
 	Enable       bool    `json:"enable"`
 }
 
+// GPSLocationWrap godoc
+type GPSLocationWrap struct {
+	Lat float32 `json:"lat"`
+	Lng float32 `json:"lng"`
+}
+
 // DeviceWrap godoc
 type DeviceWrap struct {
 	ModelType     string    `json:"modelType"`
@@ -43,8 +49,9 @@ type GatewayRepository interface {
 	GetGatewayByGatewayID(gwID int64) (*deremsmodels.Gateway, error)
 	GetGateways() ([]*deremsmodels.Gateway, error)
 	GetGatewayLocationByGatewayID(gwID int64) (gatewayLocation GatewayLocationWrap, err error)
+	GetGPSLocations() (locations []*GPSLocationWrap, err error)
 	GetGatewayGroupsForUserID(executedUserID, gwID int64) ([]*deremsmodels.Group, error)
-	IsGatewayExistedForUserID(executedUserID int64, gwUUID string) bool
+	IsGatewayExistedForUserID(executedUserID int64, gwUUID string) bool	
 	GetDeviceModels() ([]*deremsmodels.DeviceModel, error)
 	GetDeviceMappingByGatewayID(gwID int64) (devices []*DeviceWrap, err error)
 }
@@ -104,6 +111,20 @@ func (repo defaultGatewayRepository) GetGatewayLocationByGatewayID(gwID int64) (
 	return
 }
 
+func (repo defaultGatewayRepository) GetGPSLocations() (locations []*GPSLocationWrap, err error) {
+	locations = make([]*GPSLocationWrap, 0)
+	err = deremsmodels.NewQuery(
+		qm.Select(
+			"l.weather_lat AS lat",
+			"l.weather_lng AS lng",
+		),
+		qm.From("location AS l"),
+		qm.InnerJoin("gateway AS g ON l.id = g.location_id"),
+		qm.Where("g.deleted_at IS NULL"),
+		qm.GroupBy("l.weather_lat, l.weather_lng"),
+	).Bind(context.Background(), models.GetDB(), &locations)
+	return
+}
 // GetGateways godoc
 func (repo defaultGatewayRepository) GetGateways() ([]*deremsmodels.Gateway, error) {
 	return deremsmodels.Gateways().All(repo.db)

@@ -17,9 +17,15 @@ type WeatherInfo struct {
 	Values []map[string]interface{} `json:"values"`
 }
 
+// GPSLocationInfo godoc
+type GPSLocationInfo struct {
+	Values []*repository.GPSLocationWrap `json:"values"`
+}
+
 // WeatherService godoc
 type WeatherService interface {
 	GenerateWeatherInfo(lat, lng float32) (data []byte, gatewayUUIDs []string, err error)
+	GenerateGPSLocations() (data []byte, err error)
 }
 
 type defaultWeatherService struct {
@@ -95,5 +101,29 @@ func (s defaultWeatherService) getGatewayUUIDsByLocation(lat, lng float32) (gate
 		gatewayUUIDs = append(gatewayUUIDs, gateway.UUID)
 	}
 	logrus.Debug("gatewayUUIDs: ", gatewayUUIDs)
+	return
+}
+
+func (s defaultWeatherService) GenerateGPSLocations() (data []byte, err error) {
+	locations, err := s.repo.Gateway.GetGPSLocations()
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.Gateway.GetGPSLocations",
+			"err":       err,
+		}).Error()
+		return
+	}
+	gpsLocationInfo := GPSLocationInfo{
+		Values: locations,
+	}
+	data, err = json.Marshal(gpsLocationInfo)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "json.Marshal",
+			"err":       err,
+		}).Error()
+		return
+	}
+	logrus.Debug("gpsLocationInfoJSON: ", string(data))
 	return
 }

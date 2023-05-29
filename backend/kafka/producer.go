@@ -22,6 +22,12 @@ func SendDataToGateways(cfg *viper.Viper, topic string, data []byte, gatewayUUID
 	}
 }
 
+// SendDataToAIServer godoc
+func SendDataToAIServer(cfg *viper.Viper, topic string, data []byte) {
+	log.Debug("topic: ", topic)
+	Produce(cfg, topic, string(data))
+}
+
 // Produce godoc
 func Produce(cfg *viper.Viper, topic, message string) {
 	saramaConfig := sarama.NewConfig()

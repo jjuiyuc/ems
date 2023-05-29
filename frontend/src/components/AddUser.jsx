@@ -43,13 +43,12 @@ export default connect(null, mapDispatch)(function AddUser(props) {
         changeAccount = (e) => {
             setAccount(e.target.value)
         },
+        validateCurAccount = () => setAccountError(!validateEmail(account)),
         changePassword = (e) => {
             setPassword(e.target.value)
         },
         passwordLengthError = password.length == 0 || password.length < 8 || password.length > 50,
-        validateCurPassword = () => setPasswordError(
-            !validatePassword(password)
-        ),
+        validateCurPassword = () => setPasswordError(!validatePassword(password)),
         changeName = (e) => {
             const
                 nameTarget = e.target.value,
@@ -68,12 +67,7 @@ export default connect(null, mapDispatch)(function AddUser(props) {
 
     const
         submit = async () => {
-            const isEmail = validateEmail(account)
 
-            if (!isEmail) {
-                setAccountError({ type: "emailFormat" })
-                return
-            }
             const data = {
                 username: account,
                 password: password,
@@ -116,6 +110,13 @@ export default connect(null, mapDispatch)(function AddUser(props) {
                 },
                 url: "/api/account-management/users"
             })
+        },
+        cancelClick = () => {
+            setOpenAdd(false)
+            setAccount("")
+            setPassword("")
+            setName("")
+            setGroup("")
         }
     return <>
         <Button
@@ -139,10 +140,11 @@ export default connect(null, mapDispatch)(function AddUser(props) {
                 <TextField
                     id="add-account"
                     label={pageT("account")}
+                    onBlur={validateCurAccount}
                     onChange={changeAccount}
                     value={account}
                     error={accountError}
-                    helperText={accountError ? errorT(accountError.type) : ""}
+                    helperText={accountError ? errorT("emailFormat") : ""}
                     type="email" />
                 <TextField
                     id="add-password"
@@ -197,7 +199,7 @@ export default connect(null, mapDispatch)(function AddUser(props) {
             </div>
             <Divider variant="middle" />
             <DialogActions sx={{ margin: "1rem 0.5rem 1rem 0" }}>
-                <Button onClick={() => { setOpenAdd(false) }}
+                <Button onClick={cancelClick}
                     radius="pill"
                     variant="outlined"
                     color="gray">

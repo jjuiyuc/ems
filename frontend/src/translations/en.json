@@ -176,7 +176,7 @@
             "chartError": "Can't get chart data",
             "discharged": "Discharged",
             "infoError": "Can't get battery info",
-            "modal": "Modal",
+            "model": "Model",
             "percentage": "Percentage",
             "powerSources": "Power Sources",
             "stateOfChargeSOC": "State of Charge (SoC)",

@@ -17,7 +17,7 @@ const mapDispatch = dispatch => ({
 
 })
 export default connect(null, mapDispatch)(function AddUser(props) {
-    const { getList, userList, groupDict } = props
+    const { getList, groupDict } = props
 
     const
         t = useTranslation(),
@@ -178,7 +178,10 @@ export default connect(null, mapDispatch)(function AddUser(props) {
                     id="add-name"
                     label={pageT("name")}
                     value={name || ""}
-                    onChange={changeName}>
+                    onChange={changeName}
+                    error={nameError}
+                    helperText={nameError ? errorT("nameLength") : ""}
+                >
                 </TextField>
                 <TextField
                     id="add-group"

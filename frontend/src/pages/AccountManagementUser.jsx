@@ -1,8 +1,5 @@
-import { connect } from "react-redux"
-import {
-    Button, DialogActions, Divider, FormControl, TextField
-} from "@mui/material"
-import LockOpenIcon from "@mui/icons-material/LockOpen"
+import { Button, DialogActions, TextField } from "@mui/material"
+import LockIcon from "@mui/icons-material/Lock"
 
 import { useTranslation } from "react-multi-lang"
 import { useEffect, useMemo, useState } from "react"
@@ -15,94 +12,29 @@ import DialogForm from "../components/DialogForm"
 import Table from "../components/DataTable"
 
 import { ReactComponent as DeleteIcon } from "../assets/icons/trash_solid.svg"
-import { ReactComponent as EditIcon } from "../assets/icons/edit.svg"
 
 export default function AccountManagementUser() {
 
-    const groupData = [
-        {
-            value: "Area Owner_TW",
-            label: "Area Owner_TW",
-        },
-        {
-            value: "Area Maintainer_TW",
-            label: "Area Maintainer_TW",
-        },
-        {
-            value: "Serenegray",
-            label: "Serenegray",
-        },
-        {
-            value: "Cht_Miaoli",
-            label: "Cht_Miaoli",
-        }
-    ]
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
         dialogT = (string) => t("dialog." + string),
         pageT = (string, params) => t("accountManagementUser." + string, params)
     const
-        [data, setData] = useState([
-            {
-                id: 1,
-                account: "XXXXX@ubiik.com",
-                password: "xxxxxll",
-                name: "XXXXX",
-                group: "Area Owner_TW"
-            }
-        ]),
         [userList, setUserList] = useState([]),
         [groupDict, setGroupDict] = useState({}),
         [loading, setLoading] = useState(false),
         [infoError, setInfoError] = useState(""),
-        [openEdit, setOpenEdit] = useState(false),
         [openDelete, setOpenDelete] = useState(false),
-        [account, setAccount] = useState(data?.account || ""),
-        [accountError, setAccountError] = useState(null),
-        [password, setPassword] = useState(data?.password || ""),
-        [passwordError, setPasswordError] = useState(false),
-        [showPassword, setShowPassword] = useState(false),
-        [name, setName] = useState(data?.name || ""),
-        [nameError, setNameError] = useState(null),
-        [group, setGroup] = useState(data?.group || ""),
-        [groupError, setGroupError] = useState(null),
-        [otherError, setOtherError] = useState(""),
-        [fullWidth, setFullWidth] = useState(true),
-        [maxWidth, setMaxWidth] = useState("sm"),
         [target, setTarget] = useState({})
 
-    const
-
-        changePassword = (e) => {
-            setTarget(r => ({ ...r, password: e.target.value }))
-            setPasswordError(false)
-            setOtherError("")
-        },
-        changeName = (e) => {
-            setTarget(r => ({ ...r, name: e.target.value }))
-            setNameError(null)
-            setOtherError("")
-        },
-        changeGroup = (e) => {
-            setTarget(r => ({ ...r, group: e.target.value }))
-            setGroupError(null)
-            setOtherError("")
-        }
-    const
-        handleClickShowPassword = () => setShowPassword((show) => !show),
-        handleMouseDownPassword = (event) => {
-            event.preventDefault()
-        }
-    const editSave = () => {
-        setData(r => {
-            const newData = [...r]
-            newData[target.index].password = target.password
-            newData[target.index].name = target.name
-            newData[target.index].group = target.group
-            return newData
-        })
+    const onSave = (row) => {
+        const newData = userList.map((value) =>
+            value.id === row.id ? row : value
+        )
+        setUserList(newData)
     }
+
     const columns = [
         {
             cell: row => <span className="font-mono">{row.username}</span>,
@@ -130,9 +62,9 @@ export default function AccountManagementUser() {
 
         },
         {
-            cell: (row, index) => <div className="flex w-24">
+            cell: (row) => <div className="flex w-24">
                 <EditUser className="mr-4"
-                    {...{ row, groupDict }}
+                    {...{ row, groupDict, onSave, getList }}
                 />
                 {row.group === "Area Owner_TW"
                     ? null
@@ -141,7 +73,10 @@ export default function AccountManagementUser() {
                         setTarget(row)
                     }} />
                 }
-                <LockOpenIcon className="ml-4" />
+                {row.lockedAt === null
+                    ? <div className="ml-4 bg-gray-600 w-6 h-6"></div>
+                    : <LockIcon className="ml-4" />
+                }
             </div>,
             center: true,
             grow: 0.4
@@ -185,12 +120,11 @@ export default function AccountManagementUser() {
             progressPending={loading}
             theme="dark"
         />
-
         {/* delete */}
         <DialogForm
             dialogTitle={dialogT("deleteMsg")}
-            fullWidth={fullWidth}
-            maxWidth={maxWidth}
+            fullWidth={true}
+            maxWidth="sm"
             open={openDelete}
             setOpen={setOpenDelete}>
             <div className="flex">

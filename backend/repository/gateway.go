@@ -41,6 +41,16 @@ type DeviceWrap struct {
 	ExtraInfo     null.JSON `json:"extraInfo"`
 }
 
+// DLDeviceWrap godoc
+type DLDeviceWrap struct {
+	DeviceType      string    `json:"deviceType"`
+	DeviceModelName string    `json:"deviceModelName"`
+	ModbusID        int       `json:"modbusID"`
+	UUEID           string    `json:"uueID"`
+	PowerCapacity   float32   `json:"powerCapacity"`
+	ExtraInfo       null.JSON `json:"extraInfo"`
+}
+
 // GatewayRepository godoc
 type GatewayRepository interface {
 	GetGatewayByGatewayUUID(gwUUID string) (*deremsmodels.Gateway, error)
@@ -54,6 +64,7 @@ type GatewayRepository interface {
 	IsGatewayExistedForUserID(executedUserID int64, gwUUID string) bool	
 	GetDeviceModels() ([]*deremsmodels.DeviceModel, error)
 	GetDeviceMappingByGatewayID(gwID int64) (devices []*DeviceWrap, err error)
+	GetDLDeviceMappingByGatewayID(gwID int64) (devices []*DLDeviceWrap, err error)
 }
 
 type defaultGatewayRepository struct {
@@ -179,6 +190,25 @@ func (repo defaultGatewayRepository) GetDeviceMappingByGatewayID(gwID int64) (de
 		qm.Select(
 			"dm2.type AS model_type",
 			"d.model_id AS model_id",
+			"d.modbusid AS modbus_id",
+			"dm.uueid AS uue_id",
+			"d.power_capacity AS power_capacity",
+			"d.extra_info AS extra_info",
+		),
+		qm.From("device AS d"),
+		qm.InnerJoin("device_module AS dm ON d.module_id = dm.id"),
+		qm.InnerJoin("device_model AS dm2 ON d.model_id = dm2.id"),
+		qm.Where("d.deleted_at IS NULL AND d.gw_id = ?", gwID),
+	).Bind(context.Background(), models.GetDB(), &devices)
+	return
+}
+
+func (repo defaultGatewayRepository) GetDLDeviceMappingByGatewayID(gwID int64) (devices []*DLDeviceWrap, err error) {
+	devices = make([]*DLDeviceWrap, 0)
+	err = deremsmodels.NewQuery(
+		qm.Select(
+			"dm2.type AS device_type",
+			"dm2.name AS device_model_name",
 			"d.modbusid AS modbus_id",
 			"dm.uueid AS uue_id",
 			"d.power_capacity AS power_capacity",

@@ -1,6 +1,8 @@
 package services
 
 import (
+	"encoding/json"
+
 	"github.com/sirupsen/logrus"
 	"github.com/volatiletech/null/v8"
 
@@ -13,6 +15,7 @@ type FieldManagementService interface {
 	GetFields(userID int64) (getFields *GetFieldsResponse, err error)
 	GetDeviceModels() (getDeviceModels *GetDeviceModelsResponse, err error)
 	GetField(executedUserID int64, gwUUID string) (getField *GetFieldResponse, err error)
+	GenerateDLDeviceMappingInfo(gwID int64) (data []byte, err error)
 }
 
 // GetFieldsResponse godoc
@@ -61,6 +64,11 @@ type FieldGroupInfo struct {
 	ID       int64      `json:"id"`
 	Name     string     `json:"name"`
 	ParentID null.Int64 `json:"parentID"`
+}
+
+// DLDeviceMappingInfo godoc
+type DLDeviceMappingInfo struct {
+	Values []*repository.DLDeviceWrap `json:"values"`
 }
 
 type defaultFieldManagementService struct {
@@ -235,4 +243,28 @@ func (s defaultFieldManagementService) getFieldDevices(gwID int64) (deviceInfos 
 func (s defaultFieldManagementService) isFakeModbusID(modbusID int64) bool {
 	// XXX: Fake modbus id decrements from 255
 	return modbusID > 200
+}
+
+func (s defaultFieldManagementService) GenerateDLDeviceMappingInfo(gwID int64) (data []byte, err error) {
+	devices, err := s.repo.Gateway.GetDLDeviceMappingByGatewayID(gwID)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.Gateway.GetDLDeviceMappingByGatewayID",
+			"err":       err,
+		}).Error()
+		return
+	}
+	deviceMappingInfo := DLDeviceMappingInfo{
+		Values: devices,
+	}
+	data, err = json.Marshal(deviceMappingInfo)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "json.Marshal",
+			"err":       err,
+		}).Error()
+		return
+	}
+	logrus.Debug("deviceMappingInfoJSON: ", string(data))
+	return
 }

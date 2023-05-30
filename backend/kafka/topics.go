@@ -8,6 +8,9 @@ const (
 	// SendGPSLocation godoc
 	SendGPSLocation = "core.location.fct.gps.0"
 
+	// SendDeviceMappingToLocalGW godoc
+	SendDeviceMappingToLocalGW = "core.meta.cmd.gw-ed-mapping.{gw-id}.0"
+
 	// SendAIBillingParamsToLocalGW godoc
 	SendAIBillingParamsToLocalGW = "core.ai.cmd.billing-params.{gw-id}.0"
 

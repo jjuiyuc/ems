@@ -17,16 +17,16 @@ type UserRepository interface {
 	InsertLoginLog(loginLog *deremsmodels.LoginLog) error
 	UpdateUser(user *deremsmodels.User) (err error)
 	GetLoginLogCount() (int64, error)
-	GetUserByUserID(userID int64) (*deremsmodels.User, error)
+	GetUserByUserID(tx *sql.Tx, userID int64) (*deremsmodels.User, error)
 	GetUserByUsername(username string) (*deremsmodels.User, error)
 	GetUserByPasswordToken(token string) (*deremsmodels.User, error)
-	GetUserCountByGroupID(groupID int64) (int64, error)
-	CreateGroup(group *deremsmodels.Group) (err error)
-	UpdateGroup(group *deremsmodels.Group) (err error)
-	DeleteGroup(userID, groupID int64) (err error)
-	IsGroupNameExistedOnSameLevel(group *deremsmodels.Group) bool
-	GetGroupByGroupID(groupID int64) (*deremsmodels.Group, error)
-	GetGroupsByGroupID(groupID int64) ([]*deremsmodels.Group, error)
+	GetUserCountByGroupID(tx *sql.Tx, groupID int64) (int64, error)
+	CreateGroup(tx *sql.Tx, group *deremsmodels.Group) (err error)
+	UpdateGroup(tx *sql.Tx, group *deremsmodels.Group) (err error)
+	DeleteGroup(tx *sql.Tx, userID, groupID int64) (err error)
+	IsGroupNameExistedOnSameLevel(tx *sql.Tx, group *deremsmodels.Group) bool
+	GetGroupByGroupID(tx *sql.Tx, groupID int64) (*deremsmodels.Group, error)
+	GetGroupsByGroupID(tx *sql.Tx, groupID int64) ([]*deremsmodels.Group, error)
 	GetGroupTypes() ([]*deremsmodels.GroupType, error)
 	GetGatewaysPermissionByGroupID(groupID int64, findDisabled bool) ([]*deremsmodels.GroupGatewayRight, error)
 	GetWebpagesPermissionByGroupTypeID(groupTypeID int64) ([]*deremsmodels.GroupTypeWebpageRight, error)
@@ -63,8 +63,8 @@ func (repo defaultUserRepository) GetLoginLogCount() (int64, error) {
 }
 
 // GetUserByUserID godoc
-func (repo defaultUserRepository) GetUserByUserID(userID int64) (*deremsmodels.User, error) {
-	return deremsmodels.FindUser(repo.db, userID)
+func (repo defaultUserRepository) GetUserByUserID(tx *sql.Tx, userID int64) (*deremsmodels.User, error) {
+	return deremsmodels.FindUser(repo.getExecutor(tx), userID)
 }
 
 // GetUserByUsername godoc
@@ -81,47 +81,48 @@ func (repo defaultUserRepository) GetUserByPasswordToken(token string) (*deremsm
 		qm.Where("pwd_token_expiry > ?", time.Now().UTC())).One(repo.db)
 }
 
-func (repo defaultUserRepository) GetUserCountByGroupID(groupID int64) (int64, error) {
+func (repo defaultUserRepository) GetUserCountByGroupID(tx *sql.Tx, groupID int64) (int64, error) {
 	return deremsmodels.Users(
 		qm.Where("group_id = ?", groupID),
-		qm.Where("deleted_at IS NULL")).Count(repo.db)
+		qm.Where("deleted_at IS NULL")).Count(repo.getExecutor(tx))
 }
 
-func (repo defaultUserRepository) CreateGroup(group *deremsmodels.Group) (err error) {
-	return group.Insert(repo.db, boil.Infer())
+func (repo defaultUserRepository) CreateGroup(tx *sql.Tx, group *deremsmodels.Group) (err error) {
+	return group.Insert(repo.getExecutor(tx), boil.Infer())
 }
 
-func (repo defaultUserRepository) UpdateGroup(group *deremsmodels.Group) (err error) {
+func (repo defaultUserRepository) UpdateGroup(tx *sql.Tx, group *deremsmodels.Group) (err error) {
 	group.UpdatedAt = time.Now().UTC()
-	_, err = group.Update(repo.db, boil.Infer())
+	_, err = group.Update(repo.getExecutor(tx), boil.Infer())
 	return
 }
 
-func (repo defaultUserRepository) DeleteGroup(userID, groupID int64) (err error) {
-	group, err := deremsmodels.FindGroup(repo.db, groupID)
+func (repo defaultUserRepository) DeleteGroup(tx *sql.Tx, userID, groupID int64) (err error) {
+	exec := repo.getExecutor(tx)
+	group, err := deremsmodels.FindGroup(exec, groupID)
 	if err == nil {
 		now := time.Now().UTC()
 		group.UpdatedAt = now
 		group.DeletedAt = null.TimeFrom(now)
 		group.DeletedBy = null.Int64From(userID)
-		_, err = group.Update(repo.db, boil.Infer())
+		_, err = group.Update(exec, boil.Infer())
 	}
 	return
 }
 
-func (repo defaultUserRepository) IsGroupNameExistedOnSameLevel(group *deremsmodels.Group) (exist bool) {
+func (repo defaultUserRepository) IsGroupNameExistedOnSameLevel(tx *sql.Tx, group *deremsmodels.Group) (exist bool) {
 	exist, _ = deremsmodels.Groups(
 		qm.Where("name = ?", group.Name),
 		qm.Where("parent_id = ?", group.ParentID),
-		qm.Where("deleted_at IS NULL")).Exists(repo.db)
+		qm.Where("deleted_at IS NULL")).Exists(repo.getExecutor(tx))
 	return
 }
 
-func (repo defaultUserRepository) GetGroupByGroupID(groupID int64) (*deremsmodels.Group, error) {
-	return deremsmodels.FindGroup(repo.db, groupID)
+func (repo defaultUserRepository) GetGroupByGroupID(tx *sql.Tx, groupID int64) (*deremsmodels.Group, error) {
+	return deremsmodels.FindGroup(repo.getExecutor(tx), groupID)
 }
 
-func (repo defaultUserRepository) GetGroupsByGroupID(groupID int64) ([]*deremsmodels.Group, error) {
+func (repo defaultUserRepository) GetGroupsByGroupID(tx *sql.Tx, groupID int64) ([]*deremsmodels.Group, error) {
 	return deremsmodels.Groups(
 		qm.SQL(fmt.Sprintf(`
 		WITH RECURSIVE group_path AS
@@ -135,7 +136,7 @@ func (repo defaultUserRepository) GetGroupsByGroupID(groupID int64) ([]*deremsmo
 			ON gp.id = g.parent_id
 			AND g.deleted_at IS NULL
 		)
-		SELECT * FROM group_path;`, "`group`", "`group`"), groupID)).All(repo.db)
+		SELECT * FROM group_path;`, "`group`", "`group`"), groupID)).All(repo.getExecutor(tx))
 }
 
 func (repo defaultUserRepository) GetGroupTypes() ([]*deremsmodels.GroupType, error) {
@@ -159,4 +160,13 @@ func (repo defaultUserRepository) GetWebpagesPermissionByGroupTypeID(groupTypeID
 
 func (repo defaultUserRepository) GetWebpageByWebpageID(webpagesID int64) (*deremsmodels.Webpage, error) {
 	return deremsmodels.FindWebpage(repo.db, webpagesID)
+}
+
+func (repo defaultUserRepository) getExecutor(tx *sql.Tx) (exec boil.Executor) {
+	if tx == nil {
+		exec = repo.db
+		return
+	}
+	exec = tx
+	return
 }

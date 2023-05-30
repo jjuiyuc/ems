@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/sirupsen/logrus"
 	"github.com/volatiletech/null/v8"
@@ -66,7 +67,7 @@ func NewAccountManagementService(repo *repository.Repository) AccountManagementS
 }
 
 func (s defaultAccountManagementService) GetGroups(userID int64) (getGroups *GetGroupsResponse, err error) {
-	groups, err := s.getGroupTreeNodes(userID)
+	groups, err := s.getGroupTreeNodes(nil, userID)
 	if err != nil {
 		return
 	}
@@ -106,8 +107,8 @@ func (s defaultAccountManagementService) GetGroups(userID int64) (getGroups *Get
 	return
 }
 
-func (s defaultAccountManagementService) getGroupTreeNodes(userID int64) (groups []*deremsmodels.Group, err error) {
-	user, err := s.repo.User.GetUserByUserID(userID)
+func (s defaultAccountManagementService) getGroupTreeNodes(tx *sql.Tx, userID int64) (groups []*deremsmodels.Group, err error) {
+	user, err := s.repo.User.GetUserByUserID(tx, userID)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"caused-by": "s.repo.User.GetUserByUserID",
@@ -115,7 +116,7 @@ func (s defaultAccountManagementService) getGroupTreeNodes(userID int64) (groups
 		}).Error()
 		return
 	}
-	groups, err = s.repo.User.GetGroupsByGroupID(user.GroupID)
+	groups, err = s.repo.User.GetGroupsByGroupID(tx, user.GroupID)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"caused-by": "s.repo.User.GetGroupsByGroupID",
@@ -142,12 +143,12 @@ func (s defaultAccountManagementService) CreateGroup(body *app.CreateGroupBody) 
 		TypeID:   int64(body.TypeID),
 		ParentID: null.Int64From(int64(body.ParentID)),
 	}
-	if s.repo.User.IsGroupNameExistedOnSameLevel(group) {
+	if s.repo.User.IsGroupNameExistedOnSameLevel(tx, group) {
 		err = e.ErrNewAccountGroupNameOnSameLevelExist
 		tx.Rollback()
 		return
 	}
-	err = s.repo.User.CreateGroup(group)
+	err = s.repo.User.CreateGroup(tx, group)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"caused-by": "s.repo.User.CreateGroup",
@@ -163,7 +164,7 @@ func (s defaultAccountManagementService) CreateGroup(body *app.CreateGroupBody) 
 }
 
 func (s defaultAccountManagementService) validateGroupType(groupID, expectedTypeID int64) bool {
-	group, err := s.repo.User.GetGroupByGroupID(groupID)
+	group, err := s.repo.User.GetGroupByGroupID(nil, groupID)
 	if err == nil && group.TypeID == expectedTypeID {
 		return true
 	}
@@ -171,11 +172,11 @@ func (s defaultAccountManagementService) validateGroupType(groupID, expectedType
 }
 
 func (s defaultAccountManagementService) GetGroup(userID, groupID int64) (getGroup *GetGroupResponse, err error) {
-	if !s.authorizeGroupID(userID, groupID) {
+	if !s.authorizeGroupID(nil, userID, groupID) {
 		err = e.ErrNewAuthPermissionNotAllow
 		return
 	}
-	group, err := s.repo.User.GetGroupByGroupID(groupID)
+	group, err := s.repo.User.GetGroupByGroupID(nil, groupID)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"caused-by": "s.repo.User.GetGroupByGroupID",
@@ -236,19 +237,19 @@ func (s defaultAccountManagementService) UpdateGroup(userID, groupID int64, body
 		return
 	}
 
-	if !s.authorizeGroupID(userID, groupID) {
+	if !s.authorizeGroupID(tx, userID, groupID) {
 		err = e.ErrNewAuthPermissionNotAllow
 		tx.Rollback()
 		return
 	}
-	if s.isOwnAccountGroup(userID, groupID) {
+	if s.isOwnAccountGroup(tx, userID, groupID) {
 		err = e.ErrNewOwnAccountGroupModifiedNotAllow
 		logrus.WithField("caused-by", err).Error()
 		tx.Rollback()
 		return
 	}
 
-	group, err := s.repo.User.GetGroupByGroupID(groupID)
+	group, err := s.repo.User.GetGroupByGroupID(tx, groupID)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"caused-by": "s.repo.User.GetGroupByGroupID",
@@ -258,12 +259,12 @@ func (s defaultAccountManagementService) UpdateGroup(userID, groupID int64, body
 		return
 	}
 	group.Name = body.Name
-	if s.repo.User.IsGroupNameExistedOnSameLevel(group) {
+	if s.repo.User.IsGroupNameExistedOnSameLevel(tx, group) {
 		err = e.ErrNewAccountGroupNameOnSameLevelExist
 		tx.Rollback()
 		return
 	}
-	err = s.repo.User.UpdateGroup(group)
+	err = s.repo.User.UpdateGroup(tx, group)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"caused-by": "s.repo.User.UpdateGroup",
@@ -278,8 +279,8 @@ func (s defaultAccountManagementService) UpdateGroup(userID, groupID int64, body
 	return
 }
 
-func (s defaultAccountManagementService) isOwnAccountGroup(userID, groupID int64) bool {
-	user, err := s.repo.User.GetUserByUserID(userID)
+func (s defaultAccountManagementService) isOwnAccountGroup(tx *sql.Tx, userID, groupID int64) bool {
+	user, err := s.repo.User.GetUserByUserID(tx, userID)
 	if err == nil && user.GroupID == groupID {
 		return true
 	}
@@ -292,18 +293,18 @@ func (s defaultAccountManagementService) DeleteGroup(userID, groupID int64) (err
 		return
 	}
 
-	if !s.authorizeGroupID(userID, groupID) {
+	if !s.authorizeGroupID(tx, userID, groupID) {
 		err = e.ErrNewAuthPermissionNotAllow
 		tx.Rollback()
 		return
 	}
-	err = s.checkDeletedRules(userID, groupID)
+	err = s.checkDeletedRules(tx, userID, groupID)
 	if err != nil {
 		tx.Rollback()
 		return
 	}
 
-	err = s.repo.User.DeleteGroup(userID, groupID)
+	err = s.repo.User.DeleteGroup(tx, userID, groupID)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"caused-by": "s.repo.User.DeleteGroup",
@@ -317,26 +318,26 @@ func (s defaultAccountManagementService) DeleteGroup(userID, groupID int64) (err
 	return
 }
 
-func (s defaultAccountManagementService) checkDeletedRules(userID, groupID int64) (err error) {
-	if s.isOwnAccountGroup(userID, groupID) {
+func (s defaultAccountManagementService) checkDeletedRules(tx *sql.Tx, userID, groupID int64) (err error) {
+	if s.isOwnAccountGroup(tx, userID, groupID) {
 		err = e.ErrNewOwnAccountGroupModifiedNotAllow
 		logrus.WithField("caused-by", err).Error()
 		return
 	}
-	if s.isSubGroupExisted(groupID) {
+	if s.isSubGroupExisted(tx, groupID) {
 		err = e.ErrNewAccountGroupHasSubGroup
 		logrus.WithField("caused-by", err).Error()
 		return
 	}
-	if s.isUserExistedInGroup(groupID) {
+	if s.isUserExistedInGroup(tx, groupID) {
 		err = e.ErrNewAccountGroupHasUser
 		logrus.WithField("caused-by", err).Error()
 	}
 	return
 }
 
-func (s defaultAccountManagementService) isSubGroupExisted(groupID int64) bool {
-	groups, err := s.repo.User.GetGroupsByGroupID(groupID)
+func (s defaultAccountManagementService) isSubGroupExisted(tx *sql.Tx, groupID int64) bool {
+	groups, err := s.repo.User.GetGroupsByGroupID(tx, groupID)
 	if err == nil {
 		for _, group := range groups {
 			if group.ParentID.Int64 == groupID {
@@ -347,13 +348,13 @@ func (s defaultAccountManagementService) isSubGroupExisted(groupID int64) bool {
 	return false
 }
 
-func (s defaultAccountManagementService) isUserExistedInGroup(groupID int64) bool {
-	count, _ := s.repo.User.GetUserCountByGroupID(groupID)
+func (s defaultAccountManagementService) isUserExistedInGroup(tx *sql.Tx, groupID int64) bool {
+	count, _ := s.repo.User.GetUserCountByGroupID(tx, groupID)
 	return count > 0
 }
 
-func (s defaultAccountManagementService) authorizeGroupID(userID, groupID int64) bool {
-	groups, err := s.getGroupTreeNodes(userID)
+func (s defaultAccountManagementService) authorizeGroupID(tx *sql.Tx, userID, groupID int64) bool {
+	groups, err := s.getGroupTreeNodes(tx, userID)
 	if err == nil {
 		for _, group := range groups {
 			if group.ID == groupID {

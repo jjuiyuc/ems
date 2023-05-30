@@ -138,7 +138,7 @@ func (s defaultUserService) PasswordResetByPasswordToken(token, newPassword stri
 // GetProfile godoc
 func (s defaultUserService) GetProfile(userID int64) (profile *ProfileResponse, err error) {
 	// Get user information
-	user, err := s.repo.User.GetUserByUserID(userID)
+	user, err := s.repo.User.GetUserByUserID(nil, userID)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "s.repo.User.GetUserByUserID",
@@ -148,7 +148,7 @@ func (s defaultUserService) GetProfile(userID int64) (profile *ProfileResponse, 
 	}
 
 	// Get group information
-	group, err := s.repo.User.GetGroupByGroupID(user.GroupID)
+	group, err := s.repo.User.GetGroupByGroupID(nil, user.GroupID)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "s.repo.User.GetGroupByGroupID",
@@ -269,7 +269,7 @@ func (s defaultUserService) getGroupWebpageInfo(groupTypeID int64) (webpageInfos
 }
 
 func (s defaultUserService) UpdateName(userID int64, name string) (err error) {
-	user, err := s.repo.User.GetUserByUserID(userID)
+	user, err := s.repo.User.GetUserByUserID(nil, userID)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "s.repo.User.GetUserByUserID",
@@ -289,7 +289,7 @@ func (s defaultUserService) UpdateName(userID int64, name string) (err error) {
 }
 
 func (s defaultUserService) UpdatePassword(userID int64, currentPassword, newPassword string) (errCode int, err error) {
-	user, err := s.repo.User.GetUserByUserID(userID)
+	user, err := s.repo.User.GetUserByUserID(nil, userID)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "s.repo.User.GetUserByUserID",

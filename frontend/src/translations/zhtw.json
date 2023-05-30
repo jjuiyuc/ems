@@ -14,8 +14,10 @@
     "accountManagementUser":{
         "account":"帳號",
         "addUser":"新增使用者",
+        "editUser":"修改使用者",
         "name":"名稱",
         "password":"密碼",
+        "unlockUser":"解鎖使用者",
         "user":"使用者"
     },
     "analysis": {
@@ -118,6 +120,7 @@
         "deletedSuccessfully":"刪除成功",
         "deleteMsg":"請問您是否要刪除這筆資料?",
         "editFieldInfo":"編輯場域資訊",
+        "editedSuccessfully":"修改成功",
         "fieldInfo":"場域資訊",
         "modifyNameMsg":"成功更改名字",
         "promptMsg":"If all charging resources are turned off, the battery will be in standby mode.",
@@ -217,6 +220,7 @@
         "emailNotExist": "帳號不存在，請重新輸入。",
         "failureToCreate":"新增失敗",
         "failureToDelete":"刪除失敗！",
+        "failureToEdit":"修改失敗",
         "failureToSave":"儲存失敗！",
         "groupHasSubGroup":"該群組之下尚有子群組。",
         "groupHasUser":"該群組內尚有使用者。",
@@ -224,7 +228,7 @@
         "modifyOwnAccountGroupNotAllow":"無法修改所屬群組的名稱。",
         "noDataMsg":"無顯示資料",
         "nameLength":"請輸入介於1到20個字",
-        "passwordFormat": "您輸入的密碼不符合密碼原則的要求，請重新輸入。",
+        "passwordFormat": "您輸入的密碼不符合密碼原則的要求，須包含8位以上英文字母及數字。",
         "passwordIncorrect": "密碼錯誤，請重新輸入。",
         "passwordLength":"請輸入介於8到50個字元",
         "passwordNotMatch": "密碼不一致，請重新輸入。",

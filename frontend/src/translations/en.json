@@ -14,8 +14,10 @@
     "accountManagementUser":{
         "account":"Account",
         "addUser":"Add User",
+        "editUser":"Edit User",
         "name":"Name",
         "password":"Password",
+        "unlockUser":"Unlock User",
         "user":"User"
     },
     "analysis": {
@@ -118,6 +120,7 @@
         "deleteMsg":"Are you sure you want to delete this?",
         "deletedSuccessfully":"Deleted Successfully.",
         "editFieldInfo":"Edit Field Info",
+        "editedSuccessfully":"Edited successfully.",
         "fieldInfo":"Field Info",
         "modifyNameMsg":"Modify name successfully",
         "promptMsg":"If all charging resources are turned off, the battery will be in standby mode.",
@@ -216,6 +219,7 @@
         "emailNotExist": "Account does not exist, please try again.",
         "failureToCreate":"Failure to create.",
         "failureToDelete":"Failure to delete",
+        "failureToEdit":"Failure to edit.",
         "failureToSave":"Failure to save",
         "groupHasSubGroup":"Account group has sub group.",
         "groupHasUser":"Account group has user.",
@@ -223,7 +227,7 @@
         "modifyOwnAccountGroupNotAllow":"Modify own account group does not allow.",
         "nameLength":"Please enter between 1 to 20 characters.",
         "noDataMsg":"No Data Message",
-        "passwordFormat": "Password must meet complexity requirements, please try again.",
+        "passwordFormat": "Password must meet complexity requirements,including at least 8 characters and numbers.",
         "passwordIncorrect": "Password is incorrect, please try again.",
         "passwordLength":"Please enter between 8 to 50 characters.",
         "passwordNotMatch": "Password does not match, please try again.",

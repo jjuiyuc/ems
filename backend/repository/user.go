@@ -109,12 +109,12 @@ func (repo defaultUserRepository) DeleteGroup(userID, groupID int64) (err error)
 	return
 }
 
-func (repo defaultUserRepository) IsGroupNameExistedOnSameLevel(group *deremsmodels.Group) bool {
-	count, _ := deremsmodels.Groups(
+func (repo defaultUserRepository) IsGroupNameExistedOnSameLevel(group *deremsmodels.Group) (exist bool) {
+	exist, _ = deremsmodels.Groups(
 		qm.Where("name = ?", group.Name),
 		qm.Where("parent_id = ?", group.ParentID),
-		qm.Where("deleted_at IS NULL")).Count(repo.db)
-	return count > 0
+		qm.Where("deleted_at IS NULL")).Exists(repo.db)
+	return
 }
 
 func (repo defaultUserRepository) GetGroupByGroupID(groupID int64) (*deremsmodels.Group, error) {

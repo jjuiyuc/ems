@@ -376,11 +376,11 @@ func validateBody[T any](next func(*gin.Context, *T)) gin.HandlerFunc {
 	}
 }
 
-func validateURIAndBody[T, T2 any](next func(*gin.Context, *T, *T2)) gin.HandlerFunc {
+func validateURIAndBody[URI, Body any](next func(*gin.Context, *URI, *Body)) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		appG := app.Gin{c}
-		uri := new(T)
-		body:= new(T2)
+		uri := new(URI)
+		body:= new(Body)
 		if err := c.ShouldBindUri(uri); err != nil {
 			log.WithField("caused-by", err).Error()
 			appG.Response(http.StatusBadRequest, e.InvalidParams, nil)

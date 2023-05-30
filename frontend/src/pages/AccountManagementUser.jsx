@@ -1,3 +1,4 @@
+import { connect } from "react-redux"
 import { Button, DialogActions, TextField } from "@mui/material"
 import LockIcon from "@mui/icons-material/Lock"
 
@@ -13,8 +14,11 @@ import Table from "../components/DataTable"
 
 import { ReactComponent as DeleteIcon } from "../assets/icons/trash_solid.svg"
 
-export default function AccountManagementUser() {
+const mapState = state => ({
+    username: state.user.username
+})
 
+export default connect(mapState)(function AccountManagementUser(props) {
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
@@ -66,8 +70,8 @@ export default function AccountManagementUser() {
                 <EditUser className="mr-4"
                     {...{ row, groupDict, onSave, getList }}
                 />
-                {row.group === "Area Owner_TW"
-                    ? null
+                {row.username === props.username
+                    ? <div className="bg-gray-600 w-6 h-6"></div>
                     : <DeleteIcon onClick={() => {
                         setOpenDelete(true)
                         setTarget(row)
@@ -148,4 +152,4 @@ export default function AccountManagementUser() {
             </DialogActions>
         </DialogForm>
     </>
-}
+})

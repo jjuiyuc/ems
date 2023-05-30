@@ -44,6 +44,10 @@ func sendAIBillingParams(cfg *viper.Viper, repo *repository.Repository, billing 
 	}
 
 	for _, gateway := range gateways {
+		if !repo.Gateway.MatchDownlinkRules(gateway) {
+			log.WithField("gateway-uuid", gateway.UUID).Warning("not-match-downlink-rules")
+			continue
+		}
 		data, err := billing.GenerateBillingParams(gateway, sendNow)
 		if err != nil {
 			continue

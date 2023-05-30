@@ -65,6 +65,8 @@ type GatewayRepository interface {
 	GetDeviceModels() ([]*deremsmodels.DeviceModel, error)
 	GetDeviceMappingByGatewayID(gwID int64) (devices []*DeviceWrap, err error)
 	GetDLDeviceMappingByGatewayID(gwID int64) (devices []*DLDeviceWrap, err error)
+	MatchDownlinkRules(gateway *deremsmodels.Gateway) bool
+	IsGatewayBoundField(gateway *deremsmodels.Gateway) bool
 }
 
 type defaultGatewayRepository struct {
@@ -220,4 +222,12 @@ func (repo defaultGatewayRepository) GetDLDeviceMappingByGatewayID(gwID int64) (
 		qm.Where("d.deleted_at IS NULL AND d.gw_id = ?", gwID),
 	).Bind(context.Background(), models.GetDB(), &devices)
 	return
+}
+
+func (repo defaultGatewayRepository) MatchDownlinkRules(gateway *deremsmodels.Gateway) bool {
+	return repo.IsGatewayBoundField(gateway) && gateway.Enable.Bool
+}
+
+func (repo defaultGatewayRepository) IsGatewayBoundField(gateway *deremsmodels.Gateway) bool {
+	return gateway.LocationID.Int64 > 0 && gateway.DeletedAt.IsZero()
 }

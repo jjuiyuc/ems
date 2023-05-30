@@ -98,6 +98,10 @@ func (s defaultWeatherService) getGatewayUUIDsByLocation(lat, lng float32) (gate
 		return
 	}
 	for _, gateway := range gateways {
+		if !s.repo.Gateway.MatchDownlinkRules(gateway) {
+			logrus.WithField("gateway-uuid", gateway.UUID).Warning("not-match-downlink-rules")
+			continue
+		}
 		gatewayUUIDs = append(gatewayUUIDs, gateway.UUID)
 	}
 	logrus.Debug("gatewayUUIDs: ", gatewayUUIDs)

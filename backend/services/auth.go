@@ -73,12 +73,12 @@ func (s defaultAuthService) Login(username, password string) (user *deremsmodels
 			now := time.Now().UTC()
 			user.LockedAt = null.TimeFrom(now)
 		}
-		s.repo.User.UpdateUser(user)
+		s.repo.User.UpdateUser(nil, user)
 		return
 	}
 	if nowPasswordRetryCount > 0 {
 		user.PasswordRetryCount = null.IntFrom(0)
-		s.repo.User.UpdateUser(user)
+		s.repo.User.UpdateUser(nil, user)
 	}
 
 	group, err := s.repo.User.GetGroupByGroupID(nil, user.GroupID)

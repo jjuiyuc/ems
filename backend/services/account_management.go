@@ -392,13 +392,20 @@ func (s defaultAccountManagementService) GetUsers(userID int64) (getUsers *GetUs
 }
 
 func (s defaultAccountManagementService) CreateUser(userID int64, body *app.CreateUserBody) (err error) {
-	if !s.authorizeGroupID(nil, userID, int64(body.GroupID)) {
-		err = e.ErrNewAuthPermissionNotAllow
+	tx, err := models.GetDB().BeginTx(context.Background(), nil)
+	if err != nil {
 		return
 	}
-	if s.repo.User.IsUsernameExisted(body.Username) {
+
+	if !s.authorizeGroupID(tx, userID, int64(body.GroupID)) {
+		err = e.ErrNewAuthPermissionNotAllow
+		tx.Rollback()
+		return
+	}
+	if s.repo.User.IsUsernameExisted(tx, body.Username) {
 		err = e.ErrNewAccountUsernameExist
 		logrus.WithField("caused-by", err).Error()
+		tx.Rollback()
 		return
 	}
 
@@ -408,6 +415,7 @@ func (s defaultAccountManagementService) CreateUser(userID int64, body *app.Crea
 			"caused-by": "utils.CreateHashedPassword",
 			"err":       err,
 		}).Error()
+		tx.Rollback()
 		return
 	}
 	user := &deremsmodels.User{
@@ -416,36 +424,52 @@ func (s defaultAccountManagementService) CreateUser(userID int64, body *app.Crea
 		Name:     null.StringFrom(body.Name),
 		GroupID:  int64(body.GroupID),
 	}
-	if err = s.repo.User.CreateUser(user); err != nil {
+	if err = s.repo.User.CreateUser(tx, user); err != nil {
 		logrus.WithFields(logrus.Fields{
 			"caused-by": "s.repo.User.CreateUser",
 			"err":       err,
 			"body":      *body,
 		}).Error()
+		tx.Rollback()
+		return
 	}
+
+	tx.Commit()
 	return
 }
 
 func (s defaultAccountManagementService) UpdateUser(executedUserID, userID int64, body *app.UpdateUserBody) (err error) {
-	if !s.authorizeUserID(executedUserID, userID) ||
-		(body.GroupID > 0 && !s.authorizeGroupID(nil, executedUserID, int64(body.GroupID))) {
-		err = e.ErrNewAuthPermissionNotAllow
+	tx, err := models.GetDB().BeginTx(context.Background(), nil)
+	if err != nil {
 		return
 	}
 
-	user, err := s.repo.User.GetUserByUserID(nil, userID)
+	if !s.authorizeUserID(tx, executedUserID, userID) ||
+		(body.GroupID > 0 && !s.authorizeGroupID(tx, executedUserID, int64(body.GroupID))) {
+		err = e.ErrNewAuthPermissionNotAllow
+		tx.Rollback()
+		return
+	}
+
+	user, err := s.repo.User.GetUserByUserID(tx, userID)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"caused-by": "s.repo.User.GetUserByUserID",
 			"err":       err,
 		}).Error()
+		tx.Rollback()
 		return
 	}
-	err = s.processUpdateUser(user, body)
+	if err = s.processUpdateUser(tx, user, body); err != nil {
+		tx.Rollback()
+		return
+	}
+
+	tx.Commit()
 	return
 }
 
-func (s defaultAccountManagementService) processUpdateUser(user *deremsmodels.User, body *app.UpdateUserBody) (err error) {
+func (s defaultAccountManagementService) processUpdateUser(tx *sql.Tx, user *deremsmodels.User, body *app.UpdateUserBody) (err error) {
 	if body.Password != "" {
 		var hashPassword string
 		hashPassword, err = utils.CreateHashedPassword(body.Password)
@@ -468,7 +492,7 @@ func (s defaultAccountManagementService) processUpdateUser(user *deremsmodels.Us
 		user.PasswordRetryCount = null.IntFrom(0)
 		user.LockedAt = null.TimeFromPtr(nil)
 	}
-	if err = s.repo.User.UpdateUser(user); err != nil {
+	if err = s.repo.User.UpdateUser(tx, user); err != nil {
 		logrus.WithFields(logrus.Fields{
 			"caused-by": "s.repo.User.UpdateUser",
 			"err":       err,
@@ -479,31 +503,42 @@ func (s defaultAccountManagementService) processUpdateUser(user *deremsmodels.Us
 }
 
 func (s defaultAccountManagementService) DeleteUser(executedUserID, userID int64) (err error) {
-	if !s.authorizeUserID(executedUserID, userID) {
+	tx, err := models.GetDB().BeginTx(context.Background(), nil)
+	if err != nil {
+		return
+	}
+
+	if !s.authorizeUserID(tx, executedUserID, userID) {
 		err = e.ErrNewAuthPermissionNotAllow
+		tx.Rollback()
 		return
 	}
 	if executedUserID == userID {
 		err = e.ErrNewOwnAccountDeletedNotAllow
 		logrus.WithField("caused-by", err).Error()
+		tx.Rollback()
 		return
 	}
 
-	if err = s.repo.User.DeleteUser(executedUserID, userID); err != nil {
+	if err = s.repo.User.DeleteUser(tx, executedUserID, userID); err != nil {
 		logrus.WithFields(logrus.Fields{
 			"caused-by": "s.repo.User.DeleteUser",
 			"err":       err,
 		}).Error()
+		tx.Rollback()
+		return
 	}
+
+	tx.Commit()
 	return
 }
 
-func (s defaultAccountManagementService) authorizeUserID(executedUserID, userID int64) bool {
-	user, err := s.repo.User.GetUserByUserID(nil, userID)
+func (s defaultAccountManagementService) authorizeUserID(tx *sql.Tx, executedUserID, userID int64) bool {
+	user, err := s.repo.User.GetUserByUserID(tx, userID)
 	if err != nil || !user.DeletedAt.IsZero() {
 		return false
 	}
-	groups, err := s.getGroupTreeNodes(nil, executedUserID)
+	groups, err := s.getGroupTreeNodes(tx, executedUserID)
 	if err == nil {
 		for _, group := range groups {
 			if group.ID == user.GroupID {

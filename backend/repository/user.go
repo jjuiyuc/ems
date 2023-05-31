@@ -30,16 +30,16 @@ type UserWrap struct {
 // UserRepository godoc
 type UserRepository interface {
 	InsertLoginLog(loginLog *deremsmodels.LoginLog) error
-	CreateUser(user *deremsmodels.User) error
-	UpdateUser(user *deremsmodels.User) (err error)
-	DeleteUser(executedUserID, userID int64) (err error)
+	CreateUser(tx *sql.Tx, user *deremsmodels.User) error
+	UpdateUser(tx *sql.Tx, user *deremsmodels.User) (err error)
+	DeleteUser(tx *sql.Tx, executedUserID, userID int64) (err error)
 	GetLoginLogCount() (int64, error)
 	GetUserByUserID(tx *sql.Tx, userID int64) (*deremsmodels.User, error)
 	GetUserByUsername(username string) (*deremsmodels.User, error)
 	GetUserByPasswordToken(token string) (*deremsmodels.User, error)
 	GetUserWrapsByGroupIDs(groupIDs []interface{}) ([]*UserWrap, error)	
 	IsUserExistedInGroup(tx *sql.Tx, groupID int64) bool
-	IsUsernameExisted(username string) bool
+	IsUsernameExisted(tx *sql.Tx, username string) bool
 	CreateGroup(tx *sql.Tx, group *deremsmodels.Group) (err error)
 	UpdateGroup(tx *sql.Tx, group *deremsmodels.Group) (err error)
 	DeleteGroup(tx *sql.Tx, executedUserID, groupID int64) (err error)
@@ -69,25 +69,26 @@ func (repo defaultUserRepository) InsertLoginLog(loginLog *deremsmodels.LoginLog
 	return loginLog.Insert(repo.db, boil.Infer())
 }
 
-func (repo defaultUserRepository) CreateUser(user *deremsmodels.User) error {
-	return user.Insert(repo.db, boil.Infer())
+func (repo defaultUserRepository) CreateUser(tx *sql.Tx, user *deremsmodels.User) error {
+	return user.Insert(repo.getExecutor(tx), boil.Infer())
 }
 
 // UpdateUser godoc
-func (repo defaultUserRepository) UpdateUser(user *deremsmodels.User) (err error) {
+func (repo defaultUserRepository) UpdateUser(tx *sql.Tx, user *deremsmodels.User) (err error) {
 	user.UpdatedAt = time.Now().UTC()
-	_, err = user.Update(repo.db, boil.Infer())
+	_, err = user.Update(repo.getExecutor(tx), boil.Infer())
 	return
 }
 
-func (repo defaultUserRepository) DeleteUser(executedUserID, userID int64) (err error) {
-	user, err := deremsmodels.FindUser(repo.db, userID)
+func (repo defaultUserRepository) DeleteUser(tx *sql.Tx, executedUserID, userID int64) (err error) {
+	exec := repo.getExecutor(tx)
+	user, err := deremsmodels.FindUser(exec, userID)
 	if err == nil {
 		now := time.Now().UTC()
 		user.UpdatedAt = now
 		user.DeletedAt = null.TimeFrom(now)
 		user.DeletedBy = null.Int64From(executedUserID)
-		_, err = user.Update(repo.db, boil.Infer())
+		_, err = user.Update(exec, boil.Infer())
 	}
 	return
 }
@@ -146,10 +147,10 @@ func (repo defaultUserRepository) IsUserExistedInGroup(tx *sql.Tx, groupID int64
 	return
 }
 
-func (repo defaultUserRepository) IsUsernameExisted(username string) (exist bool) {
+func (repo defaultUserRepository) IsUsernameExisted(tx *sql.Tx, username string) (exist bool) {
 	exist, _ = deremsmodels.Users(
 		qm.Where("username = ?", username),
-		qm.Where("deleted_at IS NULL")).Exists(repo.db)
+		qm.Where("deleted_at IS NULL")).Exists(repo.getExecutor(tx))
 	return
 }
 

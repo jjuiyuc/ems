@@ -20,6 +20,7 @@ type AccountManagementService interface {
 	GetGroups(userID int64) (getGroups *GetGroupsResponse, err error)
 	CreateGroup(body *app.CreateGroupBody) (err error)
 	GetGroup(userID, groupID int64) (getGroup *GetGroupResponse, err error)
+	GetGroupGateways(groupID int64) (groupGateways []GroupGatewayInfo)
 	UpdateGroup(executedUserID, groupID int64, body *app.UpdateGroupBody) (err error)
 	DeleteGroup(executedUserID, groupID int64) (err error)
 	GetUsers(userID int64) (getUsers *GetUsersResponse, err error)
@@ -174,7 +175,7 @@ func (s defaultAccountManagementService) GetGroup(userID, groupID int64) (getGro
 		}).Error()
 		return
 	}
-	gateways := s.getGroupGateways(groupID)
+	gateways := s.GetGroupGateways(groupID)
 
 	getGroup = &GetGroupResponse{
 		Name:     group.Name,
@@ -185,7 +186,7 @@ func (s defaultAccountManagementService) GetGroup(userID, groupID int64) (getGro
 	return
 }
 
-func (s defaultAccountManagementService) getGroupGateways(groupID int64) (groupGateways []GroupGatewayInfo) {
+func (s defaultAccountManagementService) GetGroupGateways(groupID int64) (groupGateways []GroupGatewayInfo) {
 	gatewaysPermission, err := s.repo.User.GetGatewaysPermissionByGroupID(groupID, false)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{

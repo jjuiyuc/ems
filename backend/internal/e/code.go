@@ -50,4 +50,5 @@ const (
 	ErrAccountUserUpdate                = 60014
 	ErrOwnAccountDeletedNotAllow        = 60015
 	ErrAccountUserDelete                = 60016
+	ErrFieldsGen                        = 60017
 )

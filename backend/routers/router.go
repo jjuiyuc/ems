@@ -104,6 +104,9 @@ var EndpointMapping = map[PolicyWebpageObject][]string{
 		"/api/:gwid/devices/grid/energy-info",
 		"/api/:gwid/devices/grid/power-state",
 	},
+	FieldManagement: {
+		"/api/device-management/gateways",
+	},
 	AccountManagementGroup: {
 		"/api/account-management/groups",
 		"/api/account-management/groups/:groupid",
@@ -208,6 +211,9 @@ func InitRouter(isCORS bool, ginMode string, enforcer *casbin.Enforcer, w *APIWo
 	// Energy Resources - Grid tab
 	r.GET(EndpointMapping[EnergyResources][5], authorizeJWT(REST), authorizePolicy(enforcer), w.GetGridEnergyInfo)
 	r.GET(EndpointMapping[EnergyResources][6], authorizeJWT(REST), authorizePolicy(enforcer), w.GetGridPowerState)
+
+	// Field Management
+	r.GET(EndpointMapping[FieldManagement][0], authorizeJWT(REST), authorizePolicy(enforcer), w.GetFields)
 
 	// Account Management Group
 	r.GET(EndpointMapping[AccountManagementGroup][0], authorizeJWT(REST), authorizePolicy(enforcer), w.GetGroups)

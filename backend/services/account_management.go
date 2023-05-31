@@ -148,8 +148,7 @@ func (s defaultAccountManagementService) CreateGroup(body *app.CreateGroupBody) 
 		tx.Rollback()
 		return
 	}
-	err = s.repo.User.CreateGroup(tx, group)
-	if err != nil {
+	if err = s.repo.User.CreateGroup(tx, group); err != nil {
 		logrus.WithFields(logrus.Fields{
 			"caused-by": "s.repo.User.CreateGroup",
 			"err":       err,
@@ -264,8 +263,7 @@ func (s defaultAccountManagementService) UpdateGroup(userID, groupID int64, body
 		tx.Rollback()
 		return
 	}
-	err = s.repo.User.UpdateGroup(tx, group)
-	if err != nil {
+	if err = s.repo.User.UpdateGroup(tx, group); err != nil {
 		logrus.WithFields(logrus.Fields{
 			"caused-by": "s.repo.User.UpdateGroup",
 			"err":       err,
@@ -298,14 +296,12 @@ func (s defaultAccountManagementService) DeleteGroup(userID, groupID int64) (err
 		tx.Rollback()
 		return
 	}
-	err = s.checkDeletedRules(tx, userID, groupID)
-	if err != nil {
+	if err = s.checkDeletedRules(tx, userID, groupID); err != nil {
 		tx.Rollback()
 		return
 	}
 
-	err = s.repo.User.DeleteGroup(tx, userID, groupID)
-	if err != nil {
+	if err = s.repo.User.DeleteGroup(tx, userID, groupID); err != nil {
 		logrus.WithFields(logrus.Fields{
 			"caused-by": "s.repo.User.DeleteGroup",
 			"err":       err,

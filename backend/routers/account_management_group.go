@@ -52,8 +52,7 @@ func (w *APIWorker) GetGroups(c *gin.Context) {
 // @Router      /account-management/groups [post]
 func (w *APIWorker) CreateGroup(c *gin.Context, body *app.CreateGroupBody) {
 	appG := app.Gin{c}
-	err := w.Services.AccountManagement.CreateGroup(body)
-	if err != nil {
+	if err := w.Services.AccountManagement.CreateGroup(body); err != nil {
 		var code int
 		if errors.Is(err, e.ErrNewAccountGroupNameOnSameLevelExist) {
 			code = e.ErrAccountGroupNameOnSameLevelExist
@@ -114,8 +113,7 @@ func (w *APIWorker) GetGroup(c *gin.Context, uri *app.GroupURI) {
 func (w *APIWorker) UpdateGroup(c *gin.Context, uri *app.GroupURI, body *app.UpdateGroupBody) {
 	appG := app.Gin{c}
 	userID, _ := c.Get("userID")
-	err := w.Services.AccountManagement.UpdateGroup(userID.(int64), uri.GroupID, body)
-	if err != nil {
+	if err := w.Services.AccountManagement.UpdateGroup(userID.(int64), uri.GroupID, body); err != nil {
 		if errors.Is(err, e.ErrNewAuthPermissionNotAllow) {
 			appG.Response(http.StatusForbidden, e.ErrAuthPermissionNotAllow, nil)
 			return

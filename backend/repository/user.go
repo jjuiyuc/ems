@@ -162,11 +162,9 @@ func (repo defaultUserRepository) GetWebpageByWebpageID(webpagesID int64) (*dere
 	return deremsmodels.FindWebpage(repo.db, webpagesID)
 }
 
-func (repo defaultUserRepository) getExecutor(tx *sql.Tx) (exec boil.Executor) {
+func (repo defaultUserRepository) getExecutor(tx *sql.Tx) boil.Executor {
 	if tx == nil {
-		exec = repo.db
-		return
+		return repo.db
 	}
-	exec = tx
-	return
+	return tx
 }

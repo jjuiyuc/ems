@@ -396,7 +396,7 @@ func (s defaultAccountManagementService) CreateUser(userID int64, body *app.Crea
 		err = e.ErrNewAuthPermissionNotAllow
 		return
 	}
-	if s.isUsernameExisted(body.Username) {
+	if s.repo.User.IsUsernameExisted(body.Username) {
 		err = e.ErrNewAccountUsernameExist
 		logrus.WithField("caused-by", err).Error()
 		return
@@ -424,11 +424,6 @@ func (s defaultAccountManagementService) CreateUser(userID int64, body *app.Crea
 		}).Error()
 	}
 	return
-}
-
-func (s defaultAccountManagementService) isUsernameExisted(username string) bool {
-	count, _ := s.repo.User.GetUserCountByUsername(username)
-	return count > 0
 }
 
 func (s defaultAccountManagementService) UpdateUser(executedUserID, userID int64, body *app.UpdateUserBody) (err error) {

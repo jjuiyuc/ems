@@ -38,8 +38,8 @@ type UserRepository interface {
 	GetUserByUsername(username string) (*deremsmodels.User, error)
 	GetUserByPasswordToken(token string) (*deremsmodels.User, error)
 	GetUserWrapsByGroupIDs(groupIDs []interface{}) ([]*UserWrap, error)	
-	GetUserCountByUsername(username string) (int64, error)
 	IsUserExistedInGroup(tx *sql.Tx, groupID int64) bool
+	IsUsernameExisted(username string) bool
 	CreateGroup(tx *sql.Tx, group *deremsmodels.Group) (err error)
 	UpdateGroup(tx *sql.Tx, group *deremsmodels.Group) (err error)
 	DeleteGroup(tx *sql.Tx, executedUserID, groupID int64) (err error)
@@ -146,14 +146,15 @@ func (repo defaultUserRepository) IsUserExistedInGroup(tx *sql.Tx, groupID int64
 	return
 }
 
-func (repo defaultUserRepository) CreateGroup(tx *sql.Tx, group *deremsmodels.Group) (err error) {
-	return group.Insert(repo.getExecutor(tx), boil.Infer())
+func (repo defaultUserRepository) IsUsernameExisted(username string) (exist bool) {
+	exist, _ = deremsmodels.Users(
+		qm.Where("username = ?", username),
+		qm.Where("deleted_at IS NULL")).Exists(repo.db)
+	return
 }
 
-func (repo defaultUserRepository) GetUserCountByUsername(username string) (int64, error) {
-	return deremsmodels.Users(
-		qm.Where("username = ?", username),
-		qm.Where("deleted_at IS NULL")).Count(repo.db)
+func (repo defaultUserRepository) CreateGroup(tx *sql.Tx, group *deremsmodels.Group) (err error) {
+	return group.Insert(repo.getExecutor(tx), boil.Infer())
 }
 
 func (repo defaultUserRepository) UpdateGroup(tx *sql.Tx, group *deremsmodels.Group) (err error) {

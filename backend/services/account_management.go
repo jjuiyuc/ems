@@ -325,7 +325,7 @@ func (s defaultAccountManagementService) checkDeletedRules(tx *sql.Tx, userID, g
 		logrus.WithField("caused-by", err).Error()
 		return
 	}
-	if s.isUserExistedInGroup(tx, groupID) {
+	if s.repo.User.IsUserExistedInGroup(tx, groupID) {
 		err = e.ErrNewAccountGroupHasUser
 		logrus.WithField("caused-by", err).Error()
 	}
@@ -342,11 +342,6 @@ func (s defaultAccountManagementService) isSubGroupExisted(tx *sql.Tx, groupID i
 		}
 	}
 	return false
-}
-
-func (s defaultAccountManagementService) isUserExistedInGroup(tx *sql.Tx, groupID int64) bool {
-	count, _ := s.repo.User.GetUserCountByGroupID(tx, groupID)
-	return count > 0
 }
 
 func (s defaultAccountManagementService) authorizeGroupID(tx *sql.Tx, userID, groupID int64) bool {

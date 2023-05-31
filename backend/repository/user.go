@@ -20,7 +20,7 @@ type UserRepository interface {
 	GetUserByUserID(tx *sql.Tx, userID int64) (*deremsmodels.User, error)
 	GetUserByUsername(username string) (*deremsmodels.User, error)
 	GetUserByPasswordToken(token string) (*deremsmodels.User, error)
-	GetUserCountByGroupID(tx *sql.Tx, groupID int64) (int64, error)
+	IsUserExistedInGroup(tx *sql.Tx, groupID int64) bool
 	CreateGroup(tx *sql.Tx, group *deremsmodels.Group) (err error)
 	UpdateGroup(tx *sql.Tx, group *deremsmodels.Group) (err error)
 	DeleteGroup(tx *sql.Tx, userID, groupID int64) (err error)
@@ -81,10 +81,11 @@ func (repo defaultUserRepository) GetUserByPasswordToken(token string) (*deremsm
 		qm.Where("pwd_token_expiry > ?", time.Now().UTC())).One(repo.db)
 }
 
-func (repo defaultUserRepository) GetUserCountByGroupID(tx *sql.Tx, groupID int64) (int64, error) {
-	return deremsmodels.Users(
+func (repo defaultUserRepository) IsUserExistedInGroup(tx *sql.Tx, groupID int64) (exist bool) {
+	exist, _ = deremsmodels.Users(
 		qm.Where("group_id = ?", groupID),
-		qm.Where("deleted_at IS NULL")).Count(repo.getExecutor(tx))
+		qm.Where("deleted_at IS NULL")).Exists(repo.getExecutor(tx))
+	return
 }
 
 func (repo defaultUserRepository) CreateGroup(tx *sql.Tx, group *deremsmodels.Group) (err error) {

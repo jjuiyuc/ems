@@ -85,3 +85,24 @@ $ go run weather-worker.go -d <config_path> -e <yaml_filename>
   # Restart a process
   pm2 restart "core-local-cc-worker"
   ```
+
+## Frontend
+
+### Deploy with GitLab CI/CD
+
+#### Basic Information
+- All the commits can be deployed although there's no frontend changes in it.
+- The version name would be set as the last commit number.
+
+#### Steps
+1. Go to the [Pipeline](https://gitlab.com/ubiik/ems/der-ems/-/pipelines) page and locate the relevant pipeline.
+2. Click stage button to open the job list for that pipeline.
+3. Find the job named `deploy-frontend-dev` or `deploy-frontend-production`.
+   - Show all sections in TOU page:
+      - Click the `play` button to run the job directly.
+   - Hide `Mid Peak` sections:
+      1. Go to the job page.
+      2. Fill out the form with following information:
+         - Key: `HIDE_MID_PEAK`
+         - Value: `true`
+      3. Click `Run job` button below the form to run the job with the specified version number.

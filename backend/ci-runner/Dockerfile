@@ -9,12 +9,32 @@ RUN wget -O kafka.tgz https://archive.apache.org/dist/kafka/3.0.0/kafka_2.13-3.0
 RUN mkdir /opt/kafka
 RUN tar -xzvf kafka.tgz --strip 1 -C /opt/kafka
 
+# install ssh client
+RUN apt-get update -y && apt-get install openssh-client -y
+
+# install python
+RUN apt-get update -y && apt-get -y install python3 python3-pip python3-dev
+
+# install ansible
+RUN pip3 install ansible
+
 # mysql 8.0
 RUN wget https://repo.mysql.com/mysql-apt-config_0.8.13-1_all.deb
 RUN dpkg -i mysql-apt-config_0.8.13-1_all.deb
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 467B942D3A79BD29
 
 RUN apt-get update && apt-get install -y mysql-server openjdk-8-jre-headless
+
+# node.js
+RUN curl -sL https://deb.nodesource.com/setup_14.x -o nodesource_setup.sh
+RUN bash nodesource_setup.sh
+RUN apt install nodejs
+
+# yarn
+RUN npm install yarn -g
+
+# jest-junit
+RUN yarn add jest-junit -g
 
 # go 1.18
 RUN wget https://dl.google.com/go/go1.18.2.linux-amd64.tar.gz

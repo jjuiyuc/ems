@@ -91,8 +91,9 @@ $ go run weather-worker.go -d <config_path> -e <yaml_filename>
 ### Deploy with GitLab CI/CD
 
 #### Basic Information
-- All the commits can be deployed although there's no frontend changes in it.
-- The version name would be set as the last commit number.
+- All the commits can be deployed although there's no any frontend changes in it.
+- The version name would be `{Branch Name}-{Commit SHA}`.
+- The folder `/var/www/dist` on the target server will be replaced without backup.
 
 #### Steps
 1. Go to the [Pipeline](https://gitlab.com/ubiik/ems/der-ems/-/pipelines) page and locate the relevant pipeline.

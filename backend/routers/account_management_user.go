@@ -55,8 +55,7 @@ func (w *APIWorker) GetUsers(c *gin.Context) {
 func (w *APIWorker) CreateUser(c *gin.Context, body *app.CreateUserBody) {
 	appG := app.Gin{c}
 	userID, _ := c.Get("userID")
-	err := w.Services.AccountManagement.CreateUser(userID.(int64), body)
-	if err != nil {
+	if err := w.Services.AccountManagement.CreateUser(userID.(int64), body); err != nil {
 		if errors.Is(err, e.ErrNewAuthPermissionNotAllow) {
 			appG.Response(http.StatusForbidden, e.ErrAuthPermissionNotAllow, nil)
 			return
@@ -101,8 +100,7 @@ func (w *APIWorker) CreateUser(c *gin.Context, body *app.CreateUserBody) {
 func (w *APIWorker) UpdateUser(c *gin.Context, uri *app.UserURI, body *app.UpdateUserBody) {
 	appG := app.Gin{c}
 	userID, _ := c.Get("userID")
-	err := w.Services.AccountManagement.UpdateUser(userID.(int64), uri.UserID, body)
-	if err != nil {
+	if err := w.Services.AccountManagement.UpdateUser(userID.(int64), uri.UserID, body); err != nil {
 		if errors.Is(err, e.ErrNewAuthPermissionNotAllow) {
 			appG.Response(http.StatusForbidden, e.ErrAuthPermissionNotAllow, nil)
 			return
@@ -132,8 +130,7 @@ func (w *APIWorker) UpdateUser(c *gin.Context, uri *app.UserURI, body *app.Updat
 func (w *APIWorker) DeleteUser(c *gin.Context, uri *app.UserURI) {
 	appG := app.Gin{c}
 	userID, _ := c.Get("userID")
-	err := w.Services.AccountManagement.DeleteUser(userID.(int64), uri.UserID)
-	if err != nil {
+	if err := w.Services.AccountManagement.DeleteUser(userID.(int64), uri.UserID); err != nil {
 		if errors.Is(err, e.ErrNewAuthPermissionNotAllow) {
 			appG.Response(http.StatusForbidden, e.ErrAuthPermissionNotAllow, nil)
 			return

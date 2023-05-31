@@ -416,8 +416,7 @@ func (s defaultAccountManagementService) CreateUser(userID int64, body *app.Crea
 		Name:     null.StringFrom(body.Name),
 		GroupID:  int64(body.GroupID),
 	}
-	err = s.repo.User.CreateUser(user)
-	if err != nil {
+	if err = s.repo.User.CreateUser(user); err != nil {
 		logrus.WithFields(logrus.Fields{
 			"caused-by": "s.repo.User.CreateUser",
 			"err":       err,
@@ -474,8 +473,7 @@ func (s defaultAccountManagementService) processUpdateUser(user *deremsmodels.Us
 		user.PasswordRetryCount = null.IntFrom(0)
 		user.LockedAt = null.TimeFromPtr(nil)
 	}
-	err = s.repo.User.UpdateUser(user)
-	if err != nil {
+	if err = s.repo.User.UpdateUser(user); err != nil {
 		logrus.WithFields(logrus.Fields{
 			"caused-by": "s.repo.User.UpdateUser",
 			"err":       err,
@@ -496,8 +494,7 @@ func (s defaultAccountManagementService) DeleteUser(executedUserID, userID int64
 		return
 	}
 
-	err = s.repo.User.DeleteUser(executedUserID, userID)
-	if err != nil {
+	if err = s.repo.User.DeleteUser(executedUserID, userID); err != nil {
 		logrus.WithFields(logrus.Fields{
 			"caused-by": "s.repo.User.DeleteUser",
 			"err":       err,

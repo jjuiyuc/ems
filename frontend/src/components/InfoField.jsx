@@ -19,7 +19,8 @@ export default function InfoField({
         t = useTranslation(),
         commonT = string => t("common." + string),
         dialogT = (string) => t("dialog." + string),
-        formT = (string) => t("form." + string)
+        formT = (string) => t("form." + string),
+        pageT = (string, params) => t("fieldManagement." + string, params)
 
     const
         [openNotice, setOpenNotice] = useState(false),
@@ -43,9 +44,7 @@ export default function InfoField({
         ]),
         [energyCapacity, setEnergyCapacity] = useState(null),
         [voltage, setVoltage] = useState(null),
-        [subPowerCapacity, setSubPowerCapacity] = useState(""),
-        [fullWidth, setFullWidth] = useState(true),
-        [maxWidth, setMaxWidth] = useState("md")
+        [subPowerCapacity, setSubPowerCapacity] = useState("")
 
     const
         inputPercent = (e) => {
@@ -63,8 +62,8 @@ export default function InfoField({
             onClick={handleClick} />
         <DialogForm
             dialogTitle={dialogT("fieldInfo")}
-            fullWidth={fullWidth}
-            maxWidth={maxWidth}
+            fullWidth={true}
+            maxWidth="md"
             open={openNotice}
             setOpen={setOpenNotice}>
             <Divider variant="middle" />

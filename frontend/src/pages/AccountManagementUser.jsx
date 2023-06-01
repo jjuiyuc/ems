@@ -60,12 +60,12 @@ export default connect(mapState)(function AccountManagementUser(props) {
         },
         {
             cell: (row) => <div className="flex w-24">
-                <EditUser
-                    {...{ row, groupDictionary, onSave, getList }}
-                />
                 {row.username === props.username
                     ? <div className="bg-gray-600 w-6 h-6"></div>
-                    : <DeleteUser {...{ row, getList }} />
+                    : <>
+                        <EditUser {...{ row, groupDictionary, onSave, getList }} />
+                        <DeleteUser {...{ row, getList }} />
+                    </>
                 }
                 {row.lockedAt === null
                     ? <div className="ml-4 bg-gray-600 w-6 h-6"></div>

@@ -22,7 +22,7 @@ export default connect(mapState)(function AccountManagementUser(props) {
         pageT = (string, params) => t("accountManagementUser." + string, params)
     const
         [userList, setUserList] = useState([]),
-        [groupDict, setGroupDict] = useState({}),
+        [groupDictionary, setGroupDictionary] = useState({}),
         [loading, setLoading] = useState(false),
         [infoError, setInfoError] = useState("")
 
@@ -61,7 +61,7 @@ export default connect(mapState)(function AccountManagementUser(props) {
         {
             cell: (row) => <div className="flex w-24">
                 <EditUser
-                    {...{ row, groupDict, onSave, getList }}
+                    {...{ row, groupDictionary, onSave, getList }}
                 />
                 {row.username === props.username
                     ? <div className="bg-gray-600 w-6 h-6"></div>
@@ -87,22 +87,36 @@ export default connect(mapState)(function AccountManagementUser(props) {
                 const { data } = rawData
 
                 setUserList(data.users || [])
-                setGroupDict(data.users?.reduce((acc, cur) => {
-                    acc[cur.groupID] = cur.groupName
-                    return acc
-                }, {}) || {})
             },
             url: `/api/account-management/users`
         })
     }
+    const getGroupList = () => {
+        apiCall({
+            onComplete: () => setLoading(false),
+            onError: error => setInfoError(error),
+            onStart: () => setLoading(true),
+            onSuccess: rawData => {
+                if (!rawData?.data) return
+
+                const { data } = rawData
+                setGroupDictionary(data.groups?.reduce((acc, cur) => {
+                    acc[cur.id] = cur.name
+                    return acc
+                }, {}) || {})
+            },
+            url: `/api/account-management/groups`
+        })
+    }
     useEffect(() => {
         getList()
+        getGroupList()
     }, [])
 
     return <>
         <h1 className="mb-9">{commonT("accountManagementUser")}</h1>
         <div className="mb-9">
-            <AddUser {...{ getList, userList, groupDict }} />
+            <AddUser {...{ getList, userList, groupDictionary }} />
         </div>
         <Table
             {...{ columns, data: userList }}

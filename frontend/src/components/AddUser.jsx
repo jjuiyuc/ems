@@ -17,7 +17,7 @@ const mapDispatch = dispatch => ({
 
 })
 export default connect(null, mapDispatch)(function AddUser(props) {
-    const { getList, groupDict } = props
+    const { getList, groupDictionary } = props
 
     const
         t = useTranslation(),
@@ -189,7 +189,7 @@ export default connect(null, mapDispatch)(function AddUser(props) {
                     onChange={changeGroup}
                     label={commonT("group")}
                     defaultValue="">
-                    {Object.entries(groupDict).map(([key, value]) =>
+                    {Object.entries(groupDictionary).map(([key, value]) =>
                         <MenuItem key={"a-g-" + key} value={key}>
                             {value}
                         </MenuItem>)}

@@ -21,7 +21,7 @@ const mapDispatch = dispatch => ({
 })
 export default connect(null, mapDispatch)(function EditUser(props) {
 
-    const { row, groupDict, onSave = () => { }, getList } = props
+    const { row, groupDictionary, onSave = () => { }, getList } = props
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
@@ -193,7 +193,7 @@ export default connect(null, mapDispatch)(function EditUser(props) {
                     label={commonT("group")}
                     onChange={changeGroup}
                     value={group}>
-                    {Object.entries(groupDict).map(([key, value]) =>
+                    {Object.entries(groupDictionary).map(([key, value]) =>
                         <MenuItem key={"e-g-" + key} value={key}>
                             {value}
                         </MenuItem>)}

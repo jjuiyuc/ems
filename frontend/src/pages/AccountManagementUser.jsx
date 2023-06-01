@@ -1,18 +1,14 @@
 import { connect } from "react-redux"
-import { Button, DialogActions, TextField } from "@mui/material"
 import LockIcon from "@mui/icons-material/Lock"
-
 import { useTranslation } from "react-multi-lang"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 
 import { apiCall } from "../utils/api"
 
 import AddUser from "../components/AddUser"
 import EditUser from "../components/EditUser"
-import DialogForm from "../components/DialogForm"
+import DeleteUser from "../components/DeleteUser"
 import Table from "../components/DataTable"
-
-import { ReactComponent as DeleteIcon } from "../assets/icons/trash_solid.svg"
 
 const mapState = state => ({
     username: state.user.username
@@ -28,9 +24,7 @@ export default connect(mapState)(function AccountManagementUser(props) {
         [userList, setUserList] = useState([]),
         [groupDict, setGroupDict] = useState({}),
         [loading, setLoading] = useState(false),
-        [infoError, setInfoError] = useState(""),
-        [openDelete, setOpenDelete] = useState(false),
-        [target, setTarget] = useState({})
+        [infoError, setInfoError] = useState("")
 
     const onSave = (row) => {
         const newData = userList.map((value) =>
@@ -38,7 +32,6 @@ export default connect(mapState)(function AccountManagementUser(props) {
         )
         setUserList(newData)
     }
-
     const columns = [
         {
             cell: row => <span className="font-mono">{row.username}</span>,
@@ -67,15 +60,12 @@ export default connect(mapState)(function AccountManagementUser(props) {
         },
         {
             cell: (row) => <div className="flex w-24">
-                <EditUser className="mr-4"
+                <EditUser
                     {...{ row, groupDict, onSave, getList }}
                 />
                 {row.username === props.username
                     ? <div className="bg-gray-600 w-6 h-6"></div>
-                    : <DeleteIcon onClick={() => {
-                        setOpenDelete(true)
-                        setTarget(row)
-                    }} />
+                    : <DeleteUser {...{ row, getList }} />
                 }
                 {row.lockedAt === null
                     ? <div className="ml-4 bg-gray-600 w-6 h-6"></div>
@@ -124,32 +114,5 @@ export default connect(mapState)(function AccountManagementUser(props) {
             progressPending={loading}
             theme="dark"
         />
-        {/* delete */}
-        <DialogForm
-            dialogTitle={dialogT("deleteMsg")}
-            fullWidth={true}
-            maxWidth="sm"
-            open={openDelete}
-            setOpen={setOpenDelete}>
-            <div className="flex">
-                <h5 className="ml-6 mr-2">{pageT("account")} :</h5>
-                {target?.account || ""}
-            </div>
-            <DialogActions sx={{ margin: "0.5rem 0.5rem 0.5rem 0" }}>
-                <Button onClick={() => { setOpenDelete(false) }}
-                    radius="pill"
-                    variant="outlined"
-                    color="gray">
-                    {commonT("cancel")}
-                </Button>
-                <Button onClick={() => { setOpenDelete(false) }} autoFocus
-                    radius="pill"
-                    variant="contained"
-                    color="negative"
-                    sx={{ color: "#ffffff" }}>
-                    {commonT("delete")}
-                </Button>
-            </DialogActions>
-        </DialogForm>
     </>
 })

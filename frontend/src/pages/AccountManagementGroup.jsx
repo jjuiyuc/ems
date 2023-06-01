@@ -18,7 +18,6 @@ export default connect(mapState)(function AccountManagementGroup(props) {
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
-        dialogT = (string) => t("dialog." + string),
         pageT = (string, params) => t("accountManagementGroup." + string, params)
 
     const

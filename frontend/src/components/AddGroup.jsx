@@ -28,7 +28,8 @@ export default connect(null, mapDispatch)(function AddGroup(props) {
         [groupType, setGroupType] = useState(null),
         [groupTypeError, setGroupTypeError] = useState(false),
         [parentGroup, setParentGroup] = useState(null),
-        [parentGroupError, setParentGroupError] = useState(false)
+        [parentGroupError, setParentGroupError] = useState(false),
+        [otherError, setOtherError] = useState("")
 
     const submitDisabled = !groupName.length || groupType == null || parentGroup == null || isGroupNameError || groupTypeError || parentGroupError
     const
@@ -46,13 +47,13 @@ export default connect(null, mapDispatch)(function AddGroup(props) {
         .filter(item => item.typeID == 2)
 
     const
-        submit = () => {
+        submit = async () => {
             const data = {
                 name: groupName,
                 typeID: parseInt(groupType),
                 parentID: parseInt(parentGroup)
             }
-            apiCall({
+            await apiCall({
                 method: "post",
                 data,
                 onSuccess: () => {
@@ -66,14 +67,30 @@ export default connect(null, mapDispatch)(function AddGroup(props) {
                     setGroupType(null)
                     setParentGroup(null)
                 },
-                onError: () => {
-                    props.updateSnackbarMsg({
-                        type: "error",
-                        msg: errorT("failureToSave")
-                    })
+                onError: (err) => {
+                    switch (err) {
+                        case 60003:
+                            setIsGroupNameError({ type: "groupNameExistsOnTheSameLevel" })
+                            props.updateSnackbarMsg({
+                                type: "error",
+                                msg: errorT("groupNameExistsOnTheSameLevel")
+                            })
+                            break
+                        default: setOtherError(err)
+                            props.updateSnackbarMsg({
+                                type: "error",
+                                msg: errorT("failureToCreate")
+                            })
+                    }
                 },
                 url: "/api/account-management/groups"
             })
+        },
+        cancelClick = () => {
+            setOpenAdd(false)
+            setGroupName("")
+            setGroupType("")
+            setParentGroup("")
         }
     return <>
         <Button
@@ -142,7 +159,7 @@ export default connect(null, mapDispatch)(function AddGroup(props) {
             </FormControl>
             <Divider variant="middle" />
             <DialogActions sx={{ margin: "1rem 0.5rem 1rem 0" }}>
-                <Button onClick={() => { setOpenAdd(false) }}
+                <Button onClick={cancelClick}
                     radius="pill"
                     variant="outlined"
                     color="gray">

@@ -16,6 +16,7 @@
         "addUser":"Add User",
         "editUser":"Edit User",
         "name":"Name",
+        "newPassword":"New Password",
         "password":"Password",
         "unlockUser":"Unlock User",
         "user":"User"
@@ -214,6 +215,8 @@
     },
     "error": {
         "curPasswordNotMatch":"Current password does not match, please try again.",
+        "deleteAccountUserError":"Delete account user error",
+        "deleteOwnAccountNotAllow":"Delete own account does not allow.",
         "emailFormat": "Email is incorrect, please try again.",
         "emailExist": "Account exists, please try again.",
         "emailNotExist": "Account does not exist, please try again.",

@@ -153,7 +153,7 @@ export default connect(null, mapDispatch)(function EditUser(props) {
                 <TextField
                     id="edit-password"
                     type={showPassword ? "text" : "password"}
-                    label={pageT("password")}
+                    label={pageT("newPassword")}
                     value={password}
                     onBlur={validateCurPassword}
                     onChange={changePassword}

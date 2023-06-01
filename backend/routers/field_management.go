@@ -19,3 +19,13 @@ func (w *APIWorker) GetFields(c *gin.Context) {
 	}
 	appG.Response(http.StatusOK, e.Success, responseData)
 }
+
+func (w *APIWorker) GetDeviceModels(c *gin.Context) {
+	appG := app.Gin{c}
+	responseData, err := w.Services.FieldManagement.GetDeviceModels()
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ErrDeviceModelsGen, nil)
+		return
+	}
+	appG.Response(http.StatusOK, e.Success, responseData)
+}

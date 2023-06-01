@@ -106,6 +106,7 @@ var EndpointMapping = map[PolicyWebpageObject][]string{
 	},
 	FieldManagement: {
 		"/api/device-management/gateways",
+		"/api/device-management/devices/models",
 	},
 	AccountManagementGroup: {
 		"/api/account-management/groups",
@@ -214,6 +215,7 @@ func InitRouter(isCORS bool, ginMode string, enforcer *casbin.Enforcer, w *APIWo
 
 	// Field Management
 	r.GET(EndpointMapping[FieldManagement][0], authorizeJWT(REST), authorizePolicy(enforcer), w.GetFields)
+	r.GET(EndpointMapping[FieldManagement][1], authorizeJWT(REST), authorizePolicy(enforcer), w.GetDeviceModels)
 
 	// Account Management Group
 	r.GET(EndpointMapping[AccountManagementGroup][0], authorizeJWT(REST), authorizePolicy(enforcer), w.GetGroups)
@@ -382,7 +384,7 @@ func validateURI[T any](next func(*gin.Context, *T)) gin.HandlerFunc {
 func validateBody[T any](next func(*gin.Context, *T)) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		appG := app.Gin{c}
-		body:= new(T)
+		body := new(T)
 		if err := c.BindJSON(body); err != nil {
 			log.WithField("caused-by", err).Error()
 			appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
@@ -396,7 +398,7 @@ func validateURIAndBody[URI, Body any](next func(*gin.Context, *URI, *Body)) gin
 	return func(c *gin.Context) {
 		appG := app.Gin{c}
 		uri := new(URI)
-		body:= new(Body)
+		body := new(Body)
 		if err := c.ShouldBindUri(uri); err != nil {
 			log.WithField("caused-by", err).Error()
 			appG.Response(http.StatusBadRequest, e.InvalidParams, nil)

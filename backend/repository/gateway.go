@@ -15,6 +15,7 @@ type GatewayRepository interface {
 	GetGatewaysByUserID(userID int64) ([]*deremsmodels.Gateway, error)
 	GetGatewayByGatewayID(gwID int64) (*deremsmodels.Gateway, error)
 	GetGateways() ([]*deremsmodels.Gateway, error)
+	GetDeviceModels() ([]*deremsmodels.DeviceModel, error)
 }
 
 type defaultGatewayRepository struct {
@@ -54,4 +55,8 @@ func (repo defaultGatewayRepository) GetGatewayByGatewayID(gwID int64) (*deremsm
 // GetGateways godoc
 func (repo defaultGatewayRepository) GetGateways() ([]*deremsmodels.Gateway, error) {
 	return deremsmodels.Gateways().All(repo.db)
+}
+
+func (repo defaultGatewayRepository) GetDeviceModels() ([]*deremsmodels.DeviceModel, error) {
+	return deremsmodels.DeviceModels().All(repo.db)
 }

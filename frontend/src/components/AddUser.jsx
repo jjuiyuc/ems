@@ -132,7 +132,7 @@ export default connect(null, mapDispatch)(function AddUser(props) {
         <DialogForm
             dialogTitle={pageT("addUser")}
             fullWidth={true}
-            maxWidth="sm"
+            maxWidth="md"
             open={openAdd}
             setOpen={setOpenAdd}>
             <Divider variant="middle" />

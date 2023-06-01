@@ -31,8 +31,8 @@ export default function Economics(props) {
         t = useTranslation(),
         commonT = string => t("common." + string),
         pageT = (string, params) => t("economics." + string, params),
-        monthtlyTabs = ["thisMonth", "perviousMonth", "thisMonthLastYear"],
-        weeklyTabs = ["thisWeek", "perviouWeek"]
+        monthlyTabs = ["thisMonth", "previousMonth", "thisMonthLastYear"],
+        weeklyTabs = ["thisWeek", "previousWeek"]
 
     const
         [total, setTotal] = useState(630),
@@ -42,7 +42,7 @@ export default function Economics(props) {
         [renewableEnergyCertificate, setRenewableEnergyCertificate] = useState(150),
         [solarLocalUsage, setSolarLocalUsage] = useState(160),
         [exportToGrid, setExportToGrid] = useState(130),
-        [monthtlyTab, setMonthtlyTab] = useState(monthtlyTabs[0]),
+        [monthlyTab, setMonthlyTab] = useState(monthlyTabs[0]),
         [weeklyTab, setWeeklyTab] = useState(weeklyTabs[0])
 
     const
@@ -178,12 +178,12 @@ export default function Economics(props) {
             <div className="items-center grid-cols-1fr-auto-1fr mb-8 lg:grid">
                 <h4 className="mb-4 lg:mb-0">{pageT("monthlyStackedRevenue")}</h4>
                 <Stack direction="row" spacing={1.5} className="flex-wrap lg:flex">
-                    {monthtlyTabs.map((t, i) =>
+                    {monthlyTabs.map((t, i) =>
                         <Button
                             className="mb-5"
                             color="gray"
-                            onClick={() => setMonthtlyTab(t)}
-                            filter={monthtlyTab === t ? "selected" : ""}
+                            onClick={() => setMonthlyTab(t)}
+                            filter={monthlyTab === t ? "selected" : ""}
                             key={"ec-m" + i}
                             radius="pill"
                             variant="contained">

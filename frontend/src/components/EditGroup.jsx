@@ -23,7 +23,6 @@ export default connect(null, mapDispatch)(function EditGroup(props) {
     const
         [openEdit, setOpenEdit] = useState(false),
         [groupName, setGroupName] = useState(row.name),
-        [groupNameError, setGroupNameError] = useState(null),
         [isGroupNameError, setIsGroupNameError] = useState(false),
         [otherError, setOtherError] = useState("")
 
@@ -69,14 +68,14 @@ export default connect(null, mapDispatch)(function EditGroup(props) {
             onError: (err) => {
                 switch (err) {
                     case 60003:
-                        setGroupNameError({ type: "groupNameExistsOnTheSameLevel" })
+                        setIsGroupNameError({ type: "groupNameExistsOnTheSameLevel" })
                         props.updateSnackbarMsg({
                             type: "error",
                             msg: errorT("groupNameExistsOnTheSameLevel")
                         })
                         break
                     case 60006:
-                        setGroupNameError({ type: "modifyOwnAccountGroupNotAllow" })
+                        setIsGroupNameError({ type: "modifyOwnAccountGroupNotAllow" })
                         props.updateSnackbarMsg({
                             type: "error",
                             msg: errorT("modifyOwnAccountGroupNotAllow")
@@ -109,6 +108,9 @@ export default connect(null, mapDispatch)(function EditGroup(props) {
                     label={commonT("groupName")}
                     onChange={changeGroupName}
                     value={groupName || ""}
+                    onChange={changeGroupName}
+                    error={isGroupNameError}
+                    helperText={errorT("nameLength")}
                     focused>
                 </TextField>
             </div>

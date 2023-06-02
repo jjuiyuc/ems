@@ -107,6 +107,7 @@ var EndpointMapping = map[PolicyWebpageObject][]string{
 	FieldManagement: {
 		"/api/device-management/gateways",
 		"/api/device-management/devices/models",
+		"/api/device-management/gateways/:gatewayid",
 	},
 	AccountManagementGroup: {
 		"/api/account-management/groups",
@@ -216,6 +217,7 @@ func InitRouter(isCORS bool, ginMode string, enforcer *casbin.Enforcer, w *APIWo
 	// Field Management
 	r.GET(EndpointMapping[FieldManagement][0], authorizeJWT(REST), authorizePolicy(enforcer), w.GetFields)
 	r.GET(EndpointMapping[FieldManagement][1], authorizeJWT(REST), authorizePolicy(enforcer), w.GetDeviceModels)
+	r.GET(EndpointMapping[FieldManagement][2], authorizeJWT(REST), authorizePolicy(enforcer), validateURI(w.GetField))
 
 	// Account Management Group
 	r.GET(EndpointMapping[AccountManagementGroup][0], authorizeJWT(REST), authorizePolicy(enforcer), w.GetGroups)

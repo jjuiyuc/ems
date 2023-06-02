@@ -1,6 +1,7 @@
 package routers
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -25,6 +26,21 @@ func (w *APIWorker) GetDeviceModels(c *gin.Context) {
 	responseData, err := w.Services.FieldManagement.GetDeviceModels()
 	if err != nil {
 		appG.Response(http.StatusInternalServerError, e.ErrDeviceModelsGen, nil)
+		return
+	}
+	appG.Response(http.StatusOK, e.Success, responseData)
+}
+
+func (w *APIWorker) GetField(c *gin.Context, uri *app.FieldURI) {
+	appG := app.Gin{c}
+	userID, _ := c.Get("userID")
+	responseData, err := w.Services.FieldManagement.GetField(userID.(int64), uri.GatewayID)
+	if err != nil {
+		if errors.Is(err, e.ErrNewAuthPermissionNotAllow) {
+			appG.Response(http.StatusForbidden, e.ErrAuthPermissionNotAllow, nil)
+			return
+		}
+		appG.Response(http.StatusInternalServerError, e.ErrFieldGen, nil)
 		return
 	}
 	appG.Response(http.StatusOK, e.Success, responseData)

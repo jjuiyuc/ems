@@ -1,5 +1,10 @@
 package app
 
+// FieldURI godoc
+type FieldURI struct {
+	GatewayID string `uri:"gatewayid" binding:"required"`
+}
+
 // GroupURI godoc
 type GroupURI struct {
 	GroupID int64 `uri:"groupid" binding:"required"`

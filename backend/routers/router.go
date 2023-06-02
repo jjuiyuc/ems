@@ -106,6 +106,7 @@ var EndpointMapping = map[PolicyWebpageObject][]string{
 	},
 	AccountManagementGroup: {
 		"/api/account-management/groups",
+		"/api/account-management/groups/:groupid",
 	},
 }
 
@@ -113,6 +114,8 @@ var EndpointMapping = map[PolicyWebpageObject][]string{
 var MethodMapping = map[PolicyWebpageAction]string{
 	Create: "POST",
 	Read:   "GET",
+	Update: "PUT",
+	Delete: "DELETE",
 }
 
 // APIWorker godoc
@@ -204,7 +207,10 @@ func InitRouter(isCORS bool, ginMode string, enforcer *casbin.Enforcer, w *APIWo
 
 	// Account Management Group
 	r.GET(EndpointMapping[AccountManagementGroup][0], authorizeJWT(REST), authorizePolicy(enforcer), w.GetGroups)
-	r.POST(EndpointMapping[AccountManagementGroup][0], authorizeJWT(REST), authorizePolicy(enforcer), w.CreateGroup)
+	r.POST(EndpointMapping[AccountManagementGroup][0], authorizeJWT(REST), authorizePolicy(enforcer), validateBody(w.CreateGroup))
+	r.GET(EndpointMapping[AccountManagementGroup][1], authorizeJWT(REST), authorizePolicy(enforcer), validateURI(w.GetGroup))
+	r.PUT(EndpointMapping[AccountManagementGroup][1], authorizeJWT(REST), authorizePolicy(enforcer), validateURIAndBody(w.UpdateGroup))
+	r.DELETE(EndpointMapping[AccountManagementGroup][1], authorizeJWT(REST), authorizePolicy(enforcer), validateURI(w.DeleteGroup))
 
 	// Casbin route
 	apiGroup.GET("/casbin", w.getFrontendPermission(enforcer))
@@ -342,6 +348,51 @@ func getAction(method string) (action PolicyWebpageAction) {
 		}
 	}
 	return
+}
+
+func validateURI[T any](next func(*gin.Context, *T)) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		appG := app.Gin{c}
+		uri := new(T)
+		if err := c.ShouldBindUri(uri); err != nil {
+			log.WithField("caused-by", err).Error()
+			appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
+			return
+		}
+		next(c, uri)
+	}
+}
+
+func validateBody[T any](next func(*gin.Context, *T)) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		appG := app.Gin{c}
+		body:= new(T)
+		if err := c.BindJSON(body); err != nil {
+			log.WithField("caused-by", err).Error()
+			appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
+			return
+		}
+		next(c, body)
+	}
+}
+
+func validateURIAndBody[URI, Body any](next func(*gin.Context, *URI, *Body)) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		appG := app.Gin{c}
+		uri := new(URI)
+		body:= new(Body)
+		if err := c.ShouldBindUri(uri); err != nil {
+			log.WithField("caused-by", err).Error()
+			appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
+			return
+		}
+		if err := c.BindJSON(body); err != nil {
+			log.WithField("caused-by", err).Error()
+			appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
+			return
+		}
+		next(c, uri, body)
+	}
 }
 
 func leapAuthorize() gin.HandlerFunc {

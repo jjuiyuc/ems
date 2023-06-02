@@ -324,6 +324,18 @@ func (s defaultAccountManagementService) checkDeletedRules(tx *sql.Tx, executedU
 	return
 }
 
+func (s defaultAccountManagementService) isSubGroupExisted(tx *sql.Tx, groupID int64) bool {
+	groups, err := s.repo.User.GetGroupsByGroupID(tx, groupID)
+	if err == nil {
+		for _, group := range groups {
+			if group.ParentID.Int64 == groupID {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 func (s defaultAccountManagementService) authorizeGroupID(tx *sql.Tx, executedUserID, groupID int64) (exist bool) {
 	if exist = s.repo.User.AuthorizeGroupID(tx, executedUserID, groupID); !exist {
 		logrus.WithField("executedUserID", executedUserID).Error("authorize-group-id-failed")

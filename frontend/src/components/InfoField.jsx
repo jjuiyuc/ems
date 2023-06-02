@@ -1,20 +1,17 @@
 import { Button, Chip, DialogActions, Divider, Switch, TextField } from "@mui/material"
 import { useTranslation } from "react-multi-lang"
 import { useEffect, useMemo, useState } from "react"
+
+import { apiCall } from "../utils/api"
 import { validateNumPercent } from "../utils/utils"
 
 import DialogForm from "../components/DialogForm"
 import ExtraDeviceInfoForm from "../components/ExtraDeviceInfoForm"
-
 import { ReactComponent as NoticeIcon } from "../assets/icons/notice.svg"
 
-export default function InfoField({
-    row,
-    locationInfo,
-    fieldDevices,
-    deviceInfo,
-    extraDeviceInfo
-}) {
+export default function InfoField(props) {
+    const { row } = props
+
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
@@ -30,6 +27,8 @@ export default function InfoField({
         [lat, setLat] = useState(""),
         [lng, setLng] = useState(""),
         [powerCompany, setPowerCompany] = useState(""),
+        [voltageType, setVoltageType] = useState(""),
+        [touType, setTouType] = useState(""),
         [deviceType, setDeviceType] = useState(""),
         [gridOutagePercent, setGridOutagePercent] = useState(""),
         [chargingSource, setChargingSource] = useState([
@@ -44,22 +43,45 @@ export default function InfoField({
         ]),
         [energyCapacity, setEnergyCapacity] = useState(null),
         [voltage, setVoltage] = useState(null),
-        [subPowerCapacity, setSubPowerCapacity] = useState("")
+        [subPowerCapacity, setSubPowerCapacity] = useState(""),
+        [loading, setLoading] = useState(false),
+        [infoError, setInfoError] = useState("")
 
     const
-        inputPercent = (e) => {
-            const num = e.target.value
-            const isNum = validateNumPercent(num)
-            if (!isNum) return
-            setGridOutagePercent(num)
-        },
-        handleClick = () => {
+        iconOnClick = () => {
             setOpenNotice(true)
+
+            const gatewayID = row.gatewayID
+            apiCall({
+                onComplete: () => setLoading(false),
+                onError: error => setInfoError(error),
+                onStart: () => setLoading(true),
+                onSuccess: rawData => {
+
+                    if (!rawData?.data) return
+
+                    const { data } = rawData
+
+                    setGatewayID(data.gatewayID || "")
+                    setLocationName(data.locationName || "")
+                    setAddress(data.address || "")
+                    setLat(data.lat || "")
+                    setLng(data.lng || "")
+                    setPowerCompany(data.powerCompany || "")
+                    setVoltageType(data.voltageType || "")
+                    setTouType(data.touType || "")
+
+
+                },
+                url: `/api/device-management/gateways/${gatewayID}`
+            })
+            // console.log(row?.gatewayID)
+
         }
     return <>
         <NoticeIcon
             className="mr-5"
-            onClick={handleClick} />
+            onClick={iconOnClick} />
         <DialogForm
             dialogTitle={dialogT("fieldInfo")}
             fullWidth={true}
@@ -72,22 +94,22 @@ export default function InfoField({
                     sx={{ marginBottom: 2 }}
                     key="gateway-id"
                     label={commonT("gatewayID")}
-                    value={row?.gatewayID || ""}
+                    value={gatewayID}
                     focused
                     disabled={true}
                 />
-                <h5 className="mb-4 ml-2">{locationInfo}</h5>
+                <h5 className="mb-4 ml-2">{pageT("locationInformation")}</h5>
                 <TextField
                     key="location-name"
                     label={commonT("locationName")}
-                    value={row?.locationName || ""}
+                    value={locationName}
                     focused
                     disabled={true}
                 />
                 <TextField
                     key="address"
                     label={formT("address")}
-                    value={row?.address || ""}
+                    value={address}
                     focused
                     disabled={true}
                 />
@@ -96,7 +118,7 @@ export default function InfoField({
                         key="lat"
                         type="number"
                         label={formT("lat")}
-                        value={row?.lat || ""}
+                        value={lat}
                         focused
                         disabled={true}
                     />
@@ -105,30 +127,30 @@ export default function InfoField({
                         key="lng"
                         type="number"
                         label={formT("lng")}
-                        value={row?.lng || ""}
+                        value={lng}
                         disabled={true}
                     />
                 </div>
                 <TextField
                     key="power-company"
                     label={formT("powerCompany")}
-                    value={row?.powerCompany || ""}
+                    value={powerCompany}
                     disabled={true}
                 />
                 <TextField
                     key="v-t"
                     label={formT("voltageType")}
-                    value={formT(row?.voltageType) || ""}
+                    value={voltageType}
                     disabled={true}
                 />
                 <TextField
                     key="tou-t"
                     label={formT("touType")}
-                    value={formT(row?.touType) || ""}
+                    value={touType}
                     disabled={true}
                 />
                 <Divider variant="middle" />
-                <h5 className="mb-4 mt-4 ml-2">{fieldDevices}</h5>
+                <h5 className="mb-4 mt-4 ml-2">{pageT("fieldDevices")}</h5>
                 <TextField
                     key="d-t"
                     label={formT("deviceType")}
@@ -142,7 +164,7 @@ export default function InfoField({
                     disabled={true}
                 />
                 <Divider variant="middle" />
-                <h5 className="mb-4 mt-4 ml-2">{deviceInfo}</h5>
+                <h5 className="mb-4 mt-4 ml-2">{pageT("deviceInformation")}</h5>
                 <TextField
                     key="m-id"
                     type="number"

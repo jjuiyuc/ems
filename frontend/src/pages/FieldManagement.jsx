@@ -43,9 +43,7 @@ export default function FieldManagement() {
         },
         {
             cell: (row, index) => <div className="flex w-28">
-                <InfoField
-                    row={row}
-                />
+                <InfoField {...{ row }} />
                 <EditField className="mr-5"
                     row={row}
                     onSave={editSave}

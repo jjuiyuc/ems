@@ -53,4 +53,5 @@ const (
 	ErrFieldsGen                        = 60017
 	ErrDeviceModelsGen                  = 60018
 	ErrFieldGen                         = 60019
+	ErrFieldEnable                      = 60020
 )

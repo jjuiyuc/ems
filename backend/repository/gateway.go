@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/volatiletech/null/v8"
+	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 
 	"der-ems/models"
@@ -53,6 +54,8 @@ type DLDeviceWrap struct {
 
 // GatewayRepository godoc
 type GatewayRepository interface {
+	InsertGatewayLog(tx *sql.Tx, gatewayLog *deremsmodels.GatewayLog) error
+	UpdateGateway(tx *sql.Tx, gateway *deremsmodels.Gateway) (err error)
 	GetGatewayByGatewayUUID(gwUUID string) (*deremsmodels.Gateway, error)
 	GetGatewaysByLocation(lat, lng float32) ([]*deremsmodels.Gateway, error)
 	GetGatewaysByUserID(userID int64) ([]*deremsmodels.Gateway, error)
@@ -76,6 +79,15 @@ type defaultGatewayRepository struct {
 // NewGatewayRepository godoc
 func NewGatewayRepository(db *sql.DB) GatewayRepository {
 	return &defaultGatewayRepository{db}
+}
+
+func (repo defaultGatewayRepository) InsertGatewayLog(tx *sql.Tx, gatewayLog *deremsmodels.GatewayLog) error {
+	return gatewayLog.Insert(repo.getExecutor(tx), boil.Infer())
+}
+
+func (repo defaultGatewayRepository) UpdateGateway(tx *sql.Tx, gateway *deremsmodels.Gateway) (err error) {
+	_, err = gateway.Update(repo.getExecutor(tx), boil.Infer())
+	return
 }
 
 // GetGatewayByGatewayUUID godoc
@@ -230,4 +242,11 @@ func (repo defaultGatewayRepository) MatchDownlinkRules(gateway *deremsmodels.Ga
 
 func (repo defaultGatewayRepository) IsGatewayBoundField(gateway *deremsmodels.Gateway) bool {
 	return gateway.LocationID.Int64 > 0 && gateway.DeletedAt.IsZero()
+}
+
+func (repo defaultGatewayRepository) getExecutor(tx *sql.Tx) boil.Executor {
+	if tx == nil {
+		return repo.db
+	}
+	return tx
 }

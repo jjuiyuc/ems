@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 
 	"der-ems/internal/app"
 	"der-ems/internal/e"
@@ -44,4 +45,19 @@ func (w *APIWorker) GetField(c *gin.Context, uri *app.FieldURI) {
 		return
 	}
 	appG.Response(http.StatusOK, e.Success, responseData)
+}
+
+func (w *APIWorker) EnableField(c *gin.Context, uri *app.FieldURI, body *app.EnableFieldBody) {
+	appG := app.Gin{c}
+	userID, _ := c.Get("userID")
+	if err := w.Services.FieldManagement.EnableField(userID.(int64), uri.GatewayID, *body.Enable); err != nil {
+		if errors.Is(err, e.ErrNewAuthPermissionNotAllow) {
+			appG.Response(http.StatusForbidden, e.ErrAuthPermissionNotAllow, nil)
+			return
+		}
+		appG.Response(http.StatusInternalServerError, e.ErrFieldEnable, nil)
+		return
+	}
+	appG.Response(http.StatusOK, e.Success, nil)
+	logrus.WithFields(logrus.Fields{"enabled-by": userID}).Info("field-enabled")
 }

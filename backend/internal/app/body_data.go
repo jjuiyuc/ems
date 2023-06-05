@@ -1,5 +1,10 @@
 package app
 
+// EnableFieldBody godoc
+type EnableFieldBody struct {
+	Enable *bool `form:"enable" binding:"required"`
+}
+
 // CreateGroupBody godoc
 type CreateGroupBody struct {
 	Name string `form:"name" binding:"required,max=20"`

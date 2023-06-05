@@ -1,12 +1,17 @@
 package services
 
 import (
+	"context"
+	"database/sql"
 	"encoding/json"
+	"time"
 
 	"github.com/sirupsen/logrus"
 	"github.com/volatiletech/null/v8"
 
 	"der-ems/internal/e"
+	"der-ems/models"
+	deremsmodels "der-ems/models/der-ems"
 	"der-ems/repository"
 )
 
@@ -15,6 +20,7 @@ type FieldManagementService interface {
 	GetFields(userID int64) (getFields *GetFieldsResponse, err error)
 	GetDeviceModels() (getDeviceModels *GetDeviceModelsResponse, err error)
 	GetField(executedUserID int64, gwUUID string) (getField *GetFieldResponse, err error)
+	EnableField(executedUserID int64, gwUUID string, enable bool) (err error)
 	GenerateDLDeviceMappingInfo(gwID int64) (data []byte, err error)
 }
 
@@ -243,6 +249,78 @@ func (s defaultFieldManagementService) getFieldDevices(gwID int64) (deviceInfos 
 func (s defaultFieldManagementService) isFakeModbusID(modbusID int64) bool {
 	// XXX: Fake modbus id decrements from 255
 	return modbusID > 200
+}
+
+func (s defaultFieldManagementService) EnableField(executedUserID int64, gwUUID string, enable bool) (err error) {
+	if !s.authorizeGatewayUUID(executedUserID, gwUUID) {
+		err = e.ErrNewAuthPermissionNotAllow
+		return
+	}
+
+	tx, err := models.GetDB().BeginTx(context.Background(), nil)
+	if err != nil {
+		return
+	}
+
+	gateway, err := s.repo.Gateway.GetGatewayByGatewayUUID(gwUUID)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.Gateway.GetGatewayByGatewayUUID",
+			"err":       err,
+		}).Error()
+		tx.Rollback()
+		return
+	}
+	if gateway.Enable.Bool == enable {
+		logrus.Warn("value-is-the-same-ignored")
+		tx.Rollback()
+		return
+	}
+	if err = s.updateGatewayForEnableField(tx, executedUserID, enable, gateway); err != nil {
+		tx.Rollback()
+		return
+	}
+	if err = s.updateGatewayLog(tx, gateway); err != nil {
+		tx.Rollback()
+		return
+	}
+
+	tx.Commit()
+	return
+}
+
+func (s defaultFieldManagementService) updateGatewayForEnableField(tx *sql.Tx, executedUserID int64, enable bool, gateway *deremsmodels.Gateway) (err error) {
+	gateway.Enable.Bool = enable
+	gateway.UpdatedAt = time.Now().UTC()
+	gateway.UpdatedBy = null.Int64From(executedUserID)
+	if err = s.repo.Gateway.UpdateGateway(tx, gateway); err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.Gateway.UpdateGateway",
+			"err":       err,
+		}).Error()
+	}
+	return
+}
+
+func (s defaultFieldManagementService) updateGatewayLog(tx *sql.Tx, gateway *deremsmodels.Gateway) (err error) {
+	gatewayLog := &deremsmodels.GatewayLog{
+		GWID:        null.Int64From(gateway.ID),
+		UUID:        null.StringFrom(gateway.UUID),
+		LocationID:  gateway.LocationID,
+		Enable:      gateway.Enable,
+		Remark:      gateway.Remark,
+		GWUpdatedAt: null.TimeFrom(gateway.UpdatedAt),
+		GWUpdatedBy: gateway.UpdatedBy,
+		GWDeletedAt: gateway.DeletedAt,
+		GWDeletedBy: gateway.DeletedBy,
+	}
+	if err = s.repo.Gateway.InsertGatewayLog(tx, gatewayLog); err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.Gateway.InsertGatewayLog",
+			"err":       err,
+		}).Error()
+	}
+	return
 }
 
 func (s defaultFieldManagementService) GenerateDLDeviceMappingInfo(gwID int64) (data []byte, err error) {

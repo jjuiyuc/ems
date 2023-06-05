@@ -10,6 +10,8 @@ import EditUser from "../components/EditUser"
 import DeleteUser from "../components/DeleteUser"
 import Table from "../components/DataTable"
 
+import { ReactComponent as DeleteIcon } from "../assets/icons/trash_solid.svg"
+
 const mapState = state => ({
     username: state.user.username
 })
@@ -21,6 +23,8 @@ export default connect(mapState)(function AccountManagementUser(props) {
         dialogT = (string) => t("dialog." + string),
         pageT = (string, params) => t("accountManagementUser." + string, params)
     const
+        [openDelete, setOpenDelete] = useState(false),
+        [row, setRow] = useState(null),
         [userList, setUserList] = useState([]),
         [groupDictionary, setGroupDictionary] = useState({}),
         [loading, setLoading] = useState(false),
@@ -32,6 +36,12 @@ export default connect(mapState)(function AccountManagementUser(props) {
         )
         setUserList(newData)
     }
+
+    const handleClickDelete = row => {
+        setOpenDelete(true)
+        setRow(row)
+    }
+
     const columns = [
         {
             cell: row => <span className="font-mono">{row.username}</span>,
@@ -64,7 +74,7 @@ export default connect(mapState)(function AccountManagementUser(props) {
                     ? <div className="bg-gray-600 w-6 h-6"></div>
                     : <>
                         <EditUser {...{ row, groupDictionary, onSave, getList }} />
-                        <DeleteUser {...{ row, getList }} />
+                        <DeleteIcon onClick={() => handleClickDelete(row)} />
                     </>
                 }
                 {row.lockedAt === null
@@ -128,5 +138,6 @@ export default connect(mapState)(function AccountManagementUser(props) {
             progressPending={loading}
             theme="dark"
         />
+        <DeleteUser {...{ getList, openDelete, row, setOpenDelete }} />
     </>
 })

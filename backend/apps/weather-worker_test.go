@@ -111,9 +111,9 @@ func (s *WeatherWorkerSuite) SetupSuite() {
 
 	// Mock gateway table
 	_, err = db.Exec(`
-		INSERT INTO gateway (id,uuid,location_id) VALUES
-		(1,'U00001',1),
-		(2,'U00002',2);
+		INSERT INTO gateway (id,uuid,location_id,enable) VALUES
+		(1,'U00001',1,true),
+		(2,'U00002',2,true);
 	`)
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 }

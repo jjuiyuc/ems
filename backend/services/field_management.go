@@ -204,8 +204,7 @@ func (s defaultFieldManagementService) getFieldDevices(gwID int64) (deviceInfos 
 	}
 
 	for _, device := range devices {
-		// Fake modbus id decrements from 255
-		if device.ModbusID > 200 {
+		if s.isFakeModbusID(device.ModbusID) {
 			continue
 		}
 		deviceInfo := DeviceInfo{
@@ -222,7 +221,7 @@ func (s defaultFieldManagementService) getFieldDevices(gwID int64) (deviceInfos 
 
 		var subDeviceInfos []SubDeviceInfo
 		for _, subDevice := range devices {
-			if subDevice.UUEID == device.UUEID && subDevice.ModbusID > 200 {
+			if subDevice.UUEID == device.UUEID && s.isFakeModbusID(subDevice.ModbusID) {
 				subDeviceInfo := SubDeviceInfo{
 					ModelID:       subDevice.ModelID,
 					PowerCapacity: subDevice.PowerCapacity,
@@ -235,6 +234,11 @@ func (s defaultFieldManagementService) getFieldDevices(gwID int64) (deviceInfos 
 		deviceInfos = append(deviceInfos, deviceInfo)
 	}
 	return
+}
+
+func (s defaultFieldManagementService) isFakeModbusID(modbusID int64) bool {
+	// XXX: Fake modbus id decrements from 255
+	return modbusID > 200
 }
 
 func (s defaultFieldManagementService) intersectGroup(a []*deremsmodels.Group, b []*deremsmodels.Group) []*deremsmodels.Group {

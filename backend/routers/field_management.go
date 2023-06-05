@@ -9,6 +9,8 @@ import (
 
 	"der-ems/internal/app"
 	"der-ems/internal/e"
+	"der-ems/kafka"
+	"der-ems/services"
 )
 
 func (w *APIWorker) GetFields(c *gin.Context) {
@@ -60,4 +62,35 @@ func (w *APIWorker) EnableField(c *gin.Context, uri *app.FieldURI, body *app.Ena
 	}
 	appG.Response(http.StatusOK, e.Success, nil)
 	logrus.WithFields(logrus.Fields{"enabled-by": userID}).Info("field-enabled")
+}
+
+func (w *APIWorker) SyncDeviceSettings(c *gin.Context, uri *app.FieldURI) {
+	appG := app.Gin{c}
+	userID, _ := c.Get("userID")
+	deviceSettings, err := w.Services.FieldManagement.GenerateDeviceSettings(userID.(int64), uri.GatewayID)
+	if err != nil {
+		if errors.Is(err, e.ErrNewAuthPermissionNotAllow) {
+			appG.Response(http.StatusForbidden, e.ErrAuthPermissionNotAllow, nil)
+			return
+		}
+
+		var code int
+		switch err {
+		case e.ErrNewFieldIsDisabled:
+			code = e.ErrFieldIsDisabled
+		default:
+			code = e.ErrDeviceSettingsSync
+		}
+		appG.Response(http.StatusInternalServerError, code, nil)
+		return
+	}
+	w.sendDeviceSettings(deviceSettings)
+	appG.Response(http.StatusOK, e.Success, nil)
+}
+
+func (w *APIWorker) sendDeviceSettings(deviceSettings *services.DeviceSettingsData) {
+	kafka.SendDataToGateways(w.Cfg, kafka.SendWeatherDataToLocalGW, deviceSettings.WeatherData, []string{deviceSettings.GWUUID})
+	kafka.SendDataToGateways(w.Cfg, kafka.SendAIBillingParamsToLocalGW, deviceSettings.BillingData, []string{deviceSettings.GWUUID})
+	kafka.SendDataToGateways(w.Cfg, kafka.SendDeviceMappingToLocalGW, deviceSettings.DeviceMappingData, []string{deviceSettings.GWUUID})
+	kafka.SendDataToAIServer(w.Cfg, kafka.SendGPSLocation, deviceSettings.LocationData)
 }

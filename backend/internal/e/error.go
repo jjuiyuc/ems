@@ -37,6 +37,8 @@ var (
 	ErrNewAccountUsernameExist = errors.New("account username exists")
 	// ErrNewOwnAccountDeletedNotAllow godoc
 	ErrNewOwnAccountDeletedNotAllow = errors.New("delete own account does not allow")
+	// ErrNewFieldIsDisabled godoc
+	ErrNewFieldIsDisabled = errors.New("field is disabled")
 )
 
 // ErrNewKeyNotExist godoc

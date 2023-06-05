@@ -21,6 +21,7 @@ type FieldManagementService interface {
 	GetDeviceModels() (getDeviceModels *GetDeviceModelsResponse, err error)
 	GetField(executedUserID int64, gwUUID string) (getField *GetFieldResponse, err error)
 	EnableField(executedUserID int64, gwUUID string, enable bool) (err error)
+	GenerateDeviceSettings(executedUserID int64, gwUUID string) (deviceSettings *DeviceSettingsData, err error)
 	GenerateDLDeviceMappingInfo(gwID int64) (data []byte, err error)
 }
 
@@ -77,14 +78,25 @@ type DLDeviceMappingInfo struct {
 	Values []*repository.DLDeviceWrap `json:"values"`
 }
 
+// DeviceSettingsData godoc
+type DeviceSettingsData struct {
+	GWUUID            string
+	WeatherData       []byte
+	BillingData       []byte
+	DeviceMappingData []byte
+	LocationData      []byte
+}
+
 type defaultFieldManagementService struct {
 	repo              *repository.Repository
 	accountManagement AccountManagementService
+	Weather           WeatherService
+	Billing           BillingService
 }
 
 // NewFieldManagementService godoc
-func NewFieldManagementService(repo *repository.Repository, accountManagement AccountManagementService) FieldManagementService {
-	return &defaultFieldManagementService{repo, accountManagement}
+func NewFieldManagementService(repo *repository.Repository, accountManagement AccountManagementService, weather WeatherService, billing BillingService) FieldManagementService {
+	return &defaultFieldManagementService{repo, accountManagement, weather, billing}
 }
 
 func (s defaultFieldManagementService) GetFields(userID int64) (getFields *GetFieldsResponse, err error) {
@@ -319,6 +331,68 @@ func (s defaultFieldManagementService) updateGatewayLog(tx *sql.Tx, gateway *der
 			"caused-by": "s.repo.Gateway.InsertGatewayLog",
 			"err":       err,
 		}).Error()
+	}
+	return
+}
+
+func (s defaultFieldManagementService) GenerateDeviceSettings(executedUserID int64, gwUUID string) (deviceSettings *DeviceSettingsData, err error) {
+	if !s.authorizeGatewayUUID(executedUserID, gwUUID) {
+		err = e.ErrNewAuthPermissionNotAllow
+		return
+	}
+
+	gateway, err := s.repo.Gateway.GetGatewayByGatewayUUID(gwUUID)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.Gateway.GetGatewayByGatewayUUID",
+			"err":       err,
+		}).Error()
+		return
+	}
+
+	if !s.repo.Gateway.MatchDownlinkRules(gateway) {
+		logrus.WithField("gateway-uuid", gateway.UUID).Warning("not-match-downlink-rules")
+		err = e.ErrNewFieldIsDisabled
+		return
+	}
+
+	deviceSettings, err = s.getDeviceSettings(gateway)
+	return
+}
+
+func (s defaultFieldManagementService) getDeviceSettings(gateway *deremsmodels.Gateway) (deviceSettings *DeviceSettingsData, err error) {
+	location, err := s.repo.Location.GetLocationByLocationID(gateway.LocationID.Int64)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.Location.GetLocationByLocationID",
+			"err":       err,
+		}).Error()
+		return
+	}
+
+	weatherData, err := s.Weather.GetWeatherDataByLocation(location.WeatherLat.Float32, location.WeatherLng.Float32)
+	if err != nil {
+		return
+	}
+	billingData, err := s.Billing.GenerateBillingParams(gateway, true)
+	if err != nil {
+		return
+	}
+	deviceMappingData, err := s.GenerateDLDeviceMappingInfo(gateway.ID)
+	if err != nil {
+		return
+	}
+	locationData, err := s.Weather.GenerateGPSLocations()
+	if err != nil {
+		return
+	}
+
+	deviceSettings = &DeviceSettingsData{
+		GWUUID:            gateway.UUID,
+		WeatherData:       weatherData,
+		BillingData:       billingData,
+		DeviceMappingData: deviceMappingData,
+		LocationData:      locationData,
 	}
 	return
 }

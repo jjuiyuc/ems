@@ -26,6 +26,7 @@ type GPSLocationInfo struct {
 type WeatherService interface {
 	GenerateWeatherInfo(lat, lng float32) (data []byte, gatewayUUIDs []string, err error)
 	GenerateGPSLocations() (data []byte, err error)
+	GetWeatherDataByLocation(lat, lng float32) (data []byte, err error)
 }
 
 type defaultWeatherService struct {
@@ -38,7 +39,7 @@ func NewWeatherService(repo *repository.Repository) WeatherService {
 }
 
 func (s defaultWeatherService) GenerateWeatherInfo(lat, lng float32) (data []byte, gatewayUUIDs []string, err error) {
-	data, err = s.getWeatherDataByLocation(lat, lng)
+	data, err = s.GetWeatherDataByLocation(lat, lng)
 	if err != nil {
 		return
 	}
@@ -46,7 +47,7 @@ func (s defaultWeatherService) GenerateWeatherInfo(lat, lng float32) (data []byt
 	return
 }
 
-func (s defaultWeatherService) getWeatherDataByLocation(lat, lng float32) (data []byte, err error) {
+func (s defaultWeatherService) GetWeatherDataByLocation(lat, lng float32) (data []byte, err error) {
 	now := time.Now().UTC()
 	startValidDate := now
 	endValidDate := now.Add(31 * time.Hour)
@@ -84,7 +85,9 @@ func (s defaultWeatherService) getWeatherDataByLocation(lat, lng float32) (data 
 			"caused-by": "json.Marshal",
 			"err":       err,
 		}).Error()
+		return
 	}
+	logrus.Debug("weatherInfoJSON: ", string(data))
 	return
 }
 

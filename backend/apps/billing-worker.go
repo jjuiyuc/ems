@@ -22,10 +22,7 @@ func NewBillingWorker(
 	billing services.BillingService,
 	name string,
 ) {
-	// 1. Send at the beginning
-	sendAIBillingParams(cfg, repo, billing, true)
-
-	// 2. Send at 04:00 on Saturday in UTC(12:00 on Saturday in UTC+0800)
+	// Send at 04:00 on Saturday in UTC(12:00 on Saturday in UTC+0800)
 	c := cron.New()
 	c.AddFunc(cfg.GetString("cron.billing"), func() { sendAIBillingParams(cfg, repo, billing, false) })
 	c.Start()

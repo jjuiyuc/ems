@@ -1,6 +1,6 @@
 import { Button, Chip, DialogActions, Divider, Switch, TextField } from "@mui/material"
 import { useTranslation } from "react-multi-lang"
-import { useEffect, useMemo, useState } from "react"
+import { Fragment, useEffect, useMemo, useState } from "react"
 
 import { apiCall } from "../utils/api"
 import { validateNumPercent } from "../utils/utils"
@@ -29,7 +29,11 @@ export default function InfoField(props) {
         [powerCompany, setPowerCompany] = useState(""),
         [voltageType, setVoltageType] = useState(""),
         [touType, setTouType] = useState(""),
+        [modelTypeDict, setModelTypeDict] = useState({}),
+        [modelNameDict, setModelNameDict] = useState({}),
+        [deviceList, setDeviceList] = useState([]),
         [deviceType, setDeviceType] = useState(""),
+        [deviceModel, setDeviceModel] = useState(""),
         [gridOutagePercent, setGridOutagePercent] = useState(""),
         [chargingSource, setChargingSource] = useState([
             {
@@ -45,15 +49,43 @@ export default function InfoField(props) {
         [voltage, setVoltage] = useState(null),
         [subPowerCapacity, setSubPowerCapacity] = useState(""),
         [loading, setLoading] = useState(false),
-        [infoError, setInfoError] = useState("")
+        [infoError, setInfoError] = useState(""),
+        [fetched, setFetched] = useState(false)
 
+
+    const getModelList = () => {
+        apiCall({
+            onComplete: () => setLoading(false),
+            onError: error => setInfoError(error),
+            onStart: () => setLoading(true),
+            onSuccess: rawData => {
+                if (!rawData?.data) return
+
+                const { data } = rawData
+
+                setModelTypeDict(data.models?.reduce((acc, cur) => {
+                    acc[cur.id] = cur.type
+                    return acc
+                }, {}) || {})
+                setModelNameDict(data.models?.reduce((acc, cur) => {
+                    acc[cur.id] = cur.name
+                    return acc
+                }, {}) || {})
+            },
+            url: `/api/device-management/devices/models`
+        })
+    }
     const
-        iconOnClick = () => {
+        iconOnClick = async () => {
             setOpenNotice(true)
+            getModelList()
 
             const gatewayID = row.gatewayID
-            apiCall({
-                onComplete: () => setLoading(false),
+            await apiCall({
+                onComplete: () => {
+                    setLoading(false)
+                    setFetched(true)
+                },
                 onError: error => setInfoError(error),
                 onStart: () => setLoading(true),
                 onSuccess: rawData => {
@@ -61,7 +93,7 @@ export default function InfoField(props) {
                     if (!rawData?.data) return
 
                     const { data } = rawData
-
+                    console.log(data)
                     setGatewayID(data.gatewayID || "")
                     setLocationName(data.locationName || "")
                     setAddress(data.address || "")
@@ -70,14 +102,18 @@ export default function InfoField(props) {
                     setPowerCompany(data.powerCompany || "")
                     setVoltageType(data.voltageType || "")
                     setTouType(data.touType || "")
-
+                    setDeviceList(data?.devices || [])
 
                 },
                 url: `/api/device-management/gateways/${gatewayID}`
             })
-            // console.log(row?.gatewayID)
-
         }
+    // useEffect(() => {
+    //     if (row && fetched == false)
+    //         getModelList()
+    // }, [fetched, row])
+
+    // console.log(modelTypeDict)
     return <>
         <NoticeIcon
             className="mr-5"
@@ -150,43 +186,66 @@ export default function InfoField(props) {
                     disabled={true}
                 />
                 <Divider variant="middle" />
-                <h5 className="mb-4 mt-4 ml-2">{pageT("fieldDevices")}</h5>
-                <TextField
-                    key="d-t"
-                    label={formT("deviceType")}
-                    value={formT(row?.deviceType) || ""}
-                    disabled={true}
-                />
-                <TextField
-                    key="d-m"
-                    label={formT("deviceModel")}
-                    value={row?.deviceModel || ""}
-                    disabled={true}
-                />
-                <Divider variant="middle" />
-                <h5 className="mb-4 mt-4 ml-2">{pageT("deviceInformation")}</h5>
-                <TextField
-                    key="m-id"
-                    type="number"
-                    label={formT("modbusID")}
-                    value={row?.modbusID || ""}
-                    disabled={true}
-                />
-                <TextField
-                    key="uueid"
-                    label="UUEID"
-                    value={row?.UUEID || ""}
-                    disabled={true}
-                />
-                <TextField
-                    key="power-capacity"
-                    type="number"
-                    label={formT("powerCapacity")}
-                    value={row?.powerCapacity || ""}
-                    disabled={true}
-                />
-                <Divider variant="middle" sx={{ margin: "0 0 2rem" }} />
-                {row?.deviceType === "battery"
+                {deviceList.map((item, index) => (
+                    <Fragment key={"f-d-" + index}>
+                        <h5 className="mb-4 mt-4 ml-2">
+                            {pageT("fieldDevices") + " " + (index + 1)}
+                        </h5>
+                        <TextField
+                            label={formT("deviceType")}
+                            value={modelTypeDict?.[item.modelID]}
+                            disabled={true}
+                        />
+                        <TextField
+                            label={formT("deviceModel")}
+                            value={modelNameDict?.[item.modelID]}
+                            disabled={true}
+                        />
+                        <h5 className="mb-4 ml-2">
+                            {pageT("deviceInformation") + " " + (index + 1)}
+                        </h5>
+                        <TextField
+                            key="m-id"
+                            type="number"
+                            label={formT("modbusID")}
+                            value={item.modbusID}
+                            disabled={true}
+                        />
+                        <TextField
+                            key="uueid"
+                            label="UUEID"
+                            value={item?.uueID}
+                            disabled={true}
+                        />
+                        <TextField
+                            key="power-capacity"
+                            type="number"
+                            label={formT("powerCapacity")}
+                            value={item.powerCapacity}
+                            disabled={true}
+                        />
+                        <Divider variant="middle" sx={{ margin: "0 0 2rem" }} />
+                        {item.subDevices?.map((subItem) => {
+                            {
+                                subItem?.modelID === 9
+                                    ? <ExtraDeviceInfoForm
+                                        key={"b-e-d-i"}
+                                        subTitle={extraDeviceInfo}
+                                        gridOutagePercent={gridOutagePercent}
+                                        setGridOutagePercent={setGridOutagePercent}
+                                        chargingSource={chargingSource}
+                                        setChargingSource={setChargingSource}
+                                        energyCapacity={energyCapacity}
+                                        setEnergyCapacity={setEnergyCapacity}
+                                        voltage={voltage}
+                                        setVoltage={setVoltage}
+                                    />
+                                    : null
+                            }
+                        })}
+                    </Fragment>
+                ))}
+                {/* {row?.deviceType === "battery"
                     ? <ExtraDeviceInfoForm
                         key={"b-e-d-i"}
                         subTitle={extraDeviceInfo}
@@ -199,7 +258,7 @@ export default function InfoField(props) {
                         voltage={voltage}
                         setVoltage={setVoltage}
                     />
-                    : null}
+                    : null} */}
                 {row?.deviceType === "hybridInverter"
                     ? <>
                         {row?.subDevice.map((item, i) => (

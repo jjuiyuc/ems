@@ -24,28 +24,41 @@ export default connect(null, mapDispatch)(function AddGroup(props) {
     const
         [openAdd, setOpenAdd] = useState(false),
         [groupName, setGroupName] = useState(""),
-        [isGroupNameError, setIsGroupNameError] = useState(false),
+        [groupNameError, setGroupNameError] = useState(false),
         [groupType, setGroupType] = useState(null),
         [groupTypeError, setGroupTypeError] = useState(false),
         [parentGroup, setParentGroup] = useState(null),
         [parentGroupError, setParentGroupError] = useState(false),
         [otherError, setOtherError] = useState("")
 
-    const submitDisabled = !groupName.length || groupType == null || parentGroup == null || isGroupNameError || groupTypeError || parentGroupError
+    const submitDisabled = !groupName.length || groupType == null || parentGroup == null || groupNameError || groupTypeError || parentGroupError
     const
         changeGroupName = (e) => {
             const
                 groupNameTarget = e.target.value,
-                groupNameError = groupNameTarget.length == 0 || groupNameTarget.length > 20
+                isGroupNameError = groupNameTarget.length == 0 || groupNameTarget.length > 20
             setGroupName(groupNameTarget)
-            setIsGroupNameError(groupNameError)
+            setGroupNameError(isGroupNameError)
         },
         changeGroupType = (e) => {
-            setGroupType(e.target.value)
+            const
+                groupTypeTarget = e.target.value,
+                groupTypeError = groupTypeTarget == null
+
+            setGroupType(groupTypeTarget)
+            setGroupTypeError(groupTypeError)
+        },
+        changeParentGroup = (e) => {
+            const
+                parentGroupTarget = e.target.value,
+                parentGroupError = parentGroupTarget == null
+
+            setParentGroup(parentGroupTarget)
+            setParentGroupError(parentGroupError)
         }
+
     const parentGroupTypeOptions = groupList.filter(item => item.parentID == 1)
         .filter(item => item.typeID == 2)
-
     const
         submit = async () => {
             const data = {
@@ -70,7 +83,7 @@ export default connect(null, mapDispatch)(function AddGroup(props) {
                 onError: (err) => {
                     switch (err) {
                         case 60003:
-                            setIsGroupNameError({ type: "groupNameExistsOnTheSameLevel" })
+                            setGroupNameError({ type: "groupNameExistsOnTheSameLevel" })
                             props.updateSnackbarMsg({
                                 type: "error",
                                 msg: errorT("groupNameExistsOnTheSameLevel")
@@ -89,8 +102,8 @@ export default connect(null, mapDispatch)(function AddGroup(props) {
         cancelClick = () => {
             setOpenAdd(false)
             setGroupName("")
-            setGroupType("")
-            setParentGroup("")
+            setGroupType(null)
+            setParentGroup(null)
         }
     return <>
         <Button
@@ -123,7 +136,7 @@ export default connect(null, mapDispatch)(function AddGroup(props) {
                     label={commonT("groupName")}
                     value={groupName}
                     onChange={changeGroupName}
-                    error={isGroupNameError}
+                    error={groupNameError}
                     helperText={errorT("nameLength")}
                     required
                 />
@@ -132,6 +145,10 @@ export default connect(null, mapDispatch)(function AddGroup(props) {
                     select
                     label={pageT("groupType")}
                     onChange={changeGroupType}
+                    value={groupType}
+                    onBlur={groupTypeError}
+                    error={groupTypeError}
+                    helperText={groupTypeError ? errorT("selectError") : ""}
                     defaultValue=""
                     required
                 >
@@ -144,8 +161,11 @@ export default connect(null, mapDispatch)(function AddGroup(props) {
                     id="add-parent-group-type"
                     select
                     label={pageT("parentGroup")}
-                    onChange={e => setParentGroup(e.target.value)}
-                    value={parentGroup || ""}
+                    onChange={changeParentGroup}
+                    onBlur={parentGroupError}
+                    value={parentGroup}
+                    error={parentGroupError}
+                    helperText={parentGroupError ? errorT("selectError") : ""}
                     disabled={!groupType}
                     defaultValue=""
                     required

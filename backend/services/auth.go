@@ -81,7 +81,7 @@ func (s defaultAuthService) Login(username, password string) (user *deremsmodels
 		s.repo.User.UpdateUser(user)
 	}
 
-	group, err := s.repo.User.GetGroupByGroupID(user.GroupID)
+	group, err := s.repo.User.GetGroupByGroupID(nil, user.GroupID)
 	if err != nil {
 		errCode = e.ErrAuthUserNotExist
 		log.WithFields(log.Fields{

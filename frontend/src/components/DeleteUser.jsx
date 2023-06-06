@@ -12,22 +12,23 @@ const mapDispatch = dispatch => ({
         dispatch({ type: "snackbarMsg/updateSnackbarMsg", payload: value }),
 
 })
-export default connect(null, mapDispatch)(function DeleteGroup(props) {
+export default connect(null, mapDispatch)(function DeleteUser(props) {
     const { row, getList, openDelete, setOpenDelete } = props
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
         dialogT = (string) => t("dialog." + string),
-        errorT = string => t("error." + string)
+        errorT = string => t("error." + string),
+        pageT = (string, params) => t("accountManagementUser." + string, params)
 
     const
-        [groupNameError, setGroupNameError] = useState(null),
+        [deleteError, setDeleteError] = useState(null),
         [otherError, setOtherError] = useState("")
 
     const
         submit = async () => {
 
-            const groupID = row.id
+            const userID = row.id
 
             await apiCall({
                 method: "delete",
@@ -37,23 +38,23 @@ export default connect(null, mapDispatch)(function DeleteGroup(props) {
                     getList()
                     props.updateSnackbarMsg({
                         type: "success",
-                        msg: dialogT("deletedSuccessfully")
+                        msg: t("dialog.deletedSuccessfully")
                     })
                 },
                 onError: (err) => {
                     switch (err) {
-                        case 60008:
-                            setGroupNameError({ type: "groupHasSubGroup" })
+                        case 60015:
+                            setDeleteError({ type: "deleteOwnAccountNotAllow" })
                             props.updateSnackbarMsg({
                                 type: "error",
-                                msg: errorT("groupHasSubGroup")
+                                msg: errorT("deleteOwnAccountNotAllow")
                             })
                             break
-                        case 60009:
-                            setGroupNameError({ type: "groupHasUser" })
+                        case 60016:
+                            setDeleteError({ type: "deleteAccountUserError" })
                             props.updateSnackbarMsg({
                                 type: "error",
-                                msg: errorT("groupHasUser")
+                                msg: errorT("deleteAccountUserError")
                             })
                             break
                         default: setOtherError(err)
@@ -63,19 +64,19 @@ export default connect(null, mapDispatch)(function DeleteGroup(props) {
                             })
                     }
                 },
-                url: `/api/account-management/groups/${groupID}`
+                url: `/api/account-management/users/${userID}`
             })
         }
     return <>
         <DialogForm
-            dialogTitle={dialogT("deleteMsg")}
+            dialogTitle={t("dialog.deleteMsg")}
             fullWidth={true}
             maxWidth="sm"
             open={openDelete}
             setOpen={setOpenDelete}>
             <div className="flex">
-                <h5 className="ml-6 mr-2">{commonT("groupName")} :</h5>
-                {row?.name || ""}
+                <h5 className="ml-6 mr-2">{pageT("account")} :</h5>
+                {row?.username || ""}
             </div>
             <DialogActions sx={{ margin: "0.5rem 0.5rem 0.5rem 0" }}>
                 <Button onClick={() => { setOpenDelete(false) }}
@@ -84,7 +85,7 @@ export default connect(null, mapDispatch)(function DeleteGroup(props) {
                     color="gray">
                     {commonT("cancel")}
                 </Button>
-                <Button onClick={submit}
+                <Button onClick={submit} autoFocus
                     radius="pill"
                     variant="contained"
                     color="negative"

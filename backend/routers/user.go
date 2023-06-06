@@ -118,12 +118,6 @@ func (w *APIWorker) PasswordResetByToken(c *gin.Context) {
 func (w *APIWorker) GetProfile(c *gin.Context) {
 	appG := app.Gin{c}
 	userID, _ := c.Get("userID")
-	if userID == nil {
-		log.WithField("caused-by", "error token").Error()
-		appG.Response(http.StatusUnauthorized, e.ErrToken, nil)
-		return
-	}
-
 	profile, err := w.Services.User.GetProfile(userID.(int64))
 	if err != nil {
 		log.WithField("caused-by", "get profile").Error()

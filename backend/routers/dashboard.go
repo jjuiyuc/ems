@@ -15,11 +15,6 @@ func (w *APIWorker) dashboardHandler(c *gin.Context) {
 	appG := app.Gin{c}
 
 	userID, _ := c.Get("userID")
-	if userID == nil {
-		log.WithField("caused-by", "error token").Error()
-		appG.Response(http.StatusUnauthorized, e.ErrToken, nil)
-		return
-	}
 	token, _ := c.Get("token")
 
 	gatewayUUID := c.Param("gwid")

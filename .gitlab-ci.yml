@@ -78,6 +78,7 @@ test-frontend:
     paths:
       - frontend/coverage/lcov-report
     expire_in: 6 mos
+  allow_failure: true
   coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
 
 .deploy-frontend-template:

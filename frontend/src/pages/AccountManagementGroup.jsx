@@ -9,6 +9,7 @@ import DeleteGroup from "../components/DeleteGroup"
 import EditGroup from "../components/EditGroup"
 import InfoGroup from "../components/InfoGroup"
 import Table from "../components/DataTable"
+import { ReactComponent as DeleteIcon } from "../assets/icons/trash_solid.svg"
 
 const mapState = state => ({
     parentID: state.user.group.parentID
@@ -18,28 +19,29 @@ export default connect(mapState)(function AccountManagementGroup(props) {
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
-        dialogT = (string) => t("dialog." + string),
         pageT = (string, params) => t("accountManagementGroup." + string, params)
 
     const
         [groupList, setGroupList] = useState([]),
         [groupTypeDict, setGroupTypeDict] = useState({}),
         [groupDictionary, setGroupDictionary] = useState({}),
+        [row, setRow] = useState(null),
+        [openDelete, setOpenDelete] = useState(false),
         [loading, setLoading] = useState(false),
-        [infoError, setInfoError] = useState(""),
-        [fullWidth, setFullWidth] = useState(true),
-        [maxWidth, setMaxWidth] = useState("sm")
+        [infoError, setInfoError] = useState("")
 
-    // const handleChange = (e) => {
-    //     setTarget(r => ({ ...r, groupName: e.target.value }))
-    // }
     const onSave = (row) => {
         const newData = groupList.map((value) =>
             value.id === row.id ? row : value
         )
         setGroupList(newData)
     }
-    const adminID = groupList[0]?.id
+    const handleClickDelete = row => {
+        setOpenDelete(true)
+        setRow(row)
+    }
+
+    const adminID = groupList[0]?.parentID
     const columns = [
         {
             cell: row => <span className="font-mono">{row.name || ""}</span>,
@@ -59,23 +61,14 @@ export default connect(mapState)(function AccountManagementGroup(props) {
         {
             cell: row =>
                 <div className="flex w-28">
-                    <InfoGroup
-                        row={row}
-                        groupTypeDict={groupTypeDict}
-                        groupDictionary={groupDictionary} />
+                    <InfoGroup {...{ row, groupTypeDict, groupDictionary }} />
                     {/* Admin has no parentID */}
-                    {row.parentID === null || props.parentID === adminID
+                    {row.parentID === null || row.parentID === adminID
                         ? null
                         : <>
-                            <EditGroup
-                                row={row}
-                                groupList={groupList}
-                                onSave={onSave}
-                            />
-                            <DeleteGroup
-                                row={row}
-                                getList={getList}
-                            />
+                            <EditGroup {...{ row, groupList, onSave }} />
+                            <DeleteIcon onClick={() => handleClickDelete(row)} />
+
                         </>}
                 </div>,
             center: true
@@ -123,5 +116,6 @@ export default connect(mapState)(function AccountManagementGroup(props) {
             progressPending={loading}
             theme="dark"
         />
+        <DeleteGroup {...{ row, getList, openDelete, setOpenDelete }} />
     </>
 })

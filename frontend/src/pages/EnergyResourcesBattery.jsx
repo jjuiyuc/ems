@@ -57,7 +57,7 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
         [dischargedToday, setDischargedToday] = useState(0),
         [infoError, setInfoError] = useState(""),
         [infoLoading, setInfoLoading] = useState(false),
-        [modal, setModal] = useState(""),
+        [model, setModel] = useState(""),
         [power, setPower] = useState(null),
         [powerError, setPowerError] = useState(""),
         [powerLoading, setPowerLoading] = useState(false),
@@ -166,7 +166,7 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
                 setDischargedToday(data.batteryProducedLifetimeEnergyACDiff || 0)
                 setCyclesToday(data.batteryLifetimeOperationCyclesDiff || 0)
                 setCyclesLifetime(data.batteryLifetimeOperationCycles.toFixed(1) || 0)
-                setModal(data.model || "-")
+                setModel(data.model || "-")
                 setPowerSources(data.powerSources || "-")
                 setVoltage(data.voltage || 0)
             },
@@ -249,7 +249,7 @@ export default connect(mapState)(function EnergyResoucesBattery(props) {
         pageT = string => t("energyResources.battery." + string)
 
     const batteryInfoData = [
-        { title: pageT("modal"), value: modal },
+        { title: pageT("model"), value: model },
         { title: pageT("capacity"), value: capacity },
         { title: pageT("powerSources"), value: powerSources },
         { title: pageT("batteryPower"), value: batteryPower },

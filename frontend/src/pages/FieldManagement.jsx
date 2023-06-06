@@ -16,7 +16,8 @@ export default function FieldManagement() {
     const
         [fieldList, setFieldList] = useState([]),
         [loading, setLoading] = useState(false),
-        [infoError, setInfoError] = useState("")
+        [infoError, setInfoError] = useState(""),
+        [fetched, setFetched] = useState(false)
 
     const editSave = (row) => {
         const newData = data.map((value) =>
@@ -55,7 +56,10 @@ export default function FieldManagement() {
     ]
     const getList = () => {
         apiCall({
-            onComplete: () => setLoading(false),
+            onComplete: () => {
+                setLoading(false)
+                setFetched(true)
+            },
             onError: error => setInfoError(error),
             onStart: () => setLoading(true),
             onSuccess: rawData => {
@@ -69,8 +73,9 @@ export default function FieldManagement() {
         })
     }
     useEffect(() => {
-        getList()
-    }, [])
+        if (fetched == false)
+            getList()
+    }, [fetched])
 
     return <>
         <h1 className="mb-9">{commonT("fieldManagement")}</h1>

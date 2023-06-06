@@ -6,9 +6,10 @@ import { useEffect, useState } from "react"
 import { apiCall } from "../utils/api"
 
 import AddUser from "../components/AddUser"
-import EditUser from "../components/EditUser"
 import DeleteUser from "../components/DeleteUser"
+import EditUser from "../components/EditUser"
 import Table from "../components/DataTable"
+import { ReactComponent as DeleteIcon } from "../assets/icons/trash_solid.svg"
 
 const mapState = state => ({
     username: state.user.username
@@ -23,6 +24,8 @@ export default connect(mapState)(function AccountManagementUser(props) {
     const
         [userList, setUserList] = useState([]),
         [groupDictionary, setGroupDictionary] = useState({}),
+        [row, setRow] = useState(null),
+        [openDelete, setOpenDelete] = useState(false),
         [loading, setLoading] = useState(false),
         [infoError, setInfoError] = useState("")
 
@@ -31,6 +34,10 @@ export default connect(mapState)(function AccountManagementUser(props) {
             value.id === row.id ? row : value
         )
         setUserList(newData)
+    }
+    const handleClickDelete = row => {
+        setOpenDelete(true)
+        setRow(row)
     }
     const columns = [
         {
@@ -64,7 +71,7 @@ export default connect(mapState)(function AccountManagementUser(props) {
                     ? <div className="bg-gray-600 w-6 h-6"></div>
                     : <>
                         <EditUser {...{ row, groupDictionary, onSave, getList }} />
-                        <DeleteUser {...{ row, getList }} />
+                        <DeleteIcon onClick={() => handleClickDelete(row)} />
                     </>
                 }
                 {row.lockedAt === null
@@ -128,5 +135,6 @@ export default connect(mapState)(function AccountManagementUser(props) {
             progressPending={loading}
             theme="dark"
         />
+        <DeleteUser {...{ row, getList, openDelete, setOpenDelete }} />
     </>
 })

@@ -6,7 +6,6 @@ import { useState } from "react"
 import { apiCall } from "../utils/api"
 
 import DialogForm from "../components/DialogForm"
-import { ReactComponent as DeleteIcon } from "../assets/icons/trash_solid.svg"
 
 const mapDispatch = dispatch => ({
     updateSnackbarMsg: value =>
@@ -14,7 +13,7 @@ const mapDispatch = dispatch => ({
 
 })
 export default connect(null, mapDispatch)(function DeleteUser(props) {
-    const { row, getList } = props
+    const { row, getList, openDelete, setOpenDelete } = props
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
@@ -23,22 +22,17 @@ export default connect(null, mapDispatch)(function DeleteUser(props) {
         pageT = (string, params) => t("accountManagementUser." + string, params)
 
     const
-        [openDelete, setOpenDelete] = useState(false),
         [deleteError, setDeleteError] = useState(null),
         [otherError, setOtherError] = useState("")
 
     const
-        handleClick = () => {
-            setOpenDelete(true)
-        },
         submit = async () => {
 
             const userID = row.id
-            const data = null
 
             await apiCall({
                 method: "delete",
-                data,
+                data: null,
                 onSuccess: () => {
                     setOpenDelete(false)
                     getList()
@@ -74,7 +68,6 @@ export default connect(null, mapDispatch)(function DeleteUser(props) {
             })
         }
     return <>
-        <DeleteIcon onClick={handleClick} />
         <DialogForm
             dialogTitle={t("dialog.deleteMsg")}
             fullWidth={true}

@@ -28,8 +28,7 @@ export default connect(null, mapDispatch)(function AddGroup(props) {
         [groupType, setGroupType] = useState(null),
         [groupTypeError, setGroupTypeError] = useState(false),
         [parentGroup, setParentGroup] = useState(null),
-        [parentGroupError, setParentGroupError] = useState(false),
-        [otherError, setOtherError] = useState("")
+        [parentGroupError, setParentGroupError] = useState(false)
 
     const submitDisabled = !groupName.length || groupType == null || parentGroup == null || groupNameError || groupTypeError || parentGroupError
     const
@@ -89,7 +88,7 @@ export default connect(null, mapDispatch)(function AddGroup(props) {
                                 msg: errorT("groupNameExistsOnTheSameLevel")
                             })
                             break
-                        default: setOtherError(err)
+                        default:
                             props.updateSnackbarMsg({
                                 type: "error",
                                 msg: errorT("failureToCreate")

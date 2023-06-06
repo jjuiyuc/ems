@@ -93,7 +93,7 @@ export default function InfoField(props) {
                     if (!rawData?.data) return
 
                     const { data } = rawData
-                    console.log(data)
+
                     setGatewayID(data.gatewayID || "")
                     setLocationName(data.locationName || "")
                     setAddress(data.address || "")
@@ -186,49 +186,78 @@ export default function InfoField(props) {
                     disabled={true}
                 />
                 <Divider variant="middle" />
-                {deviceList.map((item, index) => (
-                    <Fragment key={"f-d-" + index}>
-                        <h5 className="mb-4 mt-4 ml-2">
-                            {pageT("fieldDevices") + " " + (index + 1)}
-                        </h5>
-                        <TextField
-                            label={formT("deviceType")}
-                            value={modelTypeDict?.[item.modelID]}
-                            disabled={true}
-                        />
-                        <TextField
-                            label={formT("deviceModel")}
-                            value={modelNameDict?.[item.modelID]}
-                            disabled={true}
-                        />
-                        <h5 className="mb-4 ml-2">
-                            {pageT("deviceInformation") + " " + (index + 1)}
-                        </h5>
-                        <TextField
-                            key="m-id"
-                            type="number"
-                            label={formT("modbusID")}
-                            value={item.modbusID}
-                            disabled={true}
-                        />
-                        <TextField
-                            key="uueid"
-                            label="UUEID"
-                            value={item?.uueID}
-                            disabled={true}
-                        />
-                        <TextField
-                            key="power-capacity"
-                            type="number"
-                            label={formT("powerCapacity")}
-                            value={item.powerCapacity}
-                            disabled={true}
-                        />
-                        <Divider variant="middle" sx={{ margin: "0 0 2rem" }} />
-                        {item.subDevices?.map((subItem) => {
-                            {
-                                subItem?.modelID === 9
-                                    ? <ExtraDeviceInfoForm
+                {deviceList.map((item, index) => {
+                    console.log(item)
+                    return (
+                        <Fragment key={"f-d-" + index}>
+                            <h5 className="mb-4 ml-2">
+                                {pageT("fieldDevices") + " " + (index + 1)}
+                            </h5>
+                            <TextField
+                                label={formT("deviceType")}
+                                value={modelTypeDict?.[item.modelID]}
+                                disabled={true}
+                            />
+                            <TextField
+                                label={formT("deviceModel")}
+                                value={modelNameDict?.[item.modelID]}
+                                disabled={true}
+                            />
+                            <h5 className="mb-4 ml-2">
+                                {pageT("deviceInformation") + " " + (index + 1)}
+                            </h5>
+                            <TextField
+                                key="m-id"
+                                type="number"
+                                label={formT("modbusID")}
+                                value={item.modbusID}
+                                disabled={true}
+                            />
+                            <TextField
+                                key="uueid"
+                                label="UUEID"
+                                value={item?.uueID}
+                                disabled={true}
+                            />
+                            <TextField
+                                key="power-capacity"
+                                type="number"
+                                label={formT("powerCapacity")}
+                                value={item.powerCapacity}
+                                disabled={true}
+                            />
+                            {item.subDevices?.map((subItem, subIndex) => {
+                                {/* console.log(subItem.modelID) */ }
+                                let subDeviceContent = null
+                                //pv && inverter
+                                if (subItem?.modelID === 8 && item?.modelID === 6) {
+                                    subDeviceContent = <>
+                                        <TextField
+                                            key={"i-sub-d-t-"}
+                                            label={formT("deviceType")}
+                                            value={modelTypeDict?.[subItem.modelID]}
+                                            disabled={true}
+                                        />
+                                        <TextField
+                                            key={"i-sub-d-m-"}
+                                            label={formT("deviceModel")}
+                                            value={modelNameDict?.[subItem.modelID]}
+                                            disabled={true}
+                                        />
+                                        <h5 className="mb-5 ml-2">{formT("deviceInformation")}</h5>
+                                        <TextField
+                                            key={"d-i-p-c-"}
+                                            type="number"
+                                            label={formT("powerCapacity")}
+                                            value={subItem?.powerCapacity}
+                                            disabled={true}
+                                        />
+                                    </>
+                                }
+                                //battery
+                                if (subItem?.modelID === 5 && item?.modelID === 6) {
+                                    subDeviceContent = "ExtraDeviceInfoForm"
+                                    {/* subDeviceContent = <ExtraDeviceInfoForm
                                         key={"b-e-d-i"}
                                         subTitle={extraDeviceInfo}
                                         gridOutagePercent={gridOutagePercent}
@@ -239,91 +268,66 @@ export default function InfoField(props) {
                                         setEnergyCapacity={setEnergyCapacity}
                                         voltage={voltage}
                                         setVoltage={setVoltage}
-                                    />
-                                    : null
-                            }
-                        })}
-                    </Fragment>
-                ))}
-                {/* {row?.deviceType === "battery"
-                    ? <ExtraDeviceInfoForm
-                        key={"b-e-d-i"}
-                        subTitle={extraDeviceInfo}
-                        gridOutagePercent={gridOutagePercent}
-                        setGridOutagePercent={setGridOutagePercent}
-                        chargingSource={chargingSource}
-                        setChargingSource={setChargingSource}
-                        energyCapacity={energyCapacity}
-                        setEnergyCapacity={setEnergyCapacity}
-                        voltage={voltage}
-                        setVoltage={setVoltage}
-                    />
-                    : null} */}
+                                    /> */}
+                                }
+                                console.log(item?.modelID)
+                                //hybridInverter
+                                if (item?.modelID === 2) {
+                                    subDeviceContent = <>
+                                        <TextField
+                                            key={"h-sub-d-t-"}
+                                            label={formT("deviceType")}
+                                            value={modelTypeDict?.[subItem.modelID]}
+                                            disabled={true}
+                                        />
+                                        <TextField
+                                            key={"h-sub-d-m-"}
+                                            label={formT("deviceModel")}
+                                            value={modelNameDict?.[subItem.modelID]}
+                                            disabled={true}
+                                        />
+                                        <h5 className="mb-5 ml-2">{formT("deviceInformation")}</h5>
+                                        <TextField
+                                            key={"h-p-c-"}
+                                            type="number"
+                                            label={formT("powerCapacity")}
+                                            value={subItem?.powerCapacity}
+                                        />
+                                        {/* <Divider key={"h-line-"} variant="middle" sx={{ margin: "1rem 0 2.5rem" }} /> */}
+                                        {subItem?.modelID === 5 && "ExtraDeviceInfoForm"}
+                                        {/* <ExtraDeviceInfoForm
+                                            key={"h-e-d-i"}
+                                            subTitle={extraDeviceInfo}
+                                            gridOutagePercent={gridOutagePercent}
+                                            setGridOutagePercent={setGridOutagePercent}
+                                            chargingSource={chargingSource}
+                                            setChargingSource={setChargingSource}
+                                            energyCapacity={energyCapacity}
+                                            setEnergyCapacity={setEnergyCapacity}
+                                            voltage={voltage}
+                                            setVoltage={setVoltage}
+                                        /> */}
+                                    </>
+                                }
+                                return <div className="pl-10 flex flex-col">
+                                    <h5 className="mb-4 ml-2">
+                                        {pageT("subdevice") + " " + (subIndex + 1)}
+                                    </h5>
+                                    {subDeviceContent}
+                                </div>
+                            })}
+                            <Divider variant="middle" sx={{ margin: "0 0 2rem" }} />
+                        </Fragment>
+                    )
+                })}
+
                 {row?.deviceType === "hybridInverter"
                     ? <>
-                        {row?.subDevice.map((item, i) => (
-                            <>
-                                <TextField
-                                    key={"h-sub-d-t-" + i}
-                                    label={formT("deviceType")}
-                                    value={formT(`${item.deviceType}`)}
-                                    disabled={true}
-                                />
-                                <TextField
-                                    key={"h-sub-d-m-" + i}
-                                    label={formT("deviceModel")}
-                                    value={item.deviceModel || ""}
-                                    disabled={true}
-                                />
 
-                                <h5 className="mb-5 ml-2">{formT("deviceInformation")}</h5>
-                                <TextField
-                                    key={"h-p-c-" + i}
-                                    type="number"
-                                    label={formT("powerCapacity")}
-                                    value={item.powerCapacity || ""}
-                                />
-                                <Divider key={"h-line-" + i} variant="middle" sx={{ margin: "1rem 0 2.5rem" }} />
-                            </>
-                        ))}
-                        <ExtraDeviceInfoForm
-                            key={"h-e-d-i"}
-                            subTitle={extraDeviceInfo}
-                            gridOutagePercent={gridOutagePercent}
-                            setGridOutagePercent={setGridOutagePercent}
-                            chargingSource={chargingSource}
-                            setChargingSource={setChargingSource}
-                            energyCapacity={energyCapacity}
-                            setEnergyCapacity={setEnergyCapacity}
-                            voltage={voltage}
-                            setVoltage={setVoltage}
-                        />
+
                     </>
                     : null}
-                {row?.deviceType === "inverter"
-                    ? <>
-                        <TextField
-                            key={"i-sub-d-t-"}
-                            label={formT("deviceType")}
-                            value={formT(`${row?.subDevice[1].deviceType}`)}
-                            disabled={true}
-                        />
-                        <TextField
-                            key={"i-sub-d-m-"}
-                            label={formT("deviceModel")}
-                            value={row?.subDevice[1].deviceModel || ""}
-                            disabled={true}
-                        />
-                        <h5 className="mb-5 ml-2">{formT("deviceInformation")}</h5>
-                        <TextField
-                            key={"d-i-p-c-"}
-                            type="number"
-                            label={formT("powerCapacity")}
-                            value={row?.subDevice[1].powerCapacity || ""}
-                            disabled={true}
-                        />
-                    </>
-                    : null}
+
                 <div className="mb-5 flex items-baseline">
                     <p className="ml-1 mr-2">{formT("enableField")}</p>
                     <Switch disabled={true} />

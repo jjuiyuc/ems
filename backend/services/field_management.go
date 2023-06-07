@@ -46,6 +46,7 @@ type DeviceInfo struct {
 	ModbusID      int64           `json:"modbusID"`
 	UUEID         string          `json:"uueID"`
 	PowerCapacity float32         `json:"powerCapacity"`
+	ExtraInfo     null.JSON       `json:"extraInfo"`
 	SubDevices    []SubDeviceInfo `json:"subDevices"`
 }
 
@@ -212,6 +213,7 @@ func (s defaultFieldManagementService) getFieldDevices(gwID int64) (deviceInfos 
 			ModbusID:      device.ModbusID,
 			UUEID:         device.UUEID,
 			PowerCapacity: device.PowerCapacity,
+			ExtraInfo:     device.ExtraInfo,
 		}
 
 		if device.ModelType != "Hybrid-Inverter" && device.ModelType != "Inverter" {

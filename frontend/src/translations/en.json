@@ -243,7 +243,6 @@
         "userProfileError":"Generate user profile error"
     },
     "fieldManagement":{
-        "deviceInformation":"Device Information",
         "extraDeviceInfo":"Extra Device Information",
         "fieldDevices":"Field Devices",
         "locationInformation":"Location Information",

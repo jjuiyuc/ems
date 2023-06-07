@@ -100,3 +100,20 @@ func DiffTwoArrays(array1, array2 []int) (diff []int) {
 	}
 	return
 }
+
+// UnorderedEqualTwoArrays godoc
+func UnorderedEqualTwoArrays(array1, array2 []int64) bool {
+	if len(array1) != len(array2) {
+		return false
+	}
+	exists := make(map[int64]bool)
+	for _, value := range array1 {
+		exists[value] = true
+	}
+	for _, value := range array2 {
+		if !exists[value] {
+			return false
+		}
+	}
+	return true
+}

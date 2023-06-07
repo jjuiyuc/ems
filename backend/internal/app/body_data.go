@@ -33,3 +33,14 @@ type UpdateUserBody struct {
 	GroupID  int    `form:"groupID"`
 	Unlock   bool   `form:"unlock"`
 }
+
+// UpdateFieldGroupsBody godoc
+type UpdateFieldGroupsBody struct {
+	Groups []FieldGroupInfo `form:"groups" binding:"required"`
+}
+
+// FieldGroupInfo godoc
+type FieldGroupInfo struct {
+	ID    int64 `form:"id" binding:"required"`
+	Check *bool `form:"check" binding:"required"`
+}

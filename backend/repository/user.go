@@ -51,6 +51,9 @@ type UserRepository interface {
 	AuthorizeGroupID(tx *sql.Tx, executedUserID, groupID int64) (exist bool)
 	AuthorizeUserID(tx *sql.Tx, executedUserID, userID int64) (exist bool)
 	GetGroupTypes() ([]*deremsmodels.GroupType, error)
+	InsertGroupGatewayPermissionLog(tx *sql.Tx, groupGatewayRightLog *deremsmodels.GroupGatewayRightLog) error
+	InsertGroupGatewayPermission(groupGatewayRight *deremsmodels.GroupGatewayRight) error
+	UpdateGroupGatewayPermission(groupGatewayRight *deremsmodels.GroupGatewayRight) (err error)
 	GetGatewaysPermissionByGroupID(groupID int64, findDisabled bool) ([]*deremsmodels.GroupGatewayRight, error)
 	GetWebpagesPermissionByGroupTypeID(groupTypeID int64) ([]*deremsmodels.GroupTypeWebpageRight, error)
 	GetWebpageByWebpageID(webpagesID int64) (*deremsmodels.Webpage, error)
@@ -301,6 +304,19 @@ func (repo defaultUserRepository) AuthorizeUserID(tx *sql.Tx, executedUserID, us
 
 func (repo defaultUserRepository) GetGroupTypes() ([]*deremsmodels.GroupType, error) {
 	return deremsmodels.GroupTypes().All(repo.db)
+}
+
+func (repo defaultUserRepository) InsertGroupGatewayPermissionLog(tx *sql.Tx, groupGatewayRightLog *deremsmodels.GroupGatewayRightLog) error {
+	return groupGatewayRightLog.Insert(repo.getExecutor(tx), boil.Infer())
+}
+
+func (repo defaultUserRepository) InsertGroupGatewayPermission(groupGatewayRight *deremsmodels.GroupGatewayRight) error {
+	return groupGatewayRight.Insert(repo.db, boil.Infer())
+}
+
+func (repo defaultUserRepository) UpdateGroupGatewayPermission(groupGatewayRight *deremsmodels.GroupGatewayRight) (err error) {
+	_, err = groupGatewayRight.Update(repo.db, boil.Infer())
+	return
 }
 
 func (repo defaultUserRepository) GetGatewaysPermissionByGroupID(groupID int64, findDisabled bool) ([]*deremsmodels.GroupGatewayRight, error) {

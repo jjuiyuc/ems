@@ -86,6 +86,7 @@ func (w *APIWorker) SyncDeviceSettings(c *gin.Context, uri *app.FieldURI) {
 	}
 	w.sendDeviceSettings(deviceSettings)
 	appG.Response(http.StatusOK, e.Success, nil)
+	logrus.WithFields(logrus.Fields{"sync-by": userID}).Info("device-settings-sync")
 }
 
 func (w *APIWorker) sendDeviceSettings(deviceSettings *services.DeviceSettingsData) {
@@ -93,4 +94,33 @@ func (w *APIWorker) sendDeviceSettings(deviceSettings *services.DeviceSettingsDa
 	kafka.SendDataToGateways(w.Cfg, kafka.SendAIBillingParamsToLocalGW, deviceSettings.BillingData, []string{deviceSettings.GWUUID})
 	kafka.SendDataToGateways(w.Cfg, kafka.SendDeviceMappingToLocalGW, deviceSettings.DeviceMappingData, []string{deviceSettings.GWUUID})
 	kafka.SendDataToAIServer(w.Cfg, kafka.SendGPSLocation, deviceSettings.LocationData)
+}
+
+func (w *APIWorker) UpdateFieldGroups(c *gin.Context, uri *app.FieldURI, body *app.UpdateFieldGroupsBody) {
+	appG := app.Gin{c}
+	userID, _ := c.Get("userID")
+	for _, group := range body.Groups {
+		logrus.WithFields(logrus.Fields{
+			"updated-by":    userID,
+			"body-group-id": group.ID,
+			"body-check":    *group.Check,
+		}).Info("field-groups-updated")
+	}
+	if err := w.Services.FieldManagement.UpdateFieldGroups(userID.(int64), uri.GatewayID, body.Groups); err != nil {
+		if errors.Is(err, e.ErrNewAuthPermissionNotAllow) {
+			appG.Response(http.StatusForbidden, e.ErrAuthPermissionNotAllow, nil)
+			return
+		}
+
+		var code int
+		switch err {
+		case e.ErrNewOwnAccountGroupModifiedNotAllow:
+			code = e.ErrOwnAccountGroupModifiedNotAllow
+		default:
+			code = e.ErrFieldGroupsUpdate
+		}
+		appG.Response(http.StatusInternalServerError, code, nil)
+		return
+	}
+	appG.Response(http.StatusOK, e.Success, nil)
 }

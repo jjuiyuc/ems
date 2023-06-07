@@ -150,6 +150,7 @@ func (repo defaultGatewayRepository) GetGPSLocations() (locations []*GPSLocation
 	).Bind(context.Background(), models.GetDB(), &locations)
 	return
 }
+
 // GetGateways godoc
 func (repo defaultGatewayRepository) GetGateways() ([]*deremsmodels.Gateway, error) {
 	return deremsmodels.Gateways().All(repo.db)

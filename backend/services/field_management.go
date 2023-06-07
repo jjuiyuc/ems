@@ -9,7 +9,9 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/volatiletech/null/v8"
 
+	"der-ems/internal/app"
 	"der-ems/internal/e"
+	"der-ems/internal/utils"
 	"der-ems/models"
 	deremsmodels "der-ems/models/der-ems"
 	"der-ems/repository"
@@ -23,6 +25,7 @@ type FieldManagementService interface {
 	EnableField(executedUserID int64, gwUUID string, enable bool) (err error)
 	GenerateDeviceSettings(executedUserID int64, gwUUID string) (deviceSettings *DeviceSettingsData, err error)
 	GenerateDLDeviceMappingInfo(gwID int64) (data []byte, err error)
+	UpdateFieldGroups(executedUserID int64, gwUUID string, groups []app.FieldGroupInfo) (err error)
 }
 
 // GetFieldsResponse godoc
@@ -418,5 +421,212 @@ func (s defaultFieldManagementService) GenerateDLDeviceMappingInfo(gwID int64) (
 		return
 	}
 	logrus.Debug("deviceMappingInfoJSON: ", string(data))
+	return
+}
+
+func (s defaultFieldManagementService) UpdateFieldGroups(executedUserID int64, gwUUID string, groups []app.FieldGroupInfo) (err error) {
+	if !s.authorizeGatewayUUID(executedUserID, gwUUID) {
+		err = e.ErrNewAuthPermissionNotAllow
+		return
+	}
+	if !s.isOwnAccountGroupChecked(nil, executedUserID, groups) {
+		err = e.ErrNewOwnAccountGroupModifiedNotAllow
+		return
+	}
+	if err = s.authorizeGroupIDs(executedUserID, groups); err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.authorizeGroupIDs",
+			"err":       err,
+		}).Error()
+		return
+	}
+
+	gateway, err := s.repo.Gateway.GetGatewayByGatewayUUID(gwUUID)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.Gateway.GetGatewayByGatewayUUID",
+			"err":       err,
+		}).Error()
+		return
+	}
+	addedGroupIDs, deletedGroupIDs := s.getUpdatedFieldGroupIDs(executedUserID, gateway.ID, groups)
+	logrus.Debug("addedGroupIDs: ", addedGroupIDs)
+	logrus.Debug("deletedGroupIDs: ", deletedGroupIDs)
+	if err = s.addFieldGroups(executedUserID, addedGroupIDs, gateway); err != nil {
+		return
+	}
+	if err = s.deleteFieldGroups(executedUserID, deletedGroupIDs); err != nil {
+		return
+	}
+
+	return
+}
+
+func (s defaultFieldManagementService) isOwnAccountGroupChecked(tx *sql.Tx, executedUserID int64, groups []app.FieldGroupInfo) (checked bool) {
+	user, err := s.repo.User.GetUserByUserID(tx, executedUserID)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.User.GetUserByUserID",
+			"err":       err,
+		}).Error()
+		return
+	}
+	for _, group := range groups {
+		if group.ID == user.GroupID {
+			if *group.Check {
+				checked = true
+				break
+			} else {
+				break
+			}
+		}
+	}
+	return
+}
+
+func (s defaultFieldManagementService) authorizeGroupIDs(executedUserID int64, groups []app.FieldGroupInfo) (err error) {
+	executedUserGroups, err := s.repo.User.GetGroupsByUserID(nil, executedUserID)
+	if err != nil {
+		return
+	}
+
+	var executedUserGroupIDs, updatedGroupIDs []int64
+	for _, group := range executedUserGroups {
+		executedUserGroupIDs = append(executedUserGroupIDs, group.ID)
+	}
+	for _, group := range groups {
+		updatedGroupIDs = append(updatedGroupIDs, group.ID)
+	}
+	if !utils.UnorderedEqualTwoArrays(executedUserGroupIDs, updatedGroupIDs) {
+		err = e.ErrNewAuthPermissionNotAllow
+	}
+	return
+}
+
+func (s defaultFieldManagementService) getUpdatedFieldGroupIDs(executedUserID, gatewayID int64, groups []app.FieldGroupInfo) (addedGroupIDs, deletedGroupIDs []int64) {
+	boundFieldGroups, err := s.getFieldGroups(executedUserID, gatewayID)
+	if err != nil {
+		return
+	}
+
+	for _, group := range groups {
+		isBound := false
+		for _, boundFieldGroup := range boundFieldGroups {
+			if group.ID == boundFieldGroup.ID {
+				isBound = true
+				break
+			}
+		}
+
+		if *group.Check {
+			if !isBound {
+				addedGroupIDs = append(addedGroupIDs, group.ID)
+			}
+		} else {
+			if isBound {
+				deletedGroupIDs = append(deletedGroupIDs, group.ID)
+			}
+		}
+	}
+	return
+}
+
+func (s defaultFieldManagementService) addFieldGroups(executedUserID int64, groupIDs []int64, gateway *deremsmodels.Gateway) (err error) {
+	if len(groupIDs) == 0 {
+		return
+	}
+	for _, groupID := range groupIDs {
+		addedGatewaysPermission, err := s.insertGroupGatewayPermission(executedUserID, groupID, gateway.ID, gateway.LocationID)
+		if err != nil {
+			break
+		}
+		if err = s.insertGroupGatewayPermissionLog(nil, addedGatewaysPermission); err != nil {
+			break
+		}
+	}
+	return
+}
+
+func (s defaultFieldManagementService) deleteFieldGroups(executedUserID int64, groupIDs []int64) (err error) {
+	if len(groupIDs) == 0 {
+		return
+	}
+	for _, groupID := range groupIDs {
+		deletedGatewaysPermission, err := s.deletedGroupGatewayPermission(executedUserID, groupID)
+		if err != nil {
+			break
+		}
+		if err = s.insertGroupGatewayPermissionLog(nil, deletedGatewaysPermission); err != nil {
+			break
+		}
+	}
+	return
+}
+
+func (s defaultFieldManagementService) insertGroupGatewayPermission(executedUserID, groupID, gatewayID int64, locationID null.Int64) (addedGatewaysPermission *deremsmodels.GroupGatewayRight, err error) {
+	now := time.Now().UTC()
+	addedGatewaysPermission = &deremsmodels.GroupGatewayRight{
+		GroupID:    groupID,
+		GWID:       gatewayID,
+		LocationID: locationID,
+		EnabledAt:  now,
+		EnabledBy:  null.Int64From(executedUserID),
+		CreatedAt:  now,
+		CreatedBy:  null.Int64From(executedUserID),
+		UpdatedAt:  now,
+		UpdatedBy:  null.Int64From(executedUserID),
+	}
+	if err = s.repo.User.InsertGroupGatewayPermission(addedGatewaysPermission); err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.User.InsertGroupGatewayPermission",
+			"err":       err,
+		}).Error()
+	}
+	return
+}
+
+func (s defaultFieldManagementService) deletedGroupGatewayPermission(executedUserID, groupID int64) (deletedGatewaysPermission *deremsmodels.GroupGatewayRight, err error) {
+	now := time.Now().UTC()
+	gatewaysPermission, err := s.repo.User.GetGatewaysPermissionByGroupID(groupID, false)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.User.GetGatewaysPermissionByGroupID",
+			"err":       err,
+		}).Error()
+		return
+	}
+	deletedGatewaysPermission = gatewaysPermission[0]
+	deletedGatewaysPermission.DisabledAt = null.TimeFrom(now)
+	deletedGatewaysPermission.DisabledBy = null.Int64From(executedUserID)
+	deletedGatewaysPermission.UpdatedAt = now
+	deletedGatewaysPermission.UpdatedBy = null.Int64From(executedUserID)
+	if err = s.repo.User.UpdateGroupGatewayPermission(deletedGatewaysPermission); err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.User.UpdateGroupGatewayPermission",
+			"err":       err,
+		}).Error()
+	}
+	return
+}
+
+func (s defaultFieldManagementService) insertGroupGatewayPermissionLog(tx *sql.Tx, gatewaysPermission *deremsmodels.GroupGatewayRight) (err error) {
+	groupGatewayRightLog := &deremsmodels.GroupGatewayRightLog{
+		GroupGatewayRightID:        null.Int64From(gatewaysPermission.ID),
+		GroupID:                    null.Int64From(gatewaysPermission.GroupID),
+		GWID:                       null.Int64From(gatewaysPermission.GWID),
+		LocationID:                 gatewaysPermission.LocationID,
+		EnabledAt:                  null.TimeFrom(gatewaysPermission.EnabledAt),
+		EnabledBy:                  gatewaysPermission.EnabledBy,
+		DisabledAt:                 gatewaysPermission.DisabledAt,
+		DisabledBy:                 gatewaysPermission.DisabledBy,
+		GroupGatewayRightUpdatedAt: null.TimeFrom(gatewaysPermission.UpdatedAt),
+		GroupGatewayRightUpdatedBy: gatewaysPermission.UpdatedBy,
+	}
+	if err := s.repo.User.InsertGroupGatewayPermissionLog(tx, groupGatewayRightLog); err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.User.InsertGroupGatewayPermissionLog",
+			"err":       err,
+		}).Error()
+	}
 	return
 }

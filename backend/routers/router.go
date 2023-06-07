@@ -110,6 +110,7 @@ var EndpointMapping = map[PolicyWebpageObject][]string{
 		"/api/device-management/gateways/:gatewayid",
 		"/api/device-management/gateways/:gatewayid/field-state",
 		"/api/device-management/gateways/:gatewayid/sync-device-settings",
+		"/api/device-management/gateways/:gatewayid/account-groups",
 	},
 	AccountManagementGroup: {
 		"/api/account-management/groups",
@@ -222,6 +223,7 @@ func InitRouter(isCORS bool, ginMode string, enforcer *casbin.Enforcer, w *APIWo
 	r.GET(EndpointMapping[FieldManagement][2], authorizeJWT(REST), authorizePolicy(enforcer), validateURI(w.GetField))
 	r.PUT(EndpointMapping[FieldManagement][3], authorizeJWT(REST), authorizePolicy(enforcer), validateURIAndBody(w.EnableField))
 	r.GET(EndpointMapping[FieldManagement][4], authorizeJWT(REST), authorizePolicy(enforcer), validateURI(w.SyncDeviceSettings))
+	r.PUT(EndpointMapping[FieldManagement][5], authorizeJWT(REST), authorizePolicy(enforcer), validateURIAndBody(w.UpdateFieldGroups))
 
 	// Account Management Group
 	r.GET(EndpointMapping[AccountManagementGroup][0], authorizeJWT(REST), authorizePolicy(enforcer), w.GetGroups)

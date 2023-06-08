@@ -1,13 +1,12 @@
-import { Divider, InputAdornment, MenuItem, TextField } from "@mui/material"
+
+import { InputAdornment, MenuItem, TextField } from "@mui/material"
 import { useTranslation } from "react-multi-lang"
 import { useEffect, useMemo, useState } from "react"
 import { validateNumPercent } from "../utils/utils"
 
-
 export default function ExtraDeviceInfoForm(props) {
-    const { subTitle, gridOutagePercent, setGridOutagePercent,
-        chargingSource, setChargingSource, energyCapacity, setEnergyCapacity,
-        voltage, setVoltage
+    const { subTitle, voltage, energyCapacity, chargingSource, gridOutagePercent,
+        setVoltage, setEnergyCapacity, setChargingSource, setGridOutagePercent
     } = props
 
     const
@@ -15,7 +14,6 @@ export default function ExtraDeviceInfoForm(props) {
         commonT = string => t("common." + string),
         dialogT = (string) => t("dialog." + string),
         formT = (string) => t("form." + string)
-
 
     const
         inputPercent = (e) => {
@@ -40,7 +38,9 @@ export default function ExtraDeviceInfoForm(props) {
             key="charging-source"
             select
             label={formT("chargingSource")}
+            // value={chargingSource}
             defaultValue=""
+
         >
             {chargingSource.map((option) => (
                 <MenuItem key={option.value} value={option.value}>

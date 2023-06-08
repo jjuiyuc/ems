@@ -71,7 +71,7 @@ var _ = Describe("User", func() {
 				}
 				payloadBuf, _ := json.Marshal(seedUtArg)
 				testutils.GinkgoAssertRequest(tt, router, "PUT", bytes.NewBuffer(payloadBuf))
-				user, err := repo.User.GetUserByUserID(testdata.UtUser.ID)
+				user, err := repo.User.GetUserByUserID(nil, testdata.UtUser.ID)
 				Expect(err).Should(BeNil())
 				Expect(user.Name.String).To(Equal(seedUtArg.Name))
 			})
@@ -118,7 +118,7 @@ var _ = Describe("User", func() {
 				}
 				payloadBuf, _ := json.Marshal(seedUtArg)
 				testutils.GinkgoAssertRequest(tt, router, "PUT", bytes.NewBuffer(payloadBuf))
-				user, err := repo.User.GetUserByUserID(testdata.UtUser.ID)
+				user, err := repo.User.GetUserByUserID(nil, testdata.UtUser.ID)
 				Expect(err).Should(BeNil())
 				err = utils.ComparePassword(seedUtPassword, user.Password)
 				Expect(err).Should(BeNil())

@@ -224,6 +224,7 @@
         "failureToCreate":"新增失敗",
         "failureToDelete":"刪除失敗！",
         "failureToEdit":"修改失敗",
+        "failureToGenerate":"產生資料失敗",
         "failureToSave":"儲存失敗！",
         "groupHasSubGroup":"該群組之下尚有子群組。",
         "groupHasUser":"該群組內尚有使用者。",

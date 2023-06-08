@@ -223,6 +223,7 @@
         "failureToCreate":"Failure to create.",
         "failureToDelete":"Failure to delete",
         "failureToEdit":"Failure to edit.",
+        "failureToGenerate":"Failure to Generate",
         "failureToSave":"Failure to save",
         "groupHasSubGroup":"Account group has sub group.",
         "groupHasUser":"Account group has user.",

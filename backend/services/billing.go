@@ -157,8 +157,8 @@ func (s defaultBillingService) GetPeriodTypeOfDay(touLocationID int64, t time.Ti
 }
 
 func (s defaultBillingService) IsSummer(voltageType string, t time.Time) bool {
-	/* XXX: Hardcode TPC ~2022 summer is 06/30~09/30
-	   TPC 2023~ summer low voltage is 06/30~09/30 and the other is 05/16~10/15 */
+	/* XXX: Hardcode TPC ~2022 summer is 06/01~09/30
+	   TPC 2023~ summer low voltage is 06/01~09/30 and the other is 05/16~10/15 */
 	if (t.Year() <= 2022) || (t.Year() > 2022 && voltageType == "Low voltage") {
 		switch t.Month() {
 		case time.June, time.July, time.August, time.September:

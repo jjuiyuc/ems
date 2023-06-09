@@ -41,13 +41,13 @@ export default connect(null, mapDispatch)(function AddUser(props) {
     const
         changeAccount = (e) => {
             setAccount(e.target.value)
+            setAccountError(!validateEmail(e.target.value))
         },
-        validateCurAccount = () => setAccountError(!validateEmail(account)),
         changePassword = (e) => {
             setPassword(e.target.value)
+            setPasswordError(!validatePassword(e.target.value))
         },
         passwordLengthError = password.length == 0 || password.length < 8 || password.length > 50,
-        validateCurPassword = () => setPasswordError(!validatePassword(password)),
         changeName = (e) => {
             const
                 nameTarget = e.target.value,
@@ -139,7 +139,6 @@ export default connect(null, mapDispatch)(function AddUser(props) {
                 <TextField
                     id="add-account"
                     label={pageT("account")}
-                    onBlur={validateCurAccount}
                     onChange={changeAccount}
                     value={account}
                     error={accountError}
@@ -150,7 +149,6 @@ export default connect(null, mapDispatch)(function AddUser(props) {
                     type={showPassword ? "text" : "password"}
                     label={pageT("password")}
                     value={password}
-                    onBlur={validateCurPassword}
                     onChange={changePassword}
                     error={passwordError}
                     helperText={(passwordError ? errorT("passwordFormat") : "")

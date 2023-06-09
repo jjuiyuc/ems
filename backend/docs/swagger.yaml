@@ -207,6 +207,32 @@ definitions:
           type: integer
         type: array
     type: object
+  services.DeviceInfo:
+    properties:
+      extraInfo:
+        type: string
+      modbusID:
+        type: integer
+      modelID:
+        type: integer
+      powerCapacity:
+        type: number
+      subDevices:
+        items:
+          $ref: '#/definitions/services.SubDeviceInfo'
+        type: array
+      uueID:
+        type: string
+    type: object
+  services.DeviceModelInfo:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      type:
+        type: string
+    type: object
   services.EnergyCostsDailyInfo:
     properties:
       postUbiikLastMonth:
@@ -296,6 +322,15 @@ definitions:
       pvProducedLifetimeEnergyACDiff:
         type: number
     type: object
+  services.FieldGroupInfo:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      parentID:
+        type: string
+    type: object
   services.Float32ArrayFormat:
     items:
       type: number
@@ -322,6 +357,49 @@ definitions:
       location:
         $ref: '#/definitions/services.LocationInfo'
         type: object
+    type: object
+  services.GetDeviceModelsResponse:
+    properties:
+      models:
+        items:
+          $ref: '#/definitions/services.DeviceModelInfo'
+        type: array
+    type: object
+  services.GetFieldResponse:
+    properties:
+      address:
+        type: string
+      devices:
+        items:
+          $ref: '#/definitions/services.DeviceInfo'
+        type: array
+      enable:
+        type: boolean
+      gatewayID:
+        type: string
+      groups:
+        items:
+          $ref: '#/definitions/services.FieldGroupInfo'
+        type: array
+      lat:
+        type: number
+      lng:
+        type: number
+      locationName:
+        type: string
+      powerCompany:
+        type: string
+      touType:
+        type: string
+      voltageType:
+        type: string
+    type: object
+  services.GetFieldsResponse:
+    properties:
+      gateways:
+        items:
+          $ref: '#/definitions/services.GroupGatewayInfo'
+        type: array
     type: object
   services.GetGroupInfo:
     properties:
@@ -543,6 +621,15 @@ definitions:
         items:
           type: integer
         type: array
+    type: object
+  services.SubDeviceInfo:
+    properties:
+      extraInfo:
+        type: string
+      modelID:
+        type: integer
+      powerCapacity:
+        type: number
     type: object
   services.TimeOfUseEnergyCostResponse:
     properties:
@@ -1679,109 +1766,7 @@ paths:
       summary: Create a group
       tags:
       - account management group
-  /account-management/users:
-    get:
-      description: list users based on token
-      parameters:
-      - default: Bearer <Add access token here>
-        description: Input user's access token
-        in: header
-        name: Authorization
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/app.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/services.GetUsersResponse'
-              type: object
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/app.Response'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/app.Response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/app.Response'
-      security:
-      - ApiKeyAuth: []
-      summary: List users
-      tags:
-      - account management user
-    post:
-      consumes:
-      - application/json
-      description: create a user by token
-      parameters:
-      - default: Bearer <Add access token here>
-        description: Input user's access token
-        in: header
-        name: Authorization
-        required: true
-        type: string
-      - description: Username
-        in: body
-        name: username
-        required: true
-        schema:
-          type: string
-      - description: Password
-        in: body
-        name: password
-        required: true
-        schema:
-          type: string
-      - description: Name
-        in: body
-        name: name
-        required: true
-        schema:
-          type: string
-      - description: GroupID
-        in: body
-        name: groupID
-        required: true
-        schema:
-          type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/app.Response'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/app.Response'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/app.Response'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/app.Response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/app.Response'
-      security:
-      - ApiKeyAuth: []
-      summary: Create a user
-      tags:
-      - account management user
-  /api/account-management/groups/{groupid}:
+  /account-management/groups/{groupid}:
     delete:
       description: delete a group by token and group id
       parameters:
@@ -1921,7 +1906,109 @@ paths:
       summary: Update a group
       tags:
       - account management group
-  /api/account-management/users/{user-id}:
+  /account-management/users:
+    get:
+      description: list users based on token
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Input user's access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/app.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/services.GetUsersResponse'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: List users
+      tags:
+      - account management user
+    post:
+      consumes:
+      - application/json
+      description: create a user by token
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Input user's access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Username
+        in: body
+        name: username
+        required: true
+        schema:
+          type: string
+      - description: Password
+        in: body
+        name: password
+        required: true
+        schema:
+          type: string
+      - description: Name
+        in: body
+        name: name
+        required: true
+        schema:
+          type: string
+      - description: GroupID
+        in: body
+        name: groupID
+        required: true
+        schema:
+          type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Create a user
+      tags:
+      - account management user
+  /account-management/users/{user-id}:
     delete:
       description: delete a user by token and user id
       parameters:
@@ -2070,6 +2157,277 @@ paths:
       summary: Show a token
       tags:
       - authorization
+  /device-management/devices/models:
+    get:
+      description: list device models based on token
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Input user's access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/app.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/services.GetDeviceModelsResponse'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: List device models
+      tags:
+      - field management
+  /device-management/gateways:
+    get:
+      description: list fields based on token
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Input user's access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/app.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/services.GetFieldsResponse'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: List fields
+      tags:
+      - field management
+  /device-management/gateways/{gatewayid}:
+    get:
+      description: get a field by token and gateway id
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Input user's access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Gateway ID
+        in: path
+        name: gatewayid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/app.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/services.GetFieldResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Show a field
+      tags:
+      - field management
+  /device-management/gateways/{gatewayid}/account-groups:
+    put:
+      consumes:
+      - application/json
+      description: update a field groups by token and gateway id
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Input user's access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Gateway ID
+        in: path
+        name: gatewayid
+        required: true
+        type: string
+      - description: Groups
+        in: body
+        name: groups
+        required: true
+        schema:
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Update a field groups
+      tags:
+      - field management
+  /device-management/gateways/{gatewayid}/field-state:
+    put:
+      consumes:
+      - application/json
+      description: enable/disable a field by token and gateway id
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Input user's access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Gateway ID
+        in: path
+        name: gatewayid
+        required: true
+        type: string
+      - description: Enable
+        in: body
+        name: enable
+        required: true
+        schema:
+          type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Enable/Disable a field
+      tags:
+      - field management
+  /device-management/gateways/{gatewayid}/sync-device-settings:
+    get:
+      description: sync a field device settings by token and gateway id
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Input user's access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Gateway ID
+        in: path
+        name: gatewayid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Sync device settings
+      tags:
+      - field management
   /user/PasswordResetByToken:
     put:
       consumes:

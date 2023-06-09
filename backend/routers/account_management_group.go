@@ -84,7 +84,7 @@ func (w *APIWorker) CreateGroup(c *gin.Context, body *app.CreateGroupBody) {
 // @Failure     401            {object}  app.Response
 // @Failure     403            {object}  app.Response
 // @Failure     500            {object}  app.Response
-// @Router      /api/account-management/groups/{groupid} [get]
+// @Router      /account-management/groups/{groupid} [get]
 func (w *APIWorker) GetGroup(c *gin.Context, uri *app.GroupURI) {
 	appG := app.Gin{c}
 	userID, _ := c.Get("userID")
@@ -115,7 +115,7 @@ func (w *APIWorker) GetGroup(c *gin.Context, uri *app.GroupURI) {
 // @Failure     401            {object}  app.Response
 // @Failure     403            {object}  app.Response
 // @Failure     500            {object}  app.Response
-// @Router      /api/account-management/groups/{groupid} [put]
+// @Router      /account-management/groups/{groupid} [put]
 func (w *APIWorker) UpdateGroup(c *gin.Context, uri *app.GroupURI, body *app.UpdateGroupBody) {
 	appG := app.Gin{c}
 	userID, _ := c.Get("userID")
@@ -156,7 +156,7 @@ func (w *APIWorker) UpdateGroup(c *gin.Context, uri *app.GroupURI, body *app.Upd
 // @Failure     401            {object}  app.Response
 // @Failure     403            {object}  app.Response
 // @Failure     500            {object}  app.Response
-// @Router      /api/account-management/groups/{groupid} [delete]
+// @Router      /account-management/groups/{groupid} [delete]
 func (w *APIWorker) DeleteGroup(c *gin.Context, uri *app.GroupURI) {
 	appG := app.Gin{c}
 	userID, _ := c.Get("userID")

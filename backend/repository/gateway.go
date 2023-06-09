@@ -56,15 +56,15 @@ type DLDeviceWrap struct {
 type GatewayRepository interface {
 	InsertGatewayLog(tx *sql.Tx, gatewayLog *deremsmodels.GatewayLog) error
 	UpdateGateway(tx *sql.Tx, gateway *deremsmodels.Gateway) (err error)
-	GetGatewayByGatewayUUID(gwUUID string) (*deremsmodels.Gateway, error)
+	GetGatewayByGatewayUUID(tx *sql.Tx, gwUUID string) (*deremsmodels.Gateway, error)
 	GetGatewaysByLocation(lat, lng float32) ([]*deremsmodels.Gateway, error)
 	GetGatewaysByUserID(userID int64) ([]*deremsmodels.Gateway, error)
 	GetGatewayByGatewayID(gwID int64) (*deremsmodels.Gateway, error)
 	GetGateways() ([]*deremsmodels.Gateway, error)
 	GetGatewayLocationByGatewayID(gwID int64) (gatewayLocation GatewayLocationWrap, err error)
 	GetGPSLocations() (locations []*GPSLocationWrap, err error)
-	GetGatewayGroupsForUserID(executedUserID, gwID int64) ([]*deremsmodels.Group, error)
-	IsGatewayExistedForUserID(executedUserID int64, gwUUID string) bool	
+	GetGatewayGroupsForUserID(tx *sql.Tx, executedUserID, gwID int64) ([]*deremsmodels.Group, error)
+	IsGatewayExistedForUserID(tx *sql.Tx, executedUserID int64, gwUUID string) bool
 	GetDeviceModels() ([]*deremsmodels.DeviceModel, error)
 	GetDeviceMappingByGatewayID(gwID int64) (devices []*DeviceWrap, err error)
 	GetDLDeviceMappingByGatewayID(gwID int64) (devices []*DLDeviceWrap, err error)
@@ -91,9 +91,9 @@ func (repo defaultGatewayRepository) UpdateGateway(tx *sql.Tx, gateway *deremsmo
 }
 
 // GetGatewayByGatewayUUID godoc
-func (repo defaultGatewayRepository) GetGatewayByGatewayUUID(gwUUID string) (*deremsmodels.Gateway, error) {
+func (repo defaultGatewayRepository) GetGatewayByGatewayUUID(tx *sql.Tx, gwUUID string) (*deremsmodels.Gateway, error) {
 	return deremsmodels.Gateways(
-		qm.Where("uuid = ?", gwUUID)).One(repo.db)
+		qm.Where("uuid = ?", gwUUID)).One(repo.getExecutor(tx))
 }
 
 // GetGatewaysByLocation godoc
@@ -156,7 +156,7 @@ func (repo defaultGatewayRepository) GetGateways() ([]*deremsmodels.Gateway, err
 	return deremsmodels.Gateways().All(repo.db)
 }
 
-func (repo defaultGatewayRepository) GetGatewayGroupsForUserID(executedUserID, gwID int64) ([]*deremsmodels.Group, error) {
+func (repo defaultGatewayRepository) GetGatewayGroupsForUserID(tx *sql.Tx, executedUserID, gwID int64) ([]*deremsmodels.Group, error) {
 	return deremsmodels.Groups(
 		qm.SQL(fmt.Sprintf(`
 		WITH RECURSIVE gateway_groups AS
@@ -184,14 +184,14 @@ func (repo defaultGatewayRepository) GetGatewayGroupsForUserID(executedUserID, g
 		)
 		SELECT gateway_groups.*
 			FROM gateway_groups JOIN user_groups
-			ON user_groups.id = gateway_groups.id;`, "`group`", "`group`", "`group`", "`group`"), executedUserID, gwID)).All(repo.db)
+			ON user_groups.id = gateway_groups.id;`, "`group`", "`group`", "`group`", "`group`"), executedUserID, gwID)).All(repo.getExecutor(tx))
 }
 
-func (repo defaultGatewayRepository) IsGatewayExistedForUserID(executedUserID int64, gwUUID string) (exist bool) {
+func (repo defaultGatewayRepository) IsGatewayExistedForUserID(tx *sql.Tx, executedUserID int64, gwUUID string) (exist bool) {
 	exist, _ = deremsmodels.Gateways(
 		qm.InnerJoin("group_gateway_right AS gr ON gateway.id = gr.gw_id"),
 		qm.InnerJoin("user AS u ON gr.group_id = u.group_id"),
-		qm.Where("uuid = ? AND u.id = ?", gwUUID, executedUserID)).Exists(repo.db)
+		qm.Where("uuid = ? AND u.id = ?", gwUUID, executedUserID)).Exists(repo.getExecutor(tx))
 	return
 }
 

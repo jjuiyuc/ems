@@ -57,7 +57,7 @@ func NewBillingService(repo *repository.Repository) BillingService {
 }
 
 func (s defaultBillingService) GetTOUsOfLocalTime(gwUUID string, t time.Time) (localTime time.Time, tous []*deremsmodels.Tou, err error) {
-	gateway, err := s.repo.Gateway.GetGatewayByGatewayUUID(gwUUID)
+	gateway, err := s.repo.Gateway.GetGatewayByGatewayUUID(nil, gwUUID)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "s.repo.Gateway.GetGatewayByGatewayUUID",

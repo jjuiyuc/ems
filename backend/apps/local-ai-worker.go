@@ -111,7 +111,7 @@ func (h localAIConsumerHandler) saveLocalAIData(msg []byte) (err error) {
 		LocalAiData: null.JSONFrom(dataJSON),
 	}
 
-	gateway, err := h.repo.Gateway.GetGatewayByGatewayUUID(gwUUID)
+	gateway, err := h.repo.Gateway.GetGatewayByGatewayUUID(nil, gwUUID)
 	if err == nil {
 		aiData.GWID = null.Int64From(gateway.ID)
 		aiData.LocationID = gateway.LocationID

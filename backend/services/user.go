@@ -173,7 +173,7 @@ func (s defaultUserService) GetProfile(userID int64) (profile *ProfileResponse, 
 }
 
 func (s defaultUserService) getGroupGatewayInfo(groupID int64) (gatewayInfos []GatewayInfo) {
-	gatewaysPermission, getErr := s.repo.User.GetGatewaysPermissionByGroupID(groupID, true)
+	gatewaysPermission, getErr := s.repo.User.GetGatewaysPermissionByGroupID(nil, groupID, true)
 	if getErr != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "s.repo.User.GetGatewaysPermissionByGroupID",

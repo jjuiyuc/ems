@@ -15,6 +15,13 @@ import (
 
 // SendDataToGateways godoc
 func SendDataToGateways(cfg *viper.Viper, topic string, data []byte, gatewayUUIDs []string) {
+	if len(data) == 0 {
+		log.WithFields(log.Fields{
+			"topic":        topic,
+			"gatewayUUIDs": gatewayUUIDs,
+		}).Warning("no-data")
+		return
+	}
 	for _, uuid := range gatewayUUIDs {
 		replacedTopic := strings.Replace(topic, "{gw-id}", uuid, 1)
 		log.Debug("topic: ", replacedTopic)

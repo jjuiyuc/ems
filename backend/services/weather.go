@@ -79,6 +79,13 @@ func (s defaultWeatherService) GetWeatherDataByLocation(lat, lng float32) (data 
 		value[validDate] = weatherForecast.ValidDate.Format(time.RFC3339)
 		weatherInfo.Values = append(weatherInfo.Values, value)
 	}
+	if len(weatherInfo.Values) == 0 {
+		logrus.WithFields(logrus.Fields{
+			"lat": lat,
+			"lng": lng,
+		}).Warning("no-weather-data")
+		return
+	}
 	data, err = json.Marshal(weatherInfo)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{

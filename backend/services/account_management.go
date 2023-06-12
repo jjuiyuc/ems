@@ -77,7 +77,7 @@ func NewAccountManagementService(repo *repository.Repository) AccountManagementS
 }
 
 func (s defaultAccountManagementService) GetGroups(userID int64) (getGroups *GetGroupsResponse, err error) {
-	groups, err := s.getGroupTreeNodes(nil, userID)
+	groups, err := s.repo.User.GetGroupsByUserID(nil, userID)
 	if err != nil {
 		return
 	}
@@ -113,25 +113,6 @@ func (s defaultAccountManagementService) GetGroups(userID int64) (getGroups *Get
 	getGroups = &GetGroupsResponse{
 		Groups:     getGroupInfos,
 		GroupTypes: getGroupTypeInfos,
-	}
-	return
-}
-
-func (s defaultAccountManagementService) getGroupTreeNodes(tx *sql.Tx, userID int64) (groups []*deremsmodels.Group, err error) {
-	user, err := s.repo.User.GetUserByUserID(tx, userID)
-	if err != nil {
-		logrus.WithFields(logrus.Fields{
-			"caused-by": "s.repo.User.GetUserByUserID",
-			"err":       err,
-		}).Error()
-		return
-	}
-	groups, err = s.repo.User.GetGroupsByGroupID(tx, user.GroupID)
-	if err != nil {
-		logrus.WithFields(logrus.Fields{
-			"caused-by": "s.repo.User.GetGroupsByGroupID",
-			"err":       err,
-		}).Error()
 	}
 	return
 }
@@ -353,7 +334,7 @@ func (s defaultAccountManagementService) isSubGroupExisted(tx *sql.Tx, groupID i
 }
 
 func (s defaultAccountManagementService) authorizeGroupID(tx *sql.Tx, executedUserID, groupID int64) bool {
-	groups, _ := s.getGroupTreeNodes(tx, executedUserID)
+	groups, _ := s.repo.User.GetGroupsByUserID(tx, executedUserID)
 	for _, group := range groups {
 		if group.ID == groupID {
 			return true
@@ -364,7 +345,7 @@ func (s defaultAccountManagementService) authorizeGroupID(tx *sql.Tx, executedUs
 }
 
 func (s defaultAccountManagementService) GetUsers(userID int64) (getUsers *GetUsersResponse, err error) {
-	groups, err := s.getGroupTreeNodes(nil, userID)
+	groups, err := s.repo.User.GetGroupsByUserID(nil, userID)
 	if err != nil {
 		return
 	}
@@ -534,7 +515,7 @@ func (s defaultAccountManagementService) authorizeUserID(tx *sql.Tx, executedUse
 	if err != nil || !user.DeletedAt.IsZero() {
 		return false
 	}
-	groups, _ := s.getGroupTreeNodes(tx, executedUserID)
+	groups, _ := s.repo.User.GetGroupsByUserID(tx, executedUserID)
 	for _, group := range groups {
 		if group.ID == user.GroupID {
 			return true

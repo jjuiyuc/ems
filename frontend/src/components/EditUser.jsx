@@ -39,7 +39,7 @@ export default connect(null, mapDispatch)(function EditUser(props) {
         [name, setName] = useState(row.name),
         [nameError, setNameError] = useState(false),
         [group, setGroup] = useState(row?.groupID),
-        [groupError, setGroupError] = useState(null),
+        [groupError, setGroupError] = useState(false),
         [otherError, setOtherError] = useState("")
 
     const submitDisabled = group == null || passwordError || nameError || groupError
@@ -49,13 +49,13 @@ export default connect(null, mapDispatch)(function EditUser(props) {
             setOpenEdit(true)
         },
         handleSwitch = () => {
-            setUnlock(!unlock)
+            setUnlock(preState => !preState)
         },
         changePassword = (e) => {
             setPassword(e.target.value)
+            setPasswordError(!validatePassword(e.target.value))
         },
         passwordLengthError = password.length < 8 || password.length > 50,
-        validateCurPassword = () => setPasswordError(!validatePassword(password)),
         changeName = (e) => {
             const
                 nameTarget = e.target.value,
@@ -64,7 +64,11 @@ export default connect(null, mapDispatch)(function EditUser(props) {
             setNameError(nameError)
         },
         changeGroup = (e) => {
+            const
+                groupTarget = e.target.value,
+                groupError = groupTarget == null
             setGroup(e.target.value)
+            setGroupError(groupError)
         },
         handleSave = () => {
             if (!passwordError && !passwordLengthError && !nameError && !groupError) {
@@ -155,11 +159,11 @@ export default connect(null, mapDispatch)(function EditUser(props) {
                     type={showPassword ? "text" : "password"}
                     label={pageT("newPassword")}
                     value={password}
-                    onBlur={validateCurPassword}
                     onChange={changePassword}
                     error={passwordError}
-                    helperText={passwordError ? errorT("passwordFormat") : ""
-                        || passwordLengthError ? errorT("passwordLength") : ""}
+                    helperText={(passwordError ? errorT("passwordFormat") : "")
+                        || (passwordLengthError ? errorT("passwordLength") : "")
+                    }
                     autoComplete="password"
                     InputProps={{
                         endAdornment:
@@ -183,7 +187,7 @@ export default connect(null, mapDispatch)(function EditUser(props) {
                     id="edit-name"
                     label={pageT("name")}
                     onChange={changeName}
-                    value={name || ""}
+                    value={name}
                     error={nameError}
                     helperText={nameError ? errorT("nameLength") : ""}
                 />
@@ -192,6 +196,7 @@ export default connect(null, mapDispatch)(function EditUser(props) {
                     select
                     label={commonT("group")}
                     onChange={changeGroup}
+                    error={groupError}
                     value={group}>
                     {Object.entries(groupDictionary).map(([key, value]) =>
                         <MenuItem key={"e-g-" + key} value={key}>

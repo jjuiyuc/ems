@@ -14,8 +14,12 @@ import { ReactComponent as DeleteIcon } from "../assets/icons/trash_solid.svg"
 const mapState = state => ({
     parentID: state.user.group.parentID
 })
+const mapDispatch = dispatch => ({
+    updateSnackbarMsg: value =>
+        dispatch({ type: "snackbarMsg/updateSnackbarMsg", payload: value }),
 
-export default connect(mapState)(function AccountManagementGroup(props) {
+})
+export default connect(mapState, mapDispatch)(function AccountManagementGroup(props) {
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
@@ -27,8 +31,7 @@ export default connect(mapState)(function AccountManagementGroup(props) {
         [groupDictionary, setGroupDictionary] = useState({}),
         [row, setRow] = useState(null),
         [openDelete, setOpenDelete] = useState(false),
-        [loading, setLoading] = useState(false),
-        [infoError, setInfoError] = useState("")
+        [loading, setLoading] = useState(false)
 
     const onSave = (row) => {
         const newData = groupList.map((value) =>
@@ -77,8 +80,22 @@ export default connect(mapState)(function AccountManagementGroup(props) {
     const getList = () => {
         apiCall({
             onComplete: () => setLoading(false),
-            onError: error => setInfoError(error),
             onStart: () => setLoading(true),
+            onError: (err) => {
+                switch (err) {
+                    case 60011:
+                        props.updateSnackbarMsg({
+                            type: "error",
+                            msg: errorT("failureToGenerate")
+                        })
+                        break
+                    default:
+                        props.updateSnackbarMsg({
+                            type: "error",
+                            msg: errorT("failureToGenerate")
+                        })
+                }
+            },
             onSuccess: rawData => {
                 if (!rawData?.data) return
 

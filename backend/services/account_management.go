@@ -496,16 +496,9 @@ func (s defaultAccountManagementService) DeleteUser(executedUserID, userID int64
 	return
 }
 
-func (s defaultAccountManagementService) authorizeUserID(tx *sql.Tx, executedUserID, userID int64) bool {
-	user, err := s.repo.User.GetUserByUserID(tx, userID)
-	if err != nil || !user.DeletedAt.IsZero() {
-		return false
+func (s defaultAccountManagementService) authorizeUserID(tx *sql.Tx, executedUserID, userID int64) (exist bool) {
+	if exist = s.repo.User.AuthorizeUserID(tx, executedUserID, userID); !exist {
+		logrus.WithField("executedUserID", executedUserID).Error("authorize-user-id-failed")
 	}
-	groups, _ := s.repo.User.GetGroupsByUserID(tx, executedUserID)
-	for _, group := range groups {
-		if group.ID == user.GroupID {
-			return true
-		}
-	}
-	return false
+	return
 }

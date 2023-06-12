@@ -49,6 +49,7 @@ type UserRepository interface {
 	GetGroupsByGroupID(tx *sql.Tx, groupID int64) ([]*deremsmodels.Group, error)
 	GetGroupsByUserID(tx *sql.Tx, userID int64) ([]*deremsmodels.Group, error)
 	AuthorizeGroupID(tx *sql.Tx, executedUserID, groupID int64) (exist bool)
+	AuthorizeUserID(tx *sql.Tx, executedUserID, userID int64) (exist bool)
 	GetGroupTypes() ([]*deremsmodels.GroupType, error)
 	GetGatewaysPermissionByGroupID(groupID int64, findDisabled bool) ([]*deremsmodels.GroupGatewayRight, error)
 	GetWebpagesPermissionByGroupTypeID(groupTypeID int64) ([]*deremsmodels.GroupTypeWebpageRight, error)
@@ -267,6 +268,34 @@ func (repo defaultUserRepository) AuthorizeGroupID(tx *sql.Tx, executedUserID, g
 			AND g.deleted_at IS NULL
 		)
 		SELECT id FROM group_path WHERE id = ?;`, "`group`", "`group`"), executedUserID, groupID)).Exists(repo.getExecutor(tx))
+	return
+}
+
+func (repo defaultUserRepository) AuthorizeUserID(tx *sql.Tx, executedUserID, userID int64) (exist bool) {
+	exist, _ = deremsmodels.Groups(
+		qm.SQL(fmt.Sprintf(`
+		WITH RECURSIVE group_path AS
+		(
+		SELECT *
+			FROM %s
+			WHERE id = (
+				SELECT group_id
+				FROM user
+				WHERE id = ?
+			)
+		UNION ALL
+		SELECT g.*
+			FROM group_path AS gp JOIN %s AS g
+			ON gp.id = g.parent_id
+			AND g.deleted_at IS NULL
+		)
+		SELECT id
+			FROM group_path
+			WHERE id = (
+				SELECT group_id
+				FROM user
+				WHERE id = ? AND deleted_at IS NULL
+		);`, "`group`", "`group`"), executedUserID, userID)).Exists(repo.getExecutor(tx))
 	return
 }
 

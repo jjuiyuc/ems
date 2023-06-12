@@ -333,15 +333,11 @@ func (s defaultAccountManagementService) isSubGroupExisted(tx *sql.Tx, groupID i
 	return false
 }
 
-func (s defaultAccountManagementService) authorizeGroupID(tx *sql.Tx, executedUserID, groupID int64) bool {
-	groups, _ := s.repo.User.GetGroupsByUserID(tx, executedUserID)
-	for _, group := range groups {
-		if group.ID == groupID {
-			return true
-		}
+func (s defaultAccountManagementService) authorizeGroupID(tx *sql.Tx, executedUserID, groupID int64) (exist bool) {
+	if exist = s.repo.User.AuthorizeGroupID(tx, executedUserID, groupID); !exist {
+		logrus.WithField("executedUserID", executedUserID).Error("authorize-group-id-failed")
 	}
-	logrus.WithField("executedUserID", executedUserID).Error("authorize-group-id-failed")
-	return false
+	return
 }
 
 func (s defaultAccountManagementService) GetUsers(userID int64) (getUsers *GetUsersResponse, err error) {

@@ -37,7 +37,7 @@ type UserRepository interface {
 	GetUserByUserID(tx *sql.Tx, userID int64) (*deremsmodels.User, error)
 	GetUserByUsername(username string) (*deremsmodels.User, error)
 	GetUserByPasswordToken(token string) (*deremsmodels.User, error)
-	GetUserWrapsByGroupIDs(groupIDs []interface{}) ([]*UserWrap, error)	
+	GetUserWrapsByGroupIDs(groupIDs []interface{}) ([]*UserWrap, error)
 	IsUserExistedInGroup(tx *sql.Tx, groupID int64) bool
 	IsUsernameExisted(tx *sql.Tx, username string) bool
 	CreateGroup(tx *sql.Tx, group *deremsmodels.Group) (err error)
@@ -47,6 +47,7 @@ type UserRepository interface {
 	GetGroupByGroupID(tx *sql.Tx, groupID int64) (*deremsmodels.Group, error)
 	GetGroupsByGroupID(tx *sql.Tx, groupID int64) ([]*deremsmodels.Group, error)
 	GetGroupsByUserID(tx *sql.Tx, userID int64) ([]*deremsmodels.Group, error)
+	AuthorizeGroupID(tx *sql.Tx, executedUserID, groupID int64) (exist bool)
 	GetGroupTypes() ([]*deremsmodels.GroupType, error)
 	GetGatewaysPermissionByGroupID(groupID int64, findDisabled bool) ([]*deremsmodels.GroupGatewayRight, error)
 	GetWebpagesPermissionByGroupTypeID(groupTypeID int64) ([]*deremsmodels.GroupTypeWebpageRight, error)
@@ -226,6 +227,28 @@ func (repo defaultUserRepository) GetGroupsByUserID(tx *sql.Tx, userID int64) ([
 			AND g.deleted_at IS NULL
 		)
 		SELECT * FROM group_path;`, "`group`", "`group`"), userID)).All(repo.getExecutor(tx))
+}
+
+func (repo defaultUserRepository) AuthorizeGroupID(tx *sql.Tx, executedUserID, groupID int64) (exist bool) {
+	exist, _ = deremsmodels.Groups(
+		qm.SQL(fmt.Sprintf(`
+		WITH RECURSIVE group_path AS
+		(
+		SELECT *
+			FROM %s
+			WHERE id = (
+				SELECT group_id
+				FROM user
+				WHERE id = ?
+			)
+		UNION ALL
+		SELECT g.*
+			FROM group_path AS gp JOIN %s AS g
+			ON gp.id = g.parent_id
+			AND g.deleted_at IS NULL
+		)
+		SELECT id FROM group_path WHERE id = ?;`, "`group`", "`group`"), executedUserID, groupID)).Exists(repo.getExecutor(tx))
+	return
 }
 
 func (repo defaultUserRepository) GetGroupTypes() ([]*deremsmodels.GroupType, error) {

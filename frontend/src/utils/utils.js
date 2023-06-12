@@ -1,4 +1,4 @@
-import moment from "moment"
+import moment from "moment-timezone"
 import variables from "../configs/variables"
 
 const { colors } = variables
@@ -46,7 +46,7 @@ const validateEmail = email =>
     /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)
 
 const validatePassword = password =>
-    /^(?=.{8,})((?=.*[^a-zA-Z]))|(?=.*\d)(?=.*[a-zA-Z])|(?=.*[^a-zA-Z0-9]).*$/.test(password)
+    /^(?=.{8,})((?=.*[^a-zA-Z]))|(?=.{8,})(?=.*\d)(?=.*[a-zA-Z])|(?=.*[^a-zA-Z0-9]).*$/.test(password)
 
 const validateNum = num =>
     /^(0?|[1-9][0-9]*)$/.test(num)

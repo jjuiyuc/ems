@@ -239,6 +239,7 @@
         "passwordUpdateError":"密碼更新失敗",
         "passwordTokenError": "該重設密碼連結已失效",
         "pricingError":"價格須大於0",
+        "selectError":"請選擇一個選項。",
         "sumError":"時間區間加總須為二十四小時。",
         "timeOverlapError":"時間區間不能重疊。",
         "userLocked": "使用者帳號已被鎖定。",

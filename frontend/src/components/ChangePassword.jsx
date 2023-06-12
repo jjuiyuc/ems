@@ -37,53 +37,52 @@ export default connect(null, mapDispatch)(function ChangePassword(props) {
         },
         changeNewPassword = (e) => {
             setNewPassword(e.target.value)
+            setNewPasswordError(!validatePassword(e.target.value))
         },
-        validateNewPassword = () => setNewPasswordError(
-            newPassword.length > 0 && !validatePassword(newPassword)
-        ),
-        newPasswordLengthError = newPassword.length == 0 || newPassword.length > 50,
-        submit = async () => {
+        newPasswordLengthError = newPassword.length == 0 || newPassword.length > 50
 
-            const onError = (err) => {
-                switch (err) {
-                    case 20007:
-                        setCurPasswordError(true)
-                        props.updateSnackbarMsg({
-                            type: "error",
-                            msg: errorT("curPasswordNotMatch")
-                        })
-                        break
-                    case 60001:
-                        setNewPasswordError(true)
-                        props.updateSnackbarMsg({
-                            type: "error",
-                            msg: errorT("passwordUpdateError")
-                        })
-                        break
-                    default: setOtherError(err)
-                }
-            }
-            await apiCall({
-                data: {
-                    currentPassword: curPassword,
-                    newPassword: newPassword
-                },
-                method: "put",
-                onSuccess: () => {
+    const submit = async () => {
+
+        const onError = (err) => {
+            switch (err) {
+                case 20007:
+                    setCurPasswordError(true)
                     props.updateSnackbarMsg({
-                        type: "success",
-                        msg: t("dialog.updatedPasswordMsg")
-
+                        type: "error",
+                        msg: errorT("curPasswordNotMatch")
                     })
-                    setCurPasswordError(false)
-                    setNewPasswordError(false)
-                    setCurPassword("")
-                    setNewPassword("")
-                },
-                onError,
-                url: "/api/users/password"
-            })
+                    break
+                case 60001:
+                    setNewPasswordError(true)
+                    props.updateSnackbarMsg({
+                        type: "error",
+                        msg: errorT("passwordUpdateError")
+                    })
+                    break
+                default: setOtherError(err)
+            }
         }
+        await apiCall({
+            data: {
+                currentPassword: curPassword,
+                newPassword: newPassword
+            },
+            method: "put",
+            onSuccess: () => {
+                props.updateSnackbarMsg({
+                    type: "success",
+                    msg: t("dialog.updatedPasswordMsg")
+
+                })
+                setCurPasswordError(false)
+                setNewPasswordError(false)
+                setCurPassword("")
+                setNewPassword("")
+            },
+            onError,
+            url: "/api/users/password"
+        })
+    }
 
     return <>
         <div className="card w-fit lg:w-88">
@@ -123,7 +122,6 @@ export default connect(null, mapDispatch)(function ChangePassword(props) {
                     label={pageT("newPassword")}
                     type={showPassword ? "text" : "password"}
                     value={newPassword}
-                    onBlur={validateNewPassword}
                     onChange={changeNewPassword}
                     error={newPasswordError}
                     helperText={newPasswordLengthError ? errorT("passwordLength") : ""

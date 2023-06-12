@@ -17,13 +17,8 @@ export default connect(null, mapDispatch)(function DeleteUser(props) {
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
-        dialogT = (string) => t("dialog." + string),
         errorT = string => t("error." + string),
         pageT = (string, params) => t("accountManagementUser." + string, params)
-
-    const
-        [deleteError, setDeleteError] = useState(null),
-        [otherError, setOtherError] = useState("")
 
     const
         submit = async () => {
@@ -44,20 +39,18 @@ export default connect(null, mapDispatch)(function DeleteUser(props) {
                 onError: (err) => {
                     switch (err) {
                         case 60015:
-                            setDeleteError({ type: "deleteOwnAccountNotAllow" })
                             props.updateSnackbarMsg({
                                 type: "error",
                                 msg: errorT("deleteOwnAccountNotAllow")
                             })
                             break
                         case 60016:
-                            setDeleteError({ type: "deleteAccountUserError" })
                             props.updateSnackbarMsg({
                                 type: "error",
                                 msg: errorT("deleteAccountUserError")
                             })
                             break
-                        default: setOtherError(err)
+                        default:
                             props.updateSnackbarMsg({
                                 type: "error",
                                 msg: errorT("failureToDelete")

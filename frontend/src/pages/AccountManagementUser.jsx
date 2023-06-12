@@ -14,20 +14,23 @@ import { ReactComponent as DeleteIcon } from "../assets/icons/trash_solid.svg"
 const mapState = state => ({
     username: state.user.username
 })
+const mapDispatch = dispatch => ({
+    updateSnackbarMsg: value =>
+        dispatch({ type: "snackbarMsg/updateSnackbarMsg", payload: value }),
 
-export default connect(mapState)(function AccountManagementUser(props) {
+})
+export default connect(mapState, mapDispatch)(function AccountManagementUser(props) {
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
-        dialogT = (string) => t("dialog." + string),
         pageT = (string, params) => t("accountManagementUser." + string, params)
+
     const
         [userList, setUserList] = useState([]),
         [groupDictionary, setGroupDictionary] = useState({}),
         [row, setRow] = useState(null),
         [openDelete, setOpenDelete] = useState(false),
-        [loading, setLoading] = useState(false),
-        [infoError, setInfoError] = useState("")
+        [loading, setLoading] = useState(false)
 
     const onSave = (row) => {
         const newData = userList.map((value) =>
@@ -57,11 +60,11 @@ export default connect(mapState)(function AccountManagementUser(props) {
         },
         {
             cell: row => <span className="font-mono">
-                {`${row.groupName + " " + `(${row.groupParentName})`}`}
+                {`${row.groupName} (${row.groupParentName})`}
             </span>,
             center: true,
             name: commonT("group"),
-            selector: row => `${row.groupName + row.groupParentName}`,
+            selector: row => row.groupName + row.groupParentName,
             grow: 1.1
 
         },
@@ -86,8 +89,22 @@ export default connect(mapState)(function AccountManagementUser(props) {
     const getList = () => {
         apiCall({
             onComplete: () => setLoading(false),
-            onError: error => setInfoError(error),
             onStart: () => setLoading(true),
+            onError: (err) => {
+                switch (err) {
+                    case 60011:
+                        props.updateSnackbarMsg({
+                            type: "error",
+                            msg: errorT("failureToGenerate")
+                        })
+                        break
+                    default:
+                        props.updateSnackbarMsg({
+                            type: "error",
+                            msg: errorT("noDataMsg")
+                        })
+                }
+            },
             onSuccess: rawData => {
                 if (!rawData?.data) return
 
@@ -101,8 +118,22 @@ export default connect(mapState)(function AccountManagementUser(props) {
     const getGroupList = () => {
         apiCall({
             onComplete: () => setLoading(false),
-            onError: error => setInfoError(error),
             onStart: () => setLoading(true),
+            onError: (err) => {
+                switch (err) {
+                    case 60002:
+                        props.updateSnackbarMsg({
+                            type: "error",
+                            msg: errorT("failureToGenerate")
+                        })
+                        break
+                    default:
+                        props.updateSnackbarMsg({
+                            type: "error",
+                            msg: errorT("noDataMsg")
+                        })
+                }
+            },
             onSuccess: rawData => {
                 if (!rawData?.data) return
 

@@ -343,24 +343,20 @@ func (s defaultAccountManagementService) checkDeletedRules(tx *sql.Tx, executedU
 }
 
 func (s defaultAccountManagementService) isSubGroupExisted(tx *sql.Tx, groupID int64) bool {
-	groups, err := s.repo.User.GetGroupsByGroupID(tx, groupID)
-	if err == nil {
-		for _, group := range groups {
-			if group.ParentID.Int64 == groupID {
-				return true
-			}
+	groups, _ := s.repo.User.GetGroupsByGroupID(tx, groupID)
+	for _, group := range groups {
+		if group.ParentID.Int64 == groupID {
+			return true
 		}
 	}
 	return false
 }
 
 func (s defaultAccountManagementService) authorizeGroupID(tx *sql.Tx, executedUserID, groupID int64) bool {
-	groups, err := s.getGroupTreeNodes(tx, executedUserID)
-	if err == nil {
-		for _, group := range groups {
-			if group.ID == groupID {
-				return true
-			}
+	groups, _ := s.getGroupTreeNodes(tx, executedUserID)
+	for _, group := range groups {
+		if group.ID == groupID {
+			return true
 		}
 	}
 	logrus.WithField("executedUserID", executedUserID).Error("authorize-group-id-failed")
@@ -538,12 +534,10 @@ func (s defaultAccountManagementService) authorizeUserID(tx *sql.Tx, executedUse
 	if err != nil || !user.DeletedAt.IsZero() {
 		return false
 	}
-	groups, err := s.getGroupTreeNodes(tx, executedUserID)
-	if err == nil {
-		for _, group := range groups {
-			if group.ID == user.GroupID {
-				return true
-			}
+	groups, _ := s.getGroupTreeNodes(tx, executedUserID)
+	for _, group := range groups {
+		if group.ID == user.GroupID {
+			return true
 		}
 	}
 	return false

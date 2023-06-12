@@ -1,8 +1,10 @@
+import moment from "moment-timezone"
 import { convertTimeToNumber } from "../utils/utils"
 
 test(
     "Convert Time to Number",
     () => {
+        moment.tz.setDefault("Asia/Taipei")
         expect(convertTimeToNumber("07:30:00", "+0800")).toEqual(7.5)
         expect(convertTimeToNumber("07:30:00", "+0900")).toEqual(6.5)
         expect(convertTimeToNumber("20:40", "+0800")).toEqual(20.7)

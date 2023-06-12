@@ -311,7 +311,7 @@ func (s defaultAccountManagementService) checkDeletedRules(tx *sql.Tx, executedU
 		logrus.WithField("caused-by", err).Error()
 		return
 	}
-	if s.isSubGroupExisted(tx, groupID) {
+	if s.repo.User.IsSubGroupExisted(tx, groupID) {
 		err = e.ErrNewAccountGroupHasSubGroup
 		logrus.WithField("caused-by", err).Error()
 		return
@@ -321,16 +321,6 @@ func (s defaultAccountManagementService) checkDeletedRules(tx *sql.Tx, executedU
 		logrus.WithField("caused-by", err).Error()
 	}
 	return
-}
-
-func (s defaultAccountManagementService) isSubGroupExisted(tx *sql.Tx, groupID int64) bool {
-	groups, _ := s.repo.User.GetGroupsByGroupID(tx, groupID)
-	for _, group := range groups {
-		if group.ParentID.Int64 == groupID {
-			return true
-		}
-	}
-	return false
 }
 
 func (s defaultAccountManagementService) authorizeGroupID(tx *sql.Tx, executedUserID, groupID int64) (exist bool) {

@@ -44,6 +44,7 @@ type UserRepository interface {
 	UpdateGroup(tx *sql.Tx, group *deremsmodels.Group) (err error)
 	DeleteGroup(tx *sql.Tx, executedUserID, groupID int64) (err error)
 	IsGroupNameExistedOnSameLevel(tx *sql.Tx, group *deremsmodels.Group) bool
+	IsSubGroupExisted(tx *sql.Tx, groupID int64) (exist bool)
 	GetGroupByGroupID(tx *sql.Tx, groupID int64) (*deremsmodels.Group, error)
 	GetGroupsByGroupID(tx *sql.Tx, groupID int64) ([]*deremsmodels.Group, error)
 	GetGroupsByUserID(tx *sql.Tx, userID int64) ([]*deremsmodels.Group, error)
@@ -184,6 +185,24 @@ func (repo defaultUserRepository) IsGroupNameExistedOnSameLevel(tx *sql.Tx, grou
 		qm.Where("name = ?", group.Name),
 		qm.Where("parent_id = ?", group.ParentID),
 		qm.Where("deleted_at IS NULL")).Exists(repo.getExecutor(tx))
+	return
+}
+
+func (repo defaultUserRepository) IsSubGroupExisted(tx *sql.Tx, groupID int64) (exist bool) {
+	exist, _ = deremsmodels.Groups(
+		qm.SQL(fmt.Sprintf(`
+		WITH RECURSIVE group_path AS
+		(
+		SELECT *
+			FROM %s
+			WHERE id = ?
+		UNION ALL
+		SELECT g.*
+			FROM group_path AS gp JOIN %s AS g
+			ON gp.id = g.parent_id
+			AND g.deleted_at IS NULL
+		)
+		SELECT parent_id FROM group_path WHERE parent_id = ?;`, "`group`", "`group`"), groupID, groupID)).Exists(repo.getExecutor(tx))
 	return
 }
 

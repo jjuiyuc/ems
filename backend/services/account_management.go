@@ -9,6 +9,7 @@ import (
 
 	"der-ems/internal/app"
 	"der-ems/internal/e"
+	"der-ems/internal/utils"
 	"der-ems/models"
 	deremsmodels "der-ems/models/der-ems"
 	"der-ems/repository"
@@ -19,8 +20,12 @@ type AccountManagementService interface {
 	GetGroups(userID int64) (getGroups *GetGroupsResponse, err error)
 	CreateGroup(body *app.CreateGroupBody) (err error)
 	GetGroup(userID, groupID int64) (getGroup *GetGroupResponse, err error)
-	UpdateGroup(userID, groupID int64, body *app.UpdateGroupBody) (err error)
-	DeleteGroup(userID, groupID int64) (err error)
+	UpdateGroup(executedUserID, groupID int64, body *app.UpdateGroupBody) (err error)
+	DeleteGroup(executedUserID, groupID int64) (err error)
+	GetUsers(userID int64) (getUsers *GetUsersResponse, err error)
+	CreateUser(userID int64, body *app.CreateUserBody) error
+	UpdateUser(executedUserID, userID int64, body *app.UpdateUserBody) (err error)
+	DeleteUser(executedUserID, userID int64) (err error)
 }
 
 // GetGroupsResponse godoc
@@ -57,6 +62,11 @@ type GroupGatewayInfo struct {
 	LocationName string `json:"locationName"`
 }
 
+// GetUsersResponse godoc
+type GetUsersResponse struct {
+	Users []*repository.UserWrap `json:"users"`
+}
+
 type defaultAccountManagementService struct {
 	repo *repository.Repository
 }
@@ -67,7 +77,7 @@ func NewAccountManagementService(repo *repository.Repository) AccountManagementS
 }
 
 func (s defaultAccountManagementService) GetGroups(userID int64) (getGroups *GetGroupsResponse, err error) {
-	groups, err := s.getGroupTreeNodes(nil, userID)
+	groups, err := s.repo.User.GetGroupsByUserID(nil, userID)
 	if err != nil {
 		return
 	}
@@ -103,25 +113,6 @@ func (s defaultAccountManagementService) GetGroups(userID int64) (getGroups *Get
 	getGroups = &GetGroupsResponse{
 		Groups:     getGroupInfos,
 		GroupTypes: getGroupTypeInfos,
-	}
-	return
-}
-
-func (s defaultAccountManagementService) getGroupTreeNodes(tx *sql.Tx, userID int64) (groups []*deremsmodels.Group, err error) {
-	user, err := s.repo.User.GetUserByUserID(tx, userID)
-	if err != nil {
-		logrus.WithFields(logrus.Fields{
-			"caused-by": "s.repo.User.GetUserByUserID",
-			"err":       err,
-		}).Error()
-		return
-	}
-	groups, err = s.repo.User.GetGroupsByGroupID(tx, user.GroupID)
-	if err != nil {
-		logrus.WithFields(logrus.Fields{
-			"caused-by": "s.repo.User.GetGroupsByGroupID",
-			"err":       err,
-		}).Error()
 	}
 	return
 }
@@ -230,18 +221,18 @@ func (s defaultAccountManagementService) getGroupGateways(groupID int64) (groupG
 	return
 }
 
-func (s defaultAccountManagementService) UpdateGroup(userID, groupID int64, body *app.UpdateGroupBody) (err error) {
+func (s defaultAccountManagementService) UpdateGroup(executedUserID, groupID int64, body *app.UpdateGroupBody) (err error) {
 	tx, err := models.GetDB().BeginTx(context.Background(), nil)
 	if err != nil {
 		return
 	}
 
-	if !s.authorizeGroupID(tx, userID, groupID) {
+	if !s.authorizeGroupID(tx, executedUserID, groupID) {
 		err = e.ErrNewAuthPermissionNotAllow
 		tx.Rollback()
 		return
 	}
-	if s.isOwnAccountGroup(tx, userID, groupID) {
+	if s.isOwnAccountGroup(tx, executedUserID, groupID) {
 		err = e.ErrNewOwnAccountGroupModifiedNotAllow
 		logrus.WithField("caused-by", err).Error()
 		tx.Rollback()
@@ -285,23 +276,23 @@ func (s defaultAccountManagementService) isOwnAccountGroup(tx *sql.Tx, userID, g
 	return false
 }
 
-func (s defaultAccountManagementService) DeleteGroup(userID, groupID int64) (err error) {
+func (s defaultAccountManagementService) DeleteGroup(executedUserID, groupID int64) (err error) {
 	tx, err := models.GetDB().BeginTx(context.Background(), nil)
 	if err != nil {
 		return
 	}
 
-	if !s.authorizeGroupID(tx, userID, groupID) {
+	if !s.authorizeGroupID(tx, executedUserID, groupID) {
 		err = e.ErrNewAuthPermissionNotAllow
 		tx.Rollback()
 		return
 	}
-	if err = s.checkDeletedRules(tx, userID, groupID); err != nil {
+	if err = s.checkDeletedRules(tx, executedUserID, groupID); err != nil {
 		tx.Rollback()
 		return
 	}
 
-	if err = s.repo.User.DeleteGroup(tx, userID, groupID); err != nil {
+	if err = s.repo.User.DeleteGroup(tx, executedUserID, groupID); err != nil {
 		logrus.WithFields(logrus.Fields{
 			"caused-by": "s.repo.User.DeleteGroup",
 			"err":       err,
@@ -314,13 +305,13 @@ func (s defaultAccountManagementService) DeleteGroup(userID, groupID int64) (err
 	return
 }
 
-func (s defaultAccountManagementService) checkDeletedRules(tx *sql.Tx, userID, groupID int64) (err error) {
-	if s.isOwnAccountGroup(tx, userID, groupID) {
+func (s defaultAccountManagementService) checkDeletedRules(tx *sql.Tx, executedUserID, groupID int64) (err error) {
+	if s.isOwnAccountGroup(tx, executedUserID, groupID) {
 		err = e.ErrNewOwnAccountGroupModifiedNotAllow
 		logrus.WithField("caused-by", err).Error()
 		return
 	}
-	if s.isSubGroupExisted(tx, groupID) {
+	if s.repo.User.IsSubGroupExisted(tx, groupID) {
 		err = e.ErrNewAccountGroupHasSubGroup
 		logrus.WithField("caused-by", err).Error()
 		return
@@ -332,27 +323,182 @@ func (s defaultAccountManagementService) checkDeletedRules(tx *sql.Tx, userID, g
 	return
 }
 
-func (s defaultAccountManagementService) isSubGroupExisted(tx *sql.Tx, groupID int64) bool {
-	groups, err := s.repo.User.GetGroupsByGroupID(tx, groupID)
-	if err == nil {
-		for _, group := range groups {
-			if group.ParentID.Int64 == groupID {
-				return true
-			}
-		}
+func (s defaultAccountManagementService) authorizeGroupID(tx *sql.Tx, executedUserID, groupID int64) (exist bool) {
+	if exist = s.repo.User.AuthorizeGroupID(tx, executedUserID, groupID); !exist {
+		logrus.WithField("executedUserID", executedUserID).Error("authorize-group-id-failed")
 	}
-	return false
+	return
 }
 
-func (s defaultAccountManagementService) authorizeGroupID(tx *sql.Tx, userID, groupID int64) bool {
-	groups, err := s.getGroupTreeNodes(tx, userID)
-	if err == nil {
-		for _, group := range groups {
-			if group.ID == groupID {
-				return true
-			}
-		}
+func (s defaultAccountManagementService) GetUsers(userID int64) (getUsers *GetUsersResponse, err error) {
+	groups, err := s.repo.User.GetGroupsByUserID(nil, userID)
+	if err != nil {
+		return
 	}
-	logrus.WithField("userID", userID).Error("authorize-group-id-failed")
-	return false
+
+	var groupIDs []interface{}
+	for _, group := range groups {
+		groupIDs = append(groupIDs, group.ID)
+	}
+	users, err := s.repo.User.GetUserWrapsByGroupIDs(groupIDs)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.User.GetUserWrapsByGroupIDs",
+			"err":       err,
+		}).Error()
+		return
+	}
+	getUsers = &GetUsersResponse{
+		Users: users,
+	}
+	return
+}
+
+func (s defaultAccountManagementService) CreateUser(userID int64, body *app.CreateUserBody) (err error) {
+	tx, err := models.GetDB().BeginTx(context.Background(), nil)
+	if err != nil {
+		return
+	}
+
+	if !s.authorizeGroupID(tx, userID, int64(body.GroupID)) {
+		err = e.ErrNewAuthPermissionNotAllow
+		tx.Rollback()
+		return
+	}
+	if s.repo.User.IsUsernameExisted(tx, body.Username) {
+		err = e.ErrNewAccountUsernameExist
+		logrus.WithField("caused-by", err).Error()
+		tx.Rollback()
+		return
+	}
+
+	hashPassword, err := utils.CreateHashedPassword(body.Password)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "utils.CreateHashedPassword",
+			"err":       err,
+		}).Error()
+		tx.Rollback()
+		return
+	}
+	user := &deremsmodels.User{
+		Username: body.Username,
+		Password: hashPassword,
+		Name:     null.StringFrom(body.Name),
+		GroupID:  int64(body.GroupID),
+	}
+	if err = s.repo.User.CreateUser(tx, user); err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.User.CreateUser",
+			"err":       err,
+			"body":      *body,
+		}).Error()
+		tx.Rollback()
+		return
+	}
+
+	tx.Commit()
+	return
+}
+
+func (s defaultAccountManagementService) UpdateUser(executedUserID, userID int64, body *app.UpdateUserBody) (err error) {
+	tx, err := models.GetDB().BeginTx(context.Background(), nil)
+	if err != nil {
+		return
+	}
+
+	if !s.authorizeUserID(tx, executedUserID, userID) ||
+		(body.GroupID > 0 && !s.authorizeGroupID(tx, executedUserID, int64(body.GroupID))) {
+		err = e.ErrNewAuthPermissionNotAllow
+		tx.Rollback()
+		return
+	}
+
+	user, err := s.repo.User.GetUserByUserID(tx, userID)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.User.GetUserByUserID",
+			"err":       err,
+		}).Error()
+		tx.Rollback()
+		return
+	}
+	if err = s.processUpdateUser(tx, user, body); err != nil {
+		tx.Rollback()
+		return
+	}
+
+	tx.Commit()
+	return
+}
+
+func (s defaultAccountManagementService) processUpdateUser(tx *sql.Tx, user *deremsmodels.User, body *app.UpdateUserBody) (err error) {
+	if body.Password != "" {
+		var hashPassword string
+		hashPassword, err = utils.CreateHashedPassword(body.Password)
+		if err != nil {
+			logrus.WithFields(logrus.Fields{
+				"caused-by": "utils.CreateHashedPassword",
+				"err":       err,
+			}).Error()
+			return
+		}
+		user.Password = hashPassword
+	}
+	if body.Name != "" {
+		user.Name = null.StringFrom(body.Name)
+	}
+	if body.GroupID > 0 {
+		user.GroupID = int64(body.GroupID)
+	}
+	if body.Unlock {
+		user.PasswordRetryCount = null.IntFrom(0)
+		user.LockedAt = null.TimeFromPtr(nil)
+	}
+	if err = s.repo.User.UpdateUser(tx, user); err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.User.UpdateUser",
+			"err":       err,
+			"body":      *body,
+		}).Error()
+	}
+	return
+}
+
+func (s defaultAccountManagementService) DeleteUser(executedUserID, userID int64) (err error) {
+	tx, err := models.GetDB().BeginTx(context.Background(), nil)
+	if err != nil {
+		return
+	}
+
+	if !s.authorizeUserID(tx, executedUserID, userID) {
+		err = e.ErrNewAuthPermissionNotAllow
+		tx.Rollback()
+		return
+	}
+	if executedUserID == userID {
+		err = e.ErrNewOwnAccountDeletedNotAllow
+		logrus.WithField("caused-by", err).Error()
+		tx.Rollback()
+		return
+	}
+
+	if err = s.repo.User.DeleteUser(tx, executedUserID, userID); err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.User.DeleteUser",
+			"err":       err,
+		}).Error()
+		tx.Rollback()
+		return
+	}
+
+	tx.Commit()
+	return
+}
+
+func (s defaultAccountManagementService) authorizeUserID(tx *sql.Tx, executedUserID, userID int64) (exist bool) {
+	if exist = s.repo.User.AuthorizeUserID(tx, executedUserID, userID); !exist {
+		logrus.WithField("executedUserID", executedUserID).Error("authorize-user-id-failed")
+	}
+	return
 }

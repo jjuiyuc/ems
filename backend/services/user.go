@@ -94,7 +94,7 @@ func (s defaultUserService) CreatePasswordToken(username string) (name, token st
 	token = uuid.New().String()
 	user.ResetPWDToken = null.StringFrom(token)
 	user.PWDTokenExpiry = null.TimeFrom(time.Now().UTC().Add(1 * time.Hour))
-	err = s.repo.User.UpdateUser(user)
+	err = s.repo.User.UpdateUser(nil, user)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "s.repo.User.UpdateUser",
@@ -125,7 +125,7 @@ func (s defaultUserService) PasswordResetByPasswordToken(token, newPassword stri
 	user.Password = hashedPassword
 	user.PasswordLastChanged = null.TimeFrom(time.Now().UTC())
 	user.ResetPWDToken = null.StringFrom("")
-	err = s.repo.User.UpdateUser(user)
+	err = s.repo.User.UpdateUser(nil, user)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "s.repo.User.UpdateUser",
@@ -279,7 +279,7 @@ func (s defaultUserService) UpdateName(userID int64, name string) (err error) {
 	}
 
 	user.Name = null.StringFrom(name)
-	if err = s.repo.User.UpdateUser(user); err != nil {
+	if err = s.repo.User.UpdateUser(nil, user); err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "s.repo.User.UpdateUser",
 			"err":       err,
@@ -313,7 +313,7 @@ func (s defaultUserService) UpdatePassword(userID int64, currentPassword, newPas
 	}
 	user.Password = hashPassword
 	user.PasswordLastChanged = null.TimeFrom(time.Now().UTC())
-	if err = s.repo.User.UpdateUser(user); err != nil {
+	if err = s.repo.User.UpdateUser(nil, user); err != nil {
 		log.WithFields(log.Fields{
 			"caused-by": "s.repo.User.UpdateUser",
 			"err":       err,

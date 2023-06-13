@@ -72,6 +72,25 @@ definitions:
     - resolution
     - startTime
     type: object
+  repository.UserWrap:
+    properties:
+      groupID:
+        type: integer
+      groupName:
+        type: string
+      groupParentID:
+        type: string
+      groupParentName:
+        type: string
+      id:
+        type: integer
+      lockedAt:
+        type: string
+      name:
+        type: string
+      username:
+        type: string
+    type: object
   services.AccumulatedPowerStateResponse:
     properties:
       batteryLifetimeEnergyACDiffs:
@@ -344,6 +363,13 @@ definitions:
       groups:
         items:
           $ref: '#/definitions/services.GetGroupInfo'
+        type: array
+    type: object
+  services.GetUsersResponse:
+    properties:
+      users:
+        items:
+          $ref: '#/definitions/repository.UserWrap'
         type: array
     type: object
   services.GridEnergyInfoResponse:
@@ -1653,6 +1679,108 @@ paths:
       summary: Create a group
       tags:
       - account management group
+  /account-management/users:
+    get:
+      description: list users based on token
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Input user's access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/app.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/services.GetUsersResponse'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: List users
+      tags:
+      - account management user
+    post:
+      consumes:
+      - application/json
+      description: create a user by token
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Input user's access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Username
+        in: body
+        name: username
+        required: true
+        schema:
+          type: string
+      - description: Password
+        in: body
+        name: password
+        required: true
+        schema:
+          type: string
+      - description: Name
+        in: body
+        name: name
+        required: true
+        schema:
+          type: string
+      - description: GroupID
+        in: body
+        name: groupID
+        required: true
+        schema:
+          type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Create a user
+      tags:
+      - account management user
   /api/account-management/groups/{groupid}:
     delete:
       description: delete a group by token and group id
@@ -1793,6 +1921,115 @@ paths:
       summary: Update a group
       tags:
       - account management group
+  /api/account-management/users/{user-id}:
+    delete:
+      description: delete a user by token and user id
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Input user's access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: User ID
+        in: path
+        name: userid
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete a user
+      tags:
+      - account management user
+    put:
+      consumes:
+      - application/json
+      description: update a user by token and user id
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Input user's access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: User ID
+        in: path
+        name: userid
+        required: true
+        type: string
+      - description: Password
+        in: body
+        name: password
+        required: true
+        schema:
+          type: string
+      - description: Name
+        in: body
+        name: name
+        required: true
+        schema:
+          type: string
+      - description: GroupID
+        in: body
+        name: groupID
+        required: true
+        schema:
+          type: integer
+      - description: Unlock
+        in: body
+        name: unlock
+        required: true
+        schema:
+          type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Update a user
+      tags:
+      - account management user
   /auth:
     post:
       consumes:

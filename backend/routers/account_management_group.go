@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 
 	"der-ems/internal/app"
 	"der-ems/internal/e"
@@ -52,17 +53,22 @@ func (w *APIWorker) GetGroups(c *gin.Context) {
 // @Router      /account-management/groups [post]
 func (w *APIWorker) CreateGroup(c *gin.Context, body *app.CreateGroupBody) {
 	appG := app.Gin{c}
+	userID, _ := c.Get("userID")
 	if err := w.Services.AccountManagement.CreateGroup(body); err != nil {
 		var code int
 		if errors.Is(err, e.ErrNewAccountGroupNameOnSameLevelExist) {
 			code = e.ErrAccountGroupNameOnSameLevelExist
 		} else {
-			code = e.ErrorAccountGroupCreate
+			code = e.ErrAccountGroupCreate
 		}
 		appG.Response(http.StatusInternalServerError, code, nil)
 		return
 	}
 	appG.Response(http.StatusOK, e.Success, nil)
+	logrus.WithFields(logrus.Fields{
+		"created-by": userID,
+		"name":       body.Name,
+	}).Info("group-created")
 }
 
 // GetGroup godoc
@@ -132,6 +138,9 @@ func (w *APIWorker) UpdateGroup(c *gin.Context, uri *app.GroupURI, body *app.Upd
 		return
 	}
 	appG.Response(http.StatusOK, e.Success, nil)
+	logrus.WithFields(logrus.Fields{
+		"updated-by":       userID,
+	}).Info("group-updated")
 }
 
 // DeleteGroup godoc

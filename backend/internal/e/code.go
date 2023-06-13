@@ -37,11 +37,17 @@ const (
 	ErrPasswordUpdate                   = 60001
 	ErrAccountGroupsGen                 = 60002
 	ErrAccountGroupNameOnSameLevelExist = 60003
-	ErrorAccountGroupCreate             = 60004
+	ErrAccountGroupCreate               = 60004
 	ErrAccountGroupGen                  = 60005
 	ErrOwnAccountGroupModifiedNotAllow  = 60006
 	ErrAccountGroupUpdate               = 60007
 	ErrAccountGroupHasSubGroup          = 60008
 	ErrAccountGroupHasUser              = 60009
 	ErrAccountGroupDelete               = 60010
+	ErrAccountUsersGen                  = 60011
+	ErrAccountUsernameExist             = 60012
+	ErrAccountUserCreate                = 60013
+	ErrAccountUserUpdate                = 60014
+	ErrOwnAccountDeletedNotAllow        = 60015
+	ErrAccountUserDelete                = 60016
 )

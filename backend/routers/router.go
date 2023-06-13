@@ -108,6 +108,10 @@ var EndpointMapping = map[PolicyWebpageObject][]string{
 		"/api/account-management/groups",
 		"/api/account-management/groups/:groupid",
 	},
+	AccountManagementUser: {
+		"/api/account-management/users",
+		"/api/account-management/users/:userid",
+	},
 }
 
 // MethodMapping godoc
@@ -211,6 +215,12 @@ func InitRouter(isCORS bool, ginMode string, enforcer *casbin.Enforcer, w *APIWo
 	r.GET(EndpointMapping[AccountManagementGroup][1], authorizeJWT(REST), authorizePolicy(enforcer), validateURI(w.GetGroup))
 	r.PUT(EndpointMapping[AccountManagementGroup][1], authorizeJWT(REST), authorizePolicy(enforcer), validateURIAndBody(w.UpdateGroup))
 	r.DELETE(EndpointMapping[AccountManagementGroup][1], authorizeJWT(REST), authorizePolicy(enforcer), validateURI(w.DeleteGroup))
+
+	// Account Management User
+	r.GET(EndpointMapping[AccountManagementUser][0], authorizeJWT(REST), authorizePolicy(enforcer), w.GetUsers)
+	r.POST(EndpointMapping[AccountManagementUser][0], authorizeJWT(REST), authorizePolicy(enforcer), validateBody(w.CreateUser))
+	r.PUT(EndpointMapping[AccountManagementUser][1], authorizeJWT(REST), authorizePolicy(enforcer), validateURIAndBody(w.UpdateUser))
+	r.DELETE(EndpointMapping[AccountManagementUser][1], authorizeJWT(REST), authorizePolicy(enforcer), validateURI(w.DeleteUser))
 
 	// Casbin route
 	apiGroup.GET("/casbin", w.getFrontendPermission(enforcer))

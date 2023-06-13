@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
 	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
@@ -42,7 +43,7 @@ type GatewayRepository interface {
 	GetGatewayByGatewayID(gwID int64) (*deremsmodels.Gateway, error)
 	GetGateways() ([]*deremsmodels.Gateway, error)
 	GetGatewayLocationByGatewayID(gwID int64) (gatewayLocation GatewayLocationWrap, err error)
-	GetGatewayGroupsByGatewayID(gwID int64) ([]*deremsmodels.Group, error)
+	GetGatewayGroupsForUserID(executedUserID, gwID int64) ([]*deremsmodels.Group, error)
 	IsGatewayExistedForUserID(executedUserID int64, gwUUID string) bool
 	GetDeviceModels() ([]*deremsmodels.DeviceModel, error)
 	GetDeviceMappingByGatewayID(gwID int64) (devices []*DeviceWrap, err error)
@@ -103,15 +104,40 @@ func (repo defaultGatewayRepository) GetGatewayLocationByGatewayID(gwID int64) (
 	return
 }
 
-func (repo defaultGatewayRepository) GetGatewayGroupsByGatewayID(gwID int64) ([]*deremsmodels.Group, error) {
-	return deremsmodels.Groups(
-		qm.InnerJoin("group_gateway_right AS gr ON gr.gw_id = ? AND gr.group_id = `group`.id", gwID),
-		qm.Where("deleted_at IS NULL")).All(repo.db)
-}
-
 // GetGateways godoc
 func (repo defaultGatewayRepository) GetGateways() ([]*deremsmodels.Gateway, error) {
 	return deremsmodels.Gateways().All(repo.db)
+}
+
+func (repo defaultGatewayRepository) GetGatewayGroupsForUserID(executedUserID, gwID int64) ([]*deremsmodels.Group, error) {
+	return deremsmodels.Groups(
+		qm.SQL(fmt.Sprintf(`
+		WITH RECURSIVE gateway_groups AS
+		(
+		SELECT *
+			FROM %s
+			WHERE id = (
+				SELECT group_id
+				FROM user
+				WHERE id = ?
+			)
+		UNION ALL
+		SELECT g.*
+			FROM gateway_groups AS gp JOIN %s AS g
+			ON gp.id = g.parent_id
+			AND g.deleted_at IS NULL
+		),
+		user_groups AS
+		(
+		SELECT %s
+			FROM %s INNER JOIN group_gateway_right AS gr
+			ON gr.gw_id = ?
+			AND gr.group_id = group.id
+			WHERE deleted_at IS NULL
+		)
+		SELECT gateway_groups.*
+			FROM gateway_groups JOIN user_groups
+			ON user_groups.id = gateway_groups.id;`, "`group`", "`group`", "`group`.*", "`group`"), executedUserID, gwID)).All(repo.db)
 }
 
 func (repo defaultGatewayRepository) IsGatewayExistedForUserID(executedUserID int64, gwUUID string) (exist bool) {

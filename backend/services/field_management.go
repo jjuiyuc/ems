@@ -5,7 +5,6 @@ import (
 	"github.com/volatiletech/null/v8"
 
 	"der-ems/internal/e"
-	deremsmodels "der-ems/models/der-ems"
 	"der-ems/repository"
 )
 
@@ -169,21 +168,16 @@ func (s defaultFieldManagementService) getGatewayLocation(gwID int64) (gatewayLo
 }
 
 func (s defaultFieldManagementService) getFieldGroups(executedUserID, gwID int64) (fieldGroups []FieldGroupInfo, err error) {
-	groups, err := s.repo.Gateway.GetGatewayGroupsByGatewayID(gwID)
+	groups, err := s.repo.Gateway.GetGatewayGroupsForUserID(executedUserID, gwID)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
-			"caused-by": "s.repo.Gateway.GetGatewayGroupsByGatewayID",
+			"caused-by": "s.repo.Gateway.GetGatewayGroupsForUserID",
 			"err":       err,
 		}).Error()
 		return
 	}
-	executedUserGroups, err := s.repo.User.GetGroupsByUserID(nil, executedUserID)
-	if err != nil {
-		return
-	}
-	joinGroups := s.intersectGroup(groups, executedUserGroups)
 
-	for _, group := range joinGroups {
+	for _, group := range groups {
 		fieldGroup := FieldGroupInfo{
 			ID:       group.ID,
 			Name:     group.Name,
@@ -241,21 +235,4 @@ func (s defaultFieldManagementService) getFieldDevices(gwID int64) (deviceInfos 
 func (s defaultFieldManagementService) isFakeModbusID(modbusID int64) bool {
 	// XXX: Fake modbus id decrements from 255
 	return modbusID > 200
-}
-
-func (s defaultFieldManagementService) intersectGroup(a []*deremsmodels.Group, b []*deremsmodels.Group) []*deremsmodels.Group {
-	var inter []*deremsmodels.Group
-	mp := make(map[deremsmodels.Group]bool)
-
-	for _, s := range a {
-		if _, ok := mp[*s]; !ok {
-			mp[*s] = true
-		}
-	}
-	for _, s := range b {
-		if _, ok := mp[*s]; ok {
-			inter = append(inter, s)
-		}
-	}
-	return inter
 }

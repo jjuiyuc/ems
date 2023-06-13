@@ -123,13 +123,13 @@ func (repo defaultGatewayRepository) GetGatewayGroupsForUserID(executedUserID, g
 			)
 		UNION ALL
 		SELECT g.*
-			FROM gateway_groups AS gp JOIN %s AS g
-			ON gp.id = g.parent_id
+			FROM gateway_groups AS gg JOIN %s AS g
+			ON gg.id = g.parent_id
 			AND g.deleted_at IS NULL
 		),
 		user_groups AS
 		(
-		SELECT %s
+		SELECT %s.*
 			FROM %s INNER JOIN group_gateway_right AS gr
 			ON gr.gw_id = ?
 			AND gr.group_id = group.id
@@ -137,7 +137,7 @@ func (repo defaultGatewayRepository) GetGatewayGroupsForUserID(executedUserID, g
 		)
 		SELECT gateway_groups.*
 			FROM gateway_groups JOIN user_groups
-			ON user_groups.id = gateway_groups.id;`, "`group`", "`group`", "`group`.*", "`group`"), executedUserID, gwID)).All(repo.db)
+			ON user_groups.id = gateway_groups.id;`, "`group`", "`group`", "`group`", "`group`"), executedUserID, gwID)).All(repo.db)
 }
 
 func (repo defaultGatewayRepository) IsGatewayExistedForUserID(executedUserID int64, gwUUID string) (exist bool) {

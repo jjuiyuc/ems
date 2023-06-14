@@ -277,7 +277,7 @@ func (s defaultFieldManagementService) EnableField(executedUserID int64, gwUUID 
 		return
 	}
 
-	gateway, err := s.repo.Gateway.GetGatewayByGatewayUUID(nil, gwUUID)
+	gateway, err := s.repo.Gateway.GetGatewayByGatewayUUID(tx, gwUUID)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"caused-by": "s.repo.Gateway.GetGatewayByGatewayUUID",

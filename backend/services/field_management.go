@@ -48,8 +48,8 @@ type DeviceModelInfo struct {
 // GetFieldResponse godoc
 type GetFieldResponse struct {
 	*repository.GatewayLocationWrap
-	Devices []DeviceInfo     `json:"devices"`
-	Groups  []FieldGroupInfo `json:"groups"`
+	Devices []DeviceInfo                 `json:"devices"`
+	Groups  []*repository.FieldGroupWrap `json:"groups"`
 }
 
 // DeviceInfo godoc
@@ -67,13 +67,6 @@ type SubDeviceInfo struct {
 	ModelID       int64     `json:"modelID"`
 	PowerCapacity float32   `json:"powerCapacity"`
 	ExtraInfo     null.JSON `json:"extraInfo"`
-}
-
-// FieldGroupInfo godoc
-type FieldGroupInfo struct {
-	ID       int64      `json:"id"`
-	Name     string     `json:"name"`
-	ParentID null.Int64 `json:"parentID"`
 }
 
 // DLDeviceMappingInfo godoc
@@ -169,8 +162,12 @@ func (s defaultFieldManagementService) getFieldResponse(executedUserID, gwID int
 	if err != nil {
 		return
 	}
-	fieldGroups, err := s.getFieldGroups(nil, executedUserID, gwID)
+	fieldGroups, err := s.repo.Gateway.GetGatewayGroupsForUserID(nil, executedUserID, gwID)
 	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.Gateway.GetGatewayGroupsForUserID",
+			"err":       err,
+		}).Error()
 		return
 	}
 	fieldDevices, err := s.getFieldDevices(gwID)
@@ -192,27 +189,6 @@ func (s defaultFieldManagementService) getGatewayLocation(gwID int64) (gatewayLo
 			"caused-by": "s.repo.Gateway.GetGatewayLocationByGatewayID",
 			"err":       err,
 		}).Error()
-	}
-	return
-}
-
-func (s defaultFieldManagementService) getFieldGroups(tx *sql.Tx, executedUserID, gwID int64) (fieldGroups []FieldGroupInfo, err error) {
-	groups, err := s.repo.Gateway.GetGatewayGroupsForUserID(tx, executedUserID, gwID)
-	if err != nil {
-		logrus.WithFields(logrus.Fields{
-			"caused-by": "s.repo.Gateway.GetGatewayGroupsForUserID",
-			"err":       err,
-		}).Error()
-		return
-	}
-
-	for _, group := range groups {
-		fieldGroup := FieldGroupInfo{
-			ID:       group.ID,
-			Name:     group.Name,
-			ParentID: group.ParentID,
-		}
-		fieldGroups = append(fieldGroups, fieldGroup)
 	}
 	return
 }
@@ -517,27 +493,27 @@ func (s defaultFieldManagementService) authorizeGroupIDs(tx *sql.Tx, executedUse
 }
 
 func (s defaultFieldManagementService) getUpdatedFieldGroupIDs(tx *sql.Tx, executedUserID, gatewayID int64, groups []app.FieldGroupInfo) (addedGroupIDs, deletedGroupIDs []int64) {
-	boundFieldGroups, err := s.getFieldGroups(tx, executedUserID, gatewayID)
+	fieldGroups, err := s.repo.Gateway.GetGatewayGroupsForUserID(tx, executedUserID, gatewayID)
 	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.Gateway.GetGatewayGroupsForUserID",
+			"err":       err,
+		}).Error()
 		return
 	}
 
 	for _, group := range groups {
-		isBound := false
-		for _, boundFieldGroup := range boundFieldGroups {
-			if group.ID == boundFieldGroup.ID {
-				isBound = true
+		for _, fieldGroup := range fieldGroups {
+			if group.ID == fieldGroup.ID {
+				if *group.Check == fieldGroup.Check {
+					break
+				}
+				if *group.Check {
+					addedGroupIDs = append(addedGroupIDs, group.ID)
+				} else {
+					deletedGroupIDs = append(deletedGroupIDs, group.ID)
+				}
 				break
-			}
-		}
-
-		if *group.Check {
-			if !isBound {
-				addedGroupIDs = append(addedGroupIDs, group.ID)
-			}
-		} else {
-			if isBound {
-				deletedGroupIDs = append(deletedGroupIDs, group.ID)
 			}
 		}
 	}

@@ -7,6 +7,7 @@ import (
 
 	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
+	"github.com/volatiletech/sqlboiler/v4/queries"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 
 	"der-ems/models"
@@ -30,6 +31,14 @@ type GatewayLocationWrap struct {
 type GPSLocationWrap struct {
 	Lat float32 `json:"lat"`
 	Lng float32 `json:"lng"`
+}
+
+// FieldGroupWrap godoc
+type FieldGroupWrap struct {
+	ID       int64      `json:"id"`
+	Name     string     `json:"name"`
+	ParentID null.Int64 `json:"parentID"`
+	Check    bool       `json:"check"`
 }
 
 // DeviceWrap godoc
@@ -63,7 +72,7 @@ type GatewayRepository interface {
 	GetGateways() ([]*deremsmodels.Gateway, error)
 	GetGatewayLocationByGatewayID(gwID int64) (gatewayLocation GatewayLocationWrap, err error)
 	GetGPSLocations() (locations []*GPSLocationWrap, err error)
-	GetGatewayGroupsForUserID(tx *sql.Tx, executedUserID, gwID int64) ([]*deremsmodels.Group, error)
+	GetGatewayGroupsForUserID(tx *sql.Tx, executedUserID, gwID int64) (groups []*FieldGroupWrap, err error)
 	IsGatewayExistedForUserID(tx *sql.Tx, executedUserID int64, gwUUID string) bool
 	GetDeviceModels() ([]*deremsmodels.DeviceModel, error)
 	GetDeviceMappingByGatewayID(gwID int64) (devices []*DeviceWrap, err error)
@@ -156,10 +165,10 @@ func (repo defaultGatewayRepository) GetGateways() ([]*deremsmodels.Gateway, err
 	return deremsmodels.Gateways().All(repo.db)
 }
 
-func (repo defaultGatewayRepository) GetGatewayGroupsForUserID(tx *sql.Tx, executedUserID, gwID int64) ([]*deremsmodels.Group, error) {
-	return deremsmodels.Groups(
-		qm.SQL(fmt.Sprintf(`
-		WITH RECURSIVE gateway_groups AS
+func (repo defaultGatewayRepository) GetGatewayGroupsForUserID(tx *sql.Tx, executedUserID, gwID int64) (groups []*FieldGroupWrap, err error) {
+	groups = make([]*FieldGroupWrap, 0)
+	err = queries.Raw(fmt.Sprintf(`
+		WITH RECURSIVE user_groups AS
 		(
 		SELECT *
 			FROM %s
@@ -170,21 +179,24 @@ func (repo defaultGatewayRepository) GetGatewayGroupsForUserID(tx *sql.Tx, execu
 			)
 		UNION ALL
 		SELECT g.*
-			FROM gateway_groups AS gg JOIN %s AS g
-			ON gg.id = g.parent_id
+			FROM user_groups AS ug JOIN %s AS g
+			ON ug.id = g.parent_id
 			AND g.deleted_at IS NULL
 		),
-		user_groups AS
+		gateway_groups AS
 		(
 		SELECT %s.*
 			FROM %s INNER JOIN group_gateway_right AS gr
 			ON gr.gw_id = ?
 			AND gr.group_id = group.id
+			AND gr.disabled_at IS NULL
 			WHERE deleted_at IS NULL
 		)
-		SELECT gateway_groups.*
-			FROM gateway_groups JOIN user_groups
-			ON user_groups.id = gateway_groups.id;`, "`group`", "`group`", "`group`", "`group`"), executedUserID, gwID)).All(repo.getExecutor(tx))
+		SELECT user_groups.id, user_groups.name, user_groups.parent_id, IF(gateway_groups.id IS NULL, FALSE, TRUE) AS %s
+			FROM user_groups LEFT JOIN gateway_groups
+			ON gateway_groups.id = user_groups.id;`, "`group`", "`group`", "`group`", "`group`", "`check`"), executedUserID, gwID,
+	).Bind(context.Background(), repo.getExecutor(tx), &groups)
+	return
 }
 
 func (repo defaultGatewayRepository) IsGatewayExistedForUserID(tx *sql.Tx, executedUserID int64, gwUUID string) (exist bool) {

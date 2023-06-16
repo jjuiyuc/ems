@@ -19,12 +19,6 @@ export default function FieldManagement() {
         [infoError, setInfoError] = useState(""),
         [fetched, setFetched] = useState(false)
 
-    const editSave = (row) => {
-        const newData = data.map((value) =>
-            value.id === row.id ? row : value
-        )
-        setFieldList(newData)
-    }
     const columns = [
         {
             cell: row => <span className="font-mono">{row.locationName}</span>,
@@ -45,10 +39,7 @@ export default function FieldManagement() {
         {
             cell: (row, index) => <div className="flex w-28">
                 <InfoField {...{ row }} />
-                <EditField className="mr-5"
-                    row={row}
-                    onSave={editSave}
-                />
+                <EditField className="mr-5" {...{ row, fieldList, setFieldList }} />
             </div>,
             center: true,
             grow: 0.5

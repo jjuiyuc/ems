@@ -38,7 +38,8 @@ export default connect(null, mapDispatch)(function InfoField(props) {
         [modelNameDict, setModelNameDict] = useState({}),
         [deviceList, setDeviceList] = useState([]),
         [enable, setEnable] = useState(false),
-        [groupDictionary, setGroupDictionary] = useState({}),
+        [groupDict, setGroupDict] = useState({}),
+        [groups, setGroups] = useState([]),
         [loading, setLoading] = useState(false),
         [infoError, setInfoError] = useState(""),
         [fetched, setFetched] = useState(false)
@@ -105,10 +106,12 @@ export default connect(null, mapDispatch)(function InfoField(props) {
                     setTouType(data.touType || "")
                     setDeviceList(data?.devices || [])
                     setEnable(data.enable)
-                    setGroupDictionary(data.groups?.reduce((acc, cur) => {
-                        acc[cur.id] = cur.name
+                    setGroupDict(data.groups?.reduce((acc, cur) => {
+                        if (cur.check) {
+                            acc[cur.id] = cur.name
+                        }
                         return acc
-                    }, {}) || {})
+                    }, {}))
                 },
                 url: `/api/device-management/gateways/${gatewayID}`
             })
@@ -124,7 +127,7 @@ export default connect(null, mapDispatch)(function InfoField(props) {
             className="mr-5"
             onClick={iconOnClick} />
         <DialogForm
-            dialogTitle={t("dialog.fieldInfo")}
+            dialogTitle={pageT("fieldInfo")}
             fullWidth={true}
             maxWidth="md"
             open={openNotice}
@@ -344,7 +347,7 @@ export default connect(null, mapDispatch)(function InfoField(props) {
                 <h5 className="mb-5">{commonT("group")}</h5>
                 <div className="border-gray-400 border rounded-xl
                     grid grid-cols-3 gap-2 items-center mb-4 p-4">
-                    {Object.entries(groupDictionary).map(([key, value]) =>
+                    {Object.entries(groupDict).map(([key, value]) =>
                         <Chip key={"g-t-p-" + key} label={value}
                             variant="outlined" color="primary"
                         />

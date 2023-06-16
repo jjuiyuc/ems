@@ -126,7 +126,7 @@ export default function AddField({
             {commonT("add")}
         </Button>
         <DialogForm
-            dialogTitle={dialogT("addField")}
+            dialogTitle={pageT("addField")}
             open={openAdd}
             setOpen={setOpenAdd}
             fullWidth={fullWidth}

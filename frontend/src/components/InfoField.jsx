@@ -1,25 +1,28 @@
+import { connect } from "react-redux"
 import { Button, Chip, DialogActions, Divider, Switch, TextField } from "@mui/material"
 import { useTranslation } from "react-multi-lang"
-import { useEffect, useMemo, useState } from "react"
-import { validateNumPercent } from "../utils/utils"
+import { Fragment, useEffect, useState } from "react"
+
+import { apiCall } from "../utils/api"
 
 import DialogForm from "../components/DialogForm"
-import ExtraDeviceInfoForm from "../components/ExtraDeviceInfoForm"
-
+import InfoExtraDeviceForm from "../components/InfoExtraDeviceForm"
 import { ReactComponent as NoticeIcon } from "../assets/icons/notice.svg"
 
-export default function InfoField({
-    row,
-    locationInfo,
-    fieldDevices,
-    deviceInfo,
-    extraDeviceInfo
-}) {
+const mapDispatch = dispatch => ({
+    updateSnackbarMsg: value =>
+        dispatch({ type: "snackbarMsg/updateSnackbarMsg", payload: value }),
+
+})
+export default connect(null, mapDispatch)(function InfoField(props) {
+    const { row } = props
+
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
-        dialogT = (string) => t("dialog." + string),
-        formT = (string) => t("form." + string)
+        formT = (string) => t("form." + string),
+        errorT = string => t("error." + string),
+        pageT = (string, params) => t("fieldManagement." + string, params)
 
     const
         [openNotice, setOpenNotice] = useState(false),
@@ -29,42 +32,104 @@ export default function InfoField({
         [lat, setLat] = useState(""),
         [lng, setLng] = useState(""),
         [powerCompany, setPowerCompany] = useState(""),
-        [deviceType, setDeviceType] = useState(""),
-        [gridOutagePercent, setGridOutagePercent] = useState(""),
-        [chargingSource, setChargingSource] = useState([
-            {
-                value: "Solar+Grid",
-                label: "Solar+Grid",
-            },
-            {
-                value: "Solar",
-                label: "Solar",
-            }
-        ]),
-        [energyCapacity, setEnergyCapacity] = useState(null),
-        [voltage, setVoltage] = useState(null),
-        [subPowerCapacity, setSubPowerCapacity] = useState(""),
-        [fullWidth, setFullWidth] = useState(true),
-        [maxWidth, setMaxWidth] = useState("md")
+        [voltageType, setVoltageType] = useState(""),
+        [touType, setTouType] = useState(""),
+        [modelTypeDict, setModelTypeDict] = useState({}),
+        [modelNameDict, setModelNameDict] = useState({}),
+        [deviceList, setDeviceList] = useState([]),
+        [enable, setEnable] = useState(false),
+        [groupDict, setGroupDict] = useState({}),
+        [groups, setGroups] = useState([]),
+        [loading, setLoading] = useState(false),
+        [infoError, setInfoError] = useState(""),
+        [fetched, setFetched] = useState(false)
 
+    const getModelList = () => {
+        apiCall({
+            onError: error => setInfoError(error),
+            onSuccess: rawData => {
+                if (!rawData?.data) return
+
+                const { data } = rawData
+
+                setModelTypeDict(data.models?.reduce((acc, cur) => {
+                    acc[cur.id] = cur.type
+                    return acc
+                }, {}) || {})
+                setModelNameDict(data.models?.reduce((acc, cur) => {
+                    acc[cur.id] = cur.name
+                    return acc
+                }, {}) || {})
+            },
+            url: `/api/device-management/devices/models`
+        })
+    }
     const
-        inputPercent = (e) => {
-            const num = e.target.value
-            const isNum = validateNumPercent(num)
-            if (!isNum) return
-            setGridOutagePercent(num)
-        },
-        handleClick = () => {
+        iconOnClick = async () => {
             setOpenNotice(true)
+
+            const gatewayID = row.gatewayID
+            await apiCall({
+                onComplete: () => {
+                    setLoading(false)
+                    setFetched(true)
+                },
+                onStart: () => setLoading(true),
+                onError: (err) => {
+                    switch (err) {
+                        case 60019:
+                            props.updateSnackbarMsg({
+                                type: "error",
+                                msg: errorT("noDataMsg")
+                            })
+                            break
+                        default:
+                            props.updateSnackbarMsg({
+                                type: "error",
+                                msg: errorT("failureToGenerate")
+                            })
+                    }
+                },
+                onSuccess: rawData => {
+
+                    if (!rawData?.data) return
+
+                    const { data } = rawData
+
+                    setGatewayID(data.gatewayID || "")
+                    setLocationName(data.locationName || "")
+                    setAddress(data.address || "")
+                    setLat(data.lat || "")
+                    setLng(data.lng || "")
+                    setPowerCompany(data.powerCompany || "")
+                    setVoltageType(data.voltageType || "")
+                    setTouType(data.touType || "")
+                    setDeviceList(data?.devices || [])
+                    setEnable(data.enable)
+                    setGroupDict(data.groups?.reduce((acc, cur) => {
+                        if (cur.check) {
+                            acc[cur.id] = cur.name
+                        }
+                        return acc
+                    }, {}))
+                },
+                url: `/api/device-management/gateways/${gatewayID}`
+            })
         }
+
+    useEffect(() => {
+        if (openNotice && fetched == false)
+            getModelList()
+    }, [fetched, openNotice])
+
     return <>
         <NoticeIcon
             className="mr-5"
-            onClick={handleClick} />
+            onClick={iconOnClick} />
         <DialogForm
-            dialogTitle={dialogT("fieldInfo")}
-            fullWidth={fullWidth}
-            maxWidth={maxWidth}
+            dialogTitle={pageT("fieldInfo")}
+            fullWidth={true}
+            maxWidth="md"
             open={openNotice}
             setOpen={setOpenNotice}>
             <Divider variant="middle" />
@@ -73,22 +138,22 @@ export default function InfoField({
                     sx={{ marginBottom: 2 }}
                     key="gateway-id"
                     label={commonT("gatewayID")}
-                    value={row?.gatewayID || ""}
+                    value={gatewayID}
                     focused
                     disabled={true}
                 />
-                <h5 className="mb-4 ml-2">{locationInfo}</h5>
+                <h5 className="mb-4 ml-2">{pageT("locationInformation")}</h5>
                 <TextField
                     key="location-name"
                     label={commonT("locationName")}
-                    value={row?.locationName || ""}
+                    value={locationName}
                     focused
                     disabled={true}
                 />
                 <TextField
                     key="address"
                     label={formT("address")}
-                    value={row?.address || ""}
+                    value={address}
                     focused
                     disabled={true}
                 />
@@ -97,7 +162,7 @@ export default function InfoField({
                         key="lat"
                         type="number"
                         label={formT("lat")}
-                        value={row?.lat || ""}
+                        value={lat}
                         focused
                         disabled={true}
                     />
@@ -106,155 +171,187 @@ export default function InfoField({
                         key="lng"
                         type="number"
                         label={formT("lng")}
-                        value={row?.lng || ""}
+                        value={lng}
                         disabled={true}
                     />
                 </div>
                 <TextField
                     key="power-company"
                     label={formT("powerCompany")}
-                    value={row?.powerCompany || ""}
+                    value={powerCompany}
                     disabled={true}
                 />
                 <TextField
                     key="v-t"
                     label={formT("voltageType")}
-                    value={formT(row?.voltageType) || ""}
+                    value={voltageType}
                     disabled={true}
                 />
                 <TextField
                     key="tou-t"
                     label={formT("touType")}
-                    value={formT(row?.touType) || ""}
+                    value={touType}
                     disabled={true}
                 />
-                <Divider variant="middle" />
-                <h5 className="mb-4 mt-4 ml-2">{fieldDevices}</h5>
-                <TextField
-                    key="d-t"
-                    label={formT("deviceType")}
-                    value={formT(row?.deviceType) || ""}
-                    disabled={true}
-                />
-                <TextField
-                    key="d-m"
-                    label={formT("deviceModel")}
-                    value={row?.deviceModel || ""}
-                    disabled={true}
-                />
-                <Divider variant="middle" />
-                <h5 className="mb-4 mt-4 ml-2">{deviceInfo}</h5>
-                <TextField
-                    key="m-id"
-                    type="number"
-                    label={formT("modbusID")}
-                    value={row?.modbusID || ""}
-                    disabled={true}
-                />
-                <TextField
-                    key="uueid"
-                    label="UUEID"
-                    value={row?.UUEID || ""}
-                    disabled={true}
-                />
-                <TextField
-                    key="power-capacity"
-                    type="number"
-                    label={formT("powerCapacity")}
-                    value={row?.powerCapacity || ""}
-                    disabled={true}
-                />
-                <Divider variant="middle" sx={{ margin: "0 0 2rem" }} />
-                {row?.deviceType === "battery"
-                    ? <ExtraDeviceInfoForm
-                        key={"b-e-d-i"}
-                        subTitle={extraDeviceInfo}
-                        gridOutagePercent={gridOutagePercent}
-                        setGridOutagePercent={setGridOutagePercent}
-                        chargingSource={chargingSource}
-                        setChargingSource={setChargingSource}
-                        energyCapacity={energyCapacity}
-                        setEnergyCapacity={setEnergyCapacity}
-                        voltage={voltage}
-                        setVoltage={setVoltage}
-                    />
-                    : null}
-                {row?.deviceType === "hybridInverter"
-                    ? <>
-                        {row?.subDevice.map((item, i) => (
-                            <>
-                                <TextField
-                                    key={"h-sub-d-t-" + i}
-                                    label={formT("deviceType")}
-                                    value={formT(`${item.deviceType}`)}
-                                    disabled={true}
-                                />
-                                <TextField
-                                    key={"h-sub-d-m-" + i}
-                                    label={formT("deviceModel")}
-                                    value={item.deviceModel || ""}
-                                    disabled={true}
-                                />
+                <Divider variant="middle" sx={{ margin: "0.8rem 0 2rem" }} />
+                {deviceList.map((item, index) => {
 
-                                <h5 className="mb-5 ml-2">{formT("deviceInformation")}</h5>
-                                <TextField
-                                    key={"h-p-c-" + i}
-                                    type="number"
-                                    label={formT("powerCapacity")}
-                                    value={item.powerCapacity || ""}
+                    let extraContent = null
+                    return (
+                        <Fragment key={"f-d-" + index}>
+                            <h5 className="mb-4 ml-2">
+                                {pageT("fieldDevices") + " " + (index + 1)}
+                            </h5>
+                            <TextField
+                                label={formT("deviceType")}
+                                value={modelTypeDict?.[item.modelID]}
+                                disabled={true}
+                            />
+                            <TextField
+                                label={formT("deviceModel")}
+                                value={modelNameDict?.[item.modelID]}
+                                disabled={true}
+                            />
+                            <h5 className="mb-4 ml-2">
+                                {formT("deviceInformation") + " " + (index + 1)}
+                            </h5>
+                            <TextField
+                                key="m-id"
+                                type="number"
+                                label={formT("modbusID")}
+                                value={item.modbusID}
+                                disabled={true}
+                            />
+                            <TextField
+                                key="uueid"
+                                label="UUEID"
+                                value={item?.uueID}
+                                disabled={true}
+                            />
+                            <TextField
+                                key="p-c"
+                                type="number"
+                                label={formT("powerCapacity")}
+                                value={item.powerCapacity}
+                                disabled={true}
+                            />
+                            {/* Battery */}
+                            {item?.modelID === 9 ? <>
+                                <InfoExtraDeviceForm
+                                    key="extra-info"
+                                    subTitle={pageT("extraDeviceInfo")}
+                                    voltage={item.extraInfo?.voltage}
+                                    energyCapacity={item.extraInfo?.energyCapacity}
+                                    chargingSource={item.extraInfo?.chargingSources}
+                                    gridOutagePercent={item.extraInfo?.reservedForGridOutagePercent}
                                 />
-                                <Divider key={"h-line-" + i} variant="middle" sx={{ margin: "1rem 0 2.5rem" }} />
                             </>
-                        ))}
-                        <ExtraDeviceInfoForm
-                            key={"h-e-d-i"}
-                            subTitle={extraDeviceInfo}
-                            gridOutagePercent={gridOutagePercent}
-                            setGridOutagePercent={setGridOutagePercent}
-                            chargingSource={chargingSource}
-                            setChargingSource={setChargingSource}
-                            energyCapacity={energyCapacity}
-                            setEnergyCapacity={setEnergyCapacity}
-                            voltage={voltage}
-                            setVoltage={setVoltage}
-                        />
-                    </>
-                    : null}
-                {row?.deviceType === "inverter"
-                    ? <>
-                        <TextField
-                            key={"i-sub-d-t-"}
-                            label={formT("deviceType")}
-                            value={formT(`${row?.subDevice[1].deviceType}`)}
-                            disabled={true}
-                        />
-                        <TextField
-                            key={"i-sub-d-m-"}
-                            label={formT("deviceModel")}
-                            value={row?.subDevice[1].deviceModel || ""}
-                            disabled={true}
-                        />
-                        <h5 className="mb-5 ml-2">{formT("deviceInformation")}</h5>
-                        <TextField
-                            key={"d-i-p-c-"}
-                            type="number"
-                            label={formT("powerCapacity")}
-                            value={row?.subDevice[1].powerCapacity || ""}
-                            disabled={true}
-                        />
-                    </>
-                    : null}
-                <div className="mb-5 flex items-baseline">
+                                : null}
+                            {item.subDevices?.map((subItem, subIndex) => {
+                                {/* console.log(subItem) */ }
+
+                                let subDeviceContent = null
+                                //Inverter - sub: PV
+                                if (item?.modelID === 6 && subItem?.modelID === 8) {
+                                    subDeviceContent = <>
+                                        <TextField
+                                            key="i-sub-d-t-"
+                                            label={formT("deviceType")}
+                                            value={modelTypeDict?.[subItem.modelID]}
+                                            disabled={true}
+                                        />
+                                        <TextField
+                                            key="i-sub-d-m-"
+                                            label={formT("deviceModel")}
+                                            value={modelNameDict?.[subItem.modelID]}
+                                            disabled={true}
+                                        />
+                                        <h5 className="mb-5 ml-2">
+                                            {formT("deviceInformation") + " " + (subIndex + 1)}
+                                        </h5>
+                                        <TextField
+                                            key="i-sub-p-c-"
+                                            type="number"
+                                            label={formT("powerCapacity")}
+                                            value={subItem?.powerCapacity}
+                                            disabled={true}
+                                        />
+                                    </>
+                                }
+                                //Battery
+                                if (subItem?.modelID === 9) {
+                                    subDeviceContent = <InfoExtraDeviceForm
+                                        key="b-sub-extra-info"
+                                        subTitle={pageT("extraDeviceInfo")}
+                                        voltage={subItem.extraInfo?.voltage}
+                                        energyCapacity={subItem.extraInfo?.energyCapacity}
+                                        chargingSource={subItem.extraInfo?.chargingSources}
+                                        gridOutagePercent={subItem.extraInfo?.reservedForGridOutagePercent}
+                                    />
+                                }
+                                //HybridInverter
+                                if (item?.modelID === 2 || item?.modelID === 1) {
+                                    subDeviceContent = <>
+                                        <TextField
+                                            key="h-sub-d-t-"
+                                            label={formT("deviceType")}
+                                            value={modelTypeDict?.[subItem.modelID]}
+                                            disabled={true}
+                                        />
+                                        <TextField
+                                            key="h-sub-d-m-"
+                                            label={formT("deviceModel")}
+                                            value={modelNameDict?.[subItem.modelID]}
+                                            disabled={true}
+                                        />
+                                        <h5 className="mb-5 ml-2">
+                                            {formT("deviceInformation") + " " + (subIndex + 1)}
+                                        </h5>
+                                        <TextField
+                                            key="h-p-c-"
+                                            type="number"
+                                            label={formT("powerCapacity")}
+                                            value={subItem?.powerCapacity}
+                                            disabled={true}
+                                        />
+                                        {/* sub: Battery */}
+                                        {subItem?.modelID === 5 &&
+                                            <InfoExtraDeviceForm
+                                                key="h-extra-i-"
+                                                subTitle={pageT("extraDeviceInfo")}
+                                                voltage={subItem.extraInfo?.voltage}
+                                                energyCapacity={subItem.extraInfo?.energyCapacity}
+                                                chargingSource={subItem.extraInfo?.chargingSources}
+                                                gridOutagePercent={subItem.extraInfo?.reservedForGridOutagePercent}
+                                            />}
+                                    </>
+                                }
+                                return <div className="pl-10 flex flex-col">
+                                    <h5 className="mb-4 ml-2">
+                                        {pageT("subdevice") + " " + (subIndex + 1)}
+                                    </h5>
+                                    {subDeviceContent}
+                                </div>
+                            })}
+                            <Divider variant="middle" sx={{ margin: "0.8rem 0 1rem" }} />
+                        </Fragment>
+                    )
+                })}
+                <div className="flex items-baseline">
                     <p className="ml-1 mr-2">{formT("enableField")}</p>
-                    <Switch disabled={true} />
+                    <Switch
+                        checked={enable}
+                        disabled={true} />
                 </div>
-                <Divider variant="middle" sx={{ margin: "0 0 1rem" }} />
+                <Divider variant="middle" sx={{ margin: "1rem 0" }} />
                 <h5 className="mb-5">{commonT("group")}</h5>
                 <div className="border-gray-400 border rounded-xl
                     grid grid-cols-3 gap-2 items-center mb-4 p-4">
-                    <Chip label="AreaOwner_TW" variant="outlined" color="primary" />
-                    <Chip label="Area Maintainer" variant="outlined" color="primary" />
-                    <Chip label="Serenegray" variant="outlined" color="primary" />
+                    {Object.entries(groupDict).map(([key, value]) =>
+                        <Chip key={"g-t-p-" + key} label={value}
+                            variant="outlined" color="primary"
+                        />
+                    )}
                 </div>
             </div>
             <DialogActions sx={{ margin: "1rem 1.5rem 1rem 0" }}>
@@ -268,4 +365,4 @@ export default function InfoField({
             </DialogActions>
         </DialogForm>
     </>
-}
+})

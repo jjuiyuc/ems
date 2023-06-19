@@ -83,6 +83,7 @@
         "solar": "太陽能",
         "sources":"供給",
         "stateOfCharge": "電池電量",
+        "sync":"同步",
         "thisMonth": "當月",
         "today": "今日",
         "v":"V",
@@ -115,17 +116,16 @@
         "realizedSavings": "已避免超約費用"
     },
     "dialog": {
-        "addField":"新增場域",
         "addedSuccessfully":"新增成功!",
         "confirmedMsg":"Are you sure you want to turn off all the charging resources?",
         "deletedSuccessfully":"刪除成功",
         "deleteMsg":"請問您是否要刪除這筆資料?",
-        "editFieldInfo":"編輯場域資訊",
         "editedSuccessfully":"修改成功",
-        "fieldInfo":"場域資訊",
         "modifyNameMsg":"成功更改名字",
         "promptMsg":"If all charging resources are turned off, the battery will be in standby mode.",
-        "updatedPasswordMsg":"密碼變更成功"
+        "updatedPasswordMsg":"密碼變更成功",
+        "syncMsg":"請問您是否要同步這筆資料?",
+        "syncSuccessfully":"同步裝置設定成功"
     },
     "economics": {
         "ancillaryServices": "輔助服務",
@@ -221,11 +221,13 @@
         "emailFormat": "Email 帳號格式錯誤，請重新輸入。",
         "emailExist": "帳號已存在，請重新輸入。",
         "emailNotExist": "帳號不存在，請重新輸入。",
+        "error":"發生錯誤!",
         "failureToCreate":"新增失敗",
         "failureToDelete":"刪除失敗！",
         "failureToEdit":"修改失敗",
         "failureToGenerate":"產生資料失敗",
         "failureToSave":"儲存失敗！",
+        "fieldDisabled":"場域不可用。",
         "groupHasSubGroup":"該群組之下尚有子群組。",
         "groupHasUser":"該群組內尚有使用者。",
         "groupNameExistsOnTheSameLevel":"在同一個管理層級已存在已存在一樣的群組名稱。",
@@ -241,14 +243,17 @@
         "pricingError":"價格須大於0",
         "selectError":"請選擇一個選項。",
         "sumError":"時間區間加總須為二十四小時。",
+        "syncError":"發送同步裝置設定請求失敗。",
         "timeOverlapError":"時間區間不能重疊。",
         "userLocked": "使用者帳號已被鎖定。",
         "userProfileError":"載入使用者資料失敗。"
     },
     "fieldManagement":{
-        "deviceInformation":"Device Information",
+        "addField":"新增場域",
+        "editFieldInfo":"編輯場域資訊",
         "extraDeviceInfo":"Extra Device Information",
         "fieldDevices":"場域裝置",
+        "fieldInfo":"場域資訊",
         "locationInformation":"場域資訊",
         "subdevice":"Subdevice"
     },

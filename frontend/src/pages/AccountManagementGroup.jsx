@@ -117,7 +117,6 @@ export default connect(mapState, mapDispatch)(function AccountManagementGroup(pr
     useEffect(() => {
         getList()
     }, [])
-
     return <>
         <h1 className="mb-9">{commonT("accountManagementGroup")}</h1>
         <div className="mb-9">

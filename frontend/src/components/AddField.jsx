@@ -81,7 +81,8 @@ export default function AddField({
         t = useTranslation(),
         commonT = string => t("common." + string),
         dialogT = (string) => t("dialog." + string),
-        formT = (string) => t("form." + string)
+        formT = (string) => t("form." + string),
+        pageT = (string, params) => t("fieldManagement." + string, params)
 
     const
         [gatewayID, setGatewayID] = useState(""),
@@ -125,7 +126,7 @@ export default function AddField({
             {commonT("add")}
         </Button>
         <DialogForm
-            dialogTitle={dialogT("addField")}
+            dialogTitle={pageT("addField")}
             open={openAdd}
             setOpen={setOpenAdd}
             fullWidth={fullWidth}

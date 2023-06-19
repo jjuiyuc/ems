@@ -290,7 +290,7 @@ export default connect(null, mapDispatch)(function InfoField(props) {
                                     />
                                 }
                                 //HybridInverter
-                                if (item?.modelID === 2 || 1) {
+                                if (item?.modelID === 2 || item?.modelID === 1) {
                                     subDeviceContent = <>
                                         <TextField
                                             key="h-sub-d-t-"

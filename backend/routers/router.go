@@ -239,7 +239,7 @@ func InitRouter(isCORS bool, ginMode string, enforcer *casbin.Enforcer, w *APIWo
 	r.DELETE(EndpointMapping[AccountManagementUser][1], authorizeJWT(REST), authorizePolicy(enforcer), validateURI(w.DeleteUser))
 
 	// Casbin route
-	apiGroup.GET("/casbin", w.getFrontendPermission(enforcer))
+	// apiGroup.GET("/casbin", w.getFrontendPermission(enforcer))
 
 	// Leap - webhook endpoint
 	apiGroup.POST("/leap/bidding/dispatch/webhook", leapAuthorize(), w.GetLeapBiddingDispatch)

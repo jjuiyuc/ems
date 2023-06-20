@@ -351,6 +351,7 @@
         "superOffPeak": "超級離峰時段電力",
         "tariff":"電價",
         "timeOfUse": "時間電價",
+        "type":"類型",
         "to": "至",
         "turnOff":"關閉",
         "weekdays":"平日"

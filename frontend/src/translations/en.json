@@ -349,6 +349,7 @@
         "superOffPeak": "Super off-Peak",
         "tariff":"Tariff",
         "timeOfUse": "Time of Use",
+        "type":"Type",
         "to": "to",
         "turnOff":"Turn Off",
         "weekdays":"Weekdays"

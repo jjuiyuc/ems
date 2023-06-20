@@ -40,4 +40,5 @@ var UtGateway = &deremsmodels.Gateway{
 	ID:         1,
 	UUID:       "0E0BA27A8175AF978C49396BDE9D7A1E",
 	LocationID: null.Int64From(1),
+	Enable:     null.BoolFrom(true),
 }

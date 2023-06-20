@@ -1,5 +1,10 @@
 package app
 
+// EnableFieldBody godoc
+type EnableFieldBody struct {
+	Enable *bool `form:"enable" binding:"required"`
+}
+
 // CreateGroupBody godoc
 type CreateGroupBody struct {
 	Name string `form:"name" binding:"required,max=20"`
@@ -27,4 +32,15 @@ type UpdateUserBody struct {
 	Name     string `form:"name" binding:"max=20"`
 	GroupID  int    `form:"groupID"`
 	Unlock   bool   `form:"unlock"`
+}
+
+// UpdateFieldGroupsBody godoc
+type UpdateFieldGroupsBody struct {
+	Groups []FieldGroupInfo `form:"groups" binding:"required"`
+}
+
+// FieldGroupInfo godoc
+type FieldGroupInfo struct {
+	ID    int64 `form:"id" binding:"required"`
+	Check *bool `form:"check" binding:"required"`
 }

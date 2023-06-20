@@ -106,7 +106,7 @@ func (h localCCConsumerHandler) saveLocalCCData(msg []byte) (err error) {
 		LocalCCData: null.JSONFrom(dataJSON),
 	}
 
-	gateway, err := h.repo.Gateway.GetGatewayByGatewayUUID(gwUUID)
+	gateway, err := h.repo.Gateway.GetGatewayByGatewayUUID(nil, gwUUID)
 	if err == nil {
 		ccData.GWID = null.Int64From(gateway.ID)
 		ccData.LocationID = gateway.LocationID
@@ -153,7 +153,7 @@ func (h localCCConsumerHandler) saveLocalCCDataLog(msg []byte) (err error) {
 
 	ccDataLog.GWUUID = gwIDValue.(string)
 	ccDataLog.LogDate = time.Unix(int64(timestampValue.(float64)), 0)
-	gateway, err := h.repo.Gateway.GetGatewayByGatewayUUID(gwIDValue.(string))
+	gateway, err := h.repo.Gateway.GetGatewayByGatewayUUID(nil, gwIDValue.(string))
 	if err == nil {
 		ccDataLog.GWID = null.Int64From(gateway.ID)
 		ccDataLog.LocationID = gateway.LocationID

@@ -13,6 +13,7 @@ import (
 	"der-ems/kafka"
 	"der-ems/models"
 	"der-ems/repository"
+	"der-ems/services"
 	"der-ems/testutils"
 )
 
@@ -20,7 +21,7 @@ type WeatherWorkerSuite struct {
 	suite.Suite
 	seedUtTopic   string
 	seedUtTime    time.Time
-	seedUtWeather LatestWeather
+	seedUtWeather services.WeatherInfo
 	repo          *repository.Repository
 	handler       weatherConsumerHandler
 }
@@ -35,9 +36,11 @@ func (s *WeatherWorkerSuite) SetupSuite() {
 	models.Init(cfg)
 	db := models.GetDB()
 	repo := repository.NewRepository(db)
+	weather := services.NewWeatherService(repo)
 	handler := weatherConsumerHandler{
-		cfg:  cfg,
-		repo: repo,
+		cfg:     cfg,
+		repo:    repo,
+		weather: weather,
 	}
 
 	s.seedUtTopic = kafka.ReceiveWeatherData
@@ -57,7 +60,7 @@ func (s *WeatherWorkerSuite) SetupSuite() {
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	// Mock seedUtWeather data
 	s.seedUtTime = time.Now().UTC()
-	s.seedUtWeather = LatestWeather{
+	s.seedUtWeather = services.WeatherInfo{
 		Lat: 24.75,
 		Lng: 121.75,
 		Alt: 100,
@@ -108,9 +111,9 @@ func (s *WeatherWorkerSuite) SetupSuite() {
 
 	// Mock gateway table
 	_, err = db.Exec(`
-		INSERT INTO gateway (id,uuid,location_id) VALUES
-		(1,'U00001',1),
-		(2,'U00002',2);
+		INSERT INTO gateway (id,uuid,location_id,enable) VALUES
+		(1,'U00001',1,true),
+		(2,'U00002',2,true);
 	`)
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 }
@@ -124,7 +127,7 @@ func (s *WeatherWorkerSuite) Test_01_SaveWeatherData() {
 
 	// Modify seedUtWeather data
 	// seedUtDataUpdated
-	seedUtDataUpdated := LatestWeather{
+	seedUtDataUpdated := services.WeatherInfo{
 		Lat: s.seedUtWeather.Lat,
 		Lng: s.seedUtWeather.Lng,
 		Alt: s.seedUtWeather.Alt,
@@ -141,7 +144,7 @@ func (s *WeatherWorkerSuite) Test_01_SaveWeatherData() {
 		}
 	}
 	// seedUtDataNoValidDate
-	seedUtDataNoValidDate := LatestWeather{
+	seedUtDataNoValidDate := services.WeatherInfo{
 		Lat: s.seedUtWeather.Lat,
 		Lng: s.seedUtWeather.Lng,
 		Alt: s.seedUtWeather.Alt,
@@ -155,7 +158,7 @@ func (s *WeatherWorkerSuite) Test_01_SaveWeatherData() {
 
 	tests := []struct {
 		name string
-		args LatestWeather
+		args services.WeatherInfo
 	}{
 		{
 			name: "saveWeatherData",
@@ -208,7 +211,7 @@ func (s *WeatherWorkerSuite) Test_01_SaveWeatherData() {
 	}
 }
 
-func (s *WeatherWorkerSuite) Test_02_GenerateWeatherSendingInfo() {
+func (s *WeatherWorkerSuite) Test_02_GenerateWeatherInfo() {
 	type args struct {
 		Lat float32
 		Lng float32
@@ -219,7 +222,7 @@ func (s *WeatherWorkerSuite) Test_02_GenerateWeatherSendingInfo() {
 		UUIDs       []string
 	}
 
-	testData := LatestWeather{
+	testData := services.WeatherInfo{
 		Lat: s.seedUtWeather.Lat,
 		Lng: s.seedUtWeather.Lng,
 		Alt: s.seedUtWeather.Alt,
@@ -243,7 +246,7 @@ func (s *WeatherWorkerSuite) Test_02_GenerateWeatherSendingInfo() {
 		args   args
 		wantRv response
 	}{
-		name: "generateWeatherSendingInfo",
+		name: "GenerateWeatherInfo",
 		args: args{
 			Lat: s.seedUtWeather.Lat,
 			Lng: s.seedUtWeather.Lng,
@@ -255,7 +258,7 @@ func (s *WeatherWorkerSuite) Test_02_GenerateWeatherSendingInfo() {
 	}
 
 	log.Info("test name: ", tt.name)
-	weatherData, uuids, err := s.handler.generateWeatherSendingInfo(tt.args.Lat, tt.args.Lng)
+	weatherData, uuids, err := s.handler.weather.GenerateWeatherInfo(tt.args.Lat, tt.args.Lng)
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	s.Equalf(tt.wantRv.WeatherData, weatherData, e.ErrNewMessageNotEqual.Error())
 	s.Equalf(tt.wantRv.UUIDs, uuids, e.ErrNewMessageNotEqual.Error())

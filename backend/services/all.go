@@ -14,6 +14,7 @@ type Services struct {
 	Devices           DevicesService
 	Billing           BillingService
 	AccountManagement AccountManagementService
+	Weather           WeatherService
 	FieldManagement   FieldManagementService
 }
 
@@ -25,8 +26,9 @@ func NewServices(cfg *viper.Viper, repo *repository.Repository) (services *Servi
 		User:              NewUserService(repo),
 		Billing:           NewBillingService(repo),
 		AccountManagement: NewAccountManagementService(repo),
+		Weather:           NewWeatherService(repo),
 	}
 	services.Devices = NewDevicesService(repo, services.Billing)
-	services.FieldManagement = NewFieldManagementService(repo, services.AccountManagement)
+	services.FieldManagement = NewFieldManagementService(repo, services.AccountManagement, services.Weather, services.Billing)
 	return
 }

@@ -53,4 +53,8 @@ const (
 	ErrFieldsGen                        = 60017
 	ErrDeviceModelsGen                  = 60018
 	ErrFieldGen                         = 60019
+	ErrFieldEnable                      = 60020
+	ErrFieldGroupsUpdate                = 60021
+	ErrFieldIsDisabled                  = 60022
+	ErrDeviceSettingsSync               = 60023
 )

@@ -187,7 +187,7 @@ func (s defaultAccountManagementService) GetGroup(userID, groupID int64) (getGro
 }
 
 func (s defaultAccountManagementService) GetGroupGateways(groupID int64) (groupGateways []GroupGatewayInfo) {
-	gatewaysPermission, err := s.repo.User.GetGatewaysPermissionByGroupID(groupID, false)
+	gatewaysPermission, err := s.repo.User.GetGatewaysPermissionByGroupID(nil, groupID, false)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"caused-by": "s.repo.User.GetGatewaysPermissionByGroupID",

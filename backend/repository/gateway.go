@@ -6,6 +6,8 @@ import (
 	"fmt"
 
 	"github.com/volatiletech/null/v8"
+	"github.com/volatiletech/sqlboiler/v4/boil"
+	"github.com/volatiletech/sqlboiler/v4/queries"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 
 	"der-ems/models"
@@ -25,6 +27,20 @@ type GatewayLocationWrap struct {
 	Enable       bool    `json:"enable"`
 }
 
+// GPSLocationWrap godoc
+type GPSLocationWrap struct {
+	Lat float32 `json:"lat"`
+	Lng float32 `json:"lng"`
+}
+
+// FieldGroupWrap godoc
+type FieldGroupWrap struct {
+	ID       int64      `json:"id"`
+	Name     string     `json:"name"`
+	ParentID null.Int64 `json:"parentID"`
+	Check    bool       `json:"check"`
+}
+
 // DeviceWrap godoc
 type DeviceWrap struct {
 	ModelType     string    `json:"modelType"`
@@ -35,18 +51,34 @@ type DeviceWrap struct {
 	ExtraInfo     null.JSON `json:"extraInfo"`
 }
 
+// DLDeviceWrap godoc
+type DLDeviceWrap struct {
+	DeviceType      string    `json:"deviceType"`
+	DeviceModelName string    `json:"deviceModelName"`
+	ModbusID        int       `json:"modbusID"`
+	UUEID           string    `json:"uueID"`
+	PowerCapacity   float32   `json:"powerCapacity"`
+	ExtraInfo       null.JSON `json:"extraInfo"`
+}
+
 // GatewayRepository godoc
 type GatewayRepository interface {
-	GetGatewayByGatewayUUID(gwUUID string) (*deremsmodels.Gateway, error)
+	InsertGatewayLog(tx *sql.Tx, gatewayLog *deremsmodels.GatewayLog) error
+	UpdateGateway(tx *sql.Tx, gateway *deremsmodels.Gateway) (err error)
+	GetGatewayByGatewayUUID(tx *sql.Tx, gwUUID string) (*deremsmodels.Gateway, error)
 	GetGatewaysByLocation(lat, lng float32) ([]*deremsmodels.Gateway, error)
 	GetGatewaysByUserID(userID int64) ([]*deremsmodels.Gateway, error)
 	GetGatewayByGatewayID(gwID int64) (*deremsmodels.Gateway, error)
 	GetGateways() ([]*deremsmodels.Gateway, error)
 	GetGatewayLocationByGatewayID(gwID int64) (gatewayLocation GatewayLocationWrap, err error)
-	GetGatewayGroupsForUserID(executedUserID, gwID int64) ([]*deremsmodels.Group, error)
-	IsGatewayExistedForUserID(executedUserID int64, gwUUID string) bool
+	GetGPSLocations() (locations []*GPSLocationWrap, err error)
+	GetGatewayGroupsForUserID(tx *sql.Tx, executedUserID, gwID int64) (groups []*FieldGroupWrap, err error)
+	IsGatewayExistedForUserID(tx *sql.Tx, executedUserID int64, gwUUID string) bool
 	GetDeviceModels() ([]*deremsmodels.DeviceModel, error)
 	GetDeviceMappingByGatewayID(gwID int64) (devices []*DeviceWrap, err error)
+	GetDLDeviceMappingByGatewayID(gwID int64) (devices []*DLDeviceWrap, err error)
+	MatchDownlinkRules(gateway *deremsmodels.Gateway) bool
+	IsGatewayBoundField(gateway *deremsmodels.Gateway) bool
 }
 
 type defaultGatewayRepository struct {
@@ -58,10 +90,19 @@ func NewGatewayRepository(db *sql.DB) GatewayRepository {
 	return &defaultGatewayRepository{db}
 }
 
+func (repo defaultGatewayRepository) InsertGatewayLog(tx *sql.Tx, gatewayLog *deremsmodels.GatewayLog) error {
+	return gatewayLog.Insert(repo.getExecutor(tx), boil.Infer())
+}
+
+func (repo defaultGatewayRepository) UpdateGateway(tx *sql.Tx, gateway *deremsmodels.Gateway) (err error) {
+	_, err = gateway.Update(repo.getExecutor(tx), boil.Infer())
+	return
+}
+
 // GetGatewayByGatewayUUID godoc
-func (repo defaultGatewayRepository) GetGatewayByGatewayUUID(gwUUID string) (*deremsmodels.Gateway, error) {
+func (repo defaultGatewayRepository) GetGatewayByGatewayUUID(tx *sql.Tx, gwUUID string) (*deremsmodels.Gateway, error) {
 	return deremsmodels.Gateways(
-		qm.Where("uuid = ?", gwUUID)).One(repo.db)
+		qm.Where("uuid = ?", gwUUID)).One(repo.getExecutor(tx))
 }
 
 // GetGatewaysByLocation godoc
@@ -104,15 +145,30 @@ func (repo defaultGatewayRepository) GetGatewayLocationByGatewayID(gwID int64) (
 	return
 }
 
+func (repo defaultGatewayRepository) GetGPSLocations() (locations []*GPSLocationWrap, err error) {
+	locations = make([]*GPSLocationWrap, 0)
+	err = deremsmodels.NewQuery(
+		qm.Select(
+			"l.weather_lat AS lat",
+			"l.weather_lng AS lng",
+		),
+		qm.From("location AS l"),
+		qm.InnerJoin("gateway AS g ON l.id = g.location_id"),
+		qm.Where("g.deleted_at IS NULL"),
+		qm.GroupBy("l.weather_lat, l.weather_lng"),
+	).Bind(context.Background(), models.GetDB(), &locations)
+	return
+}
+
 // GetGateways godoc
 func (repo defaultGatewayRepository) GetGateways() ([]*deremsmodels.Gateway, error) {
 	return deremsmodels.Gateways().All(repo.db)
 }
 
-func (repo defaultGatewayRepository) GetGatewayGroupsForUserID(executedUserID, gwID int64) ([]*deremsmodels.Group, error) {
-	return deremsmodels.Groups(
-		qm.SQL(fmt.Sprintf(`
-		WITH RECURSIVE gateway_groups AS
+func (repo defaultGatewayRepository) GetGatewayGroupsForUserID(tx *sql.Tx, executedUserID, gwID int64) (groups []*FieldGroupWrap, err error) {
+	groups = make([]*FieldGroupWrap, 0)
+	err = queries.Raw(fmt.Sprintf(`
+		WITH RECURSIVE user_groups AS
 		(
 		SELECT *
 			FROM %s
@@ -123,28 +179,31 @@ func (repo defaultGatewayRepository) GetGatewayGroupsForUserID(executedUserID, g
 			)
 		UNION ALL
 		SELECT g.*
-			FROM gateway_groups AS gg JOIN %s AS g
-			ON gg.id = g.parent_id
+			FROM user_groups AS ug JOIN %s AS g
+			ON ug.id = g.parent_id
 			AND g.deleted_at IS NULL
 		),
-		user_groups AS
+		gateway_groups AS
 		(
 		SELECT %s.*
 			FROM %s INNER JOIN group_gateway_right AS gr
 			ON gr.gw_id = ?
 			AND gr.group_id = group.id
+			AND gr.disabled_at IS NULL
 			WHERE deleted_at IS NULL
 		)
-		SELECT gateway_groups.*
-			FROM gateway_groups JOIN user_groups
-			ON user_groups.id = gateway_groups.id;`, "`group`", "`group`", "`group`", "`group`"), executedUserID, gwID)).All(repo.db)
+		SELECT user_groups.id, user_groups.name, user_groups.parent_id, IF(gateway_groups.id IS NULL, FALSE, TRUE) AS %s
+			FROM user_groups LEFT JOIN gateway_groups
+			ON gateway_groups.id = user_groups.id;`, "`group`", "`group`", "`group`", "`group`", "`check`"), executedUserID, gwID,
+	).Bind(context.Background(), repo.getExecutor(tx), &groups)
+	return
 }
 
-func (repo defaultGatewayRepository) IsGatewayExistedForUserID(executedUserID int64, gwUUID string) (exist bool) {
+func (repo defaultGatewayRepository) IsGatewayExistedForUserID(tx *sql.Tx, executedUserID int64, gwUUID string) (exist bool) {
 	exist, _ = deremsmodels.Gateways(
 		qm.InnerJoin("group_gateway_right AS gr ON gateway.id = gr.gw_id"),
 		qm.InnerJoin("user AS u ON gr.group_id = u.group_id"),
-		qm.Where("uuid = ? AND u.id = ?", gwUUID, executedUserID)).Exists(repo.db)
+		qm.Where("uuid = ? AND u.id = ?", gwUUID, executedUserID)).Exists(repo.getExecutor(tx))
 	return
 }
 
@@ -169,4 +228,38 @@ func (repo defaultGatewayRepository) GetDeviceMappingByGatewayID(gwID int64) (de
 		qm.Where("d.deleted_at IS NULL AND d.gw_id = ?", gwID),
 	).Bind(context.Background(), models.GetDB(), &devices)
 	return
+}
+
+func (repo defaultGatewayRepository) GetDLDeviceMappingByGatewayID(gwID int64) (devices []*DLDeviceWrap, err error) {
+	devices = make([]*DLDeviceWrap, 0)
+	err = deremsmodels.NewQuery(
+		qm.Select(
+			"dm2.type AS device_type",
+			"dm2.name AS device_model_name",
+			"d.modbusid AS modbus_id",
+			"dm.uueid AS uue_id",
+			"d.power_capacity AS power_capacity",
+			"d.extra_info AS extra_info",
+		),
+		qm.From("device AS d"),
+		qm.InnerJoin("device_module AS dm ON d.module_id = dm.id"),
+		qm.InnerJoin("device_model AS dm2 ON d.model_id = dm2.id"),
+		qm.Where("d.deleted_at IS NULL AND d.gw_id = ?", gwID),
+	).Bind(context.Background(), models.GetDB(), &devices)
+	return
+}
+
+func (repo defaultGatewayRepository) MatchDownlinkRules(gateway *deremsmodels.Gateway) bool {
+	return repo.IsGatewayBoundField(gateway) && gateway.Enable.Bool
+}
+
+func (repo defaultGatewayRepository) IsGatewayBoundField(gateway *deremsmodels.Gateway) bool {
+	return gateway.LocationID.Int64 > 0 && gateway.DeletedAt.IsZero()
+}
+
+func (repo defaultGatewayRepository) getExecutor(tx *sql.Tx) boil.Executor {
+	if tx == nil {
+		return repo.db
+	}
+	return tx
 }

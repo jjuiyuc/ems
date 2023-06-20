@@ -128,7 +128,7 @@ func (s *BillingWorkerSuite) Test_GetLocalTime() {
 	}
 }
 
-func (s *BillingWorkerSuite) Test_getSundayOfBillingWeek() {
+func (s *BillingWorkerSuite) Test_GetSundayOfBillingWeek() {
 	type args struct {
 		LocalTime time.Time
 		SendNow   bool
@@ -146,7 +146,7 @@ func (s *BillingWorkerSuite) Test_getSundayOfBillingWeek() {
 		wantRv response
 	}{
 		{
-			name: "getSundayOfBillingWeek",
+			name: "GetSundayOfBillingWeek",
 			args: args{
 				LocalTime: s.seedUtTime,
 				SendNow:   true,
@@ -156,7 +156,7 @@ func (s *BillingWorkerSuite) Test_getSundayOfBillingWeek() {
 			},
 		},
 		{
-			name: "getSundayOfBillingWeekNextWeek",
+			name: "GetSundayOfBillingWeekNextWeek",
 			args: args{
 				LocalTime: s.seedUtTime,
 				SendNow:   false,
@@ -168,12 +168,12 @@ func (s *BillingWorkerSuite) Test_getSundayOfBillingWeek() {
 	}
 
 	for _, tt := range tests {
-		timeOnSunday := getSundayOfBillingWeek(tt.args.LocalTime, tt.args.SendNow)
+		timeOnSunday := s.billing.GetSundayOfBillingWeek(tt.args.LocalTime, tt.args.SendNow)
 		s.Equalf(tt.wantRv.TimeOnSunday, timeOnSunday, e.ErrNewMessageNotEqual.Error())
 	}
 }
 
-func (s *BillingWorkerSuite) Test_getWeeklyBillingParamsByType() {
+func (s *BillingWorkerSuite) Test_GetWeeklyBillingParamsByType() {
 	type args struct {
 		BillingType *services.BillingType
 		LocalTime   time.Time
@@ -181,7 +181,7 @@ func (s *BillingWorkerSuite) Test_getWeeklyBillingParamsByType() {
 	}
 
 	type response struct {
-		BillingParams BillingParams
+		BillingParams services.BillingParams
 	}
 
 	seedUtBillingType := &services.BillingType{
@@ -190,10 +190,10 @@ func (s *BillingWorkerSuite) Test_getWeeklyBillingParamsByType() {
 		TOUType:       testdata.UtLocation.TOUType.String,
 	}
 
-	var testBillingParams BillingParams
+	var testBillingParams services.BillingParams
 	testBillingParams.Timezone = "+0800"
-	timeOnSunday := getSundayOfBillingWeek(s.seedUtTime, true)
-	rate := RateInfo{
+	timeOnSunday := s.billing.GetSundayOfBillingWeek(s.seedUtTime, true)
+	rate := services.RateInfo{
 		Date:             timeOnSunday.Format(utils.YYYYMMDD),
 		Interval:         "0000-2400",
 		DemandChargeRate: 47.2,
@@ -210,7 +210,7 @@ func (s *BillingWorkerSuite) Test_getWeeklyBillingParamsByType() {
 		args   args
 		wantRv response
 	}{
-		name: "getWeeklyBillingParamsByType",
+		name: "GetWeeklyBillingParamsByType",
 		args: args{
 			BillingType: seedUtBillingType,
 			LocalTime:   s.seedUtTime,
@@ -221,8 +221,8 @@ func (s *BillingWorkerSuite) Test_getWeeklyBillingParamsByType() {
 		},
 	}
 
-	billingParamsJSON, err := getWeeklyBillingParamsByType(s.repo, s.billing, *tt.args.BillingType, tt.args.LocalTime, tt.args.SendNow)
-	var billingParams BillingParams
+	billingParamsJSON, err := s.billing.GetWeeklyBillingParamsByType(*tt.args.BillingType, tt.args.LocalTime, tt.args.SendNow)
+	var billingParams services.BillingParams
 	err = json.Unmarshal(billingParamsJSON, &billingParams)
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	s.Equalf(tt.wantRv.BillingParams.Timezone, billingParams.Timezone, e.ErrNewMessageNotEqual.Error())
@@ -231,6 +231,6 @@ func (s *BillingWorkerSuite) Test_getWeeklyBillingParamsByType() {
 
 func (s *BillingWorkerSuite) Test_generateBillingParams() {
 	gateways, _ := getGateways(s.repo)
-	_, err := generateBillingParams(s.repo, s.billing, gateways[0], true)
+	_, err := s.billing.GenerateBillingParams(gateways[0], true)
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 }

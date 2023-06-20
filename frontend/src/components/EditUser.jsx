@@ -180,8 +180,8 @@ export default connect(null, mapDispatch)(function EditUser(props) {
                                     }
                                 </IconButton>
                             </InputAdornment>
-                    }
-                    }
+                    }}
+                    sx={{ maxWidth: "16.5rem" }}
                 />
                 <TextField
                     id="edit-name"

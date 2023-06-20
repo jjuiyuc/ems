@@ -171,6 +171,7 @@ export default connect(null, mapDispatch)(function AddUser(props) {
                                 </IconButton>
                             </InputAdornment>
                     }}
+                    sx={{ maxWidth: "16.5rem" }}
                 />
                 <TextField
                     id="add-name"

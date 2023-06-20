@@ -93,19 +93,21 @@ export default function InfoGroup(props) {
                                 label={pageT("parentGroup")}
                             >
                                 {groupDictionary[parentGroup]}
-                            </ListItem></>
+                            </ListItem>
+                        </>
                         : null}
                     <h5 className="ml-6 mt-2">{pageT("fieldList")} :</h5>
                     <ListItem
                         id="field-list"
                         label={pageT("fieldList")}
-                        className="flex flex-wrap gap-y-4"
                     >
-                        {fieldList?.map((field, index) => (
-                            <p key={index} className="w-full" >
-                                {field.locationName}-{field.gatewayID}
-                            </p>
-                        ))}
+                        <div className="grid gap-y-4">
+                            {fieldList?.map((field, index) => (
+                                <p key={index} className="w-full" >
+                                    {field.locationName}-{field.gatewayID}
+                                </p>
+                            ))}
+                        </div>
                     </ListItem>
                 </div>
             </div>

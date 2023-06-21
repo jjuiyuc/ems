@@ -1,5 +1,5 @@
 import { Fragment as Frag, useEffect, useState, useRef } from "react"
-import { Button, Box, FormControl, Stack, InputLabel, Select, MenuItem, TextField } from "@mui/material"
+import { Button, Select, MenuItem, TextField } from "@mui/material"
 import { useTranslation } from "react-multi-lang"
 
 import DatePeriodPicker from "./DatePeriodPicker"
@@ -8,7 +8,7 @@ import { ReactComponent as AddIcon } from "../assets/icons/add.svg"
 import { ReactComponent as DeleteIcon } from "../assets/icons/delete.svg"
 import { ReactComponent as PowerOutageIcon } from "../assets/icons/power_outage.svg"
 
-const maxLength = 2
+const maxLength = 5
 
 const defaultPolicyConfig = {
     preNotifiedOutagePeriod: {
@@ -67,7 +67,7 @@ export default function PowerOutageCard(props) {
                                 return (
                                     <div key={`${policy}-${index}`}
                                         className="time-range-picker grid
-                                        grid-cols-settings-input-col4 gap-x-4 items-center mt-4">
+                                        grid-cols-settings-input-col5 gap-x-4 items-center mt-4">
                                         <DatePeriodPicker
                                             key={index}
                                             startDate={startDate}

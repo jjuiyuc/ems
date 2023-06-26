@@ -14,6 +14,14 @@ import (
 	deremsmodels "der-ems/models/der-ems"
 )
 
+// DeviceModelType godoc
+type DeviceModelType string
+
+const (
+	// Battery godoc
+	Battery DeviceModelType = "Battery"
+)
+
 // GatewayLocationWrap godoc
 type GatewayLocationWrap struct {
 	GatewayID    string  `json:"gatewayID"`
@@ -74,6 +82,7 @@ type GatewayRepository interface {
 	GetGPSLocations() (locations []*GPSLocationWrap, err error)
 	GetGatewayGroupsForUserID(tx *sql.Tx, executedUserID, gwID int64) (groups []*FieldGroupWrap, err error)
 	IsGatewayExistedForUserID(tx *sql.Tx, executedUserID int64, gwUUID string) bool
+	GetDeviceByGatewayUUIDAndType(tx *sql.Tx, gwUUID string, modelType DeviceModelType) (*deremsmodels.Device, error)
 	GetDeviceModels() ([]*deremsmodels.DeviceModel, error)
 	GetDeviceMappingByGatewayID(gwID int64) (devices []*DeviceWrap, err error)
 	GetDLDeviceMappingByGatewayID(gwID int64) (devices []*DLDeviceWrap, err error)
@@ -205,6 +214,14 @@ func (repo defaultGatewayRepository) IsGatewayExistedForUserID(tx *sql.Tx, execu
 		qm.InnerJoin("user AS u ON gr.group_id = u.group_id"),
 		qm.Where("uuid = ? AND u.id = ?", gwUUID, executedUserID)).Exists(repo.getExecutor(tx))
 	return
+}
+
+func (repo defaultGatewayRepository) GetDeviceByGatewayUUIDAndType(tx *sql.Tx, gwUUID string, modelType DeviceModelType) (*deremsmodels.Device, error) {
+	return deremsmodels.Devices(
+		qm.InnerJoin("device_module AS dm ON device.module_id = dm.id"),
+		qm.InnerJoin("device_model AS dm2 ON device.model_id = dm2.id"),
+		qm.InnerJoin("gateway AS g ON g.uuid = ? AND g.id = device.gw_id", gwUUID),
+		qm.Where("device.deleted_at IS NULL AND dm2.type = ?", modelType)).One(repo.getExecutor(tx))
 }
 
 func (repo defaultGatewayRepository) GetDeviceModels() ([]*deremsmodels.DeviceModel, error) {

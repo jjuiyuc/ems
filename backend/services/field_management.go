@@ -22,6 +22,7 @@ type FieldManagementService interface {
 	GetFields(userID int64) (getFields *GetFieldsResponse, err error)
 	GetDeviceModels() (getDeviceModels *GetDeviceModelsResponse, err error)
 	GetField(executedUserID int64, gwUUID string) (getField *GetFieldResponse, err error)
+	AuthorizeGatewayUUID(tx *sql.Tx, executedUserID int64, gwUUID string) bool
 	EnableField(executedUserID int64, gwUUID string, enable bool) (err error)
 	GenerateDeviceSettings(executedUserID int64, gwUUID string) (deviceSettings *DeviceSettingsData, err error)
 	GenerateDLDeviceMappingInfo(gwID int64) (data []byte, err error)
@@ -136,7 +137,7 @@ func (s defaultFieldManagementService) GetDeviceModels() (getDeviceModels *GetDe
 }
 
 func (s defaultFieldManagementService) GetField(executedUserID int64, gwUUID string) (getField *GetFieldResponse, err error) {
-	if !s.authorizeGatewayUUID(nil, executedUserID, gwUUID) {
+	if !s.AuthorizeGatewayUUID(nil, executedUserID, gwUUID) {
 		err = e.ErrNewAuthPermissionNotAllow
 		return
 	}
@@ -153,7 +154,7 @@ func (s defaultFieldManagementService) GetField(executedUserID int64, gwUUID str
 	return
 }
 
-func (s defaultFieldManagementService) authorizeGatewayUUID(tx *sql.Tx, executedUserID int64, gwUUID string) bool {
+func (s defaultFieldManagementService) AuthorizeGatewayUUID(tx *sql.Tx, executedUserID int64, gwUUID string) bool {
 	return s.repo.Gateway.IsGatewayExistedForUserID(tx, executedUserID, gwUUID)
 }
 
@@ -243,7 +244,7 @@ func (s defaultFieldManagementService) isFakeModbusID(modbusID int64) bool {
 }
 
 func (s defaultFieldManagementService) EnableField(executedUserID int64, gwUUID string, enable bool) (err error) {
-	if !s.authorizeGatewayUUID(nil, executedUserID, gwUUID) {
+	if !s.AuthorizeGatewayUUID(nil, executedUserID, gwUUID) {
 		err = e.ErrNewAuthPermissionNotAllow
 		return
 	}
@@ -315,7 +316,7 @@ func (s defaultFieldManagementService) updateGatewayLog(tx *sql.Tx, gateway *der
 }
 
 func (s defaultFieldManagementService) GenerateDeviceSettings(executedUserID int64, gwUUID string) (deviceSettings *DeviceSettingsData, err error) {
-	if !s.authorizeGatewayUUID(nil, executedUserID, gwUUID) {
+	if !s.AuthorizeGatewayUUID(nil, executedUserID, gwUUID) {
 		err = e.ErrNewAuthPermissionNotAllow
 		return
 	}
@@ -407,7 +408,7 @@ func (s defaultFieldManagementService) UpdateFieldGroups(executedUserID int64, g
 		return
 	}
 
-	if !s.authorizeGatewayUUID(tx, executedUserID, gwUUID) {
+	if !s.AuthorizeGatewayUUID(tx, executedUserID, gwUUID) {
 		err = e.ErrNewAuthPermissionNotAllow
 		tx.Rollback()
 		return

@@ -44,3 +44,10 @@ type FieldGroupInfo struct {
 	ID    int64 `form:"id" binding:"required"`
 	Check *bool `form:"check" binding:"required"`
 }
+
+// UpdateBatterySettingsBody godoc
+type UpdateBatterySettingsBody struct {
+	// According with luxpower logic, the sources need to be 'Solar + Grid' or 'Solar'
+	ChargingSources              string `form:"chargingSources" binding:"required,oneof='Solar + Grid' 'Solar'"`
+	ReservedForGridOutagePercent int    `form:"reservedForGridOutagePercent" binding:"required"`
+}

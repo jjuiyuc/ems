@@ -120,6 +120,9 @@ var EndpointMapping = map[PolicyWebpageObject][]string{
 		"/api/account-management/users",
 		"/api/account-management/users/:userid",
 	},
+	Settings: {
+		"/api/device-management/gateways/:gatewayid/battery-settings",
+	},
 }
 
 // MethodMapping godoc
@@ -237,6 +240,9 @@ func InitRouter(isCORS bool, ginMode string, enforcer *casbin.Enforcer, w *APIWo
 	r.POST(EndpointMapping[AccountManagementUser][0], authorizeJWT(REST), authorizePolicy(enforcer), validateBody(w.CreateUser))
 	r.PUT(EndpointMapping[AccountManagementUser][1], authorizeJWT(REST), authorizePolicy(enforcer), validateURIAndBody(w.UpdateUser))
 	r.DELETE(EndpointMapping[AccountManagementUser][1], authorizeJWT(REST), authorizePolicy(enforcer), validateURI(w.DeleteUser))
+
+	// Settings
+	r.GET(EndpointMapping[Settings][0], authorizeJWT(REST), authorizePolicy(enforcer), validateURI(w.GetBatterySettings))
 
 	// Casbin route
 	// apiGroup.GET("/casbin", w.getFrontendPermission(enforcer))

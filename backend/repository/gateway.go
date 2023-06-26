@@ -82,6 +82,8 @@ type GatewayRepository interface {
 	GetGPSLocations() (locations []*GPSLocationWrap, err error)
 	GetGatewayGroupsForUserID(tx *sql.Tx, executedUserID, gwID int64) (groups []*FieldGroupWrap, err error)
 	IsGatewayExistedForUserID(tx *sql.Tx, executedUserID int64, gwUUID string) bool
+	InsertDeviceLog(tx *sql.Tx, deviceLog *deremsmodels.DeviceLog) error
+	UpdateDevice(tx *sql.Tx, device *deremsmodels.Device) (err error)
 	GetDeviceByGatewayUUIDAndType(tx *sql.Tx, gwUUID string, modelType DeviceModelType) (*deremsmodels.Device, error)
 	GetDeviceModels() ([]*deremsmodels.DeviceModel, error)
 	GetDeviceMappingByGatewayID(gwID int64) (devices []*DeviceWrap, err error)
@@ -213,6 +215,15 @@ func (repo defaultGatewayRepository) IsGatewayExistedForUserID(tx *sql.Tx, execu
 		qm.InnerJoin("group_gateway_right AS gr ON gateway.id = gr.gw_id"),
 		qm.InnerJoin("user AS u ON gr.group_id = u.group_id"),
 		qm.Where("uuid = ? AND u.id = ?", gwUUID, executedUserID)).Exists(repo.getExecutor(tx))
+	return
+}
+
+func (repo defaultGatewayRepository) InsertDeviceLog(tx *sql.Tx, deviceLog *deremsmodels.DeviceLog) error {
+	return deviceLog.Insert(repo.getExecutor(tx), boil.Infer())
+}
+
+func (repo defaultGatewayRepository) UpdateDevice(tx *sql.Tx, device *deremsmodels.Device) (err error) {
+	_, err = device.Update(repo.getExecutor(tx), boil.Infer())
 	return
 }
 

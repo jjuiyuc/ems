@@ -243,6 +243,7 @@ func InitRouter(isCORS bool, ginMode string, enforcer *casbin.Enforcer, w *APIWo
 
 	// Settings
 	r.GET(EndpointMapping[Settings][0], authorizeJWT(REST), authorizePolicy(enforcer), validateURI(w.GetBatterySettings))
+	r.PUT(EndpointMapping[Settings][0], authorizeJWT(REST), authorizePolicy(enforcer), validateURIAndBody(w.UpdateBatterySettings))
 
 	// Casbin route
 	// apiGroup.GET("/casbin", w.getFrontendPermission(enforcer))

@@ -58,4 +58,5 @@ const (
 	ErrFieldIsDisabled                  = 60022
 	ErrDeviceSettingsSync               = 60023
 	ErrBatterySettingsGen               = 60030
+	ErrBatterySettingsUpdate            = 60031
 )

@@ -235,7 +235,7 @@
         "noDataMsg":"No Data Message",
         "passwordFormat": "Password must meet complexity requirements, including at least 8 characters and numbers.",
         "passwordIncorrect": "Password is incorrect, please try again.",
-        "passwordLength":"Please enter between 8 to 50 characters.",
+        "passwordLength":"Please enter between 8 to 50 characters and numbers.",
         "passwordNotMatch": "Password does not match, please try again.",
         "passwordUpdateError":"Password updates error",
         "passwordTokenError": "The reset password link is invalid.",

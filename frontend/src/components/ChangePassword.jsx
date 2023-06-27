@@ -27,19 +27,24 @@ export default connect(null, mapDispatch)(function ChangePassword(props) {
         [otherError, setOtherError] = useState(""),
         [showPassword, setShowPassword] = useState(false)
 
+    const submitDisabled = curPassword.length == 0 || newPassword.length == 0 || newPasswordError || curPasswordError
+
     const
         handleClickShowPassword = () => setShowPassword((show) => !show),
         handleMouseDownPassword = (event) => {
             event.preventDefault()
         },
         changePassword = (e) => {
+            // setCurPasswordError(false)
             setCurPassword(e.target.value)
+            setCurPasswordError(!validatePassword(e.target.value))
         },
+        curPasswordLengthError = curPassword.length < 8 || curPassword.length > 50,
         changeNewPassword = (e) => {
             setNewPassword(e.target.value)
             setNewPasswordError(!validatePassword(e.target.value))
         },
-        newPasswordLengthError = newPassword.length == 0 || newPassword.length > 50
+        newPasswordLengthError = newPassword.length < 8 || newPassword.length > 50
 
     const submit = async () => {
 
@@ -98,6 +103,7 @@ export default connect(null, mapDispatch)(function ChangePassword(props) {
                     value={curPassword}
                     onChange={changePassword}
                     error={curPasswordError}
+                    helperText={curPasswordLengthError ? errorT("passwordLength") : ""}
                     autoComplete="current-password"
                     InputProps={{
                         endAdornment:
@@ -124,8 +130,9 @@ export default connect(null, mapDispatch)(function ChangePassword(props) {
                     value={newPassword}
                     onChange={changeNewPassword}
                     error={newPasswordError}
-                    helperText={newPasswordLengthError ? errorT("passwordLength") : ""
-                        || newPasswordError ? errorT("passwordFormat") : ""}
+                    helperText={newPasswordError ? errorT("passwordFormat") : ""
+                        || newPasswordLengthError ? errorT("passwordLength") : ""
+                    }
                     autoComplete="new-password"
                     InputProps={{
                         endAdornment:
@@ -149,7 +156,7 @@ export default connect(null, mapDispatch)(function ChangePassword(props) {
             <div className="flex flex-row-reverse mt-6">
                 <Button
                     onClick={submit}
-                    disabled={curPassword.length == 0 || newPassword.length == 0}
+                    disabled={submitDisabled}
                     radius="pill"
                     variant="contained"
                     color="primary">

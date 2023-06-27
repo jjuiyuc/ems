@@ -11,7 +11,7 @@ import DialogForm from "../components/DialogForm"
 import { ReactComponent as EditIcon } from "../assets/icons/edit.svg"
 
 const mapState = state => ({
-    typeID: state.user.group.typeID
+    id: state.user.group.id
 })
 const mapDispatch = dispatch => ({
     updateSnackbarMsg: value =>
@@ -318,7 +318,7 @@ export default connect(mapState, mapDispatch)(function EditField(props) {
                                         checked={groups.some(item => item.id === parseInt(key) && item.check === true)}
                                         value={key}
                                         onChange={handleChange}
-                                        disabled={parseInt(key) === props.typeID ? true : false}
+                                        disabled={parseInt(key) === props.id ? true : false}
                                         name={value} />
                                 }
                                 label={value}

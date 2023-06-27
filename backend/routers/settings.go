@@ -59,3 +59,21 @@ func (w *APIWorker) GetMeterSettings(c *gin.Context, uri *app.FieldURI) {
 	}
 	appG.Response(http.StatusOK, e.Success, responseData)
 }
+
+func (w *APIWorker) UpdateMeterSettings(c *gin.Context, uri *app.FieldURI, body *app.UpdateMeterSettingsBody) {
+	appG := app.Gin{c}
+	userID, _ := c.Get("userID")
+	logrus.WithFields(logrus.Fields{
+		"updated-by":                       userID,
+		"max-demand-capacity":              body.MaxDemandCapacity,
+	}).Info("meter-settings-updated")
+	if err := w.Services.Settings.UpdateMeterSettings(userID.(int64), uri.GatewayID, body); err != nil {
+		if errors.Is(err, e.ErrNewAuthPermissionNotAllow) {
+			appG.Response(http.StatusForbidden, e.ErrAuthPermissionNotAllow, nil)
+			return
+		}
+		appG.Response(http.StatusInternalServerError, e.ErrMeterSettingsUpdate, nil)
+		return
+	}
+	appG.Response(http.StatusOK, e.Success, nil)
+}

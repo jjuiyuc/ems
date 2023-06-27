@@ -51,3 +51,8 @@ type UpdateBatterySettingsBody struct {
 	ChargingSources              string `form:"chargingSources" binding:"required,oneof='Solar + Grid' 'Solar'"`
 	ReservedForGridOutagePercent int    `form:"reservedForGridOutagePercent" binding:"required"`
 }
+
+// UpdateMeterSettingsBody godoc
+type UpdateMeterSettingsBody struct {
+	MaxDemandCapacity int `form:"maxDemandCapacity" binding:"required"`
+}

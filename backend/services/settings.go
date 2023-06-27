@@ -21,6 +21,7 @@ type SettingsService interface {
 	GetBatterySettings(executedUserID int64, gwUUID string) (getBatterySettings *GetBatterySettingsResponse, err error)
 	UpdateBatterySettings(executedUserID int64, gwUUID string, body *app.UpdateBatterySettingsBody) (err error)
 	GetMeterSettings(executedUserID int64, gwUUID string) (getMeterSettings *GetMeterSettingsResponse, err error)
+	UpdateMeterSettings(executedUserID int64, gwUUID string, body *app.UpdateMeterSettingsBody) (err error)
 }
 
 // GetBatterySettingsResponse godoc
@@ -193,5 +194,54 @@ func (s defaultSettingsService) getMeterSettingsResponse(gwUUID string) (getMete
 	getMeterSettings = &GetMeterSettingsResponse{
 		MaxDemandCapacity: int(device.PowerCapacity),
 	}
+	return
+}
+
+func (s defaultSettingsService) UpdateMeterSettings(executedUserID int64, gwUUID string, body *app.UpdateMeterSettingsBody) (err error) {
+	if !s.fieldManagement.AuthorizeGatewayUUID(nil, executedUserID, gwUUID) {
+		err = e.ErrNewAuthPermissionNotAllow
+		return
+	}
+
+	tx, err := models.GetDB().BeginTx(context.Background(), nil)
+	if err != nil {
+		return
+	}
+
+	device, err := s.getUpdateMeterSettingsInfo(tx, executedUserID, gwUUID, body)
+	if err != nil || device == nil {
+		tx.Rollback()
+		return
+	}
+	if err = s.repo.Gateway.UpdateDevice(tx, device); err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.Gateway.UpdateDevice",
+			"err":       err,
+		}).Error()
+		tx.Rollback()
+		return
+	}
+	if err = s.updateDeviceLog(tx, device); err != nil {
+		tx.Rollback()
+		return
+	}
+
+	tx.Commit()
+	return
+}
+
+func (s defaultSettingsService) getUpdateMeterSettingsInfo(tx *sql.Tx, executedUserID int64, gwUUID string, body *app.UpdateMeterSettingsBody) (device *deremsmodels.Device, err error) {
+	device, err = s.getSettingsByGatewayUUIDAndType(tx, gwUUID, repository.Meter)
+	if err != nil {
+		return
+	}
+	if device.PowerCapacity == float32(body.MaxDemandCapacity) {
+		device = nil
+		logrus.Warn("the-same-value-ignored")
+		return
+	}
+	device.PowerCapacity = float32(body.MaxDemandCapacity)
+	device.UpdatedAt = time.Now().UTC()
+	device.UpdatedBy = null.Int64From(executedUserID)
 	return
 }

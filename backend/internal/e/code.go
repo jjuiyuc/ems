@@ -60,4 +60,5 @@ const (
 	ErrBatterySettingsGen               = 60030
 	ErrBatterySettingsUpdate            = 60031
 	ErrMeterSettingsGen                 = 60036
+	ErrMeterSettingsUpdate              = 60037
 )

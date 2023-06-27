@@ -9,6 +9,7 @@ import (
 
 	"der-ems/internal/app"
 	"der-ems/internal/e"
+	"der-ems/kafka"
 )
 
 func (w *APIWorker) GetBatterySettings(c *gin.Context, uri *app.FieldURI) {
@@ -34,13 +35,17 @@ func (w *APIWorker) UpdateBatterySettings(c *gin.Context, uri *app.FieldURI, bod
 		"charging-sources":                 body.ChargingSources,
 		"reserved-for-grid-outage-percent": body.ReservedForGridOutagePercent,
 	}).Info("battery-settings-updated")
-	if err := w.Services.Settings.UpdateBatterySettings(userID.(int64), uri.GatewayID, body); err != nil {
+	dlData, err := w.Services.Settings.UpdateBatterySettings(userID.(int64), uri.GatewayID, body)
+	if err != nil {
 		if errors.Is(err, e.ErrNewAuthPermissionNotAllow) {
 			appG.Response(http.StatusForbidden, e.ErrAuthPermissionNotAllow, nil)
 			return
 		}
 		appG.Response(http.StatusInternalServerError, e.ErrBatterySettingsUpdate, nil)
 		return
+	}
+	if dlData != nil {
+		w.sendAISystemParam(dlData, uri.GatewayID)
 	}
 	appG.Response(http.StatusOK, e.Success, nil)
 }
@@ -64,10 +69,11 @@ func (w *APIWorker) UpdateMeterSettings(c *gin.Context, uri *app.FieldURI, body 
 	appG := app.Gin{c}
 	userID, _ := c.Get("userID")
 	logrus.WithFields(logrus.Fields{
-		"updated-by":                       userID,
-		"max-demand-capacity":              body.MaxDemandCapacity,
+		"updated-by":          userID,
+		"max-demand-capacity": body.MaxDemandCapacity,
 	}).Info("meter-settings-updated")
-	if err := w.Services.Settings.UpdateMeterSettings(userID.(int64), uri.GatewayID, body); err != nil {
+	dlData, err := w.Services.Settings.UpdateMeterSettings(userID.(int64), uri.GatewayID, body)
+	if err != nil {
 		if errors.Is(err, e.ErrNewAuthPermissionNotAllow) {
 			appG.Response(http.StatusForbidden, e.ErrAuthPermissionNotAllow, nil)
 			return
@@ -75,5 +81,12 @@ func (w *APIWorker) UpdateMeterSettings(c *gin.Context, uri *app.FieldURI, body 
 		appG.Response(http.StatusInternalServerError, e.ErrMeterSettingsUpdate, nil)
 		return
 	}
+	if dlData != nil {
+		w.sendAISystemParam(dlData, uri.GatewayID)
+	}
 	appG.Response(http.StatusOK, e.Success, nil)
+}
+
+func (w *APIWorker) sendAISystemParam(data []byte, gatewayUUID string) {
+	kafka.SendDataToGateways(w.Cfg, kafka.SendAISystemParamToLocalGW, data, []string{gatewayUUID})
 }

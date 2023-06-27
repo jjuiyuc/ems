@@ -19,9 +19,9 @@ import (
 // SettingsService godoc
 type SettingsService interface {
 	GetBatterySettings(executedUserID int64, gwUUID string) (getBatterySettings *GetBatterySettingsResponse, err error)
-	UpdateBatterySettings(executedUserID int64, gwUUID string, body *app.UpdateBatterySettingsBody) (err error)
+	UpdateBatterySettings(executedUserID int64, gwUUID string, body *app.UpdateBatterySettingsBody) (dlData []byte, err error)
 	GetMeterSettings(executedUserID int64, gwUUID string) (getMeterSettings *GetMeterSettingsResponse, err error)
-	UpdateMeterSettings(executedUserID int64, gwUUID string, body *app.UpdateMeterSettingsBody) (err error)
+	UpdateMeterSettings(executedUserID int64, gwUUID string, body *app.UpdateMeterSettingsBody) (dlData []byte, err error)
 }
 
 // GetBatterySettingsResponse godoc
@@ -38,9 +38,21 @@ type BatterySettings struct {
 	ReservedForGridOutagePercent int     `json:"reservedForGridOutagePercent"`
 }
 
+// BatteryDLData godoc
+type BatteryDLData struct {
+	Type   string                     `json:"type"`
+	Values GetBatterySettingsResponse `json:"values"`
+}
+
 // GetMeterSettingsResponse godoc
 type GetMeterSettingsResponse struct {
 	MaxDemandCapacity int `json:"maxDemandCapacity"`
+}
+
+// MeterDLData godoc
+type MeterDLData struct {
+	Type   string                   `json:"type"`
+	Values GetMeterSettingsResponse `json:"values"`
 }
 
 type defaultSettingsService struct {
@@ -86,7 +98,7 @@ func (s defaultSettingsService) getSettingsByGatewayUUIDAndType(tx *sql.Tx, gwUU
 	return
 }
 
-func (s defaultSettingsService) UpdateBatterySettings(executedUserID int64, gwUUID string, body *app.UpdateBatterySettingsBody) (err error) {
+func (s defaultSettingsService) UpdateBatterySettings(executedUserID int64, gwUUID string, body *app.UpdateBatterySettingsBody) (dlData []byte, err error) {
 	if !s.fieldManagement.AuthorizeGatewayUUID(nil, executedUserID, gwUUID) {
 		err = e.ErrNewAuthPermissionNotAllow
 		return
@@ -111,6 +123,11 @@ func (s defaultSettingsService) UpdateBatterySettings(executedUserID int64, gwUU
 		return
 	}
 	if err = s.updateDeviceLog(tx, device); err != nil {
+		tx.Rollback()
+		return
+	}
+	dlData, err = s.getBatteryDLData(body)
+	if err != nil {
 		tx.Rollback()
 		return
 	}
@@ -178,6 +195,26 @@ func (s defaultSettingsService) updateDeviceLog(tx *sql.Tx, device *deremsmodels
 	return
 }
 
+func (s defaultSettingsService) getBatteryDLData(body *app.UpdateBatterySettingsBody) (dlData []byte, err error) {
+	batteryDLData := &BatteryDLData{
+		Type: "batterySetting",
+		Values: GetBatterySettingsResponse{
+			ChargingSources:              body.ChargingSources,
+			ReservedForGridOutagePercent: body.ReservedForGridOutagePercent,
+		},
+	}
+	dlData, err = json.Marshal(batteryDLData)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "json.Marshal",
+			"err":       err,
+		}).Error()
+		return
+	}
+	logrus.Debug("batteryDLDataJSON: ", string(dlData))
+	return
+}
+
 func (s defaultSettingsService) GetMeterSettings(executedUserID int64, gwUUID string) (getMeterSettings *GetMeterSettingsResponse, err error) {
 	if !s.fieldManagement.AuthorizeGatewayUUID(nil, executedUserID, gwUUID) {
 		err = e.ErrNewAuthPermissionNotAllow
@@ -197,7 +234,7 @@ func (s defaultSettingsService) getMeterSettingsResponse(gwUUID string) (getMete
 	return
 }
 
-func (s defaultSettingsService) UpdateMeterSettings(executedUserID int64, gwUUID string, body *app.UpdateMeterSettingsBody) (err error) {
+func (s defaultSettingsService) UpdateMeterSettings(executedUserID int64, gwUUID string, body *app.UpdateMeterSettingsBody) (dlData []byte, err error) {
 	if !s.fieldManagement.AuthorizeGatewayUUID(nil, executedUserID, gwUUID) {
 		err = e.ErrNewAuthPermissionNotAllow
 		return
@@ -225,6 +262,11 @@ func (s defaultSettingsService) UpdateMeterSettings(executedUserID int64, gwUUID
 		tx.Rollback()
 		return
 	}
+	dlData, err = s.getMeterDLData(body)
+	if err != nil {
+		tx.Rollback()
+		return
+	}
 
 	tx.Commit()
 	return
@@ -243,5 +285,24 @@ func (s defaultSettingsService) getUpdateMeterSettingsInfo(tx *sql.Tx, executedU
 	device.PowerCapacity = float32(body.MaxDemandCapacity)
 	device.UpdatedAt = time.Now().UTC()
 	device.UpdatedBy = null.Int64From(executedUserID)
+	return
+}
+
+func (s defaultSettingsService) getMeterDLData(body *app.UpdateMeterSettingsBody) (dlData []byte, err error) {
+	meterDLData := &MeterDLData{
+		Type: "meterSetting",
+		Values: GetMeterSettingsResponse{
+			MaxDemandCapacity: body.MaxDemandCapacity,
+		},
+	}
+	dlData, err = json.Marshal(meterDLData)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "json.Marshal",
+			"err":       err,
+		}).Error()
+		return
+	}
+	logrus.Debug("meterDLDataJSON: ", string(dlData))
 	return
 }

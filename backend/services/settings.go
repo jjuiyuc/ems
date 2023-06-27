@@ -20,6 +20,7 @@ import (
 type SettingsService interface {
 	GetBatterySettings(executedUserID int64, gwUUID string) (getBatterySettings *GetBatterySettingsResponse, err error)
 	UpdateBatterySettings(executedUserID int64, gwUUID string, body *app.UpdateBatterySettingsBody) (err error)
+	GetMeterSettings(executedUserID int64, gwUUID string) (getMeterSettings *GetMeterSettingsResponse, err error)
 }
 
 // GetBatterySettingsResponse godoc
@@ -34,6 +35,11 @@ type BatterySettings struct {
 	EnergyCapacity               float32 `json:"energyCapacity"`
 	ChargingSources              string  `json:"chargingSources"`
 	ReservedForGridOutagePercent int     `json:"reservedForGridOutagePercent"`
+}
+
+// GetMeterSettingsResponse godoc
+type GetMeterSettingsResponse struct {
+	MaxDemandCapacity int `json:"maxDemandCapacity"`
 }
 
 type defaultSettingsService struct {
@@ -167,6 +173,25 @@ func (s defaultSettingsService) updateDeviceLog(tx *sql.Tx, device *deremsmodels
 			"caused-by": "s.repo.Gateway.InsertDeviceLog",
 			"err":       err,
 		}).Error()
+	}
+	return
+}
+
+func (s defaultSettingsService) GetMeterSettings(executedUserID int64, gwUUID string) (getMeterSettings *GetMeterSettingsResponse, err error) {
+	if !s.fieldManagement.AuthorizeGatewayUUID(nil, executedUserID, gwUUID) {
+		err = e.ErrNewAuthPermissionNotAllow
+		return
+	}
+	return s.getMeterSettingsResponse(gwUUID)
+}
+
+func (s defaultSettingsService) getMeterSettingsResponse(gwUUID string) (getMeterSettings *GetMeterSettingsResponse, err error) {
+	device, err := s.getSettingsByGatewayUUIDAndType(nil, gwUUID, repository.Meter)
+	if err != nil {
+		return
+	}
+	getMeterSettings = &GetMeterSettingsResponse{
+		MaxDemandCapacity: int(device.PowerCapacity),
 	}
 	return
 }

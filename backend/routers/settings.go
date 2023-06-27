@@ -44,3 +44,18 @@ func (w *APIWorker) UpdateBatterySettings(c *gin.Context, uri *app.FieldURI, bod
 	}
 	appG.Response(http.StatusOK, e.Success, nil)
 }
+
+func (w *APIWorker) GetMeterSettings(c *gin.Context, uri *app.FieldURI) {
+	appG := app.Gin{c}
+	userID, _ := c.Get("userID")
+	responseData, err := w.Services.Settings.GetMeterSettings(userID.(int64), uri.GatewayID)
+	if err != nil {
+		if errors.Is(err, e.ErrNewAuthPermissionNotAllow) {
+			appG.Response(http.StatusForbidden, e.ErrAuthPermissionNotAllow, nil)
+			return
+		}
+		appG.Response(http.StatusInternalServerError, e.ErrMeterSettingsGen, nil)
+		return
+	}
+	appG.Response(http.StatusOK, e.Success, responseData)
+}

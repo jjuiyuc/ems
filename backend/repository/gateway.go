@@ -20,6 +20,8 @@ type DeviceModelType string
 const (
 	// Battery godoc
 	Battery DeviceModelType = "Battery"
+	// Meter godoc
+	Meter DeviceModelType = "Meter"
 )
 
 // GatewayLocationWrap godoc

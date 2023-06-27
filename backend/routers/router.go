@@ -122,6 +122,7 @@ var EndpointMapping = map[PolicyWebpageObject][]string{
 	},
 	Settings: {
 		"/api/device-management/gateways/:gatewayid/battery-settings",
+		"/api/device-management/gateways/:gatewayid/meter-settings",
 	},
 }
 
@@ -244,6 +245,7 @@ func InitRouter(isCORS bool, ginMode string, enforcer *casbin.Enforcer, w *APIWo
 	// Settings
 	r.GET(EndpointMapping[Settings][0], authorizeJWT(REST), authorizePolicy(enforcer), validateURI(w.GetBatterySettings))
 	r.PUT(EndpointMapping[Settings][0], authorizeJWT(REST), authorizePolicy(enforcer), validateURIAndBody(w.UpdateBatterySettings))
+	r.GET(EndpointMapping[Settings][1], authorizeJWT(REST), authorizePolicy(enforcer), validateURI(w.GetMeterSettings))
 
 	// Casbin route
 	// apiGroup.GET("/casbin", w.getFrontendPermission(enforcer))

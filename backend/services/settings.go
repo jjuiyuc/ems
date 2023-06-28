@@ -109,6 +109,11 @@ func (s defaultSettingsService) UpdateBatterySettings(executedUserID int64, gwUU
 		return
 	}
 
+	if err = s.matchDownlinkRules(tx, gwUUID); err != nil {
+		tx.Rollback()
+		return
+	}
+
 	device, err := s.getUpdateBatterySettingsInfo(tx, executedUserID, gwUUID, body)
 	if err != nil || device == nil {
 		tx.Rollback()
@@ -133,6 +138,23 @@ func (s defaultSettingsService) UpdateBatterySettings(executedUserID int64, gwUU
 	}
 
 	tx.Commit()
+	return
+}
+
+func (s defaultSettingsService) matchDownlinkRules(tx *sql.Tx, gwUUID string) (err error) {
+	gateway, err := s.repo.Gateway.GetGatewayByGatewayUUID(tx, gwUUID)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.Gateway.GetGatewayByGatewayUUID",
+			"err":       err,
+		}).Error()
+		return
+	}
+
+	if !s.repo.Gateway.MatchDownlinkRules(gateway) {
+		logrus.WithField("gateway-uuid", gateway.UUID).Warning("not-match-downlink-rules")
+		err = e.ErrNewFieldIsDisabled
+	}
 	return
 }
 
@@ -242,6 +264,11 @@ func (s defaultSettingsService) UpdateMeterSettings(executedUserID int64, gwUUID
 
 	tx, err := models.GetDB().BeginTx(context.Background(), nil)
 	if err != nil {
+		return
+	}
+
+	if err = s.matchDownlinkRules(tx, gwUUID); err != nil {
+		tx.Rollback()
 		return
 	}
 

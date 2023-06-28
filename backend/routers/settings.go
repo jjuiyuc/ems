@@ -41,7 +41,15 @@ func (w *APIWorker) UpdateBatterySettings(c *gin.Context, uri *app.FieldURI, bod
 			appG.Response(http.StatusForbidden, e.ErrAuthPermissionNotAllow, nil)
 			return
 		}
-		appG.Response(http.StatusInternalServerError, e.ErrBatterySettingsUpdate, nil)
+
+		var code int
+		switch err {
+		case e.ErrNewFieldIsDisabled:
+			code = e.ErrFieldIsDisabled
+		default:
+			code = e.ErrBatterySettingsUpdate
+		}
+		appG.Response(http.StatusInternalServerError, code, nil)
 		return
 	}
 	if dlData != nil {
@@ -78,7 +86,15 @@ func (w *APIWorker) UpdateMeterSettings(c *gin.Context, uri *app.FieldURI, body 
 			appG.Response(http.StatusForbidden, e.ErrAuthPermissionNotAllow, nil)
 			return
 		}
-		appG.Response(http.StatusInternalServerError, e.ErrMeterSettingsUpdate, nil)
+
+		var code int
+		switch err {
+		case e.ErrNewFieldIsDisabled:
+			code = e.ErrFieldIsDisabled
+		default:
+			code = e.ErrMeterSettingsUpdate
+		}
+		appG.Response(http.StatusInternalServerError, code, nil)
 		return
 	}
 	if dlData != nil {

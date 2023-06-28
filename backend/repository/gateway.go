@@ -71,6 +71,21 @@ type DLDeviceWrap struct {
 	ExtraInfo       null.JSON `json:"extraInfo"`
 }
 
+// BatteryWrap godoc
+type BatteryWrap struct {
+	DeviceModelName string    `json:"deviceModelName"`
+	PowerCapacity   float32   `json:"powerCapacity"`
+	ExtraInfo       null.JSON `json:"extraInfo"`
+}
+
+// BatteryExtraInfo godoc
+type BatteryExtraInfo struct {
+	Voltage                      float32 `json:"voltage"`
+	EnergyCapacity               float32 `json:"energyCapacity"`
+	ChargingSources              string  `json:"chargingSources"`
+	ReservedForGridOutagePercent int     `json:"reservedForGridOutagePercent"`
+}
+
 // GatewayRepository godoc
 type GatewayRepository interface {
 	InsertGatewayLog(tx *sql.Tx, gatewayLog *deremsmodels.GatewayLog) error
@@ -90,6 +105,7 @@ type GatewayRepository interface {
 	GetDeviceModels() ([]*deremsmodels.DeviceModel, error)
 	GetDeviceMappingByGatewayID(gwID int64) (devices []*DeviceWrap, err error)
 	GetDLDeviceMappingByGatewayID(gwID int64) (devices []*DLDeviceWrap, err error)
+	GetBatteryMappingByGatewayUUID(gwUUID string) (battery *BatteryWrap, err error)
 	MatchDownlinkRules(gateway *deremsmodels.Gateway) bool
 	IsGatewayBoundField(gateway *deremsmodels.Gateway) bool
 }
@@ -276,6 +292,25 @@ func (repo defaultGatewayRepository) GetDLDeviceMappingByGatewayID(gwID int64) (
 		qm.InnerJoin("device_model AS dm2 ON d.model_id = dm2.id"),
 		qm.Where("d.deleted_at IS NULL AND d.gw_id = ?", gwID),
 	).Bind(context.Background(), models.GetDB(), &devices)
+	return
+}
+
+func (repo defaultGatewayRepository) GetBatteryMappingByGatewayUUID(gwUUID string) (battery *BatteryWrap, err error) {
+	devices := make([]*BatteryWrap, 0)
+	err = deremsmodels.NewQuery(
+		qm.Select(
+			"dm.name AS device_model_name",
+			"d.power_capacity AS power_capacity",
+			"d.extra_info AS extra_info",
+		),
+		qm.From("device AS d"),
+		qm.InnerJoin("device_model AS dm ON d.model_id = dm.id"),
+		qm.InnerJoin("gateway AS g ON g.uuid = ? AND d.gw_id = g.id", gwUUID),
+		qm.Where("d.deleted_at IS NULL AND dm.type = ?", Battery),
+	).Bind(context.Background(), models.GetDB(), &devices)
+	if err == nil && len(devices) > 0 {
+		battery = devices[0]
+	}
 	return
 }
 

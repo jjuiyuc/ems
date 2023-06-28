@@ -30,14 +30,6 @@ type GetBatterySettingsResponse struct {
 	ReservedForGridOutagePercent int    `json:"reservedForGridOutagePercent"`
 }
 
-// BatterySettings godoc
-type BatterySettings struct {
-	Voltage                      float32 `json:"voltage"`
-	EnergyCapacity               float32 `json:"energyCapacity"`
-	ChargingSources              string  `json:"chargingSources"`
-	ReservedForGridOutagePercent int     `json:"reservedForGridOutagePercent"`
-}
-
 // BatteryDLData godoc
 type BatteryDLData struct {
 	Type   string                     `json:"type"`
@@ -163,7 +155,7 @@ func (s defaultSettingsService) getUpdateBatterySettingsInfo(tx *sql.Tx, execute
 	if err != nil {
 		return
 	}
-	var batterySettings BatterySettings
+	var batterySettings repository.BatteryExtraInfo
 	if err = json.Unmarshal(device.ExtraInfo.JSON, &batterySettings); err != nil {
 		logrus.WithFields(logrus.Fields{
 			"caused-by": "json.Unmarshal",

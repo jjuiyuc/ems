@@ -20,10 +20,9 @@ const defaultPolicyConfig = {
 }
 const defaultPolicyTime = {
     preNotifiedOutagePeriod: [
-        { startDate: "", endDate: "", },
+        { startDate: "", endDate: "", type: "" },
     ]
 }
-
 
 export default function PowerOutageCard(props) {
     const

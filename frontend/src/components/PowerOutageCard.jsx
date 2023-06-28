@@ -20,21 +20,44 @@ const defaultPolicyConfig = {
 }
 const defaultPolicyTime = {
     preNotifiedOutagePeriod: [
-        { startDate: "", endDate: "" },
+        { startDate: "", endDate: "", },
     ]
 }
+
+
 export default function PowerOutageCard(props) {
-    const { data } = props
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
         pageT = (string, params) => t("settings." + string, params)
 
+    const powerOutageTypes = [
+        {
+            "id": 1,
+            "name": "advanceBlackout"
+        },
+        {
+            "id": 2,
+            "name": "evCharge"
+        }
+    ]
     const
         [policyConfig, setPolicyConfig] = useState(defaultPolicyConfig),
         [policyTime, setPolicyTime] = useState(defaultPolicyTime),
         [startDate, setStartDate] = useState(null),
-        [endDate, setEndDate] = useState(null)
+        [endDate, setEndDate] = useState(null),
+        [type, setType] = useState(null),
+        [typeDict, setTypeDict] = useState({})
+
+    const generateTypeDict = () => {
+        setTypeDict(powerOutageTypes.reduce((acc, cur) => {
+            acc[cur.id] = cur.name
+            return acc
+        }, {}) || {})
+    }
+    useEffect(() => {
+        generateTypeDict()
+    }, [])
     return <div className="card mb-8">
         <div className="flex justify-between sm:col-span-2 items-center">
             <div className="flex items-center">
@@ -69,9 +92,8 @@ export default function PowerOutageCard(props) {
                                         className="time-range-picker grid
                                         grid-cols-settings-input-col5 gap-x-4 items-center mt-4">
                                         <DatePeriodPicker
+                                            {...{ startDate, endDate, type, setType, typeDict }}
                                             key={index}
-                                            startDate={startDate}
-                                            endDate={endDate}
                                             setStartDate={(date) => {
                                                 const newPolicyTime = {
                                                     ...policyTime,

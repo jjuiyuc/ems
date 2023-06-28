@@ -106,7 +106,6 @@ export default connect(null, mapDispatch)(function EditGroup(props) {
                 <TextField
                     id="edit-name"
                     label={commonT("groupName")}
-                    onChange={changeGroupName}
                     value={groupName || ""}
                     onChange={changeGroupName}
                     error={isGroupNameError}

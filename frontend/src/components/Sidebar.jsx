@@ -3,6 +3,7 @@ import { Link, NavLink } from "react-router-dom"
 import React from "react"
 import { Fade, Tooltip } from "@mui/material"
 import { useTranslation } from "react-multi-lang"
+import AdvancedSettings from "@mui/icons-material/SettingsSuggest"
 
 import { ReactComponent as AccountGroup } from "../assets/icons/group.svg"
 import { ReactComponent as AccountUser } from "../assets/icons/user.svg"
@@ -16,7 +17,6 @@ import { ReactComponent as Logo } from "../assets/images/logo.svg"
 import { ReactComponent as LogoWithName } from "../assets/images/logoWithName.svg"
 import { ReactComponent as Resource } from "../assets/icons/resource.svg"
 import { ReactComponent as Settings } from "../assets/icons/settings.svg"
-import { ReactComponent as AdvancedSettings } from "../assets/icons/settings.svg"
 import { ReactComponent as Timer } from "../assets/icons/timer.svg"
 
 const navs = {
@@ -41,7 +41,7 @@ const navs = {
     settings:
         { icon: <Settings />, path: "settings", text: "settings" },
     advancedSettings:
-        { icon: <AdvancedSettings />, path: "advanced-settings", text: "advancedSettings" }
+        { icon: <AdvancedSettings fontSize="medium" />, path: "advanced-settings", text: "advancedSettings" }
 }
 
 function Sidebar(props) {

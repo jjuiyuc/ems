@@ -42,3 +42,18 @@ var UtGateway = &deremsmodels.Gateway{
 	LocationID: null.Int64From(1),
 	Enable:     null.BoolFrom(true),
 }
+
+var UtBatteryDevice = &deremsmodels.Device{
+	ID:            4,
+	ModbusID:      251,
+	ModuleID:      1,
+	ModelID:       5,
+	GWID:          null.Int64From(1),
+	PowerCapacity: 20,
+	ExtraInfo: null.JSONFrom([]byte(`{
+		"voltage": 51.2,
+		"energyCapacity": 30,
+		"chargingSources": "Solar + Grid",
+		"reservedForGridOutagePercent": 20
+		}`)),
+}

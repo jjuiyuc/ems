@@ -44,6 +44,8 @@ backend-test-job:
     - cat scripts/der-ems-group.sql | mysql --user=ubiik --password=testing123 der_ems
     - cat scripts/der-ems-webpage.sql | mysql --user=ubiik --password=testing123 der_ems
     - cat scripts/der-ems-group-type-webpage-right.sql | mysql --user=ubiik --password=testing123 der_ems
+    - cat scripts/der-ems-device-module.sql | mysql --user=ubiik --password=testing123 der_ems
+    - cat scripts/der-ems-device-model.sql | mysql --user=ubiik --password=testing123 der_ems
     - make go-cover
     - go run github.com/t-yuki/gocover-cobertura < cover.out > coverage.xml
     - sed -i 's;filename=\"gitlab.com/ubiik/ems/der-ems/;filename=\";g' coverage.xml

@@ -76,6 +76,10 @@ func SeedUtLocationAndGateway(db *sql.DB) (err error) {
 	if err != nil {
 		return
 	}
+	_, err = db.Exec("truncate table device")
+	if err != nil {
+		return
+	}
 	_, err = db.Exec("truncate table gateway")
 	if err != nil {
 		return
@@ -95,6 +99,11 @@ func SeedUtLocationAndGateway(db *sql.DB) (err error) {
 	}
 	gateway := testdata.UtGateway
 	err = gateway.Insert(db, boil.Infer())
+	if err != nil {
+		return
+	}
+	batteryDevice := testdata.UtBatteryDevice
+	err = batteryDevice.Insert(db, boil.Infer())
 	return
 }
 

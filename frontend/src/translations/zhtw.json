@@ -236,7 +236,7 @@
         "nameLength":"請輸入介於1到20個字",
         "passwordFormat": "您輸入的密碼不符合密碼原則的要求，須包含8位以上英文字母及數字。",
         "passwordIncorrect": "密碼錯誤，請重新輸入。",
-        "passwordLength":"請輸入8到50個字元，須含英文字母及數字",
+        "passwordLength":"請輸入8個以上字元，須含英文字母及數字",
         "passwordNotMatch": "密碼不一致，請重新輸入。",
         "passwordUpdateError":"密碼更新失敗",
         "passwordTokenError": "該重設密碼連結已失效",

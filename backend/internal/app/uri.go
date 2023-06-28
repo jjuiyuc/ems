@@ -2,7 +2,7 @@ package app
 
 // FieldURI godoc
 type FieldURI struct {
-	GatewayID string `uri:"gatewayid" binding:"required"`
+	GatewayID string `uri:"gwid" binding:"required"`
 }
 
 // GroupURI godoc

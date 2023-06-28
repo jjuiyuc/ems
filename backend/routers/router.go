@@ -107,10 +107,10 @@ var EndpointMapping = map[PolicyWebpageObject][]string{
 	FieldManagement: {
 		"/api/device-management/gateways",
 		"/api/device-management/devices/models",
-		"/api/device-management/gateways/:gatewayid",
-		"/api/device-management/gateways/:gatewayid/field-state",
-		"/api/device-management/gateways/:gatewayid/sync-device-settings",
-		"/api/device-management/gateways/:gatewayid/account-groups",
+		"/api/device-management/gateways/:gwid",
+		"/api/device-management/gateways/:gwid/field-state",
+		"/api/device-management/gateways/:gwid/sync-device-settings",
+		"/api/device-management/gateways/:gwid/account-groups",
 	},
 	AccountManagementGroup: {
 		"/api/account-management/groups",
@@ -121,8 +121,8 @@ var EndpointMapping = map[PolicyWebpageObject][]string{
 		"/api/account-management/users/:userid",
 	},
 	Settings: {
-		"/api/device-management/gateways/:gatewayid/battery-settings",
-		"/api/device-management/gateways/:gatewayid/meter-settings",
+		"/api/device-management/gateways/:gwid/battery-settings",
+		"/api/device-management/gateways/:gwid/meter-settings",
 	},
 }
 

@@ -87,8 +87,8 @@ type DeviceSettingsData struct {
 type defaultFieldManagementService struct {
 	repo              *repository.Repository
 	accountManagement AccountManagementService
-	Weather           WeatherService
-	Billing           BillingService
+	weather           WeatherService
+	billing           BillingService
 }
 
 // NewFieldManagementService godoc
@@ -350,11 +350,11 @@ func (s defaultFieldManagementService) getDeviceSettings(gateway *deremsmodels.G
 		return
 	}
 
-	weatherData, err := s.Weather.GetWeatherDataByLocation(location.WeatherLat.Float32, location.WeatherLng.Float32)
+	weatherData, err := s.weather.GetWeatherDataByLocation(location.WeatherLat.Float32, location.WeatherLng.Float32)
 	if err != nil {
 		return
 	}
-	billingData, err := s.Billing.GenerateBillingParams(gateway, true)
+	billingData, err := s.billing.GenerateBillingParams(gateway, true)
 	if err != nil {
 		return
 	}
@@ -362,7 +362,7 @@ func (s defaultFieldManagementService) getDeviceSettings(gateway *deremsmodels.G
 	if err != nil {
 		return
 	}
-	locationData, err := s.Weather.GenerateGPSLocations()
+	locationData, err := s.weather.GenerateGPSLocations()
 	if err != nil {
 		return
 	}

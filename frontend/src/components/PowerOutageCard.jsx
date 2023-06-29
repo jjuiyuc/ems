@@ -8,31 +8,16 @@ import { apiCall } from "../utils/api"
 import AddPowerOutagePeriod from "./AddPowerOutagePeriod"
 import Table from "./DataTable"
 
-import { ReactComponent as AddIcon } from "../assets/icons/add.svg"
-import { ReactComponent as DeleteIcon } from "../assets/icons/delete.svg"
+import { ReactComponent as DeleteIcon } from "../assets/icons/trash_solid.svg"
 import { ReactComponent as PowerOutageIcon } from "../assets/icons/power_outage.svg"
 
-const maxLength = 5
-
-const defaultPolicyConfig = {
-    preNotifiedOutagePeriod: {
-        name: "preNotifiedOutagePeriod",
-        tempName: "preNotifiedOutagePeriod",
-        extensible: true,
-        deletable: false
-    }
-}
-const defaultPolicyTime = {
-    preNotifiedOutagePeriod: [
-        { startDate: "", endDate: "", type: "" },
-    ]
-}
 
 export default function PowerOutageCard(props) {
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
         pageT = (string, params) => t("settings." + string, params)
+
     const data = [
         {
             "id": 1,
@@ -47,23 +32,7 @@ export default function PowerOutageCard(props) {
             "endTime": moment("2023-06-22T09:00:00.00Z").format("YYYY/MM/DD HH:mm")
         }
     ]
-    const powerOutageTypes = [
-        {
-            "id": 1,
-            "name": "advanceBlackout"
-        },
-        {
-            "id": 2,
-            "name": "evCharge"
-        }
-    ]
     const
-        [policyConfig, setPolicyConfig] = useState(defaultPolicyConfig),
-        [policyTime, setPolicyTime] = useState(defaultPolicyTime),
-        [startDate, setStartDate] = useState(null),
-        [endDate, setEndDate] = useState(null),
-        [type, setType] = useState(null),
-        [typeDict, setTypeDict] = useState({}),
         [openDelete, setOpenDelete] = useState(false),
         [row, setRow] = useState(null),
         [loading, setLoading] = useState(false)
@@ -78,7 +47,7 @@ export default function PowerOutageCard(props) {
             center: true,
             name: pageT("startDate"),
             selector: row => row.startTime,
-            grow: 0.8
+            grow: 0.6
 
         },
         {
@@ -86,14 +55,14 @@ export default function PowerOutageCard(props) {
             center: true,
             name: pageT("endDate"),
             selector: row => row.endTime,
-            grow: 0.8
+            grow: 0.6
         },
         {
             cell: row => <span className="font-mono">{pageT(`${row.type}`)}</span>,
             center: true,
             name: pageT("type"),
             selector: row => row.type,
-            grow: 0.6
+            grow: 0.5
 
         },
         {
@@ -104,15 +73,7 @@ export default function PowerOutageCard(props) {
             grow: 0.2
         }
     ]
-    const generateTypeDict = () => {
-        setTypeDict(powerOutageTypes.reduce((acc, cur) => {
-            acc[cur.id] = cur.name
-            return acc
-        }, {}) || {})
-    }
-    useEffect(() => {
-        generateTypeDict()
-    }, [])
+
     return <div className="card mb-8">
         <div className="flex justify-between sm:col-span-2 items-center">
             <div className="flex items-center mb-9">

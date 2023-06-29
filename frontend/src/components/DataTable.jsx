@@ -11,6 +11,5 @@ export default function Table(props) {
         {...props}
         customStyles={DATATABLE_STYLES}
         noDataComponent={tableT("noDataMsg")}
-        pagination={true}
         paginationRowsPerPageOptions={[10, 25, 50, 100]} />
 }

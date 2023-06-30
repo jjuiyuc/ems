@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"time"
 
 	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
@@ -106,6 +107,7 @@ type GatewayRepository interface {
 	GetDeviceMappingByGatewayID(gwID int64) (devices []*DeviceWrap, err error)
 	GetDLDeviceMappingByGatewayID(gwID int64) (devices []*DLDeviceWrap, err error)
 	GetBatteryMappingByGatewayUUID(gwUUID string) (battery *BatteryWrap, err error)
+	GetPowerOutagePeriods(gwUUID string) ([]*deremsmodels.PowerOutagePeriod, error)
 	MatchDownlinkRules(gateway *deremsmodels.Gateway) bool
 	IsGatewayBoundField(gateway *deremsmodels.Gateway) bool
 }
@@ -312,6 +314,12 @@ func (repo defaultGatewayRepository) GetBatteryMappingByGatewayUUID(gwUUID strin
 		battery = devices[0]
 	}
 	return
+}
+
+func (repo defaultGatewayRepository) GetPowerOutagePeriods(gwUUID string) ([]*deremsmodels.PowerOutagePeriod, error) {
+	return deremsmodels.PowerOutagePeriods(
+		qm.InnerJoin("gateway AS g ON g.uuid = ? AND g.id = power_outage_period.gw_id", gwUUID),
+		qm.Where("power_outage_period.deleted_at IS NULL AND power_outage_period.ended_at > ?", time.Now().UTC())).All(repo.db)
 }
 
 func (repo defaultGatewayRepository) MatchDownlinkRules(gateway *deremsmodels.Gateway) bool {

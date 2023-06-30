@@ -106,3 +106,18 @@ func (w *APIWorker) UpdateMeterSettings(c *gin.Context, uri *app.FieldURI, body 
 func (w *APIWorker) sendAISystemParam(data []byte, gatewayUUID string) {
 	kafka.SendDataToGateways(w.Cfg, kafka.SendAISystemParamToLocalGW, data, []string{gatewayUUID})
 }
+
+func (w *APIWorker) GetPowerOutagePeriods(c *gin.Context, uri *app.FieldURI) {
+	appG := app.Gin{c}
+	userID, _ := c.Get("userID")
+	responseData, err := w.Services.Settings.GetPowerOutagePeriods(userID.(int64), uri.GatewayID)
+	if err != nil {
+		if errors.Is(err, e.ErrNewAuthPermissionNotAllow) {
+			appG.Response(http.StatusForbidden, e.ErrAuthPermissionNotAllow, nil)
+			return
+		}
+		appG.Response(http.StatusInternalServerError, e.ErrPowerOutagePeriodsGen, nil)
+		return
+	}
+	appG.Response(http.StatusOK, e.Success, responseData)
+}

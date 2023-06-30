@@ -22,6 +22,7 @@ type SettingsService interface {
 	UpdateBatterySettings(executedUserID int64, gwUUID string, body *app.UpdateBatterySettingsBody) (dlData []byte, err error)
 	GetMeterSettings(executedUserID int64, gwUUID string) (getMeterSettings *GetMeterSettingsResponse, err error)
 	UpdateMeterSettings(executedUserID int64, gwUUID string, body *app.UpdateMeterSettingsBody) (dlData []byte, err error)
+	GetPowerOutagePeriods(executedUserID int64, gwUUID string) (getPowerOutagePeriods *GetPowerOutagePeriodsResponse, err error)
 }
 
 // GetBatterySettingsResponse godoc
@@ -45,6 +46,20 @@ type GetMeterSettingsResponse struct {
 type MeterDLData struct {
 	Type   string                   `json:"type"`
 	Values GetMeterSettingsResponse `json:"values"`
+}
+
+// GetPowerOutagePeriodsResponse godoc
+type GetPowerOutagePeriodsResponse struct {
+	Periods []PowerOutagePeriodInfo `json:"periods"`
+}
+
+// PowerOutagePeriodInfo godoc
+type PowerOutagePeriodInfo struct {
+	ID        int64     `json:"id"`
+	Type      string    `json:"type"`
+	StartTime time.Time `json:"startTime"`
+	EndTime   time.Time `json:"endTime"`
+	Ongoing   bool      `json:"ongoing"`
 }
 
 type defaultSettingsService struct {
@@ -323,5 +338,40 @@ func (s defaultSettingsService) getMeterDLData(body *app.UpdateMeterSettingsBody
 		return
 	}
 	logrus.Debug("meterDLDataJSON: ", string(dlData))
+	return
+}
+
+func (s defaultSettingsService) GetPowerOutagePeriods(executedUserID int64, gwUUID string) (getPowerOutagePeriods *GetPowerOutagePeriodsResponse, err error) {
+	if !s.fieldManagement.AuthorizeGatewayUUID(nil, executedUserID, gwUUID) {
+		err = e.ErrNewAuthPermissionNotAllow
+		return
+	}
+	return s.getPowerOutagePeriodsResponse(gwUUID)
+}
+
+func (s defaultSettingsService) getPowerOutagePeriodsResponse(gwUUID string) (getPowerOutagePeriods *GetPowerOutagePeriodsResponse, err error) {
+	periods, err := s.repo.Gateway.GetPowerOutagePeriods(gwUUID)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.Gateway.GetPowerOutagePeriods",
+			"err":       err,
+		}).Error()
+		return
+	}
+	var getPeriods []PowerOutagePeriodInfo
+	now := time.Now().UTC()
+	for _, period := range periods {
+		powerOutagePeriodInfo := PowerOutagePeriodInfo{
+			ID:        period.ID,
+			Type:      period.Type,
+			StartTime: period.StartedAt,
+			EndTime:   period.EndedAt,
+			Ongoing:   period.StartedAt.Before(now),
+		}
+		getPeriods = append(getPeriods, powerOutagePeriodInfo)
+	}
+	getPowerOutagePeriods = &GetPowerOutagePeriodsResponse{
+		Periods: getPeriods,
+	}
 	return
 }

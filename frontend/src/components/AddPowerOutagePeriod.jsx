@@ -2,7 +2,7 @@ import { Button, DialogActions, Divider, InputAdornment, IconButton, MenuItem, T
 import AddIcon from "@mui/icons-material/Add"
 import { connect } from "react-redux"
 import { useTranslation } from "react-multi-lang"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 
 import { apiCall } from "../utils/api"
 
@@ -17,7 +17,7 @@ const mapDispatch = dispatch => ({
         dispatch({ type: "snackbarMsg/updateSnackbarMsg", payload: value }),
 
 })
-const maxLength = 5
+const maxLength = 3
 
 const defaultPolicyConfig = {
     preNotifiedOutagePeriod: {

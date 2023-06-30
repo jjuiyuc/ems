@@ -59,6 +59,6 @@ const (
 	ErrDeviceSettingsSync               = 60023
 	ErrBatterySettingsGen               = 60030
 	ErrBatterySettingsUpdate            = 60031
-	ErrMeterSettingsGen                 = 60036
-	ErrMeterSettingsUpdate              = 60037
+	ErrMeterSettingsGen                 = 60032
+	ErrMeterSettingsUpdate              = 60033
 )

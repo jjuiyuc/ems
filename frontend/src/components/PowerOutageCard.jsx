@@ -6,6 +6,7 @@ import moment from "moment"
 import { apiCall } from "../utils/api"
 
 import AddPowerOutagePeriod from "./AddPowerOutagePeriod"
+import DeletePeriod from "./DeletePeriod"
 import Table from "./DataTable"
 
 import { ReactComponent as DeleteIcon } from "../assets/icons/trash_solid.svg"
@@ -94,5 +95,6 @@ export default function PowerOutageCard(props) {
                 theme="dark"
             />
         </div>
+        <DeletePeriod{...{ row, openDelete, setOpenDelete }} />
     </div>
 }

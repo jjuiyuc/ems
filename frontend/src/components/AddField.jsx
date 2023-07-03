@@ -1,6 +1,6 @@
 import {
-    Button, Checkbox, DialogActions, Divider, FormControl, FormControlLabel,
-    FormGroup, MenuItem, Switch, TextField
+    Button, Checkbox, DialogActions, Divider, FormControlLabel, FormGroup,
+    MenuItem, Switch, TextField
 } from "@mui/material"
 import AddIcon from "@mui/icons-material/Add"
 import { useTranslation } from "react-multi-lang"
@@ -193,15 +193,7 @@ export default function AddField({
             fullWidth={fullWidth}
             maxWidth={maxWidth}>
             <Divider variant="middle" />
-            <FormControl sx={{
-                display: "flex",
-                flexDirection: "column",
-                margin: "auto",
-                width: "fit-content",
-                mt: 2,
-                minWidth: 120
-            }}
-                fullWidth={true}>
+            <div className="flex flex-col m-auto mt-4 min-w-49 w-fit">
                 <div className="grid grid-cols-1fr-auto items-center mb-8">
                     <TextField
                         sx={{ marginBottom: 0 }}
@@ -302,6 +294,18 @@ export default function AddField({
                         )}
                     </FormGroup>
                 </div>
+                {/* <TextField
+                    id="d-m-"
+                    select
+                    label={formT("deviceModel")}
+                    onChange={handleChangeDeviceModel}
+                    // error={}
+                    value={deviceModel}>
+                    {deviceModelOptions.map(({ id, name }) =>
+                        <MenuItem key={"option-d-m-" + id} value={id}>
+                            {deviceModel.includes(name)}
+                        </MenuItem>)}
+                </TextField> */}
                 <h5 className="mb-5  ml-2">{formT("deviceModel")}</h5>
                 <div className="border-gray-400 border rounded-xl
                     grid grid-cols-2 gap-2 items-center mb-4 p-4">
@@ -395,7 +399,7 @@ export default function AddField({
                     <p className="ml-1 mr-2">{formT("enableField")}</p>
                     <Switch />
                 </div>
-            </FormControl>
+            </div>
             <Divider variant="middle" />
             <DialogActions sx={{ margin: "1rem 0.8rem 1rem 0" }}>
                 <Button onClick={() => { setOpenAdd(false) }}

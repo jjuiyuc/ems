@@ -321,6 +321,7 @@
     },
     "settings":{
         "aboveBaseline":"Above Baseline",
+        "addPowerOutagePeriod":"Add Power Outage Period",
         "addRatePeriod":"Add Rate Period",
         "addDateRange":"Add Date Range",
         "addTimeRange":"Add Time Range",

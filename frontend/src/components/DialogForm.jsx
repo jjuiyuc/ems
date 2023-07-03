@@ -1,5 +1,17 @@
 import { Dialog, DialogTitle } from "@mui/material"
-import { useState } from "react"
+import { styled } from "@mui/material/styles"
+
+import palette from "../configs/palette.json"
+
+const CustomDialog = styled(Dialog)(({ theme }) => ({
+    "& .MuiPaper-root": {
+        color: theme.palette.gray[200],
+        backgroundColor: theme.palette.gray[900],
+        backgroundImage: "none",
+        border: "2px solid" + theme.palette.gray[400],
+        boxShadow: "0px 2px 6px 2px rgba(0,0,0,0.14), 0px 2px 8px 2px rgba(96,96,96,0.4)"
+    },
+}))
 
 export default function DialogForm({
     children = null,
@@ -10,9 +22,8 @@ export default function DialogForm({
     setOpen,
     closeOutside = false
 }) {
-
     return <>
-        <Dialog
+        <CustomDialog
             fullWidth={fullWidth}
             maxWidth={maxWidth}
             open={open}
@@ -22,6 +33,6 @@ export default function DialogForm({
                 {dialogTitle}
             </DialogTitle>
             {children}
-        </Dialog>
+        </CustomDialog>
     </>
 }

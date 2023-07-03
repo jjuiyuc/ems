@@ -68,7 +68,7 @@ export default function SubDeviceForm(props) {
         }
     return <>
         <h5 className="mb-5 ml-2">{title}</h5>
-        {mainDeviceType.value === "hybridInverter"
+        {mainDeviceType.includes("Hybrid-Inverter")
             ? <>
                 {subDeviceData.map((item, i) => (
                     <>
@@ -103,7 +103,7 @@ export default function SubDeviceForm(props) {
                 ))}
             </>
             : null}
-        {mainDeviceType.value === "inverter"
+        {mainDeviceType.includes("Inverter")
             ? <>
                 <TextField
                     key={"i-sub-d-t-"}

@@ -71,7 +71,7 @@ export default function FieldManagement() {
     return <>
         <h1 className="mb-9">{commonT("fieldManagement")}</h1>
         <div className="mb-9">
-            {/* <AddField /> */}
+            <AddField />
         </div>
         <Table
             columns={columns}

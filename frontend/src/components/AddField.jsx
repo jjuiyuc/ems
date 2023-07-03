@@ -1,6 +1,6 @@
 import {
-    Button, DialogActions, Divider, FormControl, InputAdornment, ListItem,
-    MenuItem, Switch, TextField
+    Button, Checkbox, DialogActions, Divider, FormControl, FormControlLabel,
+    FormGroup, MenuItem, Switch, TextField
 } from "@mui/material"
 import AddIcon from "@mui/icons-material/Add"
 import { useTranslation } from "react-multi-lang"
@@ -12,13 +12,8 @@ import ExtraDeviceInfoForm from "../components/ExtraDeviceInfoForm"
 import SubDeviceForm from "../components/SubDeviceForm"
 
 export default function AddField({
-    dialogTitle = "",
-    locationInfo,
-    fieldDevices,
-    deviceInfo,
     extraDeviceInfo,
-    subdevice,
-    closeOutside = false
+    subdevice
 }) {
 
     const
@@ -44,39 +39,57 @@ export default function AddField({
                 label: "twoSection",
             }
         ],
-        deviceTypes = [
+        apiData = [
             {
-                value: "hybridInverter",
-                label: "hybridInverter",
+                "id": 1,
+                "name": "LXP-12K US-Luxpower Hybrid-Inverter",
+                "type": "Hybrid-Inverter"
             },
             {
-                value: "inverter",
-                label: "inverter",
+                "id": 2,
+                "name": "LXP-5K EU-Luxpower Hybrid-Inverter",
+                "type": "Hybrid-Inverter"
             },
             {
-                value: "meter",
-                label: "meter",
+                "id": 3,
+                "name": "CMO336 CM Meter",
+                "type": "Meter"
             },
             {
-                value: "pv",
-                label: "pv",
+                "id": 4,
+                "name": "D1K330H3A URE PV",
+                "type": "PV"
             },
             {
-                value: "battery",
-                label: "battery",
+                "id": 5,
+                "name": "L051100-A UZ-Energy Battery",
+                "type": "Battery"
             },
             {
-                value: "pcs",
-                label: "pcs",
-            }
-        ],
-
-        deviceModel = [
+                "id": 6,
+                "name": "M20A-220 Delta Inverter",
+                "type": "Inverter"
+            },
             {
-                value: "LXP-12K US-Luxpower Hybrid-Inverter",
-                label: "LXP-12K US-Luxpower Hybrid-Inverter"
-            }
-        ]
+                "id": 7,
+                "name": "SPM-3 Shihlin Meter",
+                "type": "Meter"
+            },
+            {
+                "id": 8,
+                "name": "D2K340H7A URE PV",
+                "type": "PV"
+            },
+            {
+                "id": 9,
+                "name": "PR2116 Poweroad Battery",
+                "type": "Battery"
+            },
+            {
+                "id": 10,
+                "name": "PWS2-30M-EX Sinexcel PCS",
+                "type": "PCS"
+            }]
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
@@ -90,7 +103,8 @@ export default function AddField({
         [address, setAddress] = useState(""),
         [lat, setLat] = useState(""),
         [lng, setLng] = useState(""),
-        [deviceType, setDeviceType] = useState(""),
+        [deviceType, setDeviceType] = useState([]),
+        [deviceModel, setDeviceModel] = useState([]),
         [gridOutagePercent, setGridOutagePercent] = useState(""),
         [chargingSource, setChargingSource] = useState([
             {
@@ -108,6 +122,53 @@ export default function AddField({
         [maxWidth, setMaxWidth] = useState("lg"),
         [openAdd, setOpenAdd] = useState(false)
     const
+        deviceTypeOptions = useMemo(() => {
+            const filteredData = apiData.filter(({ type }) => type !== "PV")
+            const allUniqueTypes = [...new Set(filteredData.map(({ type }) => type))]
+            const typeOptions = allUniqueTypes.map((type) => {
+                if (type === 'Hybrid-Inverter') {
+                    const otherSelected = deviceType.some((type) => type !== 'Hybrid-Inverter')
+                    if (otherSelected) return { type, disabled: true }
+                } else {
+                    const hybridInverterSelected = deviceType.includes('Hybrid-Inverter')
+                    if (hybridInverterSelected) return { type, disabled: true }
+                }
+                return { type, disabled: false }
+            })
+            return typeOptions
+        }, [apiData, deviceType]),
+        deviceModelOptions = useMemo(() => {
+            const filteredData = apiData.filter(({ type }) => deviceType.includes(type))
+            return filteredData
+        }, [apiData, deviceType])
+    console.log(deviceModel)
+    const
+        handleChange = (e) => {
+            const { value } = e.target
+            const alreadyChecked = deviceType.includes(value)
+
+            const newDeviceType = alreadyChecked ?
+                deviceType.filter((v) => v !== value)
+                : [...deviceType, value]
+            setDeviceType(newDeviceType)
+
+            if (alreadyChecked) {
+                const newDeviceModel = deviceModel.filter((deviceId) => {
+                    const device = apiData.find(({ id }) => id === deviceId)
+                    return newDeviceType.includes(device.type)
+                })
+                setDeviceModel(newDeviceModel)
+            }
+        },
+        handleChangeDeviceModel = (e) => {
+            const value = Number(e.target.value)
+            const checked = deviceModel.includes(value)
+
+            const newDeviceModel = checked ?
+                deviceModel.filter((v) => v !== value)
+                : [...deviceModel, value]
+            setDeviceModel(newDeviceModel)
+        },
         inputPercent = (e) => {
             const num = e.target.value
             const isNum = validateNumPercent(num)
@@ -157,8 +218,7 @@ export default function AddField({
                         {commonT("verify")}
                     </Button>
                 </div>
-
-                <h5 className="mb-5 ml-2">{locationInfo}</h5>
+                <h5 className="mb-5 ml-2">{pageT("locationInfo")}</h5>
                 <TextField
                     id="location-name"
                     label={commonT("locationName")}
@@ -221,38 +281,47 @@ export default function AddField({
                     ))}
                 </TextField>
                 <Divider variant="middle" sx={{ margin: "1rem 0 2.5rem" }} />
-                <h5 className="mb-5 ml-2">{fieldDevices}</h5>
-                <TextField
-                    id="deviceType"
-                    select
-                    label={formT("deviceType")}
-                    defaultValue=""
-                >
-                    {deviceTypes.map((option) => (
-                        <MenuItem
-                            key={option.value}
-                            value={formT(`${option.value}`)}
-                            onClick={() => {
-                                setDeviceType(option)
-                            }}>
-                            {formT(`${option.label}`)}
-                        </MenuItem>
-
-                    ))}
-                </TextField>
-                <TextField
-                    id="deviceModel"
-                    select
-                    label={formT("deviceModel")}
-                    defaultValue=""
-                >
-                    {deviceModel.map((option) => (
-                        <MenuItem key={option.value} value={option.value}>
-                            {option.label}
-                        </MenuItem>
-                    ))}
-                </TextField>
-                <h5 className="mb-5 ml-2">{deviceInfo}</h5>
+                <h5 className="mb-5 ml-2">{pageT("fieldDevices")}</h5>
+                <h5 className="mb-5 ml-2">{formT("deviceType")}</h5>
+                <div className="border-gray-400 border rounded-xl
+                    grid grid-cols-2 gap-2 items-center mb-4 p-4">
+                    <FormGroup>
+                        {deviceTypeOptions.map(({ type, disabled }) =>
+                            <FormControlLabel
+                                key={"option-d-t-" + type}
+                                control={
+                                    <Checkbox
+                                        checked={deviceType.includes(type)}
+                                        value={type}
+                                        onChange={handleChange}
+                                        disabled={disabled}
+                                    />
+                                }
+                                label={type}
+                            />
+                        )}
+                    </FormGroup>
+                </div>
+                <h5 className="mb-5  ml-2">{formT("deviceModel")}</h5>
+                <div className="border-gray-400 border rounded-xl
+                    grid grid-cols-2 gap-2 items-center mb-4 p-4">
+                    <FormGroup>
+                        {deviceModelOptions.map(({ id, name }) =>
+                            <FormControlLabel
+                                key={"option-d-m-" + id}
+                                control={
+                                    <Checkbox
+                                        checked={deviceModel.includes(id)}
+                                        value={id}
+                                        onChange={handleChangeDeviceModel}
+                                    />
+                                }
+                                label={name}
+                            />
+                        )}
+                    </FormGroup>
+                </div>
+                <h5 className="mb-5 ml-2">{formT("deviceInfo")}</h5>
                 <TextField
                     id="modbusID"
                     type="number"
@@ -282,7 +351,7 @@ export default function AddField({
                 // value={powerCapacity}
                 />
                 <Divider variant="middle" sx={{ margin: "1rem 0 2rem" }} />
-                {deviceType.value === "battery"
+                {deviceType.includes("Battery")
                     ? <ExtraDeviceInfoForm
                         subTitle={extraDeviceInfo}
                         gridOutagePercent={gridOutagePercent}
@@ -295,7 +364,7 @@ export default function AddField({
                         setVoltage={setVoltage}
                     />
                     : null}
-                {deviceType.value === "hybridInverter"
+                {deviceType.includes("Hybrid-Inverter")
                     ? <>
                         <SubDeviceForm
                             title={subdevice}
@@ -314,7 +383,7 @@ export default function AddField({
                         />
                     </>
                     : null}
-                {deviceType.value === "inverter"
+                {deviceType.includes("Inverter")
                     ? <>
                         <SubDeviceForm
                             title={subdevice}

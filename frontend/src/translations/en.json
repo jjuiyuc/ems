@@ -253,7 +253,7 @@
         "extraDeviceInfo":"Extra Device Information",
         "fieldDevices":"Field Devices",
         "fieldInfo":"Field Info",
-        "locationInformation":"Location Information",
+        "locationInfo":"Location Information",
         "subdevice":"Subdevice"
     },
     "forgotPassword": {
@@ -267,7 +267,7 @@
         "battery":"Battery",
         "chargingSource":"Charging Source",
         "confirmPassword": "Confirm Password",
-        "deviceInformation":"Device Information",
+        "deviceInfo":"Device Information",
         "deviceModel":"Device Model",
         "deviceType":"Device Type",
         "email": "Email",

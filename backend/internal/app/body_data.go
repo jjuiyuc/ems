@@ -40,7 +40,7 @@ type UpdateUserBody struct {
 
 // UpdateFieldGroupsBody godoc
 type UpdateFieldGroupsBody struct {
-	Groups []FieldGroupInfo `form:"groups" binding:"required"`
+	Groups []FieldGroupInfo `form:"groups" binding:"required,dive"`
 }
 
 // FieldGroupInfo godoc

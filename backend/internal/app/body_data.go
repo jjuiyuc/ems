@@ -1,5 +1,9 @@
 package app
 
+import (
+	"time"
+)
+
 // EnableFieldBody godoc
 type EnableFieldBody struct {
 	Enable *bool `form:"enable" binding:"required"`
@@ -55,4 +59,16 @@ type UpdateBatterySettingsBody struct {
 // UpdateMeterSettingsBody godoc
 type UpdateMeterSettingsBody struct {
 	MaxDemandCapacity int `form:"maxDemandCapacity" binding:"required"`
+}
+
+// CreatePowerOutagePeriodsBody godoc
+type CreatePowerOutagePeriodsBody struct {
+	Periods []PowerOutagePeriodInfo `form:"periods" binding:"required,dive"`
+}
+
+// PowerOutagePeriodInfo godoc
+type PowerOutagePeriodInfo struct {
+	Type      string    `form:"type" binding:"required,oneof='advanceBlackout' 'evCharge'"`
+	StartTime time.Time `form:"startTime" binding:"required,gt" format:"date-time"`
+	EndTime   time.Time `form:"endTime" binding:"required,gtfield=StartTime" format:"date-time"`
 }

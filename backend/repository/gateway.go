@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/volatiletech/null/v8"
@@ -107,7 +108,8 @@ type GatewayRepository interface {
 	GetDeviceMappingByGatewayID(gwID int64) (devices []*DeviceWrap, err error)
 	GetDLDeviceMappingByGatewayID(gwID int64) (devices []*DLDeviceWrap, err error)
 	GetBatteryMappingByGatewayUUID(gwUUID string) (battery *BatteryWrap, err error)
-	GetPowerOutagePeriods(gwUUID string) ([]*deremsmodels.PowerOutagePeriod, error)
+	InsertPowerOutagePeriods(tx *sql.Tx, periods []*deremsmodels.PowerOutagePeriod) error
+	GetPowerOutagePeriods(tx *sql.Tx, gwUUID string) ([]*deremsmodels.PowerOutagePeriod, error)
 	MatchDownlinkRules(gateway *deremsmodels.Gateway) bool
 	IsGatewayBoundField(gateway *deremsmodels.Gateway) bool
 }
@@ -316,10 +318,35 @@ func (repo defaultGatewayRepository) GetBatteryMappingByGatewayUUID(gwUUID strin
 	return
 }
 
-func (repo defaultGatewayRepository) GetPowerOutagePeriods(gwUUID string) ([]*deremsmodels.PowerOutagePeriod, error) {
+func (repo defaultGatewayRepository) InsertPowerOutagePeriods(tx *sql.Tx, periods []*deremsmodels.PowerOutagePeriod) error {
+	var values = []string{}
+	for _, period := range periods {
+		values = append(values, fmt.Sprintf("(%d,'%s','%s','%s','%s',%d)",
+			period.GWID,
+			period.Type,
+			period.StartedAt.Format(time.DateTime),
+			period.EndedAt.Format(time.DateTime),
+			period.CreatedAt.Format(time.DateTime),
+			period.CreatedBy.Int64,
+		))
+	}
+	if len(values) == 0 {
+		return nil
+	}
+
+	sql := fmt.Sprintf(`
+		INSERT INTO power_outage_period (gw_id, type, started_at, ended_at, created_at, created_by)
+		VALUES %s`,
+		strings.Join(values, ","),
+	)
+	_, err := repo.getExecutor(tx).Exec(sql)
+	return err
+}
+
+func (repo defaultGatewayRepository) GetPowerOutagePeriods(tx *sql.Tx, gwUUID string) ([]*deremsmodels.PowerOutagePeriod, error) {
 	return deremsmodels.PowerOutagePeriods(
 		qm.InnerJoin("gateway AS g ON g.uuid = ? AND g.id = power_outage_period.gw_id", gwUUID),
-		qm.Where("power_outage_period.deleted_at IS NULL AND power_outage_period.ended_at > ?", time.Now().UTC())).All(repo.db)
+		qm.Where("power_outage_period.deleted_at IS NULL AND power_outage_period.ended_at > ?", time.Now().UTC())).All(repo.getExecutor(tx))
 }
 
 func (repo defaultGatewayRepository) MatchDownlinkRules(gateway *deremsmodels.Gateway) bool {

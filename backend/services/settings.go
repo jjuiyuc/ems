@@ -16,6 +16,8 @@ import (
 	"der-ems/repository"
 )
 
+const maxNumberOfPowerOutagePeriods = 12
+
 // SettingsService godoc
 type SettingsService interface {
 	GetBatterySettings(executedUserID int64, gwUUID string) (getBatterySettings *GetBatterySettingsResponse, err error)
@@ -23,6 +25,7 @@ type SettingsService interface {
 	GetMeterSettings(executedUserID int64, gwUUID string) (getMeterSettings *GetMeterSettingsResponse, err error)
 	UpdateMeterSettings(executedUserID int64, gwUUID string, body *app.UpdateMeterSettingsBody) (dlData []byte, err error)
 	GetPowerOutagePeriods(executedUserID int64, gwUUID string) (getPowerOutagePeriods *GetPowerOutagePeriodsResponse, err error)
+	CreatePowerOutagePeriods(executedUserID int64, gwUUID string, body *app.CreatePowerOutagePeriodsBody) (dlData []byte, err error)
 }
 
 // GetBatterySettingsResponse godoc
@@ -60,6 +63,19 @@ type PowerOutagePeriodInfo struct {
 	StartTime time.Time `json:"startTime"`
 	EndTime   time.Time `json:"endTime"`
 	Ongoing   bool      `json:"ongoing"`
+}
+
+// PowerOutagePeriodsDLData godoc
+type PowerOutagePeriodsDLData struct {
+	AddedPeriods   []PeriodDLInfo `json:"addedPeriods"`
+	DeletedPeriods []PeriodDLInfo `json:"deletedPeriods"`
+}
+
+// PeriodDLInfo godoc
+type PeriodDLInfo struct {
+	Type      string `json:"type"`
+	StartTime int64  `json:"startTime"`
+	EndTime   int64  `json:"endTime"`
 }
 
 type defaultSettingsService struct {
@@ -350,7 +366,7 @@ func (s defaultSettingsService) GetPowerOutagePeriods(executedUserID int64, gwUU
 }
 
 func (s defaultSettingsService) getPowerOutagePeriodsResponse(gwUUID string) (getPowerOutagePeriods *GetPowerOutagePeriodsResponse, err error) {
-	periods, err := s.repo.Gateway.GetPowerOutagePeriods(gwUUID)
+	periods, err := s.repo.Gateway.GetPowerOutagePeriods(nil, gwUUID)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"caused-by": "s.repo.Gateway.GetPowerOutagePeriods",
@@ -373,5 +389,149 @@ func (s defaultSettingsService) getPowerOutagePeriodsResponse(gwUUID string) (ge
 	getPowerOutagePeriods = &GetPowerOutagePeriodsResponse{
 		Periods: getPeriods,
 	}
+	return
+}
+
+func (s defaultSettingsService) CreatePowerOutagePeriods(executedUserID int64, gwUUID string, body *app.CreatePowerOutagePeriodsBody) (dlData []byte, err error) {
+	if !s.fieldManagement.AuthorizeGatewayUUID(nil, executedUserID, gwUUID) {
+		err = e.ErrNewAuthPermissionNotAllow
+		return
+	}
+
+	tx, err := models.GetDB().BeginTx(context.Background(), nil)
+	if err != nil {
+		return
+	}
+
+	if err = s.matchDownlinkRules(tx, gwUUID); err != nil {
+		tx.Rollback()
+		return
+	}
+
+	if err = s.matchPowerOutagePeriodsRules(tx, gwUUID, body); err != nil {
+		tx.Rollback()
+		return
+	}
+
+	if err = s.insertPowerOutagePeriods(tx, executedUserID, gwUUID, body); err != nil {
+		tx.Rollback()
+		return
+	}
+	dlData, err = s.getAddedPowerOutagePeriodsDLData(body)
+	if err != nil {
+		tx.Rollback()
+		return
+	}
+
+	tx.Commit()
+	return
+}
+
+func (s defaultSettingsService) matchPowerOutagePeriodsRules(tx *sql.Tx, gwUUID string, body *app.CreatePowerOutagePeriodsBody) (err error) {
+	existedPeriods, err := s.repo.Gateway.GetPowerOutagePeriods(tx, gwUUID)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.Gateway.GetPowerOutagePeriods",
+			"err":       err,
+		}).Error()
+		return
+	}
+	if len(existedPeriods)+len(body.Periods) > maxNumberOfPowerOutagePeriods {
+		err = e.ErrNewPowerOutagePeriodsMoreThanMaximum
+		return
+	}
+
+	return s.checkAllPeriodsNotOverlapping(existedPeriods, body)
+}
+
+func (s defaultSettingsService) checkAllPeriodsNotOverlapping(existedPeriods []*deremsmodels.PowerOutagePeriod, body *app.CreatePowerOutagePeriodsBody) (err error) {
+	for _, newPeriod := range body.Periods {
+		for _, existedPeriod := range existedPeriods {
+			if !s.checkTwoPeriodsNotOverlapping(newPeriod.StartTime, newPeriod.EndTime, existedPeriod.StartedAt, existedPeriod.EndedAt) {
+				err = e.ErrNewPowerOutagePeriodInvalid
+				return
+			}
+
+		}
+	}
+	for i, newPeriod := range body.Periods {
+		for j, newPeriod2 := range body.Periods {
+			if i == j {
+				continue
+			}
+			if !s.checkTwoPeriodsNotOverlapping(newPeriod.StartTime, newPeriod.EndTime, newPeriod2.StartTime, newPeriod2.EndTime) {
+				err = e.ErrNewPowerOutagePeriodInvalid
+				return
+			}
+
+		}
+	}
+	return
+}
+
+func (s defaultSettingsService) checkTwoPeriodsNotOverlapping(newPeriodStartTime, newPeriodEndTime, existedPeriodStartTime, existedPeriodEndTime time.Time) bool {
+	return (newPeriodStartTime.Before(existedPeriodStartTime) && !newPeriodEndTime.After(existedPeriodStartTime)) ||
+		(!newPeriodStartTime.Before(existedPeriodEndTime) && newPeriodEndTime.After(existedPeriodEndTime))
+}
+
+func (s defaultSettingsService) insertPowerOutagePeriods(tx *sql.Tx, executedUserID int64, gwUUID string, body *app.CreatePowerOutagePeriodsBody) (err error) {
+	gateway, err := s.repo.Gateway.GetGatewayByGatewayUUID(tx, gwUUID)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.Gateway.GetGatewayByGatewayUUID",
+			"err":       err,
+		}).Error()
+		return
+	}
+
+	now := time.Now().UTC()
+	var powerOutagePeriods []*deremsmodels.PowerOutagePeriod
+	for _, period := range body.Periods {
+		powerOutagePeriod := &deremsmodels.PowerOutagePeriod{
+			GWID:      gateway.ID,
+			Type:      period.Type,
+			StartedAt: period.StartTime,
+			EndedAt:   period.EndTime,
+			CreatedAt: now,
+			CreatedBy: null.Int64From(executedUserID),
+		}
+		powerOutagePeriods = append(powerOutagePeriods, powerOutagePeriod)
+	}
+	if err = s.repo.Gateway.InsertPowerOutagePeriods(tx, powerOutagePeriods); err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.Gateway.InsertPowerOutagePeriods",
+			"err":       err,
+		}).Error()
+	}
+	return
+}
+
+func (s defaultSettingsService) getAddedPowerOutagePeriodsDLData(body *app.CreatePowerOutagePeriodsBody) (dlData []byte, err error) {
+	var addedPeriods []PeriodDLInfo
+	for _, period := range body.Periods {
+		addedPeriod := PeriodDLInfo{
+			Type:      period.Type,
+			StartTime: period.StartTime.Unix(),
+			EndTime:   period.EndTime.Unix(),
+		}
+		addedPeriods = append(addedPeriods, addedPeriod)
+	}
+	if addedPeriods == nil {
+		logrus.Warning("no-added-periods")
+		return
+	}
+
+	powerOutagePeriodsDLData := PowerOutagePeriodsDLData{
+		AddedPeriods: addedPeriods,
+	}
+	dlData, err = json.Marshal(powerOutagePeriodsDLData)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "json.Marshal",
+			"err":       err,
+		}).Error()
+		return
+	}
+	logrus.Debug("powerOutagePeriodsDLDataJSON: ", string(dlData))
 	return
 }

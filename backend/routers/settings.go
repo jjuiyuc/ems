@@ -121,3 +121,39 @@ func (w *APIWorker) GetPowerOutagePeriods(c *gin.Context, uri *app.FieldURI) {
 	}
 	appG.Response(http.StatusOK, e.Success, responseData)
 }
+
+func (w *APIWorker) CreatePowerOutagePeriods(c *gin.Context, uri *app.FieldURI, body *app.CreatePowerOutagePeriodsBody) {
+	appG := app.Gin{c}
+	userID, _ := c.Get("userID")
+	for _, period := range body.Periods {
+		logrus.WithFields(logrus.Fields{
+			"created-by": userID,
+			"period":     period,
+		}).Info("power-outage-created")
+	}
+	dlData, err := w.Services.Settings.CreatePowerOutagePeriods(userID.(int64), uri.GatewayID, body)
+	if err != nil {
+		if errors.Is(err, e.ErrNewAuthPermissionNotAllow) {
+			appG.Response(http.StatusForbidden, e.ErrAuthPermissionNotAllow, nil)
+			return
+		}
+
+		var code int
+		switch err {
+		case e.ErrNewFieldIsDisabled:
+			code = e.ErrFieldIsDisabled
+		case e.ErrNewPowerOutagePeriodsMoreThanMaximum:
+			code = e.ErrPowerOutagePeriodsMoreThanMaximum
+		case e.ErrNewPowerOutagePeriodInvalid:
+			code = e.ErrPowerOutagePeriodInvalid
+		default:
+			code = e.ErrPowerOutagePeriodsCreate
+		}
+		appG.Response(http.StatusInternalServerError, code, nil)
+		return
+	}
+	if dlData != nil {
+		kafka.SendDataToGateways(w.Cfg, kafka.SendAINotificationToLocalGW, dlData, []string{uri.GatewayID})
+	}
+	appG.Response(http.StatusOK, e.Success, nil)
+}

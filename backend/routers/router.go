@@ -249,6 +249,7 @@ func InitRouter(isCORS bool, ginMode string, enforcer *casbin.Enforcer, w *APIWo
 	r.GET(EndpointMapping[Settings][1], authorizeJWT(REST), authorizePolicy(enforcer), validateURI(w.GetMeterSettings))
 	r.PUT(EndpointMapping[Settings][1], authorizeJWT(REST), authorizePolicy(enforcer), validateURIAndBody(w.UpdateMeterSettings))
 	r.GET(EndpointMapping[Settings][2], authorizeJWT(REST), authorizePolicy(enforcer), validateURI(w.GetPowerOutagePeriods))
+	r.POST(EndpointMapping[Settings][2], authorizeJWT(REST), authorizePolicy(enforcer), validateURIAndBody(w.CreatePowerOutagePeriods))
 
 	// Casbin route
 	// apiGroup.GET("/casbin", w.getFrontendPermission(enforcer))

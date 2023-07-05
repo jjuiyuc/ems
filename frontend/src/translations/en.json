@@ -122,6 +122,7 @@
         "deletedSuccessfully":"Deleted Successfully.",
         "editedSuccessfully":"Edited successfully.",
         "modifyNameMsg":"Modify name successfully",
+        "modifySuccessfully":"Modify successfully!",
         "promptMsg":"If all charging resources are turned off, the battery will be in standby mode.",
         "updatedPasswordMsg":"Your password has been updated.",
         "syncMsg":"Are you sure you want to sync?",
@@ -244,6 +245,8 @@
         "sumError":"The sum of the time range must be equal to 24 hours.",
         "syncError":"Send sync device settings request error.",
         "timeOverlapError":"The time range cannot overlap.",
+        "updateBatterySettingsError":"Update battery settings error.",
+        "updateMeterSettingsError":"Update meter settings error.",
         "userLocked": "User is locked.",
         "userProfileError":"Generate user profile error"
     },

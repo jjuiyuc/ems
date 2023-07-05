@@ -26,6 +26,7 @@ type SettingsService interface {
 	UpdateMeterSettings(executedUserID int64, gwUUID string, body *app.UpdateMeterSettingsBody) (dlData []byte, err error)
 	GetPowerOutagePeriods(executedUserID int64, gwUUID string) (getPowerOutagePeriods *GetPowerOutagePeriodsResponse, err error)
 	CreatePowerOutagePeriods(executedUserID int64, gwUUID string, body *app.CreatePowerOutagePeriodsBody) (dlData []byte, err error)
+	DeletePowerOutagePeriod(executedUserID int64, gwUUID string, periodID int64) (dlData []byte, err error)
 }
 
 // GetBatterySettingsResponse godoc
@@ -523,6 +524,84 @@ func (s defaultSettingsService) getAddedPowerOutagePeriodsDLData(body *app.Creat
 
 	powerOutagePeriodsDLData := PowerOutagePeriodsDLData{
 		AddedPeriods: addedPeriods,
+	}
+	dlData, err = json.Marshal(powerOutagePeriodsDLData)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "json.Marshal",
+			"err":       err,
+		}).Error()
+		return
+	}
+	logrus.Debug("powerOutagePeriodsDLDataJSON: ", string(dlData))
+	return
+}
+
+func (s defaultSettingsService) DeletePowerOutagePeriod(executedUserID int64, gwUUID string, periodID int64) (dlData []byte, err error) {
+	if !s.fieldManagement.AuthorizeGatewayUUID(nil, executedUserID, gwUUID) {
+		err = e.ErrNewAuthPermissionNotAllow
+		return
+	}
+
+	tx, err := models.GetDB().BeginTx(context.Background(), nil)
+	if err != nil {
+		return
+	}
+
+	if err = s.matchDownlinkRules(tx, gwUUID); err != nil {
+		tx.Rollback()
+		return
+	}
+
+	period, err := s.getPowerOutagePeriod(tx, gwUUID, periodID)
+	if err != nil {
+		tx.Rollback()
+		return
+	}
+	if err = s.repo.Gateway.DeletePowerOutagePeriod(tx, executedUserID, periodID); err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.Gateway.DeletePowerOutagePeriod",
+			"err":       err,
+		}).Error()
+		tx.Rollback()
+		return
+	}
+	dlData, err = s.getDeletedPowerOutagePeriodsDLData(period)
+	if err != nil {
+		tx.Rollback()
+		return
+	}
+
+	tx.Commit()
+	return
+}
+
+func (s defaultSettingsService) getPowerOutagePeriod(tx *sql.Tx, gwUUID string, periodID int64) (period *deremsmodels.PowerOutagePeriod, err error) {
+	period, err = s.repo.Gateway.GetPowerOutagePeriod(tx, gwUUID, periodID)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.Gateway.GetPowerOutagePeriod",
+			"err":       err,
+		}).Error()
+		return
+	}
+	if period.StartedAt.Before(time.Now().UTC()) {
+		err = e.ErrNewPowerOutagePeriodOngoing
+	}
+	return
+}
+
+func (s defaultSettingsService) getDeletedPowerOutagePeriodsDLData(period *deremsmodels.PowerOutagePeriod) (dlData []byte, err error) {
+	var deletedPeriods []PeriodDLInfo
+	deletedPeriod := PeriodDLInfo{
+		Type:      period.Type,
+		StartTime: period.StartedAt.Unix(),
+		EndTime:   period.EndedAt.Unix(),
+	}
+	deletedPeriods = append(deletedPeriods, deletedPeriod)
+
+	powerOutagePeriodsDLData := PowerOutagePeriodsDLData{
+		DeletedPeriods: deletedPeriods,
 	}
 	dlData, err = json.Marshal(powerOutagePeriodsDLData)
 	if err != nil {

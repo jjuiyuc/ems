@@ -43,6 +43,8 @@ var (
 	ErrNewPowerOutagePeriodsMoreThanMaximum = errors.New("power outage periods are more than maximum")
 	// ErrNewPowerOutagePeriodInvalid godoc
 	ErrNewPowerOutagePeriodInvalid = errors.New("power outage period is invalid")
+	// ErrNewPowerOutagePeriodOngoing godoc
+	ErrNewPowerOutagePeriodOngoing = errors.New("power outage period is ongoing")
 )
 
 // ErrNewKeyNotExist godoc

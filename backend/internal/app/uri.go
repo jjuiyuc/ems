@@ -5,6 +5,12 @@ type FieldURI struct {
 	GatewayID string `uri:"gwid" binding:"required"`
 }
 
+// GatewayAndPeriodURI godoc
+type GatewayAndPeriodURI struct {
+	GatewayID string `uri:"gwid" binding:"required"`
+	PeriodID  int64  `uri:"periodid" binding:"required"`
+}
+
 // GroupURI godoc
 type GroupURI struct {
 	GroupID int64 `uri:"groupid" binding:"required"`

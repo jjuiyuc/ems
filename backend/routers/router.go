@@ -124,6 +124,7 @@ var EndpointMapping = map[PolicyWebpageObject][]string{
 		"/api/device-management/gateways/:gwid/battery-settings",
 		"/api/device-management/gateways/:gwid/meter-settings",
 		"/api/device-management/gateways/:gwid/power-outage-periods",
+		"/api/device-management/gateways/:gwid/power-outage-periods/:periodid",
 	},
 }
 
@@ -250,6 +251,7 @@ func InitRouter(isCORS bool, ginMode string, enforcer *casbin.Enforcer, w *APIWo
 	r.PUT(EndpointMapping[Settings][1], authorizeJWT(REST), authorizePolicy(enforcer), validateURIAndBody(w.UpdateMeterSettings))
 	r.GET(EndpointMapping[Settings][2], authorizeJWT(REST), authorizePolicy(enforcer), validateURI(w.GetPowerOutagePeriods))
 	r.POST(EndpointMapping[Settings][2], authorizeJWT(REST), authorizePolicy(enforcer), validateURIAndBody(w.CreatePowerOutagePeriods))
+	r.DELETE(EndpointMapping[Settings][3], authorizeJWT(REST), authorizePolicy(enforcer), validateURI(w.DeletePowerOutagePeriod))
 
 	// Casbin route
 	// apiGroup.GET("/casbin", w.getFrontendPermission(enforcer))

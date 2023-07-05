@@ -157,3 +157,31 @@ func (w *APIWorker) CreatePowerOutagePeriods(c *gin.Context, uri *app.FieldURI, 
 	}
 	appG.Response(http.StatusOK, e.Success, nil)
 }
+
+func (w *APIWorker) DeletePowerOutagePeriod(c *gin.Context, uri *app.GatewayAndPeriodURI) {
+	appG := app.Gin{c}
+	userID, _ := c.Get("userID")
+	dlData, err := w.Services.Settings.DeletePowerOutagePeriod(userID.(int64), uri.GatewayID, uri.PeriodID)
+	if err != nil {
+		if errors.Is(err, e.ErrNewAuthPermissionNotAllow) {
+			appG.Response(http.StatusForbidden, e.ErrAuthPermissionNotAllow, nil)
+			return
+		}
+
+		var code int
+		switch err {
+		case e.ErrNewFieldIsDisabled:
+			code = e.ErrFieldIsDisabled
+		case e.ErrNewPowerOutagePeriodOngoing:
+			code = e.ErrPowerOutagePeriodOngoing
+		default:
+			code = e.ErrPowerOutagePeriodDelete
+		}
+		appG.Response(http.StatusInternalServerError, code, nil)
+		return
+	}
+	if dlData != nil {
+		kafka.SendDataToGateways(w.Cfg, kafka.SendAINotificationToLocalGW, dlData, []string{uri.GatewayID})
+	}
+	appG.Response(http.StatusOK, e.Success, nil)
+}

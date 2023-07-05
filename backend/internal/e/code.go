@@ -65,4 +65,6 @@ const (
 	ErrPowerOutagePeriodsMoreThanMaximum = 60035
 	ErrPowerOutagePeriodInvalid          = 60036
 	ErrPowerOutagePeriodsCreate          = 60037
+	ErrPowerOutagePeriodOngoing          = 60038
+	ErrPowerOutagePeriodDelete           = 60039
 )

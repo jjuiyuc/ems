@@ -110,6 +110,8 @@ type GatewayRepository interface {
 	GetBatteryMappingByGatewayUUID(gwUUID string) (battery *BatteryWrap, err error)
 	InsertPowerOutagePeriods(tx *sql.Tx, periods []*deremsmodels.PowerOutagePeriod) error
 	GetPowerOutagePeriods(tx *sql.Tx, gwUUID string) ([]*deremsmodels.PowerOutagePeriod, error)
+	GetPowerOutagePeriod(tx *sql.Tx, gwUUID string, periodID int64) (*deremsmodels.PowerOutagePeriod, error)
+	DeletePowerOutagePeriod(tx *sql.Tx, executedUserID, periodID int64) (err error)
 	MatchDownlinkRules(gateway *deremsmodels.Gateway) bool
 	IsGatewayBoundField(gateway *deremsmodels.Gateway) bool
 }
@@ -347,6 +349,24 @@ func (repo defaultGatewayRepository) GetPowerOutagePeriods(tx *sql.Tx, gwUUID st
 	return deremsmodels.PowerOutagePeriods(
 		qm.InnerJoin("gateway AS g ON g.uuid = ? AND g.id = power_outage_period.gw_id", gwUUID),
 		qm.Where("power_outage_period.deleted_at IS NULL AND power_outage_period.ended_at > ?", time.Now().UTC())).All(repo.getExecutor(tx))
+}
+
+func (repo defaultGatewayRepository) GetPowerOutagePeriod(tx *sql.Tx, gwUUID string, periodID int64) (*deremsmodels.PowerOutagePeriod, error) {
+	return deremsmodels.PowerOutagePeriods(
+		qm.InnerJoin("gateway AS g ON g.uuid = ? AND g.id = power_outage_period.gw_id", gwUUID),
+		qm.Where("power_outage_period.deleted_at IS NULL AND power_outage_period.ended_at > ? AND power_outage_period.id = ?", time.Now().UTC(), periodID)).One(repo.getExecutor(tx))
+}
+
+func (repo defaultGatewayRepository) DeletePowerOutagePeriod(tx *sql.Tx, executedUserID, periodID int64) (err error) {
+	exec := repo.getExecutor(tx)
+	period, err := deremsmodels.FindPowerOutagePeriod(exec, periodID)
+	if err == nil {
+		now := time.Now().UTC()
+		period.DeletedAt = null.TimeFrom(now)
+		period.DeletedBy = null.Int64From(executedUserID)
+		_, err = period.Update(exec, boil.Infer())
+	}
+	return
 }
 
 func (repo defaultGatewayRepository) MatchDownlinkRules(gateway *deremsmodels.Gateway) bool {

@@ -72,6 +72,17 @@ definitions:
     - resolution
     - startTime
     type: object
+  repository.FieldGroupWrap:
+    properties:
+      check:
+        type: boolean
+      id:
+        type: integer
+      name:
+        type: string
+      parentID:
+        type: string
+    type: object
   repository.UserWrap:
     properties:
       groupID:
@@ -322,15 +333,6 @@ definitions:
       pvProducedLifetimeEnergyACDiff:
         type: number
     type: object
-  services.FieldGroupInfo:
-    properties:
-      id:
-        type: integer
-      name:
-        type: string
-      parentID:
-        type: string
-    type: object
   services.Float32ArrayFormat:
     items:
       type: number
@@ -358,6 +360,13 @@ definitions:
         $ref: '#/definitions/services.LocationInfo'
         type: object
     type: object
+  services.GetBatterySettingsResponse:
+    properties:
+      chargingSources:
+        type: string
+      reservedForGridOutagePercent:
+        type: integer
+    type: object
   services.GetDeviceModelsResponse:
     properties:
       models:
@@ -379,7 +388,7 @@ definitions:
         type: string
       groups:
         items:
-          $ref: '#/definitions/services.FieldGroupInfo'
+          $ref: '#/definitions/repository.FieldGroupWrap'
         type: array
       lat:
         type: number
@@ -441,6 +450,18 @@ definitions:
       groups:
         items:
           $ref: '#/definitions/services.GetGroupInfo'
+        type: array
+    type: object
+  services.GetMeterSettingsResponse:
+    properties:
+      maxDemandCapacity:
+        type: integer
+    type: object
+  services.GetPowerOutagePeriodsResponse:
+    properties:
+      periods:
+        items:
+          $ref: '#/definitions/services.PowerOutagePeriodInfo'
         type: array
     type: object
   services.GetUsersResponse:
@@ -513,6 +534,19 @@ definitions:
       address:
         type: string
       name:
+        type: string
+    type: object
+  services.PowerOutagePeriodInfo:
+    properties:
+      endTime:
+        type: string
+      id:
+        type: integer
+      ongoing:
+        type: boolean
+      startTime:
+        type: string
+      type:
         type: string
     type: object
   services.PowerSelfSupplyRateResponse:
@@ -2428,6 +2462,345 @@ paths:
       summary: Sync device settings
       tags:
       - field management
+  /device-management/gateways/{gwid}/battery-settings:
+    get:
+      description: get battery settings by token and gateway UUID
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Input user's access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Gateway UUID
+        in: path
+        name: gwid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/app.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/services.GetBatterySettingsResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Show battery settings
+      tags:
+      - settings
+    put:
+      consumes:
+      - application/json
+      description: update battery settings by token and gateway UUID
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Input user's access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Gateway UUID
+        in: path
+        name: gwid
+        required: true
+        type: string
+      - description: Charging sources
+        in: body
+        name: chargingSources
+        required: true
+        schema:
+          type: string
+      - description: Reserved for grid outage percent
+        in: body
+        name: reservedForGridOutagePercent
+        required: true
+        schema:
+          type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Update battery settings
+      tags:
+      - settings
+  /device-management/gateways/{gwid}/meter-settings:
+    get:
+      description: get meter settings by token and gateway UUID
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Input user's access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Gateway UUID
+        in: path
+        name: gwid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/app.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/services.GetMeterSettingsResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Show maximum demand capacity
+      tags:
+      - settings
+    put:
+      consumes:
+      - application/json
+      description: update meter settings by token and gateway UUID
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Input user's access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Gateway UUID
+        in: path
+        name: gwid
+        required: true
+        type: string
+      - description: Maximum demand capacity
+        in: body
+        name: maxDemandCapacity
+        required: true
+        schema:
+          type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Update maximum demand capacity
+      tags:
+      - settings
+  /device-management/gateways/{gwid}/power-outage-periods:
+    get:
+      description: get power outage periods by token and gateway UUID
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Input user's access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Gateway UUID
+        in: path
+        name: gwid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/app.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/services.GetPowerOutagePeriodsResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Show power outage periods
+      tags:
+      - settings
+    post:
+      consumes:
+      - application/json
+      description: create power outage periods by token and gateway UUID
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Input user's access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Periods
+        in: body
+        name: periods
+        required: true
+        schema:
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Create power outage periods
+      tags:
+      - settings
+  /device-management/gateways/{gwid}/power-outage-periods/{periodid}:
+    delete:
+      description: delete a power outage period by token, gateway UUID and period
+        ID
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Input user's access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Period ID
+        in: path
+        name: periodid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete a power outage period
+      tags:
+      - settings
   /user/PasswordResetByToken:
     put:
       consumes:

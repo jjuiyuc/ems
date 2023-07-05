@@ -556,7 +556,7 @@ var doc = `{
                 }
             }
         },
-        "/account-management/users/{user-id}": {
+        "/account-management/users/{userid}": {
             "put": {
                 "security": [
                     {
@@ -913,14 +913,14 @@ var doc = `{
                 }
             }
         },
-        "/device-management/gateways/{gatewayid}": {
+        "/device-management/gateways/{gwid}": {
             "get": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "get a field by token and gateway id",
+                "description": "get a field by token and gateway UUID",
                 "produces": [
                     "application/json"
                 ],
@@ -939,8 +939,8 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "Gateway ID",
-                        "name": "gatewayid",
+                        "description": "Gateway UUID",
+                        "name": "gwid",
                         "in": "path",
                         "required": true
                     }
@@ -991,14 +991,14 @@ var doc = `{
                 }
             }
         },
-        "/device-management/gateways/{gatewayid}/account-groups": {
+        "/device-management/gateways/{gwid}/account-groups": {
             "put": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "update a field groups by token and gateway id",
+                "description": "update a field groups by token and gateway UUID",
                 "consumes": [
                     "application/json"
                 ],
@@ -1020,8 +1020,8 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "Gateway ID",
-                        "name": "gatewayid",
+                        "description": "Gateway UUID",
+                        "name": "gwid",
                         "in": "path",
                         "required": true
                     },
@@ -1033,150 +1033,6 @@ var doc = `{
                         "schema": {
                             "type": "array"
                         }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/app.Response"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/app.Response"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/app.Response"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/app.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/app.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/device-management/gateways/{gatewayid}/field-state": {
-            "put": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "enable/disable a field by token and gateway id",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "field management"
-                ],
-                "summary": "Enable/Disable a field",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "default": "Bearer \u003cAdd access token here\u003e",
-                        "description": "Input user's access token",
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Gateway ID",
-                        "name": "gatewayid",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Enable",
-                        "name": "enable",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "boolean"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/app.Response"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/app.Response"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/app.Response"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/app.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/app.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/device-management/gateways/{gatewayid}/sync-device-settings": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "sync a field device settings by token and gateway id",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "field management"
-                ],
-                "summary": "Sync device settings",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "default": "Bearer \u003cAdd access token here\u003e",
-                        "description": "Input user's access token",
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Gateway ID",
-                        "name": "gatewayid",
-                        "in": "path",
-                        "required": true
                     }
                 ],
                 "responses": {
@@ -1339,6 +1195,84 @@ var doc = `{
                         "required": true,
                         "schema": {
                             "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/device-management/gateways/{gwid}/field-state": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "enable/disable a field by token and gateway UUID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "field management"
+                ],
+                "summary": "Enable/Disable a field",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Input user's access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Gateway UUID",
+                        "name": "gwid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Enable",
+                        "name": "enable",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "boolean"
                         }
                     }
                 ],
@@ -1705,6 +1639,72 @@ var doc = `{
                         "type": "string",
                         "description": "Period ID",
                         "name": "periodid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/device-management/gateways/{gwid}/sync-device-settings": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "sync a field device settings by token and gateway id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "field management"
+                ],
+                "summary": "Sync device settings",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Input user's access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Gateway UUID",
+                        "name": "gwid",
                         "in": "path",
                         "required": true
                     }

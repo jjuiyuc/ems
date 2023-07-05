@@ -2042,7 +2042,7 @@ paths:
       summary: Create a user
       tags:
       - account management user
-  /account-management/users/{user-id}:
+  /account-management/users/{userid}:
     delete:
       description: delete a user by token and user id
       parameters:
@@ -2269,9 +2269,9 @@ paths:
       summary: List fields
       tags:
       - field management
-  /device-management/gateways/{gatewayid}:
+  /device-management/gateways/{gwid}:
     get:
-      description: get a field by token and gateway id
+      description: get a field by token and gateway UUID
       parameters:
       - default: Bearer <Add access token here>
         description: Input user's access token
@@ -2279,9 +2279,9 @@ paths:
         name: Authorization
         required: true
         type: string
-      - description: Gateway ID
+      - description: Gateway UUID
         in: path
-        name: gatewayid
+        name: gwid
         required: true
         type: string
       produces:
@@ -2317,11 +2317,11 @@ paths:
       summary: Show a field
       tags:
       - field management
-  /device-management/gateways/{gatewayid}/account-groups:
+  /device-management/gateways/{gwid}/account-groups:
     put:
       consumes:
       - application/json
-      description: update a field groups by token and gateway id
+      description: update a field groups by token and gateway UUID
       parameters:
       - default: Bearer <Add access token here>
         description: Input user's access token
@@ -2329,9 +2329,9 @@ paths:
         name: Authorization
         required: true
         type: string
-      - description: Gateway ID
+      - description: Gateway UUID
         in: path
-        name: gatewayid
+        name: gwid
         required: true
         type: string
       - description: Groups
@@ -2366,100 +2366,6 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Update a field groups
-      tags:
-      - field management
-  /device-management/gateways/{gatewayid}/field-state:
-    put:
-      consumes:
-      - application/json
-      description: enable/disable a field by token and gateway id
-      parameters:
-      - default: Bearer <Add access token here>
-        description: Input user's access token
-        in: header
-        name: Authorization
-        required: true
-        type: string
-      - description: Gateway ID
-        in: path
-        name: gatewayid
-        required: true
-        type: string
-      - description: Enable
-        in: body
-        name: enable
-        required: true
-        schema:
-          type: boolean
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/app.Response'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/app.Response'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/app.Response'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/app.Response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/app.Response'
-      security:
-      - ApiKeyAuth: []
-      summary: Enable/Disable a field
-      tags:
-      - field management
-  /device-management/gateways/{gatewayid}/sync-device-settings:
-    get:
-      description: sync a field device settings by token and gateway id
-      parameters:
-      - default: Bearer <Add access token here>
-        description: Input user's access token
-        in: header
-        name: Authorization
-        required: true
-        type: string
-      - description: Gateway ID
-        in: path
-        name: gatewayid
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/app.Response'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/app.Response'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/app.Response'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/app.Response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/app.Response'
-      security:
-      - ApiKeyAuth: []
-      summary: Sync device settings
       tags:
       - field management
   /device-management/gateways/{gwid}/battery-settings:
@@ -2566,6 +2472,57 @@ paths:
       summary: Update battery settings
       tags:
       - settings
+  /device-management/gateways/{gwid}/field-state:
+    put:
+      consumes:
+      - application/json
+      description: enable/disable a field by token and gateway UUID
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Input user's access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Gateway UUID
+        in: path
+        name: gwid
+        required: true
+        type: string
+      - description: Enable
+        in: body
+        name: enable
+        required: true
+        schema:
+          type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Enable/Disable a field
+      tags:
+      - field management
   /device-management/gateways/{gwid}/meter-settings:
     get:
       description: get meter settings by token and gateway UUID
@@ -2801,6 +2758,49 @@ paths:
       summary: Delete a power outage period
       tags:
       - settings
+  /device-management/gateways/{gwid}/sync-device-settings:
+    get:
+      description: sync a field device settings by token and gateway id
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Input user's access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Gateway UUID
+        in: path
+        name: gwid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Sync device settings
+      tags:
+      - field management
   /user/PasswordResetByToken:
     put:
       consumes:

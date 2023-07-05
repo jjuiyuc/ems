@@ -10,7 +10,7 @@ export default function DatePeriodPicker(props) {
         pageT = (string, params) => t("settings." + string, params),
         errorT = (string) => t("error." + string)
 
-    const { startDate, setStartDate, endDate, setEndDate, typeDict, type, setType } = props
+    const { startDate, setStartDate, endDate, setEndDate, typeDict, type, setType, timeError } = props
 
     const changeType = (e) => {
         setType(e.target.value)
@@ -48,8 +48,8 @@ export default function DatePeriodPicker(props) {
                     startDate={startDate}
                     value={endDate ? moment(endDate).format("yyyy/MM/DD HH:mm") : ""}
                     minDate={startDate}
-                    minTime={moment(startDate).add(1, "minutes")._d}
-                    maxTime={moment().startOf("day")._d}
+                    minTime={moment(startDate).add(15, "minutes")._d}
+                    maxTime={endDate <= startDate ? moment(startDate).add(15, "minutes").endOf("day")._d : moment().startOf("day")._d}
                     disabled={!startDate}
                 />
             </div>
@@ -60,6 +60,7 @@ export default function DatePeriodPicker(props) {
                     select
                     variant="outlined"
                     onChange={changeType}
+                    value={type}
                     defaultValue="">
                     {Object.entries(typeDict).map(([key, value]) =>
                         <MenuItem key={"type-o-" + key} value={key}>

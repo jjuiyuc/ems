@@ -34,7 +34,7 @@ const defaultPolicyTime = {
 }
 
 export default connect(null, mapDispatch)(function AddPowerOutagePeriod(props) {
-    // const { getList, groupDictionary } = props
+    const { periodList } = props
 
     const
         t = useTranslation(),
@@ -61,8 +61,8 @@ export default connect(null, mapDispatch)(function AddPowerOutagePeriod(props) {
         [type, setType] = useState(null),
         [typeDict, setTypeDict] = useState({}),
         [otherError, setOtherError] = useState("")
-
-    const submitDisabled = type == null
+    const timeError = startDate >= endDate
+    const submitDisabled = type == null || timeError
 
     const cancelClick = () => {
         setOpenAdd(false)
@@ -113,7 +113,7 @@ export default connect(null, mapDispatch)(function AddPowerOutagePeriod(props) {
                                                 className="time-range-picker grid
                                         grid-cols-settings-input-col5 gap-x-4 items-center mt-4">
                                                 <DatePeriodPicker
-                                                    {...{ startDate, endDate, type, setType, typeDict }}
+                                                    {...{ startDate, endDate, type, setType, typeDict, timeError }}
                                                     key={index}
                                                     setStartDate={(date) => {
                                                         const newPolicyTime = {

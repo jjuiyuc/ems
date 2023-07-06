@@ -17,7 +17,7 @@ const mapDispatch = dispatch => ({
         dispatch({ type: "snackbarMsg/updateSnackbarMsg", payload: value }),
 
 })
-const maxLength = 3
+const maxLength = 5
 
 const defaultPolicyConfig = {
     preNotifiedOutagePeriod: {

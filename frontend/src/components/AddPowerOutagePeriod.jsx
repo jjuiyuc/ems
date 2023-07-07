@@ -38,7 +38,7 @@ const defaultPolicyTime = {
     ]
 }
 export default connect(mapState, mapDispatch)(function AddPowerOutagePeriod(props) {
-    const { getList } = props
+    const { getList, periodList } = props
 
     const
         t = useTranslation(),
@@ -65,11 +65,20 @@ export default connect(mapState, mapDispatch)(function AddPowerOutagePeriod(prop
         [type, setType] = useState(null),
         [typeDict, setTypeDict] = useState({}),
         [timeError, setTimeError] = useState(false),
+        [periodError, setPeriodError] = useState(false),
         [otherError, setOtherError] = useState("")
 
-    const timeChangeError = startDate < moment().toDate() || startDate >= endDate
+    const maxPeriodError = periodList.length + policyTime > 5
+    const timeChangeError = policyTime.startDate < moment().toDate() || policyTime.startDate >= policyTime.endDate
     const submitDisabled = type == null || timeChangeError || timeError == true
 
+    const filterPassedTime = (time) => {
+        const
+            currentDate = new Date(),
+            selectedDate = new Date(time)
+
+        return moment(currentDate).isBefore(selectedDate)
+    }
     const
         generateTypeDict = () => {
             setTypeDict(powerOutageTypes.reduce((acc, cur) => {
@@ -101,29 +110,31 @@ export default connect(mapState, mapDispatch)(function AddPowerOutagePeriod(prop
                 data,
                 onSuccess: () => {
                     setOpenAdd(false)
+                    setPeriodError(false)
+                    setStartDate("")
+                    setEndDate("")
+                    setType("")
+                    setPolicyTime(defaultPolicyTime)
                     getList()
                     props.updateSnackbarMsg({
                         type: "success",
                         msg: t("dialog.addedSuccessfully")
                     })
-                    setStartDate("")
-                    setEndDate("")
-                    setType("")
                 },
                 onError: err => {
                     switch (err) {
-                        case 60033:
-                            setAccountError(true)
+                        case 60035:
+                            setPeriodError(maxPeriodError)
                             props.updateSnackbarMsg({
                                 type: "error",
-                                msg: errorT("emailExist")
+                                msg: errorT("moreThanMaxPeriods")
                             })
                             break
-                        case 60034:
-                            setAccountError(true)
+                        case 60036:
+                            setPeriodError(true)
                             props.updateSnackbarMsg({
                                 type: "error",
-                                msg: errorT("failureToCreate")
+                                msg: errorT("powerOutagePeriodInvalid")
                             })
                             break
                         default: setOtherError(err)
@@ -138,6 +149,7 @@ export default connect(mapState, mapDispatch)(function AddPowerOutagePeriod(prop
             setStartDate("")
             setEndDate("")
             setType("")
+            setPolicyTime(defaultPolicyTime)
         }
     return <>
         <Button
@@ -167,11 +179,11 @@ export default connect(mapState, mapDispatch)(function AddPowerOutagePeriod(prop
                                     <div className="flex items-center text-white mb-4">
                                         <h5 className="font-bold">{pageT(policyConfig[policy].name)}</h5>
                                     </div>
-                                    {timeGroup.map(({ startDate, endDate }, index) => {
+                                    {timeGroup.map(({ startDate, endDate, type }, index) => {
                                         return (
                                             <div key={`${policy}-${index}`}
                                                 className="time-range-picker grid
-                                        grid-cols-settings-input-col5 gap-x-4 items-center mt-4">
+                                                grid-cols-settings-input-col5 gap-x-4 items-center mt-4">
                                                 <div>
                                                     <h6 className="mb-1 ml-1">{pageT("startDate")}</h6>
                                                     <DatePicker
@@ -200,6 +212,7 @@ export default connect(mapState, mapDispatch)(function AddPowerOutagePeriod(prop
                                                         startDate={startDate}
                                                         endDate={endDate}
                                                         minDate={moment(new Date())._d}
+                                                        filterTime={filterPassedTime}
                                                     />
                                                 </div>
                                                 <span className="mt-6">{pageT("to")}</span>
@@ -242,7 +255,17 @@ export default connect(mapState, mapDispatch)(function AddPowerOutagePeriod(prop
                                                         id="p-o-type"
                                                         select
                                                         variant="outlined"
-                                                        onChange={changeType}
+                                                        onChange={(e) => {
+                                                            const newPolicyTime = {
+                                                                ...policyTime,
+                                                                [policy]: timeGroup.map((row, i) =>
+                                                                    i === index
+                                                                        ? { ...row, type: e.target.value }
+                                                                        : row)
+                                                            }
+                                                            setPolicyTime(newPolicyTime)
+                                                            setType(e.target.value)
+                                                        }}
                                                         value={type}
                                                         defaultValue="">
                                                         {Object.entries(typeDict).map(([key, value]) =>

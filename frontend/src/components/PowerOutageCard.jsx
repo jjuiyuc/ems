@@ -115,7 +115,7 @@ export default connect(mapState, mapDispatch)(function PowerOutageCard(props) {
                 </div>
                 <h2 className="font-bold ml-4">{pageT("powerOutage")}</h2>
             </div>
-            <AddPowerOutagePeriod {...{ periodList }} />
+            <AddPowerOutagePeriod {...{ getList }} />
         </div>
         <div className="flex flex-col mt-4 min-w-49 w-full">
             <Table

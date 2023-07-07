@@ -40,6 +40,32 @@ func GetConfigDir() string {
 	return filepath.Join(filepath.Dir(filename), "..", "config")
 }
 
+// SeedUtWebpageAndRight godoc
+func SeedUtWebpageAndRight(db *sql.DB) (err error) {
+	_, err = db.Exec("SET FOREIGN_KEY_CHECKS = 0")
+	if err != nil {
+		return
+	}
+	_, err = db.Exec("truncate table group_type_webpage_right")
+	if err != nil {
+		return
+	}
+	_, err = db.Exec("truncate table webpage")
+	if err != nil {
+		return
+	}
+	_, err = db.Exec("SET FOREIGN_KEY_CHECKS = 1")
+	if err != nil {
+		return
+	}
+	err = insertDataFromFile(db, "webpage.input.sql")
+	if err != nil {
+		return
+	}
+	err = insertDataFromFile(db, "group_type_webpage_right.input.sql")
+	return
+}
+
 // SeedUtUser godoc
 func SeedUtUser(db *sql.DB) (err error) {
 	_, err = db.Exec("SET FOREIGN_KEY_CHECKS = 0")
@@ -134,7 +160,7 @@ func insertDataFromFile(db *sql.DB, filename string) (err error) {
 // SeedUtClaims godoc
 func SeedUtClaims() (claims utils.Claims) {
 	claims = utils.Claims{
-		UserID:  testdata.UtUser.ID,
+		UserID:    testdata.UtUser.ID,
 		GroupType: testdata.UtGroupType,
 	}
 	return

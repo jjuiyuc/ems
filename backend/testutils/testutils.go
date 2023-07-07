@@ -80,6 +80,14 @@ func SeedUtLocationAndGateway(db *sql.DB) (err error) {
 	if err != nil {
 		return
 	}
+	_, err = db.Exec("truncate table device_model")
+	if err != nil {
+		return
+	}
+	_, err = db.Exec("truncate table device_module")
+	if err != nil {
+		return
+	}
 	_, err = db.Exec("truncate table gateway")
 	if err != nil {
 		return
@@ -102,8 +110,24 @@ func SeedUtLocationAndGateway(db *sql.DB) (err error) {
 	if err != nil {
 		return
 	}
-	batteryDevice := testdata.UtBatteryDevice
-	err = batteryDevice.Insert(db, boil.Infer())
+	err = insertDataFromFile(db, "device_model.input.sql")
+	if err != nil {
+		return
+	}
+	err = insertDataFromFile(db, "device_module.input.sql")
+	if err != nil {
+		return
+	}
+	err = insertDataFromFile(db, "device.input.sql")
+	return
+}
+
+func insertDataFromFile(db *sql.DB, filename string) (err error) {
+	b, err := testdata.ReadDataFromFile(filename)
+	if err != nil {
+		return
+	}
+	_, err = db.Exec(string(b))
 	return
 }
 

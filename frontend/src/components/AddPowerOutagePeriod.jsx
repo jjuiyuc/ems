@@ -68,9 +68,9 @@ export default connect(mapState, mapDispatch)(function AddPowerOutagePeriod(prop
         [periodError, setPeriodError] = useState(false),
         [otherError, setOtherError] = useState("")
 
-    const maxPeriodError = periodList.length + policyTime > 5
+    const maxPeriodError = periodList.length + policyTime > 12
     const timeChangeError = policyTime.startDate < moment().toDate() || policyTime.startDate >= policyTime.endDate
-    const submitDisabled = type == null || timeChangeError || timeError == true
+    const submitDisabled = startDate == null || endDate == null || type == null || timeChangeError || timeError == true
 
     const filterPassedTime = (time) => {
         const
@@ -97,13 +97,15 @@ export default connect(mapState, mapDispatch)(function AddPowerOutagePeriod(prop
             const gatewayID = props.gatewayID
 
             const data = {
-                "periods": [
-                    {
-                        "startTime": moment(startDate).toISOString(),
-                        "endTime": moment(endDate).toISOString(),
-                        "type": type
-                    },
-                ]
+                periods: Object.keys(policyTime).reduce((acc, policy) => {
+                    const timeGroup = policyTime[policy]
+                    const periods = timeGroup.map(({ startDate, endDate, type }) => ({
+                        startTime: moment(startDate).toISOString(),
+                        endTime: moment(endDate).toISOString(),
+                        type: type,
+                    }))
+                    return [...acc, ...periods]
+                }, []),
             }
             await apiCall({
                 method: "post",
@@ -123,6 +125,19 @@ export default connect(mapState, mapDispatch)(function AddPowerOutagePeriod(prop
                 },
                 onError: err => {
                     switch (err) {
+                        case 400:
+                            setPeriodError(true)
+                            props.updateSnackbarMsg({
+                                type: "error",
+                                msg: errorT("inputEmptyError")
+                            })
+                            break
+                        case 60022:
+                            props.updateSnackbarMsg({
+                                type: "error",
+                                msg: errorT("fieldDisabled")
+                            })
+                            break
                         case 60035:
                             setPeriodError(maxPeriodError)
                             props.updateSnackbarMsg({
@@ -138,6 +153,10 @@ export default connect(mapState, mapDispatch)(function AddPowerOutagePeriod(prop
                             })
                             break
                         default: setOtherError(err)
+                            props.updateSnackbarMsg({
+                                type: "error",
+                                msg: errorT("failureToCreate")
+                            })
                     }
                 },
                 url: `/api/device-management/gateways/${gatewayID}/power-outage-periods`
@@ -150,6 +169,7 @@ export default connect(mapState, mapDispatch)(function AddPowerOutagePeriod(prop
             setEndDate("")
             setType("")
             setPolicyTime(defaultPolicyTime)
+            setOtherError("")
         }
     return <>
         <Button

@@ -23,6 +23,7 @@ export default connect(mapState, mapDispatch)(function Settings(props) {
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
+        errorT = string => t("error." + string),
         pageT = (string, params) => t("settings." + string, params)
     const
         [reservedForGridOutage, setReservedForGridOutage] = useState(1),
@@ -121,7 +122,6 @@ export default connect(mapState, mapDispatch)(function Settings(props) {
             url: `/api/device-management/gateways/${gatewayID}/battery-settings`
         })
     }
-
     return <>
         <h1 className="mb-8">{pageT("settings")}</h1>
         <div className="card mb-8">

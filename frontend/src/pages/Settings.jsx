@@ -183,6 +183,7 @@ export default connect(mapState, mapDispatch)(function Settings(props) {
                             <p className="text-13px ml-2">{commonT("solar")}</p>
                             <Switch
                                 checked={true}
+                                disabled={true}
                             />
                         </div>
                     </div>

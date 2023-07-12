@@ -232,7 +232,7 @@
         "groupHasSubGroup":"該群組之下尚有子群組。",
         "groupHasUser":"該群組內尚有使用者。",
         "groupNameExistsOnTheSameLevel":"在同一個管理層級已存在已存在一樣的群組名稱。",
-        "inputEmptyError":"所有的輸入框不得為空。",
+        "inputEmptyError":"所有的輸入框不得為空，且輸入的時間須為未來時間。",
         "modifyOwnAccountGroupNotAllow":"無法修改所屬群組的名稱。",
         "moreThanMaxPeriods":"已超過停電區間數量限制",
         "noDataMsg":"無顯示資料",

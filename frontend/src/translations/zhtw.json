@@ -323,6 +323,7 @@
     },
     "settings":{
         "aboveBaseline":"流動電價",
+        "addPowerOutagePeriod":"新增停電時間區間",
         "addRatePeriod":"新增費率區間",
         "addDateRange":"新增日期區間",
         "addTimeRange":"新增時間區間",

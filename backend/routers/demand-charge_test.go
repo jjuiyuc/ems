@@ -44,7 +44,7 @@ var _ = Describe("DemandCharge", func() {
 		}
 
 		// Truncate & seed data
-		err = testutils.SeedUtUser(db)
+		err = testutils.SeedUtGroupAndUser(db)
 		Expect(err).Should(BeNil())
 		err = testutils.SeedUtLocationAndGateway(db)
 		Expect(err).Should(BeNil())

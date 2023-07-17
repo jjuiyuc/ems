@@ -66,17 +66,29 @@ func SeedUtWebpageAndRight(db *sql.DB) (err error) {
 	return
 }
 
-// SeedUtUser godoc
-func SeedUtUser(db *sql.DB) (err error) {
+// SeedUtGroupAndUser godoc
+func SeedUtGroupAndUser(db *sql.DB) (err error) {
 	_, err = db.Exec("SET FOREIGN_KEY_CHECKS = 0")
 	if err != nil {
 		return
 	}
-	_, err = db.Exec("truncate table user")
+	_, err = db.Exec("TRUNCATE TABLE user")
+	if err != nil {
+		return
+	}
+	_, err = db.Exec("TRUNCATE TABLE group_gateway_right")
+	if err != nil {
+		return
+	}
+	_, err = db.Exec("TRUNCATE TABLE `group`")
 	if err != nil {
 		return
 	}
 	_, err = db.Exec("SET FOREIGN_KEY_CHECKS = 1")
+	if err != nil {
+		return
+	}
+	err = insertDataFromFile(db, "group.input.sql")
 	if err != nil {
 		return
 	}

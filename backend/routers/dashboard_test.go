@@ -47,7 +47,7 @@ func (s *DashboardSuite) SetupSuite() {
 	s.worker = w
 
 	// Truncate & seed data
-	err := testutils.SeedUtUser(db)
+	err := testutils.SeedUtGroupAndUser(db)
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	err = testutils.SeedUtLocationAndGateway(db)
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())

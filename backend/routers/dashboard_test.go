@@ -51,6 +51,8 @@ func (s *DashboardSuite) SetupSuite() {
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	err = testutils.SeedUtLocationAndGateway(db)
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
+	err = testutils.SeedUtCCDataLog(db)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	token, err := utils.GenerateToken(testutils.SeedUtClaims())
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	s.token = token

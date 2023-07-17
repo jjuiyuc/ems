@@ -68,6 +68,7 @@ export default connect(mapState, mapDispatch)(function AddPowerOutagePeriod(prop
         [periodError, setPeriodError] = useState(false),
         [otherError, setOtherError] = useState("")
 
+    const MAX_PERIOD_LENGTH = 12
     const maxPeriodError = periodList.length + policyTime > 12
     const timeChangeError = policyTime.startDate < moment().toDate() || policyTime.startDate >= policyTime.endDate
     const submitDisabled = startDate == null || endDate == null || type == null || timeChangeError || timeError == true
@@ -231,7 +232,7 @@ export default connect(mapState, mapDispatch)(function AddPowerOutagePeriod(prop
                                                         selectsStart
                                                         startDate={startDate}
                                                         endDate={endDate}
-                                                        minDate={moment(new Date())._d}
+                                                        minDate={new Date()}
                                                         filterTime={filterPassedTime}
                                                     />
                                                 </div>

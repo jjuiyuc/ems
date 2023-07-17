@@ -160,6 +160,16 @@ func SeedUtLocationAndGateway(db *sql.DB) (err error) {
 	return
 }
 
+// SeedUtCCDataLogCalculatedDaily godoc
+func SeedUtCCDataLogCalculatedDaily(db *sql.DB) (err error) {
+	_, err = db.Exec("truncate table cc_data_log_calculated_daily")
+	if err != nil {
+		return
+	}
+	err = insertDataFromFile(db, "cc_data_log_calculated_daily.input.sql")
+	return
+}
+
 func insertDataFromFile(db *sql.DB, filename string) (err error) {
 	b, err := testdata.ReadDataFromFile(filename)
 	if err != nil {

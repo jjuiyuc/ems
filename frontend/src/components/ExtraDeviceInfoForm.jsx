@@ -12,7 +12,6 @@ export default function ExtraDeviceInfoForm(props) {
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
-        dialogT = (string) => t("dialog." + string),
         formT = (string) => t("form." + string)
 
     const
@@ -23,7 +22,7 @@ export default function ExtraDeviceInfoForm(props) {
             setGridOutagePercent(num)
         }
     return <>
-        <h5 className="mb-5 ml-2">{subTitle}</h5>
+        <h5 className="mb-5 ml-2">{props.subTitle}</h5>
         <TextField
             key="r-g-o-p"
             label={formT("reservedForGridOutagePercent")}

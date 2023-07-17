@@ -90,7 +90,7 @@ export default function SubDeviceForm(props) {
                                     </MenuItem>
                                 ))}
                         </TextField>
-                        <h5 className="mb-5 ml-2">{formT("deviceInformation")}</h5>
+                        <h5 className="mb-5 ml-2">{formT("deviceInfo")}</h5>
                         <TextField
                             key={"p-c-" + i}
                             type="number"
@@ -122,7 +122,7 @@ export default function SubDeviceForm(props) {
                         </MenuItem>
                     ))}
                 </TextField>
-                <h5 className="mb-5 ml-2">{formT("deviceInformation")}</h5>
+                <h5 className="mb-5 ml-2">{formT("deviceInfo")}</h5>
                 <TextField
                     key={"i-p-c-"}
                     type="number"

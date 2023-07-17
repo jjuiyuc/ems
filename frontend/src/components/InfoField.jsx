@@ -213,7 +213,7 @@ export default connect(null, mapDispatch)(function InfoField(props) {
                                 disabled={true}
                             />
                             <h5 className="mb-4 ml-2">
-                                {formT("deviceInformation") + " " + (index + 1)}
+                                {formT("deviceInfo") + ` ${index + 1}`}
                             </h5>
                             <TextField
                                 key="m-id"
@@ -267,7 +267,7 @@ export default connect(null, mapDispatch)(function InfoField(props) {
                                             disabled={true}
                                         />
                                         <h5 className="mb-5 ml-2">
-                                            {formT("deviceInformation") + " " + (subIndex + 1)}
+                                            {formT("deviceInfo") + ` ${subIndex + 1}`}
                                         </h5>
                                         <TextField
                                             key="i-sub-p-c-"

@@ -35,6 +35,7 @@ module.exports = {
                 "8rem-auto": "8rem auto",
                 "15rem-1fr": "15rem 1fr",
                 "1fr-auto-1fr": "1fr auto 1fr",
+                "settings-col4": "auto 50px auto auto",
                 "settings-input": "auto 1fr auto auto auto 30px",
                 "settings-input-col5": "auto 1fr auto auto 30px"
             },

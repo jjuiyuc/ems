@@ -180,6 +180,32 @@ func SeedUtCCDataLog(db *sql.DB) (err error) {
 	return
 }
 
+// SeedUtTOU godoc
+func SeedUtTOU(db *sql.DB) (err error) {
+	_, err = db.Exec("truncate table tou")
+	if err != nil {
+		return
+	}
+	_, err = db.Exec("truncate table tou_holiday")
+	if err != nil {
+		return
+	}
+	_, err = db.Exec("truncate table tou_location")
+	if err != nil {
+		return
+	}
+	err = insertDataFromFile(db, "tou_location.input.sql")
+	if err != nil {
+		return
+	}
+	err = insertDataFromFile(db, "tou_holiday.input.sql")
+	if err != nil {
+		return
+	}
+	err = insertDataFromFile(db, "tou.input.sql")
+	return
+}
+
 func insertDataFromFile(db *sql.DB, filename string) (err error) {
 	b, err := testdata.ReadDataFromFile(filename)
 	if err != nil {

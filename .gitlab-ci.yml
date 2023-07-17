@@ -35,9 +35,6 @@ backend-test-job:
     - /start.sh
     - cd backend/
     - cat scripts/der-ems.sql | mysql --user=ubiik --password=testing123 der_ems
-    - cat scripts/der-ems-tou.sql | mysql --user=ubiik --password=testing123 der_ems
-    - cat scripts/der-ems-tou-holiday.sql | mysql --user=ubiik --password=testing123 der_ems
-    - cat scripts/der-ems-tou-location.sql | mysql --user=ubiik --password=testing123 der_ems
     - cat scripts/der-ems-group-type.sql | mysql --user=ubiik --password=testing123 der_ems
     - make go-cover
     - go run github.com/t-yuki/gocover-cobertura < cover.out > coverage.xml

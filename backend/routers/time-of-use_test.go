@@ -50,6 +50,8 @@ var _ = Describe("TimeOfUse", func() {
 		Expect(err).Should(BeNil())
 		err = testutils.SeedUtCCDataLog(db)
 		Expect(err).Should(BeNil())
+		err = testutils.SeedUtTOU(db)
+		Expect(err).Should(BeNil())
 		token, err = utils.GenerateToken(testutils.SeedUtClaims())
 		Expect(err).Should(BeNil())
 		// Mock group_gateway_right table

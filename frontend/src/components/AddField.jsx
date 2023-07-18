@@ -44,7 +44,6 @@ export default function AddField({
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
-        dialogT = (string) => t("dialog." + string),
         formT = (string) => t("form." + string),
         pageT = (string, params) => t("fieldManagement." + string, params)
 
@@ -70,6 +69,9 @@ export default function AddField({
         ]),
         [energyCapacity, setEnergyCapacity] = useState(null),
         [voltage, setVoltage] = useState(null),
+        [deviceInfoCount, setDeviceInfoCount] = useState(1),
+        [showAddIcon, setShowAddIcon] = useState(true),
+        [isHybridInverterSelected, setIsHybridInverterSelected] = useState(false),
         [fullWidth, setFullWidth] = useState(true),
         [maxWidth, setMaxWidth] = useState("lg"),
         [openAdd, setOpenAdd] = useState(false),
@@ -90,8 +92,10 @@ export default function AddField({
     }
     const deviceTypeOptions = useMemo(() => {
         const filteredData = modelList.filter(({ type }) => type !== "PV")
-        const allUniqueTypes = [...new Set(filteredData.map(({ type }) => type))]
-        const typeOptions = allUniqueTypes.map((type) => {
+        const allTypes = [...new Set(filteredData.map(({ type }) => type))]
+        // console.log(allTypes)
+
+        const typeOptions = allTypes.map((type) => {
             if (type === "Hybrid-Inverter") {
                 const otherSelected = deviceType.some((type) => type !== "Hybrid-Inverter")
                 if (otherSelected) return { type, disabled: true }
@@ -105,39 +109,54 @@ export default function AddField({
     }, [modelList, deviceType])
 
     const deviceModelOptions = useMemo(() => {
-        const filteredData = modelList.filter(({ type }) => deviceType?.includes(type))
-        return filteredData
+        return deviceType.flatMap((type) => {
+            const filteredOptions = modelList.filter((model) => model.type === type)
+            return filteredOptions
+        })
     }, [modelList, deviceType])
-
-    console.log(deviceModel)
 
     const
         changeDeviceType = (e) => {
             const { value } = e.target
             const alreadyChecked = deviceType.includes(value)
 
-            const newDeviceType = alreadyChecked ?
-                deviceType.filter((v) => v !== value)
+            const newDeviceType = alreadyChecked
+                ? deviceType.filter((v) => v !== value)
                 : [...deviceType, value]
             setDeviceType(newDeviceType)
 
             if (alreadyChecked) {
-                const newDeviceModel = deviceModel.filter((deviceId) => {
-                    const device = modelList.find(({ id }) => id === deviceId)
+                const newDeviceModel = deviceModel.filter((type) => {
+                    const device = modelList.find(({ type }) => type === type)
                     return newDeviceType.includes(device.type)
                 })
                 setDeviceModel(newDeviceModel)
             }
+            if (value === "Hybrid-Inverter") {
+                setIsHybridInverterSelected(!alreadyChecked)
+            }
         },
-        changeDeviceModel = (e) => {
-
-            setDeviceModel(e.target.value)
+        changeDeviceModel = (index) => (e) => {
+            const { value } = e.target
+            setDeviceModel((prevDeviceModel) => {
+                const updatedDeviceModel = [...prevDeviceModel]
+                updatedDeviceModel[index] = value
+                return updatedDeviceModel
+            })
         },
         inputPercent = (e) => {
             const num = e.target.value
             const isNum = validateNumPercent(num)
             if (!isNum) return
             setGridOutagePercent(num)
+        },
+        addDeviceInfoGroup = () => {
+            if (deviceInfoCount < 3) {
+                setDeviceInfoCount((prevCount) => prevCount + 1)
+            }
+            if (deviceInfoCount + 1 >= 3) {
+                setShowAddIcon(false)
+            }
         }
     useEffect(() => {
         // if (openAdd && fetched == false)
@@ -145,6 +164,7 @@ export default function AddField({
     }, [fetched, openAdd])
 
     // console.log(modelList)
+    // console.log(deviceModelOptions)
     return <>
         <Button
             onClick={() => { setOpenAdd(true) }}
@@ -180,7 +200,7 @@ export default function AddField({
                         {commonT("verify")}
                     </Button>
                 </div>
-                <h5 className="mb-5 ml-2">{pageT("locationInfo")}</h5>
+                <h4 className="mb-5 ml-2">{pageT("locationInfo")}</h4>
                 <TextField
                     id="location-name"
                     label={commonT("locationName")}
@@ -242,11 +262,11 @@ export default function AddField({
                         </MenuItem>
                     ))}
                 </TextField>
-                <Divider variant="middle" sx={{ margin: "1rem 0 2.5rem" }} />
-                <h5 className="mb-5 ml-2">{pageT("fieldDevices")}</h5>
+                <Divider variant="middle" sx={{ margin: "0 0 2rem" }} />
+                <h4 className="mb-5 ml-2">{pageT("fieldDevices")}</h4>
                 <h5 className="mb-5 ml-2">{formT("deviceType")}</h5>
                 <div className="border-gray-400 border rounded-xl
-                    grid grid-cols-2 gap-2 items-center mb-4 p-4">
+                    grid grid-cols-2 gap-2 items-center mb-8 p-4">
                     <FormGroup>
                         {deviceTypeOptions.map(({ i, type, disabled }) =>
                             <FormControlLabel
@@ -264,65 +284,69 @@ export default function AddField({
                         )}
                     </FormGroup>
                 </div>
-                <TextField
-                    id="d-m-"
-                    select
-                    label={formT("deviceModel")}
-                    onChange={changeDeviceModel}
-                    // error={}
-                    value={deviceModel}>
-                    {deviceModelOptions.map(({ id, name }) =>
-                        <MenuItem key={"option-d-m-" + id} value={id}>
-                            {name}
-                        </MenuItem>)}
-                </TextField>
-                <h5 className="mb-5 ml-2">{formT("deviceInfo")}</h5>
-                <TextField
-                    id="modbusID"
-                    type="number"
-                    label={formT("modbusID")}
-                // value={modbusID}
-                />
-                <div className="grid grid-cols-1fr-auto items-center mb-8">
-                    <TextField
-                        sx={{ marginBottom: 0 }}
-                        id="UUEID"
-                        label="UUEID"
-                    // value={UUEID}
-                    />
-                    <Button
-                        // onClick={}
-                        sx={{ marginLeft: "0.3rem" }}
-                        radius="pill"
-                        variant="contained"
-                        color="primary">
-                        {commonT("verify")}
-                    </Button>
-                </div>
-                <TextField
-                    id="powerCapacity"
-                    type="number"
-                    label={formT("powerCapacity")}
-                // value={powerCapacity}
-                />
-                <Divider variant="middle" sx={{ margin: "1rem 0 2rem" }} />
-                {deviceType.includes("Battery")
-                    ? <>
-                        <div className="pl-10 flex flex-col">
-                            <ExtraDeviceInfoForm
-                                subTitle={extraDeviceInfo}
-                                gridOutagePercent={gridOutagePercent}
-                                setGridOutagePercent={setGridOutagePercent}
-                                chargingSource={chargingSource}
-                                setChargingSource={setChargingSource}
-                                energyCapacity={energyCapacity}
-                                setEnergyCapacity={setEnergyCapacity}
-                                voltage={voltage}
-                                setVoltage={setVoltage}
-                            />
-                        </div>
-                    </>
-                    : null}
+                {deviceType.map((type, index) => {
+                    return (
+                        <>
+                            <TextField
+                                key={index}
+                                id={`d-m-${index}`}
+                                select
+                                label={formT("deviceModel") + ` ${index + 1}`}
+                                onChange={changeDeviceModel(index)}
+                                value={deviceModel[index] || ""}
+                            >
+                                {deviceModelOptions
+                                    .filter((model) => model.type === type)
+                                    .map(({ id, name }) => (
+                                        <MenuItem key={id} value={id}>
+                                            {name}
+                                        </MenuItem>
+                                    ))}
+                            </TextField>
+                            {Array.from({ length: deviceInfoCount }).map((_, i) => (
+                                <div className="flex flex-col">
+                                    <div className="grid grid-cols-1fr-auto items-center mb-5 ml-2">
+                                        <h5 className="">{formT("deviceInfo") + ` ${i + 1}`}</h5>
+                                        {i === deviceInfoCount - 1 && isHybridInverterSelected && showAddIcon && (
+                                            <AddIcon onClick={addDeviceInfoGroup} />
+                                        )}
+                                    </div>
+                                    <TextField
+                                        id={`modbusID-${i}`}
+                                        type="number"
+                                        label={formT("modbusID")}
+                                    // value={modbusID}
+                                    />
+                                    <div className="grid grid-cols-1fr-auto items-center mb-8">
+                                        <TextField
+                                            sx={{ marginBottom: 0 }}
+                                            id={`UUEID-${i}`}
+                                            label="UUEID"
+                                        // value={UUEID}
+                                        />
+                                        <Button
+                                            // onClick={}
+                                            sx={{ marginLeft: "0.3rem" }}
+                                            radius="pill"
+                                            variant="contained"
+                                            color="primary"
+                                        >
+                                            {commonT("verify")}
+                                        </Button>
+                                    </div>
+                                    <TextField
+                                        id={`powerCapacity-${i}`}
+                                        type="number"
+                                        label={formT("powerCapacity")}
+                                    // value={powerCapacity}
+                                    />
+                                    <Divider variant="middle" sx={{ margin: "0 0 2rem" }} />
+                                </div>
+                            ))}
+                        </>
+                    )
+                })}
+                {/* <Divider variant="middle" sx={{ margin: "0 0 2rem" }} /> */}
                 {deviceType.includes("Hybrid-Inverter")
                     ? <>
                         <div className="pl-10 flex flex-col">
@@ -350,6 +374,23 @@ export default function AddField({
                             <SubDeviceForm
                                 title={subdevice}
                                 mainDeviceType={deviceType}
+                            />
+                        </div>
+                    </>
+                    : null}
+                {deviceType.includes("Battery")
+                    ? <>
+                        <div className="pl-10 flex flex-col">
+                            <ExtraDeviceInfoForm
+                                subTitle={extraDeviceInfo}
+                                gridOutagePercent={gridOutagePercent}
+                                setGridOutagePercent={setGridOutagePercent}
+                                chargingSource={chargingSource}
+                                setChargingSource={setChargingSource}
+                                energyCapacity={energyCapacity}
+                                setEnergyCapacity={setEnergyCapacity}
+                                voltage={voltage}
+                                setVoltage={setVoltage}
                             />
                         </div>
                     </>

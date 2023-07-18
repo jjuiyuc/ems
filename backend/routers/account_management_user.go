@@ -96,7 +96,7 @@ func (w *APIWorker) CreateUser(c *gin.Context, body *app.CreateUserBody) {
 // @Failure     401            {object}  app.Response
 // @Failure     403            {object}  app.Response
 // @Failure     500            {object}  app.Response
-// @Router      /account-management/users/{user-id} [put]
+// @Router      /account-management/users/{userid} [put]
 func (w *APIWorker) UpdateUser(c *gin.Context, uri *app.UserURI, body *app.UpdateUserBody) {
 	appG := app.Gin{c}
 	userID, _ := c.Get("userID")
@@ -126,7 +126,7 @@ func (w *APIWorker) UpdateUser(c *gin.Context, uri *app.UserURI, body *app.Updat
 // @Failure     401            {object}  app.Response
 // @Failure     403            {object}  app.Response
 // @Failure     500            {object}  app.Response
-// @Router      /account-management/users/{user-id} [delete]
+// @Router      /account-management/users/{userid} [delete]
 func (w *APIWorker) DeleteUser(c *gin.Context, uri *app.UserURI) {
 	appG := app.Gin{c}
 	userID, _ := c.Get("userID")

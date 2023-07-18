@@ -1,5 +1,5 @@
-import { Fragment as Frag, useEffect, useState, useRef } from "react"
-import { Button, Select, MenuItem, TextField } from "@mui/material"
+import { connect } from "react-redux"
+import { useEffect, useState } from "react"
 import { useTranslation } from "react-multi-lang"
 import moment from "moment"
 
@@ -12,30 +12,23 @@ import Table from "./DataTable"
 import { ReactComponent as DeleteIcon } from "../assets/icons/trash_solid.svg"
 import { ReactComponent as PowerOutageIcon } from "../assets/icons/power_outage.svg"
 
+const mapState = state => ({
+    gatewayID: state.gateways.active.gatewayID
+})
+const mapDispatch = dispatch => ({
+    updateSnackbarMsg: value =>
+        dispatch({ type: "snackbarMsg/updateSnackbarMsg", payload: value }),
 
-export default function PowerOutageCard(props) {
+})
+export default connect(mapState, mapDispatch)(function PowerOutageCard(props) {
     const
         t = useTranslation(),
-        commonT = string => t("common." + string),
         pageT = (string, params) => t("settings." + string, params)
 
-    const data = [
-        {
-            "id": 1,
-            "type": "advanceBlackout",
-            "startTime": moment("2023-06-20T05:00:00.00Z").format("YYYY/MM/DD HH:mm"),
-            "endTime": moment("2023-06-20T05:00:00.00Z").format("YYYY/MM/DD HH:mm")
-        },
-        {
-            "id": 3,
-            "type": "evCharge",
-            "startTime": moment("2023-06-22T05:00:00.00Z").format("YYYY/MM/DD HH:mm"),
-            "endTime": moment("2023-06-22T09:00:00.00Z").format("YYYY/MM/DD HH:mm")
-        }
-    ]
     const
-        [openDelete, setOpenDelete] = useState(false),
+        [periodList, setPeriodList] = useState([]),
         [row, setRow] = useState(null),
+        [openDelete, setOpenDelete] = useState(false),
         [loading, setLoading] = useState(false)
 
     const handleClickDelete = row => {
@@ -44,7 +37,7 @@ export default function PowerOutageCard(props) {
     }
     const columns = [
         {
-            cell: row => <span className="font-mono">{row.startTime}</span>,
+            cell: row => <span className="font-mono">{moment(row.startTime).format("YYYY/MM/DD HH:mm")}</span>,
             center: true,
             name: pageT("startDate"),
             selector: row => row.startTime,
@@ -52,7 +45,7 @@ export default function PowerOutageCard(props) {
 
         },
         {
-            cell: row => <span className="font-mono">{row.endTime}</span>,
+            cell: row => <span className="font-mono">{moment(row.endTime).format("YYYY/MM/DD HH:mm")}</span>,
             center: true,
             name: pageT("endDate"),
             selector: row => row.endTime,
@@ -68,13 +61,50 @@ export default function PowerOutageCard(props) {
         },
         {
             cell: (row) => <div className="flex w-24">
-                <DeleteIcon onClick={() => handleClickDelete(row)} />
+                {row.ongoing === true
+                    ? <div className="bg-gray-600 w-6 h-6"></div>
+                    : <DeleteIcon onClick={() => handleClickDelete(row)} />
+                }
             </div>,
             center: true,
             grow: 0.2
         }
     ]
+    const getList = () => {
 
+        const gatewayID = props.gatewayID
+
+        apiCall({
+            onComplete: () => setLoading(false),
+            onStart: () => setLoading(true),
+            onError: (err) => {
+                switch (err) {
+                    case 60034:
+                        props.updateSnackbarMsg({
+                            type: "error",
+                            msg: errorT("failureToGenerate")
+                        })
+                        break
+                    default:
+                        props.updateSnackbarMsg({
+                            type: "error",
+                            msg: errorT("noDataMsg")
+                        })
+                }
+            },
+            onSuccess: rawData => {
+                if (!rawData?.data) return
+
+                const { data } = rawData
+
+                setPeriodList(data.periods || [])
+            },
+            url: `/api/device-management/gateways/${gatewayID}/power-outage-periods`
+        })
+    }
+    useEffect(() => {
+        getList()
+    }, [props.gatewayID])
     return <div className="card mb-8">
         <div className="flex justify-between sm:col-span-2 items-center">
             <div className="flex items-center mb-9">
@@ -85,16 +115,16 @@ export default function PowerOutageCard(props) {
                 </div>
                 <h2 className="font-bold ml-4">{pageT("powerOutage")}</h2>
             </div>
-            <AddPowerOutagePeriod />
+            <AddPowerOutagePeriod {...{ getList, periodList }} />
         </div>
         <div className="flex flex-col mt-4 min-w-49 w-full">
             <Table
-                {...{ columns, data }}
+                {...{ columns, data: periodList }}
                 pagination={false}
                 progressPending={loading}
                 theme="dark"
             />
         </div>
-        <DeletePeriod{...{ row, openDelete, setOpenDelete }} />
+        <DeletePeriod {...{ row, getList, openDelete, setOpenDelete }} />
     </div>
-}
+})

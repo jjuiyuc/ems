@@ -36,9 +36,9 @@ RUN npm install yarn -g
 # jest-junit
 RUN yarn add jest-junit -g
 
-# go 1.18
-RUN wget https://dl.google.com/go/go1.18.2.linux-amd64.tar.gz
-RUN tar -C /usr/local -xzf go1.18.2.linux-amd64.tar.gz
+# go 1.20
+RUN wget https://dl.google.com/go/go1.20.5.linux-amd64.tar.gz
+RUN tar -C /usr/local -xzf go1.20.5.linux-amd64.tar.gz
 
 RUN sed -i 's?"$?:/usr/local/go/bin"?' /etc/environment
 ENV PATH "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/local/go/bin:/usr/local/google-cloud-sdk/bin"

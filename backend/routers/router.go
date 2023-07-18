@@ -107,10 +107,10 @@ var EndpointMapping = map[PolicyWebpageObject][]string{
 	FieldManagement: {
 		"/api/device-management/gateways",
 		"/api/device-management/devices/models",
-		"/api/device-management/gateways/:gatewayid",
-		"/api/device-management/gateways/:gatewayid/field-state",
-		"/api/device-management/gateways/:gatewayid/sync-device-settings",
-		"/api/device-management/gateways/:gatewayid/account-groups",
+		"/api/device-management/gateways/:gwid",
+		"/api/device-management/gateways/:gwid/field-state",
+		"/api/device-management/gateways/:gwid/sync-device-settings",
+		"/api/device-management/gateways/:gwid/account-groups",
 	},
 	AccountManagementGroup: {
 		"/api/account-management/groups",
@@ -119,6 +119,12 @@ var EndpointMapping = map[PolicyWebpageObject][]string{
 	AccountManagementUser: {
 		"/api/account-management/users",
 		"/api/account-management/users/:userid",
+	},
+	Settings: {
+		"/api/device-management/gateways/:gwid/battery-settings",
+		"/api/device-management/gateways/:gwid/meter-settings",
+		"/api/device-management/gateways/:gwid/power-outage-periods",
+		"/api/device-management/gateways/:gwid/power-outage-periods/:periodid",
 	},
 }
 
@@ -237,6 +243,15 @@ func InitRouter(isCORS bool, ginMode string, enforcer *casbin.Enforcer, w *APIWo
 	r.POST(EndpointMapping[AccountManagementUser][0], authorizeJWT(REST), authorizePolicy(enforcer), validateBody(w.CreateUser))
 	r.PUT(EndpointMapping[AccountManagementUser][1], authorizeJWT(REST), authorizePolicy(enforcer), validateURIAndBody(w.UpdateUser))
 	r.DELETE(EndpointMapping[AccountManagementUser][1], authorizeJWT(REST), authorizePolicy(enforcer), validateURI(w.DeleteUser))
+
+	// Settings
+	r.GET(EndpointMapping[Settings][0], authorizeJWT(REST), authorizePolicy(enforcer), validateURI(w.GetBatterySettings))
+	r.PUT(EndpointMapping[Settings][0], authorizeJWT(REST), authorizePolicy(enforcer), validateURIAndBody(w.UpdateBatterySettings))
+	r.GET(EndpointMapping[Settings][1], authorizeJWT(REST), authorizePolicy(enforcer), validateURI(w.GetMeterSettings))
+	r.PUT(EndpointMapping[Settings][1], authorizeJWT(REST), authorizePolicy(enforcer), validateURIAndBody(w.UpdateMeterSettings))
+	r.GET(EndpointMapping[Settings][2], authorizeJWT(REST), authorizePolicy(enforcer), validateURI(w.GetPowerOutagePeriods))
+	r.POST(EndpointMapping[Settings][2], authorizeJWT(REST), authorizePolicy(enforcer), validateURIAndBody(w.CreatePowerOutagePeriods))
+	r.DELETE(EndpointMapping[Settings][3], authorizeJWT(REST), authorizePolicy(enforcer), validateURI(w.DeletePowerOutagePeriod))
 
 	// Casbin route
 	// apiGroup.GET("/casbin", w.getFrontendPermission(enforcer))

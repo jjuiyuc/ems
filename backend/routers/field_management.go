@@ -60,18 +60,18 @@ func (w *APIWorker) GetDeviceModels(c *gin.Context) {
 
 // GetField godoc
 // @Summary Show a field
-// @Description get a field by token and gateway id
+// @Description get a field by token and gateway UUID
 // @Tags        field management
 // @Security    ApiKeyAuth
 // @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
-// @Param       gatewayid      path      string true "Gateway ID"
+// @Param       gwid           path      string true "Gateway UUID"
 // @Produce     json
 // @Success     200            {object}  app.Response{data=services.GetFieldResponse}
 // @Failure     400            {object}  app.Response
 // @Failure     401            {object}  app.Response
 // @Failure     403            {object}  app.Response
 // @Failure     500            {object}  app.Response
-// @Router      /device-management/gateways/{gatewayid} [get]
+// @Router      /device-management/gateways/{gwid} [get]
 func (w *APIWorker) GetField(c *gin.Context, uri *app.FieldURI) {
 	appG := app.Gin{c}
 	userID, _ := c.Get("userID")
@@ -89,11 +89,11 @@ func (w *APIWorker) GetField(c *gin.Context, uri *app.FieldURI) {
 
 // EnableField godoc
 // @Summary Enable/Disable a field
-// @Description enable/disable a field by token and gateway id
+// @Description enable/disable a field by token and gateway UUID
 // @Tags        field management
 // @Security    ApiKeyAuth
 // @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
-// @Param       gatewayid      path      string true "Gateway ID"
+// @Param       gwid           path      string true "Gateway UUID"
 // @Accept      json
 // @Param       enable         body      bool true "Enable"
 // @Produce     json
@@ -102,7 +102,7 @@ func (w *APIWorker) GetField(c *gin.Context, uri *app.FieldURI) {
 // @Failure     401            {object}  app.Response
 // @Failure     403            {object}  app.Response
 // @Failure     500            {object}  app.Response
-// @Router      /device-management/gateways/{gatewayid}/field-state [put]
+// @Router      /device-management/gateways/{gwid}/field-state [put]
 func (w *APIWorker) EnableField(c *gin.Context, uri *app.FieldURI, body *app.EnableFieldBody) {
 	appG := app.Gin{c}
 	userID, _ := c.Get("userID")
@@ -124,14 +124,14 @@ func (w *APIWorker) EnableField(c *gin.Context, uri *app.FieldURI, body *app.Ena
 // @Tags        field management
 // @Security    ApiKeyAuth
 // @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
-// @Param       gatewayid      path      string true "Gateway ID"
+// @Param       gwid           path      string true "Gateway UUID"
 // @Produce     json
 // @Success     200            {object}  app.Response
 // @Failure     400            {object}  app.Response
 // @Failure     401            {object}  app.Response
 // @Failure     403            {object}  app.Response
 // @Failure     500            {object}  app.Response
-// @Router      /device-management/gateways/{gatewayid}/sync-device-settings [get]
+// @Router      /device-management/gateways/{gwid}/sync-device-settings [get]
 func (w *APIWorker) SyncDeviceSettings(c *gin.Context, uri *app.FieldURI) {
 	appG := app.Gin{c}
 	userID, _ := c.Get("userID")
@@ -166,11 +166,11 @@ func (w *APIWorker) sendDeviceSettings(deviceSettings *services.DeviceSettingsDa
 
 // UpdateFieldGroups godoc
 // @Summary Update a field groups
-// @Description update a field groups by token and gateway id
+// @Description update a field groups by token and gateway UUID
 // @Tags        field management
 // @Security    ApiKeyAuth
 // @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
-// @Param       gatewayid      path      string true "Gateway ID"
+// @Param       gwid           path      string true "Gateway UUID"
 // @Accept      json
 // @Param       groups         body      array  true "Groups"
 // @Produce     json
@@ -179,7 +179,7 @@ func (w *APIWorker) sendDeviceSettings(deviceSettings *services.DeviceSettingsDa
 // @Failure     401            {object}  app.Response
 // @Failure     403            {object}  app.Response
 // @Failure     500            {object}  app.Response
-// @Router      /device-management/gateways/{gatewayid}/account-groups [put]
+// @Router      /device-management/gateways/{gwid}/account-groups [put]
 func (w *APIWorker) UpdateFieldGroups(c *gin.Context, uri *app.FieldURI, body *app.UpdateFieldGroupsBody) {
 	appG := app.Gin{c}
 	userID, _ := c.Get("userID")

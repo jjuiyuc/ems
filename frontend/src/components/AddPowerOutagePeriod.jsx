@@ -1,17 +1,22 @@
-import { Button, DialogActions, Divider, InputAdornment, IconButton, MenuItem, TextField } from "@mui/material"
+import { Button, DialogActions, Divider, MenuItem, TextField } from "@mui/material"
 import AddIcon from "@mui/icons-material/Add"
 import { connect } from "react-redux"
+import DatePicker from "react-datepicker"
 import { useTranslation } from "react-multi-lang"
-import { useEffect, useState, useMemo } from "react"
+import { useEffect, useState } from "react"
+import moment from "moment"
+import "../assets/css/timeRangePicker.css"
 
 import { apiCall } from "../utils/api"
 
-import DatePeriodPicker from "./DatePeriodPicker"
 import DialogForm from "./DialogForm"
 
 import { ReactComponent as Add_Icon } from "../assets/icons/add.svg"
 import { ReactComponent as DeleteIcon } from "../assets/icons/delete.svg"
 
+const mapState = state => ({
+    gatewayID: state.gateways.active.gatewayID
+})
 const mapDispatch = dispatch => ({
     updateSnackbarMsg: value =>
         dispatch({ type: "snackbarMsg/updateSnackbarMsg", payload: value }),
@@ -32,9 +37,8 @@ const defaultPolicyTime = {
         { startDate: "", endDate: "", type: "" },
     ]
 }
-
-export default connect(null, mapDispatch)(function AddPowerOutagePeriod(props) {
-    // const { getList, groupDictionary } = props
+export default connect(mapState, mapDispatch)(function AddPowerOutagePeriod(props) {
+    const { getList, periodList } = props
 
     const
         t = useTranslation(),
@@ -60,25 +64,114 @@ export default connect(null, mapDispatch)(function AddPowerOutagePeriod(props) {
         [endDate, setEndDate] = useState(null),
         [type, setType] = useState(null),
         [typeDict, setTypeDict] = useState({}),
+        [timeError, setTimeError] = useState(false),
+        [periodError, setPeriodError] = useState(false),
         [otherError, setOtherError] = useState("")
 
-    const submitDisabled = type == null
+    const MAX_PERIOD_LENGTH = 12
+    const maxPeriodError = periodList.length + policyTime > 12
+    const timeChangeError = policyTime.startDate < moment().toDate() || policyTime.startDate >= policyTime.endDate
+    const submitDisabled = startDate == null || endDate == null || type == null || timeChangeError || timeError == true
 
-    const cancelClick = () => {
-        setOpenAdd(false)
-        setStartDate(null)
-        setEndDate(null)
-        setType("")
+    const filterPassedTime = (time) => {
+        const
+            currentDate = new Date(),
+            selectedDate = new Date(time)
+
+        return moment(currentDate).isBefore(selectedDate)
     }
-    const generateTypeDict = () => {
-        setTypeDict(powerOutageTypes.reduce((acc, cur) => {
-            acc[cur.id] = cur.name
-            return acc
-        }, {}) || {})
-    }
+    const
+        generateTypeDict = () => {
+            setTypeDict(powerOutageTypes.reduce((acc, cur) => {
+                acc[cur.id] = cur.name
+                return acc
+            }, {}) || {})
+        },
+        changeType = (e) => {
+            setType(e.target.value)
+        }
     useEffect(() => {
         generateTypeDict()
     }, [])
+    const
+        submit = async () => {
+            const gatewayID = props.gatewayID
+
+            const data = {
+                periods: Object.keys(policyTime).reduce((acc, policy) => {
+                    const timeGroup = policyTime[policy]
+                    const periods = timeGroup.map(({ startDate, endDate, type }) => ({
+                        startTime: moment(startDate).toISOString(),
+                        endTime: moment(endDate).toISOString(),
+                        type: type,
+                    }))
+                    return [...acc, ...periods]
+                }, []),
+            }
+            await apiCall({
+                method: "post",
+                data,
+                onSuccess: () => {
+                    setOpenAdd(false)
+                    setPeriodError(false)
+                    setStartDate("")
+                    setEndDate("")
+                    setType("")
+                    setPolicyTime(defaultPolicyTime)
+                    getList()
+                    props.updateSnackbarMsg({
+                        type: "success",
+                        msg: t("dialog.addedSuccessfully")
+                    })
+                },
+                onError: err => {
+                    switch (err) {
+                        case 400:
+                            setPeriodError(true)
+                            props.updateSnackbarMsg({
+                                type: "error",
+                                msg: errorT("inputEmptyError")
+                            })
+                            break
+                        case 60022:
+                            props.updateSnackbarMsg({
+                                type: "error",
+                                msg: errorT("fieldDisabled")
+                            })
+                            break
+                        case 60035:
+                            setPeriodError(maxPeriodError)
+                            props.updateSnackbarMsg({
+                                type: "error",
+                                msg: errorT("moreThanMaxPeriods")
+                            })
+                            break
+                        case 60036:
+                            setPeriodError(true)
+                            props.updateSnackbarMsg({
+                                type: "error",
+                                msg: errorT("powerOutagePeriodInvalid")
+                            })
+                            break
+                        default: setOtherError(err)
+                            props.updateSnackbarMsg({
+                                type: "error",
+                                msg: errorT("failureToCreate")
+                            })
+                    }
+                },
+                url: `/api/device-management/gateways/${gatewayID}/power-outage-periods`
+            })
+        },
+
+        cancelClick = () => {
+            setOpenAdd(false)
+            setStartDate("")
+            setEndDate("")
+            setType("")
+            setPolicyTime(defaultPolicyTime)
+            setOtherError("")
+        }
     return <>
         <Button
             onClick={() => { setOpenAdd(true) }}
@@ -107,35 +200,101 @@ export default connect(null, mapDispatch)(function AddPowerOutagePeriod(props) {
                                     <div className="flex items-center text-white mb-4">
                                         <h5 className="font-bold">{pageT(policyConfig[policy].name)}</h5>
                                     </div>
-                                    {timeGroup.map(({ startDate, endDate }, index) => {
+                                    {timeGroup.map(({ startDate, endDate, type }, index) => {
                                         return (
                                             <div key={`${policy}-${index}`}
                                                 className="time-range-picker grid
-                                        grid-cols-settings-input-col5 gap-x-4 items-center mt-4">
-                                                <DatePeriodPicker
-                                                    {...{ startDate, endDate, type, setType, typeDict }}
-                                                    key={index}
-                                                    setStartDate={(date) => {
-                                                        const newPolicyTime = {
-                                                            ...policyTime,
-                                                            [policy]: timeGroup.map((row, i) =>
-                                                                i === index
-                                                                    ? { ...row, startDate: date }
-                                                                    : row)
-                                                        }
-                                                        setPolicyTime(newPolicyTime)
-                                                    }}
-                                                    setEndDate={(date) => {
-                                                        const newPolicyTime = {
-                                                            ...policyTime,
-                                                            [policy]: timeGroup.map((row, i) =>
-                                                                i === index
-                                                                    ? { ...row, endDate: date }
-                                                                    : row)
-                                                        }
-                                                        setPolicyTime(newPolicyTime)
-                                                    }}
-                                                />
+                                                grid-cols-settings-input-col5 gap-x-4 items-center mt-4">
+                                                <div>
+                                                    <h6 className="mb-1 ml-1">{pageT("startDate")}</h6>
+                                                    <DatePicker
+                                                        showTimeSelect
+                                                        timeFormat="HH:mm"
+                                                        timeIntervals={15}
+                                                        selected={startDate}
+                                                        onChange={(date) => {
+                                                            const newPolicyTime = {
+                                                                ...policyTime,
+                                                                [policy]: timeGroup.map((row, i) =>
+                                                                    i === index
+                                                                        ? { ...row, startDate: date }
+                                                                        : row)
+                                                            }
+                                                            setPolicyTime(newPolicyTime)
+                                                            setStartDate(date)
+                                                            if (timeChangeError) {
+                                                                setTimeError(true)
+                                                            } else {
+                                                                setTimeError(false)
+                                                            }
+                                                        }}
+                                                        value={startDate ? moment(startDate).format("yyyy/MM/DD HH:mm") : ""}
+                                                        selectsStart
+                                                        startDate={startDate}
+                                                        endDate={endDate}
+                                                        minDate={new Date()}
+                                                        filterTime={filterPassedTime}
+                                                    />
+                                                </div>
+                                                <span className="mt-6">{pageT("to")}</span>
+                                                <div>
+                                                    <h6 className="mb-1 ml-1">{pageT("endDate")}</h6>
+                                                    <DatePicker
+                                                        showTimeSelect
+                                                        timeFormat="HH:mm"
+                                                        timeIntervals={15}
+                                                        selected={endDate}
+                                                        onChange={(date) => {
+                                                            const newPolicyTime = {
+                                                                ...policyTime,
+                                                                [policy]: timeGroup.map((row, i) =>
+                                                                    i === index
+                                                                        ? { ...row, endDate: date }
+                                                                        : row)
+                                                            }
+                                                            setPolicyTime(newPolicyTime)
+                                                            setEndDate(date)
+                                                            if (timeChangeError) {
+                                                                setTimeError(true)
+                                                            } else {
+                                                                setTimeError(false)
+                                                            }
+                                                        }}
+                                                        selectsEnd
+                                                        endDate={endDate}
+                                                        startDate={startDate}
+                                                        value={endDate ? moment(endDate).format("yyyy/MM/DD HH:mm") : ""}
+                                                        minDate={startDate}
+                                                        minTime={moment(startDate).add(15, "minutes")._d}
+                                                        maxTime={endDate <= startDate ? moment(startDate).add(15, "minutes").endOf("day")._d : moment().startOf("day")._d}
+                                                        disabled={!startDate}
+                                                    />
+                                                </div>
+                                                <div className="flex flex-col m-auto min-w-49 w-fit">
+                                                    <h6 className="mb-1 ml-1">{pageT("type")}</h6>
+                                                    <TextField
+                                                        id="p-o-type"
+                                                        select
+                                                        variant="outlined"
+                                                        onChange={(e) => {
+                                                            const newPolicyTime = {
+                                                                ...policyTime,
+                                                                [policy]: timeGroup.map((row, i) =>
+                                                                    i === index
+                                                                        ? { ...row, type: e.target.value }
+                                                                        : row)
+                                                            }
+                                                            setPolicyTime(newPolicyTime)
+                                                            setType(e.target.value)
+                                                        }}
+                                                        value={type}
+                                                        defaultValue="">
+                                                        {Object.entries(typeDict).map(([key, value]) =>
+                                                            <MenuItem key={"type-o-" + key} value={value}>
+                                                                {pageT(`${value}`)}
+                                                            </MenuItem>)}
+                                                    </TextField>
+                                                </div>
                                                 {index ?
                                                     <div className="ml-2 mt-4 h-4 w-4 flex cursor-pointer">
                                                         <DeleteIcon
@@ -186,7 +345,7 @@ export default connect(null, mapDispatch)(function AddPowerOutagePeriod(props) {
                     {commonT("cancel")}
                 </Button>
                 <Button
-                    // onClick={submit}
+                    onClick={submit}
                     disabled={submitDisabled}
                     radius="pill"
                     variant="contained"

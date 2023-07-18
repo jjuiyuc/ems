@@ -41,8 +41,8 @@ func (s *TestutilsSuite) SetupSuite() {
 	}
 }
 
-func (s *TestutilsSuite) Test_SeedUtUser() {
-	SeedUtUser(s.db)
+func (s *TestutilsSuite) Test_SeedUtGroupAndUser() {
+	SeedUtGroupAndUser(s.db)
 	_, err := s.repo.User.GetUserByUsername(testdata.UtUser.Username)
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 }

@@ -34,12 +34,11 @@ export default connect(null, mapDispatch)(function InfoField(props) {
         [powerCompany, setPowerCompany] = useState(""),
         [voltageType, setVoltageType] = useState(""),
         [touType, setTouType] = useState(""),
-        [modelTypeDict, setModelTypeDict] = useState({}),
+        [modelType, setModelType] = useState(""),
         [modelNameDict, setModelNameDict] = useState({}),
         [deviceList, setDeviceList] = useState([]),
         [enable, setEnable] = useState(false),
         [groupDict, setGroupDict] = useState({}),
-        [groups, setGroups] = useState([]),
         [loading, setLoading] = useState(false),
         [infoError, setInfoError] = useState(""),
         [fetched, setFetched] = useState(false)
@@ -52,10 +51,6 @@ export default connect(null, mapDispatch)(function InfoField(props) {
 
                 const { data } = rawData
 
-                setModelTypeDict(data.models?.reduce((acc, cur) => {
-                    acc[cur.id] = cur.type
-                    return acc
-                }, {}) || {})
                 setModelNameDict(data.models?.reduce((acc, cur) => {
                     acc[cur.id] = cur.name
                     return acc
@@ -104,6 +99,7 @@ export default connect(null, mapDispatch)(function InfoField(props) {
                     setPowerCompany(data.powerCompany || "")
                     setVoltageType(data.voltageType || "")
                     setTouType(data.touType || "")
+                    setModelType(data?.devices?.modelType || "")
                     setDeviceList(data?.devices || [])
                     setEnable(data.enable)
                     setGroupDict(data.groups?.reduce((acc, cur) => {
@@ -121,7 +117,6 @@ export default connect(null, mapDispatch)(function InfoField(props) {
         if (openNotice && fetched == false)
             getModelList()
     }, [fetched, openNotice])
-
     return <>
         <NoticeIcon
             className="mr-5"
@@ -195,7 +190,6 @@ export default connect(null, mapDispatch)(function InfoField(props) {
                 />
                 <Divider variant="middle" sx={{ margin: "0.8rem 0 2rem" }} />
                 {deviceList.map((item, index) => {
-
                     let extraContent = null
                     return (
                         <Fragment key={"f-d-" + index}>
@@ -204,7 +198,7 @@ export default connect(null, mapDispatch)(function InfoField(props) {
                             </h5>
                             <TextField
                                 label={formT("deviceType")}
-                                value={modelTypeDict?.[item.modelID]}
+                                value={item?.modelType}
                                 disabled={true}
                             />
                             <TextField
@@ -236,7 +230,7 @@ export default connect(null, mapDispatch)(function InfoField(props) {
                                 disabled={true}
                             />
                             {/* Battery */}
-                            {item?.modelID === 9 ? <>
+                            {item?.modelType === "Battery" ? <>
                                 <InfoExtraDeviceForm
                                     key="extra-info"
                                     subTitle={pageT("extraDeviceInfo")}
@@ -248,16 +242,15 @@ export default connect(null, mapDispatch)(function InfoField(props) {
                             </>
                                 : null}
                             {item.subDevices?.map((subItem, subIndex) => {
-                                {/* console.log(subItem) */ }
 
                                 let subDeviceContent = null
                                 //Inverter - sub: PV
-                                if (item?.modelID === 6 && subItem?.modelID === 8) {
+                                if (item?.modelType === "Inverter" && subItem?.modelType === "PV") {
                                     subDeviceContent = <>
                                         <TextField
                                             key="i-sub-d-t-"
                                             label={formT("deviceType")}
-                                            value={modelTypeDict?.[subItem.modelID]}
+                                            value={subItem?.modelType}
                                             disabled={true}
                                         />
                                         <TextField
@@ -279,7 +272,7 @@ export default connect(null, mapDispatch)(function InfoField(props) {
                                     </>
                                 }
                                 //Battery
-                                if (subItem?.modelID === 9) {
+                                if (subItem?.modelType === "Battery") {
                                     subDeviceContent = <InfoExtraDeviceForm
                                         key="b-sub-extra-info"
                                         subTitle={pageT("extraDeviceInfo")}
@@ -289,13 +282,13 @@ export default connect(null, mapDispatch)(function InfoField(props) {
                                         gridOutagePercent={subItem.extraInfo?.reservedForGridOutagePercent}
                                     />
                                 }
-                                //HybridInverter
-                                if (item?.modelID === 2 || item?.modelID === 1) {
+                                //Hybrid-Inverter
+                                if (item?.modelType === "Hybrid-Inverter") {
                                     subDeviceContent = <>
                                         <TextField
                                             key="h-sub-d-t-"
                                             label={formT("deviceType")}
-                                            value={modelTypeDict?.[subItem.modelID]}
+                                            value={subItem?.modelType}
                                             disabled={true}
                                         />
                                         <TextField
@@ -315,7 +308,7 @@ export default connect(null, mapDispatch)(function InfoField(props) {
                                             disabled={true}
                                         />
                                         {/* sub: Battery */}
-                                        {subItem?.modelID === 5 &&
+                                        {subItem?.modelType === "Battery" &&
                                             <InfoExtraDeviceForm
                                                 key="h-extra-i-"
                                                 subTitle={pageT("extraDeviceInfo")}

@@ -342,31 +342,21 @@ type BatteryEnergyInfoResponse struct {
 }
 
 // GetBatteryInfo godoc
-func (r *BatteryEnergyInfoResponse) GetBatteryInfo(gwUUID string) {
-	// XXX: Hardcode battery information by gateway UUID
-	const (
-		Huayu      = "0324DE7B51B262F3B11A643CBA8E12CE"
-		Serenegray = "0E0BA27A8175AF978C49396BDE9D7A1E"
-		CHTMiaoli  = "018F1623ADD8E739F7C6CBE62A7DF3C0"
-	)
-	switch gwUUID {
-	case Huayu:
-		r.Model = "PR2116 Poweroad Battery"
-		r.Capcity = 48
-		r.BatteryPower = 30
-		r.Voltage = 480
-	case Serenegray:
-		r.Model = "L051100-A UZ-Energy Battery"
-		r.Capcity = 30
-		r.BatteryPower = 20
-		r.Voltage = 51.2
-	case CHTMiaoli:
-		r.Model = "L051100-A UZ-Energy Battery"
-		r.Capcity = 10
-		r.BatteryPower = 5
-		r.Voltage = 51.2
+func (r *BatteryEnergyInfoResponse) GetBatteryInfo(batteryWrap *repository.BatteryWrap) {
+	r.Model = batteryWrap.DeviceModelName
+	r.BatteryPower = batteryWrap.PowerCapacity
+
+	var extraInfo repository.BatteryExtraInfo
+	if err := json.Unmarshal(batteryWrap.ExtraInfo.JSON, &extraInfo); err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "json.Unmarshal",
+			"err":       err,
+		}).Error()
+		return
 	}
-	r.PowerSources = "Solar + Grid"
+	r.Capcity = extraInfo.EnergyCapacity
+	r.Voltage = extraInfo.Voltage
+	r.PowerSources = extraInfo.ChargingSources
 }
 
 // ComputedValues godoc
@@ -971,7 +961,18 @@ func (s defaultDevicesService) GetSolarPowerState(param *app.ZoomableParam) (sol
 
 func (s defaultDevicesService) GetBatteryEnergyInfo(param *app.StartTimeParam) (batteryEnergyInfo *BatteryEnergyInfoResponse) {
 	batteryEnergyInfo = &BatteryEnergyInfoResponse{}
-	batteryEnergyInfo.GetBatteryInfo(param.GatewayUUID)
+	batteryWrap, err := s.repo.Gateway.GetBatteryMappingByGatewayUUID(param.GatewayUUID)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "s.repo.Gateway.GetBatteryMappingByGatewayUUID",
+			"err":       err,
+		}).Error()
+		return
+	}
+	if batteryWrap != nil {
+		batteryEnergyInfo.GetBatteryInfo(batteryWrap)
+	}
+
 	firstLog, err1 := s.repo.CCData.GetFirstLog(param.GatewayUUID, param.Query.StartTime, time.Time{})
 	latestLog, err2 := s.repo.CCData.GetLatestLog(param.GatewayUUID, time.Time{}, time.Time{})
 	if err1 != nil || err2 != nil {

@@ -154,7 +154,7 @@ export default connect(mapState, mapDispatch)(function AccountManagementUser(pro
     return <>
         <h1 className="mb-9">{commonT("accountManagementUser")}</h1>
         <div className="mb-9">
-            <AddUser {...{ getList, userList, groupDictionary }} />
+            <AddUser {...{ getList, groupDictionary }} />
         </div>
         <Table
             {...{ columns, data: userList }}

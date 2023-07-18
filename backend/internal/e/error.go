@@ -39,6 +39,12 @@ var (
 	ErrNewOwnAccountDeletedNotAllow = errors.New("delete own account does not allow")
 	// ErrNewFieldIsDisabled godoc
 	ErrNewFieldIsDisabled = errors.New("field is disabled")
+	// ErrNewPowerOutagePeriodsMoreThanMaximum godoc
+	ErrNewPowerOutagePeriodsMoreThanMaximum = errors.New("power outage periods are more than maximum")
+	// ErrNewPowerOutagePeriodInvalid godoc
+	ErrNewPowerOutagePeriodInvalid = errors.New("power outage period is invalid")
+	// ErrNewPowerOutagePeriodOngoing godoc
+	ErrNewPowerOutagePeriodOngoing = errors.New("power outage period is ongoing")
 )
 
 // ErrNewKeyNotExist godoc

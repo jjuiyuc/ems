@@ -16,6 +16,7 @@ type Services struct {
 	AccountManagement AccountManagementService
 	Weather           WeatherService
 	FieldManagement   FieldManagementService
+	Settings          SettingsService
 }
 
 // NewServices godoc
@@ -30,5 +31,6 @@ func NewServices(cfg *viper.Viper, repo *repository.Repository) (services *Servi
 	}
 	services.Devices = NewDevicesService(repo, services.Billing)
 	services.FieldManagement = NewFieldManagementService(repo, services.AccountManagement, services.Weather, services.Billing)
+	services.Settings = NewSettingsService(repo, services.FieldManagement)
 	return
 }

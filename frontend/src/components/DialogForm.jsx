@@ -19,7 +19,6 @@ export default function DialogForm({
     fullWidth,
     maxWidth,
     open,
-    setOpen,
     closeOutside = false
 }) {
     return <>

@@ -48,7 +48,7 @@ var _ = Describe("User", func() {
 	})
 
 	AfterEach(func() {
-		err = testutils.SeedUtUser(db)
+		err = testutils.SeedUtGroupAndUser(db)
 		Expect(err).Should(BeNil())
 		models.Close()
 	})

@@ -45,7 +45,7 @@ func (s *AuthorizationSuite) SetupSuite() {
 	// Truncate & seed data
 	_, err := db.Exec("truncate table login_log")
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
-	err = testutils.SeedUtUser(db)
+	err = testutils.SeedUtGroupAndUser(db)
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 
 	s.repo = repo

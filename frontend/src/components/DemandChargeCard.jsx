@@ -1,26 +1,118 @@
+import { connect } from "react-redux"
 import { Button, TextField, InputAdornment } from "@mui/material"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useTranslation } from "react-multi-lang"
 
+import { apiCall } from "../utils/api"
 import { validateNum } from "../utils/utils"
 
-import { ReactComponent as DemandChargeIcon } from
-    "../assets/icons/demand_charge_line.svg"
+import { ReactComponent as DemandChargeIcon } from "../assets/icons/demand_charge_line.svg"
 
-export default function DemandChargeCard(props) {
+const mapState = state => ({
+    gatewayID: state.gateways.active.gatewayID
+})
+const mapDispatch = dispatch => ({
+    updateSnackbarMsg: value =>
+        dispatch({ type: "snackbarMsg/updateSnackbarMsg", payload: value }),
+
+})
+export default connect(mapState, mapDispatch)(function DemandChargeCard(props) {
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
-        pageT = (string, params) => t("settings." + string, params)
+        errorT = string => t("error." + string)
+
     const
-        [inputValue, setInputValue] = useState("")
+        [maxDemandCapacity, setMaxDemandCapacity] = useState(null),
+        [loading, setLoading] = useState(false)
     const
         inputNum = (e) => {
             const num = e.target.value
             const isNum = validateNum(num)
             if (!isNum) return
-            setInputValue(num)
+            setMaxDemandCapacity(num)
+        },
+        handleSave = () => {
+            const newData = maxDemandCapacity
+            setMaxDemandCapacity(newData)
         }
+    const getData = () => {
+
+        const gatewayID = props.gatewayID
+
+        apiCall({
+            onComplete: () => setLoading(false),
+            onStart: () => setLoading(true),
+            onError: (err) => {
+                switch (err) {
+                    case 60019:
+                        props.updateSnackbarMsg({
+                            type: "error",
+                            msg: errorT("failureToGenerate")
+                        })
+                        break
+                    default:
+                        props.updateSnackbarMsg({
+                            type: "error",
+                            msg: errorT("failureToGenerate")
+                        })
+                }
+            },
+            onSuccess: rawData => {
+                if (!rawData?.data) return
+
+                const { data } = rawData
+
+                setMaxDemandCapacity(data.maxDemandCapacity || null)
+
+            },
+            url: `/api/device-management/gateways/${gatewayID}/meter-settings`
+        })
+    }
+    useEffect(() => {
+        getData()
+    }, [props.gatewayID])
+
+    const submit = async () => {
+
+        const gatewayID = props.gatewayID
+
+        const data = { maxDemandCapacity: parseInt(maxDemandCapacity) }
+
+        await apiCall({
+            method: "put",
+            data,
+            onSuccess: () => {
+                handleSave()
+                props.updateSnackbarMsg({
+                    type: "success",
+                    msg: t("dialog.modifySuccessfully")
+                })
+            },
+            onError: (err) => {
+                switch (err) {
+                    case 60022:
+                        props.updateSnackbarMsg({
+                            type: "error",
+                            msg: errorT("fieldDisabled")
+                        })
+                        break
+                    case 60033:
+                        props.updateSnackbarMsg({
+                            type: "error",
+                            msg: errorT("updateMeterSettingsError")
+                        })
+                        break
+                    default: setOtherError(err)
+                        props.updateSnackbarMsg({
+                            type: "error",
+                            msg: errorT("failureToSave")
+                        })
+                }
+            },
+            url: `/api/device-management/gateways/${gatewayID}/meter-settings`
+        })
+    }
     return <div className="card mt-8">
         <div className="flex justify-between sm:col-span-2 items-center">
             <div className="flex items-center">
@@ -32,8 +124,8 @@ export default function DemandChargeCard(props) {
                 <h2 className="font-bold ml-4">{commonT("demandCharge")}</h2>
             </div>
             <Button
-                // onClick={() => setTab(t)}
-                key={"s-b-"}
+                onClick={submit}
+                key={"s-b-s-d"}
                 radius="pill"
                 variant="contained">
                 {commonT("save")}
@@ -45,7 +137,7 @@ export default function DemandChargeCard(props) {
                 <TextField
                     label="Maximum Demand"
                     id="outlined-end-adornment"
-                    value={inputValue}
+                    value={maxDemandCapacity}
                     onChange={inputNum}
                     InputProps={{
                         endAdornment:
@@ -58,4 +150,4 @@ export default function DemandChargeCard(props) {
             </div>
         </div>
     </div>
-}
+})

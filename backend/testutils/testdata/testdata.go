@@ -1,12 +1,24 @@
 package testdata
 
 import (
+	"os"
+	"path/filepath"
+	"runtime"
 	"time"
 
 	"github.com/volatiletech/null/v8"
 
 	deremsmodels "der-ems/models/der-ems"
 )
+
+func ReadDataFromFile(filename string) (rv []byte, err error) {
+	return os.ReadFile(filepath.Join(dir(), filename))
+}
+
+func dir() string {
+	_, filename, _, _ := runtime.Caller(0)
+	return filepath.Dir(filename)
+}
 
 // UtUser godoc
 var UtUser = &deremsmodels.User{

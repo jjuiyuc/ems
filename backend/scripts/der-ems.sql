@@ -605,6 +605,30 @@ CREATE TABLE `device_log` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `power_outage_period`
+--
+
+DROP TABLE IF EXISTS `power_outage_period`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `power_outage_period` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `gw_id` bigint NOT NULL,
+  `type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `started_at` datetime NOT NULL,
+  `ended_at` datetime NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_by` bigint DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted_by` bigint DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `power_outage_period_gw_id_gateway_id_foreign` (`gw_id`),
+  CONSTRAINT `power_outage_period_gw_id_gateway_id_foreign` FOREIGN KEY (`gw_id`) REFERENCES `gateway` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;

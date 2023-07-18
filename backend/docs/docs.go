@@ -556,7 +556,7 @@ var doc = `{
                 }
             }
         },
-        "/account-management/users/{user-id}": {
+        "/account-management/users/{userid}": {
             "put": {
                 "security": [
                     {
@@ -913,14 +913,14 @@ var doc = `{
                 }
             }
         },
-        "/device-management/gateways/{gatewayid}": {
+        "/device-management/gateways/{gwid}": {
             "get": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "get a field by token and gateway id",
+                "description": "get a field by token and gateway UUID",
                 "produces": [
                     "application/json"
                 ],
@@ -939,8 +939,8 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "Gateway ID",
-                        "name": "gatewayid",
+                        "description": "Gateway UUID",
+                        "name": "gwid",
                         "in": "path",
                         "required": true
                     }
@@ -991,14 +991,14 @@ var doc = `{
                 }
             }
         },
-        "/device-management/gateways/{gatewayid}/account-groups": {
+        "/device-management/gateways/{gwid}/account-groups": {
             "put": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "update a field groups by token and gateway id",
+                "description": "update a field groups by token and gateway UUID",
                 "consumes": [
                     "application/json"
                 ],
@@ -1020,8 +1020,8 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "Gateway ID",
-                        "name": "gatewayid",
+                        "description": "Gateway UUID",
+                        "name": "gwid",
                         "in": "path",
                         "required": true
                     },
@@ -1069,14 +1069,177 @@ var doc = `{
                 }
             }
         },
-        "/device-management/gateways/{gatewayid}/field-state": {
+        "/device-management/gateways/{gwid}/battery-settings": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get battery settings by token and gateway UUID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "settings"
+                ],
+                "summary": "Show battery settings",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Input user's access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Gateway UUID",
+                        "name": "gwid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/app.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/services.GetBatterySettingsResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            },
             "put": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "enable/disable a field by token and gateway id",
+                "description": "update battery settings by token and gateway UUID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "settings"
+                ],
+                "summary": "Update battery settings",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Input user's access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Gateway UUID",
+                        "name": "gwid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Charging sources",
+                        "name": "chargingSources",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Reserved for grid outage percent",
+                        "name": "reservedForGridOutagePercent",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/device-management/gateways/{gwid}/field-state": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "enable/disable a field by token and gateway UUID",
                 "consumes": [
                     "application/json"
                 ],
@@ -1098,8 +1261,8 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "Gateway ID",
-                        "name": "gatewayid",
+                        "description": "Gateway UUID",
+                        "name": "gwid",
                         "in": "path",
                         "required": true
                     },
@@ -1147,7 +1310,374 @@ var doc = `{
                 }
             }
         },
-        "/device-management/gateways/{gatewayid}/sync-device-settings": {
+        "/device-management/gateways/{gwid}/meter-settings": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get meter settings by token and gateway UUID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "settings"
+                ],
+                "summary": "Show maximum demand capacity",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Input user's access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Gateway UUID",
+                        "name": "gwid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/app.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/services.GetMeterSettingsResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "update meter settings by token and gateway UUID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "settings"
+                ],
+                "summary": "Update maximum demand capacity",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Input user's access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Gateway UUID",
+                        "name": "gwid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Maximum demand capacity",
+                        "name": "maxDemandCapacity",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/device-management/gateways/{gwid}/power-outage-periods": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get power outage periods by token and gateway UUID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "settings"
+                ],
+                "summary": "Show power outage periods",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Input user's access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Gateway UUID",
+                        "name": "gwid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/app.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/services.GetPowerOutagePeriodsResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "create power outage periods by token and gateway UUID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "settings"
+                ],
+                "summary": "Create power outage periods",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Input user's access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Periods",
+                        "name": "periods",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/device-management/gateways/{gwid}/power-outage-periods/{periodid}": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "delete a power outage period by token, gateway UUID and period ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "settings"
+                ],
+                "summary": "Delete a power outage period",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Input user's access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Period ID",
+                        "name": "periodid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/device-management/gateways/{gwid}/sync-device-settings": {
             "get": {
                 "security": [
                     {
@@ -1173,8 +1703,8 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "Gateway ID",
-                        "name": "gatewayid",
+                        "description": "Gateway UUID",
+                        "name": "gwid",
                         "in": "path",
                         "required": true
                     }
@@ -3157,6 +3687,23 @@ var doc = `{
                 }
             }
         },
+        "repository.FieldGroupWrap": {
+            "type": "object",
+            "properties": {
+                "check": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "parentID": {
+                    "type": "string"
+                }
+            }
+        },
         "repository.UserWrap": {
             "type": "object",
             "properties": {
@@ -3534,20 +4081,6 @@ var doc = `{
                 }
             }
         },
-        "services.FieldGroupInfo": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "parentID": {
-                    "type": "string"
-                }
-            }
-        },
         "services.Float32ArrayFormat": {
             "type": "array",
             "items": {
@@ -3589,6 +4122,17 @@ var doc = `{
                 }
             }
         },
+        "services.GetBatterySettingsResponse": {
+            "type": "object",
+            "properties": {
+                "chargingSources": {
+                    "type": "string"
+                },
+                "reservedForGridOutagePercent": {
+                    "type": "integer"
+                }
+            }
+        },
         "services.GetDeviceModelsResponse": {
             "type": "object",
             "properties": {
@@ -3621,7 +4165,7 @@ var doc = `{
                 "groups": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/services.FieldGroupInfo"
+                        "$ref": "#/definitions/repository.FieldGroupWrap"
                     }
                 },
                 "lat": {
@@ -3716,6 +4260,25 @@ var doc = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/services.GetGroupInfo"
+                    }
+                }
+            }
+        },
+        "services.GetMeterSettingsResponse": {
+            "type": "object",
+            "properties": {
+                "maxDemandCapacity": {
+                    "type": "integer"
+                }
+            }
+        },
+        "services.GetPowerOutagePeriodsResponse": {
+            "type": "object",
+            "properties": {
+                "periods": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/services.PowerOutagePeriodInfo"
                     }
                 }
             }
@@ -3826,6 +4389,26 @@ var doc = `{
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "services.PowerOutagePeriodInfo": {
+            "type": "object",
+            "properties": {
+                "endTime": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "ongoing": {
+                    "type": "boolean"
+                },
+                "startTime": {
+                    "type": "string"
+                },
+                "type": {
                     "type": "string"
                 }
             }

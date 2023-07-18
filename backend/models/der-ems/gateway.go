@@ -148,10 +148,12 @@ var GatewayRels = struct {
 	Location             string
 	GWDevices            string
 	GWGroupGatewayRights string
+	GWPowerOutagePeriods string
 }{
 	Location:             "Location",
 	GWDevices:            "GWDevices",
 	GWGroupGatewayRights: "GWGroupGatewayRights",
+	GWPowerOutagePeriods: "GWPowerOutagePeriods",
 }
 
 // gatewayR is where relationships are stored.
@@ -159,6 +161,7 @@ type gatewayR struct {
 	Location             *Location              `boil:"Location" json:"Location" toml:"Location" yaml:"Location"`
 	GWDevices            DeviceSlice            `boil:"GWDevices" json:"GWDevices" toml:"GWDevices" yaml:"GWDevices"`
 	GWGroupGatewayRights GroupGatewayRightSlice `boil:"GWGroupGatewayRights" json:"GWGroupGatewayRights" toml:"GWGroupGatewayRights" yaml:"GWGroupGatewayRights"`
+	GWPowerOutagePeriods PowerOutagePeriodSlice `boil:"GWPowerOutagePeriods" json:"GWPowerOutagePeriods" toml:"GWPowerOutagePeriods" yaml:"GWPowerOutagePeriods"`
 }
 
 // NewStruct creates a new relationship struct
@@ -185,6 +188,13 @@ func (r *gatewayR) GetGWGroupGatewayRights() GroupGatewayRightSlice {
 		return nil
 	}
 	return r.GWGroupGatewayRights
+}
+
+func (r *gatewayR) GetGWPowerOutagePeriods() PowerOutagePeriodSlice {
+	if r == nil {
+		return nil
+	}
+	return r.GWPowerOutagePeriods
 }
 
 // gatewayL is where Load methods for each relationship are stored.
@@ -326,6 +336,20 @@ func (o *Gateway) GWGroupGatewayRights(mods ...qm.QueryMod) groupGatewayRightQue
 	)
 
 	return GroupGatewayRights(queryMods...)
+}
+
+// GWPowerOutagePeriods retrieves all the power_outage_period's PowerOutagePeriods with an executor via gw_id column.
+func (o *Gateway) GWPowerOutagePeriods(mods ...qm.QueryMod) powerOutagePeriodQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("`power_outage_period`.`gw_id`=?", o.ID),
+	)
+
+	return PowerOutagePeriods(queryMods...)
 }
 
 // LoadLocation allows an eager lookup of values, cached into the
@@ -610,6 +634,97 @@ func (gatewayL) LoadGWGroupGatewayRights(e boil.Executor, singular bool, maybeGa
 	return nil
 }
 
+// LoadGWPowerOutagePeriods allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (gatewayL) LoadGWPowerOutagePeriods(e boil.Executor, singular bool, maybeGateway interface{}, mods queries.Applicator) error {
+	var slice []*Gateway
+	var object *Gateway
+
+	if singular {
+		object = maybeGateway.(*Gateway)
+	} else {
+		slice = *maybeGateway.(*[]*Gateway)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &gatewayR{}
+		}
+		args = append(args, object.ID)
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &gatewayR{}
+			}
+
+			for _, a := range args {
+				if a == obj.ID {
+					continue Outer
+				}
+			}
+
+			args = append(args, obj.ID)
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(
+		qm.From(`power_outage_period`),
+		qm.WhereIn(`power_outage_period.gw_id in ?`, args...),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.Query(e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load power_outage_period")
+	}
+
+	var resultSlice []*PowerOutagePeriod
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice power_outage_period")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on power_outage_period")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for power_outage_period")
+	}
+
+	if singular {
+		object.R.GWPowerOutagePeriods = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &powerOutagePeriodR{}
+			}
+			foreign.R.GW = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if local.ID == foreign.GWID {
+				local.R.GWPowerOutagePeriods = append(local.R.GWPowerOutagePeriods, foreign)
+				if foreign.R == nil {
+					foreign.R = &powerOutagePeriodR{}
+				}
+				foreign.R.GW = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
 // SetLocation of the gateway to the related item.
 // Sets o.R.Location to related.
 // Adds o to related.R.Gateways.
@@ -857,6 +972,58 @@ func (o *Gateway) AddGWGroupGatewayRights(exec boil.Executor, insert bool, relat
 	for _, rel := range related {
 		if rel.R == nil {
 			rel.R = &groupGatewayRightR{
+				GW: o,
+			}
+		} else {
+			rel.R.GW = o
+		}
+	}
+	return nil
+}
+
+// AddGWPowerOutagePeriods adds the given related objects to the existing relationships
+// of the gateway, optionally inserting them as new records.
+// Appends related to o.R.GWPowerOutagePeriods.
+// Sets related.R.GW appropriately.
+func (o *Gateway) AddGWPowerOutagePeriods(exec boil.Executor, insert bool, related ...*PowerOutagePeriod) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			rel.GWID = o.ID
+			if err = rel.Insert(exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE `power_outage_period` SET %s WHERE %s",
+				strmangle.SetParamNames("`", "`", 0, []string{"gw_id"}),
+				strmangle.WhereClause("`", "`", 0, powerOutagePeriodPrimaryKeyColumns),
+			)
+			values := []interface{}{o.ID, rel.ID}
+
+			if boil.DebugMode {
+				fmt.Fprintln(boil.DebugWriter, updateQuery)
+				fmt.Fprintln(boil.DebugWriter, values)
+			}
+			if _, err = exec.Exec(updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			rel.GWID = o.ID
+		}
+	}
+
+	if o.R == nil {
+		o.R = &gatewayR{
+			GWPowerOutagePeriods: related,
+		}
+	} else {
+		o.R.GWPowerOutagePeriods = append(o.R.GWPowerOutagePeriods, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &powerOutagePeriodR{
 				GW: o,
 			}
 		} else {

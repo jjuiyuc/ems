@@ -40,17 +40,55 @@ func GetConfigDir() string {
 	return filepath.Join(filepath.Dir(filename), "..", "config")
 }
 
-// SeedUtUser godoc
-func SeedUtUser(db *sql.DB) (err error) {
+// SeedUtWebpageAndRight godoc
+func SeedUtWebpageAndRight(db *sql.DB) (err error) {
 	_, err = db.Exec("SET FOREIGN_KEY_CHECKS = 0")
 	if err != nil {
 		return
 	}
-	_, err = db.Exec("truncate table user")
+	_, err = db.Exec("truncate table group_type_webpage_right")
+	if err != nil {
+		return
+	}
+	_, err = db.Exec("truncate table webpage")
 	if err != nil {
 		return
 	}
 	_, err = db.Exec("SET FOREIGN_KEY_CHECKS = 1")
+	if err != nil {
+		return
+	}
+	err = insertDataFromFile(db, "webpage.input.sql")
+	if err != nil {
+		return
+	}
+	err = insertDataFromFile(db, "group_type_webpage_right.input.sql")
+	return
+}
+
+// SeedUtGroupAndUser godoc
+func SeedUtGroupAndUser(db *sql.DB) (err error) {
+	_, err = db.Exec("SET FOREIGN_KEY_CHECKS = 0")
+	if err != nil {
+		return
+	}
+	_, err = db.Exec("TRUNCATE TABLE user")
+	if err != nil {
+		return
+	}
+	_, err = db.Exec("TRUNCATE TABLE group_gateway_right")
+	if err != nil {
+		return
+	}
+	_, err = db.Exec("TRUNCATE TABLE `group`")
+	if err != nil {
+		return
+	}
+	_, err = db.Exec("SET FOREIGN_KEY_CHECKS = 1")
+	if err != nil {
+		return
+	}
+	err = insertDataFromFile(db, "group.input.sql")
 	if err != nil {
 		return
 	}
@@ -76,6 +114,18 @@ func SeedUtLocationAndGateway(db *sql.DB) (err error) {
 	if err != nil {
 		return
 	}
+	_, err = db.Exec("truncate table device")
+	if err != nil {
+		return
+	}
+	_, err = db.Exec("truncate table device_model")
+	if err != nil {
+		return
+	}
+	_, err = db.Exec("truncate table device_module")
+	if err != nil {
+		return
+	}
 	_, err = db.Exec("truncate table gateway")
 	if err != nil {
 		return
@@ -95,13 +145,80 @@ func SeedUtLocationAndGateway(db *sql.DB) (err error) {
 	}
 	gateway := testdata.UtGateway
 	err = gateway.Insert(db, boil.Infer())
+	if err != nil {
+		return
+	}
+	err = insertDataFromFile(db, "device_model.input.sql")
+	if err != nil {
+		return
+	}
+	err = insertDataFromFile(db, "device_module.input.sql")
+	if err != nil {
+		return
+	}
+	err = insertDataFromFile(db, "device.input.sql")
+	return
+}
+
+// SeedUtCCDataLogCalculatedDaily godoc
+func SeedUtCCDataLogCalculatedDaily(db *sql.DB) (err error) {
+	_, err = db.Exec("truncate table cc_data_log_calculated_daily")
+	if err != nil {
+		return
+	}
+	err = insertDataFromFile(db, "cc_data_log_calculated_daily.input.sql")
+	return
+}
+
+// SeedUtCCDataLog godoc
+func SeedUtCCDataLog(db *sql.DB) (err error) {
+	_, err = db.Exec("truncate table cc_data_log")
+	if err != nil {
+		return
+	}
+	err = insertDataFromFile(db, "cc_data_log.input.sql")
+	return
+}
+
+// SeedUtTOU godoc
+func SeedUtTOU(db *sql.DB) (err error) {
+	_, err = db.Exec("truncate table tou")
+	if err != nil {
+		return
+	}
+	_, err = db.Exec("truncate table tou_holiday")
+	if err != nil {
+		return
+	}
+	_, err = db.Exec("truncate table tou_location")
+	if err != nil {
+		return
+	}
+	err = insertDataFromFile(db, "tou_location.input.sql")
+	if err != nil {
+		return
+	}
+	err = insertDataFromFile(db, "tou_holiday.input.sql")
+	if err != nil {
+		return
+	}
+	err = insertDataFromFile(db, "tou.input.sql")
+	return
+}
+
+func insertDataFromFile(db *sql.DB, filename string) (err error) {
+	b, err := testdata.ReadDataFromFile(filename)
+	if err != nil {
+		return
+	}
+	_, err = db.Exec(string(b))
 	return
 }
 
 // SeedUtClaims godoc
 func SeedUtClaims() (claims utils.Claims) {
 	claims = utils.Claims{
-		UserID:  testdata.UtUser.ID,
+		UserID:    testdata.UtUser.ID,
 		GroupType: testdata.UtGroupType,
 	}
 	return

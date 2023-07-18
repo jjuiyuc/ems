@@ -22,6 +22,7 @@ var TableNames = struct {
 	GroupTypeWebpageRight      string
 	Location                   string
 	LoginLog                   string
+	PowerOutagePeriod          string
 	Tou                        string
 	TouHoliday                 string
 	TouLocation                string
@@ -47,6 +48,7 @@ var TableNames = struct {
 	GroupTypeWebpageRight:      "group_type_webpage_right",
 	Location:                   "location",
 	LoginLog:                   "login_log",
+	PowerOutagePeriod:          "power_outage_period",
 	Tou:                        "tou",
 	TouHoliday:                 "tou_holiday",
 	TouLocation:                "tou_location",

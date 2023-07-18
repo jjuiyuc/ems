@@ -41,6 +41,8 @@ func (s *BillingWorkerSuite) SetupSuite() {
 	// Truncate & seed data
 	err := testutils.SeedUtLocationAndGateway(db)
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
+	err = testutils.SeedUtTOU(db)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 
 	// Mock seedUtTime
 	loc, _ := time.LoadLocation("Asia/Taipei")

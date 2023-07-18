@@ -208,3 +208,13 @@ func (w *APIWorker) UpdateFieldGroups(c *gin.Context, uri *app.FieldURI, body *a
 	}
 	appG.Response(http.StatusOK, e.Success, nil)
 }
+
+func (w *APIWorker) GetSubDeviceModels(c *gin.Context) {
+	appG := app.Gin{c}
+	responseData, err := w.Services.FieldManagement.GetSubDeviceModels()
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ErrSubDeviceModelsGen, nil)
+		return
+	}
+	appG.Response(http.StatusOK, e.Success, responseData)
+}

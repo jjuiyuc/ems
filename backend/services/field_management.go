@@ -27,6 +27,7 @@ type FieldManagementService interface {
 	GenerateDeviceSettings(executedUserID int64, gwUUID string) (deviceSettings *DeviceSettingsData, err error)
 	GenerateDLDeviceMappingInfo(gwID int64) (data []byte, err error)
 	UpdateFieldGroups(executedUserID int64, gwUUID string, groups []app.FieldGroupInfo) (err error)
+	GetSubDeviceModels() (getSubDeviceModels *GetSubDeviceModelsResponse, err error)
 }
 
 // GetFieldsResponse godoc
@@ -84,6 +85,23 @@ type DeviceSettingsData struct {
 	BillingData       []byte
 	DeviceMappingData []byte
 	LocationData      []byte
+}
+
+// GetSubDeviceModelsResponse godoc
+type GetSubDeviceModelsResponse struct {
+	SubDevices []SubDevicesInfo `json:"subDevices"`
+}
+
+// SubDevicesInfo godoc
+type SubDevicesInfo struct {
+	Type   string               `json:"type"`
+	Models []SubDeviceModelInfo `json:"models"`
+}
+
+// SubDeviceModelInfo godoc
+type SubDeviceModelInfo struct {
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
 }
 
 type defaultFieldManagementService struct {
@@ -219,6 +237,7 @@ func (s defaultFieldManagementService) getFieldDevices(gwID int64) (deviceInfos 
 			ExtraInfo:     device.ExtraInfo,
 		}
 
+		// XXX: Type Hybrid-Inverter and Inverter would not be sub-device
 		if device.ModelType != "Hybrid-Inverter" && device.ModelType != "Inverter" {
 			deviceInfos = append(deviceInfos, deviceInfo)
 			continue
@@ -621,6 +640,43 @@ func (s defaultFieldManagementService) insertGroupGatewayPermissionLog(tx *sql.T
 			"caused-by": "s.repo.User.InsertGroupGatewayPermissionLog",
 			"err":       err,
 		}).Error()
+	}
+	return
+}
+
+func (s defaultFieldManagementService) GetSubDeviceModels() (getSubDeviceModels *GetSubDeviceModelsResponse, err error) {
+	models, err := s.repo.Gateway.GetDeviceModels()
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.Gateway.GetDeviceModels",
+			"err":       err,
+		}).Error()
+		return
+	}
+
+	subModels := make(map[string][]SubDeviceModelInfo)
+	for _, model := range models {
+		// XXX: Type Hybrid-Inverter and Inverter would not be sub-device
+		if model.Type == "Hybrid-Inverter" || model.Type == "Inverter" {
+			continue
+		}
+
+		subModelInfo := SubDeviceModelInfo{
+			ID:   model.ID,
+			Name: model.Name,
+		}
+		subModels[model.Type] = append(subModels[model.Type], subModelInfo)
+	}
+	var getSubDevicesInfos []SubDevicesInfo
+	for subModelType, subModelInfos := range subModels {
+		subDevicesInfo := SubDevicesInfo{
+			Type:   subModelType,
+			Models: subModelInfos,
+		}
+		getSubDevicesInfos = append(getSubDevicesInfos, subDevicesInfo)
+	}
+	getSubDeviceModels = &GetSubDeviceModelsResponse{
+		SubDevices: getSubDevicesInfos,
 	}
 	return
 }

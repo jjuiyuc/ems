@@ -67,4 +67,5 @@ const (
 	ErrPowerOutagePeriodsCreate          = 60037
 	ErrPowerOutagePeriodOngoing          = 60038
 	ErrPowerOutagePeriodDelete           = 60039
+	ErrSubDeviceModelsGen                = 60040
 )

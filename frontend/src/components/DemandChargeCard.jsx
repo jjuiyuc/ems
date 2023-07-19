@@ -135,7 +135,7 @@ export default connect(mapState, mapDispatch)(function DemandChargeCard(props) {
             <h5 className="mr-8">{props.title}</h5>
             <div className="mt-6">
                 <TextField
-                    label="Maximum Demand"
+                    label={props.label}
                     id="outlined-end-adornment"
                     value={maxDemandCapacity}
                     onChange={inputNum}

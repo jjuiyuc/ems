@@ -13,10 +13,7 @@ import DialogForm from "../components/DialogForm"
 import ExtraDeviceInfoForm from "../components/ExtraDeviceInfoForm"
 import SubDeviceForm from "../components/SubDeviceForm"
 
-export default function AddField({
-    extraDeviceInfo,
-    subdevice
-}) {
+export default function AddField(props) {
 
     const
         powerCompany = [
@@ -351,11 +348,11 @@ export default function AddField({
                     ? <>
                         <div className="pl-10 flex flex-col">
                             <SubDeviceForm
-                                title={subdevice}
+                                title={pageT("subdevice")}
                                 mainDeviceType={deviceType}
                             />
                             <ExtraDeviceInfoForm
-                                subTitle={extraDeviceInfo}
+                                subTitle={pageT("extraDeviceInfo")}
                                 gridOutagePercent={gridOutagePercent}
                                 setGridOutagePercent={setGridOutagePercent}
                                 chargingSource={chargingSource}
@@ -372,7 +369,7 @@ export default function AddField({
                     ? <>
                         <div className="pl-10 flex flex-col">
                             <SubDeviceForm
-                                title={subdevice}
+                                title={pageT("subdevice")}
                                 mainDeviceType={deviceType}
                             />
                         </div>
@@ -382,7 +379,7 @@ export default function AddField({
                     ? <>
                         <div className="pl-10 flex flex-col">
                             <ExtraDeviceInfoForm
-                                subTitle={extraDeviceInfo}
+                                subTitle={pageT("extraDeviceInfo")}
                                 gridOutagePercent={gridOutagePercent}
                                 setGridOutagePercent={setGridOutagePercent}
                                 chargingSource={chargingSource}

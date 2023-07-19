@@ -257,11 +257,11 @@
     "fieldManagement":{
         "addField":"新增場域",
         "editFieldInfo":"編輯場域資訊",
-        "extraDeviceInfo":"Extra Device Information",
+        "extraDeviceInfo":"額外裝置資訊",
         "fieldDevices":"場域裝置",
         "fieldInfo":"場域資訊",
         "locationInfo":"場域資訊",
-        "subdevice":"Subdevice"
+        "subdevice":"子裝置"
     },
     "forgotPassword": {
         "backToLogin": "回登入頁",
@@ -275,11 +275,11 @@
         "chargingSource":"充電來源",
         "confirmPassword": "確認密碼",
         "deviceInfo":"裝置資訊",
-        "deviceModel":"Device Model",
+        "deviceModel":"裝置型號",
         "deviceType":"裝置類型",
-        "email": "Email",
-        "enableField":"Enable Field",
-        "energyCapacity":"Energy Capacity",
+        "email": "電子郵件",
+        "enableField":"啟用場域",
+        "energyCapacity":"額定電量",
         "highVoltage":"高電壓",
         "hybridInverter":"Hybrid-Inverter",
         "language": "語言",
@@ -292,12 +292,12 @@
         "newPassword": "新密碼",
         "password": "密碼",
         "pcs":"PCS",
-        "powerCapacity":"Power Capacity",
+        "powerCapacity":"額定功率",
         "powerCompany":"電力公司",
         "pv":"PV",
-        "reservedForGridOutagePercent":"Reserved for Grid Outage Percent",
-        "syncDeviceSettings":"Sync Device Settings",
-        "touType":"TOU Type",
+        "reservedForGridOutagePercent":"預留備援電量",
+        "syncDeviceSettings":"同步裝置設定",
+        "touType":"時價類別",
         "twoSection":"兩段式",
         "voltageType":"電壓類型"
 

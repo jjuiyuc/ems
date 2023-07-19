@@ -55,6 +55,7 @@ type GetFieldResponse struct {
 
 // DeviceInfo godoc
 type DeviceInfo struct {
+	ModelType     string          `json:"modelType"`
 	ModelID       int64           `json:"modelID"`
 	ModbusID      int64           `json:"modbusID"`
 	UUEID         string          `json:"uueID"`
@@ -65,6 +66,7 @@ type DeviceInfo struct {
 
 // SubDeviceInfo godoc
 type SubDeviceInfo struct {
+	ModelType     string    `json:"modelType"`
 	ModelID       int64     `json:"modelID"`
 	PowerCapacity float32   `json:"powerCapacity"`
 	ExtraInfo     null.JSON `json:"extraInfo"`
@@ -209,6 +211,7 @@ func (s defaultFieldManagementService) getFieldDevices(gwID int64) (deviceInfos 
 			continue
 		}
 		deviceInfo := DeviceInfo{
+			ModelType:     device.ModelType,
 			ModelID:       device.ModelID,
 			ModbusID:      device.ModbusID,
 			UUEID:         device.UUEID,
@@ -225,6 +228,7 @@ func (s defaultFieldManagementService) getFieldDevices(gwID int64) (deviceInfos 
 		for _, subDevice := range devices {
 			if subDevice.UUEID == device.UUEID && s.isFakeModbusID(subDevice.ModbusID) {
 				subDeviceInfo := SubDeviceInfo{
+					ModelType:     subDevice.ModelType,
 					ModelID:       subDevice.ModelID,
 					PowerCapacity: subDevice.PowerCapacity,
 					ExtraInfo:     subDevice.ExtraInfo,

@@ -163,7 +163,7 @@ export default connect(mapState, mapDispatch)(function Settings(props) {
                             <Slider defaultValue={1} min={1} value={reservedForGridOutage}
                                 onChange={handleSlider} />
                             <div className="flex justify-between">
-                                <p className="text-11px">{pageT("reservedForGrid")}</p>
+                                <p className="text-11px">{pageT("reservedForOutage")}</p>
                                 <p className="text-11px">{pageT("regularUsage")}</p>
                             </div>
                         </div>
@@ -193,6 +193,7 @@ export default connect(mapState, mapDispatch)(function Settings(props) {
         <PowerOutageCard />
         <DemandChargeCard
             title={pageT("maximumDemandCapacity")}
+            label={pageT("maximumDemand")}
         />
     </>
 })

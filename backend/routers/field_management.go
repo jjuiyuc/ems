@@ -234,3 +234,19 @@ func (w *APIWorker) ValidateGatewayID(c *gin.Context, uri *app.FieldURI) {
 	}
 	appG.Response(http.StatusOK, e.Success, nil)
 }
+
+func (w *APIWorker) ValidateDeviceUUEID(c *gin.Context, uri *app.FieldDeviceURI) {
+	appG := app.Gin{c}
+	if err := w.Services.FieldManagement.ValidateDeviceUUEID(uri.DeviceUUEID); err != nil {
+		var code int
+		switch err {
+		case e.ErrNewDeviceUUEIDIsInvalid:
+			code = e.ErrDeviceUUEIDIsInvalid
+		case e.ErrNewDeviceUUEIDIsUsed:
+			code = e.ErrDeviceUUEIDIsUsed
+		}
+		appG.Response(http.StatusInternalServerError, code, nil)
+		return
+	}
+	appG.Response(http.StatusOK, e.Success, nil)
+}

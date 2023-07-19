@@ -101,6 +101,7 @@ type GatewayRepository interface {
 	GetGPSLocations() (locations []*GPSLocationWrap, err error)
 	GetGatewayGroupsForUserID(tx *sql.Tx, executedUserID, gwID int64) (groups []*FieldGroupWrap, err error)
 	IsGatewayExistedForUserID(tx *sql.Tx, executedUserID int64, gwUUID string) bool
+	GetDeviceModuleByDeviceUUEID(deviceUUEID string) (*deremsmodels.DeviceModule, error)
 	InsertDeviceLog(tx *sql.Tx, deviceLog *deremsmodels.DeviceLog) error
 	UpdateDevice(tx *sql.Tx, device *deremsmodels.Device) (err error)
 	GetDeviceByGatewayUUIDAndType(tx *sql.Tx, gwUUID string, modelType DeviceModelType) (*deremsmodels.Device, error)
@@ -114,6 +115,7 @@ type GatewayRepository interface {
 	DeletePowerOutagePeriod(tx *sql.Tx, executedUserID, periodID int64) (err error)
 	MatchDownlinkRules(gateway *deremsmodels.Gateway) bool
 	IsGatewayBoundField(gateway *deremsmodels.Gateway) bool
+	IsDeviceBoundField(deviceModuleID int64) (exist bool)
 }
 
 type defaultGatewayRepository struct {
@@ -240,6 +242,11 @@ func (repo defaultGatewayRepository) IsGatewayExistedForUserID(tx *sql.Tx, execu
 		qm.InnerJoin("user AS u ON gr.group_id = u.group_id"),
 		qm.Where("uuid = ? AND u.id = ?", gwUUID, executedUserID)).Exists(repo.getExecutor(tx))
 	return
+}
+
+func (repo defaultGatewayRepository) GetDeviceModuleByDeviceUUEID(deviceUUEID string) (*deremsmodels.DeviceModule, error) {
+	return deremsmodels.DeviceModules(
+		qm.Where("uueid = ?", deviceUUEID)).One(repo.db)
 }
 
 func (repo defaultGatewayRepository) InsertDeviceLog(tx *sql.Tx, deviceLog *deremsmodels.DeviceLog) error {
@@ -375,6 +382,12 @@ func (repo defaultGatewayRepository) MatchDownlinkRules(gateway *deremsmodels.Ga
 
 func (repo defaultGatewayRepository) IsGatewayBoundField(gateway *deremsmodels.Gateway) bool {
 	return gateway.LocationID.Int64 > 0 && gateway.DeletedAt.IsZero()
+}
+
+func (repo defaultGatewayRepository) IsDeviceBoundField(deviceModuleID int64) (exist bool) {
+	exist, _ = deremsmodels.Devices(
+		qm.Where("module_id = ? AND deleted_at IS NULL", deviceModuleID)).Exists(repo.db)
+	return
 }
 
 func (repo defaultGatewayRepository) getExecutor(tx *sql.Tx) boil.Executor {

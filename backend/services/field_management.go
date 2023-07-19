@@ -29,6 +29,7 @@ type FieldManagementService interface {
 	UpdateFieldGroups(executedUserID int64, gwUUID string, groups []app.FieldGroupInfo) (err error)
 	GetSubDeviceModels() (getSubDeviceModels *GetSubDeviceModelsResponse, err error)
 	ValidateGatewayUUID(gwUUID string) (err error)
+	ValidateDeviceUUEID(deviceUUEID string) (err error)
 }
 
 // GetFieldsResponse godoc
@@ -694,6 +695,22 @@ func (s defaultFieldManagementService) ValidateGatewayUUID(gwUUID string) (err e
 	}
 	if s.repo.Gateway.IsGatewayBoundField(gateway) {
 		err = e.ErrNewGatewayIDIsUsed
+	}
+	return
+}
+
+func (s defaultFieldManagementService) ValidateDeviceUUEID(deviceUUEID string) (err error) {
+	deviceModule, err := s.repo.Gateway.GetDeviceModuleByDeviceUUEID(deviceUUEID)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.Gateway.GetDeviceModuleByDeviceUUEID",
+			"err":       err,
+		}).Error()
+		err = e.ErrNewDeviceUUEIDIsInvalid
+		return
+	}
+	if s.repo.Gateway.IsDeviceBoundField(deviceModule.ID) {
+		err = e.ErrNewDeviceUUEIDIsUsed
 	}
 	return
 }

@@ -113,11 +113,13 @@ var EndpointMapping = map[PolicyWebpageObject][]string{
 		"/api/device-management/gateways/:gwid/account-groups",
 		"/api/device-management/devices/sub-devices/models",
 		"/api/device-management/gateways/:gwid/validity",
+		"/api/device-management/devices/:deviceuueid/validity",
 	},
 	AccountManagementGroup: {
 		"/api/account-management/groups",
 		"/api/account-management/groups/:groupid",
 	},
+
 	AccountManagementUser: {
 		"/api/account-management/users",
 		"/api/account-management/users/:userid",
@@ -234,6 +236,7 @@ func InitRouter(isCORS bool, ginMode string, enforcer *casbin.Enforcer, w *APIWo
 	r.PUT(EndpointMapping[FieldManagement][5], authorizeJWT(REST), authorizePolicy(enforcer), validateURIAndBody(w.UpdateFieldGroups))
 	r.GET(EndpointMapping[FieldManagement][6], authorizeJWT(REST), authorizePolicy(enforcer), w.GetSubDeviceModels)
 	r.GET(EndpointMapping[FieldManagement][7], authorizeJWT(REST), authorizePolicy(enforcer), validateURI(w.ValidateGatewayID))
+	r.GET(EndpointMapping[FieldManagement][8], authorizeJWT(REST), authorizePolicy(enforcer), validateURI(w.ValidateDeviceUUEID))
 
 	// Account Management Group
 	r.GET(EndpointMapping[AccountManagementGroup][0], authorizeJWT(REST), authorizePolicy(enforcer), w.GetGroups)

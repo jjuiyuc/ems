@@ -49,6 +49,10 @@ var (
 	ErrNewGatewayIDIsInvalid = errors.New("gateway id is invalid")
 	// ErrNewGatewayIDIsUsed godoc
 	ErrNewGatewayIDIsUsed = errors.New("gateway id is used")
+	// ErrNewDeviceUUEIDIsInvalid godoc
+	ErrNewDeviceUUEIDIsInvalid = errors.New("device uueid is invalid")
+	// ErrNewDeviceUUEIDIsUsed godoc
+	ErrNewDeviceUUEIDIsUsed = errors.New("device uueid is used")
 )
 
 // ErrNewKeyNotExist godoc

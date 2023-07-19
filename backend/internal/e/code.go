@@ -59,6 +59,8 @@ const (
 	ErrDeviceSettingsSync                = 60023
 	ErrGatewayIDIsInvalid                = 60024
 	ErrGatewayIDIsUsed                   = 60025
+	ErrDeviceUUEIDIsInvalid              = 60026
+	ErrDeviceUUEIDIsUsed                 = 60027
 	ErrBatterySettingsGen                = 60030
 	ErrBatterySettingsUpdate             = 60031
 	ErrMeterSettingsGen                  = 60032

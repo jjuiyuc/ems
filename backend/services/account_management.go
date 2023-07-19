@@ -197,6 +197,10 @@ func (s defaultAccountManagementService) GetGroupGateways(groupID int64) (groupG
 	}
 	for _, gatewayPermission := range gatewaysPermission {
 		var groupGatewayInfo GroupGatewayInfo
+		// Ignore gateway without location
+		if gatewayPermission.LocationID.IsZero() {
+			continue
+		}
 		gateway, err := s.repo.Gateway.GetGatewayByGatewayID(gatewayPermission.GWID)
 		if err != nil {
 			logrus.WithFields(logrus.Fields{

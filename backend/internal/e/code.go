@@ -57,6 +57,8 @@ const (
 	ErrFieldGroupsUpdate                 = 60021
 	ErrFieldIsDisabled                   = 60022
 	ErrDeviceSettingsSync                = 60023
+	ErrGatewayIDIsInvalid                = 60024
+	ErrGatewayIDIsUsed                   = 60025
 	ErrBatterySettingsGen                = 60030
 	ErrBatterySettingsUpdate             = 60031
 	ErrMeterSettingsGen                  = 60032

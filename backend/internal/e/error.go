@@ -45,6 +45,10 @@ var (
 	ErrNewPowerOutagePeriodInvalid = errors.New("power outage period is invalid")
 	// ErrNewPowerOutagePeriodOngoing godoc
 	ErrNewPowerOutagePeriodOngoing = errors.New("power outage period is ongoing")
+	// ErrNewGatewayIDIsInvalid godoc
+	ErrNewGatewayIDIsInvalid = errors.New("gateway id is invalid")
+	// ErrNewGatewayIDIsUsed godoc
+	ErrNewGatewayIDIsUsed = errors.New("gateway id is used")
 )
 
 // ErrNewKeyNotExist godoc

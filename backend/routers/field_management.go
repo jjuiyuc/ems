@@ -218,3 +218,19 @@ func (w *APIWorker) GetSubDeviceModels(c *gin.Context) {
 	}
 	appG.Response(http.StatusOK, e.Success, responseData)
 }
+
+func (w *APIWorker) ValidateGatewayID(c *gin.Context, uri *app.FieldURI) {
+	appG := app.Gin{c}
+	if err := w.Services.FieldManagement.ValidateGatewayUUID(uri.GatewayID); err != nil {
+		var code int
+		switch err {
+		case e.ErrNewGatewayIDIsInvalid:
+			code = e.ErrGatewayIDIsInvalid
+		case e.ErrNewGatewayIDIsUsed:
+			code = e.ErrGatewayIDIsUsed
+		}
+		appG.Response(http.StatusInternalServerError, code, nil)
+		return
+	}
+	appG.Response(http.StatusOK, e.Success, nil)
+}

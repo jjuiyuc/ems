@@ -185,10 +185,6 @@ func (s defaultUserService) getGroupGatewayInfo(groupID int64) (gatewayInfos []G
 			gatewayInfo GatewayInfo
 			permissions []GatewayPermissionInfo
 		)
-		// Ignore gateway without location
-		if gatewayPermission.LocationID.IsZero() {
-			continue
-		}
 		gateway, getErr := s.repo.Gateway.GetGatewayByGatewayID(gatewayPermission.GWID)
 		if getErr != nil {
 			log.WithFields(log.Fields{

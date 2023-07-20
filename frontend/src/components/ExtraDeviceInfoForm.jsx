@@ -1,12 +1,12 @@
 
 import { InputAdornment, MenuItem, TextField } from "@mui/material"
 import { useTranslation } from "react-multi-lang"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo } from "react"
 import { validateNumPercent } from "../utils/utils"
 
 export default function ExtraDeviceInfoForm(props) {
-    const { subTitle, voltage, energyCapacity, chargingSource, gridOutagePercent,
-        setVoltage, setEnergyCapacity, setChargingSource, setGridOutagePercent
+    const { subTitle, gridOutagePercent, setGridOutagePercent, chargingSource,
+        setChargingSource, energyCapacity, setEnergyCapacity, voltage, setVoltage
     } = props
 
     const
@@ -14,15 +14,34 @@ export default function ExtraDeviceInfoForm(props) {
         commonT = string => t("common." + string),
         formT = (string) => t("form." + string)
 
+    const chargingSourceOptions = [
+        {
+            "id": 1,
+            "name": "solarGrid"
+        },
+        {
+            "id": 2,
+            "name": "solar"
+        }
+    ]
     const
         inputPercent = (e) => {
             const num = e.target.value
             const isNum = validateNumPercent(num)
             if (!isNum) return
             setGridOutagePercent(num)
+        },
+        changeChargingSource = (e) => {
+            setChargingSource(e.target.value)
+        },
+        changeEnergyCapacity = (e) => {
+            setEnergyCapacity(e.target.value)
+        },
+        changeVoltage = (e) => {
+            setVoltage(e.target.value)
         }
     return <>
-        <h5 className="mb-5 ml-2">{props.subTitle}</h5>
+        <h5 className="mb-5 ml-2">{subTitle}</h5>
         <TextField
             key="r-g-o-p"
             label={formT("reservedForGridOutagePercent")}
@@ -37,13 +56,14 @@ export default function ExtraDeviceInfoForm(props) {
             key="charging-source"
             select
             label={formT("chargingSource")}
-            // value={chargingSource}
+            onChange={changeChargingSource}
+            value={chargingSource}
             defaultValue=""
 
         >
-            {chargingSource.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                    {option.label}
+            {chargingSourceOptions.map(({ id, name }) => (
+                <MenuItem key={"option-c-f-" + id} value={name}>
+                    {formT(`${name}`)}
                 </MenuItem>
             ))}
         </TextField>
@@ -51,13 +71,15 @@ export default function ExtraDeviceInfoForm(props) {
             key="energy-capacity"
             type="number"
             label={formT("energyCapacity")}
-        // value={energyCapacity}
+            onChange={changeEnergyCapacity}
+            value={energyCapacity}
         />
         <TextField
             key="voltage"
             type="number"
             label={commonT("voltage")}
-        // value={voltage}
+            onChange={changeVoltage}
+            value={voltage}
         />
     </>
 }

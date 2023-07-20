@@ -5,7 +5,6 @@ import {
 import AddIcon from "@mui/icons-material/Add"
 import { useTranslation } from "react-multi-lang"
 import { useEffect, useMemo, useState } from "react"
-import { validateNumPercent } from "../utils/utils"
 
 import { apiCall } from "../utils/api"
 
@@ -16,26 +15,26 @@ import SubDeviceForm from "../components/SubDeviceForm"
 export default function AddField(props) {
 
     const
-        powerCompany = [
+        powerCompanyOptions = [
             {
-                value: "TPC",
-                label: "TPC",
+                "id": 1,
+                "name": "tpc"
             }
         ],
-        voltageType = [
+        voltageTypeOptions = [
             {
-                value: "lowVoltage",
-                label: "lowVoltage",
+                "id": 1,
+                name: "lowVoltage",
             },
             {
-                value: "highVoltage",
-                label: "highVoltage",
+                "id": 2,
+                name: "highVoltage",
             }
         ],
-        touType = [
+        touTypeOptions = [
             {
-                value: "twoSection",
-                label: "twoSection",
+                "id": 1,
+                name: "twoSection",
             }
         ]
     const
@@ -51,42 +50,44 @@ export default function AddField(props) {
         [lat, setLat] = useState(""),
         [lng, setLng] = useState(""),
         [modelList, setModelList] = useState([]),
+        [subDevicesList, setSubDevicesList] = useState([]),
         [deviceType, setDeviceType] = useState([]),
         [deviceModel, setDeviceModel] = useState([]),
-        [gridOutagePercent, setGridOutagePercent] = useState(""),
-        [chargingSource, setChargingSource] = useState([
-            {
-                value: "Solar+Grid",
-                label: "Solar+Grid",
-            },
-            {
-                value: "Solar",
-                label: "Solar",
-            }
-        ]),
-        [energyCapacity, setEnergyCapacity] = useState(null),
-        [voltage, setVoltage] = useState(null),
+        // [subDeviceModel, setSubDeviceModel] = useState(""),
+        // [subPowerCapacity, setSubPowerCapacity] = useState(null),
+        [subDeviceInfo, setSubDeviceInfo] = useState({
+            subDeviceModel: "",
+            subPowerCapacity: null
+        }),
+        [extraDeviceInfo, setExtraDeviceInfo] = useState({
+            gridOutagePercent: "",
+            chargingSource: "",
+            energyCapacity: null,
+            voltage: null,
+        }),
         [deviceInfoCount, setDeviceInfoCount] = useState(1),
         [showAddIcon, setShowAddIcon] = useState(true),
         [isHybridInverterSelected, setIsHybridInverterSelected] = useState(false),
         [fullWidth, setFullWidth] = useState(true),
         [maxWidth, setMaxWidth] = useState("lg"),
         [openAdd, setOpenAdd] = useState(false),
-        [fetched, setFetched] = useState(false)
+        [fetched, setFetched] = useState(false),
+        [infoError, setInfoError] = useState("")
 
-    const getModelList = () => {
-        apiCall({
-            onError: error => setInfoError(error),
-            onSuccess: rawData => {
-                if (!rawData?.data) return
+    const
+        getModelList = () => {
+            apiCall({
+                onError: error => setInfoError(error),
+                onSuccess: rawData => {
+                    if (!rawData?.data) return
 
-                const { data } = rawData
+                    const { data } = rawData
 
-                setModelList(data.models)
-            },
-            url: `/api/device-management/devices/models`
-        })
-    }
+                    setModelList(data.models)
+                },
+                url: `/api/device-management/devices/models`
+            })
+        }
     const deviceTypeOptions = useMemo(() => {
         const filteredData = modelList.filter(({ type }) => type !== "PV")
         const allTypes = [...new Set(filteredData.map(({ type }) => type))]
@@ -141,12 +142,6 @@ export default function AddField(props) {
                 return updatedDeviceModel
             })
         },
-        inputPercent = (e) => {
-            const num = e.target.value
-            const isNum = validateNumPercent(num)
-            if (!isNum) return
-            setGridOutagePercent(num)
-        },
         addDeviceInfoGroup = () => {
             if (deviceInfoCount < 3) {
                 setDeviceInfoCount((prevCount) => prevCount + 1)
@@ -186,7 +181,7 @@ export default function AddField(props) {
                         sx={{ marginBottom: 0 }}
                         id="gatewayID"
                         label={commonT("gatewayID")}
-                    // value={gatewayID}
+                        value={gatewayID}
                     />
                     <Button
                         // onClick={}
@@ -201,25 +196,25 @@ export default function AddField(props) {
                 <TextField
                     id="location-name"
                     label={commonT("locationName")}
-                // value={locationName}
+                    value={locationName}
                 />
                 <TextField
                     id="address"
                     label={formT("address")}
-                // value={address}
+                    value={address}
                 />
                 <div className="flex-nowrap">
                     <TextField
                         id="lat"
                         type="number"
                         label={formT("lat")}
-                    // value={lat}
+                        value={lat}
                     />
                     <TextField
                         id="lng"
                         type="number"
                         label={formT("lng")}
-                        // value={lng}
+                        value={lng}
                         sx={{ marginLeft: "1rem" }}
                     />
                 </div>
@@ -229,9 +224,9 @@ export default function AddField(props) {
                     label={formT("powerCompany")}
                     defaultValue=""
                 >
-                    {powerCompany.map((option) => (
-                        <MenuItem key={option.value} value={option.value}>
-                            {option.label}
+                    {powerCompanyOptions.map(({ id, name }) => (
+                        <MenuItem key={"option-p-c-" + id} value={name}>
+                            {formT(`${name}`)}
                         </MenuItem>
                     ))}
                 </TextField>
@@ -241,9 +236,9 @@ export default function AddField(props) {
                     label={formT("voltageType")}
                     defaultValue=""
                 >
-                    {voltageType.map((option) => (
-                        <MenuItem key={option.value} value={formT(`${option.value}`)}>
-                            {formT(`${option.label}`)}
+                    {voltageTypeOptions.map(({ id, name }) => (
+                        <MenuItem key={"option-v-t-" + id} value={name}>
+                            {formT(`${name}`)}
                         </MenuItem>
                     ))}
                 </TextField>
@@ -253,9 +248,9 @@ export default function AddField(props) {
                     label={formT("touType")}
                     defaultValue=""
                 >
-                    {touType.map((option) => (
-                        <MenuItem key={option.value} value={formT(`${option.value}`)}>
-                            {formT(`${option.label}`)}
+                    {touTypeOptions.map(({ id, name }) => (
+                        <MenuItem key={"option-t-t-" + id} value={name}>
+                            {formT(`${name}`)}
                         </MenuItem>
                     ))}
                 </TextField>
@@ -350,17 +345,51 @@ export default function AddField(props) {
                             <SubDeviceForm
                                 title={pageT("subdevice")}
                                 mainDeviceType={deviceType}
+                                subDeviceModel={subDeviceInfo.subDeviceModel}
+                                setSubDeviceModel={(value) =>
+                                    setSubDeviceInfo((prevInfo) => ({
+                                        ...prevInfo,
+                                        subDeviceModel: value,
+                                    }))
+                                }
+                                subPowerCapacity={subDeviceInfo.subPowerCapacity}
+                                setSubPowerCapacity={(value) =>
+                                    setSubDeviceInfo((prevInfo) => ({
+                                        ...prevInfo,
+                                        subPowerCapacity: value,
+                                    }))
+                                }
                             />
                             <ExtraDeviceInfoForm
                                 subTitle={pageT("extraDeviceInfo")}
-                                gridOutagePercent={gridOutagePercent}
-                                setGridOutagePercent={setGridOutagePercent}
-                                chargingSource={chargingSource}
-                                setChargingSource={setChargingSource}
-                                energyCapacity={energyCapacity}
-                                setEnergyCapacity={setEnergyCapacity}
-                                voltage={voltage}
-                                setVoltage={setVoltage}
+                                gridOutagePercent={extraDeviceInfo.gridOutagePercent}
+                                setGridOutagePercent={(value) =>
+                                    setExtraDeviceInfo((prevInfo) => ({
+                                        ...prevInfo,
+                                        gridOutagePercent: value,
+                                    }))
+                                }
+                                chargingSource={extraDeviceInfo.chargingSource}
+                                setChargingSource={(value) =>
+                                    setExtraDeviceInfo((prevInfo) => ({
+                                        ...prevInfo,
+                                        chargingSource: value,
+                                    }))
+                                }
+                                energyCapacity={extraDeviceInfo.energyCapacity}
+                                setEnergyCapacity={(value) =>
+                                    setExtraDeviceInfo((prevInfo) => ({
+                                        ...prevInfo,
+                                        energyCapacity: value,
+                                    }))
+                                }
+                                voltage={extraDeviceInfo.voltage}
+                                setVoltage={(value) =>
+                                    setExtraDeviceInfo((prevInfo) => ({
+                                        ...prevInfo,
+                                        voltage: value,
+                                    }))
+                                }
                             />
                         </div>
                     </>
@@ -371,6 +400,20 @@ export default function AddField(props) {
                             <SubDeviceForm
                                 title={pageT("subdevice")}
                                 mainDeviceType={deviceType}
+                                subDeviceModel={subDeviceInfo.subDeviceModel}
+                                setSubDeviceModel={(value) =>
+                                    setSubDeviceInfo((prevInfo) => ({
+                                        ...prevInfo,
+                                        subDeviceModel: value,
+                                    }))
+                                }
+                                subPowerCapacity={subDeviceInfo.subPowerCapacity}
+                                setSubPowerCapacity={(value) =>
+                                    setSubDeviceInfo((prevInfo) => ({
+                                        ...prevInfo,
+                                        subPowerCapacity: value,
+                                    }))
+                                }
                             />
                         </div>
                     </>
@@ -380,14 +423,34 @@ export default function AddField(props) {
                         <div className="pl-10 flex flex-col">
                             <ExtraDeviceInfoForm
                                 subTitle={pageT("extraDeviceInfo")}
-                                gridOutagePercent={gridOutagePercent}
-                                setGridOutagePercent={setGridOutagePercent}
-                                chargingSource={chargingSource}
-                                setChargingSource={setChargingSource}
-                                energyCapacity={energyCapacity}
-                                setEnergyCapacity={setEnergyCapacity}
-                                voltage={voltage}
-                                setVoltage={setVoltage}
+                                gridOutagePercent={extraDeviceInfo.gridOutagePercent}
+                                setGridOutagePercent={(value) =>
+                                    setExtraDeviceInfo((prevInfo) => ({
+                                        ...prevInfo,
+                                        gridOutagePercent: value,
+                                    }))
+                                }
+                                chargingSource={extraDeviceInfo.chargingSource}
+                                setChargingSource={(value) =>
+                                    setExtraDeviceInfo((prevInfo) => ({
+                                        ...prevInfo,
+                                        chargingSource: value,
+                                    }))
+                                }
+                                energyCapacity={extraDeviceInfo.energyCapacity}
+                                setEnergyCapacity={(value) =>
+                                    setExtraDeviceInfo((prevInfo) => ({
+                                        ...prevInfo,
+                                        energyCapacity: value,
+                                    }))
+                                }
+                                voltage={extraDeviceInfo.voltage}
+                                setVoltage={(value) =>
+                                    setExtraDeviceInfo((prevInfo) => ({
+                                        ...prevInfo,
+                                        voltage: value,
+                                    }))
+                                }
                             />
                         </div>
                     </>

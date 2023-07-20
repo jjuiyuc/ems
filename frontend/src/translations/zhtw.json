@@ -296,8 +296,11 @@
         "powerCompany":"電力公司",
         "pv":"PV",
         "reservedForGridOutagePercent":"預留備援電量",
+        "solar": "太陽能",
+        "solarGrid":"太陽能 + 市電",
         "syncDeviceSettings":"同步裝置設定",
         "touType":"時價類別",
+        "tpc":"台灣電力公司",
         "twoSection":"兩段式",
         "voltageType":"電壓類型"
 

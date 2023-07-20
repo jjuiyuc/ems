@@ -295,8 +295,11 @@
         "powerCompany":"Power Company",
         "pv":"PV",
         "reservedForGridOutagePercent":"Reserved for Grid Outage Percent",
+        "solar": "Solar",
+        "solarGrid":"Solar + Grid",
         "syncDeviceSettings":"Sync Device Settings",
         "touType":"TOU Type",
+        "tpc":"TPC",
         "twoSection":"Two-section",
         "voltageType":"Voltage Type"
     },

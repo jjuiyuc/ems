@@ -7,6 +7,7 @@ import { useTranslation } from "react-multi-lang"
 import { useEffect, useMemo, useState } from "react"
 
 import { apiCall } from "../utils/api"
+import { validateNumTwoDecimalPlaces } from "../utils/utils"
 
 import DialogForm from "../components/DialogForm"
 import ExtraDeviceInfoForm from "../components/ExtraDeviceInfoForm"
@@ -50,14 +51,12 @@ export default function AddField(props) {
         [lat, setLat] = useState(""),
         [lng, setLng] = useState(""),
         [modelList, setModelList] = useState([]),
-        [subDevicesList, setSubDevicesList] = useState([]),
         [deviceType, setDeviceType] = useState([]),
         [deviceModel, setDeviceModel] = useState([]),
-        // [subDeviceModel, setSubDeviceModel] = useState(""),
-        // [subPowerCapacity, setSubPowerCapacity] = useState(null),
+        [powerCapacity, setPowerCapacity] = useState(""),
         [subDeviceInfo, setSubDeviceInfo] = useState({
-            subDeviceModel: "",
-            subPowerCapacity: null
+            subDeviceModel: ["", "", ""],
+            subPowerCapacity: [null, null, null]
         }),
         [extraDeviceInfo, setExtraDeviceInfo] = useState({
             gridOutagePercent: "",
@@ -91,7 +90,6 @@ export default function AddField(props) {
     const deviceTypeOptions = useMemo(() => {
         const filteredData = modelList.filter(({ type }) => type !== "PV")
         const allTypes = [...new Set(filteredData.map(({ type }) => type))]
-        // console.log(allTypes)
 
         const typeOptions = allTypes.map((type) => {
             if (type === "Hybrid-Inverter") {
@@ -142,6 +140,12 @@ export default function AddField(props) {
                 return updatedDeviceModel
             })
         },
+        changePowerCapacity = (e) => {
+            const num = e.target.value
+            const isNum = validateNumTwoDecimalPlaces(num)
+            if (!isNum) return
+            setPowerCapacity(num)
+        },
         addDeviceInfoGroup = () => {
             if (deviceInfoCount < 3) {
                 setDeviceInfoCount((prevCount) => prevCount + 1)
@@ -150,13 +154,18 @@ export default function AddField(props) {
                 setShowAddIcon(false)
             }
         }
+    const changeSubDeviceInfo = (index, field, value) => {
+        setSubDeviceInfo(prevInfo => {
+            const newSubDeviceInfo = { ...prevInfo }
+            newSubDeviceInfo[field][index] = value
+            return newSubDeviceInfo
+        })
+    }
     useEffect(() => {
         // if (openAdd && fetched == false)
         getModelList()
     }, [fetched, openAdd])
 
-    // console.log(modelList)
-    // console.log(deviceModelOptions)
     return <>
         <Button
             onClick={() => { setOpenAdd(true) }}
@@ -330,7 +339,8 @@ export default function AddField(props) {
                                         id={`powerCapacity-${i}`}
                                         type="number"
                                         label={formT("powerCapacity")}
-                                    // value={powerCapacity}
+                                        onChange={changePowerCapacity}
+                                        value={powerCapacity}
                                     />
                                     <Divider variant="middle" sx={{ margin: "0 0 2rem" }} />
                                 </div>
@@ -345,20 +355,8 @@ export default function AddField(props) {
                             <SubDeviceForm
                                 title={pageT("subdevice")}
                                 mainDeviceType={deviceType}
-                                subDeviceModel={subDeviceInfo.subDeviceModel}
-                                setSubDeviceModel={(value) =>
-                                    setSubDeviceInfo((prevInfo) => ({
-                                        ...prevInfo,
-                                        subDeviceModel: value,
-                                    }))
-                                }
-                                subPowerCapacity={subDeviceInfo.subPowerCapacity}
-                                setSubPowerCapacity={(value) =>
-                                    setSubDeviceInfo((prevInfo) => ({
-                                        ...prevInfo,
-                                        subPowerCapacity: value,
-                                    }))
-                                }
+                                subDeviceInfo={subDeviceInfo}
+                                changeSubDeviceInfo={changeSubDeviceInfo}
                             />
                             <ExtraDeviceInfoForm
                                 subTitle={pageT("extraDeviceInfo")}
@@ -400,20 +398,8 @@ export default function AddField(props) {
                             <SubDeviceForm
                                 title={pageT("subdevice")}
                                 mainDeviceType={deviceType}
-                                subDeviceModel={subDeviceInfo.subDeviceModel}
-                                setSubDeviceModel={(value) =>
-                                    setSubDeviceInfo((prevInfo) => ({
-                                        ...prevInfo,
-                                        subDeviceModel: value,
-                                    }))
-                                }
-                                subPowerCapacity={subDeviceInfo.subPowerCapacity}
-                                setSubPowerCapacity={(value) =>
-                                    setSubDeviceInfo((prevInfo) => ({
-                                        ...prevInfo,
-                                        subPowerCapacity: value,
-                                    }))
-                                }
+                                subDeviceInfo={subDeviceInfo}
+                                changeSubDeviceInfo={changeSubDeviceInfo}
                             />
                         </div>
                     </>

@@ -237,6 +237,7 @@ func InitRouter(isCORS bool, ginMode string, enforcer *casbin.Enforcer, w *APIWo
 	r.GET(EndpointMapping[FieldManagement][6], authorizeJWT(REST), authorizePolicy(enforcer), w.GetSubDeviceModels)
 	r.GET(EndpointMapping[FieldManagement][7], authorizeJWT(REST), authorizePolicy(enforcer), validateURI(w.ValidateGatewayID))
 	r.GET(EndpointMapping[FieldManagement][8], authorizeJWT(REST), authorizePolicy(enforcer), validateURI(w.ValidateDeviceUUEID))
+	r.POST(EndpointMapping[FieldManagement][0], authorizeJWT(REST), authorizePolicy(enforcer), validateBody(w.CreateField))
 
 	// Account Management Group
 	r.GET(EndpointMapping[AccountManagementGroup][0], authorizeJWT(REST), authorizePolicy(enforcer), w.GetGroups)

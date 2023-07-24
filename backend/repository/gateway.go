@@ -103,6 +103,7 @@ type GatewayRepository interface {
 	IsGatewayExistedForUserID(tx *sql.Tx, executedUserID int64, gwUUID string) bool
 	GetDeviceModuleByDeviceUUEID(deviceUUEID string) (*deremsmodels.DeviceModule, error)
 	InsertDeviceLog(tx *sql.Tx, deviceLog *deremsmodels.DeviceLog) error
+	CreateDevice(tx *sql.Tx, deviceLog *deremsmodels.Device) error
 	UpdateDevice(tx *sql.Tx, device *deremsmodels.Device) (err error)
 	GetDeviceByGatewayUUIDAndType(tx *sql.Tx, gwUUID string, modelType DeviceModelType) (*deremsmodels.Device, error)
 	GetDeviceModels() ([]*deremsmodels.DeviceModel, error)
@@ -251,6 +252,10 @@ func (repo defaultGatewayRepository) GetDeviceModuleByDeviceUUEID(deviceUUEID st
 
 func (repo defaultGatewayRepository) InsertDeviceLog(tx *sql.Tx, deviceLog *deremsmodels.DeviceLog) error {
 	return deviceLog.Insert(repo.getExecutor(tx), boil.Infer())
+}
+
+func (repo defaultGatewayRepository) CreateDevice(tx *sql.Tx, device *deremsmodels.Device) error {
+	return device.Insert(repo.getExecutor(tx), boil.Infer())
 }
 
 func (repo defaultGatewayRepository) UpdateDevice(tx *sql.Tx, device *deremsmodels.Device) (err error) {

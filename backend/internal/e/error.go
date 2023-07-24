@@ -53,6 +53,8 @@ var (
 	ErrNewDeviceUUEIDIsInvalid = errors.New("device uueid is invalid")
 	// ErrNewDeviceUUEIDIsUsed godoc
 	ErrNewDeviceUUEIDIsUsed = errors.New("device uueid is used")
+	// ErrNewDeviceModelIsInvalid godoc
+	ErrNewDeviceModelIsInvalid = errors.New("device model is invalid")
 )
 
 // ErrNewKeyNotExist godoc

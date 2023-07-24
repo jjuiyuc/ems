@@ -61,6 +61,8 @@ const (
 	ErrGatewayIDIsUsed                   = 60025
 	ErrDeviceUUEIDIsInvalid              = 60026
 	ErrDeviceUUEIDIsUsed                 = 60027
+	ErrDeviceModelIsInvalid              = 60028
+	ErrFieldCreate                       = 60029
 	ErrBatterySettingsGen                = 60030
 	ErrBatterySettingsUpdate             = 60031
 	ErrMeterSettingsGen                  = 60032

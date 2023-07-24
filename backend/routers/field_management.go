@@ -250,3 +250,28 @@ func (w *APIWorker) ValidateDeviceUUEID(c *gin.Context, uri *app.FieldDeviceURI)
 	}
 	appG.Response(http.StatusOK, e.Success, nil)
 }
+
+func (w *APIWorker) CreateField(c *gin.Context, body *app.CreateFieldBody) {
+	appG := app.Gin{c}
+	userID, _ := c.Get("userID")
+	if err := w.Services.FieldManagement.CreateField(userID.(int64), body); err != nil {
+		var code int
+		switch err {
+		case e.ErrNewGatewayIDIsInvalid:
+			code = e.ErrGatewayIDIsInvalid
+		case e.ErrNewGatewayIDIsUsed:
+			code = e.ErrGatewayIDIsUsed
+		case e.ErrNewDeviceUUEIDIsInvalid:
+			code = e.ErrDeviceUUEIDIsInvalid
+		case e.ErrNewDeviceUUEIDIsUsed:
+			code = e.ErrDeviceUUEIDIsUsed
+		case e.ErrNewDeviceModelIsInvalid:
+			code = e.ErrDeviceModelIsInvalid
+		default:
+			code = e.ErrFieldCreate
+		}
+		appG.Response(http.StatusInternalServerError, code, nil)
+		return
+	}
+	appG.Response(http.StatusOK, e.Success, nil)
+}

@@ -209,6 +209,18 @@ func (w *APIWorker) UpdateFieldGroups(c *gin.Context, uri *app.FieldURI, body *a
 	appG.Response(http.StatusOK, e.Success, nil)
 }
 
+// GetSubDeviceModels godoc
+// @Summary List sub-device models
+// @Description list sub-device models based on token
+// @Tags        field management
+// @Security    ApiKeyAuth
+// @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
+// @Produce     json
+// @Success     200            {object}  app.Response{data=services.GetSubDeviceModelsResponse}
+// @Failure     401            {object}  app.Response
+// @Failure     403            {object}  app.Response
+// @Failure     500            {object}  app.Response
+// @Router      /device-management/devices/sub-devices/models [get]
 func (w *APIWorker) GetSubDeviceModels(c *gin.Context) {
 	appG := app.Gin{c}
 	responseData, err := w.Services.FieldManagement.GetSubDeviceModels()
@@ -219,6 +231,19 @@ func (w *APIWorker) GetSubDeviceModels(c *gin.Context) {
 	appG.Response(http.StatusOK, e.Success, responseData)
 }
 
+// ValidateGatewayID godoc
+// @Summary Verify gateway UUID
+// @Description verify gateway UUID based on token
+// @Tags        field management
+// @Security    ApiKeyAuth
+// @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
+// @Param       gwid           path      string true "Gateway UUID"
+// @Produce     json
+// @Success     200            {object}  app.Response
+// @Failure     401            {object}  app.Response
+// @Failure     403            {object}  app.Response
+// @Failure     500            {object}  app.Response
+// @Router      /device-management/gateways/{gwid}/validity [get]
 func (w *APIWorker) ValidateGatewayID(c *gin.Context, uri *app.FieldURI) {
 	appG := app.Gin{c}
 	if err := w.Services.FieldManagement.ValidateGatewayUUID(uri.GatewayID); err != nil {
@@ -235,6 +260,19 @@ func (w *APIWorker) ValidateGatewayID(c *gin.Context, uri *app.FieldURI) {
 	appG.Response(http.StatusOK, e.Success, nil)
 }
 
+// ValidateDeviceUUEID godoc
+// @Summary Verify device UUEID
+// @Description verify device UUEID based on token
+// @Tags        field management
+// @Security    ApiKeyAuth
+// @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
+// @Param       deviceuueid    path      string true "Device UUEID"
+// @Produce     json
+// @Success     200            {object}  app.Response
+// @Failure     401            {object}  app.Response
+// @Failure     403            {object}  app.Response
+// @Failure     500            {object}  app.Response
+// @Router      /device-management/devices/{deviceuueid}/validity [get]
 func (w *APIWorker) ValidateDeviceUUEID(c *gin.Context, uri *app.FieldDeviceURI) {
 	appG := app.Gin{c}
 	if err := w.Services.FieldManagement.ValidateDeviceUUEID(uri.DeviceUUEID); err != nil {
@@ -251,6 +289,21 @@ func (w *APIWorker) ValidateDeviceUUEID(c *gin.Context, uri *app.FieldDeviceURI)
 	appG.Response(http.StatusOK, e.Success, nil)
 }
 
+// CreateField godoc
+// @Summary Create a field
+// @Description create a field by token
+// @Tags        field management
+// @Security    ApiKeyAuth
+// @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
+// @Accept      json
+// @Param       body           body      app.CreateFieldBody true "Body"
+// @Produce     json
+// @Success     200            {object}  app.Response
+// @Failure     400            {object}  app.Response
+// @Failure     401            {object}  app.Response
+// @Failure     403            {object}  app.Response
+// @Failure     500            {object}  app.Response
+// @Router      /device-management/gateways [post]
 func (w *APIWorker) CreateField(c *gin.Context, body *app.CreateFieldBody) {
 	appG := app.Gin{c}
 	userID, _ := c.Get("userID")

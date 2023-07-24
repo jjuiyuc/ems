@@ -1,5 +1,95 @@
 basePath: /api
 definitions:
+  app.CreateFieldBody:
+    properties:
+      address:
+        type: string
+      devices:
+        items:
+          $ref: '#/definitions/app.FieldDeviceInfo'
+        type: array
+      enable:
+        type: boolean
+      gatewayID:
+        type: string
+      lat:
+        format: latitude
+        type: number
+      lng:
+        format: longitude
+        type: number
+      locationName:
+        type: string
+      powerCompany:
+        type: string
+      toutype:
+        type: string
+      voltageType:
+        type: string
+    required:
+    - address
+    - devices
+    - enable
+    - gatewayID
+    - lat
+    - lng
+    - locationName
+    - powerCompany
+    - toutype
+    - voltageType
+    type: object
+  app.FieldDeviceExtraInfo:
+    properties:
+      chargingSources:
+        type: string
+      energyCapacity:
+        type: number
+      reservedForGridOutagePercent:
+        type: integer
+      voltage:
+        type: number
+    required:
+    - chargingSources
+    - energyCapacity
+    - reservedForGridOutagePercent
+    - voltage
+    type: object
+  app.FieldDeviceInfo:
+    properties:
+      extraInfo:
+        $ref: '#/definitions/app.FieldDeviceExtraInfo'
+        type: object
+      modbusID:
+        type: integer
+      modelID:
+        type: integer
+      powerCapacity:
+        type: number
+      subDevices:
+        items:
+          $ref: '#/definitions/app.FieldSubDeviceInfo'
+        type: array
+      uueid:
+        type: string
+    required:
+    - modbusID
+    - modelID
+    - powerCapacity
+    - uueid
+    type: object
+  app.FieldSubDeviceInfo:
+    properties:
+      extraInfo:
+        $ref: '#/definitions/app.FieldDeviceExtraInfo'
+        type: object
+      modelID:
+        type: integer
+      powerCapacity:
+        type: number
+    required:
+    - modelID
+    - powerCapacity
+    type: object
   app.PeriodQuery:
     properties:
       endTime:
@@ -226,6 +316,8 @@ definitions:
         type: integer
       modelID:
         type: integer
+      modelType:
+        type: string
       powerCapacity:
         type: number
       subDevices:
@@ -464,6 +556,13 @@ definitions:
           $ref: '#/definitions/services.PowerOutagePeriodInfo'
         type: array
     type: object
+  services.GetSubDeviceModelsResponse:
+    properties:
+      subDevices:
+        items:
+          $ref: '#/definitions/services.SubDevicesInfo'
+        type: array
+    type: object
   services.GetUsersResponse:
     properties:
       users:
@@ -662,8 +761,26 @@ definitions:
         type: string
       modelID:
         type: integer
+      modelType:
+        type: string
       powerCapacity:
         type: number
+    type: object
+  services.SubDeviceModelInfo:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  services.SubDevicesInfo:
+    properties:
+      models:
+        items:
+          $ref: '#/definitions/services.SubDeviceModelInfo'
+        type: array
+      type:
+        type: string
     type: object
   services.TimeOfUseEnergyCostResponse:
     properties:
@@ -2191,6 +2308,45 @@ paths:
       summary: Show a token
       tags:
       - authorization
+  /device-management/devices/{deviceuueid}/validity:
+    get:
+      description: verify device UUEID based on token
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Input user's access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Device UUEID
+        in: path
+        name: deviceuueid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Verify device UUEID
+      tags:
+      - field management
   /device-management/devices/models:
     get:
       description: list device models based on token
@@ -2230,6 +2386,45 @@ paths:
       summary: List device models
       tags:
       - field management
+  /device-management/devices/sub-devices/models:
+    get:
+      description: list sub-device models based on token
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Input user's access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/app.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/services.GetSubDeviceModelsResponse'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: List sub-device models
+      tags:
+      - field management
   /device-management/gateways:
     get:
       description: list fields based on token
@@ -2267,6 +2462,51 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: List fields
+      tags:
+      - field management
+    post:
+      consumes:
+      - application/json
+      description: create a field by token
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Input user's access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/app.CreateFieldBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Create a field
       tags:
       - field management
   /device-management/gateways/{gwid}:
@@ -2799,6 +3039,45 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Sync device settings
+      tags:
+      - field management
+  /device-management/gateways/{gwid}/validity:
+    get:
+      description: verify gateway UUID based on token
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Input user's access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Gateway UUID
+        in: path
+        name: gwid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Verify gateway UUID
       tags:
       - field management
   /user/PasswordResetByToken:

@@ -18,28 +18,28 @@ const TYPE_INVERTER = "Inverter"
 const TYPE_BATTERY = "Battery"
 
 export default function AddField(props) {
-
+    const { getList } = props
     const
         powerCompanyOptions = [
             {
                 "id": 1,
-                "name": "tpc"
+                "name": "TPC"
             }
         ],
         voltageTypeOptions = [
             {
                 "id": 1,
-                name: "lowVoltage",
+                name: "Low voltage",
             },
             {
                 "id": 2,
-                name: "highVoltage",
+                name: "High voltage",
             }
         ],
         touTypeOptions = [
             {
                 "id": 1,
-                name: "twoSection",
+                name: "Two-section",
             }
         ]
     const
@@ -49,15 +49,22 @@ export default function AddField(props) {
         pageT = (string, params) => t("fieldManagement." + string, params)
 
     const
+        [modelList, setModelList] = useState([]),
         [gatewayID, setGatewayID] = useState(""),
         [locationName, setLocationName] = useState(""),
         [address, setAddress] = useState(""),
         [lat, setLat] = useState(""),
         [lng, setLng] = useState(""),
-        [modelList, setModelList] = useState([]),
+        [powerCompany, setPowerCompany] = useState(""),
+        [voltageType, setVoltageType] = useState(""),
+        [touType, setTouType] = useState(""),
         [deviceType, setDeviceType] = useState([]),
         [deviceModel, setDeviceModel] = useState([]),
-        [powerCapacity, setPowerCapacity] = useState(""),
+        [deviceInfo, setDeviceInfo] = useState({
+            modbusID: [null, null, null],
+            uueID: [null, null, null],
+            powerCapacity: [null, null, null]
+        }),
         [subDeviceInfo, setSubDeviceInfo] = useState({
             subDeviceModel: ["", "", ""],
             subPowerCapacity: [null, null, null]
@@ -116,6 +123,15 @@ export default function AddField(props) {
     }, [modelList, deviceType])
 
     const
+        changePowerCompany = (e) => {
+            setPowerCompany(e.target.value)
+        },
+        changeVoltageType = (e) => {
+            setVoltageType(e.target.value)
+        },
+        changeTouType = (e) => {
+            setTouType(e.target.value)
+        },
         changeDeviceType = (e) => {
             const { value } = e.target
             const alreadyChecked = deviceType.includes(value)
@@ -144,32 +160,99 @@ export default function AddField(props) {
                 return updatedDeviceModel
             })
         },
-        changePowerCapacity = (e) => {
+        changeDeviceInfo = (index, value) => {
+            setDeviceInfo(prevInfo => {
+                const newDeviceInfo = { ...prevInfo }
+                newDeviceInfo[index] = value
+                return newDeviceInfo
+            })
+        },
+        changePowerCapacity = (e, index) => {
             const num = e.target.value
             const isNum = validateNumTwoDecimalPlaces(num)
             if (!isNum) return
-            setPowerCapacity(num)
+            changeDeviceInfo(index, "powerCapacity", num)
         },
         addDeviceInfoGroup = () => {
-            if (deviceInfoCount < 3) {
+            if (deviceInfoCount < 4) {
                 setDeviceInfoCount((prevCount) => prevCount + 1)
             }
-            if (deviceInfoCount >= 2) {
+            if (deviceInfoCount >= 3) {
                 setShowAddIcon(false)
             }
+        },
+        changeSubDeviceInfo = (index, field, value) => {
+            setSubDeviceInfo(prevInfo => {
+                const newSubDeviceInfo = { ...prevInfo }
+                newSubDeviceInfo[field][index] = value
+                return newSubDeviceInfo
+            })
         }
-    const changeSubDeviceInfo = (index, field, value) => {
-        setSubDeviceInfo(prevInfo => {
-            const newSubDeviceInfo = { ...prevInfo }
-            newSubDeviceInfo[field][index] = value
-            return newSubDeviceInfo
-        })
-    }
+
+
+    const
+        submit = async () => {
+
+            const data = {
+                gatewayID: gatewayID,
+                locationName: locationName,
+                address: address,
+                lat: parseInt(lat),
+                lng: parseInt(lng),
+                powerCompany: powerCompany,
+                voltageType: voltageType,
+                touType: touType,
+            }
+            await apiCall({
+                method: "post",
+                data,
+                onSuccess: () => {
+                    setOpenAdd(false)
+                    getList()
+                    props.updateSnackbarMsg({
+                        type: "success",
+                        msg: t("dialog.addedSuccessfully")
+                    })
+                    setAccount("")
+                    setPassword("")
+                    setName("")
+                    setGroup("")
+                },
+                onError: err => {
+                    switch (err) {
+                        case 60012:
+                            setAccountError(true)
+                            props.updateSnackbarMsg({
+                                type: "error",
+                                msg: errorT("emailExist")
+                            })
+                            break
+                        case 60013:
+                            setAccountError(true)
+                            props.updateSnackbarMsg({
+                                type: "error",
+                                msg: errorT("failureToCreate")
+                            })
+                            break
+                        default: setOtherError(err)
+                    }
+                },
+                url: "/api/device-management/gateways"
+            })
+        },
+        cancelClick = () => {
+            setOpenAdd(false)
+            setAccount("")
+            setPassword("")
+            setName("")
+            setGroup("")
+        }
     useEffect(() => {
         // if (openAdd && fetched == false)
         getModelList()
     }, [fetched, openAdd])
 
+    console.log(deviceInfo)
     return <>
         <Button
             onClick={() => { setOpenAdd(true) }}
@@ -235,6 +318,7 @@ export default function AddField(props) {
                     id="powerCompany"
                     select
                     label={formT("powerCompany")}
+                    onChange={changePowerCompany}
                     defaultValue=""
                 >
                     {powerCompanyOptions.map(({ id, name }) => (
@@ -247,6 +331,7 @@ export default function AddField(props) {
                     id="voltageType"
                     select
                     label={formT("voltageType")}
+                    onChange={changeVoltageType}
                     defaultValue=""
                 >
                     {voltageTypeOptions.map(({ id, name }) => (
@@ -259,6 +344,7 @@ export default function AddField(props) {
                     id="touType"
                     select
                     label={formT("touType")}
+                    onChange={changeTouType}
                     defaultValue=""
                 >
                     {touTypeOptions.map(({ id, name }) => (
@@ -320,14 +406,16 @@ export default function AddField(props) {
                                         id={`modbusID-${i}`}
                                         type="number"
                                         label={formT("modbusID")}
-                                    // value={modbusID}
+                                        value={deviceInfo.modbusID[i]}
+                                        onChange={(e) => changeSubDeviceModel(e, i)}
+
                                     />
                                     <div className="grid grid-cols-1fr-auto items-center mb-8">
                                         <TextField
                                             sx={{ marginBottom: 0 }}
                                             id={`UUEID-${i}`}
                                             label="UUEID"
-                                        // value={UUEID}
+                                            value={deviceInfo.uueID[i]}
                                         />
                                         <Button
                                             // onClick={}
@@ -343,8 +431,8 @@ export default function AddField(props) {
                                         id={`powerCapacity-${i}`}
                                         type="number"
                                         label={formT("powerCapacity")}
-                                        onChange={changePowerCapacity}
-                                        value={powerCapacity}
+                                        onChange={(e) => changePowerCapacity(e, i)}
+                                        value={deviceInfo.powerCapacity[i]}
                                     />
                                     <Divider variant="middle" sx={{ margin: "0 0 2rem" }} />
                                 </div>

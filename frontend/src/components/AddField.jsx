@@ -13,6 +13,10 @@ import DialogForm from "../components/DialogForm"
 import ExtraDeviceInfoForm from "../components/ExtraDeviceInfoForm"
 import SubDeviceForm from "../components/SubDeviceForm"
 
+const TYPE_HYBRID_INVERTER = "Hybrid-Inverter"
+const TYPE_INVERTER = "Inverter"
+const TYPE_BATTERY = "Battery"
+
 export default function AddField(props) {
 
     const
@@ -92,11 +96,11 @@ export default function AddField(props) {
         const allTypes = [...new Set(filteredData.map(({ type }) => type))]
 
         const typeOptions = allTypes.map((type) => {
-            if (type === "Hybrid-Inverter") {
-                const otherSelected = deviceType.some((type) => type !== "Hybrid-Inverter")
+            if (type === TYPE_HYBRID_INVERTER) {
+                const otherSelected = deviceType.some((type) => type !== TYPE_HYBRID_INVERTER)
                 if (otherSelected) return { type, disabled: true }
             } else {
-                const hybridInverterSelected = deviceType.includes("Hybrid-Inverter")
+                const hybridInverterSelected = deviceType.includes(TYPE_HYBRID_INVERTER)
                 if (hybridInverterSelected) return { type, disabled: true }
             }
             return { type, disabled: false }
@@ -128,7 +132,7 @@ export default function AddField(props) {
                 })
                 setDeviceModel(newDeviceModel)
             }
-            if (value === "Hybrid-Inverter") {
+            if (value === TYPE_HYBRID_INVERTER) {
                 setIsHybridInverterSelected(!alreadyChecked)
             }
         },
@@ -150,7 +154,7 @@ export default function AddField(props) {
             if (deviceInfoCount < 3) {
                 setDeviceInfoCount((prevCount) => prevCount + 1)
             }
-            if (deviceInfoCount + 1 >= 3) {
+            if (deviceInfoCount >= 2) {
                 setShowAddIcon(false)
             }
         }
@@ -235,7 +239,7 @@ export default function AddField(props) {
                 >
                     {powerCompanyOptions.map(({ id, name }) => (
                         <MenuItem key={"option-p-c-" + id} value={name}>
-                            {formT(`${name}`)}
+                            {formT(name)}
                         </MenuItem>
                     ))}
                 </TextField>
@@ -247,7 +251,7 @@ export default function AddField(props) {
                 >
                     {voltageTypeOptions.map(({ id, name }) => (
                         <MenuItem key={"option-v-t-" + id} value={name}>
-                            {formT(`${name}`)}
+                            {formT(name)}
                         </MenuItem>
                     ))}
                 </TextField>
@@ -259,7 +263,7 @@ export default function AddField(props) {
                 >
                     {touTypeOptions.map(({ id, name }) => (
                         <MenuItem key={"option-t-t-" + id} value={name}>
-                            {formT(`${name}`)}
+                            {formT(name)}
                         </MenuItem>
                     ))}
                 </TextField>
@@ -299,16 +303,16 @@ export default function AddField(props) {
                                 {deviceModelOptions
                                     .filter((model) => model.type === type)
                                     .map(({ id, name }) => (
-                                        <MenuItem key={id} value={id}>
+                                        <MenuItem key={"option-d-m-" + id + name} value={id}>
                                             {name}
                                         </MenuItem>
                                     ))}
                             </TextField>
-                            {Array.from({ length: deviceInfoCount }).map((_, i) => (
+                            {Array.from(Array(deviceInfoCount)).map((_, i) => (
                                 <div className="flex flex-col">
                                     <div className="grid grid-cols-1fr-auto items-center mb-5 ml-2">
                                         <h5 className="">{formT("deviceInfo") + ` ${i + 1}`}</h5>
-                                        {i === deviceInfoCount - 1 && isHybridInverterSelected && showAddIcon && (
+                                        {(i === deviceInfoCount - 1) && isHybridInverterSelected && showAddIcon && (
                                             <AddIcon onClick={addDeviceInfoGroup} />
                                         )}
                                     </div>
@@ -348,8 +352,7 @@ export default function AddField(props) {
                         </>
                     )
                 })}
-                {/* <Divider variant="middle" sx={{ margin: "0 0 2rem" }} /> */}
-                {deviceType.includes("Hybrid-Inverter")
+                {deviceType.includes(TYPE_HYBRID_INVERTER)
                     ? <>
                         <div className="pl-10 flex flex-col">
                             <SubDeviceForm
@@ -392,7 +395,7 @@ export default function AddField(props) {
                         </div>
                     </>
                     : null}
-                {deviceType.includes("Inverter")
+                {deviceType.includes(TYPE_INVERTER)
                     ? <>
                         <div className="pl-10 flex flex-col">
                             <SubDeviceForm
@@ -404,7 +407,7 @@ export default function AddField(props) {
                         </div>
                     </>
                     : null}
-                {deviceType.includes("Battery")
+                {deviceType.includes(TYPE_BATTERY)
                     ? <>
                         <div className="pl-10 flex flex-col">
                             <ExtraDeviceInfoForm

@@ -137,7 +137,7 @@ export default connect(null, mapDispatch)(function InfoField(props) {
                     focused
                     disabled={true}
                 />
-                <h5 className="mb-4 ml-2">{pageT("locationInformation")}</h5>
+                <h5 className="mb-4 ml-2">{pageT("locationInfo")}</h5>
                 <TextField
                     key="location-name"
                     label={commonT("locationName")}
@@ -207,7 +207,7 @@ export default connect(null, mapDispatch)(function InfoField(props) {
                                 disabled={true}
                             />
                             <h5 className="mb-4 ml-2">
-                                {formT("deviceInfo") + ` ${index + 1}`}
+                                {`${formT("deviceInfo")} ${index + 1}`}
                             </h5>
                             <TextField
                                 key="m-id"

@@ -1,3 +1,4 @@
+import { connect } from "react-redux"
 import {
     Button, Checkbox, DialogActions, Divider, FormControlLabel, FormGroup,
     MenuItem, Switch, TextField
@@ -13,11 +14,16 @@ import DialogForm from "../components/DialogForm"
 import ExtraDeviceInfoForm from "../components/ExtraDeviceInfoForm"
 import SubDeviceForm from "../components/SubDeviceForm"
 
+const mapDispatch = dispatch => ({
+    updateSnackbarMsg: value =>
+        dispatch({ type: "snackbarMsg/updateSnackbarMsg", payload: value }),
+
+})
 const TYPE_HYBRID_INVERTER = "Hybrid-Inverter"
 const TYPE_INVERTER = "Inverter"
 const TYPE_BATTERY = "Battery"
 
-export default function AddField(props) {
+export default connect(null,mapDispatch)(function AddField(props) {
     const { getList } = props
     const
         powerCompanyOptions = [
@@ -45,6 +51,7 @@ export default function AddField(props) {
     const
         t = useTranslation(),
         commonT = string => t("common." + string),
+        errorT = string => t("error." + string),
         formT = (string) => t("form." + string),
         pageT = (string, params) => t("fieldManagement." + string, params)
 
@@ -65,6 +72,7 @@ export default function AddField(props) {
             uueID: [null, null, null],
             powerCapacity: [null, null, null]
         }),
+        [uueIDError, setUueIDError] = useState(false),
         [subDeviceInfo, setSubDeviceInfo] = useState({
             subDeviceModel: ["", "", ""],
             subPowerCapacity: [null, null, null]
@@ -82,6 +90,7 @@ export default function AddField(props) {
         [maxWidth, setMaxWidth] = useState("lg"),
         [openAdd, setOpenAdd] = useState(false),
         [fetched, setFetched] = useState(false),
+        [loading, setLoading] = useState(false),
         [infoError, setInfoError] = useState("")
 
     const
@@ -123,6 +132,9 @@ export default function AddField(props) {
     }, [modelList, deviceType])
 
     const
+        changeGatewayID = (e) => {
+            setGatewayID(e.target.value)
+        },
         changePowerCompany = (e) => {
             setPowerCompany(e.target.value)
         },
@@ -160,12 +172,19 @@ export default function AddField(props) {
                 return updatedDeviceModel
             })
         },
-        changeDeviceInfo = (index, value) => {
+        changeDeviceInfo = (index, devices,value) => {
             setDeviceInfo(prevInfo => {
                 const newDeviceInfo = { ...prevInfo }
-                newDeviceInfo[index] = value
+                newDeviceInfo[devices][index] = value
                 return newDeviceInfo
             })
+        },
+        uueIDLengthError = deviceInfo.uueID.length < 32 ||deviceInfo.uueID.length >32,
+         changeUueID = (e, index) => {
+            const uueIDTarget = e.target.value,
+                uueIDLengthError = uueIDTarget.length < 32 ||uueIDTarget.length ==0
+            setUueIDError(uueIDLengthError)
+            changeDeviceInfo(index, "uueID", uueIDTarget)
         },
         changePowerCapacity = (e, index) => {
             const num = e.target.value
@@ -188,8 +207,53 @@ export default function AddField(props) {
                 return newSubDeviceInfo
             })
         }
+        // useEffect(()=>{},[gatewayID])
+       const validateGatewayID = async () => {
 
+            // const gatewayID = gatewayID
 
+        await apiCall({
+            method: "get",
+            // data,
+            onComplete: () => {
+                setLoading(false)
+                setFetched(true)
+            },
+            onStart: () => setLoading(true),
+            onError: (err) => {
+                switch (err) {
+                    case 60024:
+                        props.updateSnackbarMsg({
+                            type: "error",
+                            msg: errorT("gatewayIDInvalid")
+                        })
+                        break
+                    case 60025:
+                        props.updateSnackbarMsg({
+                            type: "error",
+                            msg: errorT("syncError")
+                        })
+                        break
+                    default:
+                        props.updateSnackbarMsg({
+                            type: "error",
+                            msg: errorT("error")
+                        })
+                }
+            },
+            onSuccess: () => {
+
+                props.updateSnackbarMsg({
+                    type: "success",
+                    msg: t("dialog.syncSuccessfully")
+                })
+
+                // if (!rawData?.data) return
+
+            },
+            url: `/api/device-management/gateways/${gatewayID}/validity`
+        })
+    }
     const
         submit = async () => {
 
@@ -252,7 +316,7 @@ export default function AddField(props) {
         getModelList()
     }, [fetched, openAdd])
 
-    console.log(deviceInfo)
+    console.log(gatewayID)
     return <>
         <Button
             onClick={() => { setOpenAdd(true) }}
@@ -277,10 +341,11 @@ export default function AddField(props) {
                         sx={{ marginBottom: 0 }}
                         id="gatewayID"
                         label={commonT("gatewayID")}
+                        onChange={changeGatewayID}
                         value={gatewayID}
                     />
                     <Button
-                        // onClick={}
+                        onClick={validateGatewayID}
                         sx={{ marginLeft: "0.3rem" }}
                         radius="pill"
                         variant="contained"
@@ -413,8 +478,10 @@ export default function AddField(props) {
                                     <div className="grid grid-cols-1fr-auto items-center mb-8">
                                         <TextField
                                             sx={{ marginBottom: 0 }}
-                                            id={`UUEID-${i}`}
+                                            id={`uueID-${i}`}
                                             label="UUEID"
+                                            error={uueIDLengthError}
+                                            onChange={(e) => changeUueID(e, i)}
                                             value={deviceInfo.uueID[i]}
                                         />
                                         <Button
@@ -558,4 +625,4 @@ export default function AddField(props) {
             </DialogActions>
         </DialogForm>
     </>
-}
+})

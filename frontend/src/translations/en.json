@@ -228,6 +228,8 @@
         "failureToGenerate":"Failure to generate data.",
         "failureToSave":"Failure to save",
         "fieldDisabled":"Field does not be enabled.",
+        "gatewayIDInvalid":"Gateway ID is invalid.",
+        "gatewayIDisUsed":"Gateway id is used.",
         "groupHasSubGroup":"Account group has sub group.",
         "groupHasUser":"Account group has user.",
         "groupNameExistsOnTheSameLevel":"Account group name exists on the same level.",

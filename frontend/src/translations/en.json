@@ -126,7 +126,8 @@
         "promptMsg":"If all charging resources are turned off, the battery will be in standby mode.",
         "updatedPasswordMsg":"Your password has been updated.",
         "syncMsg":"Are you sure you want to sync?",
-        "syncSuccessfully":"Sync successfully!"
+        "syncSuccessfully":"Sync successfully!",
+        "verifySuccessfully":"Verify Successfully!"
     },
     "economics": {
         "ancillaryServices": "Ancillary Services",
@@ -253,7 +254,9 @@
         "updateBatterySettingsError":"Update battery settings error.",
         "updateMeterSettingsError":"Update meter settings error.",
         "userLocked": "User is locked.",
-        "userProfileError":"Generate user profile error"
+        "userProfileError":"Generate user profile error",
+        "uueIDInvalid":"Device uueID is invalid.",
+        "uueIDIsUsed":"Device uueID is used."
     },
     "fieldManagement":{
         "addField":"Add Field",

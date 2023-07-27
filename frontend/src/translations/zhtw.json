@@ -126,7 +126,8 @@
         "promptMsg":"If all charging resources are turned off, the battery will be in standby mode.",
         "updatedPasswordMsg":"密碼變更成功",
         "syncMsg":"請問您是否要同步這筆資料?",
-        "syncSuccessfully":"同步裝置設定成功"
+        "syncSuccessfully":"同步裝置設定成功",
+        "verifySuccessfully":"驗證成功"
     },
     "economics": {
         "ancillaryServices": "輔助服務",
@@ -229,8 +230,8 @@
         "failureToGenerate":"產生資料失敗",
         "failureToSave":"儲存失敗！",
         "fieldDisabled":"場域尚未啟用",
-        "gatewayIDInvalid":"Gateway ID 是無效的。",
-        "gatewayIDisUsed":"Gateway ID 已經被使用。",
+        "gatewayIDInvalid":"此Gateway ID是無效的。",
+        "gatewayIDisUsed":"此Gateway ID已綁定場域。",
         "groupHasSubGroup":"該群組之下尚有子群組。",
         "groupHasUser":"該群組內尚有使用者。",
         "groupNameExistsOnTheSameLevel":"在同一個管理層級已存在已存在一樣的群組名稱。",
@@ -254,7 +255,9 @@
         "updateBatterySettingsError":"更新電池設定錯誤",
         "updateMeterSettingsError":"更新Meter設定錯誤",
         "userLocked": "使用者帳號已被鎖定。",
-        "userProfileError":"載入使用者資料失敗。"
+        "userProfileError":"載入使用者資料失敗。",
+        "uueIDInvalid":"此裝置的uueID是無效的。",
+        "uueIDIsUsed":"此裝置的uueID已綁定場域。"
     },
     "fieldManagement":{
         "addField":"新增場域",

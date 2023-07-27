@@ -23,7 +23,7 @@ const TYPE_HYBRID_INVERTER = "Hybrid-Inverter"
 const TYPE_INVERTER = "Inverter"
 const TYPE_BATTERY = "Battery"
 
-export default connect(null,mapDispatch)(function AddField(props) {
+export default connect(null, mapDispatch)(function AddField(props) {
     const { getList } = props
     const
         powerCompanyOptions = [
@@ -112,14 +112,16 @@ export default connect(null,mapDispatch)(function AddField(props) {
         const allTypes = [...new Set(filteredData.map(({ type }) => type))]
 
         const typeOptions = allTypes.map((type) => {
+            const id = filteredData.find(({ type: t }) => t === type)?.id
+
             if (type === TYPE_HYBRID_INVERTER) {
-                const otherSelected = deviceType.some((type) => type !== TYPE_HYBRID_INVERTER)
-                if (otherSelected) return { type, disabled: true }
+                const otherSelected = deviceType.some((t) => t !== TYPE_HYBRID_INVERTER)
+                if (otherSelected) return { id, type, disabled: true }
             } else {
                 const hybridInverterSelected = deviceType.includes(TYPE_HYBRID_INVERTER)
-                if (hybridInverterSelected) return { type, disabled: true }
+                if (hybridInverterSelected) return { id, type, disabled: true }
             }
-            return { type, disabled: false }
+            return { id, type, disabled: false }
         })
         return typeOptions
     }, [modelList, deviceType])
@@ -147,7 +149,6 @@ export default connect(null,mapDispatch)(function AddField(props) {
         changeDeviceType = (e) => {
             const { value } = e.target
             const alreadyChecked = deviceType.includes(value)
-
             const newDeviceType = alreadyChecked
                 ? deviceType.filter((v) => v !== value)
                 : [...deviceType, value]
@@ -172,17 +173,17 @@ export default connect(null,mapDispatch)(function AddField(props) {
                 return updatedDeviceModel
             })
         },
-        changeDeviceInfo = (index, devices,value) => {
+        changeDeviceInfo = (index, devices, value) => {
             setDeviceInfo(prevInfo => {
                 const newDeviceInfo = { ...prevInfo }
                 newDeviceInfo[devices][index] = value
                 return newDeviceInfo
             })
         },
-        uueIDLengthError = deviceInfo.uueID.length < 32 ||deviceInfo.uueID.length >32,
-         changeUueID = (e, index) => {
+        uueIDLengthError = deviceInfo.uueID.length < 32 || deviceInfo.uueID.length > 32,
+        changeUueID = (e, index) => {
             const uueIDTarget = e.target.value,
-                uueIDLengthError = uueIDTarget.length < 32 ||uueIDTarget.length ==0
+                uueIDLengthError = uueIDTarget.length < 32
             setUueIDError(uueIDLengthError)
             changeDeviceInfo(index, "uueID", uueIDTarget)
         },
@@ -207,53 +208,82 @@ export default connect(null,mapDispatch)(function AddField(props) {
                 return newSubDeviceInfo
             })
         }
-        // useEffect(()=>{},[gatewayID])
-       const validateGatewayID = async () => {
+    const
+        validateGatewayID = async () => {
 
-            // const gatewayID = gatewayID
+            await apiCall({
+                method: "get",
+                // data,
+                onComplete: () => setLoading(false),
+                onStart: () => setLoading(true),
+                onError: (err) => {
+                    switch (err) {
+                        case 60024:
+                            props.updateSnackbarMsg({
+                                type: "error",
+                                msg: errorT("gatewayIDInvalid")
+                            })
+                            break
+                        case 60025:
+                            props.updateSnackbarMsg({
+                                type: "error",
+                                msg: errorT("gatewayIDisUsed")
+                            })
+                            break
+                        default:
+                            props.updateSnackbarMsg({
+                                type: "error",
+                                msg: errorT("error")
+                            })
+                    }
+                },
+                onSuccess: () => {
 
-        await apiCall({
-            method: "get",
-            // data,
-            onComplete: () => {
-                setLoading(false)
-                setFetched(true)
-            },
-            onStart: () => setLoading(true),
-            onError: (err) => {
-                switch (err) {
-                    case 60024:
-                        props.updateSnackbarMsg({
-                            type: "error",
-                            msg: errorT("gatewayIDInvalid")
-                        })
-                        break
-                    case 60025:
-                        props.updateSnackbarMsg({
-                            type: "error",
-                            msg: errorT("syncError")
-                        })
-                        break
-                    default:
-                        props.updateSnackbarMsg({
-                            type: "error",
-                            msg: errorT("error")
-                        })
-                }
-            },
-            onSuccess: () => {
+                    props.updateSnackbarMsg({
+                        type: "success",
+                        msg: t("dialog.verifySuccessfully")
+                    })
+                },
+                url: `/api/device-management/gateways/${gatewayID}/validity`
+            })
+        },
+        validateUueID = async (uueID) => {
 
-                props.updateSnackbarMsg({
-                    type: "success",
-                    msg: t("dialog.syncSuccessfully")
-                })
+            await apiCall({
+                method: "get",
+                onComplete: () => setLoading(false),
+                onStart: () => setLoading(true),
+                onError: (err) => {
+                    switch (err) {
+                        case 60026:
+                            props.updateSnackbarMsg({
+                                type: "error",
+                                msg: errorT("uueIDInvalid")
+                            })
+                            break
+                        case 60027:
+                            props.updateSnackbarMsg({
+                                type: "error",
+                                msg: errorT("uueIDIsUsed")
+                            })
+                            break
+                        default:
+                            props.updateSnackbarMsg({
+                                type: "error",
+                                msg: errorT("error")
+                            })
+                    }
+                },
+                onSuccess: () => {
 
-                // if (!rawData?.data) return
-
-            },
-            url: `/api/device-management/gateways/${gatewayID}/validity`
-        })
-    }
+                    props.updateSnackbarMsg({
+                        type: "success",
+                        msg: t("dialog.verifySuccessfully")
+                    })
+                },
+                url: `/api/device-management/devices/${uueID}/validity`
+            })
+        }
     const
         submit = async () => {
 
@@ -265,7 +295,7 @@ export default connect(null,mapDispatch)(function AddField(props) {
                 lng: parseInt(lng),
                 powerCompany: powerCompany,
                 voltageType: voltageType,
-                touType: touType,
+                touType: touType
             }
             await apiCall({
                 method: "post",
@@ -306,17 +336,41 @@ export default connect(null,mapDispatch)(function AddField(props) {
         },
         cancelClick = () => {
             setOpenAdd(false)
-            setAccount("")
-            setPassword("")
-            setName("")
-            setGroup("")
+            setGatewayID("")
+            setLocationName("")
+            setAddress("")
+            setLat("")
+            setLng("")
+            setPowerCompany("")
+            setVoltageType("")
+            setTouType("")
+            setDeviceType([])
+            setDeviceModel([])
+            setDeviceInfo({
+                modbusID: [null, null, null],
+                uueID: [null, null, null],
+                powerCapacity: [null, null, null]
+            })
+            setSubDeviceInfo({
+                subDeviceModel: ["", "", ""],
+                subPowerCapacity: [null, null, null]
+            })
+            setExtraDeviceInfo({
+                gridOutagePercent: "",
+                chargingSource: "",
+                energyCapacity: null,
+                voltage: null,
+            })
+            setDeviceInfoCount(1)
+            setShowAddIcon(true)
+            setIsHybridInverterSelected(false)
         }
     useEffect(() => {
         // if (openAdd && fetched == false)
         getModelList()
     }, [fetched, openAdd])
 
-    console.log(gatewayID)
+    console.log(deviceTypeOptions)
     return <>
         <Button
             onClick={() => { setOpenAdd(true) }}
@@ -424,9 +478,9 @@ export default connect(null,mapDispatch)(function AddField(props) {
                 <div className="border-gray-400 border rounded-xl
                     grid grid-cols-2 gap-2 items-center mb-8 p-4">
                     <FormGroup>
-                        {deviceTypeOptions.map(({ i, type, disabled }) =>
+                        {deviceTypeOptions.map(({ id, type, disabled }) =>
                             <FormControlLabel
-                                key={"option-d-t-" + type + i}
+                                key={"option-d-t-" + type + id}
                                 control={
                                     <Checkbox
                                         checked={deviceType.includes(type)}
@@ -480,12 +534,12 @@ export default connect(null,mapDispatch)(function AddField(props) {
                                             sx={{ marginBottom: 0 }}
                                             id={`uueID-${i}`}
                                             label="UUEID"
-                                            error={uueIDLengthError}
+                                            error={uueIDError}
                                             onChange={(e) => changeUueID(e, i)}
                                             value={deviceInfo.uueID[i]}
                                         />
                                         <Button
-                                            // onClick={}
+                                            onClick={() => validateUueID(deviceInfo.uueID[i])}
                                             sx={{ marginLeft: "0.3rem" }}
                                             radius="pill"
                                             variant="contained"
@@ -606,7 +660,7 @@ export default connect(null,mapDispatch)(function AddField(props) {
             </div>
             <Divider variant="middle" />
             <DialogActions sx={{ margin: "1rem 0.8rem 1rem 0" }}>
-                <Button onClick={() => { setOpenAdd(false) }}
+                <Button onClick={cancelClick}
                     sx={{ marginRight: "0.4rem" }}
                     size="large"
                     radius="pill"

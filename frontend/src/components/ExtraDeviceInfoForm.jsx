@@ -1,8 +1,7 @@
 
 import { InputAdornment, MenuItem, TextField } from "@mui/material"
 import { useTranslation } from "react-multi-lang"
-import { useEffect, useMemo } from "react"
-import { validateNumPercent } from "../utils/utils"
+import { validateNumPercent, validateNumTwoDecimalPlaces } from "../utils/utils"
 
 export default function ExtraDeviceInfoForm(props) {
     const { subTitle, gridOutagePercent, setGridOutagePercent, chargingSource,
@@ -17,11 +16,11 @@ export default function ExtraDeviceInfoForm(props) {
     const chargingSourceOptions = [
         {
             "id": 1,
-            "name": "solarGrid"
+            "name": "Solar + Grid"
         },
         {
             "id": 2,
-            "name": "solar"
+            "name": "Solar"
         }
     ]
     const
@@ -35,10 +34,16 @@ export default function ExtraDeviceInfoForm(props) {
             setChargingSource(e.target.value)
         },
         changeEnergyCapacity = (e) => {
-            setEnergyCapacity(e.target.value)
+            const num = e.target.value
+            const isNum = validateNumTwoDecimalPlaces(num)
+            if (!isNum) return
+            setEnergyCapacity(num)
         },
         changeVoltage = (e) => {
-            setVoltage(e.target.value)
+            const num = e.target.value
+            const isNum = validateNumTwoDecimalPlaces(num)
+            if (!isNum) return
+            setVoltage(num)
         }
     return <>
         <h5 className="mb-5 ml-2">{subTitle}</h5>

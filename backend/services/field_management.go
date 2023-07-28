@@ -19,6 +19,18 @@ import (
 	"der-ems/repository"
 )
 
+type (
+	// DeviceModelType godoc
+	DeviceModelType string
+)
+
+const (
+	// HybridInverter godoc
+	HybridInverter DeviceModelType = "Hybrid-Inverter"
+	// Inverter godoc
+	Inverter DeviceModelType = "Inverter"
+)
+
 // FakeModbusIDMapping godoc
 // XXX: For sub-device, modbusID is fake and mapping from modelID
 var FakeModbusIDMapping = map[int64]int{
@@ -147,14 +159,11 @@ func (s defaultFieldManagementService) GetFields(userID int64) (getFields *GetFi
 }
 
 func (s defaultFieldManagementService) GetDeviceModels() (getDeviceModels *GetDeviceModelsResponse, err error) {
-	models, err := s.repo.Gateway.GetDeviceModels()
+	models, err := s.getDeviceModelsInfo()
 	if err != nil {
-		logrus.WithFields(logrus.Fields{
-			"caused-by": "s.repo.Gateway.GetDeviceModels",
-			"err":       err,
-		}).Error()
 		return
 	}
+
 	var getDeviceModelInfos []DeviceModelInfo
 	for _, model := range models {
 		deviceModelInfo := DeviceModelInfo{
@@ -166,6 +175,17 @@ func (s defaultFieldManagementService) GetDeviceModels() (getDeviceModels *GetDe
 	}
 	getDeviceModels = &GetDeviceModelsResponse{
 		Models: getDeviceModelInfos,
+	}
+	return
+}
+
+func (s defaultFieldManagementService) getDeviceModelsInfo() (models []*deremsmodels.DeviceModel, err error) {
+	models, err = s.repo.Gateway.GetDeviceModels()
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.Gateway.GetDeviceModels",
+			"err":       err,
+		}).Error()
 	}
 	return
 }
@@ -252,7 +272,7 @@ func (s defaultFieldManagementService) getFieldDevices(gwID int64) (deviceInfos 
 		}
 
 		// XXX: Type Hybrid-Inverter and Inverter would not be sub-device
-		if device.ModelType != "Hybrid-Inverter" && device.ModelType != "Inverter" {
+		if device.ModelType != string(HybridInverter) && device.ModelType != string(Inverter) {
 			deviceInfos = append(deviceInfos, deviceInfo)
 			continue
 		}
@@ -659,19 +679,15 @@ func (s defaultFieldManagementService) insertGroupGatewayPermissionLog(tx *sql.T
 }
 
 func (s defaultFieldManagementService) GetSubDeviceModels() (getSubDeviceModels *GetSubDeviceModelsResponse, err error) {
-	models, err := s.repo.Gateway.GetDeviceModels()
+	models, err := s.getDeviceModelsInfo()
 	if err != nil {
-		logrus.WithFields(logrus.Fields{
-			"caused-by": "s.repo.Gateway.GetDeviceModels",
-			"err":       err,
-		}).Error()
 		return
 	}
 
 	subModels := make(map[string][]SubDeviceModelInfo)
 	for _, model := range models {
 		// XXX: Type Hybrid-Inverter and Inverter would not be sub-device
-		if model.Type == "Hybrid-Inverter" || model.Type == "Inverter" {
+		if model.Type == string(HybridInverter) || model.Type == string(Inverter) {
 			continue
 		}
 
@@ -766,19 +782,15 @@ func (s defaultFieldManagementService) validateDeviceModels(body *app.CreateFiel
 }
 
 func (s defaultFieldManagementService) getDeviceModelIDsAndSubModelIDs() (modelIDs, subModelIDs []int64, err error) {
-	models, err := s.repo.Gateway.GetDeviceModels()
+	models, err := s.getDeviceModelsInfo()
 	if err != nil {
-		logrus.WithFields(logrus.Fields{
-			"caused-by": "s.repo.Gateway.GetDeviceModels",
-			"err":       err,
-		}).Error()
 		return
 	}
 
 	for _, model := range models {
 		modelIDs = append(modelIDs, model.ID)
 		// XXX: Type Hybrid-Inverter and Inverter would not be sub-device
-		if model.Type != "Hybrid-Inverter" && model.Type != "Inverter" {
+		if model.Type != string(HybridInverter) && model.Type != string(Inverter) {
 			subModelIDs = append(subModelIDs, model.ID)
 		}
 	}
@@ -895,6 +907,14 @@ func (s defaultFieldManagementService) updateFieldGateway(tx *sql.Tx, executedUs
 
 func (s defaultFieldManagementService) insertGroupGatewayPermissionAndLog(tx *sql.Tx, executedUserID int64, gateway *deremsmodels.Gateway) (err error) {
 	parentGroups, err := s.repo.User.GetParentGroupsByUserID(tx, executedUserID)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.User.GetParentGroupsByUserID",
+			"err":       err,
+		}).Error()
+		return
+	}
+
 	for _, group := range parentGroups {
 		logrus.Debug("permitted group id: ", group.ID)
 		var permission *deremsmodels.GroupGatewayRight

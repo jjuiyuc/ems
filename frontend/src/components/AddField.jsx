@@ -8,7 +8,7 @@ import { useTranslation } from "react-multi-lang"
 import { useEffect, useMemo, useState } from "react"
 
 import { apiCall } from "../utils/api"
-import { validateNumTwoDecimalPlaces } from "../utils/utils"
+import { validateNum, validateNumTwoDecimalPlaces } from "../utils/utils"
 
 import DialogForm from "../components/DialogForm"
 import ExtraDeviceInfoForm from "../components/ExtraDeviceInfoForm"
@@ -86,6 +86,7 @@ export default connect(null, mapDispatch)(function AddField(props) {
         [deviceInfoCount, setDeviceInfoCount] = useState(1),
         [showAddIcon, setShowAddIcon] = useState(true),
         [isHybridInverterSelected, setIsHybridInverterSelected] = useState(false),
+        [enable, setEnable] = useState(false),
         [fullWidth, setFullWidth] = useState(true),
         [maxWidth, setMaxWidth] = useState("lg"),
         [openAdd, setOpenAdd] = useState(false),
@@ -137,6 +138,18 @@ export default connect(null, mapDispatch)(function AddField(props) {
         changeGatewayID = (e) => {
             setGatewayID(e.target.value)
         },
+        changeLocationName = (e) => {
+            setLocationName(e.target.value)
+        },
+        changeAddress = (e) => {
+            setAddress(e.target.value)
+        },
+        changeLat = (e) => {
+            setLat(e.target.value)
+        },
+        changeLng = (e) => {
+            setLng(e.target.value)
+        },
         changePowerCompany = (e) => {
             setPowerCompany(e.target.value)
         },
@@ -180,6 +193,12 @@ export default connect(null, mapDispatch)(function AddField(props) {
                 return newDeviceInfo
             })
         },
+        changeModbusID = (e, index) => {
+            const num = e.target.value
+            const isNum = validateNum(num)
+            if (!isNum) return
+            changeDeviceInfo(index, "modbusID", num)
+        },
         uueIDLengthError = deviceInfo.uueID.length < 32 || deviceInfo.uueID.length > 32,
         changeUueID = (e, index) => {
             const uueIDTarget = e.target.value,
@@ -207,6 +226,9 @@ export default connect(null, mapDispatch)(function AddField(props) {
                 newSubDeviceInfo[field][index] = value
                 return newSubDeviceInfo
             })
+        },
+        handleSwitch = () => {
+            setEnable(preState => !preState)
         }
     const
         validateGatewayID = async () => {
@@ -286,6 +308,57 @@ export default connect(null, mapDispatch)(function AddField(props) {
         }
     const
         submit = async () => {
+            const devices = deviceInfo.modbusID.map((modbusID, index) => {
+                const isBattery = deviceType[index] === "Battery"
+                const hasDeviceInfo = deviceModel[index] || modbusID || deviceInfo.uueID[index] || deviceInfo.powerCapacity[index]
+
+                const device = hasDeviceInfo
+                    ? {
+                        modelID: parseInt(deviceModel[index]),
+                        modbusID: parseInt(modbusID),
+                        uueID: deviceInfo.uueID[index],
+                        powerCapacity: parseFloat(deviceInfo.powerCapacity[index]),
+                    }
+                    : null
+
+                if (index === 0 && subDeviceInfo.subDeviceModel.some((subDeviceModel) => subDeviceModel)) {
+                    device.subDevices = subDeviceInfo.subDeviceModel.map((subDeviceModel, subIndex) => {
+                        const isSubBattery = subDeviceModel && deviceType[subIndex] === "Battery"
+                        const hasSubDeviceInfo = subDeviceModel || subDeviceInfo.subPowerCapacity[subIndex]
+
+                        const subDevice = hasSubDeviceInfo
+                            ? {
+                                modelID: subDeviceModel ? parseInt(subDeviceModel) : null,
+                                powerCapacity: parseFloat(subDeviceInfo.subPowerCapacity[subIndex])
+                                    ? parseFloat(subDeviceInfo.subPowerCapacity[subIndex])
+                                    : null,
+                            }
+                            : null
+
+                        if (isSubBattery && subDevice) {
+                            subDevice.extraInfo = {
+                                reservedForGridOutagePercent: parseInt(extraDeviceInfo.gridOutagePercent),
+                                chargingSources: extraDeviceInfo.chargingSource,
+                                energyCapacity: parseFloat(extraDeviceInfo.energyCapacity),
+                                voltage: parseFloat(extraDeviceInfo.voltage),
+                            }
+                        }
+
+                        return subDevice
+                    })
+                }
+
+                if (isBattery && device) {
+                    device.extraInfo = {
+                        reservedForGridOutagePercent: parseInt(extraDeviceInfo.gridOutagePercent),
+                        chargingSources: extraDeviceInfo.chargingSource,
+                        energyCapacity: parseFloat(extraDeviceInfo.energyCapacity),
+                        voltage: parseFloat(extraDeviceInfo.voltage),
+                    }
+                }
+
+                return device
+            })
 
             const data = {
                 gatewayID: gatewayID,
@@ -295,7 +368,9 @@ export default connect(null, mapDispatch)(function AddField(props) {
                 lng: parseInt(lng),
                 powerCompany: powerCompany,
                 voltageType: voltageType,
-                touType: touType
+                touType: touType,
+                devices: devices.filter((device) => device !== null),
+                enable: enable
             }
             await apiCall({
                 method: "post",
@@ -307,10 +382,34 @@ export default connect(null, mapDispatch)(function AddField(props) {
                         type: "success",
                         msg: t("dialog.addedSuccessfully")
                     })
-                    setAccount("")
-                    setPassword("")
-                    setName("")
-                    setGroup("")
+                    setGatewayID("")
+                    setLocationName("")
+                    setAddress("")
+                    setLat("")
+                    setLng("")
+                    setPowerCompany("")
+                    setVoltageType("")
+                    setTouType("")
+                    setDeviceType([])
+                    setDeviceModel([])
+                    setDeviceInfo({
+                        modbusID: [null, null, null],
+                        uueID: [null, null, null],
+                        powerCapacity: [null, null, null]
+                    })
+                    setSubDeviceInfo({
+                        subDeviceModel: ["", "", ""],
+                        subPowerCapacity: [null, null, null]
+                    })
+                    setExtraDeviceInfo({
+                        gridOutagePercent: "",
+                        chargingSource: "",
+                        energyCapacity: null,
+                        voltage: null,
+                    })
+                    setDeviceInfoCount(1)
+                    setShowAddIcon(true)
+                    setIsHybridInverterSelected(false)
                 },
                 onError: err => {
                     switch (err) {
@@ -370,7 +469,7 @@ export default connect(null, mapDispatch)(function AddField(props) {
         getModelList()
     }, [fetched, openAdd])
 
-    console.log(deviceTypeOptions)
+    console.log(deviceInfo.modbusID)
     return <>
         <Button
             onClick={() => { setOpenAdd(true) }}
@@ -411,11 +510,13 @@ export default connect(null, mapDispatch)(function AddField(props) {
                 <TextField
                     id="location-name"
                     label={commonT("locationName")}
+                    onChange={changeLocationName}
                     value={locationName}
                 />
                 <TextField
                     id="address"
                     label={formT("address")}
+                    onChange={changeAddress}
                     value={address}
                 />
                 <div className="flex-nowrap">
@@ -423,12 +524,14 @@ export default connect(null, mapDispatch)(function AddField(props) {
                         id="lat"
                         type="number"
                         label={formT("lat")}
+                        onChange={changeLat}
                         value={lat}
                     />
                     <TextField
                         id="lng"
                         type="number"
                         label={formT("lng")}
+                        onChange={changeLng}
                         value={lng}
                         sx={{ marginLeft: "1rem" }}
                     />
@@ -525,8 +628,8 @@ export default connect(null, mapDispatch)(function AddField(props) {
                                         id={`modbusID-${i}`}
                                         type="number"
                                         label={formT("modbusID")}
+                                        onChange={(e) => changeModbusID(e, i)}
                                         value={deviceInfo.modbusID[i]}
-                                        onChange={(e) => changeSubDeviceModel(e, i)}
 
                                     />
                                     <div className="grid grid-cols-1fr-auto items-center mb-8">
@@ -655,7 +758,10 @@ export default connect(null, mapDispatch)(function AddField(props) {
                     : null}
                 <div className="mb-8 flex items-baseline">
                     <p className="ml-1 mr-2">{formT("enableField")}</p>
-                    <Switch />
+                    <Switch
+                        checked={enable}
+                        onChange={handleSwitch}
+                    />
                 </div>
             </div>
             <Divider variant="middle" />
@@ -668,7 +774,7 @@ export default connect(null, mapDispatch)(function AddField(props) {
                     color="gray">
                     {commonT("cancel")}
                 </Button>
-                <Button onClick={() => { setOpenAdd(false) }}
+                <Button onClick={submit}
                     sx={{ marginRight: "0.4rem" }}
                     size="large"
                     radius="pill"

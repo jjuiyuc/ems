@@ -22,6 +22,8 @@ const mapDispatch = dispatch => ({
 const TYPE_HYBRID_INVERTER = "Hybrid-Inverter"
 const TYPE_INVERTER = "Inverter"
 const TYPE_BATTERY = "Battery"
+const TYPE_METER = "Meter"
+const TYPE_PCS = "PCS"
 
 export default connect(null, mapDispatch)(function AddField(props) {
     const { getList } = props
@@ -72,6 +74,7 @@ export default connect(null, mapDispatch)(function AddField(props) {
             uueID: [null, null, null],
             powerCapacity: [null, null, null]
         }),
+
         [uueIDError, setUueIDError] = useState(false),
         [subDeviceInfo, setSubDeviceInfo] = useState({
             subDeviceModel: ["", "", ""],
@@ -85,12 +88,12 @@ export default connect(null, mapDispatch)(function AddField(props) {
         }),
         [deviceInfoCount, setDeviceInfoCount] = useState(1),
         [showAddIcon, setShowAddIcon] = useState(true),
-        [isHybridInverterSelected, setIsHybridInverterSelected] = useState(false),
+        [hybridInverterSelected, setHybridInverterSelected] = useState(false),
+        [isOthersSelected, setIsOthersSelected] = useState(false),
         [enable, setEnable] = useState(false),
         [fullWidth, setFullWidth] = useState(true),
         [maxWidth, setMaxWidth] = useState("lg"),
         [openAdd, setOpenAdd] = useState(false),
-        [fetched, setFetched] = useState(false),
         [loading, setLoading] = useState(false),
         [infoError, setInfoError] = useState("")
 
@@ -175,7 +178,7 @@ export default connect(null, mapDispatch)(function AddField(props) {
                 setDeviceModel(newDeviceModel)
             }
             if (value === TYPE_HYBRID_INVERTER) {
-                setIsHybridInverterSelected(!alreadyChecked)
+                setHybridInverterSelected(!alreadyChecked)
             }
         },
         changeDeviceModel = (index) => (e) => {
@@ -199,7 +202,6 @@ export default connect(null, mapDispatch)(function AddField(props) {
             if (!isNum) return
             changeDeviceInfo(index, "modbusID", num)
         },
-        uueIDLengthError = deviceInfo.uueID.length < 32 || deviceInfo.uueID.length > 32,
         changeUueID = (e, index) => {
             const uueIDTarget = e.target.value,
                 uueIDLengthError = uueIDTarget.length < 32
@@ -235,7 +237,6 @@ export default connect(null, mapDispatch)(function AddField(props) {
 
             await apiCall({
                 method: "get",
-                // data,
                 onComplete: () => setLoading(false),
                 onStart: () => setLoading(true),
                 onError: (err) => {
@@ -306,6 +307,7 @@ export default connect(null, mapDispatch)(function AddField(props) {
                 url: `/api/device-management/devices/${uueID}/validity`
             })
         }
+
     const
         submit = async () => {
             const devices = deviceInfo.modbusID.map((modbusID, index) => {
@@ -314,7 +316,7 @@ export default connect(null, mapDispatch)(function AddField(props) {
 
                 const device = hasDeviceInfo
                     ? {
-                        modelID: parseInt(deviceModel[index]),
+                        modelID: parseInt(deviceModel[index]) ? parseInt(deviceModel[index]) : parseInt(deviceModel[0]),
                         modbusID: parseInt(modbusID),
                         uueID: deviceInfo.uueID[index],
                         powerCapacity: parseFloat(deviceInfo.powerCapacity[index]),
@@ -409,7 +411,8 @@ export default connect(null, mapDispatch)(function AddField(props) {
                     })
                     setDeviceInfoCount(1)
                     setShowAddIcon(true)
-                    setIsHybridInverterSelected(false)
+                    setHybridInverterSelected(false)
+                    setEnable(false)
                 },
                 onError: err => {
                     switch (err) {
@@ -462,14 +465,13 @@ export default connect(null, mapDispatch)(function AddField(props) {
             })
             setDeviceInfoCount(1)
             setShowAddIcon(true)
-            setIsHybridInverterSelected(false)
+            setHybridInverterSelected(false)
+            setEnable(false)
         }
     useEffect(() => {
-        // if (openAdd && fetched == false)
         getModelList()
-    }, [fetched, openAdd])
-
-    console.log(deviceInfo.modbusID)
+    }, [deviceType, openAdd])
+    console.log(subDeviceInfo.subDeviceModel)
     return <>
         <Button
             onClick={() => { setOpenAdd(true) }}
@@ -619,21 +621,24 @@ export default connect(null, mapDispatch)(function AddField(props) {
                             {Array.from(Array(deviceInfoCount)).map((_, i) => (
                                 <div className="flex flex-col">
                                     <div className="grid grid-cols-1fr-auto items-center mb-5 ml-2">
-                                        <h5 className="">{formT("deviceInfo") + ` ${i + 1}`}</h5>
-                                        {(i === deviceInfoCount - 1) && isHybridInverterSelected && showAddIcon && (
+                                        <h5 className="">{hybridInverterSelected ? formT("deviceInfo") + ` ${i + 1}` : formT("deviceInfo") + ` ${index + 1}`}</h5>
+                                        {(i === deviceInfoCount - 1) && hybridInverterSelected && showAddIcon && (
                                             <AddIcon onClick={addDeviceInfoGroup} />
                                         )}
                                     </div>
                                     <TextField
+                                        // autoFocus={true}
                                         id={`modbusID-${i}`}
                                         type="number"
                                         label={formT("modbusID")}
                                         onChange={(e) => changeModbusID(e, i)}
                                         value={deviceInfo.modbusID[i]}
-
+                                    // onChange={hybridInverterSelected ? (e) => changeModbusID(e, i) : (e) => changeModbusID(e, index)}
+                                    // value={hybridInverterSelected == true ? deviceInfo.modbusID[i] : deviceInfo.modbusID[index]}
                                     />
                                     <div className="grid grid-cols-1fr-auto items-center mb-8">
                                         <TextField
+                                            autoFocus={true}
                                             sx={{ marginBottom: 0 }}
                                             id={`uueID-${i}`}
                                             label="UUEID"
@@ -657,6 +662,9 @@ export default connect(null, mapDispatch)(function AddField(props) {
                                         label={formT("powerCapacity")}
                                         onChange={(e) => changePowerCapacity(e, i)}
                                         value={deviceInfo.powerCapacity[i]}
+                                    // onChange={hybridInverterSelected ? (e) => changePowerCapacity(e, i) : (e) => changePowerCapacity(e, index)}
+                                    // value={hybridInverterSelected == true ? deviceInfo.powerCapacity[i] : deviceInfo.powerCapacity[index]}
+
                                     />
                                     <Divider variant="middle" sx={{ margin: "0 0 2rem" }} />
                                 </div>

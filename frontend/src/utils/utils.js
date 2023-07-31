@@ -49,7 +49,7 @@ const validatePassword = password =>
     /^(?=.{8,})(?=.*[a-zA-Z])(?=.*\d)|(?=.{8,})(?=.*[a-zA-Z])(?=.*\d)(?=.*\W).*$/.test(password)
 
 const validateNum = num =>
-    /^[1-9]\d*$/.test(num)
+    /^[0-9]\d?*$/.test(num)
 
 const validateNumPercent = num =>
     /^(0?|[1-9]\d?|100)$/.test(num)

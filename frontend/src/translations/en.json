@@ -235,6 +235,7 @@
         "groupHasUser":"Account group has user.",
         "groupNameExistsOnTheSameLevel":"Account group name exists on the same level.",
         "inputEmptyError":"All input fields must not be empty. Period should be future time.",
+        "invalidParameter":"The parameter entered is invalid, please try again.",
         "modifyOwnAccountGroupNotAllow":"Modify own account group does not allow.",
         "moreThanMaxPeriods":"More than max periods",
         "nameLength":"Please enter between 1 to 20 characters.",
@@ -255,8 +256,10 @@
         "updateMeterSettingsError":"Update meter settings error.",
         "userLocked": "User is locked.",
         "userProfileError":"Generate user profile error",
+        "uueIDCannotBeRepeated":"UueID cannot be repeated.",
         "uueIDInvalid":"Device uueID is invalid.",
-        "uueIDIsUsed":"Device uueID is used."
+        "uueIDIsUsed":"Device uueID is used.",
+        "uueIDMustBeTheSame":"UueID must be the same."
     },
     "fieldManagement":{
         "addField":"Add Field",

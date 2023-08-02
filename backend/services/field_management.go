@@ -33,7 +33,8 @@ const (
 )
 
 // FakeModbusIDMapping godoc
-// XXX: For sub-device, modbusID is fake and mapping from modelID
+/* XXX: For sub-device, modbusID is fake and mapping from modelID
+   refer https://docs.google.com/spreadsheets/d/1zYMVK3ux4M9QGkaoxpn1FNvMBRbrcfyBu53gtnS3lPs/edit?usp=sharing */
 var FakeModbusIDMapping = map[int64]int{
 	8: 255,
 	3: 253,

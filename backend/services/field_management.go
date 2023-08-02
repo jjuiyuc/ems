@@ -260,7 +260,7 @@ func (s defaultFieldManagementService) getFieldDevices(gwID int64) (deviceInfos 
 	}
 
 	for _, device := range devices {
-		if s.isFakeModbusID(device.ModbusID) {
+		if s.isMappingFakeModbusID(device.ModelID) {
 			continue
 		}
 		deviceInfo := DeviceInfo{
@@ -279,7 +279,7 @@ func (s defaultFieldManagementService) getFieldDevices(gwID int64) (deviceInfos 
 
 		var subDeviceInfos []SubDeviceInfo
 		for _, subDevice := range devices {
-			if subDevice.UUEID == device.UUEID && s.isFakeModbusID(subDevice.ModbusID) {
+			if subDevice.UUEID == device.UUEID && s.isMappingFakeModbusID(subDevice.ModelID) {
 				subDeviceInfo := SubDeviceInfo{
 					ModelType:     subDevice.ModelType,
 					ModelID:       subDevice.ModelID,
@@ -300,9 +300,9 @@ func (s defaultFieldManagementService) isSubModel(deviceType string) bool {
 	return dt != HybridInverter && dt != Inverter
 }
 
-func (s defaultFieldManagementService) isFakeModbusID(modbusID int64) bool {
-	// XXX: Fake modbus id decrements from 255
-	return modbusID > 200
+func (s defaultFieldManagementService) isMappingFakeModbusID(modelID int64) bool {
+	_, ok := FakeModbusIDMapping[modelID]
+	return ok
 }
 
 func (s defaultFieldManagementService) EnableField(executedUserID int64, gwUUID string, enable bool) (err error) {

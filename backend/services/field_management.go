@@ -24,6 +24,7 @@ type (
 	DeviceModelType string
 )
 
+// XXX: Type Hybrid-Inverter and Inverter would not be sub-device
 const (
 	// HybridInverter godoc
 	HybridInverter DeviceModelType = "Hybrid-Inverter"
@@ -271,8 +272,7 @@ func (s defaultFieldManagementService) getFieldDevices(gwID int64) (deviceInfos 
 			ExtraInfo:     device.ExtraInfo,
 		}
 
-		// XXX: Type Hybrid-Inverter and Inverter would not be sub-device
-		if device.ModelType != string(HybridInverter) && device.ModelType != string(Inverter) {
+		if s.isSubModel(device.ModelType) {
 			deviceInfos = append(deviceInfos, deviceInfo)
 			continue
 		}
@@ -293,6 +293,11 @@ func (s defaultFieldManagementService) getFieldDevices(gwID int64) (deviceInfos 
 		deviceInfos = append(deviceInfos, deviceInfo)
 	}
 	return
+}
+
+func (s defaultFieldManagementService) isSubModel(deviceType string) bool {
+	dt := DeviceModelType(deviceType)
+	return dt != HybridInverter && dt != Inverter
 }
 
 func (s defaultFieldManagementService) isFakeModbusID(modbusID int64) bool {
@@ -686,8 +691,7 @@ func (s defaultFieldManagementService) GetSubDeviceModels() (getSubDeviceModels 
 
 	subModels := make(map[string][]SubDeviceModelInfo)
 	for _, model := range models {
-		// XXX: Type Hybrid-Inverter and Inverter would not be sub-device
-		if model.Type == string(HybridInverter) || model.Type == string(Inverter) {
+		if !s.isSubModel(model.Type) {
 			continue
 		}
 
@@ -789,8 +793,7 @@ func (s defaultFieldManagementService) getDeviceModelIDsAndSubModelIDs() (modelI
 
 	for _, model := range models {
 		modelIDs = append(modelIDs, model.ID)
-		// XXX: Type Hybrid-Inverter and Inverter would not be sub-device
-		if model.Type != string(HybridInverter) && model.Type != string(Inverter) {
+		if s.isSubModel(model.Type) {
 			subModelIDs = append(subModelIDs, model.ID)
 		}
 	}

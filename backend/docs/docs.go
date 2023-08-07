@@ -848,6 +848,131 @@ var doc = `{
                 }
             }
         },
+        "/device-management/devices/sub-devices/models": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "list sub-device models based on token",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "field management"
+                ],
+                "summary": "List sub-device models",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Input user's access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/app.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/services.GetSubDeviceModelsResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/device-management/devices/{deviceuueid}/validity": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "verify device UUEID based on token",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "field management"
+                ],
+                "summary": "Verify device UUEID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Input user's access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Device UUEID",
+                        "name": "deviceuueid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/device-management/gateways": {
             "get": {
                 "security": [
@@ -890,6 +1015,75 @@ var doc = `{
                                     }
                                 }
                             ]
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "create a field by token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "field management"
+                ],
+                "summary": "Create a field",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Input user's access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/app.CreateFieldBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
                         }
                     },
                     "401": {
@@ -1718,6 +1912,66 @@ var doc = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/device-management/gateways/{gwid}/validity": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "verify gateway UUID based on token",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "field management"
+                ],
+                "summary": "Verify gateway UUID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Input user's access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Gateway UUID",
+                        "name": "gwid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/app.Response"
                         }
@@ -3587,6 +3841,133 @@ var doc = `{
         }
     },
     "definitions": {
+        "app.CreateFieldBody": {
+            "type": "object",
+            "required": [
+                "address",
+                "devices",
+                "enable",
+                "gatewayID",
+                "lat",
+                "lng",
+                "locationName",
+                "powerCompany",
+                "toutype",
+                "voltageType"
+            ],
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "devices": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/app.FieldDeviceInfo"
+                    }
+                },
+                "enable": {
+                    "type": "boolean"
+                },
+                "gatewayID": {
+                    "type": "string"
+                },
+                "lat": {
+                    "type": "number",
+                    "format": "latitude"
+                },
+                "lng": {
+                    "type": "number",
+                    "format": "longitude"
+                },
+                "locationName": {
+                    "type": "string"
+                },
+                "powerCompany": {
+                    "type": "string"
+                },
+                "toutype": {
+                    "type": "string"
+                },
+                "voltageType": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.FieldDeviceExtraInfo": {
+            "type": "object",
+            "required": [
+                "chargingSources",
+                "energyCapacity",
+                "reservedForGridOutagePercent",
+                "voltage"
+            ],
+            "properties": {
+                "chargingSources": {
+                    "type": "string"
+                },
+                "energyCapacity": {
+                    "type": "number"
+                },
+                "reservedForGridOutagePercent": {
+                    "type": "integer"
+                },
+                "voltage": {
+                    "type": "number"
+                }
+            }
+        },
+        "app.FieldDeviceInfo": {
+            "type": "object",
+            "required": [
+                "modbusID",
+                "modelID",
+                "powerCapacity",
+                "uueid"
+            ],
+            "properties": {
+                "extraInfo": {
+                    "type": "object",
+                    "$ref": "#/definitions/app.FieldDeviceExtraInfo"
+                },
+                "modbusID": {
+                    "type": "integer"
+                },
+                "modelID": {
+                    "type": "integer"
+                },
+                "powerCapacity": {
+                    "type": "number"
+                },
+                "subDevices": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/app.FieldSubDeviceInfo"
+                    }
+                },
+                "uueid": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.FieldSubDeviceInfo": {
+            "type": "object",
+            "required": [
+                "modelID",
+                "powerCapacity"
+            ],
+            "properties": {
+                "extraInfo": {
+                    "type": "object",
+                    "$ref": "#/definitions/app.FieldDeviceExtraInfo"
+                },
+                "modelID": {
+                    "type": "integer"
+                },
+                "powerCapacity": {
+                    "type": "number"
+                }
+            }
+        },
         "app.PeriodQuery": {
             "type": "object",
             "required": [
@@ -3917,6 +4298,9 @@ var doc = `{
                 },
                 "modelID": {
                     "type": "integer"
+                },
+                "modelType": {
+                    "type": "string"
                 },
                 "powerCapacity": {
                     "type": "number"
@@ -4283,6 +4667,17 @@ var doc = `{
                 }
             }
         },
+        "services.GetSubDeviceModelsResponse": {
+            "type": "object",
+            "properties": {
+                "subDevices": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/services.SubDevicesInfo"
+                    }
+                }
+            }
+        },
         "services.GetUsersResponse": {
             "type": "object",
             "properties": {
@@ -4581,8 +4976,36 @@ var doc = `{
                 "modelID": {
                     "type": "integer"
                 },
+                "modelType": {
+                    "type": "string"
+                },
                 "powerCapacity": {
                     "type": "number"
+                }
+            }
+        },
+        "services.SubDeviceModelInfo": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "services.SubDevicesInfo": {
+            "type": "object",
+            "properties": {
+                "models": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/services.SubDeviceModelInfo"
+                    }
+                },
+                "type": {
+                    "type": "string"
                 }
             }
         },

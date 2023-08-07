@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	deremsmodels "der-ems/models/der-ems"
 
+	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
@@ -12,6 +13,7 @@ type TOURepository interface {
 	GetTOULocationByTOULocationID(touLocationID int64) (*deremsmodels.TouLocation, error)
 	GetTOUsByTOUInfo(touLocationID int64, voltageType, touType, periodType string, isSummer bool, day string) ([]*deremsmodels.Tou, error)
 	CountHolidayByDay(touLocationID int64, year, day string) (int64, error)
+	GetTOULocationByPowerCompany(tx *sql.Tx, powerCompany string) (*deremsmodels.TouLocation, error)
 }
 
 type defaultTOURepository struct {
@@ -46,4 +48,16 @@ func (repo defaultTOURepository) CountHolidayByDay(touLocationID int64, year, da
 		qm.Where("day = ?", day),
 		qm.Where("year = ?", year),
 		qm.Where("tou_location_id = ?", touLocationID)).Count(repo.db)
+}
+
+func (repo defaultTOURepository) GetTOULocationByPowerCompany(tx *sql.Tx, powerCompany string) (*deremsmodels.TouLocation, error) {
+	return deremsmodels.TouLocations(
+		qm.Where("power_company = ?", powerCompany)).One(repo.getExecutor(tx))
+}
+
+func (repo defaultTOURepository) getExecutor(tx *sql.Tx) boil.Executor {
+	if tx == nil {
+		return repo.db
+	}
+	return tx
 }

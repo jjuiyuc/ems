@@ -5,6 +5,11 @@ type FieldURI struct {
 	GatewayID string `uri:"gwid" binding:"required"`
 }
 
+// FieldDeviceURI godoc
+type FieldDeviceURI struct {
+	DeviceUUEID string `uri:"deviceuueid" binding:"required"`
+}
+
 // GatewayAndPeriodURI godoc
 type GatewayAndPeriodURI struct {
 	GatewayID string `uri:"gwid" binding:"required"`

@@ -7,7 +7,6 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	"database/sql"
 	"der-ems/config"
 	"der-ems/internal/e"
 	"der-ems/kafka"
@@ -18,7 +17,6 @@ import (
 
 type TestutilsSuite struct {
 	suite.Suite
-	db         *sql.DB
 	repo       *repository.Repository
 	seedUtData map[string]interface{}
 }
@@ -33,16 +31,18 @@ func (s *TestutilsSuite) SetupSuite() {
 	models.Init(cfg)
 	db := models.GetDB()
 
-	s.db = db
-	s.repo = repository.NewRepository(db)
+	// Truncate & seed data
+	err := SeedUtGroupAndUser(db)
+	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 	s.seedUtData = map[string]interface{}{
 		"gwID":      "U00001",
 		"timestamp": 1653964322,
 	}
+
+	s.repo = repository.NewRepository(db)
 }
 
 func (s *TestutilsSuite) Test_SeedUtGroupAndUser() {
-	SeedUtGroupAndUser(s.db)
 	_, err := s.repo.User.GetUserByUsername(testdata.UtUser.Username)
 	s.Require().NoErrorf(err, e.ErrNewMessageReceivedUnexpectedErr.Error())
 }

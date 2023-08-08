@@ -14,7 +14,7 @@ import (
 func main() {
 	name := "weather-worker"
 	dir := flag.String("d", "../../../config", "")
-	env := flag.String("e", "template", "")
+	env := flag.String("e", "ut", "")
 	flag.Parse()
 	config.Init(*dir, *env)
 	cfg := config.GetConfig()

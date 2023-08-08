@@ -45,6 +45,16 @@ var (
 	ErrNewPowerOutagePeriodInvalid = errors.New("power outage period is invalid")
 	// ErrNewPowerOutagePeriodOngoing godoc
 	ErrNewPowerOutagePeriodOngoing = errors.New("power outage period is ongoing")
+	// ErrNewGatewayIDIsInvalid godoc
+	ErrNewGatewayIDIsInvalid = errors.New("gateway id is invalid")
+	// ErrNewGatewayIDIsUsed godoc
+	ErrNewGatewayIDIsUsed = errors.New("gateway id is used")
+	// ErrNewDeviceUUEIDIsInvalid godoc
+	ErrNewDeviceUUEIDIsInvalid = errors.New("device uueid is invalid")
+	// ErrNewDeviceUUEIDIsUsed godoc
+	ErrNewDeviceUUEIDIsUsed = errors.New("device uueid is used")
+	// ErrNewDeviceModelIsInvalid godoc
+	ErrNewDeviceModelIsInvalid = errors.New("device model is invalid")
 )
 
 // ErrNewKeyNotExist godoc

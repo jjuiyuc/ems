@@ -23,14 +23,15 @@ export default connect(mapState, mapDispatch)(function DemandChargeCard(props) {
         errorT = string => t("error." + string)
 
     const
-        [maxDemandCapacity, setMaxDemandCapacity] = useState(null),
+        [maxDemandCapacity, setMaxDemandCapacity] = useState(""),
         [loading, setLoading] = useState(false)
     const
         inputNum = (e) => {
             const num = e.target.value
             const isNum = validateNum(num)
-            if (!isNum) return
-            setMaxDemandCapacity(num)
+            if (num === "" || isNum) {
+                setMaxDemandCapacity(num)
+            }
         },
         handleSave = () => {
             const newData = maxDemandCapacity
@@ -63,7 +64,7 @@ export default connect(mapState, mapDispatch)(function DemandChargeCard(props) {
 
                 const { data } = rawData
 
-                setMaxDemandCapacity(data.maxDemandCapacity || null)
+                setMaxDemandCapacity(data.maxDemandCapacity || "")
 
             },
             url: `/api/device-management/gateways/${gatewayID}/meter-settings`

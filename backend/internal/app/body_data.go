@@ -43,11 +43,11 @@ type CreateFieldBody struct {
 	GatewayID    string            `form:"gatewayID" binding:"required"`
 	LocationName string            `form:"locationName" binding:"required"`
 	Address      string            `form:"address" binding:"required"`
-	Lat          float64           `form:"lat" binding:"required" format:"latitude"`
-	Lng          float64           `form:"lng" binding:"required" format:"longitude"`
-	PowerCompany string            `form:"powerCompany" binding:"required,oneof='TPC'"`
-	VoltageType  string            `form:"voltageType" binding:"required,oneof='Low voltage' 'High voltage'"`
-	TOUType      string            `form:"touType" binding:"required,oneof='Two-section'"`
+	Lat          float64           `form:"lat" binding:"required,latitude"`
+	Lng          float64           `form:"lng" binding:"required,longitude"`
+	PowerCompany string            `form:"powerCompany" binding:"oneof='TPC'"`
+	VoltageType  string            `form:"voltageType" binding:"oneof='Low voltage' 'High voltage'"`
+	TOUType      string            `form:"touType" binding:"oneof='Two-section'"`
 	Enable       *bool             `form:"enable" binding:"required"`
 	Devices      []FieldDeviceInfo `form:"devices" binding:"required,dive"`
 }

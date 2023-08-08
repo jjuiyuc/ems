@@ -1,3 +1,4 @@
+import { connect } from "react-redux"
 import { useTranslation } from "react-multi-lang"
 import { useEffect, useState } from "react"
 
@@ -7,8 +8,10 @@ import AddField from "../components/AddField"
 import EditField from "../components/EditField"
 import InfoField from "../components/InfoField"
 import Table from "../components/DataTable"
-
-export default function FieldManagement() {
+const mapState = state => ({
+    typeID: state.user.group.typeID
+})
+export default connect(mapState)(function FieldManagement(props) {
     const
         t = useTranslation(),
         commonT = string => t("common." + string)
@@ -70,9 +73,11 @@ export default function FieldManagement() {
 
     return <>
         <h1 className="mb-9">{commonT("fieldManagement")}</h1>
-        <div className="mb-9">
-            <AddField {...{ getList }} />
-        </div>
+        {props.typeID < 3
+            ? <div className="mb-9">
+                <AddField {...{ getList }} />
+            </div>
+            : null}
         <Table
             columns={columns}
             data={fieldList}
@@ -84,4 +89,4 @@ export default function FieldManagement() {
             theme="dark"
         />
     </>
-}
+})

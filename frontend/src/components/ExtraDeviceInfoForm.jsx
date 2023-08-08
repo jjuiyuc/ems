@@ -5,8 +5,8 @@ import { validateNumPercent, validateNumTwoDecimalPlaces } from "../utils/utils"
 
 export default function ExtraDeviceInfoForm(props) {
     const { subTitle, gridOutagePercent, setGridOutagePercent, chargingSource,
-        setChargingSource, energyCapacity, setEnergyCapacity, voltage, setVoltage
-    } = props
+        setChargingSource, energyCapacity, setEnergyCapacity, voltage, setVoltage,
+        handleKeyDown } = props
 
     const
         t = useTranslation(),
@@ -36,14 +36,16 @@ export default function ExtraDeviceInfoForm(props) {
         changeEnergyCapacity = (e) => {
             const num = e.target.value
             const isNum = validateNumTwoDecimalPlaces(num)
-            if (!isNum) return
-            setEnergyCapacity(num)
+            if (num === "" || isNum) {
+                setEnergyCapacity(num)
+            }
         },
         changeVoltage = (e) => {
             const num = e.target.value
             const isNum = validateNumTwoDecimalPlaces(num)
-            if (!isNum) return
-            setVoltage(num)
+            if (num === "" || isNum) {
+                setVoltage(num)
+            }
         }
     return <>
         <h5 className="mb-5 ml-2">{subTitle}</h5>
@@ -77,6 +79,7 @@ export default function ExtraDeviceInfoForm(props) {
             type="number"
             label={formT("energyCapacity")}
             onChange={changeEnergyCapacity}
+            onKeyDown={(e) => handleKeyDown(e)}
             value={energyCapacity}
         />
         <TextField
@@ -84,6 +87,7 @@ export default function ExtraDeviceInfoForm(props) {
             type="number"
             label={commonT("voltage")}
             onChange={changeVoltage}
+            onKeyDown={(e) => handleKeyDown(e)}
             value={voltage}
         />
     </>

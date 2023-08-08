@@ -8,7 +8,7 @@ import { useTranslation } from "react-multi-lang"
 import { useEffect, useMemo, useState } from "react"
 
 import { apiCall } from "../utils/api"
-import { validateNumTwoDecimalPlaces } from "../utils/utils"
+import { validateLat, validateLng, validateNumTwoDecimalPlaces } from "../utils/utils"
 
 import DialogForm from "../components/DialogForm"
 import ExtraDeviceInfoForm from "../components/ExtraDeviceInfoForm"
@@ -142,10 +142,18 @@ export default connect(null, mapDispatch)(function AddField(props) {
             setAddress(e.target.value)
         },
         changeLat = (e) => {
-            setLat(e.target.value)
+            const num = e.target.value
+            const isNum = validateLat(num)
+            if (num === "" || isNum) {
+                setLat(num)
+            }
         },
         changeLng = (e) => {
-            setLng(e.target.value)
+            const num = e.target.value
+            const isNum = validateLng(num)
+            if (num === "" || isNum) {
+                setLng(num)
+            }
         },
         changePowerCompany = (e) => {
             setPowerCompany(e.target.value)
@@ -209,11 +217,26 @@ export default connect(null, mapDispatch)(function AddField(props) {
             changeDeviceInfo(index, "uueID", uueIDTarget)
 
         },
+        handleKeyDown = (e) => {
+            if (
+                !(
+                    e.key === "Backspace" ||
+                    e.key === "Delete" ||
+                    e.key === "Tab" ||
+                    e.key === "." ||
+                    (e.key >= "0" && e.key <= "9")
+                )
+            ) {
+                e.preventDefault()
+            }
+        },
         changePowerCapacity = (e, index) => {
             const num = e.target.value
+
             const isNum = validateNumTwoDecimalPlaces(num)
-            if (!isNum) return
-            changeDeviceInfo(index, "powerCapacity", num)
+            if (num === "" || isNum) {
+                changeDeviceInfo(index, "powerCapacity", num)
+            }
         },
         addDeviceInfoGroup = () => {
             if (deviceInfoCount < 4) {
@@ -684,9 +707,9 @@ export default connect(null, mapDispatch)(function AddField(props) {
                                         </div>
                                         <TextField
                                             id={`powerCapacity-${i}`}
-                                            type="number"
                                             label={formT("powerCapacity")}
-                                            onChange={hybridInverterSelected ? (e) => changePowerCapacity(e, i) : (e) => changePowerCapacity(e, index)}
+                                            onKeyDown={(e) => hybridInverterSelected ? handleKeyDown(e, i) : handleKeyDown(e, index)}
+                                            onChange={(e) => changePowerCapacity(e, hybridInverterSelected ? i : index)}
                                             value={hybridInverterSelected ? deviceInfo.powerCapacity[i] : deviceInfo.powerCapacity[index]}
                                         />
                                         <Divider variant="middle" sx={{ margin: "0 0 2rem" }} />
@@ -703,6 +726,7 @@ export default connect(null, mapDispatch)(function AddField(props) {
                                     mainDeviceType={deviceType}
                                     subDeviceInfo={subDeviceInfo}
                                     changeSubDeviceInfo={changeSubDeviceInfo}
+                                    handleKeyDown={handleKeyDown}
                                 />
                                 <ExtraDeviceInfoForm
                                     subTitle={pageT("extraDeviceInfo")}
@@ -734,6 +758,7 @@ export default connect(null, mapDispatch)(function AddField(props) {
                                             voltage: value,
                                         }))
                                     }
+                                    handleKeyDown={handleKeyDown}
                                 />
                             </div>
                         </>
@@ -746,6 +771,7 @@ export default connect(null, mapDispatch)(function AddField(props) {
                                     mainDeviceType={deviceType}
                                     subDeviceInfo={subDeviceInfo}
                                     changeSubDeviceInfo={changeSubDeviceInfo}
+                                    handleKeyDown={handleKeyDown}
                                 />
                             </div>
                         </>
@@ -783,6 +809,7 @@ export default connect(null, mapDispatch)(function AddField(props) {
                                             voltage: value,
                                         }))
                                     }
+                                    handleKeyDown={handleKeyDown}
                                 />
                             </div>
                         </>

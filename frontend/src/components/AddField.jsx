@@ -17,6 +17,8 @@ import SubDeviceForm from "../components/SubDeviceForm"
 const mapDispatch = (dispatch) => ({
     updateSnackbarMsg: (value) =>
         dispatch({ type: "snackbarMsg/updateSnackbarMsg", payload: value }),
+    updateList: (value) =>
+        dispatch({ type: "gateways/updateList", payload: value })
 })
 const TYPE_HYBRID_INVERTER = "Hybrid-Inverter"
 const TYPE_INVERTER = "Inverter"
@@ -406,6 +408,7 @@ export default connect(null, mapDispatch)(function AddField(props) {
             onSuccess: () => {
                 setOpenAdd(false)
                 getList()
+                props.updateList(gatewayData)
                 props.updateSnackbarMsg({
                     type: "success",
                     msg: t("dialog.addedSuccessfully"),

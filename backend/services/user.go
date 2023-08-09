@@ -18,6 +18,7 @@ type UserService interface {
 	CreatePasswordToken(username string) (name, token string, err error)
 	PasswordResetByPasswordToken(token, newPassword string) (err error)
 	GetProfile(userID int64) (profile *ProfileResponse, err error)
+	GetProfileGateways(userID int64) (gateways []GatewayInfo, err error)
 	UpdateName(userID int64, name string) (err error)
 	UpdatePassword(userID int64, currentPassword, newPassword string) (errCode int, err error)
 }
@@ -169,6 +170,21 @@ func (s defaultUserService) GetProfile(userID int64) (profile *ProfileResponse, 
 		User:  user,
 		Group: groupInfo,
 	}
+	return
+}
+
+// GetProfileGateways godoc
+func (s defaultUserService) GetProfileGateways(userID int64) (gateways []GatewayInfo, err error) {
+	user, err := s.repo.User.GetUserByUserID(nil, userID)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"caused-by": "s.repo.User.GetUserByUserID",
+			"err":       err,
+		}).Error()
+		return
+	}
+
+	gateways = s.getGroupGatewayInfo(user.GroupID)
 	return
 }
 

@@ -20,7 +20,7 @@ go-build: clean
 
 swag:
 	@$(shell if [ ! -f $(GOPATH)/bin/swag ] ; then go get -u github.com/swaggo/swag/cmd/swag; fi)
-	$(AT_RUN)$(GOPATH)/bin/swag init -g routers/router.go
+	$(AT_RUN)$(GOPATH)/bin/swag init --parseDependency --parseInternal -g routers/router.go
 
 FOCUS ?= .
 go-ginkgo:

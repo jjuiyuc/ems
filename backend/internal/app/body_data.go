@@ -49,7 +49,7 @@ type CreateFieldBody struct {
 	VoltageType  string            `form:"voltageType" binding:"oneof='Low voltage' 'High voltage'"`
 	TOUType      string            `form:"touType" binding:"oneof='Two-section'"`
 	Enable       *bool             `form:"enable" binding:"required"`
-	Devices      []FieldDeviceInfo `form:"devices" binding:"required,dive"`
+	Devices      []FieldDeviceInfo `form:"devices" binding:"required,gt=0,dive"`
 }
 
 // FieldDeviceInfo godoc

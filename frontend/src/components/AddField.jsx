@@ -335,10 +335,23 @@ export default connect(null, mapDispatch)(function AddField(props) {
                 url: `/api/device-management/devices/${uueID}/validity`,
             })
         }
+    const getGatewaysList = () => {
+        apiCall({
+            onError: (error) => setInfoError(error),
+            onSuccess: (rawData) => {
+                if (!rawData?.data) return
 
+                const { data } = rawData
+                props.updateList(data)
+
+            },
+            url: `/api/users/profile/gateways`,
+        })
+    }
     const submit = async () => {
         const devices = deviceInfo.uueID.map((uueID, index) => {
             const isBattery = deviceType[index] === "Battery"
+            const isHybridInverter = deviceType[index] === "Hybrid-Inverter"
             const hasDeviceInfo = deviceModel[index] || deviceInfo.modbusID[index] || uueID || deviceInfo.powerCapacity[index]
 
             const device = hasDeviceInfo
@@ -366,7 +379,7 @@ export default connect(null, mapDispatch)(function AddField(props) {
                         }
                         : null
 
-                    if (isSubBattery && subDevice) {
+                    if (isSubBattery || (isHybridInverter && subIndex === 2) && subDevice) {
                         subDevice.extraInfo = {
                             reservedForGridOutagePercent: parseInt(extraDeviceInfo.gridOutagePercent),
                             chargingSources: extraDeviceInfo.chargingSource,
@@ -379,7 +392,7 @@ export default connect(null, mapDispatch)(function AddField(props) {
                 device.subDevices = subDevices.filter((subDevice) => subDevice !== null)
             }
 
-            if (isBattery && device) {
+            if ((isBattery || isHybridInverter) && device) {
                 device.extraInfo = {
                     reservedForGridOutagePercent: parseInt(extraDeviceInfo.gridOutagePercent),
                     chargingSources: extraDeviceInfo.chargingSource,
@@ -408,7 +421,7 @@ export default connect(null, mapDispatch)(function AddField(props) {
             onSuccess: () => {
                 setOpenAdd(false)
                 getList()
-                props.updateList(gatewayData)
+                getGatewaysList()
                 props.updateSnackbarMsg({
                     type: "success",
                     msg: t("dialog.addedSuccessfully"),
@@ -507,8 +520,8 @@ export default connect(null, mapDispatch)(function AddField(props) {
         }
     useEffect(() => {
         getModelList()
+        getGatewaysList()
     }, [deviceType, openAdd])
-
     return (
         <>
             <Button
@@ -689,12 +702,8 @@ export default connect(null, mapDispatch)(function AddField(props) {
                                                 id={`uueID-${i}`}
                                                 label="uueID"
                                                 error={uueIDError}
-                                                onChange={hybridInverterSelected
-                                                    ? (e) => changeUueID(e, i)
-                                                    : (e) => changeUueID(e, index)}
-                                                value={hybridInverterSelected
-                                                    ? deviceInfo.uueID[i]
-                                                    : deviceInfo.uueID[index]}
+                                                onChange={(e) => changeUueID(e, hybridInverterSelected ? i : 0)}
+                                                value={deviceInfo.uueID[hybridInverterSelected ? i : 0]}
                                             />
                                             <Button
                                                 onClick={hybridInverterSelected

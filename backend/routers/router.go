@@ -10,8 +10,8 @@ import (
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"github.com/swaggo/gin-swagger/swaggerFiles"
 
 	"der-ems/docs"
 	"der-ems/internal/app"
@@ -192,6 +192,7 @@ func InitRouter(isCORS bool, ginMode string, enforcer *casbin.Enforcer, w *APIWo
 	apiGroup.PUT("/users/password/lost", w.PasswordLost)
 	apiGroup.PUT("/users/password/reset-by-token", w.PasswordResetByToken)
 	apiGroup.GET("/users/profile", authorizeJWT(REST), w.GetProfile)
+	apiGroup.GET("/users/profile/gateways", authorizeJWT(REST), w.GetProfileGateways)
 	apiGroup.PUT("/users/name", authorizeJWT(REST), w.UpdateName)
 	apiGroup.PUT("/users/password", authorizeJWT(REST), w.UpdatePassword)
 

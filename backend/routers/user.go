@@ -127,6 +127,29 @@ func (w *APIWorker) GetProfile(c *gin.Context) {
 	appG.Response(http.StatusOK, e.Success, profile)
 }
 
+// GetProfileGateways godoc
+// @Summary Show the gateways permissions information about an individual user
+// @Description get gateways permissions by token
+// @Tags        user
+// @Security    ApiKeyAuth
+// @Param       Authorization  header    string true "Input user's access token" default(Bearer <Add access token here>)
+// @Produce     json
+// @Success     200            {object}  app.Response{data=[]services.GatewayInfo}
+// @Failure     401            {object}  app.Response
+// @Failure     500            {object}  app.Response
+// @Router      /user/profile [get]
+func (w *APIWorker) GetProfileGateways(c *gin.Context) {
+	appG := app.Gin{c}
+	userID, _ := c.Get("userID")
+	gateways, err := w.Services.User.GetProfileGateways(userID.(int64))
+	if err != nil {
+		log.WithField("caused-by", "get profile gateways").Error()
+		appG.Response(http.StatusInternalServerError, e.Error, nil)
+		return
+	}
+	appG.Response(http.StatusOK, e.Success, gateways)
+}
+
 // UpdateName godoc
 // @Summary Update the display name about an individual user
 // @Description update user's name by token

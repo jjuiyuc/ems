@@ -1,30 +1,35 @@
 basePath: /api
 definitions:
-  app.CreateFieldBody:
+  der-ems_internal_app.CreateFieldBody:
     properties:
       address:
         type: string
       devices:
         items:
-          $ref: '#/definitions/app.FieldDeviceInfo'
+          $ref: '#/definitions/der-ems_internal_app.FieldDeviceInfo'
         type: array
       enable:
         type: boolean
       gatewayID:
         type: string
       lat:
-        format: latitude
         type: number
       lng:
-        format: longitude
         type: number
       locationName:
         type: string
       powerCompany:
+        enum:
+        - TPC
         type: string
-      toutype:
+      touType:
+        enum:
+        - Two-section
         type: string
       voltageType:
+        enum:
+        - Low voltage
+        - High voltage
         type: string
     required:
     - address
@@ -34,13 +39,13 @@ definitions:
     - lat
     - lng
     - locationName
-    - powerCompany
-    - toutype
-    - voltageType
     type: object
-  app.FieldDeviceExtraInfo:
+  der-ems_internal_app.FieldDeviceExtraInfo:
     properties:
       chargingSources:
+        enum:
+        - Solar + Grid
+        - Solar
         type: string
       energyCapacity:
         type: number
@@ -54,11 +59,10 @@ definitions:
     - reservedForGridOutagePercent
     - voltage
     type: object
-  app.FieldDeviceInfo:
+  der-ems_internal_app.FieldDeviceInfo:
     properties:
       extraInfo:
-        $ref: '#/definitions/app.FieldDeviceExtraInfo'
-        type: object
+        $ref: '#/definitions/der-ems_internal_app.FieldDeviceExtraInfo'
       modbusID:
         type: integer
       modelID:
@@ -67,7 +71,7 @@ definitions:
         type: number
       subDevices:
         items:
-          $ref: '#/definitions/app.FieldSubDeviceInfo'
+          $ref: '#/definitions/der-ems_internal_app.FieldSubDeviceInfo'
         type: array
       uueid:
         type: string
@@ -77,11 +81,10 @@ definitions:
     - powerCapacity
     - uueid
     type: object
-  app.FieldSubDeviceInfo:
+  der-ems_internal_app.FieldSubDeviceInfo:
     properties:
       extraInfo:
-        $ref: '#/definitions/app.FieldDeviceExtraInfo'
-        type: object
+        $ref: '#/definitions/der-ems_internal_app.FieldDeviceExtraInfo'
       modelID:
         type: integer
       powerCapacity:
@@ -90,77 +93,43 @@ definitions:
     - modelID
     - powerCapacity
     type: object
-  app.PeriodQuery:
-    properties:
-      endTime:
-        example: UTC time in ISO-8601
-        format: date-time
-        type: string
-      startTime:
-        example: UTC time in ISO-8601
-        format: date-time
-        type: string
-    required:
-    - endTime
-    - startTime
-    type: object
-  app.ResolutionWithPeriodQuery:
-    properties:
-      endTime:
-        example: UTC time in ISO-8601
-        format: date-time
-        type: string
-      resolution:
-        enum:
-        - day
-        - month
-        type: string
-      startTime:
-        example: UTC time in ISO-8601
-        format: date-time
-        type: string
-    required:
-    - endTime
-    - resolution
-    - startTime
-    type: object
-  app.Response:
+  der-ems_internal_app.Response:
     properties:
       code:
         type: integer
-      data:
-        type: object
+      data: {}
       msg:
         type: string
     type: object
-  app.StartTimeQuery:
+  null.Int:
     properties:
-      startTime:
-        example: UTC time in ISO-8601
-        format: date-time
-        type: string
-    required:
-    - startTime
+      int:
+        type: integer
+      valid:
+        type: boolean
     type: object
-  app.ZoomableQuery:
+  null.Int64:
     properties:
-      endTime:
-        example: UTC time in ISO-8601
-        format: date-time
+      int64:
+        type: integer
+      valid:
+        type: boolean
+    type: object
+  null.JSON:
+    properties:
+      json:
+        items:
+          type: integer
+        type: array
+      valid:
+        type: boolean
+    type: object
+  null.String:
+    properties:
+      string:
         type: string
-      resolution:
-        enum:
-        - hour
-        - 5minute
-        type: string
-      startTime:
-        example: UTC time in ISO-8601
-        format: date-time
-        type: string
-    required:
-    - endTime
-    - resolution
-    - startTime
+      valid:
+        type: boolean
     type: object
   repository.FieldGroupWrap:
     properties:
@@ -171,7 +140,7 @@ definitions:
       name:
         type: string
       parentID:
-        type: string
+        $ref: '#/definitions/null.Int64'
     type: object
   repository.UserWrap:
     properties:
@@ -180,32 +149,36 @@ definitions:
       groupName:
         type: string
       groupParentID:
-        type: string
+        $ref: '#/definitions/null.Int64'
       groupParentName:
-        type: string
+        $ref: '#/definitions/null.String'
       id:
         type: integer
       lockedAt:
         type: string
       name:
-        type: string
+        $ref: '#/definitions/null.String'
       username:
         type: string
     type: object
   services.AccumulatedPowerStateResponse:
     properties:
       batteryLifetimeEnergyACDiffs:
-        $ref: '#/definitions/services.Float32ArrayFormat'
-        type: object
+        items:
+          type: number
+        type: array
       gridLifetimeEnergyACDiffs:
-        $ref: '#/definitions/services.Float32ArrayFormat'
-        type: object
+        items:
+          type: number
+        type: array
       loadConsumedLifetimeEnergyACDiffs:
-        $ref: '#/definitions/services.Float32ArrayFormat'
-        type: object
+        items:
+          type: number
+        type: array
       pvProducedLifetimeEnergyACDiffs:
-        $ref: '#/definitions/services.Float32ArrayFormat'
-        type: object
+        items:
+          type: number
+        type: array
       timestamps:
         items:
           type: integer
@@ -214,11 +187,13 @@ definitions:
   services.BatteryChargeVoltageStateResponse:
     properties:
       batterySoCs:
-        $ref: '#/definitions/services.Float32ArrayFormat'
-        type: object
+        items:
+          type: number
+        type: array
       batteryVoltages:
-        $ref: '#/definitions/services.Float32ArrayFormat'
-        type: object
+        items:
+          type: number
+        type: array
       timeOfUse:
         additionalProperties: true
         type: object
@@ -257,8 +232,9 @@ definitions:
   services.BatteryPowerStateResponse:
     properties:
       batteryAveragePowerACs:
-        $ref: '#/definitions/services.Float32ArrayFormat'
-        type: object
+        items:
+          type: number
+        type: array
       timeOfUse:
         additionalProperties: true
         type: object
@@ -311,7 +287,7 @@ definitions:
   services.DeviceInfo:
     properties:
       extraInfo:
-        type: string
+        $ref: '#/definitions/null.JSON'
       modbusID:
         type: integer
       modelID:
@@ -425,10 +401,6 @@ definitions:
       pvProducedLifetimeEnergyACDiff:
         type: number
     type: object
-  services.Float32ArrayFormat:
-    items:
-      type: number
-    type: array
   services.GatewayInfo:
     properties:
       gatewayID:
@@ -443,14 +415,13 @@ definitions:
       disabledAt:
         type: string
       disabledBy:
-        type: string
+        $ref: '#/definitions/null.Int64'
       enabledAt:
         type: string
       enabledBy:
-        type: string
+        $ref: '#/definitions/null.Int64'
       location:
         $ref: '#/definitions/services.LocationInfo'
-        type: object
     type: object
   services.GetBatterySettingsResponse:
     properties:
@@ -509,7 +480,7 @@ definitions:
       name:
         type: string
       parentID:
-        type: string
+        $ref: '#/definitions/null.Int64'
       typeID:
         type: integer
     type: object
@@ -522,7 +493,7 @@ definitions:
       name:
         type: string
       parentID:
-        type: string
+        $ref: '#/definitions/null.Int64'
       typeID:
         type: integer
     type: object
@@ -584,8 +555,9 @@ definitions:
   services.GridPowerStateResponse:
     properties:
       gridAveragePowerACs:
-        $ref: '#/definitions/services.Float32ArrayFormat'
-        type: object
+        items:
+          type: number
+        type: array
       timeOfUse:
         additionalProperties: true
         type: object
@@ -608,7 +580,7 @@ definitions:
       deletedAt:
         type: string
       deletedBy:
-        type: string
+        $ref: '#/definitions/null.Int64'
       gateways:
         items:
           $ref: '#/definitions/services.GatewayInfo'
@@ -618,7 +590,7 @@ definitions:
       name:
         type: string
       parentID:
-        type: string
+        $ref: '#/definitions/null.Int64'
       typeID:
         type: integer
       updatedAt:
@@ -631,7 +603,7 @@ definitions:
   services.LocationInfo:
     properties:
       address:
-        type: string
+        $ref: '#/definitions/null.String'
       name:
         type: string
     type: object
@@ -651,8 +623,9 @@ definitions:
   services.PowerSelfSupplyRateResponse:
     properties:
       loadSelfConsumedEnergyPercentACs:
-        $ref: '#/definitions/services.Float32ArrayFormat'
-        type: object
+        items:
+          type: number
+        type: array
       timestamps:
         items:
           type: integer
@@ -661,17 +634,21 @@ definitions:
   services.PowerStateResponse:
     properties:
       batteryAveragePowerACs:
-        $ref: '#/definitions/services.Float32ArrayFormat'
-        type: object
+        items:
+          type: number
+        type: array
       gridAveragePowerACs:
-        $ref: '#/definitions/services.Float32ArrayFormat'
-        type: object
+        items:
+          type: number
+        type: array
       loadAveragePowerACs:
-        $ref: '#/definitions/services.Float32ArrayFormat'
-        type: object
+        items:
+          type: number
+        type: array
       pvAveragePowerACs:
-        $ref: '#/definitions/services.Float32ArrayFormat'
-        type: object
+        items:
+          type: number
+        type: array
       timestamps:
         items:
           type: integer
@@ -684,12 +661,11 @@ definitions:
       deletedAt:
         type: string
       deletedBy:
-        type: string
+        $ref: '#/definitions/null.Int64'
       expirationDate:
         type: string
       group:
         $ref: '#/definitions/services.GroupInfo'
-        type: object
       groupID:
         type: integer
       id:
@@ -697,15 +673,15 @@ definitions:
       lockedAt:
         type: string
       name:
-        type: string
+        $ref: '#/definitions/null.String'
       passwordLastChanged:
         type: string
       passwordRetryCount:
-        type: string
+        $ref: '#/definitions/null.Int'
       pwdTokenExpiry:
         type: string
       resetPWDToken:
-        type: string
+        $ref: '#/definitions/null.String'
       updatedAt:
         type: string
       username:
@@ -735,8 +711,9 @@ definitions:
   services.SolarEnergyUsageResponse:
     properties:
       loadPvConsumedEnergyPercentACs:
-        $ref: '#/definitions/services.Float32ArrayFormat'
-        type: object
+        items:
+          type: number
+        type: array
       timestamps:
         items:
           type: integer
@@ -745,8 +722,9 @@ definitions:
   services.SolarPowerStateResponse:
     properties:
       pvAveragePowerACs:
-        $ref: '#/definitions/services.Float32ArrayFormat'
-        type: object
+        items:
+          type: number
+        type: array
       timeOfUse:
         additionalProperties: true
         type: object
@@ -758,7 +736,7 @@ definitions:
   services.SubDeviceInfo:
     properties:
       extraInfo:
-        type: string
+        $ref: '#/definitions/null.JSON'
       modelID:
         type: integer
       modelType:
@@ -786,10 +764,8 @@ definitions:
     properties:
       energyCosts:
         $ref: '#/definitions/services.EnergyCostsInfo'
-        type: object
       energyDailyCosts:
         $ref: '#/definitions/services.EnergyCostsDailyInfo'
-        type: object
     type: object
   services.TimeOfUseInfoResponse:
     properties:
@@ -808,7 +784,6 @@ definitions:
         type: string
       permissions:
         $ref: '#/definitions/services.WebpagePermissionsInfo'
-        type: object
     type: object
   services.WebpagePermissionsInfo:
     properties:
@@ -823,7 +798,6 @@ definitions:
     type: object
 info:
   contact: {}
-  license: {}
   title: DER-EMS API
 paths:
   /{gwid}/devices/accumulated-power-state:
@@ -868,7 +842,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/app.Response'
+            - $ref: '#/definitions/der-ems_internal_app.Response'
             - properties:
                 data:
                   $ref: '#/definitions/services.AccumulatedPowerStateResponse'
@@ -876,15 +850,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: Show daily/monthly accumulated power state of Load/Solar/Battery/Grid
@@ -931,7 +905,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/app.Response'
+            - $ref: '#/definitions/der-ems_internal_app.Response'
             - properties:
                 data:
                   $ref: '#/definitions/services.BatteryChargeVoltageStateResponse'
@@ -939,19 +913,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: Show today's hourly charge and voltage state of battery
@@ -985,7 +959,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/app.Response'
+            - $ref: '#/definitions/der-ems_internal_app.Response'
             - properties:
                 data:
                   $ref: '#/definitions/services.BatteryEnergyInfoResponse'
@@ -993,15 +967,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: Show the detailed information and current state about battery
@@ -1048,7 +1022,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/app.Response'
+            - $ref: '#/definitions/der-ems_internal_app.Response'
             - properties:
                 data:
                   $ref: '#/definitions/services.BatteryPowerStateResponse'
@@ -1056,19 +1030,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: Show today's hourly power state of battery
@@ -1102,7 +1076,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/app.Response'
+            - $ref: '#/definitions/der-ems_internal_app.Response'
             - properties:
                 data:
                   $ref: '#/definitions/services.BatteryUsageInfoResponse'
@@ -1110,15 +1084,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: Show current usage state about battery
@@ -1152,7 +1126,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/app.Response'
+            - $ref: '#/definitions/der-ems_internal_app.Response'
             - properties:
                 data:
                   $ref: '#/definitions/services.ChargeInfoResponse'
@@ -1160,15 +1134,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: Show the demand charge information
@@ -1208,7 +1182,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/app.Response'
+            - $ref: '#/definitions/der-ems_internal_app.Response'
             - properties:
                 data:
                   $ref: '#/definitions/services.DemandStateResponse'
@@ -1216,15 +1190,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: Show today's demand details
@@ -1264,7 +1238,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/app.Response'
+            - $ref: '#/definitions/der-ems_internal_app.Response'
             - properties:
                 data:
                   $ref: '#/definitions/services.EnergyDistributionInfoResponse'
@@ -1272,15 +1246,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: Show the distribution of energy sources and distinations
@@ -1314,7 +1288,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/app.Response'
+            - $ref: '#/definitions/der-ems_internal_app.Response'
             - properties:
                 data:
                   $ref: '#/definitions/services.GridEnergyInfoResponse'
@@ -1322,15 +1296,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: Show the detailed information and current state about grid
@@ -1377,7 +1351,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/app.Response'
+            - $ref: '#/definitions/der-ems_internal_app.Response'
             - properties:
                 data:
                   $ref: '#/definitions/services.GridPowerStateResponse'
@@ -1385,19 +1359,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: Show today's hourly power state of grid
@@ -1445,7 +1419,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/app.Response'
+            - $ref: '#/definitions/der-ems_internal_app.Response'
             - properties:
                 data:
                   $ref: '#/definitions/services.PowerSelfSupplyRateResponse'
@@ -1453,15 +1427,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: Show daily/monthly power self supply rate
@@ -1509,7 +1483,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/app.Response'
+            - $ref: '#/definitions/der-ems_internal_app.Response'
             - properties:
                 data:
                   $ref: '#/definitions/services.PowerStateResponse'
@@ -1517,15 +1491,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: Show today's hourly power state of Load/Solar/Battery/Grid
@@ -1559,7 +1533,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/app.Response'
+            - $ref: '#/definitions/der-ems_internal_app.Response'
             - properties:
                 data:
                   $ref: '#/definitions/services.SolarEnergyInfoResponse'
@@ -1567,15 +1541,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: Show the detailed information and current state about solar
@@ -1622,7 +1596,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/app.Response'
+            - $ref: '#/definitions/der-ems_internal_app.Response'
             - properties:
                 data:
                   $ref: '#/definitions/services.SolarEnergyUsageResponse'
@@ -1630,15 +1604,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: Show the day's hourly energy usage of solar
@@ -1685,7 +1659,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/app.Response'
+            - $ref: '#/definitions/der-ems_internal_app.Response'
             - properties:
                 data:
                   $ref: '#/definitions/services.SolarPowerStateResponse'
@@ -1693,19 +1667,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: Show today's hourly power state of solar
@@ -1745,7 +1719,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/app.Response'
+            - $ref: '#/definitions/der-ems_internal_app.Response'
             - properties:
                 data:
                   $ref: '#/definitions/services.TimeOfUseEnergyCostResponse'
@@ -1753,15 +1727,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: Show energy cost of Pre-Ubiik and Post-Ubiik
@@ -1795,7 +1769,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/app.Response'
+            - $ref: '#/definitions/der-ems_internal_app.Response'
             - properties:
                 data:
                   $ref: '#/definitions/services.TimeOfUseInfoResponse'
@@ -1803,19 +1777,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: Show the distribution of energy sources for peak types of the day
@@ -1838,7 +1812,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/app.Response'
+            - $ref: '#/definitions/der-ems_internal_app.Response'
             - properties:
                 data:
                   $ref: '#/definitions/services.GetGroupsResponse'
@@ -1846,15 +1820,15 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: List groups
@@ -1895,23 +1869,23 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: Create a group
@@ -1938,23 +1912,23 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: Delete a group
@@ -1981,7 +1955,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/app.Response'
+            - $ref: '#/definitions/der-ems_internal_app.Response'
             - properties:
                 data:
                   $ref: '#/definitions/services.GetGroupResponse'
@@ -1989,19 +1963,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: Show a group
@@ -2035,23 +2009,23 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: Update a group
@@ -2074,7 +2048,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/app.Response'
+            - $ref: '#/definitions/der-ems_internal_app.Response'
             - properties:
                 data:
                   $ref: '#/definitions/services.GetUsersResponse'
@@ -2082,15 +2056,15 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: List users
@@ -2137,23 +2111,23 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: Create a user
@@ -2178,23 +2152,23 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: Delete a user
@@ -2246,23 +2220,23 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: Update a user
@@ -2292,19 +2266,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       summary: Show a token
       tags:
       - authorization
@@ -2329,19 +2303,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: Verify device UUEID
@@ -2364,7 +2338,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/app.Response'
+            - $ref: '#/definitions/der-ems_internal_app.Response'
             - properties:
                 data:
                   $ref: '#/definitions/services.GetDeviceModelsResponse'
@@ -2372,15 +2346,15 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: List device models
@@ -2403,7 +2377,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/app.Response'
+            - $ref: '#/definitions/der-ems_internal_app.Response'
             - properties:
                 data:
                   $ref: '#/definitions/services.GetSubDeviceModelsResponse'
@@ -2411,15 +2385,15 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: List sub-device models
@@ -2442,7 +2416,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/app.Response'
+            - $ref: '#/definitions/der-ems_internal_app.Response'
             - properties:
                 data:
                   $ref: '#/definitions/services.GetFieldsResponse'
@@ -2450,15 +2424,15 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: List fields
@@ -2480,30 +2454,30 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/app.CreateFieldBody'
+          $ref: '#/definitions/der-ems_internal_app.CreateFieldBody'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: Create a field
@@ -2531,7 +2505,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/app.Response'
+            - $ref: '#/definitions/der-ems_internal_app.Response'
             - properties:
                 data:
                   $ref: '#/definitions/services.GetFieldResponse'
@@ -2539,19 +2513,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: Show a field
@@ -2586,23 +2560,23 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: Update a field groups
@@ -2630,7 +2604,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/app.Response'
+            - $ref: '#/definitions/der-ems_internal_app.Response'
             - properties:
                 data:
                   $ref: '#/definitions/services.GetBatterySettingsResponse'
@@ -2638,19 +2612,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: Show battery settings
@@ -2690,23 +2664,23 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: Update battery settings
@@ -2741,23 +2715,23 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: Enable/Disable a field
@@ -2785,7 +2759,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/app.Response'
+            - $ref: '#/definitions/der-ems_internal_app.Response'
             - properties:
                 data:
                   $ref: '#/definitions/services.GetMeterSettingsResponse'
@@ -2793,19 +2767,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: Show maximum demand capacity
@@ -2839,23 +2813,23 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: Update maximum demand capacity
@@ -2883,7 +2857,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/app.Response'
+            - $ref: '#/definitions/der-ems_internal_app.Response'
             - properties:
                 data:
                   $ref: '#/definitions/services.GetPowerOutagePeriodsResponse'
@@ -2891,19 +2865,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: Show power outage periods
@@ -2932,23 +2906,23 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: Create power outage periods
@@ -2976,23 +2950,23 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: Delete a power outage period
@@ -3019,23 +2993,23 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: Sync device settings
@@ -3062,19 +3036,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: Verify gateway UUID
@@ -3104,15 +3078,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       summary: Reset the password
       tags:
       - user
@@ -3134,21 +3108,21 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       summary: Send an email for reset the password
       tags:
       - user
   /user/profile:
     get:
-      description: get user by token
+      description: get gateways permissions by token
       parameters:
       - default: Bearer <Add access token here>
         description: Input user's access token
@@ -3163,22 +3137,24 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/app.Response'
+            - $ref: '#/definitions/der-ems_internal_app.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/services.ProfileResponse'
+                  items:
+                    $ref: '#/definitions/services.GatewayInfo'
+                  type: array
               type: object
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
-      summary: Show the detailed information about an individual user
+      summary: Show the gateways permissions information about an individual user
       tags:
       - user
   /users/name:
@@ -3203,19 +3179,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: Update the display name about an individual user
@@ -3243,19 +3219,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/app.Response'
+            $ref: '#/definitions/der-ems_internal_app.Response'
       security:
       - ApiKeyAuth: []
       summary: Update the password about an individual user

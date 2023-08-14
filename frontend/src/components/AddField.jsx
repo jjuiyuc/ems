@@ -720,7 +720,7 @@ export default connect(null, mapDispatch)(function AddField(props) {
                                         <TextField
                                             id={`powerCapacity-${i}`}
                                             label={formT("powerCapacity")}
-                                            onKeyDown={(e) => hybridInverterSelected ? handleKeyDown(e, i) : handleKeyDown(e, index)}
+                                            onKeyDown={(e) => handleKeyDown(e)}
                                             onChange={(e) => changePowerCapacity(e, hybridInverterSelected ? i : index)}
                                             value={hybridInverterSelected ? deviceInfo.powerCapacity[i] : deviceInfo.powerCapacity[index]}
                                         />

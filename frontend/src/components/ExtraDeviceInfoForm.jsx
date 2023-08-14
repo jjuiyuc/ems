@@ -1,13 +1,12 @@
 
 import { InputAdornment, MenuItem, TextField } from "@mui/material"
 import { useTranslation } from "react-multi-lang"
-import { useEffect, useMemo } from "react"
-import { validateNumPercent } from "../utils/utils"
+import { validateNumPercent, validateNumTwoDecimalPlaces } from "../utils/utils"
 
 export default function ExtraDeviceInfoForm(props) {
     const { subTitle, gridOutagePercent, setGridOutagePercent, chargingSource,
-        setChargingSource, energyCapacity, setEnergyCapacity, voltage, setVoltage
-    } = props
+        setChargingSource, energyCapacity, setEnergyCapacity, voltage, setVoltage,
+        handleKeyDown } = props
 
     const
         t = useTranslation(),
@@ -17,11 +16,11 @@ export default function ExtraDeviceInfoForm(props) {
     const chargingSourceOptions = [
         {
             "id": 1,
-            "name": "solarGrid"
+            "name": "Solar + Grid"
         },
         {
             "id": 2,
-            "name": "solar"
+            "name": "Solar"
         }
     ]
     const
@@ -35,10 +34,18 @@ export default function ExtraDeviceInfoForm(props) {
             setChargingSource(e.target.value)
         },
         changeEnergyCapacity = (e) => {
-            setEnergyCapacity(e.target.value)
+            const num = e.target.value
+            const isNum = validateNumTwoDecimalPlaces(num)
+            if (num === "" || isNum) {
+                setEnergyCapacity(num)
+            }
         },
         changeVoltage = (e) => {
-            setVoltage(e.target.value)
+            const num = e.target.value
+            const isNum = validateNumTwoDecimalPlaces(num)
+            if (num === "" || isNum) {
+                setVoltage(num)
+            }
         }
     return <>
         <h5 className="mb-5 ml-2">{subTitle}</h5>
@@ -72,6 +79,7 @@ export default function ExtraDeviceInfoForm(props) {
             type="number"
             label={formT("energyCapacity")}
             onChange={changeEnergyCapacity}
+            onKeyDown={(e) => handleKeyDown(e)}
             value={energyCapacity}
         />
         <TextField
@@ -79,6 +87,7 @@ export default function ExtraDeviceInfoForm(props) {
             type="number"
             label={commonT("voltage")}
             onChange={changeVoltage}
+            onKeyDown={(e) => handleKeyDown(e)}
             value={voltage}
         />
     </>

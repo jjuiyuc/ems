@@ -298,7 +298,7 @@ export default connect(null, mapDispatch)(function InfoField(props) {
                                             disabled={true}
                                         />
                                         <h5 className="mb-5 ml-2">
-                                            {formT("deviceInformation") + " " + (subIndex + 1)}
+                                            {formT("deviceInfo") + " " + (subIndex + 1)}
                                         </h5>
                                         <TextField
                                             key="h-p-c-"

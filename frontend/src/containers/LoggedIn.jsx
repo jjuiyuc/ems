@@ -1,5 +1,5 @@
 import { connect } from "react-redux"
-import { Navigate, Route, Routes, useLocation } from "react-router-dom"
+import { Navigate, Route, Routes, useLocation,useNavigate } from "react-router-dom"
 import React, { useEffect, useState } from "react"
 import { useTranslation } from "react-multi-lang"
 import { Snackbar, Alert } from "@mui/material"
@@ -103,6 +103,7 @@ const routes = {
 function LoggedIn(props) {
     const
         location = useLocation(),
+        navigate = useNavigate(),
         isDashboard = location.pathname === "/dashboard",
         { sidebarStatus } = props,
         sidebarW = sidebarStatus === "expand" ? "w-60" : "w-20",
@@ -114,10 +115,12 @@ function LoggedIn(props) {
             msg: "", type: props.snackbarMsg.type
         })
     }
-
-    useEffect(() => {
-        if (new Date().getTime() > props.tokenExpiryTime) logout()
-    })
+     useEffect(() => {
+        if (new Date().getTime() > props.tokenExpiryTime) {
+            logout()
+            navigate("/dashboard")
+        }
+    }, [props.tokenExpiryTime, navigate])
 
     const authPages = props.webpages
         .map((authPage) => routes[authPage.name])

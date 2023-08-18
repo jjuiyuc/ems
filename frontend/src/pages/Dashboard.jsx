@@ -333,7 +333,7 @@ export default connect(mapState)(function Dashboard(props) {
                     </div>
                 </div>
             </div>
-            <div className="lg:ml-5 gap-5 grid md:grid-cols-2 lg:block lg:w-88">
+            <div className="lg:ml-5 gap-5 grid mt-5 md:grid-cols-2 lg:block lg:w-88">
                 <Card data={loadData} icon="home" title={pageT("load")} />
                 <Card
                     className="lg:mt-5"

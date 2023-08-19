@@ -350,24 +350,23 @@ export default connect(null, mapDispatch)(function AddField(props) {
     }
     const submit = async () => {
 
-        const devices = deviceInfo.uueID.map((uueID, index) => {
-            console.log(uueID)
-            const isBattery = deviceType[index] === TYPE_BATTERY
-            const isHybridInverter = deviceType.some((type)=> type=== TYPE_HYBRID_INVERTER)
-            const isInverter = deviceType[index] === TYPE_INVERTER
+             const devices = deviceInfo.uueID.map((uueID, index) => {
+            const isBattery = deviceType[index] === "Battery"
+              const isHybridInverter = deviceType.some((type)=> type=== TYPE_HYBRID_INVERTER)
             const hasDeviceInfo = deviceModel[index] || deviceInfo.modbusID[index] || uueID || deviceInfo.powerCapacity[index]
-console.log(isHybridInverter)
+
             const device = hasDeviceInfo
                 ? {
                     modelID: parseInt(deviceModel[index])
                         ? parseInt(deviceModel[index])
                         : parseInt(deviceModel[0]),
                     modbusID: parseInt(deviceInfo.modbusID[index]),
-                    uueID:isHybridInverter?uueID :deviceInfo.uueID[0],
+                    uueID: isHybridInverter?uueID :deviceInfo.uueID[0],
                     powerCapacity: parseFloat(deviceInfo.powerCapacity[index]),
                 }
                 : null
-            if ((isInverter||(isHybridInverter&&index === 0) )&& subDeviceInfo.subDeviceModel.some((subDeviceModel) => subDeviceModel)) {
+
+            if (index === 0 && subDeviceInfo.subDeviceModel.some((subDeviceModel) => subDeviceModel)) {
                 const subDevices = subDeviceInfo.subDeviceModel.map((subDeviceModel, subIndex) => {
                     const isSubBattery = subDeviceModel && deviceType[subIndex] === "Battery"
                     const hasSubDeviceInfo = subDeviceModel || subDeviceInfo.subPowerCapacity[subIndex]
@@ -524,6 +523,7 @@ console.log(isHybridInverter)
         getModelList()
         getGatewaysList()
     }, [deviceType, openAdd])
+
     return (
         <>
             <Button

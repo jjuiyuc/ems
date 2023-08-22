@@ -12,7 +12,7 @@ import Table from "../components/DataTable"
 import { ReactComponent as DeleteIcon } from "../assets/icons/trash_solid.svg"
 
 const mapState = state => ({
-    parentID: state.user.group.parentID
+    parentID: state?.user?.group?.parentID
 })
 const mapDispatch = dispatch => ({
     updateSnackbarMsg: value =>

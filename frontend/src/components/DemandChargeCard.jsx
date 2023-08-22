@@ -24,7 +24,9 @@ export default connect(mapState, mapDispatch)(function DemandChargeCard(props) {
 
     const
         [maxDemandCapacity, setMaxDemandCapacity] = useState(""),
-        [loading, setLoading] = useState(false)
+        [loading, setLoading] = useState(false),
+        [otherError, setOtherError] = useState("")
+
     const
         inputNum = (e) => {
             const num = e.target.value
@@ -46,17 +48,13 @@ export default connect(mapState, mapDispatch)(function DemandChargeCard(props) {
             onStart: () => setLoading(true),
             onError: (err) => {
                 switch (err) {
-                    case 60019:
+                    case 60032:
                         props.updateSnackbarMsg({
                             type: "error",
                             msg: errorT("failureToGenerate")
                         })
                         break
-                    default:
-                        props.updateSnackbarMsg({
-                            type: "error",
-                            msg: errorT("failureToGenerate")
-                        })
+                    default:setOtherError(err)
                 }
             },
             onSuccess: rawData => {

@@ -30,7 +30,7 @@ const ErrorBox = ({ error, margin = "", message }) => error
         iconColor="negative-main" />
     : null
 
-const mapState = state => ({ gatewayID: state.gateways.active.gatewayID })
+const mapState = state => ({ gatewayID: state?.gateways?.active?.gatewayID })
 
 export default connect(mapState)(function Analysis(props) {
     const

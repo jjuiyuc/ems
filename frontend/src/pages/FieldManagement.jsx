@@ -9,7 +9,7 @@ import EditField from "../components/EditField"
 import InfoField from "../components/InfoField"
 import Table from "../components/DataTable"
 const mapState = state => ({
-    typeID: state.user.group.typeID
+    typeID: state?.user?.group?.typeID
 })
 export default connect(mapState)(function FieldManagement(props) {
     const
@@ -70,7 +70,7 @@ export default connect(mapState)(function FieldManagement(props) {
         if (fetched == false)
             getList()
     }, [fetched])
-
+    console.log(props.typeID)
     return <>
         <h1 className="mb-9">{commonT("fieldManagement")}</h1>
         {props.typeID < 3

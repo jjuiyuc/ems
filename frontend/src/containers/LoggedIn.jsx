@@ -1,5 +1,5 @@
 import { connect } from "react-redux"
-import { Navigate, Route, Routes, useLocation,useNavigate } from "react-router-dom"
+import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom"
 import React, { useEffect, useState } from "react"
 import { useTranslation } from "react-multi-lang"
 import { Snackbar, Alert } from "@mui/material"
@@ -99,7 +99,6 @@ const routes = {
             key="advancedSettings" />
     ]
 }
-
 function LoggedIn(props) {
     const
         location = useLocation(),
@@ -115,10 +114,10 @@ function LoggedIn(props) {
             msg: "", type: props.snackbarMsg.type
         })
     }
-     useEffect(() => {
+    useEffect(() => {
         if (new Date().getTime() > props.tokenExpiryTime) {
             logout()
-            navigate("/dashboard")
+            navigate("*")
         }
     }, [props.tokenExpiryTime, navigate])
 

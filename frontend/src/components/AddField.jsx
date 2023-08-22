@@ -175,9 +175,9 @@ export default connect(null, mapDispatch)(function AddField(props) {
             setDeviceType(newDeviceType)
 
             if (alreadyChecked) {
-                const newDeviceModel = deviceModel.filter((type) => {
-                    const device = modelList.find(({ type }) => type === type)
-                    return newDeviceType.includes(device.type)
+                const newDeviceModel = deviceModel.filter((modelID) => {
+                    const device = modelList.find(({ id }) => id === modelID)
+                    return device.type!==value
                 })
                 setDeviceModel(newDeviceModel)
             }
@@ -349,9 +349,10 @@ export default connect(null, mapDispatch)(function AddField(props) {
         })
     }
     const submit = async () => {
-        const devices = deviceInfo.uueID.map((uueID, index) => {
+
+             const devices = deviceInfo.uueID.map((uueID, index) => {
             const isBattery = deviceType[index] === "Battery"
-            const isHybridInverter = deviceType[index] === "Hybrid-Inverter"
+              const isHybridInverter = deviceType.some((type)=> type=== TYPE_HYBRID_INVERTER)
             const hasDeviceInfo = deviceModel[index] || deviceInfo.modbusID[index] || uueID || deviceInfo.powerCapacity[index]
 
             const device = hasDeviceInfo
@@ -360,7 +361,7 @@ export default connect(null, mapDispatch)(function AddField(props) {
                         ? parseInt(deviceModel[index])
                         : parseInt(deviceModel[0]),
                     modbusID: parseInt(deviceInfo.modbusID[index]),
-                    uueID: uueID,
+                    uueID: isHybridInverter?uueID :deviceInfo.uueID[0],
                     powerCapacity: parseFloat(deviceInfo.powerCapacity[index]),
                 }
                 : null
@@ -392,7 +393,7 @@ export default connect(null, mapDispatch)(function AddField(props) {
                 device.subDevices = subDevices.filter((subDevice) => subDevice !== null)
             }
 
-            if ((isBattery || isHybridInverter) && device) {
+            if (isBattery && device) {
                 device.extraInfo = {
                     reservedForGridOutagePercent: parseInt(extraDeviceInfo.gridOutagePercent),
                     chargingSources: extraDeviceInfo.chargingSource,
@@ -522,6 +523,7 @@ export default connect(null, mapDispatch)(function AddField(props) {
         getModelList()
         getGatewaysList()
     }, [deviceType, openAdd])
+
     return (
         <>
             <Button
@@ -708,7 +710,7 @@ export default connect(null, mapDispatch)(function AddField(props) {
                                             <Button
                                                 onClick={hybridInverterSelected
                                                     ? () => validateUueID(deviceInfo.uueID[i])
-                                                    : () => validateUueID(deviceInfo.uueID[index])}
+                                                    : () => validateUueID(deviceInfo.uueID[0])}
                                                 sx={{ marginLeft: "0.3rem" }}
                                                 radius="pill"
                                                 variant="contained"

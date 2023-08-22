@@ -11,7 +11,7 @@ import DialogForm from "../components/DialogForm"
 import { ReactComponent as EditIcon } from "../assets/icons/edit.svg"
 
 const mapState = state => ({
-    id: state.user.group.id
+    id: state?.user?.group?.id
 })
 const mapDispatch = dispatch => ({
     updateSnackbarMsg: value =>

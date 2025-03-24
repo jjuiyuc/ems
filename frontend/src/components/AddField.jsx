@@ -87,8 +87,6 @@ export default connect(null, mapDispatch)(function AddField(props) {
         [showAddIcon, setShowAddIcon] = useState(true),
         [hybridInverterSelected, setHybridInverterSelected] = useState(false),
         [enable, setEnable] = useState(false),
-        [fullWidth, setFullWidth] = useState(true),
-        [maxWidth, setMaxWidth] = useState("lg"),
         [openAdd, setOpenAdd] = useState(false),
         [loading, setLoading] = useState(false),
         [infoError, setInfoError] = useState("")
@@ -177,7 +175,7 @@ export default connect(null, mapDispatch)(function AddField(props) {
             if (alreadyChecked) {
                 const newDeviceModel = deviceModel.filter((modelID) => {
                     const device = modelList.find(({ id }) => id === modelID)
-                    return device.type!==value
+                    return device.type !== value
                 })
                 setDeviceModel(newDeviceModel)
             }
@@ -350,9 +348,9 @@ export default connect(null, mapDispatch)(function AddField(props) {
     }
     const submit = async () => {
 
-             const devices = deviceInfo.uueID.map((uueID, index) => {
+        const devices = deviceInfo.uueID.map((uueID, index) => {
             const isBattery = deviceType[index] === "Battery"
-              const isHybridInverter = deviceType.some((type)=> type=== TYPE_HYBRID_INVERTER)
+            const isHybridInverter = deviceType.some((type) => type === TYPE_HYBRID_INVERTER)
             const hasDeviceInfo = deviceModel[index] || deviceInfo.modbusID[index] || uueID || deviceInfo.powerCapacity[index]
 
             const device = hasDeviceInfo
@@ -361,7 +359,7 @@ export default connect(null, mapDispatch)(function AddField(props) {
                         ? parseInt(deviceModel[index])
                         : parseInt(deviceModel[0]),
                     modbusID: parseInt(deviceInfo.modbusID[index]),
-                    uueID: isHybridInverter?uueID :deviceInfo.uueID[0],
+                    uueID: isHybridInverter ? uueID : deviceInfo.uueID[0],
                     powerCapacity: parseFloat(deviceInfo.powerCapacity[index]),
                 }
                 : null
@@ -540,8 +538,8 @@ export default connect(null, mapDispatch)(function AddField(props) {
                 dialogTitle={pageT("addField")}
                 open={openAdd}
                 setOpen={setOpenAdd}
-                fullWidth={fullWidth}
-                maxWidth={maxWidth}>
+                fullWidth={true}
+                maxWidth="lg">
                 <Divider variant="middle" />
                 <div className="flex flex-col m-auto mt-4 min-w-49 w-fit">
                     <div className="grid grid-cols-1fr-auto items-center mb-8">

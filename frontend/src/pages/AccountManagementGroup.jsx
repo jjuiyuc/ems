@@ -19,6 +19,65 @@ const mapDispatch = dispatch => ({
         dispatch({ type: "snackbarMsg/updateSnackbarMsg", payload: value }),
 
 })
+
+const mockData = {
+    "groups": [
+        {
+            "id": 1,
+            "name": "Admin",
+            "typeID": 1,
+            "parentID": null
+        },
+        {
+            "id": 2,
+            "name": "AreaOwner_TW",
+            "typeID": 2,
+            "parentID": 1
+        },
+        {
+            "id": 3,
+            "name": "AreaMaintainer_TW",
+            "typeID": 3,
+            "parentID": 2
+        },
+        {
+            "id": 4,
+            "name": "PLACE 0",
+            "typeID": 4,
+            "parentID": 2
+        },
+        {
+            "id": 5,
+            "name": "PLACE 1",
+            "typeID": 4,
+            "parentID": 2
+        },
+        {
+            "id": 6,
+            "name": "PLACE 2",
+            "typeID": 4,
+            "parentID": 2
+        },
+    ],
+    "groupTypes": [
+        {
+            "id": 1,
+            "name": "Admin"
+        },
+        {
+            "id": 2,
+            "name": "Area owner"
+        },
+        {
+            "id": 3,
+            "name": "Area maintainer"
+        },
+        {
+            "id": 4,
+            "name": "Field owner"
+        }
+    ]
+}
 export default connect(mapState, mapDispatch)(function AccountManagementGroup(props) {
     const
         t = useTranslation(),
@@ -77,50 +136,70 @@ export default connect(mapState, mapDispatch)(function AccountManagementGroup(pr
             center: true
         }
     ]
+    const MOCK_MODE = true
+
     const getList = () => {
-        apiCall({
-            onComplete: () => setLoading(false),
-            onStart: () => setLoading(true),
-            onError: (err) => {
-                switch (err) {
-                    case 60011:
-                        props.updateSnackbarMsg({
-                            type: "error",
-                            msg: errorT("failureToGenerate")
-                        })
-                        break
-                    default:
-                        props.updateSnackbarMsg({
-                            type: "error",
-                            msg: errorT("failureToGenerate")
-                        })
-                }
-            },
-            onSuccess: rawData => {
-                if (!rawData?.data) return
-
-                const { data } = rawData
-
-                setGroupList(data.groups || [])
-                setGroupTypeDict(data.groupTypes?.reduce((acc, cur) => {
+        if (MOCK_MODE) {
+            const { groups, groupTypes } = mockData
+            setGroupList(groups || [])
+            setGroupTypeDict(
+                groupTypes?.reduce((acc, cur) => {
                     acc[cur.id] = cur.name
                     return acc
-                }, {}) || {})
-                setGroupDictionary(data.groups?.reduce((acc, cur) => {
+                }, {}) || {}
+            )
+            setGroupDictionary(
+                groups?.reduce((acc, cur) => {
                     acc[cur.id] = cur.name
                     return acc
-                }, {}) || {})
-            },
-            url: `/api/account-management/groups`
-        })
+                }, {}) || {}
+            )
+        } else {
+            apiCall({
+                onComplete: () => setLoading(false),
+                onStart: () => setLoading(true),
+                onError: (err) => {
+                    switch (err) {
+                        case 60011:
+                            props.updateSnackbarMsg({
+                                type: "error",
+                                msg: errorT("failureToGenerate")
+                            })
+                            break
+                        default:
+                            props.updateSnackbarMsg({
+                                type: "error",
+                                msg: errorT("failureToGenerate")
+                            })
+                    }
+                },
+                onSuccess: rawData => {
+                    if (!rawData?.data) return
+
+                    const { data } = rawData
+
+                    setGroupList(data.groups || [])
+                    setGroupTypeDict(data.groupTypes?.reduce((acc, cur) => {
+                        acc[cur.id] = cur.name
+                        return acc
+                    }, {}) || {})
+                    setGroupDictionary(data.groups?.reduce((acc, cur) => {
+                        acc[cur.id] = cur.name
+                        return acc
+                    }, {}) || {})
+                },
+                url: `/api/account-management/groups`
+            })
+        }
     }
+
     useEffect(() => {
         getList()
     }, [])
     return <>
         <h1 className="mb-9">{commonT("accountManagementGroup")}</h1>
         <div className="mb-9">
-            <AddGroup {...{ getList, groupList, groupTypes: groupTypeDict }} />
+            <AddGroup {...{ getList, groupList, groupTypes: groupTypeDict, setGroupList }} />
         </div>
         <Table
             columns={columns}
@@ -132,6 +211,12 @@ export default connect(mapState, mapDispatch)(function AccountManagementGroup(pr
             progressPending={loading}
             theme="dark"
         />
-        <DeleteGroup {...{ row, getList, openDelete, setOpenDelete }} />
+        <DeleteGroup {...{
+            row,
+            openDelete,
+            setOpenDelete,
+            groupList,
+            setGroupList
+        }} />
     </>
 })

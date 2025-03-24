@@ -13,59 +13,45 @@ const mapDispatch = dispatch => ({
 
 })
 export default connect(null, mapDispatch)(function DeleteGroup(props) {
-    const { row, getList, openDelete, setOpenDelete } = props
-    const
-        t = useTranslation(),
+    const {
+        row,
+        openDelete,
+        setOpenDelete,
+        groupList,
+        setGroupList
+    } = props
+
+    const t = useTranslation(),
         commonT = string => t("common." + string),
         dialogT = (string) => t("dialog." + string),
         errorT = string => t("error." + string)
 
-    const
-        [groupNameError, setGroupNameError] = useState(null),
-        [otherError, setOtherError] = useState("")
+    const [groupNameError, setGroupNameError] = useState(null)
+    const [otherError, setOtherError] = useState("")
 
-    const
-        submit = async () => {
+    const submit = () => {
+        const groupID = row.id
 
-            const groupID = row.id
+        const hasSubGroups = groupList.some(g => g.parentID === groupID)
 
-            await apiCall({
-                method: "delete",
-                data: null,
-                onSuccess: () => {
-                    setOpenDelete(false)
-                    getList()
-                    props.updateSnackbarMsg({
-                        type: "success",
-                        msg: dialogT("deletedSuccessfully")
-                    })
-                },
-                onError: (err) => {
-                    switch (err) {
-                        case 60008:
-                            setGroupNameError({ type: "groupHasSubGroup" })
-                            props.updateSnackbarMsg({
-                                type: "error",
-                                msg: errorT("groupHasSubGroup")
-                            })
-                            break
-                        case 60009:
-                            setGroupNameError({ type: "groupHasUser" })
-                            props.updateSnackbarMsg({
-                                type: "error",
-                                msg: errorT("groupHasUser")
-                            })
-                            break
-                        default: setOtherError(err)
-                            props.updateSnackbarMsg({
-                                type: "error",
-                                msg: errorT("failureToDelete")
-                            })
-                    }
-                },
-                url: `/api/account-management/groups/${groupID}`
+        if (hasSubGroups) {
+            setGroupNameError({ type: "groupHasSubGroup" })
+            props.updateSnackbarMsg({
+                type: "error",
+                msg: errorT("groupHasSubGroup")
             })
+            return
         }
+
+        const newGroupList = groupList.filter(g => g.id !== groupID)
+        setGroupList(newGroupList)
+        setOpenDelete(false)
+        props.updateSnackbarMsg({
+            type: "success",
+            msg: dialogT("deletedSuccessfully")
+        })
+    }
+
     return <>
         <DialogForm
             dialogTitle={dialogT("deleteMsg")}
@@ -78,17 +64,21 @@ export default connect(null, mapDispatch)(function DeleteGroup(props) {
                 {row?.name || ""}
             </div>
             <DialogActions sx={{ margin: "0.5rem 0.5rem 0.5rem 0" }}>
-                <Button onClick={() => { setOpenDelete(false) }}
+                <Button
+                    onClick={() => { setOpenDelete(false) }}
                     radius="pill"
                     variant="outlined"
-                    color="gray">
+                    color="gray"
+                >
                     {commonT("cancel")}
                 </Button>
-                <Button onClick={submit}
+                <Button
+                    onClick={submit}
                     radius="pill"
                     variant="contained"
                     color="negative"
-                    sx={{ color: "#ffffff" }}>
+                    sx={{ color: "#ffffff" }}
+                >
                     {commonT("delete")}
                 </Button>
             </DialogActions>

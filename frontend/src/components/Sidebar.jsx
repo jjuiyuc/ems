@@ -6,15 +6,9 @@ import { useTranslation } from "react-multi-lang"
 import AdvancedSettings from "@mui/icons-material/SettingsSuggest"
 
 import { ReactComponent as AccountGroup } from "../assets/icons/group.svg"
-import { ReactComponent as AccountUser } from "../assets/icons/user.svg"
 import { ReactComponent as Analysis } from "../assets/icons/analysis.svg"
 import { ReactComponent as Dashboard } from "../assets/icons/dashboard.svg"
-import { ReactComponent as Demand } from "../assets/icons/demand_charge.svg"
-import { ReactComponent as Economics } from "../assets/icons/economics.svg"
-import { ReactComponent as Field } from "../assets/icons/field_management.svg"
 import { ReactComponent as Menu } from "../assets/icons/menu.svg"
-import { ReactComponent as Logo } from "../assets/images/logo.svg"
-import { ReactComponent as LogoWithName } from "../assets/images/logoWithName.svg"
 import { ReactComponent as Resource } from "../assets/icons/resource.svg"
 import { ReactComponent as Settings } from "../assets/icons/settings.svg"
 import { ReactComponent as Timer } from "../assets/icons/timer.svg"
@@ -26,18 +20,10 @@ const navs = {
         { icon: <Analysis />, path: "analysis" },
     timeOfUseEnergy:
         { icon: <Timer />, path: "time-of-use", text: "timeOfUseEnergy" },
-    economics:
-        { icon: <Economics />, path: "economics" },
-    demandCharge:
-        { icon: <Demand />, path: "demand-charge", text: "demandCharge" },
     energyResources:
         { icon: <Resource />, path: "energy-resources", text: "energyResources" },
-    fieldManagement:
-        { icon: <Field />, path: "field-management", text: "fieldManagement" },
     accountManagementGroup:
         { icon: <AccountGroup />, path: "account-management-group", text: "accountManagementGroup" },
-    accountManagementUser:
-        { icon: <AccountUser />, path: "account-management-user", text: "accountManagementUser" },
     settings:
         { icon: <Settings />, path: "settings", text: "settings" },
     advancedSettings:
@@ -54,7 +40,7 @@ function Sidebar(props) {
         transitionClasses = "duration-300 transition "
             + (isExpanded ? "opacity-100" : "opacity-0")
 
-    const MenuIcon = isExpanded ? Menu : Logo
+    const MenuIcon = isExpanded ? Menu : Menu
     const
         t = useTranslation(),
         navT = string => t("navigator." + string)
@@ -90,7 +76,7 @@ function Sidebar(props) {
                     className="cursor-pointer h-6 text-gray-200 w-6"
                     onClick={toggle} />
                 <Link className={"ml-2 " + transitionClasses} to="/">
-                    <LogoWithName className="logo" />
+                    {/* <LogoWithName className="logo" /> */}
                 </Link>
             </div>
             <ul className="mt-6 sidebar-menu">{authNavList}</ul>

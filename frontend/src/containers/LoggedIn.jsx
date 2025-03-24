@@ -1,5 +1,5 @@
 import { connect } from "react-redux"
-import { Navigate, Route, Routes, useLocation,useNavigate } from "react-router-dom"
+import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom"
 import React, { useEffect, useState } from "react"
 import { useTranslation } from "react-multi-lang"
 import { Snackbar, Alert } from "@mui/material"
@@ -12,16 +12,11 @@ import Sample from "../configs/Sample"
 
 import Account from "../pages/Account"
 import AccountManagementGroup from "../pages/AccountManagementGroup"
-import AccountManagementUser from "../pages/AccountManagementUser"
 import Analysis from "../pages/Analysis"
 import Dashboard from "../pages/Dashboard"
-import DemandCharge from "../pages/DemandCharge"
-import Economics from "../pages/Economics"
-// import EconomicsOrigin from "../pages/EconomicsOrigin"
 import EnergyResourcesBattery from "../pages/EnergyResourcesBattery"
 import EnergyResourcesGrid from "../pages/EnergyResourcesGrid"
 import EnergyResourcesSolar from "../pages/EnergyResourcesSolar"
-import FieldManagement from "../pages/FieldManagement"
 import TimeOfUse from "../pages/TimeOfUse"
 import AdvancedSettings from "../pages/AdvancedSettings"
 import Settings from "../pages/Settings"
@@ -35,12 +30,6 @@ const routes = {
     ],
     timeOfUseEnergy: [
         <Route element={<TimeOfUse />} path="/time-of-use" key="timeOfUseEnergy" />
-    ],
-    economics: [
-        <Route element={<Economics />} path="/economics" key="economics" />
-    ],
-    demandCharge: [
-        <Route element={<DemandCharge />} path="/demand-charge" key="demandCharge" />
     ],
     energyResources: [
         <Route
@@ -67,24 +56,11 @@ const routes = {
             key="energyResources"
         />
     ],
-    fieldManagement: [
-        <Route
-
-            element={<FieldManagement />}
-            path="/field-management"
-            key="fieldManagement" />
-    ],
     accountManagementGroup: [
         <Route
             element={<AccountManagementGroup />}
             path="/account-management-group"
             key="accountManagementGroup" />
-    ],
-    accountManagementUser: [
-        <Route
-            element={<AccountManagementUser />}
-            path="/account-management-user"
-            key="accountManagementUser" />
     ],
     settings: [
         <Route
@@ -115,7 +91,7 @@ function LoggedIn(props) {
             msg: "", type: props.snackbarMsg.type
         })
     }
-     useEffect(() => {
+    useEffect(() => {
         if (new Date().getTime() > props.tokenExpiryTime) {
             logout()
             navigate("/dashboard")
@@ -158,14 +134,6 @@ function LoggedIn(props) {
                 {props.snackbarMsg.msg}
             </Alert>
         </Snackbar>
-        <footer className="bg-gray-800 flex items-center justify-between
-                            text-center text-gray-300 text-sm
-                            h-14 md:h-20 px-10 md:px-20">
-            <span className="font-mono ml-4 text-gray-500 text-13px">
-                {import.meta.env.VITE_APP_VERSION}
-            </span>
-            {t("common.copyright")}
-        </footer>
     </div >
 }
 

@@ -9,12 +9,87 @@ import { apiCall } from "../utils/api"
 
 import LanguageField from "../components/NonLoggedInLanguageField"
 
+const mockWebpage = [
+    {
+        "id": 1,
+        "name": "dashboard",
+        "permissions": {
+            "create": false,
+            "read": true,
+            "update": false,
+            "delete": false
+        }
+    },
+    {
+        "id": 2,
+        "name": "analysis",
+        "permissions": {
+            "create": false,
+            "read": true,
+            "update": false,
+            "delete": false
+        }
+    },
+    {
+        "id": 3,
+        "name": "timeOfUseEnergy",
+        "permissions": {
+            "create": false,
+            "read": true,
+            "update": false,
+            "delete": false
+        }
+    },
+    {
+        "id": 6,
+        "name": "energyResources",
+        "permissions": {
+            "create": false,
+            "read": true,
+            "update": false,
+            "delete": false
+        }
+    },
+    {
+        "id": 8,
+        "name": "accountManagementGroup",
+        "permissions": {
+            "create": true,
+            "read": true,
+            "update": true,
+            "delete": true
+        }
+    },
+    {
+        "id": 10,
+        "name": "settings",
+        "permissions": {
+            "create": true,
+            "read": true,
+            "update": true,
+            "delete": true
+        }
+    },
+    {
+        "id": 11,
+        "name": "advancedSettings",
+        "permissions": {
+            "create": true,
+            "read": true,
+            "update": true,
+            "delete": false
+        }
+    }
+]
+
+const mockGateways = { "active": { "gatewayID": "MOCK-GW-000", "permissions": [{ "enabledAt": "2022-08-04T00:00:00Z", "enabledBy": null, "disabledAt": null, "disabledBy": null, "location": { "name": "PLACE 0", "address": "新竹縣XX鄉ＯＯＯ路" } }] }, "list": [{ "gatewayID": "MOCK-GW-000", "permissions": [{ "enabledAt": "2022-08-04T00:00:00Z", "enabledBy": null, "disabledAt": null, "disabledBy": null, "location": { "name": "PLACE 0", "address": "新竹縣XX鄉ＯＯＯ路" } }] }, { "gatewayID": "1E0BA27A8175AF978C49396BDE9D7A1E", "permissions": [{ "enabledAt": "2022-10-24T00:00:00Z", "enabledBy": null, "disabledAt": null, "disabledBy": null, "location": { "name": "PLACE 1", "address": "宜蘭縣ＸＸ鄉ＯＯＯ路" } }] }, { "gatewayID": "218F1623ADD8E739F7C6CBE62A7DF3C0", "permissions": [{ "enabledAt": "2023-01-19T00:00:00Z", "enabledBy": null, "disabledAt": null, "disabledBy": null, "location": { "name": "PLACE 2", "address": "台北市ＸＸ區ＯＯＯ路" } }] }, { "gatewayID": "3RT00000999000000001RUK", "permissions": [{ "enabledAt": "2023-06-20T16:00:00Z", "enabledBy": null, "disabledAt": null, "disabledBy": null, "location": { "name": "PLACE 3", "address": "台南市ＸＸ區ＯＯ路" } }] }] }
+
 function LogIn(props) {
     const t = useTranslation(),
         commonT = (string) => t("common." + string),
         errorT = (string) => t("error." + string),
         formT = (string) => t("form." + string),
-        pageT = (string) => t("logIn." + string);
+        pageT = (string) => t("logIn." + string)
 
     const
         [email, setEmail] = useState(""),
@@ -58,42 +133,106 @@ function LogIn(props) {
                 }
             }
 
-            const data = { username: email, password }
-            const loginStatus = await apiCall({
-                url: "/api/auth",
-                method: "post",
-                data,
-                onError
-            })
+            const MOCK_MODE = true
 
-            if (!loginStatus) return
+            let loginStatus
+            if (MOCK_MODE) {
+                loginStatus = {
+                    data: {
+                        token: "mock-token-123456"
+                    }
+                }
+            } else {
+                const data = { username: email, password }
+                loginStatus = await apiCall({
+                    url: "/api/auth",
+                    method: "post",
+                    data,
+                    onError
+                })
+                if (!loginStatus) return
+            }
 
             const token = loginStatus.data.token
-
             props.updateUser({ token, username: email })
 
-
-            const profileOnError = () => {
-                setShowProfileError(true)
+            let userProfile
+            if (MOCK_MODE) {
+                userProfile = {
+                    data: {
+                        id: "mock-user-id",
+                        name: "Mock User",
+                        username: email,
+                        group: {
+                            webpages: mockWebpage,
+                            gateways: mockGateways
+                        }
+                    }
+                }
+            } else {
+                const profileOnError = () => setShowProfileError(true)
+                userProfile = await apiCall({
+                    url: "/api/users/profile",
+                    profileOnError
+                })
+                if (!userProfile) return
             }
-            const userProfile = await apiCall({
-                url: "/api/users/profile",
-                profileOnError
-            })
-            if (!userProfile) return
-            const
-                { group, id, name, username } = userProfile.data,
-                webpages = group.webpages.filter(webpage => webpage?.permissions?.read),
-                gateways = group.gateways
 
-            // Tokens will expire in 3 hours
+            const {
+                group,
+                id,
+                name,
+                username
+            } = userProfile.data
+
+            const webpages = group.webpages.filter(webpage => webpage?.permissions?.read)
+            const gateways = group.gateways
+
             const tokenExpiryTime = new Date().getTime() + 1000 * 60 * 60 * 3
 
             if (gateways && gateways.length > 0) {
                 props.setGateway(gateways[0])
                 props.setGatewayList(gateways)
             }
+
             props.updateUserProfile({ group, id, name, username, tokenExpiryTime, webpages })
+            //
+            // const data = { username: email, password }
+            // const loginStatus = await apiCall({
+            //     url: "/api/auth",
+            //     method: "post",
+            //     data,
+            //     onError
+            // })
+
+            // if (!loginStatus) return
+
+            // const token = loginStatus.data.token
+
+            // props.updateUser({ token, username: email })
+
+
+            // const profileOnError = () => {
+            //     setShowProfileError(true)
+            // }
+            // const userProfile = await apiCall({
+            //     url: "/api/users/profile",
+            //     profileOnError
+            // })
+            // if (!userProfile) return
+            // const
+            //     { group, id, name, username } = userProfile.data,
+            //     webpages = group.webpages.filter(webpage => webpage?.permissions?.read),
+            //     gateways = group.gateways
+
+            // // Tokens will expire in 3 hours
+            // const tokenExpiryTime = new Date().getTime() + 1000 * 60 * 60 * 3
+
+            // if (gateways && gateways.length > 0) {
+            //     props.setGateway(gateways[0])
+            //     props.setGatewayList(gateways)
+            // }
+            // props.updateUserProfile({ group, id, name, username, tokenExpiryTime, webpages })
 
         }
     return (
@@ -145,7 +284,7 @@ function LogIn(props) {
                 <Link to="/forgotPassword">{pageT("forgotPassword")}</Link>
             </div>
         </div>
-    );
+    )
 }
 
 const mapDispatch = dispatch => {

@@ -21,6 +21,46 @@ const iconMap = {
     solar: { color: "yellow", icon: SolarIcon }
 }
 
+const data = {
+    "gridIsPeakShaving": 0,
+    "loadGridAveragePowerAC": 10,
+    "batteryGridAveragePowerAC": 0,
+    "gridContractPowerAC": 15,
+    "loadPvAveragePowerAC": 20,
+    "loadBatteryAveragePowerAC": 0,
+    "batterySoC": 45,
+    "batteryProducedAveragePowerAC": 20,
+    "batteryConsumedAveragePowerAC": 0,
+    "batteryChargingFrom": "Solar + Grid",
+    "batteryDischargingTo": "",
+    "pvAveragePowerAC": 40,
+    "loadAveragePowerAC": 30,
+    "loadLinks": {
+        "battery": 0,
+        "grid": 0,
+        "pv": 0
+    },
+    "gridLinks": {
+        "battery": 0,
+        "load": 1,
+        "pv": 0
+    },
+    "pvLinks": {
+        "battery": 1,
+        "grid": 0,
+        "load": 1
+    },
+    "batteryLinks": {
+        "grid": 0,
+        "load": 0,
+        "pv": 0
+    },
+    "batteryPvAveragePowerAC": 20,
+    "gridPvAveragePowerAC": 0,
+    "gridProducedAveragePowerAC": 10,
+    "gridConsumedAveragePowerAC": 0
+}
+
 const IconSet = props => {
     const { size } = props, { color, icon } = iconMap[props.icon], Icon = icon
 
@@ -29,28 +69,27 @@ const IconSet = props => {
         <Icon className={`h-3/5 w-3/5 text-${color}-main`} />
     </div>
 }
-const Card = props => {
-    const
-        cardClasses = "card narrow px-6"
-            + (props.className ? " " + props.className : ""),
-        { data, title } = props
+const Card = ({ data, title, icon, className }) => {
+    const cardClasses = "card narrow px-6" + (className ? " " + className : "")
 
-    return <div className={cardClasses}>
-        <div className="grid sm:grid-cols-2 text-center
-                        gap-x-4 sm:gap-x-6
-                        gap-y-6 sm:gap-y-8">
-            <div className="flex flex-wrap sm:col-span-2 items-center">
-                <IconSet icon={props.icon} size="10" />
-                <h5 className="font-bold ml-3 text-2xl">{title}</h5>
+    return (
+        <div className={cardClasses}>
+            <div className="grid sm:grid-cols-2 text-center gap-x-4 sm:gap-x-6 gap-y-6 sm:gap-y-8">
+                <div className="flex flex-wrap sm:col-span-2 items-center">
+                    <IconSet icon={icon} size="10" />
+                    <h5 className="font-bold ml-3 text-2xl">{title}</h5>
+                </div>
+                {data.map((item, i) =>
+                    <div key={"d-c-d-" + i}>
+                        <h2 className="font-bold text-2xl mb-1">{item.value}</h2>
+                        <p className="lg:test text-sm">{item.name}</p>
+                    </div>
+                )}
             </div>
-            {data.map((item, i) =>
-                <div key={"d-c-d-" + i}>
-                    <h2 className="font-bold text-2xl mb-1">{item.value}</h2>
-                    <p className="lg:test text-sm">{item.name}</p>
-                </div>)}
         </div>
-    </div>
+    )
 }
+
 const CardOnDiagram = props =>
     <div className={`arrow-${props.arrow} card-diagram bg-gray-900 flex
                     items-start px-4 py-3 rounded-lg`}>
@@ -99,6 +138,7 @@ export default connect(mapState)(function Dashboard(props) {
         [websocketSupport, setWebSocketSupport] = useState(true)
 
     const updateData = data => {
+        console.log(data)
         const
             batteryPower = data.batteryProducedAveragePowerAC
                 + data.batteryConsumedAveragePowerAC,
@@ -141,32 +181,37 @@ export default connect(mapState)(function Dashboard(props) {
             export: data.gridPvAveragePowerAC
         })
     }
-    const { gatewayID } = props
+    // const { gatewayID } = props
+    // useEffect(() => {
+    //     if (!gatewayID) return
+
+    //     const
+    //         windowProtocol = window.location.protocol,
+    //         wsProtocol = windowProtocol.replace("http", "ws")
+
+    //     let wsConnection = null
+
+    //     if (window["WebSocket"]) {
+    //         const url = `${wsProtocol}//${API_HOST}/ws/${props.gatewayID}`
+    //             + "/devices/energy-info"
+
+    //         wsConnection = new WebSocket(url, props.token)
+    //         wsConnection.onerror = () => setError({ url })
+    //         wsConnection.onmessage = e => updateData(JSON.parse(e.data).data)
+    //         wsConnection.onopen = () => setError(null)
+    //     }
+    //     else {
+    //         setWebSocketSupport(false)
+    //     }
+    //     return () => {
+    //         if (wsConnection) wsConnection.close()
+    //     }
+    // }, [gatewayID])
+
     useEffect(() => {
-        if (!gatewayID) return
-
-        const
-            windowProtocol = window.location.protocol,
-            wsProtocol = windowProtocol.replace("http", "ws")
-
-        let wsConnection = null
-
-        if (window["WebSocket"]) {
-            const url = `${wsProtocol}//${API_HOST}/ws/${props.gatewayID}`
-                + "/devices/energy-info"
-
-            wsConnection = new WebSocket(url, props.token)
-            wsConnection.onerror = () => setError({ url })
-            wsConnection.onmessage = e => updateData(JSON.parse(e.data).data)
-            wsConnection.onopen = () => setError(null)
-        }
-        else {
-            setWebSocketSupport(false)
-        }
-        return () => {
-            if (wsConnection) wsConnection.close()
-        }
-    }, [gatewayID])
+        // 使用固定資料直接更新畫面
+        updateData(data)
+    }, [])
 
     const peakShaveRate = useMemo(() => {
         if (!peak.current || !peak.threshhold) return 0

@@ -1,25 +1,24 @@
-import {Route, Routes} from "react-router-dom"
+import { Route, Routes } from "react-router-dom"
 import React from "react"
-import {useTranslation} from "react-multi-lang"
+import { useTranslation } from "react-multi-lang"
 
-import logo from "../assets/images/logo.svg"
+// import logo from "../assets/images/logo.svg"
 import smartGrid from "../assets/images/smartGrids.svg"
 
 import ForgotPassword from "../pages/ForgotPassword"
 import LogIn from "../pages/LogIn"
 import ResetPassword from "../pages/ResetPassword"
 
-function NonLoggedIn () {
+function NonLoggedIn() {
     const t = useTranslation()
 
     const Version = props =>
         <div className={"font-mono p-2 text-center text-gray-400 text-xs"
-                        + (props.className ? " " + props.className : "")}>
+            + (props.className ? " " + props.className : "")}>
             {import.meta.env.VITE_APP_VERSION}
         </div>
 
     const brand = <>
-        <img className="max-w-2/3" src={logo} />
         <h3 className="mt-4 md:mt-8 text-xl xl:text-2xl">
             <span className="text-primary-main">
                 Unlock
@@ -58,9 +57,6 @@ function NonLoggedIn () {
                         path="/handle-reset-link" />
                     <Route element={<LogIn />} path="*" />
                 </Routes>
-                <div className="text-gray-300 text-13px">
-                    {t("common.copyright")}
-                </div>
             </div>
             <Version className="md:hidden" />
         </div>

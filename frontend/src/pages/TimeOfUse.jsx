@@ -18,6 +18,66 @@ import Spinner from "../components/Spinner"
 import { ReactComponent as EditIcon } from "../assets/icons/edit.svg"
 
 const { colors } = variables
+
+const MOCK_MODE = true
+
+const mockTouInfo = {
+    energySources: {
+        offPeak: {
+            allProducedLifetimeEnergyACDiff: 44.207,
+            batteryProducedEnergyPercentAC: 2.04,
+            batteryProducedLifetimeEnergyACDiff: 0.901,
+            gridProducedEnergyPercentAC: 72.62,
+            gridProducedLifetimeEnergyACDiff: 32.102,
+            pvProducedEnergyPercentAC: 25.34,
+            pvProducedLifetimeEnergyACDiff: 11.204
+        },
+        onPeak: {
+            allProducedLifetimeEnergyACDiff: 66.896,
+            batteryProducedEnergyPercentAC: 20.18,
+            batteryProducedLifetimeEnergyACDiff: 13.498,
+            gridProducedEnergyPercentAC: 5.98,
+            gridProducedLifetimeEnergyACDiff: 4,
+            pvProducedEnergyPercentAC: 73.84,
+            pvProducedLifetimeEnergyACDiff: 49.398
+        }
+    },
+    timeOfUse: {
+        currentPeakType: "onPeak",
+        midPeak: null,
+        offPeak: [
+            { end: "06:00:00", start: "00:00:00", touRate: 2.15 },
+            { end: "14:00:00", start: "11:00:00", touRate: 2.15 }
+        ],
+        onPeak: [
+            { end: "11:00:00", start: "06:00:00", touRate: 5.39 },
+            { end: "24:00:00", start: "14:00:00", touRate: 5.39 }
+        ],
+        timezone: "+0800"
+    }
+}
+
+const mockBatteryStatus = {
+    batterySoC: 70,
+    batteryProducedAveragePowerAC: 3.369,
+    batteryConsumedAveragePowerAC: 0,
+    batteryChargingFrom: "",
+    batteryDischargingTo: "Load"
+}
+
+const mockSolarUsage = {
+    timestamps: [
+        1742749150, 1742752753, 1742756353, 1742759950, 1742763555,
+        1742767155, 1742770749, 1742774355, 1742777949, 1742781551,
+        1742785149, 1742788758, 1742792349, 1742795954, 1742799550,
+        1742803165, 1742806749, 1742810347, 1742811969
+    ],
+    loadPvConsumedEnergyPercentACs: [
+        0, 0, 0, 0, 0, 100, 100, 22.15, 18.3, 17.22,
+        100, 100, 100, 100, 100, 33.77, 100, 100, 100
+    ]
+}
+
 const ErrorBox = ({ error, margin = "", message }) => error
     ? <AlertBox
         boxClass={`${margin} negative`}
@@ -204,216 +264,105 @@ export default connect(mapState)(function TimeOfUse(props) {
     }, [timeOfUse])
 
     const urlPrefix = `/api/${props.gatewayID}/devices`
-    const
-        callTodayCards = (startTime) => {
-            apiCall({
-                onComplete: () => setInfoLoading(false),
-                onError: error => setInfoError(error),
-                onStart: () => setInfoLoading(true),
-                onSuccess: rawData => {
-                    if (!rawData?.data) return
-                    const { data } = rawData,
-                        { onPeak } = data.energySources
+    const callTodayCards = () => {
+        if (MOCK_MODE) {
+            setInfoLoading(true)
+            setTimeout(() => {
+                const data = mockTouInfo
+                const { onPeak, offPeak } = data.energySources
+                const { timeOfUse } = data
+
+                setOnPeak(r => ({
+                    ...r,
+                    types: [
+                        { kwh: onPeak.gridProducedLifetimeEnergyACDiff, percentage: onPeak.gridProducedEnergyPercentAC, type: "grid" },
+                        { kwh: onPeak.pvProducedLifetimeEnergyACDiff, percentage: onPeak.pvProducedEnergyPercentAC, type: "solar" },
+                        { kwh: onPeak.batteryProducedLifetimeEnergyACDiff, percentage: onPeak.batteryProducedEnergyPercentAC, type: "battery" }
+                    ],
+                    kwh: onPeak.allProducedLifetimeEnergyACDiff
+                }))
+
+                setOffPeak(r => ({
+                    ...r,
+                    types: [
+                        { kwh: offPeak.gridProducedLifetimeEnergyACDiff, percentage: offPeak.gridProducedEnergyPercentAC, type: "grid" },
+                        { kwh: offPeak.pvProducedLifetimeEnergyACDiff, percentage: offPeak.pvProducedEnergyPercentAC, type: "solar" },
+                        { kwh: offPeak.batteryProducedLifetimeEnergyACDiff, percentage: offPeak.batteryProducedEnergyPercentAC, type: "battery" }
+                    ],
+                    kwh: offPeak.allProducedLifetimeEnergyACDiff
+                }))
+
+                const periods = []
+                Object.entries(timeOfUse).forEach(([key, value]) => {
+                    if (Array.isArray(value)) {
+                        value.forEach(item => periods.push({ name: key, ...item }))
+                    }
+                })
+                periods.sort((a, b) => getMoment(a.start) - getMoment(b.start))
+
+                setCurrentTime(moment().format("HH:mm"))
+                setCurrentPeriod(timeOfUse.currentPeakType)
+                setTimeOfUse(periods)
+                setInfoLoading(false)
+            }, 300)
+        }
+    }
+        ,
+        callYesterdayCards = (preStartTime) => {
+            if (MOCK_MODE) {
+                setInfoLoading(true)
+                setTimeout(() => {
+                    const data = mockTouInfo
+                    const { onPeak, offPeak } = data.energySources
+                    const { timeOfUse } = data
 
                     setOnPeak(r => ({
                         ...r,
                         types: [
-                            {
-                                kwh: onPeak?.gridProducedLifetimeEnergyACDiff || 0,
-                                percentage: onPeak?.gridProducedEnergyPercentAC || 0,
-                                type: "grid"
-                            },
-                            {
-                                kwh: onPeak?.pvProducedLifetimeEnergyACDiff || 0,
-                                percentage: onPeak?.pvProducedEnergyPercentAC || 0,
-                                type: "solar"
-                            },
-                            {
-                                kwh: onPeak?.batteryProducedLifetimeEnergyACDiff || 0,
-                                percentage: onPeak?.batteryProducedEnergyPercentAC || 0,
-                                type: "battery"
-                            },
+                            { kwh: onPeak.gridProducedLifetimeEnergyACDiff, percentage: onPeak.gridProducedEnergyPercentAC, type: "grid" },
+                            { kwh: onPeak.pvProducedLifetimeEnergyACDiff, percentage: onPeak.pvProducedEnergyPercentAC, type: "solar" },
+                            { kwh: onPeak.batteryProducedLifetimeEnergyACDiff, percentage: onPeak.batteryProducedEnergyPercentAC, type: "battery" }
                         ],
-                        kwh: onPeak?.allProducedLifetimeEnergyACDiff || 0
+                        kwh: onPeak.allProducedLifetimeEnergyACDiff
                     }))
 
-                    const { offPeak } = data.energySources
                     setOffPeak(r => ({
                         ...r,
                         types: [
-                            {
-                                kwh: offPeak?.gridProducedLifetimeEnergyACDiff || 0,
-                                percentage: offPeak?.gridProducedEnergyPercentAC || 0,
-                                type: "grid"
-                            },
-                            {
-                                kwh: offPeak?.pvProducedLifetimeEnergyACDiff || 0,
-                                percentage: offPeak?.pvProducedEnergyPercentAC || 0,
-                                type: "solar"
-                            },
-                            {
-                                kwh: offPeak?.batteryProducedLifetimeEnergyACDiff || 0,
-                                percentage: offPeak?.batteryProducedEnergyPercentAC || 0,
-                                type: "battery"
-                            },
+                            { kwh: offPeak.gridProducedLifetimeEnergyACDiff, percentage: offPeak.gridProducedEnergyPercentAC, type: "grid" },
+                            { kwh: offPeak.pvProducedLifetimeEnergyACDiff, percentage: offPeak.pvProducedEnergyPercentAC, type: "solar" },
+                            { kwh: offPeak.batteryProducedLifetimeEnergyACDiff, percentage: offPeak.batteryProducedEnergyPercentAC, type: "battery" }
                         ],
-                        kwh: offPeak?.allProducedLifetimeEnergyACDiff || 0
+                        kwh: offPeak.allProducedLifetimeEnergyACDiff
                     }))
 
-                    const { midPeak } = data.energySources
-                    setMidPeak(r => ({
-                        ...r,
-                        types: [
-                            {
-                                kwh: midPeak?.gridProducedLifetimeEnergyACDiff || 0,
-                                percentage: midPeak?.gridProducedEnergyPercentAC || 0,
-                                type: "grid"
-                            },
-                            {
-                                kwh: midPeak?.pvProducedLifetimeEnergyACDiff || 0,
-                                percentage: midPeak?.pvProducedEnergyPercentAC || 0,
-                                type: "solar"
-                            },
-                            {
-                                kwh: midPeak?.batteryProducedLifetimeEnergyACDiff || 0,
-                                percentage: midPeak?.batteryProducedEnergyPercentAC || 0,
-                                type: "battery"
-                            },
-                        ],
-                        kwh: midPeak?.allProducedLifetimeEnergyACDiff || 0
-                    }))
-
-                    const { timeOfUse } = data
-                    let periods = []
-                    Object.keys(timeOfUse).forEach(key => {
-                        if (!Array.isArray(timeOfUse[key])) return
-                        timeOfUse[key].forEach(item => {
-                            periods.push({ name: key, ...item })
-                        })
+                    const periods = []
+                    Object.entries(timeOfUse).forEach(([key, value]) => {
+                        if (Array.isArray(value)) {
+                            value.forEach(item => periods.push({ name: key, ...item }))
+                        }
                     })
                     periods.sort((a, b) => getMoment(a.start) - getMoment(b.start))
-                    setCurrentTime(moment().format("hh:mm A"))
-                    setCurrentPeriod(timeOfUse.currentPeakType || "")
+
+                    setCurrentTime(moment().format("HH:mm"))
+                    setCurrentPeriod(timeOfUse.currentPeakType)
                     setTimeOfUse(periods)
-                },
-                url: `${urlPrefix}/tou/info?startTime=${startTime}`
-            })
+                    setInfoLoading(false)
+                }, 300)
+            }
         },
-        callYesterdayCards = (preStartTime) => {
-            apiCall({
-                onComplete: () => setPreInfoLoading(false),
-                onError: error => setPreInfoError(error),
-                onStart: () => setPreInfoLoading(true),
-                onSuccess: rawData => {
-                    if (!rawData?.data) return
-
-                    const { data } = rawData,
-                        { onPeak } = data.energySources
-
-                    setPreOnPeak(r => ({
-                        ...r,
-                        types: [
-                            {
-                                kwh: onPeak?.gridProducedLifetimeEnergyACDiff || 0,
-                                percentage: onPeak?.gridProducedEnergyPercentAC || 0,
-                                type: "grid"
-                            },
-                            {
-                                kwh: onPeak?.pvProducedLifetimeEnergyACDiff || 0,
-                                percentage: onPeak?.pvProducedEnergyPercentAC || 0,
-                                type: "solar"
-                            },
-                            {
-                                kwh: onPeak?.batteryProducedLifetimeEnergyACDiff || 0,
-                                percentage: onPeak?.batteryProducedEnergyPercentAC || 0,
-                                type: "battery"
-                            },
-                        ],
-                        kwh: onPeak?.allProducedLifetimeEnergyACDiff || 0
-                    }))
-
-                    const { offPeak } = data.energySources
-                    setPreOffPeak(r => ({
-                        ...r,
-                        types: [
-                            {
-                                kwh: offPeak?.gridProducedLifetimeEnergyACDiff || 0,
-                                percentage: offPeak?.gridProducedEnergyPercentAC || 0,
-                                type: "grid"
-                            },
-                            {
-                                kwh: offPeak?.pvProducedLifetimeEnergyACDiff || 0,
-                                percentage: offPeak?.pvProducedEnergyPercentAC || 0,
-                                type: "solar"
-                            },
-                            {
-                                kwh: offPeak?.batteryProducedLifetimeEnergyACDiff || 0,
-                                percentage: offPeak?.batteryProducedEnergyPercentAC || 0,
-                                type: "battery"
-                            },
-                        ],
-                        kwh: offPeak?.allProducedLifetimeEnergyACDiff || 0
-                    }))
-                    const { midPeak } = data.energySources
-                    setPreMidPeak(r => ({
-                        ...r,
-                        types: [
-                            {
-                                kwh: midPeak?.gridProducedLifetimeEnergyACDiff || 0,
-                                percentage: midPeak?.gridProducedEnergyPercentAC || 0,
-                                type: "grid"
-                            },
-                            {
-                                kwh: midPeak?.pvProducedLifetimeEnergyACDiff || 0,
-                                percentage: midPeak?.pvProducedEnergyPercentAC || 0,
-                                type: "solar"
-                            },
-                            {
-                                kwh: midPeak?.batteryProducedLifetimeEnergyACDiff || 0,
-                                percentage: midPeak?.batteryProducedEnergyPercentAC || 0,
-                                type: "battery"
-                            },
-                        ],
-                        kwh: midPeak?.allProducedLifetimeEnergyACDiff || 0
-                    }))
-
-                    const { timeOfUse } = data
-                    let periods = []
-                    Object.keys(timeOfUse).forEach(key => {
-                        if (!Array.isArray(timeOfUse[key])) return
-                        timeOfUse[key].forEach(item => {
-                            periods.push({ name: key, ...item })
-                        })
-                    })
-                    periods.sort((a, b) => getMoment(a.start) - getMoment(b.start))
-                    setTimeOfUse(periods)
-                },
-                url: `${urlPrefix}/tou/info?startTime=${preStartTime}`
-            })
-        },
-        callLineChartUsage = (startTime, endTime) => {
-            const lineChartUsageUrl = `${urlPrefix}/solar/energy-usage?`
-                + new URLSearchParams({
-                    startTime, endTime, resolution: lineChartUsageRes
-                }).toString()
-
-            apiCall({
-                onComplete: () => setLineChartUsageLoading(false),
-                onError: error => setLineChartUsageError(error),
-                onStart: () => setLineChartUsageLoading(true),
-                onSuccess: rawData => {
-                    if (!rawData || !rawData.data) return
-                    const
-                        { data } = rawData,
-                        { timestamps } = data,
-                        labels = timestamps.map(t => t * 1000)
+        callLineChartUsage = () => {
+            if (MOCK_MODE) {
+                setLineChartUsageLoading(true)
+                setTimeout(() => {
+                    const { timestamps, loadPvConsumedEnergyPercentACs } = mockSolarUsage
                     setLineChartUsage({
-                        data: data.loadPvConsumedEnergyPercentACs,
-                        labels
+                        data: loadPvConsumedEnergyPercentACs,
+                        labels: timestamps.map(t => t * 1000)
                     })
-                },
-                url: lineChartUsageUrl
-            })
+                    setLineChartUsageLoading(false)
+                }, 300)
+            }
         }
     useEffect(() => {
         if (!props.gatewayID) return
@@ -437,29 +386,22 @@ export default connect(mapState)(function TimeOfUse(props) {
 
     useEffect(() => {
         if (!props.gatewayID) return
-        const startTime = moment().startOf("day").toISOString()
 
-        apiCall({
-            onComplete: () => setBatteryStatusLoading(false),
-            onError: error => setBatteryStatusError(error),
-            onStart: () => setBatteryStatusLoading(true),
-            onSuccess: rawData => {
-                if (!rawData || !rawData.data) return
-
-                const { data } = rawData
-
+        if (MOCK_MODE) {
+            setBatteryStatusLoading(true)
+            setTimeout(() => {
+                const data = mockBatteryStatus
                 setBatteryStatus({
-                    direction:
-                        data.batteryChargingFrom ? "chargingFrom" : "dischargingTo",
-                    target: (data.batteryChargingFrom || data.batteryDischargingTo),
-                    power: (data.batteryProducedAveragePowerAC
-                        + data.batteryConsumedAveragePowerAC || 0),
-                    state: (data.batterySoC || 0)
+                    direction: data.batteryChargingFrom ? "chargingFrom" : "dischargingTo",
+                    target: data.batteryChargingFrom || data.batteryDischargingTo,
+                    power: data.batteryProducedAveragePowerAC + data.batteryConsumedAveragePowerAC,
+                    state: data.batterySoC
                 })
-            },
-            url: `/api/${props.gatewayID}/devices/battery/usage-info?startTime=${startTime}`
-        })
+                setBatteryStatusLoading(false)
+            }, 300)
+        }
     }, [props.gatewayID])
+
 
     return <>
         <div className="page-header">

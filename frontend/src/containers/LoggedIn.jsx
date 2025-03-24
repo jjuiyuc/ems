@@ -75,7 +75,6 @@ const routes = {
             key="advancedSettings" />
     ]
 }
-
 function LoggedIn(props) {
     const
         location = useLocation(),
@@ -94,7 +93,7 @@ function LoggedIn(props) {
     useEffect(() => {
         if (new Date().getTime() > props.tokenExpiryTime) {
             logout()
-            navigate("/dashboard")
+            navigate("*")
         }
     }, [props.tokenExpiryTime, navigate])
 

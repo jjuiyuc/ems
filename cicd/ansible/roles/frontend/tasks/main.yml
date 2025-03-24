@@ -1,5 +1,0 @@
-- name: copy binary file
-  copy:
-    src: "{{ playbook_dir }}/../../frontend/dist"
-    dest: /var/www
-    mode: a+x

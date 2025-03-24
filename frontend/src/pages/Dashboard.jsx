@@ -138,7 +138,6 @@ export default connect(mapState)(function Dashboard(props) {
         [websocketSupport, setWebSocketSupport] = useState(true)
 
     const updateData = data => {
-        console.log(data)
         const
             batteryPower = data.batteryProducedAveragePowerAC
                 + data.batteryConsumedAveragePowerAC,

@@ -41,16 +41,6 @@ const mockWebpage = [
         }
     },
     {
-        "id": 6,
-        "name": "energyResources",
-        "permissions": {
-            "create": false,
-            "read": true,
-            "update": false,
-            "delete": false
-        }
-    },
-    {
         "id": 8,
         "name": "accountManagementGroup",
         "permissions": {

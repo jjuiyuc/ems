@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import { Link, useSearchParams } from "react-router-dom"
 import { useTranslation } from "react-multi-lang"
 import CheckCircleIcon from "@mui/icons-material/CheckCircle"
-import HighlightOffIcon from '@mui/icons-material/HighlightOff';
+import HighlightOffIcon from '@mui/icons-material/HighlightOff'
 import { Button, FormControl, TextField } from "@mui/material"
 
 import { validatePassword } from "../utils/utils"
@@ -49,21 +49,27 @@ function ResetPassword() {
             newPassword.length > 0
             && confirmPassword.length > 0
             && (confirmPassword !== newPassword)
-        ),
+        )
 
+    const MOCK_MODE = true
+    const mockValidToken = "mockToken123"
 
+    const submit = () => {
+        const token = searchParams.get('token')
+        const data = { token, password: newPassword }
 
-        submit = () => {
+        if (MOCK_MODE) {
+            setTimeout(() => {
+                if (token === mockValidToken) {
+                    setIsReset(true)
+                } else {
+                    setIsError(true)
+                }
+            }, 500)
+        } else {
+            const onSuccess = (res) => setIsReset(true)
+            const onError = (res) => setIsError(true)
 
-            const data = { token: searchParams.get('token'), password: newPassword }
-
-            const onSuccess = (res) => {
-                setIsReset(true)
-            }
-
-            const onError = (res) => {
-                setIsError(true)
-            }
             apiCall({
                 url: "/api/users/password/reset-by-token",
                 method: "put",
@@ -72,6 +78,8 @@ function ResetPassword() {
                 onError
             })
         }
+    }
+
 
     const
         cpHelperText = confirmPasswordError ? errorT("passwordNotMatch") : "",

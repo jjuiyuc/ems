@@ -1,6 +1,0 @@
----
-- name: DER-EMS Playbook
-  hosts: all
-  remote_user: derems
-  roles:
-    - { role: frontend, tags: frontend }

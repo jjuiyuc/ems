@@ -36,29 +36,26 @@ export default function InfoGroup(props) {
         [groupName, setGroupName] = useState(""),
         [parentGroup, setParentGroup] = useState(null),
         [fieldList, setFieldList] = useState([])
-    const
-        iconOnClick = () => {
-            setOpenNotice(true)
 
-            const groupID = row.id
-            apiCall({
-                onComplete: () => setLoading(false),
-                onError: error => setInfoError(error),
-                onStart: () => setLoading(true),
-                onSuccess: rawData => {
+    const iconOnClick = () => {
+        setOpenNotice(true)
+        setInfoError("")
+        setLoading(true)
 
-                    if (!rawData?.data) return
+        setTimeout(() => {
+            setGroupName(row.name)
+            setParentGroup(row.parentID)
 
-                    const { data } = rawData
+            const mockGateways = [
+                { locationName: "PLACE 0", gatewayID: "MOCK-GW-000" },
+                { locationName: "PLACE 1", gatewayID: "MOCK-GW-001" },
+                { locationName: "PLACE 2", gatewayID: "MOCK-GW-002" },
+            ]
+            setFieldList(mockGateways)
+            setLoading(false)
+        }, 300)
+    }
 
-                    setGroupName(data.name || "")
-                    setParentGroup(data.parentID || null)
-                    setFieldList(data.gateways)
-
-                },
-                url: `/api/account-management/groups/${groupID}`
-            })
-        }
     return <>
         <NoticeIcon
             className="mr-5"

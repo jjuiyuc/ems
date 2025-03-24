@@ -49,7 +49,7 @@ const validatePassword = password =>
     /^(?=.{8,})(?=.*[a-zA-Z])(?=.*\d)|(?=.{8,})(?=.*[a-zA-Z])(?=.*\d)(?=.*\W).*$/.test(password)
 
 const validateNum = num =>
-    /^[1-9]\d*$/.test(num)
+    /^(?:0|[1-9]\d*)$/.test(num)
 
 const validateNumPercent = num =>
     /^(0?|[1-9]\d?|100)$/.test(num)
@@ -57,4 +57,13 @@ const validateNumPercent = num =>
 const validateNumTwoDecimalPlaces = num =>
     /^((0?|[1-9][0-9]*)|([0-9]*\.)|([0]\.\d{1,2}|[1-9][0-9]*\.\d{1,2}))$/.test(num)
 
-export { convertTimeToNumber, drawHighPeak, validateEmail, validatePassword, validateNum, validateNumPercent, validateNumTwoDecimalPlaces }
+const validateLat = lat =>
+    /^(\-|\+)?([0-8]?\d{1}\.\d{0,12}|90\.0{0,12}|[0-8]?\d{1}|90)$/.test(lat)
+
+const validateLng = lng =>
+    /^(\-|\+)?(((\d|[1-9]\d|1[0-7]\d|0{1,3})\.\d{0,12})|(\d|[1-9]\d|1[0-7]\d|0{1,3})|180\0.{0,12}|180)$/.test(lng)
+
+export {
+    convertTimeToNumber, drawHighPeak, validateEmail, validatePassword,
+    validateNum, validateNumPercent, validateNumTwoDecimalPlaces, validateLat, validateLng
+}

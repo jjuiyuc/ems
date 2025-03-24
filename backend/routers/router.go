@@ -10,8 +10,8 @@ import (
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"github.com/swaggo/gin-swagger/swaggerFiles"
 
 	"der-ems/docs"
 	"der-ems/internal/app"
@@ -111,11 +111,15 @@ var EndpointMapping = map[PolicyWebpageObject][]string{
 		"/api/device-management/gateways/:gwid/field-state",
 		"/api/device-management/gateways/:gwid/sync-device-settings",
 		"/api/device-management/gateways/:gwid/account-groups",
+		"/api/device-management/devices/sub-devices/models",
+		"/api/device-management/gateways/:gwid/validity",
+		"/api/device-management/devices/:deviceuueid/validity",
 	},
 	AccountManagementGroup: {
 		"/api/account-management/groups",
 		"/api/account-management/groups/:groupid",
 	},
+
 	AccountManagementUser: {
 		"/api/account-management/users",
 		"/api/account-management/users/:userid",
@@ -188,6 +192,7 @@ func InitRouter(isCORS bool, ginMode string, enforcer *casbin.Enforcer, w *APIWo
 	apiGroup.PUT("/users/password/lost", w.PasswordLost)
 	apiGroup.PUT("/users/password/reset-by-token", w.PasswordResetByToken)
 	apiGroup.GET("/users/profile", authorizeJWT(REST), w.GetProfile)
+	apiGroup.GET("/users/profile/gateways", authorizeJWT(REST), w.GetProfileGateways)
 	apiGroup.PUT("/users/name", authorizeJWT(REST), w.UpdateName)
 	apiGroup.PUT("/users/password", authorizeJWT(REST), w.UpdatePassword)
 
@@ -230,6 +235,10 @@ func InitRouter(isCORS bool, ginMode string, enforcer *casbin.Enforcer, w *APIWo
 	r.PUT(EndpointMapping[FieldManagement][3], authorizeJWT(REST), authorizePolicy(enforcer), validateURIAndBody(w.EnableField))
 	r.GET(EndpointMapping[FieldManagement][4], authorizeJWT(REST), authorizePolicy(enforcer), validateURI(w.SyncDeviceSettings))
 	r.PUT(EndpointMapping[FieldManagement][5], authorizeJWT(REST), authorizePolicy(enforcer), validateURIAndBody(w.UpdateFieldGroups))
+	r.GET(EndpointMapping[FieldManagement][6], authorizeJWT(REST), authorizePolicy(enforcer), w.GetSubDeviceModels)
+	r.GET(EndpointMapping[FieldManagement][7], authorizeJWT(REST), authorizePolicy(enforcer), validateURI(w.ValidateGatewayID))
+	r.GET(EndpointMapping[FieldManagement][8], authorizeJWT(REST), authorizePolicy(enforcer), validateURI(w.ValidateDeviceUUEID))
+	r.POST(EndpointMapping[FieldManagement][0], authorizeJWT(REST), authorizePolicy(enforcer), validateBody(w.CreateField))
 
 	// Account Management Group
 	r.GET(EndpointMapping[AccountManagementGroup][0], authorizeJWT(REST), authorizePolicy(enforcer), w.GetGroups)

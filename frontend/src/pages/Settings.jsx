@@ -32,6 +32,7 @@ export default connect(mapState, mapDispatch)(function Settings(props) {
         [grid, setGrid] = useState(false),
         [loading, setLoading] = useState(false),
         [otherError, setOtherError] = useState("")
+
     const
         handleSlider = (e) => {
             setReservedForGridOutage(Number(e.target.value))
@@ -55,11 +56,7 @@ export default connect(mapState, mapDispatch)(function Settings(props) {
                             msg: errorT("failureToGenerate")
                         })
                         break
-                    default:
-                        props.updateSnackbarMsg({
-                            type: "error",
-                            msg: errorT("failureToGenerate")
-                        })
+                    default:setOtherError(err)
                 }
             },
             onSuccess: rawData => {

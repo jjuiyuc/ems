@@ -14,7 +14,7 @@ function LogIn(props) {
         commonT = (string) => t("common." + string),
         errorT = (string) => t("error." + string),
         formT = (string) => t("form." + string),
-        pageT = (string) => t("logIn." + string);
+        pageT = (string) => t("logIn." + string)
 
     const
         [email, setEmail] = useState(""),
@@ -145,7 +145,7 @@ function LogIn(props) {
                 <Link to="/forgotPassword">{pageT("forgotPassword")}</Link>
             </div>
         </div>
-    );
+    )
 }
 
 const mapDispatch = dispatch => {

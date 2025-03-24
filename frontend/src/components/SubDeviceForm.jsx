@@ -6,14 +6,14 @@ import { apiCall } from "../utils/api"
 import { validateNumTwoDecimalPlaces } from "../utils/utils"
 
 export default function SubDeviceForm(props) {
-    const { title, mainDeviceType, subDeviceInfo, changeSubDeviceInfo } = props
+    const { title, mainDeviceType, subDeviceInfo, changeSubDeviceInfo,
+        handleKeyDown } = props
     const
         t = useTranslation(),
         formT = (string) => t("form." + string)
 
     const
         [subDevicesList, setSubDevicesList] = useState([]),
-        [fetched, setFetched] = useState(false),
         [infoError, setInfoError] = useState("")
 
     const
@@ -23,10 +23,11 @@ export default function SubDeviceForm(props) {
         },
         changePowerCapacity = (e, index) => {
             const num = e.target.value
-            const isNum = validateNumTwoDecimalPlaces(num)
-            if (!isNum) return
 
-            changeSubDeviceInfo(index, "subPowerCapacity", num)
+            const isNum = validateNumTwoDecimalPlaces(num)
+            if (num === "" || isNum) {
+                changeSubDeviceInfo(index, "subPowerCapacity", num)
+            }
         }
 
     const filteredSubDevicesList = useMemo(() => {
@@ -82,13 +83,14 @@ export default function SubDeviceForm(props) {
                     </TextField>
                     <h5 className="mb-5 ml-2">{formT("deviceInfo")}</h5>
                     <TextField
-                        key={"p-c-" + i}
+                        key={"sub-p-c-" + i}
                         type="number"
                         label={formT("powerCapacity")}
                         onChange={(e) => changePowerCapacity(e, i)}
+                        onKeyDown={(e) => handleKeyDown(e)}
                         value={subDeviceInfo.subPowerCapacity[i]}
                     />
-                    <Divider key={"line-" + i} variant="middle" sx={{ margin: "1rem 0 2.5rem" }} />
+                    <Divider key={"sub-line-" + i} variant="middle" sx={{ margin: "1rem 0 2.5rem" }} />
                 </>
             ))}
         {mainDeviceType.includes("Inverter") &&
@@ -106,14 +108,14 @@ export default function SubDeviceForm(props) {
                         onChange={(e) => changeSubDeviceModel(e, i)}
                         defaultValue="">
                         {item.models.map(({ id, name }) => (
-                            <MenuItem key={`o-sub-d-m-${id}`} value={id}>
+                            <MenuItem key={`i-sub-d-m-${id}`} value={id}>
                                 {name}
                             </MenuItem>
                         ))}
                     </TextField>
                     <h5 className="mb-5 ml-2">{formT("deviceInfo")}</h5>
                     <TextField
-                        key={"i-p-c-"}
+                        key={"i-sub-p-c-" + i}
                         type="number"
                         label={formT("powerCapacity")}
                         onChange={(e) => changePowerCapacity(e, i)}

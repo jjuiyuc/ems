@@ -23,14 +23,17 @@ export default connect(mapState, mapDispatch)(function DemandChargeCard(props) {
         errorT = string => t("error." + string)
 
     const
-        [maxDemandCapacity, setMaxDemandCapacity] = useState(null),
-        [loading, setLoading] = useState(false)
+        [maxDemandCapacity, setMaxDemandCapacity] = useState(""),
+        [loading, setLoading] = useState(false),
+        [otherError, setOtherError] = useState("")
+
     const
         inputNum = (e) => {
             const num = e.target.value
             const isNum = validateNum(num)
-            if (!isNum) return
-            setMaxDemandCapacity(num)
+            if (num === "" || isNum) {
+                setMaxDemandCapacity(num)
+            }
         },
         handleSave = () => {
             const newData = maxDemandCapacity
@@ -45,17 +48,13 @@ export default connect(mapState, mapDispatch)(function DemandChargeCard(props) {
             onStart: () => setLoading(true),
             onError: (err) => {
                 switch (err) {
-                    case 60019:
+                    case 60032:
                         props.updateSnackbarMsg({
                             type: "error",
                             msg: errorT("failureToGenerate")
                         })
                         break
-                    default:
-                        props.updateSnackbarMsg({
-                            type: "error",
-                            msg: errorT("failureToGenerate")
-                        })
+                    default:setOtherError(err)
                 }
             },
             onSuccess: rawData => {
@@ -63,7 +62,7 @@ export default connect(mapState, mapDispatch)(function DemandChargeCard(props) {
 
                 const { data } = rawData
 
-                setMaxDemandCapacity(data.maxDemandCapacity || null)
+                setMaxDemandCapacity(data.maxDemandCapacity || "")
 
             },
             url: `/api/device-management/gateways/${gatewayID}/meter-settings`

@@ -2,8 +2,7 @@
     "swagger": "2.0",
     "info": {
         "title": "DER-EMS API",
-        "contact": {},
-        "license": {}
+        "contact": {}
     },
     "basePath": "/api",
     "paths": {
@@ -38,7 +37,7 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/app.Response"
+                                    "$ref": "#/definitions/der-ems_internal_app.Response"
                                 },
                                 {
                                     "type": "object",
@@ -54,19 +53,19 @@
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -129,31 +128,31 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -197,7 +196,7 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/app.Response"
+                                    "$ref": "#/definitions/der-ems_internal_app.Response"
                                 },
                                 {
                                     "type": "object",
@@ -213,25 +212,25 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -283,31 +282,31 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -347,31 +346,31 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -408,7 +407,7 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/app.Response"
+                                    "$ref": "#/definitions/der-ems_internal_app.Response"
                                 },
                                 {
                                     "type": "object",
@@ -424,19 +423,19 @@
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -508,31 +507,31 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -613,31 +612,31 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -674,31 +673,31 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -741,25 +740,25 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -796,7 +795,7 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/app.Response"
+                                    "$ref": "#/definitions/der-ems_internal_app.Response"
                                 },
                                 {
                                     "type": "object",
@@ -812,19 +811,144 @@
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/device-management/devices/sub-devices/models": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "list sub-device models based on token",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "field management"
+                ],
+                "summary": "List sub-device models",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Input user's access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/der-ems_internal_app.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/services.GetSubDeviceModelsResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/device-management/devices/{deviceuueid}/validity": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "verify device UUEID based on token",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "field management"
+                ],
+                "summary": "Verify device UUEID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Input user's access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Device UUEID",
+                        "name": "deviceuueid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -861,7 +985,7 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/app.Response"
+                                    "$ref": "#/definitions/der-ems_internal_app.Response"
                                 },
                                 {
                                     "type": "object",
@@ -877,19 +1001,88 @@
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "create a field by token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "field management"
+                ],
+                "summary": "Create a field",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Input user's access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/der-ems_internal_app.CreateFieldBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -933,7 +1126,7 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/app.Response"
+                                    "$ref": "#/definitions/der-ems_internal_app.Response"
                                 },
                                 {
                                     "type": "object",
@@ -949,25 +1142,25 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -1021,31 +1214,31 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -1089,7 +1282,7 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/app.Response"
+                                    "$ref": "#/definitions/der-ems_internal_app.Response"
                                 },
                                 {
                                     "type": "object",
@@ -1105,25 +1298,25 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -1184,31 +1377,31 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -1262,31 +1455,31 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -1330,7 +1523,7 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/app.Response"
+                                    "$ref": "#/definitions/der-ems_internal_app.Response"
                                 },
                                 {
                                     "type": "object",
@@ -1346,25 +1539,25 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -1416,31 +1609,31 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -1484,7 +1677,7 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/app.Response"
+                                    "$ref": "#/definitions/der-ems_internal_app.Response"
                                 },
                                 {
                                     "type": "object",
@@ -1500,25 +1693,25 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -1563,31 +1756,31 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -1629,31 +1822,31 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -1695,31 +1888,91 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/device-management/gateways/{gwid}/validity": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "verify gateway UUID based on token",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "field management"
+                ],
+                "summary": "Verify gateway UUID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Input user's access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Gateway UUID",
+                        "name": "gwid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -1762,19 +2015,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -1808,19 +2061,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -1833,14 +2086,14 @@
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "get user by token",
+                "description": "get gateways permissions by token",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "user"
                 ],
-                "summary": "Show the detailed information about an individual user",
+                "summary": "Show the gateways permissions information about an individual user",
                 "parameters": [
                     {
                         "type": "string",
@@ -1857,13 +2110,16 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/app.Response"
+                                    "$ref": "#/definitions/der-ems_internal_app.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/services.ProfileResponse"
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/services.GatewayInfo"
+                                            }
                                         }
                                     }
                                 }
@@ -1873,13 +2129,13 @@
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -1923,25 +2179,25 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -1985,25 +2241,25 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -2073,7 +2329,7 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/app.Response"
+                                    "$ref": "#/definitions/der-ems_internal_app.Response"
                                 },
                                 {
                                     "type": "object",
@@ -2089,19 +2345,19 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -2171,7 +2427,7 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/app.Response"
+                                    "$ref": "#/definitions/der-ems_internal_app.Response"
                                 },
                                 {
                                     "type": "object",
@@ -2187,25 +2443,25 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -2257,7 +2513,7 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/app.Response"
+                                    "$ref": "#/definitions/der-ems_internal_app.Response"
                                 },
                                 {
                                     "type": "object",
@@ -2273,19 +2529,19 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -2355,7 +2611,7 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/app.Response"
+                                    "$ref": "#/definitions/der-ems_internal_app.Response"
                                 },
                                 {
                                     "type": "object",
@@ -2371,25 +2627,25 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -2441,7 +2697,7 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/app.Response"
+                                    "$ref": "#/definitions/der-ems_internal_app.Response"
                                 },
                                 {
                                     "type": "object",
@@ -2457,19 +2713,19 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -2521,7 +2777,7 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/app.Response"
+                                    "$ref": "#/definitions/der-ems_internal_app.Response"
                                 },
                                 {
                                     "type": "object",
@@ -2537,19 +2793,19 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -2609,7 +2865,7 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/app.Response"
+                                    "$ref": "#/definitions/der-ems_internal_app.Response"
                                 },
                                 {
                                     "type": "object",
@@ -2625,19 +2881,19 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -2697,7 +2953,7 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/app.Response"
+                                    "$ref": "#/definitions/der-ems_internal_app.Response"
                                 },
                                 {
                                     "type": "object",
@@ -2713,19 +2969,19 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -2777,7 +3033,7 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/app.Response"
+                                    "$ref": "#/definitions/der-ems_internal_app.Response"
                                 },
                                 {
                                     "type": "object",
@@ -2793,19 +3049,19 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -2875,7 +3131,7 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/app.Response"
+                                    "$ref": "#/definitions/der-ems_internal_app.Response"
                                 },
                                 {
                                     "type": "object",
@@ -2891,25 +3147,25 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -2979,7 +3235,7 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/app.Response"
+                                    "$ref": "#/definitions/der-ems_internal_app.Response"
                                 },
                                 {
                                     "type": "object",
@@ -2995,19 +3251,19 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -3077,7 +3333,7 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/app.Response"
+                                    "$ref": "#/definitions/der-ems_internal_app.Response"
                                 },
                                 {
                                     "type": "object",
@@ -3093,19 +3349,19 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -3157,7 +3413,7 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/app.Response"
+                                    "$ref": "#/definitions/der-ems_internal_app.Response"
                                 },
                                 {
                                     "type": "object",
@@ -3173,19 +3429,19 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -3255,7 +3511,7 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/app.Response"
+                                    "$ref": "#/definitions/der-ems_internal_app.Response"
                                 },
                                 {
                                     "type": "object",
@@ -3271,19 +3527,19 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -3353,7 +3609,7 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/app.Response"
+                                    "$ref": "#/definitions/der-ems_internal_app.Response"
                                 },
                                 {
                                     "type": "object",
@@ -3369,25 +3625,25 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -3447,7 +3703,7 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/app.Response"
+                                    "$ref": "#/definitions/der-ems_internal_app.Response"
                                 },
                                 {
                                     "type": "object",
@@ -3463,19 +3719,19 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -3527,7 +3783,7 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/app.Response"
+                                    "$ref": "#/definitions/der-ems_internal_app.Response"
                                 },
                                 {
                                     "type": "object",
@@ -3543,25 +3799,25 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/der-ems_internal_app.Response"
                         }
                     }
                 }
@@ -3569,103 +3825,196 @@
         }
     },
     "definitions": {
-        "app.PeriodQuery": {
+        "der-ems_internal_app.CreateFieldBody": {
             "type": "object",
             "required": [
-                "endTime",
-                "startTime"
+                "address",
+                "devices",
+                "enable",
+                "gatewayID",
+                "lat",
+                "lng",
+                "locationName"
             ],
             "properties": {
-                "endTime": {
-                    "type": "string",
-                    "format": "date-time",
-                    "example": "UTC time in ISO-8601"
+                "address": {
+                    "type": "string"
                 },
-                "startTime": {
-                    "type": "string",
-                    "format": "date-time",
-                    "example": "UTC time in ISO-8601"
-                }
-            }
-        },
-        "app.ResolutionWithPeriodQuery": {
-            "type": "object",
-            "required": [
-                "endTime",
-                "resolution",
-                "startTime"
-            ],
-            "properties": {
-                "endTime": {
-                    "type": "string",
-                    "format": "date-time",
-                    "example": "UTC time in ISO-8601"
+                "devices": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/der-ems_internal_app.FieldDeviceInfo"
+                    }
                 },
-                "resolution": {
+                "enable": {
+                    "type": "boolean"
+                },
+                "gatewayID": {
+                    "type": "string"
+                },
+                "lat": {
+                    "type": "number"
+                },
+                "lng": {
+                    "type": "number"
+                },
+                "locationName": {
+                    "type": "string"
+                },
+                "powerCompany": {
                     "type": "string",
                     "enum": [
-                        "day",
-                        "month"
+                        "TPC"
                     ]
                 },
-                "startTime": {
+                "touType": {
                     "type": "string",
-                    "format": "date-time",
-                    "example": "UTC time in ISO-8601"
+                    "enum": [
+                        "Two-section"
+                    ]
+                },
+                "voltageType": {
+                    "type": "string",
+                    "enum": [
+                        "Low voltage",
+                        "High voltage"
+                    ]
                 }
             }
         },
-        "app.Response": {
+        "der-ems_internal_app.FieldDeviceExtraInfo": {
+            "type": "object",
+            "required": [
+                "chargingSources",
+                "energyCapacity",
+                "reservedForGridOutagePercent",
+                "voltage"
+            ],
+            "properties": {
+                "chargingSources": {
+                    "type": "string",
+                    "enum": [
+                        "Solar + Grid",
+                        "Solar"
+                    ]
+                },
+                "energyCapacity": {
+                    "type": "number"
+                },
+                "reservedForGridOutagePercent": {
+                    "type": "integer"
+                },
+                "voltage": {
+                    "type": "number"
+                }
+            }
+        },
+        "der-ems_internal_app.FieldDeviceInfo": {
+            "type": "object",
+            "required": [
+                "modbusID",
+                "modelID",
+                "powerCapacity",
+                "uueid"
+            ],
+            "properties": {
+                "extraInfo": {
+                    "$ref": "#/definitions/der-ems_internal_app.FieldDeviceExtraInfo"
+                },
+                "modbusID": {
+                    "type": "integer"
+                },
+                "modelID": {
+                    "type": "integer"
+                },
+                "powerCapacity": {
+                    "type": "number"
+                },
+                "subDevices": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/der-ems_internal_app.FieldSubDeviceInfo"
+                    }
+                },
+                "uueid": {
+                    "type": "string"
+                }
+            }
+        },
+        "der-ems_internal_app.FieldSubDeviceInfo": {
+            "type": "object",
+            "required": [
+                "modelID",
+                "powerCapacity"
+            ],
+            "properties": {
+                "extraInfo": {
+                    "$ref": "#/definitions/der-ems_internal_app.FieldDeviceExtraInfo"
+                },
+                "modelID": {
+                    "type": "integer"
+                },
+                "powerCapacity": {
+                    "type": "number"
+                }
+            }
+        },
+        "der-ems_internal_app.Response": {
             "type": "object",
             "properties": {
                 "code": {
                     "type": "integer"
                 },
-                "data": {
-                    "type": "object"
-                },
+                "data": {},
                 "msg": {
                     "type": "string"
                 }
             }
         },
-        "app.StartTimeQuery": {
+        "null.Int": {
             "type": "object",
-            "required": [
-                "startTime"
-            ],
             "properties": {
-                "startTime": {
-                    "type": "string",
-                    "format": "date-time",
-                    "example": "UTC time in ISO-8601"
+                "int": {
+                    "type": "integer"
+                },
+                "valid": {
+                    "type": "boolean"
                 }
             }
         },
-        "app.ZoomableQuery": {
+        "null.Int64": {
             "type": "object",
-            "required": [
-                "endTime",
-                "resolution",
-                "startTime"
-            ],
             "properties": {
-                "endTime": {
-                    "type": "string",
-                    "format": "date-time",
-                    "example": "UTC time in ISO-8601"
+                "int64": {
+                    "type": "integer"
                 },
-                "resolution": {
-                    "type": "string",
-                    "enum": [
-                        "hour",
-                        "5minute"
-                    ]
+                "valid": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "null.JSON": {
+            "type": "object",
+            "properties": {
+                "json": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 },
-                "startTime": {
-                    "type": "string",
-                    "format": "date-time",
-                    "example": "UTC time in ISO-8601"
+                "valid": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "null.String": {
+            "type": "object",
+            "properties": {
+                "string": {
+                    "type": "string"
+                },
+                "valid": {
+                    "type": "boolean"
                 }
             }
         },
@@ -3682,7 +4031,7 @@
                     "type": "string"
                 },
                 "parentID": {
-                    "type": "string"
+                    "$ref": "#/definitions/null.Int64"
                 }
             }
         },
@@ -3696,10 +4045,10 @@
                     "type": "string"
                 },
                 "groupParentID": {
-                    "type": "string"
+                    "$ref": "#/definitions/null.Int64"
                 },
                 "groupParentName": {
-                    "type": "string"
+                    "$ref": "#/definitions/null.String"
                 },
                 "id": {
                     "type": "integer"
@@ -3708,7 +4057,7 @@
                     "type": "string"
                 },
                 "name": {
-                    "type": "string"
+                    "$ref": "#/definitions/null.String"
                 },
                 "username": {
                     "type": "string"
@@ -3719,20 +4068,28 @@
             "type": "object",
             "properties": {
                 "batteryLifetimeEnergyACDiffs": {
-                    "type": "object",
-                    "$ref": "#/definitions/services.Float32ArrayFormat"
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
                 },
                 "gridLifetimeEnergyACDiffs": {
-                    "type": "object",
-                    "$ref": "#/definitions/services.Float32ArrayFormat"
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
                 },
                 "loadConsumedLifetimeEnergyACDiffs": {
-                    "type": "object",
-                    "$ref": "#/definitions/services.Float32ArrayFormat"
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
                 },
                 "pvProducedLifetimeEnergyACDiffs": {
-                    "type": "object",
-                    "$ref": "#/definitions/services.Float32ArrayFormat"
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
                 },
                 "timestamps": {
                     "type": "array",
@@ -3746,12 +4103,16 @@
             "type": "object",
             "properties": {
                 "batterySoCs": {
-                    "type": "object",
-                    "$ref": "#/definitions/services.Float32ArrayFormat"
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
                 },
                 "batteryVoltages": {
-                    "type": "object",
-                    "$ref": "#/definitions/services.Float32ArrayFormat"
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
                 },
                 "timeOfUse": {
                     "type": "object",
@@ -3810,8 +4171,10 @@
             "type": "object",
             "properties": {
                 "batteryAveragePowerACs": {
-                    "type": "object",
-                    "$ref": "#/definitions/services.Float32ArrayFormat"
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
                 },
                 "timeOfUse": {
                     "type": "object",
@@ -3892,13 +4255,16 @@
             "type": "object",
             "properties": {
                 "extraInfo": {
-                    "type": "string"
+                    "$ref": "#/definitions/null.JSON"
                 },
                 "modbusID": {
                     "type": "integer"
                 },
                 "modelID": {
                     "type": "integer"
+                },
+                "modelType": {
+                    "type": "string"
                 },
                 "powerCapacity": {
                     "type": "number"
@@ -4063,12 +4429,6 @@
                 }
             }
         },
-        "services.Float32ArrayFormat": {
-            "type": "array",
-            "items": {
-                "type": "number"
-            }
-        },
         "services.GatewayInfo": {
             "type": "object",
             "properties": {
@@ -4090,16 +4450,15 @@
                     "type": "string"
                 },
                 "disabledBy": {
-                    "type": "string"
+                    "$ref": "#/definitions/null.Int64"
                 },
                 "enabledAt": {
                     "type": "string"
                 },
                 "enabledBy": {
-                    "type": "string"
+                    "$ref": "#/definitions/null.Int64"
                 },
                 "location": {
-                    "type": "object",
                     "$ref": "#/definitions/services.LocationInfo"
                 }
             }
@@ -4191,7 +4550,7 @@
                     "type": "string"
                 },
                 "parentID": {
-                    "type": "string"
+                    "$ref": "#/definitions/null.Int64"
                 },
                 "typeID": {
                     "type": "integer"
@@ -4211,7 +4570,7 @@
                     "type": "string"
                 },
                 "parentID": {
-                    "type": "string"
+                    "$ref": "#/definitions/null.Int64"
                 },
                 "typeID": {
                     "type": "integer"
@@ -4265,6 +4624,17 @@
                 }
             }
         },
+        "services.GetSubDeviceModelsResponse": {
+            "type": "object",
+            "properties": {
+                "subDevices": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/services.SubDevicesInfo"
+                    }
+                }
+            }
+        },
         "services.GetUsersResponse": {
             "type": "object",
             "properties": {
@@ -4297,8 +4667,10 @@
             "type": "object",
             "properties": {
                 "gridAveragePowerACs": {
-                    "type": "object",
-                    "$ref": "#/definitions/services.Float32ArrayFormat"
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
                 },
                 "timeOfUse": {
                     "type": "object",
@@ -4333,7 +4705,7 @@
                     "type": "string"
                 },
                 "deletedBy": {
-                    "type": "string"
+                    "$ref": "#/definitions/null.Int64"
                 },
                 "gateways": {
                     "type": "array",
@@ -4348,7 +4720,7 @@
                     "type": "string"
                 },
                 "parentID": {
-                    "type": "string"
+                    "$ref": "#/definitions/null.Int64"
                 },
                 "typeID": {
                     "type": "integer"
@@ -4368,7 +4740,7 @@
             "type": "object",
             "properties": {
                 "address": {
-                    "type": "string"
+                    "$ref": "#/definitions/null.String"
                 },
                 "name": {
                     "type": "string"
@@ -4399,8 +4771,10 @@
             "type": "object",
             "properties": {
                 "loadSelfConsumedEnergyPercentACs": {
-                    "type": "object",
-                    "$ref": "#/definitions/services.Float32ArrayFormat"
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
                 },
                 "timestamps": {
                     "type": "array",
@@ -4414,20 +4788,28 @@
             "type": "object",
             "properties": {
                 "batteryAveragePowerACs": {
-                    "type": "object",
-                    "$ref": "#/definitions/services.Float32ArrayFormat"
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
                 },
                 "gridAveragePowerACs": {
-                    "type": "object",
-                    "$ref": "#/definitions/services.Float32ArrayFormat"
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
                 },
                 "loadAveragePowerACs": {
-                    "type": "object",
-                    "$ref": "#/definitions/services.Float32ArrayFormat"
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
                 },
                 "pvAveragePowerACs": {
-                    "type": "object",
-                    "$ref": "#/definitions/services.Float32ArrayFormat"
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
                 },
                 "timestamps": {
                     "type": "array",
@@ -4447,13 +4829,12 @@
                     "type": "string"
                 },
                 "deletedBy": {
-                    "type": "string"
+                    "$ref": "#/definitions/null.Int64"
                 },
                 "expirationDate": {
                     "type": "string"
                 },
                 "group": {
-                    "type": "object",
                     "$ref": "#/definitions/services.GroupInfo"
                 },
                 "groupID": {
@@ -4466,19 +4847,19 @@
                     "type": "string"
                 },
                 "name": {
-                    "type": "string"
+                    "$ref": "#/definitions/null.String"
                 },
                 "passwordLastChanged": {
                     "type": "string"
                 },
                 "passwordRetryCount": {
-                    "type": "string"
+                    "$ref": "#/definitions/null.Int"
                 },
                 "pwdTokenExpiry": {
                     "type": "string"
                 },
                 "resetPWDToken": {
-                    "type": "string"
+                    "$ref": "#/definitions/null.String"
                 },
                 "updatedAt": {
                     "type": "string"
@@ -4524,8 +4905,10 @@
             "type": "object",
             "properties": {
                 "loadPvConsumedEnergyPercentACs": {
-                    "type": "object",
-                    "$ref": "#/definitions/services.Float32ArrayFormat"
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
                 },
                 "timestamps": {
                     "type": "array",
@@ -4539,8 +4922,10 @@
             "type": "object",
             "properties": {
                 "pvAveragePowerACs": {
-                    "type": "object",
-                    "$ref": "#/definitions/services.Float32ArrayFormat"
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
                 },
                 "timeOfUse": {
                     "type": "object",
@@ -4558,13 +4943,41 @@
             "type": "object",
             "properties": {
                 "extraInfo": {
-                    "type": "string"
+                    "$ref": "#/definitions/null.JSON"
                 },
                 "modelID": {
                     "type": "integer"
                 },
+                "modelType": {
+                    "type": "string"
+                },
                 "powerCapacity": {
                     "type": "number"
+                }
+            }
+        },
+        "services.SubDeviceModelInfo": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "services.SubDevicesInfo": {
+            "type": "object",
+            "properties": {
+                "models": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/services.SubDeviceModelInfo"
+                    }
+                },
+                "type": {
+                    "type": "string"
                 }
             }
         },
@@ -4572,11 +4985,9 @@
             "type": "object",
             "properties": {
                 "energyCosts": {
-                    "type": "object",
                     "$ref": "#/definitions/services.EnergyCostsInfo"
                 },
                 "energyDailyCosts": {
-                    "type": "object",
                     "$ref": "#/definitions/services.EnergyCostsDailyInfo"
                 }
             }
@@ -4604,7 +5015,6 @@
                     "type": "string"
                 },
                 "permissions": {
-                    "type": "object",
                     "$ref": "#/definitions/services.WebpagePermissionsInfo"
                 }
             }

@@ -155,7 +155,6 @@ export default function TimeOfUseCard(props) {
         return sectionData
             .filter((item) => item.policies.length >= 2)
     }, [sectionData])
-    console.log(overLappedSection)
 
     return <div className="card">
         <div className="flex justify-between sm:col-span-2 items-center">

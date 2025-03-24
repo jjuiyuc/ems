@@ -1,6 +1,6 @@
 import { connect } from "react-redux"
 import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom"
-import React, { useEffect, useState } from "react"
+import React, { useEffect } from "react"
 import { useTranslation } from "react-multi-lang"
 import { Snackbar, Alert } from "@mui/material"
 
@@ -8,15 +8,12 @@ import logout from "../utils/logout"
 
 import Sidebar from "../components/Sidebar"
 import TopNav from "../components/TopNav"
-import Sample from "../configs/Sample"
+// import Sample from "../configs/Sample"
 
 import Account from "../pages/Account"
 import AccountManagementGroup from "../pages/AccountManagementGroup"
 import Analysis from "../pages/Analysis"
 import Dashboard from "../pages/Dashboard"
-import EnergyResourcesBattery from "../pages/EnergyResourcesBattery"
-import EnergyResourcesGrid from "../pages/EnergyResourcesGrid"
-import EnergyResourcesSolar from "../pages/EnergyResourcesSolar"
 import TimeOfUse from "../pages/TimeOfUse"
 import AdvancedSettings from "../pages/AdvancedSettings"
 import Settings from "../pages/Settings"
@@ -30,31 +27,6 @@ const routes = {
     ],
     timeOfUseEnergy: [
         <Route element={<TimeOfUse />} path="/time-of-use" key="timeOfUseEnergy" />
-    ],
-    energyResources: [
-        <Route
-            element={<EnergyResourcesGrid />}
-            path="/energy-resources/grid"
-            key="energyResourcesGrid"
-        />,
-        <Route
-            element={<EnergyResourcesBattery />}
-            path="/energy-resources/battery"
-            key="energyResourcesBattery"
-        />,
-        <Route
-            element={<EnergyResourcesSolar />}
-            path="/energy-resources/solar"
-            key="energyResourcesSolar"
-        />,
-        <Route
-            element={
-                <Navigate
-                    to="/energy-resources/solar"
-                    replace />}
-            path="/energy-resources"
-            key="energyResources"
-        />
     ],
     accountManagementGroup: [
         <Route

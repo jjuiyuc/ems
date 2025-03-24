@@ -2,7 +2,6 @@ import { Route, Routes } from "react-router-dom"
 import React from "react"
 import { useTranslation } from "react-multi-lang"
 
-// import logo from "../assets/images/logo.svg"
 import smartGrid from "../assets/images/smartGrids.svg"
 
 import ForgotPassword from "../pages/ForgotPassword"
@@ -20,9 +19,12 @@ function NonLoggedIn() {
 
     const brand = <>
         <h3 className="mt-4 md:mt-8 text-xl xl:text-2xl">
+            <span className="mr-2">
+                Enjoy Life &
+            </span>
             <span className="text-primary-main">
-                Unlock
-            </span> The Potential of Smart Grids
+                The Potential of Smart Grids
+            </span>
         </h3>
     </>
 
@@ -32,8 +34,9 @@ function NonLoggedIn() {
                         hidden md:grid
                         px-8 xl:px-16">
             <div>
+                <h2 className="mb-12 ml-5">Energy Management</h2>
                 <div className="mb-32 ml-5">{brand}</div>
-                <img src={smartGrid} />
+                {/* <img src={smartGrid} /> */}
             </div>
             <Version />
         </div>

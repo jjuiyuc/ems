@@ -19,6 +19,47 @@ import MonthPicker from "../components/MonthPicker"
 
 const { colors } = variables
 
+const MOCK_MODE = true
+
+const mockAnalysisData = {
+    energySources: {
+        allProducedLifetimeEnergyACDiff: 100,
+        gridProducedLifetimeEnergyACDiff: 40,
+        pvProducedLifetimeEnergyACDiff: 40,
+        batteryProducedLifetimeEnergyACDiff: 20,
+        gridProducedEnergyPercentAC: 40,
+        pvProducedEnergyPercentAC: 40,
+        batteryProducedEnergyPercentAC: 20,
+
+        loadConsumedLifetimeEnergyACDiff: 80,
+        gridConsumedLifetimeEnergyACDiff: 10,
+        batteryConsumedLifetimeEnergyACDiff: 10,
+        loadConsumedEnergyPercentAC: 80,
+        gridConsumedEnergyPercentAC: 10,
+        batteryConsumedEnergyPercentAC: 10,
+
+        allConsumedLifetimeEnergyACDiff: 100,
+    },
+    powerState: {
+        timestamps: [1742749150, 1742752750, 1742756350],
+        loadAveragePowerACs: [10, 20, 30],
+        pvAveragePowerACs: [5, 15, 25],
+        batteryAveragePowerACs: [3, 6, 9],
+        gridAveragePowerACs: [2, 4, 6]
+    },
+    accumulatedPowerState: {
+        timestamps: [1742749150, 1742752750, 1742756350],
+        loadConsumedLifetimeEnergyACDiffs: [10, 20, 30],
+        pvProducedLifetimeEnergyACDiffs: [5, 15, 25],
+        batteryLifetimeEnergyACDiffs: [3, 6, 9],
+        gridLifetimeEnergyACDiffs: [2, 4, 6]
+    },
+    selfSupplyRate: {
+        timestamps: [1742749150, 1742752750, 1742756350],
+        loadSelfConsumedEnergyPercentACs: [50, 60, 70]
+    }
+}
+
 const ErrorBox = ({ error, margin = "", message }) => error
     ? <AlertBox
         boxClass={`${margin} negative`}
@@ -249,10 +290,6 @@ export default connect(mapState)(function Analysis(props) {
         [lineChartPowerError, setLineChartPowerError] = useState(""),
         [lineChartPowerLoading, setLineChartPowerLoading] = useState(false),
         [lineChartPowerRes] = useState("5minute"),
-        [preLineChartPower, setPreLineChartPower] = useState(null),
-        [preLineChartPowerError, setPreLineChartPowerError] = useState(""),
-        [preLineChartPowerLoading, setPreLineChartPowerLoading] = useState(false),
-        [preLineChartPowerRes] = useState("5minute"),
         [barChartData, setBarChartData] = useState(null),
         [barChartDataError, setBarChartDataError] = useState(""),
         [barChartDataLoading, setBarChartDataLoading] = useState(false),
@@ -268,6 +305,50 @@ export default connect(mapState)(function Analysis(props) {
     const urlPrefix = `/api/${props.gatewayID}/devices`
     const
         callTodayCards = (startTime, endTime) => {
+            if (MOCK_MODE) {
+                const data = mockAnalysisData.energySources
+                setEnergySourcesTotal({
+                    types: [
+                        {
+                            kwh: data.gridProducedLifetimeEnergyACDiff,
+                            percentage: data.gridProducedEnergyPercentAC,
+                            type: "importFromGrid"
+                        },
+                        {
+                            kwh: data.pvProducedLifetimeEnergyACDiff,
+                            percentage: data.pvProducedEnergyPercentAC,
+                            type: "directSolarSupply"
+                        },
+                        {
+                            kwh: data.batteryProducedLifetimeEnergyACDiff,
+                            percentage: data.batteryProducedEnergyPercentAC,
+                            type: "batteryDischarge"
+                        },
+                    ],
+                    kwh: data.allProducedLifetimeEnergyACDiff
+                })
+                setEnergyDestinations({
+                    types: [
+                        {
+                            kwh: data.loadConsumedLifetimeEnergyACDiff,
+                            percentage: data.loadConsumedEnergyPercentAC,
+                            type: "load"
+                        },
+                        {
+                            kwh: data.gridConsumedLifetimeEnergyACDiff,
+                            percentage: data.gridConsumedEnergyPercentAC,
+                            type: "exportToGrid"
+                        },
+                        {
+                            kwh: data.batteryConsumedLifetimeEnergyACDiff,
+                            percentage: data.batteryConsumedEnergyPercentAC,
+                            type: "chargeToBattery"
+                        },
+                    ],
+                    kwh: data.allConsumedLifetimeEnergyACDiff
+                })
+                return
+            }
             apiCall({
                 onComplete: () => setInfoLoading(false),
                 onError: error => setInfoError(error),
@@ -320,119 +401,84 @@ export default connect(mapState)(function Analysis(props) {
                 url: `${urlPrefix}/energy-distribution-info?startTime=${startTime}&endTime=${endTime}`
             })
         },
-        callYesterdayCards = (preStartTime, preEndTime) => {
-            apiCall({
-                onComplete: () => setPreInfoLoading(false),
-                onError: error => setPreInfoError(error),
-                onSuccess: rawData => {
-                    if (!rawData?.data) return
-
-                    const { data } = rawData
-                    setPreEnergySourcesTotal({
-                        types: [
-                            {
-                                kwh: data.gridProducedLifetimeEnergyACDiff,
-                                percentage: data.gridProducedEnergyPercentAC,
-                                type: "importFromGrid"
-                            },
-                            {
-                                kwh: data.pvProducedLifetimeEnergyACDiff,
-                                percentage: data.pvProducedEnergyPercentAC,
-                                type: "directSolarSupply"
-                            },
-                            {
-                                kwh: data.batteryProducedLifetimeEnergyACDiff,
-                                percentage: data.batteryProducedEnergyPercentAC,
-                                type: "batteryDischarge"
-                            },
-                        ],
-                        kwh: data.allProducedLifetimeEnergyACDiff
-                    })
-                    setPreEnergyDestinations({
-                        types: [
-                            {
-                                kwh: data.loadConsumedLifetimeEnergyACDiff,
-                                percentage: data.loadConsumedEnergyPercentAC,
-                                type: "load"
-                            },
-                            {
-                                kwh: data.gridConsumedLifetimeEnergyACDiff,
-                                percentage: data.gridConsumedEnergyPercentAC,
-                                type: "exportToGrid"
-                            },
-                            {
-                                kwh: data.batteryConsumedLifetimeEnergyACDiff,
-                                percentage: data.batteryConsumedEnergyPercentAC,
-                                type: "chargeToBattery"
-                            },
-                        ],
-                        kwh: data.allConsumedLifetimeEnergyACDiff
-                    })
-                },
-                url: `${urlPrefix}/energy-distribution-info?startTime=${preStartTime}&endTime=${preEndTime}`
-            })
-        },
         callLineChartPower = (startTime, endTime) => {
-            const lineChartPowerUrl = `${urlPrefix}/power-state?`
-                + new URLSearchParams({
-                    startTime, endTime, resolution: lineChartPowerRes
-                }).toString()
+            if (MOCK_MODE) {
+                const {
+                    timestamps,
+                    loadAveragePowerACs,
+                    pvAveragePowerACs,
+                    batteryAveragePowerACs,
+                    gridAveragePowerACs
+                } = mockAnalysisData.powerState
 
-            apiCall({
-                onComplete: () => setLineChartPowerLoading(false),
-                onError: error => setLineChartPowerError(error),
-                onStart: () => setLineChartPowerLoading(true),
-                onSuccess: rawData => {
-                    if (!rawData || !rawData.data) return
+                const labels = timestamps.map(t => t * 1000)
 
-                    const
-                        { data } = rawData,
-                        { timestamps } = data,
-                        labels = timestamps.map(t => t * 1000)
-                    setLineChartPower({
-                        data: {
-                            load: data.loadAveragePowerACs,
-                            solar: data.pvAveragePowerACs,
-                            battery: data.batteryAveragePowerACs,
-                            grid: data.gridAveragePowerACs
-                        },
-                        labels
-                    })
-                },
-                url: lineChartPowerUrl
-            })
-        },
-        callPreLineChartPower = (preStartTime, preEndTime) => {
-            const preLineChartPowerUrl = `${urlPrefix}/power-state?`
-                + new URLSearchParams({
-                    startTime: preStartTime, endTime: preEndTime,
-                    resolution: preLineChartPowerRes
-                }).toString()
+                setLineChartPower({
+                    data: {
+                        load: loadAveragePowerACs,
+                        solar: pvAveragePowerACs,
+                        battery: batteryAveragePowerACs,
+                        grid: gridAveragePowerACs
+                    },
+                    labels
+                })
 
-            apiCall({
-                onComplete: () => setPreLineChartPowerLoading(false),
-                onError: error => setPreLineChartPowerError(error),
-                onSuccess: rawData => {
-                    if (!rawData || !rawData.data) return
+                setLineChartPowerLoading(false)
+            } else {
+                const lineChartPowerUrl = `${urlPrefix}/power-state?`
+                    + new URLSearchParams({
+                        startTime, endTime, resolution: lineChartPowerRes
+                    }).toString()
 
-                    const
-                        { data } = rawData,
-                        { timestamps } = data,
-                        labels = timestamps.map(t => t * 1000)
-                    setPreLineChartPower({
-                        data: {
-                            load: data.loadAveragePowerACs,
-                            solar: data.pvAveragePowerACs,
-                            battery: data.batteryAveragePowerACs,
-                            grid: data.gridAveragePowerACs
-                        },
-                        labels
-                    })
-                },
-                url: preLineChartPowerUrl
-            })
+                apiCall({
+                    onComplete: () => setLineChartPowerLoading(false),
+                    onError: error => setLineChartPowerError(error),
+                    onStart: () => setLineChartPowerLoading(true),
+                    onSuccess: rawData => {
+                        if (!rawData || !rawData.data) return
+
+                        const { data } = rawData
+                        const labels = data.timestamps.map(t => t * 1000)
+
+                        setLineChartPower({
+                            data: {
+                                load: data.loadAveragePowerACs,
+                                solar: data.pvAveragePowerACs,
+                                battery: data.batteryAveragePowerACs,
+                                grid: data.gridAveragePowerACs
+                            },
+                            labels
+                        })
+                    },
+                    url: lineChartPowerUrl
+                })
+            }
         },
         callBarChartData = (startTime, endTime) => {
+            if (MOCK_MODE) {
+                const {
+                    timestamps,
+                    loadConsumedLifetimeEnergyACDiffs,
+                    pvProducedLifetimeEnergyACDiffs,
+                    batteryLifetimeEnergyACDiffs,
+                    gridLifetimeEnergyACDiffs
+                } = mockAnalysisData.accumulatedPowerState
+
+                const labels = timestamps.map(t => t * 1000)
+
+                setBarChartData({
+                    data: {
+                        load: loadConsumedLifetimeEnergyACDiffs,
+                        solar: pvProducedLifetimeEnergyACDiffs,
+                        battery: batteryLifetimeEnergyACDiffs,
+                        grid: gridLifetimeEnergyACDiffs
+                    },
+                    labels
+                })
+
+                setBarChartDataLoading(false)
+                return
+            }
             const barChartDataUrl = `${urlPrefix}/accumulated-power-state?`
                 + new URLSearchParams({
                     startTime, endTime, resolution: tab == "year" ? "month" : "day"
@@ -463,6 +509,22 @@ export default connect(mapState)(function Analysis(props) {
             })
         },
         callLineChartSupply = (startTime, endTime) => {
+            if (MOCK_MODE) {
+                const {
+                    timestamps,
+                    loadSelfConsumedEnergyPercentACs
+                } = mockAnalysisData.selfSupplyRate
+
+                const labels = timestamps.map(t => t * 1000)
+
+                setLineChartSupply({
+                    data: loadSelfConsumedEnergyPercentACs,
+                    labels
+                })
+
+                setLineChartSupplyLoading(false)
+                return
+            }
             const lineChartSupplyUrl = `${urlPrefix}/power-self-supply-rate?`
                 + new URLSearchParams({
                     startTime, endTime, resolution: tab == "year" ? "month" : "day"
@@ -529,27 +591,6 @@ export default connect(mapState)(function Analysis(props) {
         }
     }, [props.gatewayID, tab, startDate, endDate, startMonth])
 
-    useEffect(() => {
-        if (!props.gatewayID) return
-        let preStartTime = "", preEndTime = ""
-
-        if (tab === "day") {
-            preStartTime = prevDate ? moment(prevDate).toISOString() : ""
-            preEndTime = moment(prevDate).add(1, "day").startOf("day").toISOString()
-        }
-        if (!preStartTime || !preEndTime) return
-
-        setPreLineChartPowerLoading(true)
-        setPreInfoLoading(true)
-
-        clearTimeout(timeID.current)
-        timeID.current = setTimeout(() => {
-            callYesterdayCards(preStartTime, preEndTime)
-            callPreLineChartPower(preStartTime, preEndTime)
-        }, 200)
-
-    }, [props.gatewayID, tab, prevDate])
-
     const tabs = ["day", "week", "month", "year", "custom"]
 
     return <>
@@ -608,35 +649,6 @@ export default connect(mapState)(function Analysis(props) {
                             error={lineChartPowerError}
                             message={pageT("chartError")} />
                         <LoadingBox loading={lineChartPowerLoading} />
-                    </div>
-                </div>
-                <h5 className="mt-10 mb-2 ml-8">{pageT("selectPreviousDate")}</h5>
-                <div className="flex items-center">
-                    <PrevDatePicker {...{ prevDate, setPrevDate }} />
-                </div>
-                <div className="gap-8 grid relative md:grid-cols-2 items-start mt-8">
-                    <AnalysisCard
-                        data={preEnergySourcesTotal}
-                        title={pageT("energySourcesTotal")} />
-                    <AnalysisCard
-                        data={preEnergyDestinations}
-                        title={pageT("energyDestinationsTotal")} />
-                    <LoadingBox loading={preInfoLoading} />
-                </div>
-                <div className="card mt-8">
-                    <h4>
-                        {moment(prevDate).format("YYYY/MM/DD")}
-                        <span className="ml-2">{pageT("powerKW")}</span>
-                    </h4>
-                    <div className="max-h-80vh h-160 mt-10 relative w-full">
-                        <LineChart
-                            data={chartRealTimePowerSet({
-                                ...preLineChartPower
-                            })} id="analysisLineChartYesterday" />
-                        <ErrorBox
-                            error={preLineChartPowerError}
-                            message={pageT("chartError")} />
-                        <LoadingBox loading={preLineChartPowerLoading} />
                     </div>
                 </div>
             </>

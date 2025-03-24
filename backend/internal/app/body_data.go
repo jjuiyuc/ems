@@ -38,6 +38,45 @@ type UpdateUserBody struct {
 	Unlock   bool   `form:"unlock"`
 }
 
+// CreateFieldBody godoc
+type CreateFieldBody struct {
+	GatewayID    string            `form:"gatewayID" binding:"required"`
+	LocationName string            `form:"locationName" binding:"required"`
+	Address      string            `form:"address" binding:"required"`
+	Lat          float64           `form:"lat" binding:"required,latitude"`
+	Lng          float64           `form:"lng" binding:"required,longitude"`
+	PowerCompany string            `form:"powerCompany" binding:"oneof='TPC'"`
+	VoltageType  string            `form:"voltageType" binding:"oneof='Low voltage' 'High voltage'"`
+	TOUType      string            `form:"touType" binding:"oneof='Two-section'"`
+	Enable       *bool             `form:"enable" binding:"required"`
+	Devices      []FieldDeviceInfo `form:"devices" binding:"required,gt=0,dive"`
+}
+
+// FieldDeviceInfo godoc
+type FieldDeviceInfo struct {
+	ModelID       int64                 `form:"modelID" binding:"required"`
+	ModbusID      int                   `form:"modbusID" binding:"required"`
+	UUEID         string                `form:"uueid" binding:"required"`
+	PowerCapacity float32               `form:"powerCapacity" binding:"required"`
+	ExtraInfo     *FieldDeviceExtraInfo `form:"extraInfo"`
+	SubDevices    []FieldSubDeviceInfo  `form:"subDevices" binding:"dive"`
+}
+
+// FieldSubDeviceInfo godoc
+type FieldSubDeviceInfo struct {
+	ModelID       int64                 `form:"modelID" binding:"required"`
+	PowerCapacity float32               `form:"powerCapacity" binding:"required"`
+	ExtraInfo     *FieldDeviceExtraInfo `form:"extraInfo"`
+}
+
+// FieldDeviceExtraInfo godoc
+type FieldDeviceExtraInfo struct {
+	ReservedForGridOutagePercent int     `form:"reservedForGridOutagePercent" binding:"required" json:"reservedForGridOutagePercent"`
+	ChargingSources              string  `form:"chargingSources" binding:"required,oneof='Solar + Grid' 'Solar'" json:"chargingSources"`
+	EnergyCapacity               float32 `form:"energyCapacity" binding:"required" json:"energyCapacity"`
+	Voltage                      float32 `form:"voltage" binding:"required" json:"voltage"`
+}
+
 // UpdateFieldGroupsBody godoc
 type UpdateFieldGroupsBody struct {
 	Groups []FieldGroupInfo `form:"groups" binding:"required,dive"`

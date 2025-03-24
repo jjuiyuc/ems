@@ -36,8 +36,10 @@ backend-test-job:
     - cd backend/
     - cat scripts/der-ems.sql | mysql --user=ubiik --password=testing123 der_ems
     - cat scripts/der-ems-group-type.sql | mysql --user=ubiik --password=testing123 der_ems
+    - go install github.com/onsi/ginkgo/v2/ginkgo
+    - go get github.com/boumenot/gocover-cobertura
     - make go-cover
-    - go run github.com/t-yuki/gocover-cobertura < cover.out > coverage.xml
+    - gocover-cobertura < cover.out > coverage.xml
     - sed -i 's;filename=\"gitlab.com/ubiik/ems/der-ems/;filename=\";g' coverage.xml
   artifacts:
     reports:

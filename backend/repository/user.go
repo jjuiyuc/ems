@@ -48,6 +48,7 @@ type UserRepository interface {
 	GetGroupByGroupID(tx *sql.Tx, groupID int64) (*deremsmodels.Group, error)
 	GetGroupsByGroupID(tx *sql.Tx, groupID int64) ([]*deremsmodels.Group, error)
 	GetGroupsByUserID(tx *sql.Tx, userID int64) ([]*deremsmodels.Group, error)
+	GetParentGroupsByUserID(tx *sql.Tx, userID int64) ([]*deremsmodels.Group, error)
 	AuthorizeGroupID(tx *sql.Tx, executedUserID, groupID int64) (exist bool)
 	AuthorizeUserID(tx *sql.Tx, executedUserID, userID int64) (exist bool)
 	GetGroupTypes() ([]*deremsmodels.GroupType, error)
@@ -248,6 +249,27 @@ func (repo defaultUserRepository) GetGroupsByUserID(tx *sql.Tx, userID int64) ([
 			FROM group_path AS gp JOIN %s AS g
 			ON gp.id = g.parent_id
 			AND g.deleted_at IS NULL
+		)
+		SELECT * FROM group_path;`, "`group`", "`group`"), userID)).All(repo.getExecutor(tx))
+}
+
+func (repo defaultUserRepository) GetParentGroupsByUserID(tx *sql.Tx, userID int64) ([]*deremsmodels.Group, error) {
+	return deremsmodels.Groups(
+		qm.SQL(fmt.Sprintf(`
+		WITH RECURSIVE group_path AS
+		(
+		SELECT *
+			FROM %s
+			WHERE id = (
+				SELECT group_id
+				FROM user
+				WHERE id = ?
+			)
+		UNION ALL
+		SELECT g.*
+			FROM group_path AS gp JOIN %s AS g
+			ON gp.parent_id = g.id
+			AND gp.deleted_at IS NULL
 		)
 		SELECT * FROM group_path;`, "`group`", "`group`"), userID)).All(repo.getExecutor(tx))
 }

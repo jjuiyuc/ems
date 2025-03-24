@@ -29,7 +29,8 @@ export default connect(mapState, mapDispatch)(function PowerOutageCard(props) {
         [periodList, setPeriodList] = useState([]),
         [row, setRow] = useState(null),
         [openDelete, setOpenDelete] = useState(false),
-        [loading, setLoading] = useState(false)
+        [loading, setLoading] = useState(false),
+        [otherError, setOtherError] = useState("")
 
     const handleClickDelete = row => {
         setOpenDelete(true)
@@ -85,11 +86,7 @@ export default connect(mapState, mapDispatch)(function PowerOutageCard(props) {
                             msg: errorT("failureToGenerate")
                         })
                         break
-                    default:
-                        props.updateSnackbarMsg({
-                            type: "error",
-                            msg: errorT("noDataMsg")
-                        })
+                    default:setOtherError(err)
                 }
             },
             onSuccess: rawData => {

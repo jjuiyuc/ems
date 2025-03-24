@@ -58,46 +58,39 @@ export default connect(null, mapDispatch)(function AddGroup(props) {
 
     const parentGroupTypeOptions = groupList.filter(item => item.parentID == 1)
         .filter(item => item.typeID == 2)
-    const
-        submit = async () => {
-            const data = {
-                name: groupName,
-                typeID: parseInt(groupType),
-                parentID: parseInt(parentGroup)
-            }
-            await apiCall({
-                method: "post",
-                data,
-                onSuccess: () => {
-                    setOpenAdd(false)
-                    getList()
-                    props.updateSnackbarMsg({
-                        type: "success",
-                        msg: t("dialog.addedSuccessfully")
-                    })
-                    setGroupName("")
-                    setGroupType(null)
-                    setParentGroup(null)
-                },
-                onError: (err) => {
-                    switch (err) {
-                        case 60003:
-                            setGroupNameError({ type: "groupNameExistsOnTheSameLevel" })
-                            props.updateSnackbarMsg({
-                                type: "error",
-                                msg: errorT("groupNameExistsOnTheSameLevel")
-                            })
-                            break
-                        default:
-                            props.updateSnackbarMsg({
-                                type: "error",
-                                msg: errorT("failureToCreate")
-                            })
-                    }
-                },
-                url: "/api/account-management/groups"
+
+    const submit = async () => {
+        const newGroup = {
+            id: Math.max(...groupList.map(g => g.id)) + 1,
+            name: groupName,
+            typeID: parseInt(groupType),
+            parentID: parseInt(parentGroup)
+        }
+
+        const isDuplicate = groupList.some(
+            g => g.name === newGroup.name && g.parentID === newGroup.parentID
+        )
+
+        if (isDuplicate) {
+            setGroupNameError({ type: "groupNameExistsOnTheSameLevel" })
+            props.updateSnackbarMsg({
+                type: "error",
+                msg: errorT("groupNameExistsOnTheSameLevel")
             })
-        },
+            return
+        }
+
+        props.setGroupList([...groupList, newGroup])
+        setOpenAdd(false)
+        props.updateSnackbarMsg({
+            type: "success",
+            msg: t("dialog.addedSuccessfully")
+        })
+        setGroupName("")
+        setGroupType(null)
+        setParentGroup(null)
+    }
+        ,
         cancelClick = () => {
             setOpenAdd(false)
             setGroupName("")

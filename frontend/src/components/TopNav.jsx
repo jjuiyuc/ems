@@ -19,6 +19,7 @@ function TopNav(props) {
     const
         t = useTranslation(),
         commonT = string => t("common." + string)
+    console.log(props.gatewayList)
 
     const locationMap = useMemo(() =>
         props.gatewayList.reduce((acc, cur) => {

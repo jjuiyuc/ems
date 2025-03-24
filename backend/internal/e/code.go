@@ -57,6 +57,12 @@ const (
 	ErrFieldGroupsUpdate                 = 60021
 	ErrFieldIsDisabled                   = 60022
 	ErrDeviceSettingsSync                = 60023
+	ErrGatewayIDIsInvalid                = 60024
+	ErrGatewayIDIsUsed                   = 60025
+	ErrDeviceUUEIDIsInvalid              = 60026
+	ErrDeviceUUEIDIsUsed                 = 60027
+	ErrDeviceModelIsInvalid              = 60028
+	ErrFieldCreate                       = 60029
 	ErrBatterySettingsGen                = 60030
 	ErrBatterySettingsUpdate             = 60031
 	ErrMeterSettingsGen                  = 60032
@@ -67,4 +73,5 @@ const (
 	ErrPowerOutagePeriodsCreate          = 60037
 	ErrPowerOutagePeriodOngoing          = 60038
 	ErrPowerOutagePeriodDelete           = 60039
+	ErrSubDeviceModelsGen                = 60040
 )

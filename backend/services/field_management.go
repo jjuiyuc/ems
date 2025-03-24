@@ -4,10 +4,12 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"math"
 	"time"
 
 	"github.com/sirupsen/logrus"
 	"github.com/volatiletech/null/v8"
+	"golang.org/x/exp/slices"
 
 	"der-ems/internal/app"
 	"der-ems/internal/e"
@@ -16,6 +18,29 @@ import (
 	deremsmodels "der-ems/models/der-ems"
 	"der-ems/repository"
 )
+
+type (
+	// DeviceModelType godoc
+	DeviceModelType string
+)
+
+// XXX: Type Hybrid-Inverter and Inverter would not be sub-device
+const (
+	// HybridInverter godoc
+	HybridInverter DeviceModelType = "Hybrid-Inverter"
+	// Inverter godoc
+	Inverter DeviceModelType = "Inverter"
+)
+
+// FakeModbusIDMapping godoc
+/* XXX: For sub-device, modbusID is fake and mapping from modelID
+   refer https://docs.google.com/spreadsheets/d/1zYMVK3ux4M9QGkaoxpn1FNvMBRbrcfyBu53gtnS3lPs/edit?usp=sharing */
+var FakeModbusIDMapping = map[int64]int{
+	8: 255,
+	3: 253,
+	4: 252,
+	5: 251,
+}
 
 // FieldManagementService godoc
 type FieldManagementService interface {
@@ -27,6 +52,10 @@ type FieldManagementService interface {
 	GenerateDeviceSettings(executedUserID int64, gwUUID string) (deviceSettings *DeviceSettingsData, err error)
 	GenerateDLDeviceMappingInfo(gwID int64) (data []byte, err error)
 	UpdateFieldGroups(executedUserID int64, gwUUID string, groups []app.FieldGroupInfo) (err error)
+	GetSubDeviceModels() (getSubDeviceModels *GetSubDeviceModelsResponse, err error)
+	ValidateGatewayUUID(gwUUID string) (err error)
+	ValidateDeviceUUEID(deviceUUEID string) (err error)
+	CreateField(executedUserID int64, body *app.CreateFieldBody) (err error)
 }
 
 // GetFieldsResponse godoc
@@ -86,6 +115,23 @@ type DeviceSettingsData struct {
 	LocationData      []byte
 }
 
+// GetSubDeviceModelsResponse godoc
+type GetSubDeviceModelsResponse struct {
+	SubDevices []SubDevicesInfo `json:"subDevices"`
+}
+
+// SubDevicesInfo godoc
+type SubDevicesInfo struct {
+	Type   string               `json:"type"`
+	Models []SubDeviceModelInfo `json:"models"`
+}
+
+// SubDeviceModelInfo godoc
+type SubDeviceModelInfo struct {
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
+}
+
 type defaultFieldManagementService struct {
 	repo              *repository.Repository
 	accountManagement AccountManagementService
@@ -115,14 +161,11 @@ func (s defaultFieldManagementService) GetFields(userID int64) (getFields *GetFi
 }
 
 func (s defaultFieldManagementService) GetDeviceModels() (getDeviceModels *GetDeviceModelsResponse, err error) {
-	models, err := s.repo.Gateway.GetDeviceModels()
+	models, err := s.getDeviceModelsInfo()
 	if err != nil {
-		logrus.WithFields(logrus.Fields{
-			"caused-by": "s.repo.Gateway.GetDeviceModels",
-			"err":       err,
-		}).Error()
 		return
 	}
+
 	var getDeviceModelInfos []DeviceModelInfo
 	for _, model := range models {
 		deviceModelInfo := DeviceModelInfo{
@@ -134,6 +177,17 @@ func (s defaultFieldManagementService) GetDeviceModels() (getDeviceModels *GetDe
 	}
 	getDeviceModels = &GetDeviceModelsResponse{
 		Models: getDeviceModelInfos,
+	}
+	return
+}
+
+func (s defaultFieldManagementService) getDeviceModelsInfo() (models []*deremsmodels.DeviceModel, err error) {
+	models, err = s.repo.Gateway.GetDeviceModels()
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.Gateway.GetDeviceModels",
+			"err":       err,
+		}).Error()
 	}
 	return
 }
@@ -207,7 +261,7 @@ func (s defaultFieldManagementService) getFieldDevices(gwID int64) (deviceInfos 
 	}
 
 	for _, device := range devices {
-		if s.isFakeModbusID(device.ModbusID) {
+		if s.isMappingFakeModbusID(device.ModelID) {
 			continue
 		}
 		deviceInfo := DeviceInfo{
@@ -219,14 +273,14 @@ func (s defaultFieldManagementService) getFieldDevices(gwID int64) (deviceInfos 
 			ExtraInfo:     device.ExtraInfo,
 		}
 
-		if device.ModelType != "Hybrid-Inverter" && device.ModelType != "Inverter" {
+		if s.isSubModel(device.ModelType) {
 			deviceInfos = append(deviceInfos, deviceInfo)
 			continue
 		}
 
 		var subDeviceInfos []SubDeviceInfo
 		for _, subDevice := range devices {
-			if subDevice.UUEID == device.UUEID && s.isFakeModbusID(subDevice.ModbusID) {
+			if subDevice.UUEID == device.UUEID && s.isMappingFakeModbusID(subDevice.ModelID) {
 				subDeviceInfo := SubDeviceInfo{
 					ModelType:     subDevice.ModelType,
 					ModelID:       subDevice.ModelID,
@@ -242,9 +296,14 @@ func (s defaultFieldManagementService) getFieldDevices(gwID int64) (deviceInfos 
 	return
 }
 
-func (s defaultFieldManagementService) isFakeModbusID(modbusID int64) bool {
-	// XXX: Fake modbus id decrements from 255
-	return modbusID > 200
+func (s defaultFieldManagementService) isSubModel(deviceType string) bool {
+	dt := DeviceModelType(deviceType)
+	return dt != HybridInverter && dt != Inverter
+}
+
+func (s defaultFieldManagementService) isMappingFakeModbusID(modelID int64) bool {
+	_, ok := FakeModbusIDMapping[modelID]
+	return ok
 }
 
 func (s defaultFieldManagementService) EnableField(executedUserID int64, gwUUID string, enable bool) (err error) {
@@ -619,6 +678,368 @@ func (s defaultFieldManagementService) insertGroupGatewayPermissionLog(tx *sql.T
 	if err := s.repo.User.InsertGroupGatewayPermissionLog(tx, groupGatewayRightLog); err != nil {
 		logrus.WithFields(logrus.Fields{
 			"caused-by": "s.repo.User.InsertGroupGatewayPermissionLog",
+			"err":       err,
+		}).Error()
+	}
+	return
+}
+
+func (s defaultFieldManagementService) GetSubDeviceModels() (getSubDeviceModels *GetSubDeviceModelsResponse, err error) {
+	models, err := s.getDeviceModelsInfo()
+	if err != nil {
+		return
+	}
+
+	subModels := make(map[string][]SubDeviceModelInfo)
+	for _, model := range models {
+		if !s.isSubModel(model.Type) {
+			continue
+		}
+
+		subModelInfo := SubDeviceModelInfo{
+			ID:   model.ID,
+			Name: model.Name,
+		}
+		subModels[model.Type] = append(subModels[model.Type], subModelInfo)
+	}
+	var getSubDevicesInfos []SubDevicesInfo
+	for subModelType, subModelInfos := range subModels {
+		subDevicesInfo := SubDevicesInfo{
+			Type:   subModelType,
+			Models: subModelInfos,
+		}
+		getSubDevicesInfos = append(getSubDevicesInfos, subDevicesInfo)
+	}
+	getSubDeviceModels = &GetSubDeviceModelsResponse{
+		SubDevices: getSubDevicesInfos,
+	}
+	return
+}
+
+func (s defaultFieldManagementService) ValidateGatewayUUID(gwUUID string) (err error) {
+	gateway, err := s.repo.Gateway.GetGatewayByGatewayUUID(nil, gwUUID)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.Gateway.GetGatewayByGatewayUUID",
+			"err":       err,
+		}).Error()
+		err = e.ErrNewGatewayIDIsInvalid
+		return
+	}
+	if s.repo.Gateway.IsGatewayBoundField(gateway) {
+		err = e.ErrNewGatewayIDIsUsed
+	}
+	return
+}
+
+func (s defaultFieldManagementService) ValidateDeviceUUEID(deviceUUEID string) (err error) {
+	deviceModule, err := s.repo.Gateway.GetDeviceModuleByDeviceUUEID(deviceUUEID)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.Gateway.GetDeviceModuleByDeviceUUEID",
+			"err":       err,
+		}).Error()
+		err = e.ErrNewDeviceUUEIDIsInvalid
+		return
+	}
+	if s.repo.Gateway.IsDeviceBoundField(deviceModule.ID) {
+		err = e.ErrNewDeviceUUEIDIsUsed
+	}
+	return
+}
+
+func (s defaultFieldManagementService) CreateField(executedUserID int64, body *app.CreateFieldBody) (err error) {
+	if err = s.ValidateGatewayUUID(body.GatewayID); err != nil {
+		return
+	}
+	for _, device := range body.Devices {
+		if err = s.ValidateDeviceUUEID(device.UUEID); err != nil {
+			return
+		}
+	}
+	if err = s.validateDeviceModels(body); err != nil {
+		return
+	}
+	err = s.processCreateField(executedUserID, body)
+	return
+}
+
+func (s defaultFieldManagementService) validateDeviceModels(body *app.CreateFieldBody) (err error) {
+	modelIDs, subModelIDs, err := s.getDeviceModelIDsAndSubModelIDs()
+	if err != nil {
+		return
+	}
+
+	for _, targetDevice := range body.Devices {
+		if !slices.Contains(modelIDs, targetDevice.ModelID) {
+			err = e.ErrNewDeviceModelIsInvalid
+			return
+		}
+
+		for _, targetSubDevice := range targetDevice.SubDevices {
+			if !slices.Contains(subModelIDs, targetSubDevice.ModelID) {
+				err = e.ErrNewDeviceModelIsInvalid
+				return
+			}
+		}
+	}
+	return
+}
+
+func (s defaultFieldManagementService) getDeviceModelIDsAndSubModelIDs() (modelIDs, subModelIDs []int64, err error) {
+	models, err := s.getDeviceModelsInfo()
+	if err != nil {
+		return
+	}
+
+	for _, model := range models {
+		modelIDs = append(modelIDs, model.ID)
+		if s.isSubModel(model.Type) {
+			subModelIDs = append(subModelIDs, model.ID)
+		}
+	}
+	return
+}
+
+func (s defaultFieldManagementService) processCreateField(executedUserID int64, body *app.CreateFieldBody) (err error) {
+	logrus.Debug("gateway uuid: ", body.GatewayID)
+	tx, err := models.GetDB().BeginTx(context.Background(), nil)
+	if err != nil {
+		return
+	}
+
+	locationID, err := s.insertFieldLocation(tx, body)
+	if err != nil {
+		tx.Rollback()
+		return
+	}
+	logrus.Debug("created location id: ", locationID)
+
+	gateway, err := s.updateFieldGateway(tx, executedUserID, body, locationID)
+	if err != nil {
+		tx.Rollback()
+		return
+	}
+	if err = s.updateGatewayLog(tx, gateway); err != nil {
+		tx.Rollback()
+		return
+	}
+
+	if err = s.insertGroupGatewayPermissionAndLog(tx, executedUserID, gateway); err != nil {
+		tx.Rollback()
+		return
+	}
+
+	if err = s.insertDeviceAndLog(tx, executedUserID, body, gateway.ID); err != nil {
+		tx.Rollback()
+		return
+	}
+
+	tx.Commit()
+	return
+}
+
+func (s defaultFieldManagementService) insertFieldLocation(tx *sql.Tx, body *app.CreateFieldBody) (locationID int64, err error) {
+	now := time.Now().UTC()
+	touLocation, err := s.repo.TOU.GetTOULocationByPowerCompany(tx, body.PowerCompany)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.TOU.GetTOULocationByPowerCompany",
+			"err":       err,
+		}).Error()
+		return
+	}
+
+	location := &deremsmodels.Location{
+		Name:          body.LocationName,
+		Address:       null.StringFrom(body.Address),
+		Lat:           null.Float64From(body.Lat),
+		Lng:           null.Float64From(body.Lng),
+		WeatherLat:    null.Float32From(s.getWeatherLocation(body.Lat)),
+		WeatherLng:    null.Float32From(s.getWeatherLocation(body.Lng)),
+		TOULocationID: null.Int64From(touLocation.ID),
+		VoltageType:   null.StringFrom(body.VoltageType),
+		TOUType:       null.StringFrom(body.TOUType),
+		CreatedAt:     now,
+		UpdatedAt:     now,
+	}
+	if err = s.repo.Location.CreateLocation(tx, location); err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.Location.CreateLocation",
+			"err":       err,
+		}).Error()
+		return
+	}
+	locationID = location.ID
+	return
+}
+
+func (s defaultFieldManagementService) getWeatherLocation(value float64) float32 {
+	const scale = 0.25
+	quotient := int(value / scale)
+	if math.Abs(math.Mod(value, scale)) > scale/2 {
+		if quotient > 0 {
+			return (float32)(quotient+1) * scale
+		}
+		return (float32)(quotient-1) * scale
+	}
+	return (float32)(quotient) * scale
+}
+
+func (s defaultFieldManagementService) updateFieldGateway(tx *sql.Tx, executedUserID int64, body *app.CreateFieldBody, locationID int64) (gateway *deremsmodels.Gateway, err error) {
+	now := time.Now().UTC()
+	gateway, err = s.repo.Gateway.GetGatewayByGatewayUUID(tx, body.GatewayID)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.Gateway.GetGatewayByGatewayUUID",
+			"err":       err,
+		}).Error()
+		return
+	}
+	gateway.LocationID = null.Int64From(locationID)
+	gateway.Enable = null.BoolFrom(*body.Enable)
+	gateway.UpdatedAt = now
+	gateway.UpdatedBy = null.Int64From(executedUserID)
+	if err = s.repo.Gateway.UpdateGateway(tx, gateway); err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.Gateway.UpdateGateway",
+			"err":       err,
+		}).Error()
+	}
+	return
+}
+
+func (s defaultFieldManagementService) insertGroupGatewayPermissionAndLog(tx *sql.Tx, executedUserID int64, gateway *deremsmodels.Gateway) (err error) {
+	parentGroups, err := s.repo.User.GetParentGroupsByUserID(tx, executedUserID)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.User.GetParentGroupsByUserID",
+			"err":       err,
+		}).Error()
+		return
+	}
+
+	for _, group := range parentGroups {
+		logrus.Debug("permitted group id: ", group.ID)
+		var permission *deremsmodels.GroupGatewayRight
+		permission, err = s.insertGroupGatewayPermission(tx, executedUserID, group.ID, gateway.ID, gateway.LocationID)
+		if err != nil {
+			return
+		}
+		if err = s.insertGroupGatewayPermissionLog(tx, permission); err != nil {
+			return
+		}
+	}
+	return
+}
+
+func (s defaultFieldManagementService) insertDeviceAndLog(tx *sql.Tx, executedUserID int64, body *app.CreateFieldBody, gwID int64) (err error) {
+	for _, targetDevice := range body.Devices {
+		var (
+			deviceModule        *deremsmodels.DeviceModule
+			device              *deremsmodels.Device
+			deviceExtraInfoJSON []byte
+		)
+		deviceModule, err = s.repo.Gateway.GetDeviceModuleByDeviceUUEID(targetDevice.UUEID)
+		if err != nil {
+			logrus.WithFields(logrus.Fields{
+				"caused-by": "s.repo.Gateway.GetDeviceModuleByDeviceUUEID",
+				"err":       err,
+			}).Error()
+			err = e.ErrNewDeviceUUEIDIsInvalid
+			return
+		}
+		if targetDevice.ExtraInfo != nil {
+			deviceExtraInfoJSON, err = json.Marshal(targetDevice.ExtraInfo)
+			if err != nil {
+				logrus.WithFields(logrus.Fields{
+					"caused-by": "json.Marshal",
+					"err":       err,
+				}).Error()
+				return
+			}
+		}
+
+		device, err = s.insertDevice(tx, executedUserID, gwID, deviceModule.ID, targetDevice.ModbusID, targetDevice.ModelID, targetDevice.PowerCapacity, null.JSONFrom(deviceExtraInfoJSON))
+		if err != nil {
+			return
+		}
+		if err = s.insertDeviceLog(tx, device); err != nil {
+			return
+		}
+
+		for _, targetSubDevice := range targetDevice.SubDevices {
+			var subDeviceExtraInfoJSON []byte
+			if targetSubDevice.ExtraInfo != nil {
+				subDeviceExtraInfoJSON, err = json.Marshal(targetSubDevice.ExtraInfo)
+				if err != nil {
+					logrus.WithFields(logrus.Fields{
+						"caused-by": "json.Marshal",
+						"err":       err,
+					}).Error()
+					return
+				}
+			}
+
+			fakeModbusID, ok := FakeModbusIDMapping[targetSubDevice.ModelID]
+			if !ok {
+				logrus.Error("No mapping between fake modbusID and modelID: ", targetSubDevice.ModelID)
+				err = e.ErrNewDeviceModelIsInvalid
+				return
+			}
+			device, err = s.insertDevice(tx, executedUserID, gwID, deviceModule.ID, fakeModbusID, targetSubDevice.ModelID, targetSubDevice.PowerCapacity, null.JSONFrom(subDeviceExtraInfoJSON))
+			if err != nil {
+				return
+			}
+			if err = s.insertDeviceLog(tx, device); err != nil {
+				return
+			}
+		}
+	}
+	return
+}
+
+func (s defaultFieldManagementService) insertDevice(tx *sql.Tx, executedUserID, gwID, moduleID int64, modbusID int, modelID int64, powerCapacity float32, extraInfo null.JSON) (device *deremsmodels.Device, err error) {
+	now := time.Now().UTC()
+	device = &deremsmodels.Device{
+		ModbusID:      modbusID,
+		ModuleID:      moduleID,
+		ModelID:       modelID,
+		GWID:          null.Int64From(gwID),
+		PowerCapacity: powerCapacity,
+		ExtraInfo:     extraInfo,
+		CreatedAt:     now,
+		CreatedBy:     null.Int64From(executedUserID),
+		UpdatedAt:     now,
+		UpdatedBy:     null.Int64From(executedUserID),
+	}
+	if err = s.repo.Gateway.CreateDevice(tx, device); err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.Gateway.CreateDevice",
+			"err":       err,
+		}).Error()
+	}
+	return
+}
+
+func (s defaultFieldManagementService) insertDeviceLog(tx *sql.Tx, device *deremsmodels.Device) (err error) {
+	deviceLog := &deremsmodels.DeviceLog{
+		DeviceID:        null.Int64From(device.ID),
+		Modbusid:        null.IntFrom(device.ModbusID),
+		ModuleID:        null.Int64From(device.ModuleID),
+		ModelID:         null.Int64From(device.ModelID),
+		GWID:            device.GWID,
+		PowerCapacity:   null.Float32From(device.PowerCapacity),
+		ExtraInfo:       device.ExtraInfo,
+		Remark:          device.Remark,
+		DeviceUpdatedAt: null.TimeFrom(device.UpdatedAt),
+		DeviceUpdatedBy: device.UpdatedBy,
+		DeviceDeletedAt: device.DeletedAt,
+		DeviceDeletedBy: device.DeletedBy,
+	}
+	if err = s.repo.Gateway.InsertDeviceLog(tx, deviceLog); err != nil {
+		logrus.WithFields(logrus.Fields{
+			"caused-by": "s.repo.Gateway.InsertDeviceLog",
 			"err":       err,
 		}).Error()
 	}

@@ -20,11 +20,12 @@ go-build: clean
 
 swag:
 	@$(shell if [ ! -f $(GOPATH)/bin/swag ] ; then go get -u github.com/swaggo/swag/cmd/swag; fi)
-	$(AT_RUN)$(GOPATH)/bin/swag init -g routers/router.go
+	$(AT_RUN)$(GOPATH)/bin/swag init --parseDependency --parseInternal -g routers/router.go
 
-go-test:
-	@go test -v -count=1 -coverpkg=$(COVER_PKG) -coverprofile cover.out $(GO_PKGS)
+FOCUS ?= .
+go-ginkgo:
+	GIN_MODE=release ginkgo -r -v --coverpkg=$(COVER_PKG) --focus $(FOCUS) --coverprofile=cover.out --junit-report=report.xml ./...
 
-go-cover: go-test
+go-cover: go-ginkgo
 	@go tool cover -html=cover.out -o cover.html
 	@go tool cover -func=cover.out

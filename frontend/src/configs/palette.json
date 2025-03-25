@@ -1,0 +1,74 @@
+{
+    "black": {
+        "main": "#020202",
+        "main-opacity-95": "#02020295"
+    },
+    "blue": {
+        "main": "#43B0FF",
+        "main-opacity-10":"#43B0FF10",
+        "main-opacity-20":"#43B0FF20"
+    },
+    "brand": {"main": "#12c9c9"},
+    "calendar": {"white": "#EEECF1"},
+    "darkGray": {"main": "#303034"},
+    "gray": {
+        "100":"#EEEEEE",
+        "200": "#E0E0E0",
+        "main": "#E0E0E0",
+        "300": "#BDBDBD",
+        "400": "#606060",
+        "400-opacity-20": "#60606020",
+        "500": "#404040",
+        "600": "#303034",
+        "700": "#262628",
+        "800": "#232325",
+        "900": "#1C1C1E"
+    },
+    "green": {
+        "main": "#14EEC7",
+        "main-opacity-10":"#14EEC710",
+        "main-opacity-20":"#14EEC720"
+    },
+    "indigo": {
+        "main": "#7357FF",
+        "main-opacity-10":"#7357FF10",
+        "main-opacity-20":"#7357FF20"
+    },
+    "error": {"main": "#FF4E3E"},
+    "primary": {
+        "50": "#f3fcfc",
+        "100": "#e7fafa",
+        "200": "#c4f2f2",
+        "300": "#a0e9e9",
+        "400": "#59d9d9",
+        "main": "#12c9c9",
+        "main-opacity-10": "#12c9c910",
+        "main-opacity-20": "#12c9c920",
+        "main-opacity-30": "#12c9c930",
+        "main-opacity-90": "#12c9c990",
+        "500": "#12c9c9",
+        "600": "#10b5b5",
+        "700": "#0e9797",
+        "800": "#0b7979",
+        "900": "#096262"
+    },
+    "purple": {
+        "main": "#EF7BE3",
+        "main-opacity-10": "#EF7BE310",
+        "main-opacity-20": "#EF7BE320"
+    },
+    "red": {
+        "main":"#EC1F41"
+    },
+    "success": {"main": "#0FD76B"},
+    "yellow": {
+        "main": "#FBE947",
+        "main-opacity-10":"#FBE94710",
+        "main-opacity-20":"#FBE94720"
+    },
+    "positive": {"main": "#0FD76B"},
+    "negative": {
+        "main": "#FF4E3E",
+        "main-opacity-50": "#FF4E3E50"
+    }
+}

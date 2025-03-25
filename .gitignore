@@ -1,0 +1,6 @@
+*.swp
+cover.out
+cover.html
+.vscode/settings.json
+report.xml
+!temp-dist/

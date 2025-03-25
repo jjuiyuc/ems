@@ -1,0 +1,151 @@
+@use "sass:math";
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+TC&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+a:not([class*="MuiButton"]){
+    @apply duration-300 text-primary-main;
+
+    &:hover {
+        @apply text-primary-700;
+    }
+}
+a:not([class*="transition"]){
+    @apply duration-300 transition-colors;
+}
+aside .logo {
+    height: 26px;
+    width: 116px;
+}
+h1 {
+    @apply font-bold text-gray-200 text-3xl sm:text-3.5xl;
+}
+h2 {
+    @apply font-bold text-3xl text-2xl sm:text-28px;
+}
+h3 {
+    @apply font-bold text-xl sm:text-2xl;
+}
+h4 {
+    @apply font-bold text-lg sm:text-xl;
+}
+h5 {
+    @apply text-base;
+}
+h6 {
+    @apply text-sm;
+}
+.bg-image-grid {
+    background-image:
+        linear-gradient(rgb(50, 50, 50) 1.5px, transparent 1px),
+        linear-gradient(to right, rgb(50, 50, 50) 1px, transparent 1px);
+    background-position: -1px -1px;
+    background-size: 24px 24px;
+}
+.box {
+    @apply border border-gray-500 px-6 py-4 rounded-3xl;
+
+    &.negative {
+        @apply border-negative-main bg-negative-main-opacity-50 text-red-200;
+    }
+}
+.card {
+    @apply bg-gray-900 rounded-3xl;
+    @apply px-6 md:px-10;
+    @apply py-4 md:py-8;
+
+    &.chart {
+        @apply px-4 md:px-8;
+    }
+    &.narrow {
+        @apply px-4 md:px-6;
+    }
+    &.short {
+        @apply py-4 md:py-6;
+    }
+
+    .header {
+        @apply sm:flex items-center h-9 justify-between mb-6;
+    }
+
+    .subCard {
+        @apply bg-gray-700 my-4 rounded-2.5xl
+                px-4 py-3 md:px-6 md:py-4;
+    }
+}
+.light-card {
+    @apply bg-gray-800 rounded-3xl;
+    @apply px-6 md:px-10;
+    @apply py-4 md:py-8;
+
+    &.chart {
+        @apply px-4 md:px-8;
+    }
+    &.narrow {
+        @apply px-4 md:px-6;
+    }
+    &.short {
+        @apply py-4 md:py-6;
+    }
+
+    .header {
+        @apply sm:flex items-center h-9 justify-between mb-6;
+    }
+}
+.long-card {
+    @apply bg-gray-900 rounded-3xl;
+    @apply py-4 md:py-8;
+}
+.page-header {
+    @apply sm:flex items-center justify-between mb-8;
+
+    h1 {
+        @apply mb-3 sm:mb-0;
+    }
+}
+.top-menu {
+
+        a {
+            @apply flex items-center text-white;
+
+            &:hover {
+                @apply  text-white;
+            }
+            &.active {
+                @apply  cursor-default text-white;
+            }
+    }
+}
+.sidebar-menu {
+    li {
+        a {
+            @apply flex items-center pl-7 py-4 text-gray-300;
+
+            &:hover {
+                @apply bg-gray-800 text-gray-300;
+            }
+            &.active {
+                @apply bg-gray-600 cursor-default font-bold text-white;
+            }
+
+            svg {
+                @apply mr-3;
+            }
+        }
+    }
+}
+.text-11px {
+    @apply text-xs;
+    transform: scale(0.917);
+}
+.text-13px {
+   font-size: 13px;
+}
+.userMenu {
+    li {
+        @apply gap-3 grid cursor-pointer duration-300 items-center px-4 py-2
+                grid-cols-auto-1fr transition-colors hover:bg-gray-600;
+    }
+}

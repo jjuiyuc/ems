@@ -1,0 +1,55 @@
+.clock {
+    @apply rounded-full relative;
+
+    > div {
+        @apply h-full w-full;
+    }
+
+    .bg {
+        @apply p-3.5 relative;
+    }
+
+    .ticks {
+        @apply bg-gray-800 h-full relative rounded-full w-full;
+
+        div {
+            @apply absolute border-gray-200 border-l-4 border-r-4 h-0.5
+                    origin-center w-full;
+            left: 0;
+            top: calc(50% - 0.0625rem);
+
+            @for $i from 2 through 12 {
+                &:nth-child(#{$i}) {
+                    transform: rotate(($i - 1) * 15deg);
+                }
+            }
+        }
+    }
+
+    .text {
+        @apply absolute grid grid-cols-2 grid-rows-3 inset-0 p-6 text-xs;
+
+        > div {
+            @apply grid;
+        }
+
+        div:first-child,
+        div:last-child {
+            @apply col-span-2 text-center;
+        }
+        div:nth-child(2),
+        div:nth-child(3) {
+            @apply items-center;
+        }
+        div:nth-child(3) {
+            @apply justify-end;
+        }
+        div:last-child {
+            @apply items-end;
+        }
+    }
+
+    canvas {
+        @apply absolute block h-full inset-0 m-0 p-0 w-full;
+    }
+}

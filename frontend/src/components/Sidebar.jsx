@@ -9,7 +9,7 @@ import { ReactComponent as AccountGroup } from "../assets/icons/group.svg"
 import { ReactComponent as Analysis } from "../assets/icons/analysis.svg"
 import { ReactComponent as Dashboard } from "../assets/icons/dashboard.svg"
 import { ReactComponent as Menu } from "../assets/icons/menu.svg"
-import { ReactComponent as Settings } from "../assets/icons/settings.svg"
+// import { ReactComponent as Settings } from "../assets/icons/settings.svg"
 import { ReactComponent as Timer } from "../assets/icons/timer.svg"
 
 const navs = {
@@ -21,8 +21,8 @@ const navs = {
         { icon: <Timer />, path: "time-of-use", text: "timeOfUseEnergy" },
     accountManagementGroup:
         { icon: <AccountGroup />, path: "account-management-group", text: "accountManagementGroup" },
-    settings:
-        { icon: <Settings />, path: "settings", text: "settings" },
+    // settings:
+    //     { icon: <Settings />, path: "settings", text: "settings" },
     advancedSettings:
         { icon: <AdvancedSettings fontSize="medium" />, path: "advanced-settings", text: "advancedSettings" }
 }

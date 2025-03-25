@@ -50,16 +50,16 @@ const mockWebpage = [
             "delete": true
         }
     },
-    {
-        "id": 10,
-        "name": "settings",
-        "permissions": {
-            "create": true,
-            "read": true,
-            "update": true,
-            "delete": true
-        }
-    },
+    // {
+    //     "id": 10,
+    //     "name": "settings",
+    //     "permissions": {
+    //         "create": true,
+    //         "read": true,
+    //         "update": true,
+    //         "delete": true
+    //     }
+    // },
     {
         "id": 11,
         "name": "advancedSettings",

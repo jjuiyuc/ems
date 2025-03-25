@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useMemo } from "react"
+import { useState, useRef, useMemo } from "react"
 import { Button, Box, FormControl, InputLabel, MenuItem, Stack, Select, TextField } from "@mui/material"
 import { useTranslation } from "react-multi-lang"
 import moment from "moment"
@@ -133,9 +133,11 @@ export default function TimeOfUseCard(props) {
         return sectionData.reduce((acc, item) => {
             const
                 { endTime, startTime, policies } = item,
-                duration = moment.duration(getMoment(endTime).diff(getMoment(startTime))).as("minutes")
+                duration = moment.duration(getMoment(endTime)
+                    .diff(getMoment(startTime)))
+                    .as("minutes")
 
-            acc.data.push(duration)
+            acc.data?.push(duration)
             switch (policies.length) {
                 case 0:
                     acc.backgroundColor.push('transparent')
@@ -165,10 +167,6 @@ export default function TimeOfUseCard(props) {
                     <TimerIcon className="h-8 text-gray-400 w-8" />
                 </div>
                 <h2 className="font-bold ml-4">{pageT("timeOfUse")}</h2>
-                {/* <h6 className="border-solid rounded-lg border-gray-500 border
-                    px-4 py-2 opacity-60 ml-4 mr-2">低壓-單向</h6>
-                <h6 className="border-solid rounded-lg border-gray-500 border
-                    px-4 py-2 opacity-60">兩段式</h6> */}
             </div>
             <Button
                 // onClick={() => setTab(t)}
@@ -178,53 +176,67 @@ export default function TimeOfUseCard(props) {
                 {commonT("save")}
             </Button>
         </div>
-        <div className="flex items-center mt-12">
-            <div className="pr-6">
-                <Box sx={{ minWidth: 200 }}>
+        <div className="flex flex-col lg:flex-row items-center mt-12 gap-6 w-full">
+            <div className="w-full lg:w-auto lg:pr-6">
+                <Box sx={{ minWidth: 200 }} className="w-full">
                     <FormControl fullWidth>
-                        <InputLabel id="demo-simple-select-label">{pageT("tariff")}</InputLabel>
+                        <InputLabel id="tariff-select-label">
+                            {pageT("tariff")}
+                        </InputLabel>
                         <Select
-                            labelId="demo-simple-select-label"
-                            id="demo-simple-select"
+                            labelId="tariff-select-label"
+                            id="tariff-select"
                             value={tariff}
                             label="Tariff"
-                            onChange={handleChange}>
-                            {categories.map(({ label, value }, i) =>
-                                <MenuItem key={i} value={value}>{label}</MenuItem>)}
+                            onChange={handleChange}
+                        >
+                            {categories?.map(({ label, value }, i) => (
+                                <MenuItem key={i} value={value}>
+                                    {label}
+                                </MenuItem>
+                            ))}
                         </Select>
                     </FormControl>
                 </Box>
             </div>
-            <div className="flex-wrap lg:flex border-l border-gray-400 border-solid pl-6">
-                <Stack direction="row" spacing={1.5}>
-                    {dayTabs.map((t, i) =>
+            <div
+                className="w-full lg:w-auto flex flex-wrap justify-start
+               border-t lg:border-t-0 lg:border-l border-gray-400 border-solid
+               pt-6 lg:pt-0 lg:pl-6"
+            >
+                <Stack direction="row" spacing={1.5} className="flex-wrap">
+                    {dayTabs?.map((t, i) => (
                         <Button
+                            key={"st-d" + i}
                             className="py-0.5"
                             color="gray"
                             onClick={() => setDayTab(t)}
                             filter={dayTab === t ? "selected" : ""}
-                            key={"st-d" + i}
                             radius="pill"
-                            variant="contained">
+                            variant="contained"
+                        >
                             {pageT(t)}
-                        </Button>)}
+                        </Button>
+                    ))}
                 </Stack>
             </div>
         </div>
-        <div className="flex items-start mt-12">
-            <Clock size={{
-                height: "auto", width: "clamp(12rem,24vw,27.5rem)",
-                aspectRatio: "1 / 1"
-            }} dataset={clockDataset} id="touClock" />
-            <div className="mb-12 mt-4">
-                {Object.keys(policyConfig).map((policy, i) => {
+        <div className="flex flex-col lg:flex-row items-start mt-12 gap-8">
+            <div className="w-full lg:w-[27.5rem] aspect-square">
+                <Clock
+                    size={{ height: "100%", width: "100%", aspectRatio: "1 / 1" }}
+                    dataset={clockDataset} id="touClock" />
+            </div>
+            <div className="mb-12 mt-4 flex-1 w-full">
+                {Object?.keys(policyConfig)?.map((policy, i) => {
                     const priceGroup = policyPrice[policy]
                     return (
                         <div className="mb-12 ml-12" key={policy + i}>
                             <div className="flex items-center text-white mb-4">
                                 {policyConfig[policy].nameEditable
                                     ? <>
-                                        <div className="bg-blue-main h-2 rounded-full mr-3 w-2" />
+                                        <div className="bg-blue-main h-2
+                                            rounded-full mr-3 w-2" />
                                         <TextField
                                             className=""
                                             id="outlined-basic"
@@ -245,7 +257,9 @@ export default function TimeOfUseCard(props) {
                                     : <>
                                         <div className="h-2 rounded-full mr-3 w-2"
                                             style={{ background: colors[policy] }} />
-                                        <h5 className="font-bold">{policyConfig[policy].name}</h5>
+                                        <h5 className="font-bold">
+                                            {policyConfig[policy].name}
+                                        </h5>
                                     </>
                                 }
                                 {policyConfig[policy].deletable ?
@@ -260,49 +274,56 @@ export default function TimeOfUseCard(props) {
                                         />
                                     </div> : null}
                             </div>
-                            {priceGroup.map(({ startTime, endTime, basicPrice, rate }, index) => {
+                            {priceGroup?.map(({ startTime, endTime, basicPrice, rate }, index) => {
                                 const onChange = (key, value) => {
                                     setPolicyPrice((prevPolicyPrice) => {
                                         const prevPriceGroup = prevPolicyPrice[policy]
                                         return {
                                             ...prevPolicyPrice,
-                                            [policy]: prevPriceGroup.map((row, i) =>
+                                            [policy]: prevPriceGroup?.map((row, i) =>
                                                 i === index
                                                     ? { ...row, [key]: value }
                                                     : row)
                                         }
                                     })
                                 }
-                                const timeError = overLappedSection.some((section) => {
+                                const timeError = overLappedSection?.some((section) => {
                                     return startTime <= section.startTime && section.endTime <= endTime
                                 })
                                 return (
-                                    <div key={`${policy}-${i}-${index}`} className="time-range-picker grid
-                                        grid-cols-settings-input gap-x-4 items-center mt-4">
-                                        <TimeRangePicker
-                                            timeError={timeError}
-                                            key={index}
-                                            startTime={startTime}
-                                            endTime={endTime}
-                                            basicPrice={basicPrice}
-                                            rate={rate}
-                                            setStartTime={(time) => onChange("startTime", time)}
-                                            setEndTime={(time) => onChange("endTime", time)}
-                                            setBasicPrice={(price) => onChange("basicPrice", price)}
-                                            setRate={(price) => onChange("rate", price)}
-                                        />
-                                        {index ?
-                                            <div className="ml-2 mt-4 h-4 w-4 flex cursor-pointer">
-                                                <DeleteIcon
-                                                    onClick={() => {
-                                                        const newPolicyPrice = {
-                                                            ...policyPrice,
-                                                            [policy]: priceGroup.filter((_, i) => i !== index)
-                                                        }
-                                                        setPolicyPrice(newPolicyPrice)
-                                                    }}
-                                                />
-                                            </div> : <div></div>}
+                                    <div
+                                        key={`${policy}-${i}-${index}`}
+                                        className="time-range-picker w-full overflow-auto">
+                                        <div className="grid min-w-[40rem]
+                                            grid-cols-settings-input gap-x-4 gap-y-4
+                                            items-center mt-4">
+                                            <TimeRangePicker
+                                                timeError={timeError}
+                                                key={index}
+                                                startTime={startTime}
+                                                endTime={endTime}
+                                                basicPrice={basicPrice}
+                                                rate={rate}
+                                                setStartTime={(time) => onChange("startTime", time)}
+                                                setEndTime={(time) => onChange("endTime", time)}
+                                                setBasicPrice={(price) => onChange("basicPrice", price)}
+                                                setRate={(price) => onChange("rate", price)}
+                                            />
+                                            {index
+                                                ? <div className="ml-2 mt-4 h-4
+                                                    w-4 flex cursor-pointer">
+                                                    <DeleteIcon
+                                                        onClick={() => {
+                                                            const newPolicyPrice = {
+                                                                ...policyPrice,
+                                                                [policy]: priceGroup?.filter((_, i) => i !== index)
+                                                            }
+                                                            setPolicyPrice(newPolicyPrice)
+                                                        }}
+                                                    />
+                                                </div>
+                                                : <div></div>}
+                                        </div>
                                     </div>
                                 )
                             })}
@@ -314,7 +335,12 @@ export default function TimeOfUseCard(props) {
                                             ...policyPrice,
                                             [policy]: [
                                                 ...priceGroup,
-                                                { startTime: "", endTime: "", basicPrice: "", rate: "" }
+                                                {
+                                                    startTime: "",
+                                                    endTime: "",
+                                                    basicPrice: "",
+                                                    rate: ""
+                                                }
                                             ]
                                         }
                                         setPolicyPrice(newPolicyPrice)
@@ -346,7 +372,12 @@ export default function TimeOfUseCard(props) {
 
                                 const newPolicyPrice = {
                                     ...policyPrice,
-                                    [newKey]: [{ startTime: "", endTime: "", basicPrice: "", rate: "" }]
+                                    [newKey]: [{
+                                        startTime: "",
+                                        endTime: "",
+                                        basicPrice: "",
+                                        rate: ""
+                                    }]
                                 }
                                 setPolicyPrice(newPolicyPrice)
                             }}

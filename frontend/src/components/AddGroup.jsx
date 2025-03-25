@@ -138,7 +138,7 @@ export default connect(null, mapDispatch)(function AddGroup(props) {
                     label={pageT("groupType")}
                     onChange={changeGroupType}
                     value={groupType}
-                    onBlur={groupTypeError}
+                    onBlur={() => setGroupTypeError(groupType == null)}
                     error={groupTypeError}
                     helperText={groupTypeError ? errorT("selectError") : ""}
                     defaultValue=""
@@ -154,7 +154,7 @@ export default connect(null, mapDispatch)(function AddGroup(props) {
                     select
                     label={pageT("parentGroup")}
                     onChange={changeParentGroup}
-                    onBlur={parentGroupError}
+                    onBlur={() => setParentGroupError(parentGroup == null)}
                     value={parentGroup}
                     error={parentGroupError}
                     helperText={parentGroupError ? errorT("selectError") : ""}

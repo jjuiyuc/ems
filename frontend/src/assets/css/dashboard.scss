@@ -1,0 +1,28 @@
+$color: theme("colors.gray.900");
+
+.card-diagram {
+    @apply relative;
+
+    &::after {
+        @apply absolute border-6 border-transparent h-0 w-0;
+
+        content: "";
+    }
+
+    &.arrow-bottom::after {
+        border-top-color: $color;
+        @apply left-1/2 -ml-1.5 top-full;
+    }
+    &.arrow-right::after {
+        border-left-color: $color;
+        @apply left-full -mt-1.5 top-1/2;
+    }
+    &.arrow-left::after {
+        border-right-color: $color;
+        @apply left-0 -mt-1.5 -ml-3 top-1/2;
+    }
+    &.arrow-top::after {
+        border-bottom-color: $color;
+        @apply left-1/2 -ml-1.5 -mt-3 top-0;
+    }
+}
